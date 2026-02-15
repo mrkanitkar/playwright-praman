@@ -16,3 +16,14 @@
  */
 export { test, expect } from '@playwright/test';
 // export { defineConfig } from './core/config/index.js';  // TODO: uncomment when config module is implemented
+
+/**
+ * Praman library version.
+ *
+ * @example
+ * ```typescript
+ * import { VERSION } from 'playwright-praman';
+ * console.log(VERSION);
+ * ```
+ */
+export const VERSION = '1.0.0-dev' as const;
