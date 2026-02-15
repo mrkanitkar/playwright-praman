@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.ts linguist-language=TypeScript
+*.md diff=markdown
+*.json diff=json

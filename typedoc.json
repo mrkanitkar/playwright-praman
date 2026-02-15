@@ -1,0 +1,21 @@
+{
+  "entryPoints": [
+    "src/index.ts",
+    "src/ai/index.ts",
+    "src/intents/index.ts",
+    "src/vocabulary/index.ts",
+    "src/fe/index.ts",
+    "src/reporters/index.ts"
+  ],
+  "out": "docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": true
+  },
+  "treatWarningsAsErrors": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "readme": "none"
+}
