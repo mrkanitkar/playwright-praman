@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
-      - 'src/**'
+      - 'src/**/*.ts'
       - 'typedoc.json'
   workflow_dispatch:
 

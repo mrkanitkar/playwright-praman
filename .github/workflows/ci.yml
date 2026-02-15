@@ -112,3 +112,23 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm audit --audit-level=high
+      - run: npx eslint --no-warn-ignored --rule 'security/*:error' src/
+
+  docs-check:
+    name: Documentation Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx typedoc --validation
+      - name: Install Docusaurus deps
+        working-directory: docs
+        run: npm ci
+      - name: Build Docusaurus
+        working-directory: docs
+        run: npm run build -- --no-minify
