@@ -1,39 +1,63 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
-
 const config: Config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: 'Praman',
+  tagline: 'AI-First SAP UI5 Test Automation for Playwright',
   favicon: 'img/favicon.ico',
 
-  // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
-    v4: true, // Improve compatibility with the upcoming Docusaurus v4
+    v4: true,
   },
 
-  // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
+  // Custom domain: praman.zestest.in
+  url: 'https://praman.zestest.in',
   baseUrl: '/',
 
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'mrkanitkar',
+  projectName: 'playwright-praman',
+  trailingSlash: false,
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
   },
+
+  plugins: [
+    // TypeDoc plugin — auto-generates API reference pages from TSDoc
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        entryPoints: [
+          '../src/index.ts',
+          '../src/ai/index.ts',
+          '../src/intents/index.ts',
+          '../src/vocabulary/index.ts',
+          '../src/fe/index.ts',
+          '../src/reporters/index.ts',
+        ],
+        tsconfig: '../tsconfig.json',
+        out: 'docs/api',
+        sidebar: {
+          autoConfiguration: true,
+          pretty: true,
+        },
+        readme: 'none',
+        excludePrivate: true,
+        excludeProtected: true,
+        excludeInternal: true,
+      },
+    ],
+  ],
 
   presets: [
     [
@@ -41,26 +65,11 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: 'https://github.com/mrkanitkar/playwright-praman/edit/main/docs/',
+          showLastUpdateTime: true,
+          showLastUpdateAuthor: true,
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        blog: false, // Enable when blog posts are added
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -69,29 +78,55 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/praman-social-card.png',
+    metadata: [
+      { name: 'keywords', content: 'praman, playwright, sap, ui5, testing, automation, fiori, ai' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+    ],
     colorMode: {
+      defaultMode: 'light',
       respectPrefersColorScheme: true,
     },
+    announcementBar: {
+      id: 'v1_launch',
+      content:
+        '🚀 Praman v1.0 is under active development. <a href="/docs">Read the docs</a> to get started.',
+      backgroundColor: '#4f46e5',
+      textColor: '#ffffff',
+      isCloseable: true,
+    },
     navbar: {
-      title: 'My Site',
+      title: 'Praman',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Praman Logo',
         src: 'img/logo.svg',
       },
+      hideOnScroll: true,
       items: [
+        // ── Menu 1: Documentation ──
         {
           type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          sidebarId: 'docsSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Documentation',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        // ── Menu 2: API Reference (auto-generated by TypeDoc) ──
         {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
+          to: '/docs/api',
+          position: 'left',
+          label: 'API Reference',
+        },
+        // ── Menu 3: Blog (enable when posts are added) ──\n        // { to: '/blog', label: 'Blog', position: 'left' },
+        // ── Right side ──
+        {
+          type: 'search',
           position: 'right',
+        },
+        {
+          href: 'https://github.com/mrkanitkar/playwright-praman',
+          'aria-label': 'GitHub',
+          position: 'right',
+          className: 'header-github-link',
         },
       ],
     },
@@ -99,28 +134,22 @@ const config: Config = {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: 'Documentation',
           items: [
-            {
-              label: 'Tutorial',
-              to: '/docs/intro',
-            },
+            { label: 'Introduction', to: '/docs' },
+            { label: 'API Reference', to: '/docs/api' },
           ],
         },
         {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+              label: 'GitHub',
+              href: 'https://github.com/mrkanitkar/playwright-praman',
             },
             {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'X',
-              href: 'https://x.com/docusaurus',
+              label: 'npm',
+              href: 'https://www.npmjs.com/package/playwright-praman',
             },
           ],
         },
@@ -128,21 +157,28 @@ const config: Config = {
           title: 'More',
           items: [
             {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              label: 'GitHub Discussions',
+              href: 'https://github.com/mrkanitkar/playwright-praman/discussions',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      logo: {
+        alt: 'Praman',
+        src: 'img/logo.svg',
+        width: 50,
+        height: 50,
+      },
+      copyright: `Crafted with Prudence. Powered by Purpose. | Playwright + Praman — Better Together<br/>Copyright © ${new Date().getFullYear()} Zestest. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+      additionalLanguages: ['bash', 'json', 'typescript'],
+    },
+    tableOfContents: {
+      minHeadingLevel: 2,
+      maxHeadingLevel: 4,
     },
   } satisfies Preset.ThemeConfig,
 };

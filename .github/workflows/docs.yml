@@ -30,16 +30,13 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
+      # Root install — provides TypeScript source for docusaurus-plugin-typedoc
       - run: npm ci
       - run: npm run build
-      - run: npx typedoc
+      # Docusaurus install + build (docusaurus-plugin-typedoc auto-generates API docs)
       - name: Install Docusaurus deps
         working-directory: docs
         run: npm ci
-      - name: Copy API docs into Docusaurus
-        run: |
-          mkdir -p docs/docs/api
-          cp -r docs-api/* docs/docs/api/ 2>/dev/null || true
       - name: Build Docusaurus
         working-directory: docs
         run: npm run build

@@ -31,6 +31,7 @@ Thumbs.db
 docs/.docusaurus/
 docs/build/
 docs/api/
+docs/docs/api/
 
 # Generated
 skills/playwright-praman-sap-testing/SKILL.md

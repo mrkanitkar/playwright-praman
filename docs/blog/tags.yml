@@ -1,19 +1,24 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+praman:
+  label: Praman
+  permalink: /praman
+  description: Praman platform updates
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+playwright:
+  label: Playwright
+  permalink: /playwright
+  description: Playwright integration
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+sap-ui5:
+  label: SAP UI5
+  permalink: /sap-ui5
+  description: SAP UI5 testing
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+ai:
+  label: AI
+  permalink: /ai
+  description: AI-first test automation
+
+release:
+  label: Release
+  permalink: /release
+  description: Release notes
