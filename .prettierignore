@@ -1,0 +1,9 @@
+dist/
+coverage/
+node_modules/
+docs/.docusaurus/
+docs/build/
+*.json
+!.prettierrc.json
+!.commitlintrc.json
+CHANGELOG.md

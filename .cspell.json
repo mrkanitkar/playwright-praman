@@ -1,0 +1,20 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "praman", "playwright-praman", "tsup", "vitest", "docusaurus", "pino", "commitlint",
+    "fiori", "sapui", "odata", "btp", "saml", "flp", "walkme",
+    "combobox", "thenable", "webcomponent", "webcomponents",
+    "cyclonedx", "sbom", "provenance", "commitizen",
+    "redaction", "hermetic", "serializable", "introspectable",
+    "wdi5", "opentelemetry", "otel", "otlp", "camelcase",
+    "semver", "pageobject", "kebabcase", "nodenext",
+    "zestest", "mrkanitkar", "dhikraft"
+  ],
+  "ignorePaths": [
+    "node_modules", "dist", "coverage", "*.lock",
+    "playwright-report", ".auth", "docs/build"
+  ],
+  "flagWords": ["blacklist", "whitelist", "master", "slave"],
+  "suggestWords": ["allowlist", "denylist", "main", "replica"]
+}

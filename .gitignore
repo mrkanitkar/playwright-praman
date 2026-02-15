@@ -1,0 +1,38 @@
+# Build output
+dist/
+*.tsbuildinfo
+
+# Dependencies
+node_modules/
+
+# Test output
+coverage/
+test-results/
+playwright-report/
+blob-report/
+.auth/
+
+# IDE
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Docs build
+docs/.docusaurus/
+docs/build/
+docs/api/
+
+# Generated
+skills/playwright-praman-sap-testing/SKILL.md
+src/proxy/typed/*.generated.ts
+*.sbom.json

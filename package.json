@@ -1,0 +1,135 @@
+{
+  "name": "playwright-praman",
+  "version": "1.0.0",
+  "description": "AI-First SAP UI5 Test Automation Platform for Playwright",
+  "author": "support@zestest.in",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./ai": {
+      "import": "./dist/ai/index.js",
+      "types": "./dist/ai/index.d.ts"
+    },
+    "./intents": {
+      "import": "./dist/intents/index.js",
+      "types": "./dist/intents/index.d.ts"
+    },
+    "./vocabulary": {
+      "import": "./dist/vocabulary/index.js",
+      "types": "./dist/vocabulary/index.d.ts"
+    },
+    "./fe": {
+      "import": "./dist/fe/index.js",
+      "types": "./dist/fe/index.d.ts"
+    },
+    "./reporters": {
+      "import": "./dist/reporters/index.js",
+      "types": "./dist/reporters/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist coverage playwright-report test-results .auth",
+    "lint": "eslint src/ tests/ --max-warnings=0",
+    "lint:fix": "eslint src/ tests/ --fix --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"docs/**/*.md\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "spellcheck": "cspell \"src/**/*.ts\" \"docs/**/*.md\" --no-progress",
+    "deadcode": "knip",
+    "mdlint": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#docs/build\"",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:unit:ui": "vitest --ui",
+    "test:unit:coverage": "vitest run --coverage",
+    "test:integration": "playwright test",
+    "test:integration:ui": "playwright test --ui",
+    "ci": "npm run lint && npm run typecheck && npm run test:unit && npm run build",
+    "ci:full": "npm run ci && npm run test:integration && npm run spellcheck && npm run deadcode && npm run mdlint",
+    "docs:dev": "cd docs && npx docusaurus start",
+    "docs:build": "cd docs && npx docusaurus build",
+    "docs:api": "typedoc",
+    "generate:proxies": "tsx scripts/generate-typed-proxies.ts",
+    "generate:skill": "tsx scripts/generate-skill-md.ts",
+    "generate:sbom": "cyclonedx-npm --output-file playwright-praman.sbom.json --spec-version 1.5",
+    "generate:schema": "tsx scripts/generate-json-schema.ts",
+    "audit": "npm audit --audit-level=high",
+    "audit:fix": "npm audit fix",
+    "prepublishOnly": "npm run ci",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "dotenv": "17.3.1",
+    "pino": "10.3.1",
+    "zod": "4.3.6",
+    "zod-to-json-schema": "3.25.1"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.50.0 <2.0.0"
+  },
+  "optionalDependencies": {
+    "openai": "6.22.0",
+    "@opentelemetry/api": "1.9.0",
+    "@opentelemetry/sdk-node": "0.212.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "tsup": "8.5.1",
+    "tsx": "4.21.0",
+    "vitest": "4.0.18",
+    "@vitest/coverage-v8": "4.0.18",
+    "@vitest/ui": "4.0.18",
+    "@playwright/test": "1.58.2",
+    "eslint": "9.39.2",
+    "typescript-eslint": "8.55.0",
+    "eslint-plugin-security": "3.0.1",
+    "eslint-plugin-jsdoc": "62.5.5",
+    "eslint-plugin-import-x": "4.16.1",
+    "eslint-plugin-unicorn": "63.0.0",
+    "prettier": "3.8.1",
+    "eslint-config-prettier": "10.1.8",
+    "husky": "9.1.7",
+    "lint-staged": "16.2.7",
+    "@commitlint/cli": "20.4.1",
+    "@commitlint/config-conventional": "20.4.1",
+    "typedoc": "0.28.17",
+    "typedoc-plugin-markdown": "4.10.0",
+    "markdownlint-cli2": "0.20.0",
+    "knip": "5.83.1",
+    "cspell": "9.6.4",
+    "@size-limit/file": "12.0.0",
+    "size-limit": "12.0.0",
+    "pino-pretty": "13.1.3",
+    "@cyclonedx/cyclonedx-npm": "4.1.2",
+    "release-please": "17.2.1"
+  },
+  "keywords": [
+    "playwright",
+    "sap",
+    "ui5",
+    "testing",
+    "automation",
+    "fiori",
+    "ai-first",
+    "enterprise"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrkanitkar/playwright-praman.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mrkanitkar/playwright-praman/issues"
+  },
+  "homepage": "https://github.com/mrkanitkar/playwright-praman#readme"
+}

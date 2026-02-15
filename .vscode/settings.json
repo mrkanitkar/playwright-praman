@@ -1,0 +1,54 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  "editor.rulers": [100],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.preferTypeOnlyAutoImports": true,
+
+  "eslint.useFlatConfig": true,
+  "eslint.validate": ["typescript"],
+
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "playwright.reuseBrowser": true,
+  "testing.defaultGutterClickAction": "debug",
+
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": {
+    "**/dist": true,
+    "**/coverage": true,
+    "**/.auth": true
+  },
+
+  "search.exclude": {
+    "**/dist": true,
+    "**/coverage": true,
+    "**/node_modules": true,
+    "**/playwright-report": true
+  },
+
+  "cSpell.words": [
+    "praman", "playwright", "dhikraft", "tsup", "vitest", "docusaurus", "pino",
+    "commitlint", "fiori", "sapui", "odata", "flp",
+    "combobox", "walkme", "webcomponent", "thenable"
+  ]
+}
