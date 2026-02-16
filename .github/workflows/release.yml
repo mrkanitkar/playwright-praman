@@ -44,7 +44,7 @@ jobs:
       - run: npm run build
       - name: Validate export map
         run: npm run check:exports
-      - run: npm run generate:sbom
+      - run: npm run generate:sbom -- --ignore-npm-errors
       - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
