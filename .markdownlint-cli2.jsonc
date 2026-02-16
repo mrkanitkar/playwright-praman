@@ -4,6 +4,7 @@
   },
   "ignores": [
     "plans/plan.md",
+    "plans/phase1plan.md",
     "plans/setup.md",
     "skills/playwright-praman-sap-testing/skills-tdd.md",
     "node_modules/"

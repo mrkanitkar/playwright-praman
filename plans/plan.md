@@ -2,14 +2,14 @@
 
 ## Architecture & Rebuild Plan
 
-| Property         | Value                                   |
-| ---------------- | --------------------------------------- |
-| **Document ID**  | PRAMAN-ARCH-PLAN-001                    |
-| **Version**      | 2.1.0                                   |
-| **Status**       | 🟢 Phase 0 COMPLETE — Baseline Verified |
-| **Author**       | Principal Architect                     |
-| **Created**      | 2025-02-14                              |
-| **Last Updated** | 2026-02-16                              |
+| Property         | Value                                                           |
+| ---------------- | --------------------------------------------------------------- |
+| **Document ID**  | PRAMAN-ARCH-PLAN-001                                            |
+| **Version**      | 2.1.0                                                           |
+| **Status**       | 🟢 Phase 1 COMPLETE — 504 tests, 40 test files, 36 source files |
+| **Author**       | Principal Architect                                             |
+| **Created**      | 2025-02-14                                                      |
+| **Last Updated** | 2026-02-16                                                      |
 
 ---
 
@@ -1002,7 +1002,7 @@ Every decision in this plan was verified against official best practices from th
 | Phase       | Focus                     | Duration | Key Deliverables                                                                                                                                                                                                                                                                 |
 | ----------- | ------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Phase 0** | Architecture & Design     | 2 weeks  | ✅ COMPLETE. plan.md v2.1.0, npm v1.0.1, 10 ESLint plugins, dual ESM+CJS, 6 AI agents, 8 skill files, CI/CD 3 OS × 3 Node.                                                                                                                                                       |
-| **Phase 1** | Core Infrastructure       | 3 weeks  | Config (Zod), errors, logging (pino), types, PlaywrightCompat, selector engine                                                                                                                                                                                                   |
+| **Phase 1** | Core Infrastructure       | 3 weeks  | ✅ COMPLETE. 504 tests, 40 test files, 36 source files, 12 barrels. Config (Zod), errors (10 subclasses), logging (pino+redaction), OTel (NoOp), types, PlaywrightCompat, selector engine, matchers, retry, version-compare, step-decorator, wait-helpers. 98.92% stmt coverage. |
 | **Phase 2** | Bridge + Proxy            | 4 weeks  | BridgeAdapter interface, all 3 adapters, browser scripts, single unified proxy (D16), 20 typed proxies, UI5Object proxy chain (D17), API resolver (D19), object map lifecycle (D20), shared strategy logic (D21), auto-gen signatures (D22), discovery factory integration (D18) |
 | **Phase 3** | Fixtures + Auth + Nav     | 3 weeks  | All fixtures assembled, global setup, auth strategies, FLP navigation, WorkZone                                                                                                                                                                                                  |
 | **Phase 4** | Modules + Table + FE      | 3 weeks  | UI5 modules, Fiori Elements (ListReport, ObjectPage)                                                                                                                                                                                                                             |
@@ -1025,19 +1025,21 @@ Every decision in this plan was verified against official best practices from th
 | Write CONTRIBUTING.md      | Contributor guidelines                                                                     |
 | Configure ESLint           | Flat config + security plugin + 300 LOC max rule                                           |
 
-### Phase 1 — Core Infrastructure (Weeks 3–5)
+### Phase 1 — Core Infrastructure (Weeks 3–5) ✅ COMPLETE
 
-| Task                     | Files                                                 | Tests                                                                                                     |
-| ------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| PramanConfigSchema (Zod) | `core/config/schema.ts`, `core/config/loader.ts`      | Config validation, env override, NaN rejection, `Readonly<PramanConfig>` output                           |
-| Error hierarchy          | `core/errors/*.ts` (10 subclasses + `codes.ts`)       | Error creation, serialization, `retryable` flag, `attempted`, `details`, ControlError self-healing fields |
-| pino logger              | `core/logging/logger.ts`, `core/logging/redaction.ts` | Child loggers, secret redaction                                                                           |
-| OTel setup               | `core/telemetry/otel.ts`, `core/telemetry/spans.ts`   | Zero-overhead when disabled                                                                               |
-| PlaywrightCompat         | `core/compat/playwright-compat.ts`                    | Version detection, API normalization                                                                      |
-| Types                    | `core/types/*.ts`                                     | Canonical UI5Selector, PramanConfig                                                                       |
-| Utils                    | `core/utils/*.ts`                                     | wait-helpers, retry (backoff+jitter), step-decorator, version-compare                                     |
-| Selector engine          | `selectors/*.ts`                                      | Registration, parsing                                                                                     |
-| Custom matchers          | `matchers/*.ts`                                       | Web-first UI5 assertions via `expect.extend()`                                                            |
+**Completed**: 2026-02-16 | **Tests**: 504 | **Files**: 36 source + 12 barrels + 40 test files | **Coverage**: 98.92% stmts
+
+| Task                     | Files                                                 | Tests                                                                                                     | Status |
+| ------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------ |
+| PramanConfigSchema (Zod) | `core/config/schema.ts`, `core/config/loader.ts`      | Config validation, env override, NaN rejection, `Readonly<PramanConfig>` output                           | ✅     |
+| Error hierarchy          | `core/errors/*.ts` (10 subclasses + `codes.ts`)       | Error creation, serialization, `retryable` flag, `attempted`, `details`, ControlError self-healing fields | ✅     |
+| pino logger              | `core/logging/logger.ts`, `core/logging/redaction.ts` | Child loggers, secret redaction (14 paths incl. OAuth2 tokens)                                            | ✅     |
+| OTel setup               | `core/telemetry/otel.ts`, `core/telemetry/spans.ts`   | Zero-overhead when disabled (NoOp pattern)                                                                | ✅     |
+| PlaywrightCompat         | `core/compat/playwright-compat.ts`                    | Version detection, 8 feature flags, API normalization                                                     | ✅     |
+| Types                    | `core/types/*.ts`                                     | Canonical UI5Selector, PramanConfig, BridgeAdapter, controls (70+ interfaces)                             | ✅     |
+| Utils                    | `core/utils/*.ts`                                     | wait-helpers, retry (backoff+jitter), step-decorator, version-compare, constants                          | ✅     |
+| Selector engine          | `selectors/*.ts`                                      | Parser + DOM engine registration, DoS protection                                                          | ✅     |
+| Custom matchers          | `matchers/*.ts`                                       | 8 check functions (UI5 + table matchers), raw logic for Phase 2 fixture wiring                            | ✅     |
 
 ### Phase 2 — Bridge + Proxy (Weeks 6–9)
 
