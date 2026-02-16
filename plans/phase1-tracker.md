@@ -102,12 +102,12 @@ of focused work.
 
 | #   | Batch | Files                                                      | Est. Out | Depends       | Status |
 | --- | ----- | ---------------------------------------------------------- | -------- | ------------- | ------ |
-| 21  | B3a   | `src/core/config/schema.ts`                                | ~1,500   | B1a           | [ ]    |
-| 22  | B3a-t | `tests/unit/core/config/schema.test.ts`                    | ~1,200   | B3a           | [ ]    |
-| 23  | TH1   | `tests/helpers/mock-config.ts` + `mock-page.ts`            | ~800     | B3a           | [ ]    |
-| 24  | B3b   | `src/core/config/loader.ts`                                | ~1,500   | B3a, B2a      | [ ]    |
-| 25  | B3b-t | `tests/unit/core/config/loader.test.ts`                    | ~1,000   | B3b, TH1      | [ ]    |
-| 26  | B3c   | `src/core/config/index.ts` barrel + **SUB-PHASE 1.1 GATE** | ~400     | B3a, B3b, B2h | [ ]    |
+| 21  | B3a   | `src/core/config/schema.ts`                                | ~1,500   | B1a           | [x]    |
+| 22  | B3a-t | `tests/unit/core/config/schema.test.ts`                    | ~1,200   | B3a           | [x]    |
+| 23  | TH1   | `tests/helpers/mock-config.ts` + `mock-page.ts`            | ~800     | B3a           | [x]    |
+| 24  | B3b   | `src/core/config/loader.ts`                                | ~1,500   | B3a, B2a      | [x]    |
+| 25  | B3b-t | `tests/unit/core/config/loader.test.ts`                    | ~1,000   | B3b, TH1      | [x]    |
+| 26  | B3c   | `src/core/config/index.ts` barrel + **SUB-PHASE 1.1 GATE** | ~400     | B3a, B3b, B2h | [x]    |
 
 ### Sub-Phase 1.2 — Infrastructure (Batches B4-B7)
 
@@ -235,10 +235,10 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 
 | Sub-Phase          | Batches | Done   | Remaining | %       |
 | ------------------ | ------- | ------ | --------- | ------- |
-| 1.1 Foundation     | 26      | 20     | 6         | 77%     |
+| 1.1 Foundation     | 26      | 26     | 0         | 100%    |
 | 1.2 Infrastructure | 13      | 0      | 13        | 0%      |
 | 1.3 Playwright     | 7       | 0      | 7         | 0%      |
-| **Total**          | **46**  | **20** | **26**    | **43%** |
+| **Total**          | **46**  | **26** | **20**    | **57%** |
 
 ---
 
