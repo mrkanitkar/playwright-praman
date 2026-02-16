@@ -64,7 +64,7 @@ throw new ControlError({
 
 ## Testing
 
-- Unit: Vitest, hermetic (no network), `*.test.ts`, coverage ≥ 90%
+- Unit: Vitest, hermetic (no network), `*.test.ts`, tiered coverage (100%/95%/90% per-file)
 - Integration: Playwright, `*.spec.ts`, use `test.step()`
 - NEVER use `page.waitForTimeout()` — use `waitForUI5Stable()`
 

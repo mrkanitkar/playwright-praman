@@ -66,7 +66,7 @@ throw new ControlError({
 
 - Unit tests: Vitest, hermetic, `*.test.ts`
 - Integration tests: Playwright, `*.spec.ts`, use `test.step()`
-- Coverage threshold: 90% statements, 85% branches
+- Coverage: Tiered (100% errors/API, 95% core, 90% global), per-file enforced via @vitest/coverage-v8
 - Mock bridge with typed test doubles from `tests/helpers/`
 
 ## Commands
@@ -92,8 +92,9 @@ For detailed domain knowledge, see `skills/playwright-praman-sap-testing/`:
 | ------------------------------ | ----------------------------- |
 | Architecture decisions         | `skills-architect.md`         |
 | TypeScript implementation      | `skills-implementer.md`       |
+| TDD, RED-GREEN-REFACTOR cycle  | `skills-tdd.md`               |
+| Unit/integration tests         | `skills-tester.md`            |
 | Playwright fixtures, selectors | `skills-playwright-expert.md` |
 | SAP UI5 controls, FLP, OData   | `skills-sap-ui5-expert.md`    |
-| Unit/integration tests         | `skills-tester.md`            |
 | PR review, quality gates       | `skills-reviewer.md`          |
 | CI/CD, security, build         | `skills-security-build.md`    |

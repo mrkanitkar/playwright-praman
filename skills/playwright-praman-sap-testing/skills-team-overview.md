@@ -53,6 +53,10 @@ or any future AI coding agent.
 │  │           Owns: UI5 control types, FLP, OData, RecordReplay API,         │
 │  │                 bridge scripts, SAP authentication                       │
 │  │                                                                          │
+│  ├── 🔴🟢🔵 TDD AGENT (skills-tdd.md)                                        │
+│  │       Owns: RED-GREEN-REFACTOR cycle enforcement, test-first workflow,   │
+│  │             anti-pattern prevention, TDD compliance verification         │
+│  │                                                                          │
 │  ├── 🧪 TEST ENGINEER AGENT (skills-tester.md)                              │
 │  │       Owns: Unit tests (Vitest), integration tests (Playwright),         │
 │  │             behavioral equivalence, coverage, hermetic mocks             │
@@ -76,13 +80,16 @@ or any future AI coding agent.
 
 ```text
 ┌──────────┐     ┌───────────┐     ┌──────────────┐     ┌──────────┐
-│  HUMAN   │────▶│ ARCHITECT │────▶│ IMPLEMENTER  │────▶│  TESTER  │
-│  (Issue) │     │ (Design)  │     │ (Code)       │     │ (Tests)  │
+│  HUMAN   │────▶│ ARCHITECT │────▶│     TDD      │────▶│  TESTER  │
+│  (Issue) │     │ (Design)  │     │  (RED-GREEN) │     │   (Impl) │
 └──────────┘     └───────────┘     └──────────────┘     └──────────┘
                                           │                    │
-                                   ┌──────┴──────┐            │
-                                   │   PW Expert │            │
-                                   │  UI5 Expert │            │
+                                          │             ┌──────┴──────┐
+                                          │             │ IMPLEMENTER │
+                                   ┌──────┴──────┐     │  PW Expert  │
+                                   │ RED: Test   │     │ UI5 Expert  │
+                                   │ GREEN: Code │     └─────────────┘
+                                   │ REFACTOR    │            │
                                    └─────────────┘            │
                                                               ▼
 ┌──────────┐     ┌───────────┐     ┌──────────────┐     ┌──────────┐
@@ -93,28 +100,30 @@ or any future AI coding agent.
 
 ### 3.2 When to Use Which Agent
 
-| Task                                               | Primary Agent    | Supporting Agent(s)                 |
-| -------------------------------------------------- | ---------------- | ----------------------------------- |
-| New module design                                  | Architect        | —                                   |
-| Interface/type definition                          | Architect        | Implementer                         |
-| Core infrastructure code (config, errors, logging) | Implementer      | —                                   |
-| Bridge adapter implementation                      | Implementer      | SAP UI5 Expert                      |
-| Proxy handler implementation                       | Implementer      | SAP UI5 Expert, Playwright Expert   |
-| Fixture implementation                             | Implementer      | Playwright Expert                   |
-| Custom matchers (`expect.extend`)                  | Implementer      | Playwright Expert                   |
-| Browser-evaluated scripts                          | Implementer      | SAP UI5 Expert                      |
-| Unit tests                                         | Tester           | —                                   |
-| Integration tests                                  | Tester           | Playwright Expert, SAP UI5 Expert   |
-| Behavioral equivalence tests                       | Tester           | SAP UI5 Expert                      |
-| PR review                                          | Reviewer         | —                                   |
-| CI pipeline changes                                | Security & Build | —                                   |
-| Dependency updates                                 | Security & Build | —                                   |
-| Security audit                                     | Security & Build | Reviewer                            |
-| Documentation (TSDoc)                              | Implementer      | —                                   |
-| Documentation (Docusaurus)                         | Architect        | —                                   |
-| SKILL.md generation                                | Architect        | SAP UI5 Expert                      |
-| Bug diagnosis                                      | Implementer      | Playwright Expert or SAP UI5 Expert |
-| Performance optimization                           | Implementer      | SAP UI5 Expert                      |
+| Task                                               | Primary Agent    | Supporting Agent(s)                            |
+| -------------------------------------------------- | ---------------- | ---------------------------------------------- |
+| New module design                                  | Architect        | —                                              |
+| Interface/type definition                          | Architect        | Implementer                                    |
+| Core infrastructure code (config, errors, logging) | TDD              | Implementer                                    |
+| Bridge adapter implementation                      | TDD              | Implementer, SAP UI5 Expert                    |
+| Proxy handler implementation                       | TDD              | Implementer, SAP UI5 Expert, Playwright Expert |
+| Fixture implementation                             | TDD              | Implementer, Playwright Expert                 |
+| Custom matchers (`expect.extend`)                  | TDD              | Implementer, Playwright Expert                 |
+| Browser-evaluated scripts                          | TDD              | Implementer, SAP UI5 Expert                    |
+| Unit tests                                         | TDD              | Tester                                         |
+| Integration tests                                  | TDD              | Tester, Playwright Expert, SAP UI5 Expert      |
+| Behavioral equivalence tests                       | Tester           | SAP UI5 Expert                                 |
+| Bug fixes                                          | TDD              | Implementer                                    |
+| Refactoring                                        | TDD              | Implementer                                    |
+| PR review                                          | Reviewer         | TDD (workflow compliance)                      |
+| CI pipeline changes                                | Security & Build | —                                              |
+| Dependency updates                                 | Security & Build | —                                              |
+| Security audit                                     | Security & Build | Reviewer                                       |
+| Documentation (TSDoc)                              | Implementer      | —                                              |
+| Documentation (Docusaurus)                         | Architect        | —                                              |
+| SKILL.md generation                                | Architect        | SAP UI5 Expert                                 |
+| Bug diagnosis                                      | Implementer      | Playwright Expert or SAP UI5 Expert            |
+| Performance optimization                           | Implementer      | SAP UI5 Expert                                 |
 
 ### 3.3 Conflict Resolution
 
@@ -134,8 +143,9 @@ When two agents produce conflicting outputs:
 | ---------------------------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------- |
 | [skills-architect.md](skills-architect.md)                 | Principal Architect       | 5-layer architecture, D1–D29, module boundaries, API design, architectural review         |
 | [skills-implementer.md](skills-implementer.md)             | TypeScript Implementer    | Proxy patterns, bridge adapters, error hierarchy, config, logging, ESM, Zod               |
-| [skills-reviewer.md](skills-reviewer.md)                   | Code Reviewer             | PR review, 29-decision compliance, quality gates, anti-pattern detection                  |
+| [skills-tdd.md](skills-tdd.md)                             | TDD Specialist            | RED-GREEN-REFACTOR cycle, test-first workflow, anti-pattern prevention, TDD compliance    |
 | [skills-tester.md](skills-tester.md)                       | Test Engineer             | Vitest (hermetic), Playwright (integration), golden master, coverage, mocking             |
+| [skills-reviewer.md](skills-reviewer.md)                   | Code Reviewer             | PR review, 29-decision compliance, quality gates, anti-pattern detection                  |
 | [skills-sap-ui5-expert.md](skills-sap-ui5-expert.md)       | SAP UI5 Domain Expert     | 500+ control types, FLP, OData V2/V4, RecordReplay, ElementRegistry, bridge scripts       |
 | [skills-playwright-expert.md](skills-playwright-expert.md) | Playwright Expert         | Fixtures, selectors, assertions, expect.extend(), project dependencies, trace             |
 | [skills-security-build.md](skills-security-build.md)       | Security & Build Engineer | GitHub Actions, npm provenance, SBOM, eslint-plugin-security, bundle size, release-please |
@@ -230,7 +240,7 @@ throw new ControlError({
 | **eslint-plugin-import-x**       | Import hygiene                   | Included in lint       | Blocking                   |
 | **eslint-plugin-unicorn**        | Modernization rules              | Included in lint       | Blocking                   |
 | **TypeScript 5.9**               | Type checking (strict)           | `npm run typecheck`    | 0 errors                   |
-| **Vitest**                       | Unit tests (hermetic)            | `npm run test:unit`    | 90% coverage               |
+| **Vitest**                       | Unit tests (hermetic)            | `npm run test:unit`    | Tiered: 100%/95%/90%       |
 | **tsup**                         | ESM bundle build                 | `npm run build`        | Clean build                |
 | **@microsoft/api-extractor**     | API report generation            | Part of build pipeline | No regressions             |
 | **TypeDoc**                      | API documentation                | `npm run docs:api`     | All public APIs documented |
