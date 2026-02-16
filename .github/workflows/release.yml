@@ -4,6 +4,13 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Force publish to npm (skip release-please)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -29,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: ${{ needs.release-please.outputs.release_created || github.event.inputs.publish == 'true' }}
     environment:
       name: npm
       url: https://www.npmjs.com/package/playwright-praman

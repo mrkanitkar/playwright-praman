@@ -2,9 +2,12 @@
 
 > AI-First SAP UI5 Test Automation Platform for Playwright
 
-[![CI](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml/badge.svg)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml)
+> [!NOTE]
+> **Coming soon for actual use.** The package scaffold is published; full functionality is under active development.
+
+[![CI](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/playwright-praman)](https://www.npmjs.com/package/playwright-praman)
-[![License](https://img.shields.io/npm/l/playwright-praman)](./LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 
 | | Windows | macOS | Linux |
 |---|---|---|---|
@@ -99,4 +102,4 @@ docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/playwright:v1.52.0-nobl
 
 ## License
 
-[MIT](./LICENSE)
+[Apache-2.0](./LICENSE)
