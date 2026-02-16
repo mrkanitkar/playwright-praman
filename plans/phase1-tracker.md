@@ -87,16 +87,16 @@ of focused work.
 
 | #   | Batch | Files                                                                              | Est. Out | Depends  | Status |
 | --- | ----- | ---------------------------------------------------------------------------------- | -------- | -------- | ------ |
-| 11  | B2a   | `src/core/errors/codes.ts` + `tests/unit/core/errors/codes.test.ts`                | ~600     | B1a      | [ ]    |
-| 12  | B2b   | `src/core/errors/base.ts`                                                          | ~1,500   | B2a      | [ ]    |
-| 13  | B2b-t | `tests/unit/core/errors/base.test.ts`                                              | ~1,200   | B2b      | [ ]    |
-| 14  | TH3   | `tests/helpers/error-test-runner.ts`                                               | ~600     | B2b      | [ ]    |
-| 15  | B2c   | `src/core/errors/config-error.ts` + test                                           | ~1,200   | B2b, TH3 | [ ]    |
-| 16  | B2d   | `src/core/errors/bridge-error.ts` + `control-error.ts` + tests                     | ~1,800   | B2b, TH3 | [ ]    |
-| 17  | B2e   | `src/core/errors/auth-error.ts` + `navigation-error.ts` + `odata-error.ts` + tests | ~2,000   | B2b, TH3 | [ ]    |
-| 18  | B2f   | `src/core/errors/selector-error.ts` + `timeout-error.ts` + tests                   | ~1,500   | B2b, TH3 | [ ]    |
-| 19  | B2g   | `src/core/errors/ai-error.ts` + `plugin-error.ts` + tests                          | ~1,500   | B2b, TH3 | [ ]    |
-| 20  | B2h   | `src/core/errors/index.ts` barrel                                                  | ~400     | B2c-B2g  | [ ]    |
+| 11  | B2a   | `src/core/errors/codes.ts` + `tests/unit/core/errors/codes.test.ts`                | ~600     | B1a      | [x]    |
+| 12  | B2b   | `src/core/errors/base.ts`                                                          | ~1,500   | B2a      | [x]    |
+| 13  | B2b-t | `tests/unit/core/errors/base.test.ts`                                              | ~1,200   | B2b      | [x]    |
+| 14  | TH3   | `tests/helpers/error-test-runner.ts`                                               | ~600     | B2b      | [x]    |
+| 15  | B2c   | `src/core/errors/config-error.ts` + test                                           | ~1,200   | B2b, TH3 | [x]    |
+| 16  | B2d   | `src/core/errors/bridge-error.ts` + `control-error.ts` + tests                     | ~1,800   | B2b, TH3 | [x]    |
+| 17  | B2e   | `src/core/errors/auth-error.ts` + `navigation-error.ts` + `odata-error.ts` + tests | ~2,000   | B2b, TH3 | [x]    |
+| 18  | B2f   | `src/core/errors/selector-error.ts` + `timeout-error.ts` + tests                   | ~1,500   | B2b, TH3 | [x]    |
+| 19  | B2g   | `src/core/errors/ai-error.ts` + `plugin-error.ts` + tests                          | ~1,500   | B2b, TH3 | [x]    |
+| 20  | B2h   | `src/core/errors/index.ts` barrel                                                  | ~400     | B2c-B2g  | [x]    |
 
 #### Config (B3a-B3d, TH1)
 
@@ -235,10 +235,10 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 
 | Sub-Phase          | Batches | Done   | Remaining | %       |
 | ------------------ | ------- | ------ | --------- | ------- |
-| 1.1 Foundation     | 26      | 10     | 16        | 38%     |
+| 1.1 Foundation     | 26      | 20     | 6         | 77%     |
 | 1.2 Infrastructure | 13      | 0      | 13        | 0%      |
 | 1.3 Playwright     | 7       | 0      | 7         | 0%      |
-| **Total**          | **46**  | **10** | **36**    | **22%** |
+| **Total**          | **46**  | **20** | **26**    | **43%** |
 
 ---
 

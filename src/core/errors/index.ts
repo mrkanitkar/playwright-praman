@@ -1,4 +1,44 @@
 /**
+ * Errors module barrel — re-exports all error classes, codes, and types.
+ *
  * @module errors
  */
-// Barrel file — re-exports for errors module
+
+// ── Error codes ──────────────────────────────────────────────────────
+export { ErrorCode } from './codes.js';
+export type { ErrorCode as ErrorCodeType } from './codes.js';
+
+// ── Base error class ─────────────────────────────────────────────────
+export { PramanError } from './base.js';
+export type { AIErrorContext, PramanErrorOptions, SerializedPramanError } from './base.js';
+
+// ── Error subclasses ─────────────────────────────────────────────────
+export { AIError } from './ai-error.js';
+export type { AIErrorOptions, TokenUsage } from './ai-error.js';
+
+export { AuthError } from './auth-error.js';
+export type { AuthErrorOptions } from './auth-error.js';
+
+export { BridgeError } from './bridge-error.js';
+export type { BridgeErrorOptions } from './bridge-error.js';
+
+export { ConfigError } from './config-error.js';
+export type { ConfigErrorOptions } from './config-error.js';
+
+export { ControlError } from './control-error.js';
+export type { ControlErrorOptions } from './control-error.js';
+
+export { NavigationError } from './navigation-error.js';
+export type { NavigationErrorOptions } from './navigation-error.js';
+
+export { ODataError } from './odata-error.js';
+export type { ODataErrorOptions } from './odata-error.js';
+
+export { PluginError } from './plugin-error.js';
+export type { PluginErrorOptions } from './plugin-error.js';
+
+export { SelectorError } from './selector-error.js';
+export type { SelectorErrorOptions } from './selector-error.js';
+
+export { TimeoutError } from './timeout-error.js';
+export type { TimeoutErrorOptions } from './timeout-error.js';
