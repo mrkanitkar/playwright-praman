@@ -1,59 +1,49 @@
 # Phase 1 — Implementation Tracker
 
-> **Plan Version**: 1.5.0
+> **Plan Version**: 2.0.0
 > **Created**: 2026-02-16
-> **Strategy**: TDD (RED-GREEN-REFACTOR), Max 2 parallel agents, Max5 budget
+> **Strategy**: TDD (RED-GREEN-REFACTOR), Max 3 parallel agents, 20x plan
 > **Branch**: main (direct commits, Husky hooks enabled)
-> **Quality Gate**: Full `npm run ci` after every batch
+> **Quality Gate**: Full `npm run ci` after every wave
 
 ---
 
 ## Wizard Decisions (Implementation Session)
 
-| #   | Decision            | Value                                               |
-| --- | ------------------- | --------------------------------------------------- |
-| W1  | Claude Code plan    | Max5 (~88K tokens/5hr window)                       |
-| W2  | Branch strategy     | Direct to main                                      |
-| W3  | Baseline            | Commit all planning files first                     |
-| W4  | Max parallel agents | 2                                                   |
-| W5  | Batch size          | ~100 LOC source + ~80 LOC tests (~2K tokens output) |
-| W6  | Tracker format      | Markdown + GitHub Issues                            |
-| W7  | Quality gates       | Full `npm run ci` after every batch                 |
-| W8  | Git hooks           | All enabled (pre-commit + commit-msg + pre-push)    |
+| #   | Decision            | Value                                                    |
+| --- | ------------------- | -------------------------------------------------------- |
+| W1  | Claude Code plan    | 20x plan (~1.76M tokens/5hr window) — upgraded from Max5 |
+| W2  | Branch strategy     | Direct to main                                           |
+| W3  | Baseline            | Commit all planning files first                          |
+| W4  | Max parallel agents | 3                                                        |
+| W5  | Batch size          | Consolidated mega-batches per wave                       |
+| W6  | Tracker format      | Markdown + GitHub Issues                                 |
+| W7  | Quality gates       | Full `npm run ci` after every wave                       |
+| W8  | Git hooks           | All enabled (pre-commit + commit-msg + pre-push)         |
 
 ---
 
 ## Token Budget Estimate
 
-### Per-Batch Cost (Max5 Plan)
+### 20x Plan Budget
 
-| Component                   | Tokens (est.)     |
-| --------------------------- | ----------------- |
-| Read plan section + context | ~3,000 input      |
-| Read existing files         | ~1,500 input      |
-| Write test file             | ~1,200 output     |
-| Write source file           | ~1,500 output     |
-| Run npm run ci              | ~800 output       |
-| Git commit + push           | ~400 output       |
-| **Total per batch**         | **~8,400 tokens** |
+| Metric                      | Value              |
+| --------------------------- | ------------------ |
+| Token budget per 5hr window | ~1,760,000         |
+| Execution strategy          | 5 waves, 3 agents  |
+| Total batches remaining     | 19 (of 46)         |
+| **Estimated sessions**      | **1 session**      |
+| **Estimated total tokens**  | **~49,000 output** |
 
-### Session Planning
+### Wave Execution Plan
 
-| Metric                           | Value            |
-| -------------------------------- | ---------------- |
-| Token budget per 5hr window      | ~88,000          |
-| Tokens per batch (avg)           | ~8,400           |
-| Batches per session (sequential) | ~10              |
-| Batches per session (2 parallel) | ~7-8             |
-| Total batches                    | 45               |
-| **Estimated sessions**           | **5-6 sessions** |
-| **Estimated total tokens**       | **~378,000**     |
-
-### Cost Estimate (Max5 plan = $100/mo)
-
-Sessions are spread across the 5-hour rolling window. At ~7 batches per
-session with 2 parallel agents, Phase 1 requires ~6 sessions over ~3 days
-of focused work.
+| Wave | Batches                     | Parallel Agents | Est. Output |
+| ---- | --------------------------- | --------------- | ----------- |
+| 1    | B6c, B6d, B6a, TH2, B4a     | 3               | ~12K        |
+| 2    | B4b, B4c, B5a-B5c, B6b, B7a | 3               | ~15K        |
+| 3    | B6e, B7b                    | 1               | ~2K         |
+| 4    | B9a, B9b, B10a, B10b        | 2               | ~18K        |
+| 5    | B11                         | 1               | ~2K         |
 
 ---
 
@@ -115,7 +105,7 @@ of focused work.
 
 | #   | Batch | Files                                  | Est. Out | Depends  | Status |
 | --- | ----- | -------------------------------------- | -------- | -------- | ------ |
-| 27  | B4a   | `src/core/logging/redaction.ts` + test | ~1,200   | B3c, TH1 | [ ]    |
+| 27  | B4a   | `src/core/logging/redaction.ts` + test | ~1,200   | B3c, TH1 | [x]    |
 | 28  | B4b   | `src/core/logging/logger.ts` + test    | ~1,500   | B4a      | [ ]    |
 | 29  | B4c   | `src/core/logging/index.ts` barrel     | ~300     | B4b      | [ ]    |
 
@@ -131,10 +121,10 @@ of focused work.
 
 | #   | Batch | Files                                                             | Est. Out | Depends  | Status |
 | --- | ----- | ----------------------------------------------------------------- | -------- | -------- | ------ |
-| 33  | B6a   | `src/core/utils/constants.ts` + test                              | ~1,000   | B3c      | [ ]    |
+| 33  | B6a   | `src/core/utils/constants.ts` + test                              | ~1,000   | B3c      | [x]    |
 | 34  | B6b   | `src/core/utils/wait-helpers.ts` + test                           | ~1,500   | B6a, TH1 | [ ]    |
-| 35  | B6c   | `src/core/utils/retry.ts` + test                                  | ~1,500   | B2a      | [ ]    |
-| 36  | B6d   | `src/core/utils/step-decorator.ts` + `version-compare.ts` + tests | ~1,800   | B2a      | [ ]    |
+| 35  | B6c   | `src/core/utils/retry.ts` + test                                  | ~1,500   | B2a      | [x]    |
+| 36  | B6d   | `src/core/utils/step-decorator.ts` + `version-compare.ts` + tests | ~1,800   | B2a      | [x]    |
 | 37  | B6e   | `src/core/utils/index.ts` barrel                                  | ~400     | B6a-B6d  | [ ]    |
 
 #### Compat (B7a-B7b)
@@ -148,8 +138,8 @@ of focused work.
 
 | #   | Batch | Files                                                   | Est. Out | Depends  | Status |
 | --- | ----- | ------------------------------------------------------- | -------- | -------- | ------ |
-| 40  | B8a   | `src/bridge/adapter.ts` + test + barrel                 | ~1,200   | B1a      | [ ]    |
-| 41  | TH2   | `tests/helpers/mock-bridge-adapter.ts`                  | ~700     | B8a      | [ ]    |
+| 40  | B8a   | `src/bridge/adapter.ts` + test + barrel                 | ~1,200   | B1a      | [x]    |
+| 41  | TH2   | `tests/helpers/mock-bridge-adapter.ts`                  | ~700     | B8a      | [x]    |
 | 42  | B9a   | `src/selectors/selector-parser.ts` + test               | ~2,000   | B1a, B2a | [ ]    |
 | 43  | B9b   | `src/selectors/ui5-selector-engine.ts` + test + barrel  | ~1,500   | B9a      | [ ]    |
 | 44  | B10a  | `src/matchers/ui5-matchers.ts` + test                   | ~2,000   | TH2      | [ ]    |
@@ -185,17 +175,17 @@ Wave 14: B11 (GATE 1.3 — FINAL)                    [after ALL]
 B1a → B3a → B3b → B3c → B4a → B4b → B4c → B7b → B11
 ```
 
-**With Max 2 Parallel Agents**, execution plan per session:
+**With 20x Plan (Max 3 Parallel Agents)**, execution in 5 waves:
 
-| Session | Batches (est.) | Agent 1                         | Agent 2                         |
-| ------- | -------------- | ------------------------------- | ------------------------------- |
-| 1       | 8-10           | B1a → B1a-t → B2a → B2b → B2b-t | B1b → B1b-t → B1c → B1d         |
-| 2       | 8-10           | TH3 → B2c → B2d → B2e → B2f     | B1e → B1f → B1f-t → B3a → B3a-t |
-| 3       | 8-10           | B2g → B2h → B3b → B3b-t → B3c   | TH1 → B1g → B8a → TH2 → B9a     |
-| 4       | 8-10           | B4a → B4b → B4c → B5a → B5b     | B6a → B6b → B6c → B6d → B9b     |
-| 5       | 8-10           | B5c → B6e → B7a → B7b           | B10a → B10b → B11               |
+| Wave | Batches                     | Main Thread          | Agent A         | Agent B   | Status |
+| ---- | --------------------------- | -------------------- | --------------- | --------- | ------ |
+| 1    | B6c, B6d, B6a, TH2, B4a     | B6c commit + B6d     | B6a + TH2       | B4a       | [x]    |
+| 2    | B4b, B4c, B5a-B5c, B6b, B7a | B4b + B4c            | B5a + B5b + B5c | B6b + B7a | [ ]    |
+| 3    | B6e, B7b                    | B6e + B7b (Gate 1.2) | —               | —         | [ ]    |
+| 4    | B9a, B9b, B10a, B10b        | B9a + B9b            | B10a + B10b     | —         | [ ]    |
+| 5    | B11                         | B11 (Final Gate)     | —               | —         | [ ]    |
 
-Estimated total: ~5 sessions x ~88K tokens = ~440K tokens.
+Estimated total: 1 session, ~49K output tokens.
 
 ---
 
@@ -236,9 +226,9 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 | Sub-Phase          | Batches | Done   | Remaining | %       |
 | ------------------ | ------- | ------ | --------- | ------- |
 | 1.1 Foundation     | 26      | 26     | 0         | 100%    |
-| 1.2 Infrastructure | 13      | 0      | 13        | 0%      |
-| 1.3 Playwright     | 7       | 0      | 7         | 0%      |
-| **Total**          | **46**  | **26** | **20**    | **57%** |
+| 1.2 Infrastructure | 13      | 4      | 9         | 31%     |
+| 1.3 Playwright     | 7       | 2      | 5         | 29%     |
+| **Total**          | **46**  | **32** | **14**    | **70%** |
 
 ---
 
@@ -246,12 +236,12 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 
 | #   | Issue                                                              | Resolve In | Status |
 | --- | ------------------------------------------------------------------ | ---------- | ------ |
-| H3  | Mock bridge adapter typed interface                                | TH2        | [ ]    |
-| H4  | "retry() is for infrastructure only" TSDoc                         | B6c        | [ ]    |
+| H3  | Mock bridge adapter typed interface                                | TH2        | [x]    |
+| H4  | "retry() is for infrastructure only" TSDoc                         | B6c        | [x]    |
 | H5  | TSDoc `@example` tag in quality gate                               | B11        | [ ]    |
 | M1  | Selector parser depth limit                                        | B9a        | [ ]    |
 | M2  | OTel exporter-specific validation                                  | B5a        | [ ]    |
-| M3  | WalkMe pattern disclaimer in constants                             | B6a        | [ ]    |
+| M3  | WalkMe pattern disclaimer in constants                             | B6a        | [x]    |
 | M4  | Config loader: `{}` input populates all defaults                   | B3b-t      | [ ]    |
 | M5  | Matcher error code for null control                                | B10a       | [ ]    |
 | M6  | RecordReplay minimum UI5 version docs                              | B8a        | [ ]    |
@@ -260,7 +250,7 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 | M9  | schema.test.ts: enumerate remaining 10 test cases                  | B3a-t      | [ ]    |
 | M10 | loader.test.ts: enumerate remaining 3 test cases                   | B3b-t      | [ ]    |
 | M11 | pino mock: use `vi.mock('pino')` inline                            | B4b        | [ ]    |
-| M12 | mock-bridge vi.fn() returns undefined, not throws                  | TH2        | [ ]    |
+| M12 | mock-bridge vi.fn() returns undefined, not throws                  | TH2        | [x]    |
 | M13 | Move `serializeSelectorForBrowser()` from selectors.ts to parser   | B9a        | [ ]    |
 | V15 | Selector parser edge cases (Unicode, `=` in values)                | B9a        | [ ]    |
 | V16 | `waitForUI5Bootstrap` default timeout in signature                 | B6b        | [ ]    |
