@@ -1,0 +1,11 @@
+{
+  "config": {
+    "extends": ".markdownlint.jsonc"
+  },
+  "ignores": [
+    "plans/plan.md",
+    "plans/setup.md",
+    "skills/playwright-praman-sap-testing/skills-tdd.md",
+    "node_modules/"
+  ]
+}

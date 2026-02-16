@@ -1,0 +1,9 @@
+# Reference planning docs (historical, pre-existing formatting)
+plans/plan.md
+plans/setup.md
+
+# Skill files (authored externally, varied formatting)
+skills/playwright-praman-sap-testing/skills-tdd.md
+
+# Node modules
+node_modules/

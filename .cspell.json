@@ -5,12 +5,13 @@
     "praman", "playwright-praman", "tsup", "vitest", "docusaurus", "pino", "commitlint",
     "fiori", "sapui", "odata", "btp", "saml", "flp", "walkme",
     "combobox", "thenable", "webcomponent", "webcomponents",
+    "smarttable", "smartfilterbar", "smartform", "filterbar", "uxap", "webc", "icontabfilter",
     "cyclonedx", "sbom", "provenance", "commitizen",
     "redaction", "hermetic", "serializable", "introspectable",
     "wdi5", "opentelemetry", "otel", "otlp", "camelcase",
     "semver", "pageobject", "kebabcase", "nodenext",
     "zestest", "mrkanitkar", "dhikraft",
-    "agentic", "attw",
+    "agentic", "attw", "blocklist",
     "EKKO", "EKPO", "MINBE", "MAXBE", "BSTRF", "PLIFZ"
   ],
   "ignorePaths": [

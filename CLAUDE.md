@@ -16,22 +16,24 @@ Ground-up rewrite — NO copy-paste from v2.5.0.
 
 Before starting work, read the appropriate skill file from `skills/playwright-praman-sap-testing/`:
 
-| Task                                       | Skill File                    |
-| ------------------------------------------ | ----------------------------- |
-| Architecture decisions, module boundaries  | `skills-architect.md`         |
-| TypeScript implementation, proxy, bridge   | `skills-implementer.md`       |
-| Playwright fixtures, selectors, matchers   | `skills-playwright-expert.md` |
-| SAP UI5 controls, FLP, OData, RecordReplay | `skills-sap-ui5-expert.md`    |
-| Unit/integration tests, coverage           | `skills-tester.md`            |
-| PR review, quality gates                   | `skills-reviewer.md`          |
-| CI/CD, security, build, release            | `skills-security-build.md`    |
-| Team overview, collaboration model         | `skills-team-overview.md`     |
+| Task                                              | Skill File                    |
+| ------------------------------------------------- | ----------------------------- |
+| Architecture decisions, module boundaries         | `skills-architect.md`         |
+| TypeScript implementation, proxy, bridge          | `skills-implementer.md`       |
+| Test-driven development (TDD), RED-GREEN-REFACTOR | `skills-tdd.md`               |
+| Unit/integration tests, coverage                  | `skills-tester.md`            |
+| Playwright fixtures, selectors, matchers          | `skills-playwright-expert.md` |
+| SAP UI5 controls, FLP, OData, RecordReplay        | `skills-sap-ui5-expert.md`    |
+| PR review, quality gates                          | `skills-reviewer.md`          |
+| CI/CD, security, build, release                   | `skills-security-build.md`    |
+| Team overview, collaboration model                | `skills-team-overview.md`     |
 
 For multi-skill tasks, load primary + supporting skill(s). Example:
 
-- Bridge adapter implementation → `skills-implementer.md` + `skills-sap-ui5-expert.md`
-- Fixture implementation → `skills-implementer.md` + `skills-playwright-expert.md`
-- Integration tests → `skills-tester.md` + `skills-playwright-expert.md` + `skills-sap-ui5-expert.md`
+- Bridge adapter implementation → `skills-tdd.md` + `skills-implementer.md` + `skills-sap-ui5-expert.md`
+- Fixture implementation → `skills-tdd.md` + `skills-implementer.md` + `skills-playwright-expert.md`
+- Integration tests → `skills-tdd.md` + `skills-tester.md` + `skills-playwright-expert.md` + `skills-sap-ui5-expert.md`
+- Bug fixes → `skills-tdd.md` + `skills-implementer.md`
 
 ## Rules
 
@@ -58,7 +60,7 @@ For multi-skill tasks, load primary + supporting skill(s). Example:
 - Custom tags: `@intent`, `@guarantee`, `@capability`, `@recipe`, `@ai`, `@aiContext`, `@sapModule`, `@businessContext`
 - Reference: `docs/documentation-standards.md`
 
-## ESLint (9 Plugins — Zero Tolerance)
+## ESLint (10 Plugins — Zero Tolerance)
 
 - typescript-eslint (strict type-checked), eslint-plugin-tsdoc, eslint-plugin-playwright
 - eslint-plugin-security, @microsoft/eslint-plugin-sdl, eslint-plugin-sonarjs
@@ -70,9 +72,22 @@ For multi-skill tasks, load primary + supporting skill(s). Example:
 - Use `describe` / `it` pattern
 - Use `test.step()` for multi-step integration tests
 - Mock bridge with typed test doubles for unit tests
-- Coverage ≥ 90% statements, ≥ 85% branches
 - Name test files: `*.test.ts` (unit) or `*.spec.ts` (integration)
 - Use typed mock factories from `tests/helpers/`
+
+### Coverage Strategy (Tiered — Google/Microsoft Best Practice)
+
+| Tier       | Scope                                          | Statements | Branches | Functions | Lines |
+| ---------- | ---------------------------------------------- | ---------- | -------- | --------- | ----- |
+| **Tier 1** | Error classes, public API (`src/core/errors/`) | 100%       | 100%     | 100%      | 100%  |
+| **Tier 2** | Core infrastructure (`src/core/`)              | 95%        | 90%      | 95%       | 95%   |
+| **Tier 3** | All other modules (global)                     | 90%        | 85%      | 90%       | 90%   |
+
+- **Tool**: `@vitest/coverage-v8` (V8 engine, AST-based remapping — same accuracy as Istanbul)
+- **Per-file enforcement**: `perFile: true` — no single file can hide behind project averages
+- **Reporters**: text, lcov, json-summary, json, html — `json` enables CI PR comments
+- **Pre-push hook**: `npm run test:unit -- --coverage` runs on every push
+- **Watermarks**: Yellow 80-95%, Green 95%+ (visible in HTML reports)
 
 ## When Writing Errors
 
@@ -114,15 +129,15 @@ throw new ControlError({
 
 ## Supported IDEs & AI Agents
 
-| IDE / Agent | Config Location |
-|---|---|
-| VS Code + Copilot | `.github/copilot-instructions.md`, `.vscode/` |
-| JetBrains / IntelliJ | `.idea/runConfigurations/`, `.idea/codeStyles/`, `.idea/inspectionProfiles/` |
-| Cursor | `.cursor/rules/praman.mdc`, `.cursor/rules/tests.mdc` |
-| Google Antigravity | `.antigravity/rules.md` |
-| Claude Code | `CLAUDE.md` (this file) |
-| OpenAI Codex / Jules | `AGENTS.md`, `.jules/setup.md` |
-| Copilot Coding Agents | `.github/agents/` (Playwright MCP) |
+| IDE / Agent           | Config Location                                                              |
+| --------------------- | ---------------------------------------------------------------------------- |
+| VS Code + Copilot     | `.github/copilot-instructions.md`, `.vscode/`                                |
+| JetBrains / IntelliJ  | `.idea/runConfigurations/`, `.idea/codeStyles/`, `.idea/inspectionProfiles/` |
+| Cursor                | `.cursor/rules/praman.mdc`, `.cursor/rules/tests.mdc`                        |
+| Google Antigravity    | `.antigravity/rules.md`                                                      |
+| Claude Code           | `CLAUDE.md` (this file)                                                      |
+| OpenAI Codex / Jules  | `AGENTS.md`, `.jules/setup.md`                                               |
+| Copilot Coding Agents | `.github/agents/` (Playwright MCP)                                           |
 
 ## Commands
 
@@ -139,6 +154,7 @@ throw new ControlError({
 - **Microsoft**: TSDoc, API Extractor, SDL security, OTel, SHA-pinned Actions, cross-platform CI
 - **Google TS Style**: `Readonly<>` config, no barrel re-exports of internals
 - **Google SRE**: Exponential backoff + jitter, structured error codes
+- **Google Testing**: Tiered coverage (100% errors, 95% core, 90% global), per-file enforcement
 - **Node.js**: ESM-first with CJS fallback, `node:` prefix, engines field, files field, dual package exports
 - **Claude/Anthropic**: `retryable` + `suggestions[]` on errors, AI response envelope, checkpoint serialization
 - **npm**: Dual ESM+CJS via conditional exports, validated with attw

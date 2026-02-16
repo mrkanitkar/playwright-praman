@@ -16,16 +16,17 @@ Ground-up rewrite — NO copy-paste from v2.5.0.
 
 Load the appropriate skill file based on the task:
 
-| Task | Skill File |
-|------|-----------|
-| Architecture decisions, module boundaries | `skills/playwright-praman-sap-testing/skills-architect.md` |
-| TypeScript implementation, proxy, bridge | `skills/playwright-praman-sap-testing/skills-implementer.md` |
-| Playwright fixtures, selectors, matchers | `skills/playwright-praman-sap-testing/skills-playwright-expert.md` |
-| SAP UI5 controls, FLP, OData, RecordReplay | `skills/playwright-praman-sap-testing/skills-sap-ui5-expert.md` |
-| Unit/integration tests, coverage | `skills/playwright-praman-sap-testing/skills-tester.md` |
-| PR review, quality gates | `skills/playwright-praman-sap-testing/skills-reviewer.md` |
-| CI/CD, security, build, release | `skills/playwright-praman-sap-testing/skills-security-build.md` |
-| Team overview, collaboration model | `skills/playwright-praman-sap-testing/skills-team-overview.md` |
+| Task                                              | Skill File                                                         |
+| ------------------------------------------------- | ------------------------------------------------------------------ |
+| Architecture decisions, module boundaries         | `skills/playwright-praman-sap-testing/skills-architect.md`         |
+| TypeScript implementation, proxy, bridge          | `skills/playwright-praman-sap-testing/skills-implementer.md`       |
+| Test-driven development (TDD), RED-GREEN-REFACTOR | `skills/playwright-praman-sap-testing/skills-tdd.md`               |
+| Unit/integration tests, coverage                  | `skills/playwright-praman-sap-testing/skills-tester.md`            |
+| Playwright fixtures, selectors, matchers          | `skills/playwright-praman-sap-testing/skills-playwright-expert.md` |
+| SAP UI5 controls, FLP, OData, RecordReplay        | `skills/playwright-praman-sap-testing/skills-sap-ui5-expert.md`    |
+| PR review, quality gates                          | `skills/playwright-praman-sap-testing/skills-reviewer.md`          |
+| CI/CD, security, build, release                   | `skills/playwright-praman-sap-testing/skills-security-build.md`    |
+| Team overview, collaboration model                | `skills/playwright-praman-sap-testing/skills-team-overview.md`     |
 
 ## Code Standards
 
@@ -64,14 +65,14 @@ Load the appropriate skill file based on the task:
 - Integration tests: Playwright against SAP demo apps
 - All integration tests must use `test.step()` for readability
 - NEVER use `page.waitForTimeout()` — use waitForUI5Stable()
-- Coverage threshold: 90% statements, 85% branches
+- Coverage: Tiered (100% errors/API, 95% core, 90% global), per-file enforced via @vitest/coverage-v8
 - Test files: `*.test.ts` (unit), `*.spec.ts` (integration)
 - Use typed mock factories (mock-page.ts, mock-adapter.ts, mock-config.ts)
 
 ## Error Handling
 
 - All errors extend `PramanError`
-- Include: code (ERR_*), message, attempted, retryable, details, suggestions[]
+- Include: code (ERR\_\*), message, attempted, retryable, details, suggestions[]
 - ControlError adds: lastKnownSelector, availableControls[], suggestedSelector
 - NEVER use raw `throw new Error()` — always use typed error subclass
 

@@ -2,13 +2,13 @@
 
 ## Praman v1.0 — AI-First SAP UI5 Test Automation Platform
 
-| Property | Value |
-|----------|-------|
-| **Role** | Senior Test Engineer |
-| **Skill ID** | PRAMAN-SKILL-TESTER-001 |
-| **Version** | 1.0.0 |
-| **Authority Level** | Test — owns all unit, integration, and behavioral tests |
-| **Parent Docs** | plan.md (D10, Principles 7-9), setup.md, skills-implementer.md |
+| Property            | Value                                                          |
+| ------------------- | -------------------------------------------------------------- |
+| **Role**            | Senior Test Engineer                                           |
+| **Skill ID**        | PRAMAN-SKILL-TESTER-001                                        |
+| **Version**         | 1.0.0                                                          |
+| **Authority Level** | Test — owns all unit, integration, and behavioral tests        |
+| **Parent Docs**     | plan.md (D10, Principles 7-9), setup.md, skills-implementer.md |
 
 ---
 
@@ -162,8 +162,8 @@ describe('loadConfig', () => {
     const raw = {};
     const config = loadConfig(raw);
 
-    expect(config.logLevel).toBe('info');  // default
-    expect(config.skipStabilityWait).toBe(false);  // default
+    expect(config.logLevel).toBe('info'); // default
+    expect(config.skipStabilityWait).toBe(false); // default
   });
 });
 ```
@@ -224,8 +224,8 @@ import type { PramanConfig } from '#core/types';
 
 export function createTestConfig(overrides?: Partial<PramanConfig>): Readonly<PramanConfig> {
   return Object.freeze({
-    logLevel: 'error',  // suppress logs in tests
-    ui5WaitTimeout: 1000,  // fast timeout for tests
+    logLevel: 'error', // suppress logs in tests
+    ui5WaitTimeout: 1000, // fast timeout for tests
     controlDiscoveryTimeout: 500,
     interactionStrategy: 'hybrid',
     skipStabilityWait: false,
@@ -403,7 +403,8 @@ describe('withRetry', () => {
   });
 
   it('should retry up to maxRetries on failure', async () => {
-    const op = vi.fn()
+    const op = vi
+      .fn()
       .mockRejectedValueOnce(new Error('fail-1'))
       .mockRejectedValueOnce(new Error('fail-2'))
       .mockResolvedValue('success');
@@ -440,11 +441,11 @@ describe('withRetry', () => {
   it('should stop early when retryableCheck returns false', async () => {
     const op = vi.fn().mockRejectedValue(new Error('non-retryable'));
 
-    await expect(
-      withRetry(op, { maxRetries: 3, retryableCheck: () => false })
-    ).rejects.toThrow('non-retryable');
+    await expect(withRetry(op, { maxRetries: 3, retryableCheck: () => false })).rejects.toThrow(
+      'non-retryable',
+    );
 
-    expect(op).toHaveBeenCalledTimes(1);  // No retries
+    expect(op).toHaveBeenCalledTimes(1); // No retries
   });
 });
 ```
@@ -464,7 +465,7 @@ await expect(button).toBeUI5Visible();
 
 // ❌ FORBIDDEN: Snapshot-then-assert
 const text = await button.getText();
-expect(text).toBe('Save');  // ← Race condition! Text may not be rendered yet
+expect(text).toBe('Save'); // ← Race condition! Text may not be rendered yet
 ```
 
 ### 4.2 No Fixed Waits (Principle 8)
@@ -528,53 +529,89 @@ test.describe('Button Behavioral Equivalence', () => {
 
 ## 5. Coverage Requirements
 
-| Category | Threshold | Enforcement |
-|----------|-----------|-------------|
-| Statement coverage | ≥ 90% | CI blocking |
-| Branch coverage | ≥ 85% | CI blocking |
-| Function coverage | ≥ 90% | CI blocking |
-| Line coverage | ≥ 90% | CI blocking |
+### 5.1 Tiered Coverage Strategy (Google/Microsoft Best Practice)
 
-### Coverage Exclusions (Documented)
+| Tier       | Scope                              | Statements | Branches | Functions | Lines | Rationale                                        |
+| ---------- | ---------------------------------- | ---------- | -------- | --------- | ----- | ------------------------------------------------ |
+| **Tier 1** | Error classes (`src/core/errors/`) | 100%       | 100%     | 100%      | 100%  | Zero tolerance — errors are user-facing contract |
+| **Tier 2** | Core infrastructure (`src/core/`)  | 95%        | 90%      | 95%       | 95%   | Config, logging, utils are critical paths        |
+| **Tier 3** | All other modules (global)         | 90%        | 85%      | 90%       | 90%   | Google "exemplary" level                         |
+
+**Why tiered, not flat 100%?**
+
+- Google Testing Blog: 90% is "exemplary"; above 90% project-wide "likely not worthwhile"
+- Microsoft SDL: 80% is practical baseline for shipped code
+- 100% project-wide leads to: brittle tests, testing framework internals, negative ROI
+- 100% IS appropriate for: error classes (user-facing), public API surface, security utilities
+- Per-file enforcement (`perFile: true`) prevents any single file from hiding behind averages
+
+### 5.2 Coverage Tool
+
+- **`@vitest/coverage-v8`** — V8 engine coverage with AST-based remapping (Vitest 4.x)
+- c8 standalone is **deprecated** — Vitest's V8 provider replaces it entirely
+- Identical accuracy to Istanbul since Vitest 3.2.0+ (AST-based source mapping)
+- Reporters: `text` (terminal), `lcov` (Codecov/SonarCloud), `json-summary`, `json` (CI PR comments), `html` (local browsing)
+- `reportOnFailure: true` — always generates report, even when tests fail
+- Watermarks: Yellow 80-95%, Green 95%+ (visible in HTML reports)
+
+### 5.3 Coverage Exclusions (Documented)
 
 - Browser-evaluated scripts (`browser-scripts/`) — tested via integration tests
 - CLI commands (`cli/`) — tested via integration tests
 - Type-only files (`*.d.ts`) — no runtime code
+- Barrel/index files (`**/index.ts`) — re-exports only
 - Generated files (`generated.ts`) — auto-generated, tested at source
+
+### 5.4 Enforcement Points
+
+| Hook            | Command                           | What it checks                    |
+| --------------- | --------------------------------- | --------------------------------- |
+| Pre-push        | `npm run test:unit -- --coverage` | Per-file thresholds on every push |
+| CI (PR)         | `npm run test:unit -- --coverage` | Same thresholds + artifact upload |
+| CI (PR comment) | `vitest-coverage-report-action`   | Coverage delta on PR (planned)    |
 
 ---
 
 ## 6. Vitest Configuration
 
 ```typescript
-// vitest.config.ts
+// vitest.config.ts — see actual file for authoritative config
 import { defineConfig } from 'vitest/config';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
   test: {
-    globals: false,  // Explicit imports: import { describe, it, expect } from 'vitest'
+    globals: false, // Explicit imports: import { describe, it, expect } from 'vitest'
     environment: 'node',
     include: ['tests/unit/**/*.test.ts'],
     exclude: ['tests/integration/**', 'tests/e2e/**'],
     coverage: {
-      provider: 'v8',
+      provider: 'v8', // V8 engine — AST-based remapping (Vitest 4.x)
+      reporter: ['text', 'lcov', 'json-summary', 'json', 'html'],
+      reportOnFailure: true,
       include: ['src/**/*.ts'],
       exclude: [
         'src/**/*.d.ts',
-        'src/**/index.ts',  // barrel files
-        'src/bridge/browser-scripts/**',  // tested via integration
-        'src/cli/**',  // tested via integration
+        'src/**/index.ts', // barrel files
+        'src/bridge/browser-scripts/**', // tested via integration
+        'src/cli/**', // tested via integration
       ],
       thresholds: {
-        statements: 90,
+        statements: 90, // Global minimum (Tier 3)
         branches: 85,
         functions: 90,
         lines: 90,
+        perFile: true, // Per-file enforcement
+        // Glob-based overrides (Phase 1+):
+        // 'src/core/errors/**/*.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+        // 'src/core/**/*.ts': { statements: 95, branches: 90, functions: 95, lines: 95 },
+      },
+      watermarks: {
+        statements: [80, 95],
+        branches: [75, 90],
+        functions: [80, 95],
+        lines: [80, 95],
       },
     },
-    reporters: ['verbose'],
     typecheck: {
       enabled: true,
     },
@@ -595,7 +632,7 @@ Before submitting tests, verify:
 - [ ] Integration tests use `test.step()` for all major actions
 - [ ] Edge cases covered: empty input, null, undefined, error paths
 - [ ] Error assertions verify code, message, and retryable fields
-- [ ] Coverage meets thresholds (90% statement, 85% branch)
+- [ ] Coverage meets tiered thresholds (100% errors, 95% core, 90% global)
 - [ ] No flaky tests — use auto-retry assertions, not fixed waits
 
 ---
