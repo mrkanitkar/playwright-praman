@@ -6,6 +6,11 @@
  * and structured {@link UI5Selector} objects. Also provides validation and
  * type-guard utilities.
  *
+ * **LOC exception**: This module exceeds the 300 LOC guideline (currently ~380 LOC)
+ * because the parser, serializer, and validator share internal state and helper
+ * functions that would lose cohesion if split across files. Splitting would increase
+ * coupling without reducing complexity.
+ *
  * @module selectors
  */
 

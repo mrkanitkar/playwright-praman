@@ -56,7 +56,7 @@ describe('checkUI5Text', () => {
     expect(result.pass).toBe(false);
   });
 
-  it('message includes actual and expected values', async () => {
+  it('fail message includes actual and expected values', async () => {
     const adapter = createMockBridgeAdapter();
     adapter.getControlProperty.mockResolvedValue('Cancel');
 
@@ -65,6 +65,16 @@ describe('checkUI5Text', () => {
     const message = result.message();
     expect(message).toContain('Cancel');
     expect(message).toContain('Save');
+  });
+
+  it('pass message mentions "not to match" for negated assertion', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlProperty.mockResolvedValue('Save');
+
+    const result = await checkUI5Text(adapter, 'btn1', 'Save');
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to match');
   });
 });
 
@@ -88,6 +98,16 @@ describe('checkUI5Visible', () => {
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('visible');
   });
+
+  it('pass message mentions "not to be visible" for negated assertion', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlProperty.mockResolvedValue(true);
+
+    const result = await checkUI5Visible(adapter, 'ctrl1');
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to be visible');
+  });
 });
 
 describe('checkUI5Enabled', () => {
@@ -109,6 +129,16 @@ describe('checkUI5Enabled', () => {
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('enabled');
+  });
+
+  it('pass message mentions "not to be enabled" for negated assertion', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlProperty.mockResolvedValue(true);
+
+    const result = await checkUI5Enabled(adapter, 'ctrl1');
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to be enabled');
   });
 });
 
@@ -143,6 +173,38 @@ describe('checkUI5Property', () => {
     expect(message).toContain('text');
     expect(message).toContain('Hello');
   });
+
+  it('passes with deep-equal object values', async () => {
+    const adapter = createMockBridgeAdapter();
+    const objValue = { key: 'value', nested: { a: 1 } };
+    adapter.getControlProperty.mockResolvedValue(objValue);
+
+    const result = await checkUI5Property(adapter, 'ctrl1', 'data', {
+      key: 'value',
+      nested: { a: 1 },
+    });
+
+    expect(result.pass).toBe(true);
+  });
+
+  it('fails with deep-unequal object values', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlProperty.mockResolvedValue({ key: 'actual' });
+
+    const result = await checkUI5Property(adapter, 'ctrl1', 'data', { key: 'expected' });
+
+    expect(result.pass).toBe(false);
+  });
+
+  it('pass message mentions "not to equal" for negated assertion', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlProperty.mockResolvedValue('Hello');
+
+    const result = await checkUI5Property(adapter, 'ctrl1', 'text', 'Hello');
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to equal');
+  });
 });
 
 describe('checkUI5ValueState', () => {
@@ -174,5 +236,15 @@ describe('checkUI5ValueState', () => {
     const message = result.message();
     expect(message).toContain('Error');
     expect(message).toContain('None');
+  });
+
+  it('pass message mentions "not to be" for negated assertion', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlProperty.mockResolvedValue('Error');
+
+    const result = await checkUI5ValueState(adapter, 'input1', 'Error');
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to be');
   });
 });

@@ -128,6 +128,7 @@ export async function retry<T>(fn: () => Promise<T>, options?: RetryOptions): Pr
   }
 
   // Unreachable in practice, but satisfies TypeScript
+  /* v8 ignore next */
   throw lastError ?? new Error('retry exhausted');
 }
 

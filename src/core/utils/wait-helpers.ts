@@ -106,12 +106,15 @@ export async function waitForUI5Stable(
 
   try {
     await page.waitForFunction(
+      /* v8 ignore start -- browser-context function, not executable in Node tests */
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any -- browser-evaluated: sap global has no Node types
       () => (window as any).sap?.ui?.getCore?.()?.getUIPending?.() === 0,
+      /* v8 ignore stop */
       { timeout, polling },
     );
   } catch (error: unknown) {
     const base = {
+      code: ErrorCode.ERR_TIMEOUT_OPERATION,
       message: options?.message ?? `UI5 stability wait timed out after ${String(timeout)}ms`,
       attempted: 'Wait for UI5 pending operations to reach zero',
       timeoutMs: timeout,
@@ -143,11 +146,13 @@ export async function waitForUI5Stable(
 export async function briefDOMSettle(page: WaitPage, durationMs?: number): Promise<void> {
   const ms = durationMs ?? DEFAULT_TIMEOUTS.DOM_SETTLE;
   await page.evaluate(
+    /* v8 ignore start -- browser-context function, not executable in Node tests */
     // eslint-disable-next-line @typescript-eslint/promise-function-async -- browser-evaluated function cannot be async
     (timeout: number) =>
       new Promise<void>((resolve) => {
         setTimeout(resolve, timeout);
       }),
+    /* v8 ignore stop */
     ms,
   );
 }
@@ -177,8 +182,10 @@ export async function waitForUI5Bootstrap(
 
   try {
     await page.waitForFunction(
+      /* v8 ignore start -- browser-context function, not executable in Node tests */
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any -- browser-evaluated: sap global has no Node types
       () => typeof (window as any).sap?.ui?.getCore === 'function',
+      /* v8 ignore stop */
       { timeout },
     );
   } catch (error: unknown) {

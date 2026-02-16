@@ -49,7 +49,15 @@ describe('redaction', () => {
   });
 
   it('known sensitive fields covered', () => {
-    const knownSensitiveFields = ['*.password', '*.token', '*.apiKey', '*.secret'];
+    const knownSensitiveFields = [
+      '*.password',
+      '*.token',
+      '*.apiKey',
+      '*.secret',
+      '*.accessToken',
+      '*.refreshToken',
+      '*.bearerToken',
+    ];
 
     for (const field of knownSensitiveFields) {
       expect(REDACTION_PATHS).toContain(field);

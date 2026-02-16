@@ -78,13 +78,5 @@ export {
 } from './matchers/index.js';
 export type { MatcherResult } from './matchers/index.js';
 
-/**
- * Praman library version.
- *
- * @example
- * ```typescript
- * import { VERSION } from 'playwright-praman';
- * console.log(VERSION);
- * ```
- */
-export const VERSION = '1.0.0-dev' as const;
+// ── Version ──────────────────────────────────────────────────────────
+export { PACKAGE_NAME, VERSION } from './version.js';
