@@ -42,7 +42,8 @@ For EVERY file you review, check these 10 categories in order:
 | Module size | ≤ 300 LOC (or exception documented) | Warning |
 
 **Import Direction Rules** (Layer N may import from Layer ≤ N-1):
-```
+
+```text
 core/ (L1) → ONLY @playwright/test types, node: builtins
 bridge/ (L2) → core/ only
 proxy/ (L3) → bridge/, core/
@@ -320,4 +321,4 @@ When reviewing, verify alignment with these sources:
 
 ---
 
-*End of Skill File — Code Reviewer Agent v1.0.0*
+## End of Skill File — Code Reviewer Agent v1.0.0

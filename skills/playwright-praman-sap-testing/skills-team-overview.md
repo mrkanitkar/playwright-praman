@@ -15,7 +15,10 @@
 
 **100% of code is written by AI agents. Humans architect, review, and approve.**
 
-The Praman v1.0 development model uses specialized AI agents as a virtual engineering team. Each agent has a focused skill file that defines its expertise, behavioral rules, and interaction patterns. Agents are tool-agnostic — the same skill can be loaded into GitHub Copilot, Claude Code, Google Jules, or any future AI coding agent.
+The Praman v1.0 development model uses specialized AI agents as a virtual engineering team.
+Each agent has a focused skill file that defines its expertise, behavioral rules, and interaction patterns.
+Agents are tool-agnostic — the same skill can be loaded into GitHub Copilot, Claude Code, Google Jules,
+or any future AI coding agent.
 
 ### Core Principles
 
@@ -29,7 +32,7 @@ The Praman v1.0 development model uses specialized AI agents as a virtual engine
 
 ## 2. Team Roster
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                        PRAMAN v1.0 AI AGENT TEAM                         │
 ├─────────────────────────────────────────────────────────────────────────────┤
@@ -71,7 +74,7 @@ The Praman v1.0 development model uses specialized AI agents as a virtual engine
 
 ### 3.1 Workflow Per Feature
 
-```
+```text
 ┌──────────┐     ┌───────────┐     ┌──────────────┐     ┌──────────┐
 │  HUMAN   │────▶│ ARCHITECT │────▶│ IMPLEMENTER  │────▶│  TESTER  │
 │  (Issue) │     │ (Design)  │     │ (Code)       │     │ (Tests)  │
@@ -291,4 +294,4 @@ Reference in issue description:
 
 ---
 
-_End of Document — Praman v1.0 AI Agent Team Overview v1.0.0_
+## End of Document — Praman v1.0 AI Agent Team Overview v1.0.0

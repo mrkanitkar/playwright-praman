@@ -1,12 +1,16 @@
 import { execSync } from 'node:child_process';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
+const testDir = dirname(fileURLToPath(import.meta.url));
+
 describe('ESM compatibility smoke test', () => {
   it('should load the main entry point via import()', () => {
-    const distPath = resolve(import.meta.dirname, '..', '..', '..', 'dist', 'index.js');
-    const fileUrl = `file://${distPath.replace(/\\/g, '/')}`;
+    const distPath = resolve(testDir, '..', '..', '..', 'dist', 'index.js');
+    const fileUrl = `file://${distPath.replaceAll('\\', '/')}`;
+    // eslint-disable-next-line sonarjs/os-command -- intentional: smoke test verifying ESM module loading
     const result = execSync(
       `node --input-type=module -e "import('${fileUrl}').then(m => process.stdout.write(JSON.stringify(Object.keys(m))))"`,
       { encoding: 'utf-8' },
@@ -25,8 +29,9 @@ describe('ESM compatibility smoke test', () => {
     ];
 
     for (const subPath of subPaths) {
-      const distPath = resolve(import.meta.dirname, '..', '..', '..', 'dist', `${subPath}.js`);
-      const fileUrl = `file://${distPath.replace(/\\/g, '/')}`;
+      const distPath = resolve(testDir, '..', '..', '..', 'dist', `${subPath}.js`);
+      const fileUrl = `file://${distPath.replaceAll('\\', '/')}`;
+      // eslint-disable-next-line sonarjs/os-command -- intentional: smoke test verifying ESM sub-path loading
       const result = execSync(
         `node --input-type=module -e "import('${fileUrl}').then(() => process.stdout.write('ok'))"`,
         { encoding: 'utf-8' },

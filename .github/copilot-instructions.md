@@ -1,11 +1,13 @@
 # Praman v1.0 Copilot Instructions
 
 ## Project
+
 AI-First SAP UI5 Test Automation Platform for Playwright.
 Single npm package `playwright-praman` with sub-path exports.
 Ground-up rewrite — NO copy-paste from v2.5.0.
 
 ## Architecture
+
 - 5-layer architecture: Core → Bridge → Proxy → Fixtures → AI
 - All modules ≤ 300 LOC (warning, not blocking)
 - Layer dependency: lower layers NEVER import from higher layers
@@ -26,6 +28,7 @@ Load the appropriate skill file based on the task:
 | Team overview, collaboration model | `skills/playwright-praman-sap-testing/skills-team-overview.md` |
 
 ## Code Standards
+
 - TypeScript strict mode, no `any`, no `as unknown as T`
 - ESM only (`import`, not `require`)
 - All public APIs MUST have TSDoc with `@example` (TSDoc only, NOT JSDoc)
@@ -36,6 +39,7 @@ Load the appropriate skill file based on the task:
 - Node builtins must use `node:` prefix
 
 ## Documentation Standard: TSDoc
+
 - This project uses Microsoft TSDoc exclusively
 - TSDoc config: `tsdoc.json` extends `@microsoft/api-extractor`
 - Validated by: `eslint-plugin-tsdoc` with `tsdoc/syntax: 'error'`
@@ -43,6 +47,7 @@ Load the appropriate skill file based on the task:
 - Every public function: `@param`, `@returns`, `@throws`, `@example`
 
 ## ESLint Configuration (9 Plugins)
+
 - `typescript-eslint` — strict type-checked rules
 - `eslint-plugin-tsdoc` — TSDoc syntax enforcement
 - `eslint-plugin-playwright` — Playwright best practices
@@ -54,6 +59,7 @@ Load the appropriate skill file based on the task:
 - `eslint-plugin-import-x` + `eslint-plugin-unicorn` — import hygiene & modernization
 
 ## Testing Standards
+
 - Unit tests: Vitest, hermetic (no network, no SAP system)
 - Integration tests: Playwright against SAP demo apps
 - All integration tests must use `test.step()` for readability
@@ -63,12 +69,14 @@ Load the appropriate skill file based on the task:
 - Use typed mock factories (mock-page.ts, mock-adapter.ts, mock-config.ts)
 
 ## Error Handling
+
 - All errors extend `PramanError`
 - Include: code (ERR_*), message, attempted, retryable, details, suggestions[]
 - ControlError adds: lastKnownSelector, availableControls[], suggestedSelector
 - NEVER use raw `throw new Error()` — always use typed error subclass
 
 ## Naming Conventions
+
 - Files: kebab-case (e.g., `bridge-error.ts`)
 - Interfaces/Types: PascalCase (e.g., `BridgeAdapter`) — no `I` prefix
 - Functions/methods: camelCase (e.g., `findControl`)
@@ -77,6 +85,7 @@ Load the appropriate skill file based on the task:
 - Booleans: `is/has/can/should` prefix (e.g., `isVisible`, `hasError`)
 
 ## Import Order
+
 1. Node built-ins (`node:path`, `node:fs`)
 2. External packages (`zod`, `pino`)
 3. Internal (`#core/`, `#bridge/`, `#proxy/`)
@@ -84,10 +93,12 @@ Load the appropriate skill file based on the task:
 5. Sibling (`./`)
 
 ## Commit Messages
+
 - Conventional Commits: `feat(scope): description`
 - Scopes: core, config, errors, logging, bridge, adapter, proxy, fixtures, auth, ai, intents, vocabulary, fe, reporters, cli, docs, ci, deps, release
 
 ## Build Output (Dual ESM + CJS)
+
 - **ESM**: `dist/*.js` + `dist/*.d.ts` (primary)
 - **CJS**: `dist/*.cjs` + `dist/*.d.cts` (Node.js compatibility)
 - Built by tsup with `format: ['esm', 'cjs']`, `cjsInterop: true`, `shims: true`
@@ -95,6 +106,7 @@ Load the appropriate skill file based on the task:
 - 6 sub-path exports: `.`, `./ai`, `./intents`, `./vocabulary`, `./fe`, `./reporters`
 
 ## Cross-Platform Requirements
+
 - Supported OS: Windows 10/11, macOS, Linux (Ubuntu/Debian)
 - Always use `node:path` methods — never hardcoded `/` or `\`
 - Always use `node:fs/promises` for async file operations
@@ -103,6 +115,7 @@ Load the appropriate skill file based on the task:
 - CI runs on 3-OS matrix: ubuntu-latest, windows-latest, macos-latest
 
 ## Build & CI
+
 - `npm run lint` — ESLint (0 errors, 0 warnings)
 - `npm run typecheck` — tsc --noEmit
 - `npm run test:unit` — Vitest (hermetic)
@@ -111,6 +124,7 @@ Load the appropriate skill file based on the task:
 - `npm run ci` — lint + typecheck + test:unit + build
 
 ## Best Practice Alignment
+
 - **Playwright**: Web-first assertions, fixture DI, project dependencies for auth
 - **Microsoft**: TSDoc, API Extractor, SDL security, OTel, SHA-pinned Actions, cross-platform CI
 - **Google TS Style**: Readonly config, no barrel re-exports of internals

@@ -61,7 +61,7 @@ const test = base.extend<PramanFixtures>({
     const config = await loadAndValidateConfig();
     await use(config);
   },
-  
+
   // UI5 fixture — depends on page + config (auto-dependency)
   ui5: async ({ page, config }, use) => {
     // Lazy load (D2, BP-CLAUDE)
@@ -70,14 +70,14 @@ const test = base.extend<PramanFixtures>({
     await use(fixture);
     await fixture.dispose();  // Cleanup on test end
   },
-  
+
   // Navigation — depends on page + config + ui5
   navigation: async ({ page, config, ui5 }, use) => {
     const { createNavigationFixture } = await import('./navigation-fixtures.js');
     const nav = await createNavigationFixture(page, config, ui5);
     await use(nav);
   },
-  
+
   // Table — depends on page + ui5
   ui5Table: async ({ page, ui5 }, use) => {
     const { createTableFixture } = await import('./table-fixtures.js');
@@ -95,10 +95,10 @@ export { test, expect };
 ui5: async ({ page, config }, use) => {
   // SETUP: runs before test
   const fixture = await createUI5Fixture(page, config);
-  
+
   // USE: test runs here
   await use(fixture);
-  
+
   // TEARDOWN: runs after test (always, even on failure)
   await fixture.dispose();
 },
@@ -152,10 +152,10 @@ import { selectors } from '@playwright/test';
 
 /**
  * Register the ui5= selector engine with Playwright.
- * 
+ *
  * Usage in tests:
  *   page.locator('ui5={"controlType":"sap.m.Button","properties":{"text":"Save"}}')
- * 
+ *
  * @example
  * ```typescript
  * await registerUI5SelectorEngine();
@@ -174,7 +174,7 @@ export async function registerUI5SelectorEngine(): Promise<void> {
           const result = window.__praman_findControl(parsed);
           return result?.domRef ?? null;
         },
-        
+
         // QueryAll: find all matching elements
         queryAll(root, selector) {
           const parsed = JSON.parse(selector);
@@ -208,7 +208,7 @@ export const expect = baseExpect.extend({
   /**
    * Assert that a UI5 control has the expected text.
    * Web-first: auto-retries until timeout.
-   * 
+   *
    * @example
    * ```typescript
    * const label = await ui5.control({ controlType: 'sap.m.Label', properties: { text: 'Name' } });
@@ -222,11 +222,11 @@ export const expect = baseExpect.extend({
   ) {
     const controlId = proxy._handle.id;
     const page = proxy._page;
-    
+
     // Web-first: use Playwright's built-in retry mechanism
     let pass = false;
     let actualText = '';
-    
+
     try {
       await expect(async () => {
         actualText = await page.evaluate(
@@ -236,15 +236,15 @@ export const expect = baseExpect.extend({
           },
           { id: controlId },
         );
-        
+
         expect(actualText).toBe(expectedText);
       }).toPass({ timeout: options?.timeout ?? 5000 });
-      
+
       pass = true;
     } catch {
       pass = false;
     }
-    
+
     return {
       pass,
       message: () =>
@@ -253,7 +253,7 @@ export const expect = baseExpect.extend({
           : `Expected UI5 control to have text "${expectedText}", but got "${actualText}"`,
     };
   },
-  
+
   /**
    * Assert that a UI5 control is visible.
    * Web-first: auto-retries.
@@ -261,9 +261,9 @@ export const expect = baseExpect.extend({
   async toBeUI5Visible(proxy: UI5ControlProxy, options?: { timeout?: number }) {
     const controlId = proxy._handle.id;
     const page = proxy._page;
-    
+
     let pass = false;
-    
+
     try {
       await expect(async () => {
         const visible = await page.evaluate(
@@ -275,12 +275,12 @@ export const expect = baseExpect.extend({
         );
         expect(visible).toBe(true);
       }).toPass({ timeout: options?.timeout ?? 5000 });
-      
+
       pass = true;
     } catch {
       pass = false;
     }
-    
+
     return {
       pass,
       message: () =>
@@ -317,7 +317,7 @@ export default defineConfig({
       testMatch: /.*\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
-    
+
     // 2. Test project — runs AFTER setup, consumes storageState
     {
       name: 'sap-tests',
@@ -369,12 +369,12 @@ test('Create Purchase Order', async ({ page, ui5, navigation }) => {
   await test.step('Navigate to FLP tile', async () => {
     await navigation.openTileByTitle('Create Purchase Order');
   });
-  
+
   await test.step('Fill vendor field', async () => {
     const input = await ui5.input({ id: 'vendorInput' });
     await input.setValue('V001');
   });
-  
+
   await test.step('Save and verify', async () => {
     const saveBtn = await ui5.button({ text: 'Save' });
     await saveBtn.press();
@@ -397,11 +397,11 @@ import type { Page } from '@playwright/test';
 
 export class PlaywrightCompat {
   private readonly version: string;
-  
+
   constructor(version: string) {
     this.version = version;
   }
-  
+
   /**
    * Register selector engine — API changed between 1.x versions.
    */
@@ -410,7 +410,7 @@ export class PlaywrightCompat {
     const { selectors } = await import('@playwright/test');
     await selectors.register(name, { script });
   }
-  
+
   /**
    * Get trace configuration — normalize across versions.
    */
@@ -443,20 +443,20 @@ import { logger } from '#core/logging';
 export class ComplianceReporter implements Reporter {
   private readonly log = logger.child({ module: 'reporter-compliance' });
   private results: Array<{ test: string; pramanUsage: number; playwrightNative: number }> = [];
-  
+
   onTestEnd(test: TestCase, result: TestResult): void {
     // Analyze test steps for praman vs Playwright native usage
     const steps = result.steps ?? [];
     const pramanSteps = steps.filter(s => s.title.startsWith('[praman]'));
     const nativeSteps = steps.filter(s => !s.title.startsWith('[praman]'));
-    
+
     this.results.push({
       test: test.title,
       pramanUsage: pramanSteps.length,
       playwrightNative: nativeSteps.length,
     });
   }
-  
+
   async onEnd(result: FullResult): Promise<void> {
     this.log.info({ results: this.results, status: result.status }, 'Compliance report');
   }
@@ -476,7 +476,7 @@ const controlHandle = await page.evaluate(
     // This function runs in the BROWSER
     const control = window.__praman_findControl(selector);
     if (!control) throw new Error(`Control not found within ${timeout}ms`);
-    
+
     return {
       id: control.getId(),
       controlType: control.getMetadata().getName(),
@@ -520,4 +520,4 @@ page.addInitScript({
 
 ---
 
-*End of Skill File — Playwright Expert Agent v1.0.0*
+## End of Skill File — Playwright Expert Agent v1.0.0

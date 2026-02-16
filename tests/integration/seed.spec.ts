@@ -1,7 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 test.describe('Test group', () => {
-  test('seed', async ({ page }) => {
-    // generate code here.
+  // eslint-disable-next-line playwright/expect-expect -- seed placeholder
+  test('seed', () => {
+    // Placeholder for generated integration tests
+    test.skip(); // eslint-disable-line playwright/no-skipped-test -- seed placeholder
   });
 });
