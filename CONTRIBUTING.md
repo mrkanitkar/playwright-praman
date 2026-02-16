@@ -20,11 +20,25 @@ All code must follow the rules in [CLAUDE.md](CLAUDE.md):
 - Module size ≤ 300 LOC (documented exceptions allowed)
 - All errors extend `PramanError`
 
+### ⚠️ Strict TypeScript Project
+
+**JavaScript files are NOT allowed in `src/` directory.**
+
+This is enforced by pre-commit and pre-push hooks. Any attempt to commit `.js`, `.jsx`, `.mjs`, or `.cjs` files to `src/` will be automatically rejected.
+
+**Allowed locations for JavaScript:**
+
+- Configuration files in project root (e.g., `eslint.config.mjs`)
+- Build output in `dist/` (generated)
+- Test fixtures (when absolutely necessary)
+
+**Why:** Praman is a strict TypeScript project. All source code must be TypeScript to ensure type safety, better tooling support, and adherence to architectural principles.
+
 ## Commit Messages
 
 We use [Conventional Commits](https://www.conventionalcommits.org/):
 
-```
+```text
 feat(proxy): add bidirectional conversion
 fix(bridge): handle stale control reference
 docs(auth): add Office365 strategy example
