@@ -72,16 +72,16 @@ of focused work.
 
 | #   | Batch | Files                                                                                                 | Est. Out | Depends       | Status |
 | --- | ----- | ----------------------------------------------------------------------------------------------------- | -------- | ------------- | ------ |
-| 1   | B1a   | `src/version.ts` + `src/core/types/config.ts`                                                         | ~800     | None          | [ ]    |
-| 2   | B1a-t | `tests/unit/core/types/config.types.test.ts`                                                          | ~600     | B1a           | [ ]    |
-| 3   | B1b   | `src/core/types/selectors.ts` + `src/core/types/bridge.ts` + `src/core/types/validation.ts`           | ~1,000   | None          | [ ]    |
-| 4   | B1b-t | `tests/unit/core/types/selectors.types.test.ts` + `bridge.types.test.ts` + `validation.types.test.ts` | ~800     | B1b           | [ ]    |
-| 5   | B1c   | `src/core/types/controls.ts` — UI5ControlBase + sap.m Input (25 interfaces)                           | ~2,000   | None          | [ ]    |
-| 6   | B1d   | `src/core/types/controls.ts` — sap.m Display + Indicators + Tiles (19 interfaces)                     | ~1,600   | B1c           | [ ]    |
-| 7   | B1e   | `src/core/types/controls.ts` — sap.m List + Dialog + Navigation (35 interfaces)                       | ~2,500   | B1d           | [ ]    |
-| 8   | B1f   | `src/core/types/controls.ts` — sap.m Container + other libs + unions + map (34 interfaces)            | ~2,200   | B1e           | [ ]    |
-| 9   | B1f-t | `tests/unit/core/types/controls.types.test.ts`                                                        | ~700     | B1f           | [ ]    |
-| 10  | B1g   | `src/core/types/ui5-types.d.ts` + `src/core/types/index.ts` barrel                                    | ~600     | B1a, B1b, B1f | [ ]    |
+| 1   | B1a   | `src/version.ts` + `src/core/types/config.ts`                                                         | ~800     | None          | [x]    |
+| 2   | B1a-t | `tests/unit/core/types/config.types.test.ts`                                                          | ~600     | B1a           | [x]    |
+| 3   | B1b   | `src/core/types/selectors.ts` + `src/core/types/bridge.ts` + `src/core/types/validation.ts`           | ~1,000   | None          | [x]    |
+| 4   | B1b-t | `tests/unit/core/types/selectors.types.test.ts` + `bridge.types.test.ts` + `validation.types.test.ts` | ~800     | B1b           | [x]    |
+| 5   | B1c   | `src/core/types/controls.ts` — UI5ControlBase + sap.m Input (25 interfaces)                           | ~2,000   | None          | [x]    |
+| 6   | B1d   | `src/core/types/controls.ts` — sap.m Display + Indicators + Tiles (19 interfaces)                     | ~1,600   | B1c           | [x]    |
+| 7   | B1e   | `src/core/types/controls.ts` — sap.m List + Dialog + Navigation (35 interfaces)                       | ~2,500   | B1d           | [x]    |
+| 8   | B1f   | `src/core/types/controls.ts` — sap.m Container + other libs + unions + map (34 interfaces)            | ~2,200   | B1e           | [x]    |
+| 9   | B1f-t | `tests/unit/core/types/controls.types.test.ts`                                                        | ~700     | B1f           | [x]    |
+| 10  | B1g   | `src/core/types/ui5-types.d.ts` + `src/core/types/index.ts` barrel                                    | ~600     | B1a, B1b, B1f | [x]    |
 
 #### Errors (B2a-B2h, TH3)
 
@@ -233,12 +233,12 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 
 ## Progress Summary
 
-| Sub-Phase          | Batches | Done  | Remaining | %      |
-| ------------------ | ------- | ----- | --------- | ------ |
-| 1.1 Foundation     | 26      | 0     | 26        | 0%     |
-| 1.2 Infrastructure | 13      | 0     | 13        | 0%     |
-| 1.3 Playwright     | 7       | 0     | 7         | 0%     |
-| **Total**          | **46**  | **0** | **46**    | **0%** |
+| Sub-Phase          | Batches | Done   | Remaining | %       |
+| ------------------ | ------- | ------ | --------- | ------- |
+| 1.1 Foundation     | 26      | 10     | 16        | 38%     |
+| 1.2 Infrastructure | 13      | 0      | 13        | 0%      |
+| 1.3 Playwright     | 7       | 0      | 7         | 0%      |
+| **Total**          | **46**  | **10** | **36**    | **22%** |
 
 ---
 
