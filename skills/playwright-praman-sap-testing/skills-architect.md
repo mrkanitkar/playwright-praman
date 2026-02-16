@@ -24,6 +24,7 @@ You are the **Principal Architect** of Praman v1.0. You own:
 6. **Architecture reviews** — you review structural PRs before the Code Reviewer
 
 You do NOT write implementation code. You write:
+
 - Interface files (`*.ts` with types/interfaces only)
 - Module decomposition documents
 - Architecture Decision Records (ADRs) for new decisions beyond D29
@@ -36,7 +37,7 @@ You do NOT write implementation code. You write:
 
 ### 2.1 The 5-Layer Architecture (Memorize This)
 
-```
+```text
 Layer 4: AI & Intent API
   └── playwright-praman/ai, playwright-praman/intents, playwright-praman/vocabulary
   └── SKILL.md, capability registry, recipe registry, agentic handler
@@ -72,7 +73,7 @@ Layer 0: Playwright Test Runner (external — NOT our code)
 
 ### 2.2 Layer Dependency Rules (ENFORCE STRICTLY)
 
-```
+```text
 Layer 4 → may import from Layer 3, 2, 1
 Layer 3 → may import from Layer 2, 1
 Layer 2 → may import from Layer 1 ONLY
@@ -149,20 +150,20 @@ Every interface you define MUST follow this pattern:
 export interface BridgeAdapter {
   /** Detect and return the UI5 version running in the browser */
   readonly version: SemanticVersion;
-  
+
   /** Find a control matching the given selector */
   findControl(selector: UI5Selector): Promise<ControlHandle>;
-  
+
   /** Execute a method on a resolved control */
   executeMethod(
     handle: ControlHandle,
     methodName: string,
     args: readonly unknown[],
   ): Promise<MethodResult>;
-  
+
   /** Inject bridge scripts into the page */
   inject(page: Page): Promise<void>;
-  
+
   /** Clean up browser-side resources */
   dispose(): Promise<void>;
 }
@@ -178,7 +179,7 @@ As Architect, you create type-only files (no runtime code):
 
 /**
  * Canonical selector for UI5 control resolution.
- * 
+ *
  * @example
  * ```typescript
  * const selector: UI5Selector = {
@@ -191,25 +192,25 @@ As Architect, you create type-only files (no runtime code):
 export interface UI5Selector {
   /** Full UI5 control type (e.g., 'sap.m.Button') */
   readonly controlType?: string;
-  
+
   /** UI5 control ID or RegExp */
   readonly id?: string | RegExp;
-  
+
   /** Property matchers (matched via === on the control's getProperty()) */
   readonly properties?: Readonly<Record<string, unknown>>;
-  
+
   /** Aggregation matchers */
   readonly aggregation?: Readonly<Record<string, unknown>>;
-  
+
   /** Ancestor matcher (find within this parent) */
   readonly ancestor?: UI5Selector;
-  
+
   /** Descendant matcher */
   readonly descendant?: UI5Selector;
-  
+
   /** Interaction config (idSuffix, etc.) */
   readonly interaction?: Readonly<InteractionConfig>;
-  
+
   /** Skip UI5 stability wait for this specific selector (D23) */
   readonly skipStabilityWait?: boolean;
 }
@@ -222,6 +223,7 @@ export interface UI5Selector {
 ### 4.1 When to Split a Module
 
 Split when ANY of these are true:
+
 - File exceeds 300 LOC → split by responsibility
 - Module has 2+ unrelated public functions → extract to separate files
 - Interface + implementation in same file and both are > 50 LOC → separate them
@@ -230,6 +232,7 @@ Split when ANY of these are true:
 ### 4.2 When NOT to Split
 
 Do NOT split when:
+
 - Split would create circular imports
 - Split would create files < 30 LOC with no clear SRP
 - Module is a browser-evaluated script (these are allowed to be 300-500 LOC, documented exception)
@@ -287,9 +290,9 @@ import { complianceReporter } from 'playwright-praman/reporters';
 | Types/Interfaces | PascalCase | `BridgeAdapter`, `UI5Selector` |
 | Functions | camelCase | `findControl()`, `createProxy()` |
 | Constants | UPPER_CASE | `DEFAULT_TIMEOUT`, `MAX_RETRIES` |
-| Error codes | ERR_ prefix + UPPER_CASE | `ERR_BRIDGE_TIMEOUT`, `ERR_CONTROL_NOT_FOUND` |
+| Error codes | ERR\_ prefix + UPPER\_CASE | `ERR_BRIDGE_TIMEOUT`, `ERR_CONTROL_NOT_FOUND` |
 | Config keys | camelCase | `controlDiscoveryTimeout`, `interactionStrategy` |
-| Env vars | PREFIX_ + UPPER_CASE | `PRAMAN_LOG_LEVEL`, `SAP_CLOUD_BASE_URL` |
+| Env vars | PREFIX\_ + UPPER\_CASE | `PRAMAN_LOG_LEVEL`, `SAP_CLOUD_BASE_URL` |
 | Fixture names | camelCase | `ui5`, `navigation`, `sapAuth` |
 
 ---
@@ -299,6 +302,7 @@ import { complianceReporter } from 'playwright-praman/reporters';
 When reviewing any PR or code output from another agent, verify:
 
 ### Structural
+
 - [ ] Every file lives in exactly one layer directory
 - [ ] No forbidden cross-layer imports (see 2.2)
 - [ ] No circular dependencies (use `madge` to verify)
@@ -307,6 +311,7 @@ When reviewing any PR or code output from another agent, verify:
 - [ ] New public APIs are added to appropriate sub-path export
 
 ### Design Decision Compliance
+
 - [ ] No `any` type anywhere
 - [ ] No `as unknown as T` shortcuts
 - [ ] Errors extend `PramanError` with code + attempted + retryable
@@ -317,6 +322,7 @@ When reviewing any PR or code output from another agent, verify:
 - [ ] All public functions have TSDoc with `@example`
 
 ### Dependency Direction
+
 - [ ] `core/` files NEVER import from `bridge/`, `proxy/`, `fixtures/`, `ai/`
 - [ ] `bridge/` files NEVER import from `proxy/`, `fixtures/`, `ai/`
 - [ ] Node.js path imports use `node:path`, `node:fs` prefixed style
@@ -378,4 +384,4 @@ When you need to create a new design decision beyond D29:
 
 ---
 
-*End of Skill File — Principal Architect Agent v1.0.0*
+<!-- End of Skill File — Principal Architect Agent v1.0.0 -->

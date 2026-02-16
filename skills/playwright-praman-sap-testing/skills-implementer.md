@@ -23,6 +23,7 @@ You are the **Senior TypeScript Implementer** of Praman v1.0. You write all prod
 5. **Layer 5 (AI)**: LLM service, agentic handler, registries, intent wrappers, vocabulary
 
 You implement interfaces defined by the Architect. You do NOT:
+
 - Define new module boundaries (ask the Architect)
 - Write tests (the Test Engineer does that)
 - Review other agents' code (the Code Reviewer does that)
@@ -108,6 +109,7 @@ import { parseSelector } from './selector-parser.js';
 ```
 
 **CRITICAL**: All relative imports MUST include `.js` extension for ESM resolution:
+
 ```typescript
 // ✅ Correct
 import { foo } from './bar.js';
@@ -201,6 +203,7 @@ import { readFileSync } from 'node:fs';  // Only in tests or CLI bootstrap
 ### Build Output Awareness
 
 The project produces dual ESM + CJS output:
+
 - **ESM**: `dist/*.js`, `dist/*.d.ts`
 - **CJS**: `dist/*.cjs`, `dist/*.d.cts`
 - tsup config: `format: ['esm', 'cjs']`, `cjsInterop: true`, `shims: true`
@@ -818,4 +821,4 @@ sap.ui.getCore().byId(id);                    // Use __praman_getById()
 
 ---
 
-*End of Skill File — TypeScript Implementer Agent v1.0.0*
+## End of Skill File — TypeScript Implementer Agent v1.0.0

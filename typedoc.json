@@ -61,63 +61,6 @@
     "Documentation": "https://mrkanitkar.github.io/playwright-praman"
   },
 
-  "blockTags": [
-    "@param",
-    "@returns",
-    "@throws",
-    "@see",
-    "@example",
-    "@remarks",
-    "@deprecated",
-    "@internal",
-    "@public",
-    "@beta",
-    "@alpha",
-    "@experimental",
-    "@intent",
-    "@guarantee",
-    "@capability",
-    "@recipe",
-    "@ai",
-    "@aiContext",
-    "@aiHint",
-    "@aiRequired",
-    "@aiOptional",
-    "@category",
-    "@sapModule",
-    "@businessContext",
-    "@ui5Version",
-    "@fioriElement",
-    "@browserContext",
-    "@failureMode",
-    "@prerequisite",
-    "@postcondition",
-    "@alternative"
-  ],
-
-  "inlineTags": [
-    "@link",
-    "@linkcode",
-    "@linkplain",
-    "@inheritDoc",
-    "@label"
-  ],
-
-  "modifierTags": [
-    "@public",
-    "@protected",
-    "@private",
-    "@internal",
-    "@readonly",
-    "@override",
-    "@virtual",
-    "@sealed",
-    "@deprecated",
-    "@alpha",
-    "@beta",
-    "@experimental"
-  ],
-
   "requiredToBeDocumented": [
     "Enum",
     "EnumMember",

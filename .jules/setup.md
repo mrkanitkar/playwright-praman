@@ -23,6 +23,7 @@ Single npm package `playwright-praman` with sub-path exports.
 - CI runs on 3-OS matrix: ubuntu-latest, windows-latest, macos-latest
 
 ## Workflow
+
 1. Read issue description
 2. Read plan.md for architecture context
 3. Read CLAUDE.md for coding rules
@@ -42,6 +43,7 @@ Single npm package `playwright-praman` with sub-path exports.
 - `npm run ci` — lint + typecheck + test:unit + build
 
 ## Key Files
+
 - plan.md — Architecture decisions D1–D29
 - setup.md — Tool versions, ESLint config, CI pipeline
 - CLAUDE.md — Coding rules (same for all agents)

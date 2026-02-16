@@ -9,12 +9,24 @@
     "redaction", "hermetic", "serializable", "introspectable",
     "wdi5", "opentelemetry", "otel", "otlp", "camelcase",
     "semver", "pageobject", "kebabcase", "nodenext",
-    "zestest", "mrkanitkar", "dhikraft"
+    "zestest", "mrkanitkar", "dhikraft",
+    "agentic", "attw",
+    "EKKO", "EKPO", "MINBE", "MAXBE", "BSTRF", "PLIFZ"
   ],
   "ignorePaths": [
     "node_modules", "dist", "coverage", "*.lock",
     "playwright-report", ".auth", "docs/build"
   ],
-  "flagWords": ["blacklist", "whitelist", "master", "slave"],
-  "suggestWords": ["allowlist", "denylist", "main", "replica"]
+  "flagWords": ["blacklist", "whitelist", "slave"],
+  "suggestWords": ["allowlist", "denylist", "main", "replica"],
+  "overrides": [
+    {
+      "filename": "src/core/examples/**",
+      "words": ["master", "Master"]
+    },
+    {
+      "filename": "docs/documentation-standards.md",
+      "words": ["master", "Master"]
+    }
+  ]
 }

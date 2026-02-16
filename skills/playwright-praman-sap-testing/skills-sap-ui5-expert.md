@@ -28,6 +28,7 @@ You are the **SAP UI5 Domain Expert** for Praman v1.0. You have deep knowledge o
 10. **500+ UI5 Control Types** — properties, aggregations, events, methods
 
 You advise the Implementer and Tester on SAP-specific behavior. You DO:
+
 - Write browser-side scripts that run in SAP UI5 context
 - Define typed proxy interfaces for UI5 controls
 - Specify SAP authentication flows
@@ -68,7 +69,7 @@ These are the most-used controls in SAP Fiori apps. Each gets a typed proxy in `
 
 ### 2.2 Control Hierarchy
 
-```
+```text
 sap.ui.core.Element
 └── sap.ui.core.Control
     ├── sap.m.Button
@@ -97,7 +98,7 @@ sap.ui.core.Element
 
 ### 2.3 Control Resolution Strategies
 
-```
+```text
 Strategy 1: ElementRegistry (UI5 ≥ 1.108) — PREFERRED
   sap.ui.require(['sap/ui/core/ElementRegistry'], (Reg) => Reg.get(id))
 
@@ -121,6 +122,7 @@ Strategy 4: RecordReplay (property-based, no ID needed)
 ### 3.1 What It Is
 
 RecordReplay is SAP's official automation API (`sap.ui.test.RecordReplay`). It provides:
+
 - `findDOMElementByControlSelector()` — find DOM element by UI5 control properties
 - `interactWithControl()` — interact using SAP's recommended interaction method
 - `findAllDOMElementsByControlSelector()` — find multiple matches
@@ -175,7 +177,7 @@ sap.ui.test.RecordReplay.interactWithControl({
 
 ### 4.1 BTP SAML (Most Common)
 
-```
+```text
 Browser → BTP Login Page (SAP IAS / Azure AD / custom IDP)
   → POST credentials
   → SAML assertion → redirect to FLP
@@ -189,20 +191,20 @@ import { test as setup } from '@playwright/test';
 setup('SAP BTP SAML Authentication', async ({ page }) => {
   // 1. Navigate to SAP system
   await page.goto(process.env.SAP_CLOUD_BASE_URL!);
-  
+
   // 2. Wait for login page
   await page.waitForSelector('#j_username, #USERNAME_FIELD, input[name="loginfmt"]');
-  
+
   // 3. Fill credentials
   await page.fill('#j_username', process.env.SAP_CLOUD_USERNAME!);
   await page.fill('#j_password', process.env.SAP_CLOUD_PASSWORD!);
-  
+
   // 4. Submit
   await page.click('#logOnFormSubmit, #LOGIN_LINK');
-  
+
   // 5. Wait for FLP shell
   await page.waitForSelector('.sapUshellShellHead', { timeout: 30_000 });
-  
+
   // 6. Save session
   await page.context().storageState({ path: '.auth/sap-session.json' });
 });
@@ -213,10 +215,10 @@ setup('SAP BTP SAML Authentication', async ({ page }) => {
 ```typescript
 export interface AuthStrategy {
   readonly name: string;
-  
+
   /** Perform authentication and save session state */
   authenticate(page: Page, credentials: AuthCredentials): Promise<void>;
-  
+
   /** Verify session is still valid */
   isSessionValid(page: Page): Promise<boolean>;
 }
@@ -249,10 +251,10 @@ async openTileByTitle(page: Page, title: string): Promise<void> {
     },
     { tileTitle: title },
   );
-  
+
   // Click the tile
   await page.locator(`#${tile.id}`).click();
-  
+
   // Wait for app to load
   await waitForUI5Stable(page);
 }
@@ -270,10 +272,10 @@ async navigateByIntent(
   params?: Record<string, string>,
 ): Promise<void> {
   const hash = `#${semanticObject}-${action}`;
-  const queryString = params 
+  const queryString = params
     ? '?' + new URLSearchParams(params).toString()
     : '';
-  
+
   await page.evaluate(
     ({ intent }) => {
       sap.ushell.Container.getServiceAsync('CrossApplicationNavigation')
@@ -281,7 +283,7 @@ async navigateByIntent(
     },
     { intent: hash + queryString },
   );
-  
+
   await waitForUI5Stable(page);
 }
 ```
@@ -324,7 +326,7 @@ export class ODataHelper {
       },
       { model: modelName, entityPath: path },
     );
-    
+
     if (schema) {
       return schema.parse(raw);
     }
@@ -358,17 +360,17 @@ function __praman_getById(id) {
     const ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry');
     if (ElementRegistry) return ElementRegistry.get(id);
   } catch (e) { /* fall through */ }
-  
+
   // Tier 2: Core.byId
   try {
     return sap.ui.getCore().byId(id);
   } catch (e) { /* fall through */ }
-  
+
   // Tier 3: Element.getElementById (deprecated)
   try {
     return sap.ui.core.Element.getElementById(id);
   } catch (e) { /* fall through */ }
-  
+
   return undefined;
 }
 ```
@@ -381,17 +383,17 @@ function __praman_isUI5Stable() {
   try {
     // Check 1: UI5 Core is initialized
     if (!sap?.ui?.getCore) return false;
-    
+
     // Check 2: No pending async operations
     const core = sap.ui.getCore();
     if (core.getUIDirty?.()) return false;
-    
+
     // Check 3: No pending XHR requests (OData)
     if (typeof sap.ui.test?.RecordReplay?.getAutoWaiter === 'function') {
       const waiter = sap.ui.test.RecordReplay.getAutoWaiter();
       if (waiter && !waiter.hasToWait()) return true;
     }
-    
+
     // Check 4: No pending timeouts from UI5
     return true;
   } catch (e) {
@@ -406,7 +408,7 @@ function __praman_isUI5Stable() {
 
 ### 8.1 When to Use WebComponentAdapter
 
-```
+```text
 Classic UI5: sap.m.*, sap.ui.core.*, sap.ui.table.* → ClassicUI5Adapter
 Web Components: ui5-button, ui5-input, ui5-table → WebComponentAdapter
 Hybrid: Mix of both (e.g., FLP shell is classic, embedded app is WC) → HybridAdapter
@@ -454,4 +456,4 @@ When advising the Implementer or Tester on SAP topics:
 
 ---
 
-*End of Skill File — SAP UI5 Domain Expert Agent v1.0.0*
+## End of Skill File — SAP UI5 Domain Expert Agent v1.0.0

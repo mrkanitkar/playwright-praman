@@ -85,7 +85,7 @@ export default tseslint.config(
       'n/no-missing-import': 'off', // TypeScript handles this
       'n/no-unpublished-import': 'off', // TypeScript handles this
       'n/no-unsupported-features/es-syntax': 'off', // We use ESM
-      'n/file-extension-in-import': ['error', 'always', { '.ts': 'never' }],
+      'n/file-extension-in-import': 'off',
       'n/prefer-global/buffer': ['error', 'never'],
       'n/prefer-global/process': ['error', 'never'],
       'n/prefer-promises/dns': 'error',

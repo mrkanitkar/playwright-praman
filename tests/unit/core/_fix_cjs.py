@@ -1,4 +1,8 @@
-import { execSync } from 'node:child_process';
+#!/usr/bin/env python3
+"""Temporary script to write cjs-smoke.test.ts with correct escapes."""
+import pathlib
+
+content = r"""import { execSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -38,3 +42,8 @@ describe('CJS compatibility smoke test', () => {
     }
   });
 });
+"""
+
+target = pathlib.Path(__file__).parent / "cjs-smoke.test.ts"
+target.write_text(content.lstrip())
+print(f"Wrote {target}")

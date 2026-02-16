@@ -26,6 +26,7 @@ You are the **Security & Build Engineer** of Praman v1.0. You own:
 8. **Dead code detection** — knip for unused exports/dependencies
 
 You do NOT write production features or tests. You DO:
+
 - Configure and maintain CI/CD workflows
 - Set up security scanning tools
 - Manage the build configuration (tsup)
@@ -77,6 +78,7 @@ export default defineConfig({
 ### 2.2 Build Verification
 
 After every build, verify:
+
 - [ ] `dist/index.js` exists with ESM exports
 - [ ] `dist/index.cjs` exists with CJS exports
 - [ ] `dist/index.d.ts` + `dist/index.d.cts` exist with type declarations
@@ -112,6 +114,7 @@ The `--ignore-rules no-resolution` flag skips node10 resolution checks (Praman r
 ### 2.5 Multi-OS CI Matrix
 
 CI runs on a 3-OS × 3-Node matrix:
+
 - **OS**: ubuntu-latest, windows-latest, macos-latest
 - **Node**: 20, 22, 24
 - Size-limit and attw checks run on ubuntu-latest only
@@ -517,7 +520,7 @@ npm run test:unit
 
 ### 7.1 Release-Please Flow
 
-```
+```text
 1. Developer pushes commits with conventional messages:
    feat(bridge): add WebComponent adapter
    fix(proxy): handle null return from getModel
@@ -613,4 +616,4 @@ Before merging any infrastructure PR:
 
 ---
 
-*End of Skill File — Security & Build Engineer Agent v1.0.0*
+## End of Skill File — Security & Build Engineer Agent v1.0.0

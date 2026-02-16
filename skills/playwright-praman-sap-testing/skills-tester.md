@@ -23,6 +23,7 @@ You are the **Senior Test Engineer** of Praman v1.0. You write ALL tests. Specif
 5. **Test infrastructure** — shared fixtures, mocks, test utilities, custom matchers
 
 You do NOT write production code (the Implementer does that). You DO:
+
 - Write test files in `tests/unit/` and `tests/integration/`
 - Create test utilities in `tests/helpers/`
 - Define mock factories for bridge adapters, pages, configs
@@ -35,7 +36,7 @@ You do NOT write production code (the Implementer does that). You DO:
 
 ### 2.1 Test Pyramid
 
-```
+```text
                     ┌──────────┐
                     │   E2E    │  Few — SAP Cloud only (tests/e2e/)
                     │ (manual) │  Run: on-demand, not in CI
@@ -53,7 +54,7 @@ You do NOT write production code (the Implementer does that). You DO:
 
 ### 2.2 Directory Structure
 
-```
+```text
 tests/
 ├── unit/                          # Vitest — NO browser, NO SAP
 │   ├── core/
@@ -143,24 +144,24 @@ describe('loadConfig', () => {
       controlDiscoveryTimeout: 10_000,
       interactionStrategy: 'hybrid',
     };
-    
+
     const config = loadConfig(raw);
-    
+
     expect(config.logLevel).toBe('info');
     expect(config.ui5WaitTimeout).toBe(30_000);
     expect(Object.isFrozen(config)).toBe(true);
   });
-  
+
   it('should throw ConfigError for invalid config', () => {
     const raw = { logLevel: 'invalid-level' };
-    
+
     expect(() => loadConfig(raw)).toThrow(ConfigError);
   });
-  
+
   it('should apply defaults for missing optional fields', () => {
     const raw = {};
     const config = loadConfig(raw);
-    
+
     expect(config.logLevel).toBe('info');  // default
     expect(config.skipStabilityWait).toBe(false);  // default
   });
@@ -278,7 +279,7 @@ describe('ControlError', () => {
       details: { selector: { controlType: 'sap.m.Button', properties: { text: 'Save' } } },
       suggestions: ['Check if the page has loaded', 'Verify control ID'],
     });
-    
+
     expect(error.code).toBe('ERR_CONTROL_NOT_FOUND');
     expect(error.attempted).toBe('Find button with text "Save"');
     expect(error.retryable).toBe(true);
@@ -287,7 +288,7 @@ describe('ControlError', () => {
     expect(error).toBeInstanceOf(PramanError);
     expect(error).toBeInstanceOf(Error);
   });
-  
+
   it('should include self-healing context for AI agents (D29)', () => {
     const error = new ControlError({
       code: 'ERR_CONTROL_NOT_FOUND',
@@ -301,12 +302,12 @@ describe('ControlError', () => {
       availableControls: ['#cancelBtn', '#editBtn', '#submitBtn'],
       suggestedSelector: '#submitBtn',
     });
-    
+
     expect(error.lastKnownSelector).toBe('#saveBtn');
     expect(error.availableControls).toContain('#submitBtn');
     expect(error.suggestedSelector).toBe('#submitBtn');
   });
-  
+
   it('should serialize to JSON including self-healing fields', () => {
     const error = new ControlError({
       code: 'ERR_CONTROL_NOT_FOUND',
@@ -319,7 +320,7 @@ describe('ControlError', () => {
       lastKnownSelector: '#old',
       suggestedSelector: '#new',
     });
-    
+
     const json = error.toJSON();
     expect(json).toHaveProperty('code', 'ERR_CONTROL_NOT_FOUND');
     expect(json).toHaveProperty('attempted', 'Find control');
@@ -338,43 +339,43 @@ import { createMockPage, createMockAdapter } from '../helpers';
 
 describe('createControlProxy (D16: Single Unified Proxy)', () => {
   const handle = { id: 'btn-1', controlType: 'sap.m.Button', visible: true };
-  
+
   it('should prevent auto-thenable (then returns undefined)', () => {
     const adapter = createMockAdapter();
     const proxy = createControlProxy(handle, createMockPage(), adapter);
-    
+
     // Proxy must NOT be thenable — prevents Promise.resolve(proxy) from triggering
     expect(proxy.then).toBeUndefined();
     expect(proxy.catch).toBeUndefined();
     expect(proxy.finally).toBeUndefined();
   });
-  
+
   it('should forward known methods to adapter.executeMethod', async () => {
     const adapter = createMockAdapter({
       executeMethod: vi.fn().mockResolvedValue({ returnType: 'empty' }),
     });
     const proxy = createControlProxy(handle, createMockPage(), adapter);
-    
+
     await proxy.press();
-    
+
     expect(adapter.executeMethod).toHaveBeenCalledWith(handle, 'press', []);
   });
-  
+
   it('should forward unknown methods dynamically', async () => {
     const adapter = createMockAdapter({
       executeMethod: vi.fn().mockResolvedValue({ returnType: 'result', value: 'hello' }),
     });
     const proxy = createControlProxy(handle, createMockPage(), adapter);
-    
+
     const result = await proxy.getCustomProperty();
-    
+
     expect(adapter.executeMethod).toHaveBeenCalledWith(handle, 'getCustomProperty', []);
   });
-  
+
   it('should throw ControlError for blacklisted methods', () => {
     const adapter = createMockAdapter();
     const proxy = createControlProxy(handle, createMockPage(), adapter);
-    
+
     expect(() => proxy.destroy()).toThrow(ControlError);
   });
 });
@@ -391,36 +392,36 @@ describe('withRetry', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
-  
+
   it('should return result on first success', async () => {
     const op = vi.fn().mockResolvedValue('success');
-    
+
     const result = await withRetry(op);
-    
+
     expect(result).toBe('success');
     expect(op).toHaveBeenCalledTimes(1);
   });
-  
+
   it('should retry up to maxRetries on failure', async () => {
     const op = vi.fn()
       .mockRejectedValueOnce(new Error('fail-1'))
       .mockRejectedValueOnce(new Error('fail-2'))
       .mockResolvedValue('success');
-    
+
     const resultPromise = withRetry(op, { maxRetries: 3 });
     // Advance timers to process retries
     for (let i = 0; i < 3; i++) {
       await vi.advanceTimersByTimeAsync(10_000);
     }
-    
+
     const result = await resultPromise;
     expect(result).toBe('success');
     expect(op).toHaveBeenCalledTimes(3);
   });
-  
+
   it('should apply exponential backoff with jitter', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    
+
     const delays: number[] = [];
     const op = vi.fn().mockRejectedValue(new Error('fail'));
     vi.spyOn(global, 'setTimeout').mockImplementation((fn, delay) => {
@@ -428,21 +429,21 @@ describe('withRetry', () => {
       (fn as () => void)();
       return 0 as unknown as NodeJS.Timeout;
     });
-    
+
     await withRetry(op, { maxRetries: 3, baseMs: 200 }).catch(() => {});
-    
+
     // Backoff: 200*2^0 + jitter, 200*2^1 + jitter, 200*2^2 + jitter
     expect(delays[0]).toBeGreaterThanOrEqual(200);
     expect(delays[1]).toBeGreaterThan(delays[0]!);
   });
-  
+
   it('should stop early when retryableCheck returns false', async () => {
     const op = vi.fn().mockRejectedValue(new Error('non-retryable'));
-    
+
     await expect(
       withRetry(op, { maxRetries: 3, retryableCheck: () => false })
     ).rejects.toThrow('non-retryable');
-    
+
     expect(op).toHaveBeenCalledTimes(1);  // No retries
   });
 });
@@ -488,12 +489,12 @@ test('Create Purchase Order', async ({ page, ui5, navigation }) => {
   await test.step('Navigate to Create PO tile', async () => {
     await navigation.openTileByTitle('Create Purchase Order');
   });
-  
+
   await test.step('Fill vendor field', async () => {
     const vendorInput = await ui5.input({ id: 'vendorInput' });
     await vendorInput.setValue('V001');
   });
-  
+
   await test.step('Save purchase order', async () => {
     const saveBtn = await ui5.button({ text: 'Save' });
     await saveBtn.press();
@@ -513,10 +514,10 @@ test.describe('Button Behavioral Equivalence', () => {
     // Setup: navigate to demo app with a button
     // Action: press the button using praman
     // Assert: same DOM changes as wdi5 press() would produce
-    
+
     const btn = await ui5.button({ text: 'Submit' });
     await btn.press();
-    
+
     // Golden master: exact same assertions that pass with wdi5
     await expect(page.locator('#result')).toHaveText('Submitted');
   });
@@ -535,6 +536,7 @@ test.describe('Button Behavioral Equivalence', () => {
 | Line coverage | ≥ 90% | CI blocking |
 
 ### Coverage Exclusions (Documented)
+
 - Browser-evaluated scripts (`browser-scripts/`) — tested via integration tests
 - CLI commands (`cli/`) — tested via integration tests
 - Type-only files (`*.d.ts`) — no runtime code
@@ -598,4 +600,4 @@ Before submitting tests, verify:
 
 ---
 
-*End of Skill File — Test Engineer Agent v1.0.0*
+## End of Skill File — Test Engineer Agent v1.0.0
