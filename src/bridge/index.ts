@@ -1,4 +1,7 @@
 /**
+ * Bridge module barrel — re-exports adapter interface and types.
+ *
  * @module bridge
  */
-// Barrel file — re-exports for bridge module
+
+export type { BridgeAdapter, BridgePage } from './adapter.js';
