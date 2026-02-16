@@ -15,7 +15,8 @@
  * ```
  */
 export { test, expect } from '@playwright/test';
-// export { defineConfig } from './core/config/index.js';  // TODO: uncomment when config module is implemented
+// Config module will be exported when implemented
+// export { defineConfig } from './core/config/index.js';
 
 /**
  * Praman library version.

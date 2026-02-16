@@ -1,11 +1,18 @@
 // eslint.config.mjs — ESLint 9 flat config
 // Single source of truth for all lint rules. No .eslintrc files.
+// Configured for: TypeScript, Playwright, Node.js, Security (Microsoft SDL + OWASP)
+// Best practices: Microsoft, Node.js, Google, SonarJS quality rules
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import security from 'eslint-plugin-security';
 import jsdoc from 'eslint-plugin-jsdoc';
 import importX from 'eslint-plugin-import-x';
 import unicorn from 'eslint-plugin-unicorn';
+import playwright from 'eslint-plugin-playwright';
+import nodePlugin from 'eslint-plugin-n';
+import promisePlugin from 'eslint-plugin-promise';
+import sonarjs from 'eslint-plugin-sonarjs';
+import microsoftSdl from '@microsoft/eslint-plugin-sdl';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
@@ -37,7 +44,84 @@ export default tseslint.config(
   },
 
   // ── Security ─────────────────────────────────────────────────────────────
-  security.configs.recommended,
+  {
+    plugins: {
+      security,
+      '@microsoft/sdl': microsoftSdl,
+    },
+    rules: {
+      // OWASP Security plugin rules
+      'security/detect-buffer-noassert': 'error',
+      'security/detect-child-process': 'error',
+      'security/detect-disable-mustache-escape': 'error',
+      'security/detect-eval-with-expression': 'error',
+      'security/detect-no-csrf-before-method-override': 'error',
+      'security/detect-non-literal-fs-filename': 'warn',
+      'security/detect-non-literal-regexp': 'warn',
+      'security/detect-non-literal-require': 'error',
+      'security/detect-object-injection': 'warn',
+      'security/detect-possible-timing-attacks': 'warn',
+      'security/detect-pseudoRandomBytes': 'error',
+      'security/detect-unsafe-regex': 'error',
+
+      // Microsoft Security Development Lifecycle (SDL) rules
+      '@microsoft/sdl/no-insecure-url': 'error',
+      '@microsoft/sdl/no-cookies': 'warn',
+      '@microsoft/sdl/no-document-write': 'error',
+      '@microsoft/sdl/no-inner-html': 'error',
+      '@microsoft/sdl/no-msapp-exec-unsafe': 'error',
+      '@microsoft/sdl/no-postmessage-star-origin': 'error',
+      '@microsoft/sdl/no-winjs-html-unsafe': 'error',
+      '@microsoft/sdl/no-html-method': 'error',
+      '@microsoft/sdl/no-angular-bypass-sanitizer': 'error',
+    },
+  },
+
+  // ── Node.js best practices (aligned with Node.js LTS) ────────────────────
+  nodePlugin.configs['flat/recommended'],
+  {
+    rules: {
+      'n/no-missing-import': 'off', // TypeScript handles this
+      'n/no-unpublished-import': 'off', // TypeScript handles this
+      'n/no-unsupported-features/es-syntax': 'off', // We use ESM
+      'n/file-extension-in-import': ['error', 'always', { '.ts': 'never' }],
+      'n/prefer-global/buffer': ['error', 'never'],
+      'n/prefer-global/process': ['error', 'never'],
+      'n/prefer-promises/dns': 'error',
+      'n/prefer-promises/fs': 'error',
+      'n/no-process-exit': 'error',
+    },
+  },
+
+  // ── Promise best practices ───────────────────────────────────────────────
+  promisePlugin.configs['flat/recommended'],
+  {
+    rules: {
+      'promise/always-return': 'error',
+      'promise/catch-or-return': 'error',
+      'promise/no-nesting': 'warn',
+      'promise/no-return-wrap': 'error',
+      'promise/param-names': 'error',
+      'promise/no-new-statics': 'error',
+      'promise/valid-params': 'error',
+      'promise/prefer-await-to-then': 'error',
+    },
+  },
+
+  // ── SonarJS (Google/industry code quality rules) ─────────────────────────
+  sonarjs.configs.recommended,
+  {
+    rules: {
+      'sonarjs/cognitive-complexity': ['warn', 15],
+      'sonarjs/no-duplicate-string': ['warn', { threshold: 3 }],
+      'sonarjs/no-identical-functions': 'error',
+      'sonarjs/no-collapsible-if': 'error',
+      'sonarjs/prefer-immediate-return': 'error',
+      'sonarjs/prefer-single-boolean-return': 'error',
+      'sonarjs/todo-tag': 'warn', // TODOs are acceptable during development
+      'sonarjs/no-commented-code': 'warn', // Warn but don't block
+    },
+  },
 
   // ── JSDoc/TSDoc enforcement ──────────────────────────────────────────────
   jsdoc.configs['flat/recommended-typescript-error'],
@@ -90,43 +174,76 @@ export default tseslint.config(
     },
   },
 
-  // ── Praman-specific rules ────────────────────────────────────────────────
+  // ── Praman-specific rules (TypeScript + Microsoft best practices) ─────────
   {
     rules: {
+      // TypeScript strict rules
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unsafe-assignment': 'error',
       '@typescript-eslint/no-unsafe-call': 'error',
       '@typescript-eslint/no-unsafe-member-access': 'error',
       '@typescript-eslint/no-unsafe-return': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
       '@typescript-eslint/prefer-readonly': 'error',
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/promise-function-async': 'error',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/strict-boolean-expressions': ['error', {
+        allowString: false,
+        allowNumber: false,
+        allowNullableObject: false,
+      }],
       '@typescript-eslint/explicit-function-return-type': ['error', {
         allowExpressions: true,
         allowHigherOrderFunctions: true,
       }],
+      '@typescript-eslint/explicit-module-boundary-types': 'error',
+      '@typescript-eslint/no-confusing-void-expression': 'error',
+      '@typescript-eslint/no-meaningless-void-operator': 'error',
+      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/prefer-string-starts-ends-with': 'error',
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
+      '@typescript-eslint/consistent-type-imports': ['error', {
+        prefer: 'type-imports',
+        fixStyle: 'separate-type-imports',
+      }],
+      '@typescript-eslint/no-import-type-side-effects': 'error',
+
+      // Naming conventions (Microsoft/TypeScript official style)
       '@typescript-eslint/naming-convention': [
         'error',
         { selector: 'interface', format: ['PascalCase'] },
         { selector: 'typeAlias', format: ['PascalCase'] },
         { selector: 'enum', format: ['PascalCase'] },
         { selector: 'enumMember', format: ['UPPER_CASE'] },
+        { selector: 'class', format: ['PascalCase'] },
         { selector: 'variable', format: ['camelCase', 'UPPER_CASE', 'PascalCase'] },
         { selector: 'function', format: ['camelCase'] },
         { selector: 'method', format: ['camelCase'] },
         { selector: 'parameter', format: ['camelCase'], leadingUnderscore: 'allow' },
+        { selector: 'typeParameter', format: ['PascalCase'], prefix: ['T'] },
       ],
+
+      // JavaScript/ECMAScript best practices
       'no-console': 'error',
       'no-debugger': 'error',
       'no-eval': 'error',
       'no-implied-eval': 'error',
+      'no-new-func': 'error',
       'prefer-const': 'error',
       'no-var': 'error',
       'eqeqeq': ['error', 'always'],
       'curly': ['error', 'all'],
+      'no-throw-literal': 'error',
+      'prefer-promise-reject-errors': 'error',
+      'require-atomic-updates': 'error',
     },
   },
 
@@ -155,13 +272,40 @@ export default tseslint.config(
   // ── Test file overrides ──────────────────────────────────────────────────
   {
     files: ['tests/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
+    ...playwright.configs['flat/recommended'],
     rules: {
+      // Relax strict rules for tests
       '@typescript-eslint/no-explicit-any': 'off',
       'max-lines': 'off',
       'jsdoc/require-jsdoc': 'off',
       'jsdoc/require-example': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       'security/detect-object-injection': 'off',
+      'sonarjs/no-duplicate-string': 'off',
+
+      // Playwright best practices (enforced)
+      'playwright/no-wait-for-timeout': 'error', // Aligns with Principle 8
+      'playwright/missing-playwright-await': 'error',
+      'playwright/no-element-handle': 'error',
+      'playwright/no-eval': 'error',
+      'playwright/no-focused-test': 'error',
+      'playwright/no-skipped-test': 'warn',
+      'playwright/no-useless-await': 'error',
+      'playwright/prefer-web-first-assertions': 'error',
+      'playwright/prefer-to-be': 'error',
+      'playwright/prefer-to-have-length': 'error',
+      'playwright/require-top-level-describe': 'error',
+      'playwright/expect-expect': 'warn',
+      'playwright/no-conditional-in-test': 'warn',
+      'playwright/no-networkidle': 'error',
+      'playwright/no-page-pause': 'error',
+
+      // Async/await enforcement for Playwright API
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/promise-function-async': 'error',
+      'promise/catch-or-return': 'error',
+      'promise/always-return': 'error',
     },
   },
 

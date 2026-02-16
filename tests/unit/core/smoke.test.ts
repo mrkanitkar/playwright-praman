@@ -1,3 +1,5 @@
+import process from 'node:process';
+
 import { describe, expect, it } from 'vitest';
 
 describe('workspace smoke test', () => {
