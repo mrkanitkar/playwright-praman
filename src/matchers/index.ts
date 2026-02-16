@@ -1,4 +1,17 @@
 /**
+ * Barrel file for matchers module.
+ *
+ * @remarks
+ * Re-exports all matcher functions and types for UI5 control assertions.
+ *
  * @module matchers
  */
-// Barrel file — re-exports for matchers module
+export {
+  checkUI5Enabled,
+  checkUI5Property,
+  checkUI5Text,
+  checkUI5ValueState,
+  checkUI5Visible,
+} from './ui5-matchers.js';
+export type { MatcherOptions, MatcherResult } from './ui5-matchers.js';
+export { checkUI5CellText, checkUI5RowCount, checkUI5SelectedRows } from './table-matchers.js';
