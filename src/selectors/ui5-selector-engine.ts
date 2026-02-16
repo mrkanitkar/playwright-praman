@@ -134,9 +134,11 @@ export function createUI5SelectorEngineScript(): UI5SelectorEngineScript {
       const { id, controlType } = parseInlineSelector(selector);
       const cssSelector = buildAttributeSelector(id, controlType);
 
+      /* v8 ignore start -- defensive guard: parseInlineSelector always returns a non-empty field */
       if (cssSelector.length === 0) {
         return null;
       }
+      /* v8 ignore stop */
 
       return root.querySelector<HTMLElement>(cssSelector);
     },
@@ -145,9 +147,11 @@ export function createUI5SelectorEngineScript(): UI5SelectorEngineScript {
       const { id, controlType } = parseInlineSelector(selector);
       const cssSelector = buildAttributeSelector(id, controlType);
 
+      /* v8 ignore start -- defensive guard: parseInlineSelector always returns a non-empty field */
       if (cssSelector.length === 0) {
         return [];
       }
+      /* v8 ignore stop */
 
       return [...root.querySelectorAll<HTMLElement>(cssSelector)];
     },

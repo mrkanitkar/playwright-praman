@@ -83,6 +83,18 @@ describe('checkUI5RowCount', () => {
 
     expect(result.pass).toBe(true);
   });
+
+  it('pass message mentions "not to have" when passing', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlAggregation.mockResolvedValue([
+      createMockControl('r0', 'sap.m.ColumnListItem'),
+    ]);
+
+    const result = await checkUI5RowCount(adapter, 'table1', 1);
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to have');
+  });
 });
 
 describe('checkUI5CellText', () => {
@@ -133,6 +145,48 @@ describe('checkUI5CellText', () => {
 
     expect(result.pass).toBe(true);
   });
+
+  it('fails when row index is out of bounds', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlAggregation.mockResolvedValue([
+      createMockControl('row0', 'sap.m.ColumnListItem'),
+    ]);
+
+    const result = await checkUI5CellText(adapter, 'table1', 5, 0, 'text');
+
+    expect(result.pass).toBe(false);
+    expect(result.message()).toContain('row 5 does not exist');
+    expect(result.message()).toContain('1 rows');
+    expect(result.actual).toBeUndefined();
+  });
+
+  it('fails when column index is out of bounds', async () => {
+    const adapter = createMockBridgeAdapter();
+    const mockRows = [createMockControl('row0', 'sap.m.ColumnListItem')];
+    adapter.getControlAggregation
+      .mockResolvedValueOnce(mockRows)
+      .mockResolvedValueOnce([createMockControl('cell0', 'sap.m.Text')]);
+
+    const result = await checkUI5CellText(adapter, 'table1', 0, 5, 'text');
+
+    expect(result.pass).toBe(false);
+    expect(result.message()).toContain('column 5 does not exist');
+    expect(result.message()).toContain('1 cells');
+    expect(result.actual).toBeUndefined();
+  });
+
+  it('pass message mentions "not to match" when passing', async () => {
+    const adapter = createMockBridgeAdapter();
+    const mockRows = [createMockControl('row0', 'sap.m.ColumnListItem')];
+    const mockCells = [createMockControl('cell0', 'sap.m.Text')];
+    adapter.getControlAggregation.mockResolvedValueOnce(mockRows).mockResolvedValueOnce(mockCells);
+    adapter.getControlProperty.mockResolvedValue('Match');
+
+    const result = await checkUI5CellText(adapter, 'table1', 0, 0, 'Match');
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to match');
+  });
 });
 
 describe('checkUI5SelectedRows', () => {
@@ -156,5 +210,25 @@ describe('checkUI5SelectedRows', () => {
     const message = result.message();
     expect(message).toContain('3');
     expect(message).toContain('1');
+  });
+
+  it('fails when selectedItems is not an array', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlProperty.mockResolvedValue('not-an-array');
+
+    const result = await checkUI5SelectedRows(adapter, 'table1', 2);
+
+    expect(result.pass).toBe(false);
+    expect(result.message()).toContain('not an array');
+  });
+
+  it('pass message mentions "not to have" when passing', async () => {
+    const adapter = createMockBridgeAdapter();
+    adapter.getControlProperty.mockResolvedValue(['a', 'b']);
+
+    const result = await checkUI5SelectedRows(adapter, 'table1', 2);
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to have');
   });
 });

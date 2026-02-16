@@ -95,6 +95,19 @@ describe('loadConfig', () => {
     const config = await loadConfig();
     expect(config.ui5WaitTimeout).toBe(30_000);
   });
+
+  it('falls back to pure defaults when both env and overrides cause validation failure', async () => {
+    // Set an invalid env var to cause first parse to fail
+    vi.stubEnv('PRAMAN_LOG_LEVEL', 'invalid-level');
+    // Pass invalid overrides to cause fallback parse to also fail
+    const config = await loadConfig({
+      overrides: { logLevel: 'also-invalid' as 'info' },
+    });
+    // Should fall back to pure defaults
+    expect(config.logLevel).toBe('info');
+    expect(config.ui5WaitTimeout).toBe(30_000);
+    expect(Object.isFrozen(config)).toBe(true);
+  });
 });
 
 describe('defineConfig', () => {

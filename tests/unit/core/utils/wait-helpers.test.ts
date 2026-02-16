@@ -90,6 +90,40 @@ describe('waitForUI5Stable', () => {
       | undefined;
     expect(options?.polling).toBe(250);
   });
+
+  it('wraps non-Error rejection in TimeoutError', async () => {
+    const page = createMockPage();
+    page.waitForFunction.mockRejectedValue('string-error');
+
+    await expect(async () => {
+      await waitForUI5Stable(page);
+    }).rejects.toThrow(TimeoutError);
+  });
+
+  it('uses custom message in timeout error', async () => {
+    const page = createMockPage();
+    page.waitForFunction.mockRejectedValue(new Error('timeout'));
+
+    try {
+      await waitForUI5Stable(page, { message: 'Custom wait message' });
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(TimeoutError);
+      expect((error as TimeoutError).message).toBe('Custom wait message');
+    }
+  });
+
+  it('timeout error includes cause when Error thrown', async () => {
+    const page = createMockPage();
+    const original = new Error('Timeout 15000ms exceeded');
+    page.waitForFunction.mockRejectedValue(original);
+
+    try {
+      await waitForUI5Stable(page);
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(TimeoutError);
+      expect((error as TimeoutError).cause).toBe(original);
+    }
+  });
 });
 
 describe('briefDOMSettle', () => {
@@ -110,6 +144,15 @@ describe('briefDOMSettle', () => {
 
     const secondArg = page.evaluate.mock.calls[0]?.[1];
     expect(secondArg).toBe(250);
+  });
+
+  it('passes a function as first argument to evaluate', async () => {
+    const page = createMockPage();
+
+    await briefDOMSettle(page);
+
+    const firstArg = page.evaluate.mock.calls[0]?.[0];
+    expect(typeof firstArg).toBe('function');
   });
 });
 
@@ -149,5 +192,27 @@ describe('waitForUI5Bootstrap', () => {
 
     const options = page.waitForFunction.mock.calls[0]?.[1] as { timeout?: number } | undefined;
     expect(options?.timeout).toBe(30_000);
+  });
+
+  it('wraps non-Error rejection in TimeoutError', async () => {
+    const page = createMockPage();
+    page.waitForFunction.mockRejectedValue('string-rejection');
+
+    await expect(async () => {
+      await waitForUI5Bootstrap(page);
+    }).rejects.toThrow(TimeoutError);
+  });
+
+  it('timeout error preserves cause from original Error', async () => {
+    const page = createMockPage();
+    const original = new Error('Timeout 60000ms exceeded');
+    page.waitForFunction.mockRejectedValue(original);
+
+    try {
+      await waitForUI5Bootstrap(page);
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(TimeoutError);
+      expect((error as TimeoutError).cause).toBe(original);
+    }
   });
 });

@@ -162,4 +162,32 @@ describe('createUI5SelectorEngineScript', () => {
     const result = engine.query(root as unknown as HTMLElement, '#saveBtn');
     expect(result).toBe(child);
   });
+
+  it('query finds element by combined controlType#id selector', () => {
+    const child = createMockElement({
+      'data-sap-ui': 'myBtn',
+      'data-sap-ui-type': 'sap.m.Button',
+    });
+    const root = createMockRoot([child]);
+
+    const engine = createUI5SelectorEngineScript();
+    const result = engine.query(root as unknown as HTMLElement, 'sap.m.Button#myBtn');
+    expect(result).toBe(child);
+  });
+
+  it('query returns null for empty selector string', () => {
+    const root = createMockRoot([createMockElement({ 'data-sap-ui': 'btn1' })]);
+
+    const engine = createUI5SelectorEngineScript();
+    const result = engine.query(root as unknown as HTMLElement, '');
+    expect(result).toBeNull();
+  });
+
+  it('queryAll returns empty array for empty selector string', () => {
+    const root = createMockRoot([createMockElement({ 'data-sap-ui': 'btn1' })]);
+
+    const engine = createUI5SelectorEngineScript();
+    const results = engine.queryAll(root as unknown as HTMLElement, '');
+    expect(results).toHaveLength(0);
+  });
 });

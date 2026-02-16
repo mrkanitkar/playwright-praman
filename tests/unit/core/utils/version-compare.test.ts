@@ -90,6 +90,22 @@ describe('satisfiesRange', () => {
   it('compound range works', () => {
     expect(satisfiesRange(parseSemVer('1.55.0'), '>=1.50.0 <2.0.0')).toBe(true);
   });
+
+  it('exact version match (no operator prefix)', () => {
+    expect(satisfiesRange(parseSemVer('1.50.0'), '1.50.0')).toBe(true);
+  });
+
+  it('exact version mismatch (no operator prefix)', () => {
+    expect(satisfiesRange(parseSemVer('1.50.1'), '1.50.0')).toBe(false);
+  });
+
+  it('< operator passes when below', () => {
+    expect(satisfiesRange(parseSemVer('1.49.0'), '<1.50.0')).toBe(true);
+  });
+
+  it('< operator fails when equal or above', () => {
+    expect(satisfiesRange(parseSemVer('1.50.0'), '<1.50.0')).toBe(false);
+  });
 });
 
 describe('isAtLeast', () => {

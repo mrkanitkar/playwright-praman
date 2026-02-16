@@ -1,6 +1,6 @@
 # Phase 1 — Implementation Tracker
 
-> **Plan Version**: 2.0.0
+> **Plan Version**: 2.1.0 (COMPLETE)
 > **Created**: 2026-02-16
 > **Strategy**: TDD (RED-GREEN-REFACTOR), Max 3 parallel agents, 20x plan
 > **Branch**: main (direct commits, Husky hooks enabled)
@@ -31,7 +31,7 @@
 | --------------------------- | ------------------ |
 | Token budget per 5hr window | ~1,760,000         |
 | Execution strategy          | 5 waves, 3 agents  |
-| Total batches remaining     | 19 (of 46)         |
+| Total batches remaining     | 0 (of 46)          |
 | **Estimated sessions**      | **1 session**      |
 | **Estimated total tokens**  | **~49,000 output** |
 
@@ -106,33 +106,33 @@
 | #   | Batch | Files                                  | Est. Out | Depends  | Status |
 | --- | ----- | -------------------------------------- | -------- | -------- | ------ |
 | 27  | B4a   | `src/core/logging/redaction.ts` + test | ~1,200   | B3c, TH1 | [x]    |
-| 28  | B4b   | `src/core/logging/logger.ts` + test    | ~1,500   | B4a      | [ ]    |
-| 29  | B4c   | `src/core/logging/index.ts` barrel     | ~300     | B4b      | [ ]    |
+| 28  | B4b   | `src/core/logging/logger.ts` + test    | ~1,500   | B4a      | [x]    |
+| 29  | B4c   | `src/core/logging/index.ts` barrel     | ~300     | B4b      | [x]    |
 
 #### Telemetry (B5a-B5c)
 
 | #   | Batch | Files                                | Est. Out | Depends | Status |
 | --- | ----- | ------------------------------------ | -------- | ------- | ------ |
-| 30  | B5a   | `src/core/telemetry/otel.ts` + test  | ~1,500   | B3c     | [ ]    |
-| 31  | B5b   | `src/core/telemetry/spans.ts` + test | ~1,200   | B5a     | [ ]    |
-| 32  | B5c   | `src/core/telemetry/index.ts` barrel | ~300     | B5b     | [ ]    |
+| 30  | B5a   | `src/core/telemetry/otel.ts` + test  | ~1,500   | B3c     | [x]    |
+| 31  | B5b   | `src/core/telemetry/spans.ts` + test | ~1,200   | B5a     | [x]    |
+| 32  | B5c   | `src/core/telemetry/index.ts` barrel | ~300     | B5b     | [x]    |
 
 #### Utils (B6a-B6e)
 
 | #   | Batch | Files                                                             | Est. Out | Depends  | Status |
 | --- | ----- | ----------------------------------------------------------------- | -------- | -------- | ------ |
 | 33  | B6a   | `src/core/utils/constants.ts` + test                              | ~1,000   | B3c      | [x]    |
-| 34  | B6b   | `src/core/utils/wait-helpers.ts` + test                           | ~1,500   | B6a, TH1 | [ ]    |
+| 34  | B6b   | `src/core/utils/wait-helpers.ts` + test                           | ~1,500   | B6a, TH1 | [x]    |
 | 35  | B6c   | `src/core/utils/retry.ts` + test                                  | ~1,500   | B2a      | [x]    |
 | 36  | B6d   | `src/core/utils/step-decorator.ts` + `version-compare.ts` + tests | ~1,800   | B2a      | [x]    |
-| 37  | B6e   | `src/core/utils/index.ts` barrel                                  | ~400     | B6a-B6d  | [ ]    |
+| 37  | B6e   | `src/core/utils/index.ts` barrel                                  | ~400     | B6a-B6d  | [x]    |
 
 #### Compat (B7a-B7b)
 
 | #   | Batch | Files                                                                             | Est. Out | Depends            | Status |
 | --- | ----- | --------------------------------------------------------------------------------- | -------- | ------------------ | ------ |
-| 38  | B7a   | `src/core/compat/playwright-compat.ts` + test                                     | ~1,500   | B1a, B6d           | [ ]    |
-| 39  | B7b   | `src/core/compat/index.ts` + `src/core/index.ts` barrels + **SUB-PHASE 1.2 GATE** | ~600     | B4c, B5c, B6e, B7a | [ ]    |
+| 38  | B7a   | `src/core/compat/playwright-compat.ts` + test                                     | ~1,500   | B1a, B6d           | [x]    |
+| 39  | B7b   | `src/core/compat/index.ts` + `src/core/index.ts` barrels + **SUB-PHASE 1.2 GATE** | ~600     | B4c, B5c, B6e, B7a | [x]    |
 
 ### Sub-Phase 1.3 — Playwright Integration (Batches B8-B11)
 
@@ -140,11 +140,11 @@
 | --- | ----- | ------------------------------------------------------- | -------- | -------- | ------ |
 | 40  | B8a   | `src/bridge/adapter.ts` + test + barrel                 | ~1,200   | B1a      | [x]    |
 | 41  | TH2   | `tests/helpers/mock-bridge-adapter.ts`                  | ~700     | B8a      | [x]    |
-| 42  | B9a   | `src/selectors/selector-parser.ts` + test               | ~2,000   | B1a, B2a | [ ]    |
-| 43  | B9b   | `src/selectors/ui5-selector-engine.ts` + test + barrel  | ~1,500   | B9a      | [ ]    |
-| 44  | B10a  | `src/matchers/ui5-matchers.ts` + test                   | ~2,000   | TH2      | [ ]    |
-| 45  | B10b  | `src/matchers/table-matchers.ts` + test + barrel        | ~1,500   | TH2      | [ ]    |
-| 46  | B11   | `src/index.ts` update + final barrel + **PHASE 1 GATE** | ~600     | All      | [ ]    |
+| 42  | B9a   | `src/selectors/selector-parser.ts` + test               | ~2,000   | B1a, B2a | [x]    |
+| 43  | B9b   | `src/selectors/ui5-selector-engine.ts` + test + barrel  | ~1,500   | B9a      | [x]    |
+| 44  | B10a  | `src/matchers/ui5-matchers.ts` + test                   | ~2,000   | TH2      | [x]    |
+| 45  | B10b  | `src/matchers/table-matchers.ts` + test + barrel        | ~1,500   | TH2      | [x]    |
+| 46  | B11   | `src/index.ts` update + final barrel + **PHASE 1 GATE** | ~600     | All      | [x]    |
 
 **Total: 46 batches** (39 code + 4 test-only + 3 test helpers)
 
@@ -180,10 +180,10 @@ B1a → B3a → B3b → B3c → B4a → B4b → B4c → B7b → B11
 | Wave | Batches                     | Main Thread          | Agent A         | Agent B   | Status |
 | ---- | --------------------------- | -------------------- | --------------- | --------- | ------ |
 | 1    | B6c, B6d, B6a, TH2, B4a     | B6c commit + B6d     | B6a + TH2       | B4a       | [x]    |
-| 2    | B4b, B4c, B5a-B5c, B6b, B7a | B4b + B4c            | B5a + B5b + B5c | B6b + B7a | [ ]    |
-| 3    | B6e, B7b                    | B6e + B7b (Gate 1.2) | —               | —         | [ ]    |
-| 4    | B9a, B9b, B10a, B10b        | B9a + B9b            | B10a + B10b     | —         | [ ]    |
-| 5    | B11                         | B11 (Final Gate)     | —               | —         | [ ]    |
+| 2    | B4b, B4c, B5a-B5c, B6b, B7a | B4b + B4c            | B5a + B5b + B5c | B6b + B7a | [x]    |
+| 3    | B6e, B7b                    | B6e + B7b (Gate 1.2) | —               | —         | [x]    |
+| 4    | B9a, B9b, B10a, B10b        | B9a + B9b            | B10a + B10b     | —         | [x]    |
+| 5    | B11                         | B11 (Final Gate)     | —               | —         | [x]    |
 
 Estimated total: 1 session, ~49K output tokens.
 
@@ -223,12 +223,24 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 
 ## Progress Summary
 
-| Sub-Phase          | Batches | Done   | Remaining | %       |
-| ------------------ | ------- | ------ | --------- | ------- |
-| 1.1 Foundation     | 26      | 26     | 0         | 100%    |
-| 1.2 Infrastructure | 13      | 4      | 9         | 31%     |
-| 1.3 Playwright     | 7       | 2      | 5         | 29%     |
-| **Total**          | **46**  | **32** | **14**    | **70%** |
+| Sub-Phase          | Batches | Done   | Remaining | %        |
+| ------------------ | ------- | ------ | --------- | -------- |
+| 1.1 Foundation     | 26      | 26     | 0         | 100%     |
+| 1.2 Infrastructure | 13      | 13     | 0         | 100%     |
+| 1.3 Playwright     | 7       | 7      | 0         | 100%     |
+| **Total**          | **46**  | **46** | **0**     | **100%** |
+
+### Final Metrics
+
+| Metric        | Value                                      |
+| ------------- | ------------------------------------------ |
+| Test files    | 37                                         |
+| Tests passing | 459                                        |
+| Lint errors   | 0                                          |
+| Type errors   | 0                                          |
+| Export check  | 6/6 sub-path exports valid (attw)          |
+| Build output  | ESM 38.66 KB + CJS 40.18 KB + DTS 70.87 KB |
+| Commits       | Wave 1-5 (5 commits on main)               |
 
 ---
 
@@ -238,19 +250,19 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 | --- | ------------------------------------------------------------------ | ---------- | ------ |
 | H3  | Mock bridge adapter typed interface                                | TH2        | [x]    |
 | H4  | "retry() is for infrastructure only" TSDoc                         | B6c        | [x]    |
-| H5  | TSDoc `@example` tag in quality gate                               | B11        | [ ]    |
-| M1  | Selector parser depth limit                                        | B9a        | [ ]    |
-| M2  | OTel exporter-specific validation                                  | B5a        | [ ]    |
+| H5  | TSDoc `@example` tag in quality gate                               | B11        | [x]    |
+| M1  | Selector parser depth limit                                        | B9a        | [x]    |
+| M2  | OTel exporter-specific validation                                  | B5a        | [x]    |
 | M3  | WalkMe pattern disclaimer in constants                             | B6a        | [x]    |
-| M4  | Config loader: `{}` input populates all defaults                   | B3b-t      | [ ]    |
-| M5  | Matcher error code for null control                                | B10a       | [ ]    |
-| M6  | RecordReplay minimum UI5 version docs                              | B8a        | [ ]    |
-| M7  | `skipStabilityWait` precedence (per-call > selectors > top)        | B6b        | [ ]    |
-| M8  | Deduplicate `controlDiscoveryTimeout` / `selectors.defaultTimeout` | B3a        | [ ]    |
-| M9  | schema.test.ts: enumerate remaining 10 test cases                  | B3a-t      | [ ]    |
-| M10 | loader.test.ts: enumerate remaining 3 test cases                   | B3b-t      | [ ]    |
-| M11 | pino mock: use `vi.mock('pino')` inline                            | B4b        | [ ]    |
+| M4  | Config loader: `{}` input populates all defaults                   | B3b-t      | [x]    |
+| M5  | Matcher error code for null control                                | B10a       | [x]    |
+| M6  | RecordReplay minimum UI5 version docs                              | B8a        | [x]    |
+| M7  | `skipStabilityWait` precedence (per-call > selectors > top)        | B6b        | [x]    |
+| M8  | Deduplicate `controlDiscoveryTimeout` / `selectors.defaultTimeout` | B3a        | [x]    |
+| M9  | schema.test.ts: enumerate remaining 10 test cases                  | B3a-t      | [x]    |
+| M10 | loader.test.ts: enumerate remaining 3 test cases                   | B3b-t      | [x]    |
+| M11 | pino mock: use `vi.mock('pino')` inline                            | B4b        | [x]    |
 | M12 | mock-bridge vi.fn() returns undefined, not throws                  | TH2        | [x]    |
-| M13 | Move `serializeSelectorForBrowser()` from selectors.ts to parser   | B9a        | [ ]    |
-| V15 | Selector parser edge cases (Unicode, `=` in values)                | B9a        | [ ]    |
-| V16 | `waitForUI5Bootstrap` default timeout in signature                 | B6b        | [ ]    |
+| M13 | Move `serializeSelectorForBrowser()` from selectors.ts to parser   | B9a        | [x]    |
+| V15 | Selector parser edge cases (Unicode, `=` in values)                | B9a        | [x]    |
+| V16 | `waitForUI5Bootstrap` default timeout in signature                 | B6b        | [x]    |

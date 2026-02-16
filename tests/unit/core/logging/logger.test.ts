@@ -134,6 +134,18 @@ describe('createLogger', () => {
     expect(child).toHaveProperty('error');
     expect(child).toHaveProperty('debug');
   });
+
+  it('creates fallback logger when no default or parent is available', () => {
+    // resetDefaultLogger() already called in beforeEach — no default logger set
+    // Call createLogger without parent and without having called createRootLogger
+    const child = createLogger('orphan');
+
+    expect(child).toBeDefined();
+    // pinoMock was called to create the fallback
+    expect(pinoMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'playwright-praman', level: 'info' }),
+    );
+  });
 });
 
 describe('resetDefaultLogger', () => {

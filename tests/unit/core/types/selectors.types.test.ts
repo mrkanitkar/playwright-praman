@@ -127,6 +127,24 @@ describe('serializeSelectorForBrowser', () => {
       searchOpenDialogs: true,
     });
   });
+
+  it('serializes viewName, viewId, and properties when present', () => {
+    const selector: UI5Selector = {
+      controlType: 'sap.m.Input',
+      id: 'vendorInput',
+      viewName: 'sap.demo.View1',
+      viewId: 'container-demo---View1',
+      properties: { value: 'test', enabled: true },
+    };
+    const result = serializeSelectorForBrowser(selector);
+    expect(result).toEqual({
+      controlType: 'sap.m.Input',
+      id: 'vendorInput',
+      viewName: 'sap.demo.View1',
+      viewId: 'container-demo---View1',
+      properties: { value: 'test', enabled: true },
+    });
+  });
 });
 
 describe('deserializeRegExpId', () => {
