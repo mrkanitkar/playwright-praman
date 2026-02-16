@@ -1,0 +1,44 @@
+/**
+ * Ambient type declarations for SAP UI5 browser globals.
+ *
+ * @remarks
+ * These declarations type the `sap` global and `window.__praman_*` bridge
+ * functions available in the browser context during `page.evaluate()`.
+ * They are NOT runtime code — they only provide TypeScript type information.
+ */
+
+/* eslint-disable @typescript-eslint/no-explicit-any -- Browser globals use any for untyped SAP APIs */
+/* eslint-disable @typescript-eslint/no-extraneous-class -- SAP API classes have only static methods */
+/* eslint-disable @typescript-eslint/naming-convention -- Window augmentation requires __praman_* names */
+
+/** SAP UI5 global namespace (minimal subset used by Praman). */
+declare namespace sap {
+  namespace ui {
+    function getCore(): {
+      byId(id: string): any;
+    };
+    function require(module: string): any;
+    namespace core {
+      class Element {
+        static getElementById(id: string): any;
+      }
+    }
+    namespace test {
+      class RecordReplay {
+        static findAllDOMElementsByControlSelector(selector: any): Promise<any[]>;
+        static findDOMElementByControlSelector(selector: any): Promise<any>;
+        static interactWithControl(selector: any): Promise<void>;
+      }
+    }
+  }
+}
+
+/** Praman bridge functions injected into the browser context. */
+interface Window {
+  /** Three-tier control resolution (ElementRegistry → Core.byId → Element.getElementById). */
+  __praman_getById?: (id: string) => any;
+  /** Bridge adapter presence flag. */
+  __praman_bridge?: Record<string, (...args: any[]) => any>;
+  /** Find control by selector (bridge method). */
+  __praman_findControl?: (selector: any, timeout: number) => any;
+}
