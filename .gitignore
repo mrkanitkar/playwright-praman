@@ -37,3 +37,9 @@ docs/docs/api/
 skills/playwright-praman-sap-testing/SKILL.md
 src/proxy/typed/*.generated.ts
 *.sbom.json
+
+# Strict TypeScript Project
+# WARNING: JavaScript files (.js, .jsx, .mjs, .cjs) are NOT allowed in src/
+# This is enforced by pre-commit hooks. Config files like eslint.config.mjs
+# should remain in the project root.
+
