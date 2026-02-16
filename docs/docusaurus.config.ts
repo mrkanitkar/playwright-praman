@@ -11,9 +11,9 @@ const config: Config = {
     v4: true,
   },
 
-  // Custom domain: praman.zestest.in
-  url: 'https://praman.zestest.in',
-  baseUrl: '/',
+  // GitHub Pages: mrkanitkar.github.io/playwright-praman
+  url: 'https://mrkanitkar.github.io',
+  baseUrl: '/playwright-praman/',
 
   organizationName: 'mrkanitkar',
   projectName: 'playwright-praman',
