@@ -3,6 +3,10 @@
 *.md diff=markdown
 *.json diff=json
 
+# Ensure LF line endings for shell scripts (Husky hooks, CI scripts)
+*.sh text eol=lf
+.husky/* text eol=lf
+
 # Exclude generated files from language statistics
 src/proxy/typed/*.generated.ts linguist-generated=true
 docs/build/** linguist-generated=true

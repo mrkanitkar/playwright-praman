@@ -1,6 +1,6 @@
 #!/bin/bash
 # Check for JavaScript files in src/ (strict TypeScript project)
-./scripts/check-no-js-in-src.sh
+npx tsx scripts/check-no-js-in-src.ts
 
 # Run lint-staged
 npx lint-staged

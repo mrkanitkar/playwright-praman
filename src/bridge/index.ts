@@ -1,2 +1,4 @@
-/** @module bridge */
+/**
+ * @module bridge
+ */
 // Barrel file — re-exports for bridge module

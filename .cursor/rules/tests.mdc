@@ -1,0 +1,47 @@
+---
+description: 'Praman test writing rules — Vitest unit tests and Playwright integration tests'
+globs: 'tests/**/*.ts,**/*.test.ts,**/*.spec.ts'
+alwaysApply: false
+---
+
+# Test Rules
+
+## Unit Tests (Vitest)
+
+- File pattern: `*.test.ts`
+- Hermetic: no network, no SAP system
+- Use `describe` / `it` pattern
+- Mock bridge with typed test doubles from `tests/helpers/`
+- Coverage ≥ 90% statements, ≥ 85% branches
+
+## Integration Tests (Playwright)
+
+- File pattern: `*.spec.ts`
+- Use `test.step()` for each logical step
+- NEVER use `page.waitForTimeout()` — use `waitForUI5Stable()`
+- Require SAP credentials in environment
+
+## Correct Pattern
+
+```typescript
+import { describe, expect, it, vi } from 'vitest';
+
+describe('MyModule', () => {
+  it('should handle the expected case', () => {
+    const result = myFunction(input);
+    expect(result).toBe(expected);
+  });
+
+  it('should throw PramanError on failure', () => {
+    expect(() => myFunction(badInput)).toThrow(PramanError);
+  });
+});
+```
+
+## Forbidden in Tests
+
+- `any` type assertions
+- `console.log` (use test assertions)
+- `page.waitForTimeout()` (use `waitForUI5Stable()`)
+- Raw `throw new Error()` (use typed error subclass)
+- `require()` in test source (ESM only)

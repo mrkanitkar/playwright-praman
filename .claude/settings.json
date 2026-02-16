@@ -1,0 +1,16 @@
+{
+  "lspServers": {
+    "typescript": {
+      "command": "vtsls",
+      "args": ["--stdio"],
+      "extensionToLanguage": {
+        ".ts": "typescript",
+        ".tsx": "typescriptreact",
+        ".js": "javascript",
+        ".jsx": "javascriptreact",
+        ".mts": "typescript",
+        ".cts": "typescript"
+      }
+    }
+  }
+}

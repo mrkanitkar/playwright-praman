@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+docs/node_modules/
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Test artifacts
+playwright-report/
+test-results/
+blob-report/
+.auth/
+
+# Git
+.git/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock files (redundant with package.json)
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Minified files
+*.min.js
+*.min.css
+*.map
+
+# Generated files
+*.d.ts.map
+playwright-praman.sbom.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

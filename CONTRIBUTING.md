@@ -34,6 +34,39 @@ This is enforced by pre-commit and pre-push hooks. Any attempt to commit `.js`, 
 
 **Why:** Praman is a strict TypeScript project. All source code must be TypeScript to ensure type safety, better tooling support, and adherence to architectural principles.
 
+## Cross-Platform Development
+
+Praman supports Windows 10/11, macOS, and Linux. All code must work on all three platforms.
+
+### Path Handling
+
+- Always use `node:path` methods (`path.join`, `path.resolve`, `path.sep`) — **never** string concatenation with `/` or `\`
+- Always use `node:fs/promises` for async file operations
+- Use `import.meta.url` + `fileURLToPath` from `node:url` for `__dirname` equivalent
+- Use `os.homedir()` for user home directory — never `~` expansion
+- Use `os.tmpdir()` for temp directory — returns `%TEMP%` on Windows, `/tmp` on Unix
+- For user app data: `process.env.LOCALAPPDATA` or `process.env.APPDATA` on Windows, XDG paths on Linux
+
+### npm Scripts
+
+- No bash-only commands (`rm -rf`, `grep`, `sed`) — use Node.js built-ins
+- Use `node:fs` `rmSync({recursive: true, force: true})` for cross-platform cleanup
+- Scripts must be written in TypeScript (`.ts` executed via `tsx`) — not bash (`.sh`)
+
+### Dual ESM + CJS Build
+
+- The package ships both ESM (`.js`) and CJS (`.cjs`) formats
+- Run `npm run check:exports` after build to validate the export map via `attw`
+- Test both formats: CJS and ESM smoke tests are in `tests/unit/core/`
+
+### Supported IDEs
+
+VS Code (primary), JetBrains (WebStorm/IntelliJ), Cursor, Google Antigravity. See respective config directories (`.vscode/`, `.idea/`, `.cursor/`, `.antigravity/`).
+
+### Supported AI Agents
+
+GitHub Copilot, Claude Code, Google Jules, OpenAI Codex, Cursor AI, Google Antigravity Agent, GitHub Copilot Coding Agents. See `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`, `.github/agents/`.
+
 ## Commit Messages
 
 We use [Conventional Commits](https://www.conventionalcommits.org/):
