@@ -2,7 +2,6 @@
 
 ## 1.0.0 (2026-02-16)
 
-
 ### ⚠ BREAKING CHANGES
 
 * Build output now includes CJS alongside ESM
@@ -11,7 +10,6 @@
 
 * **eslint:** add comprehensive best practices configuration ([ea794d6](https://github.com/mrkanitkar/playwright-praman/commit/ea794d6809e9b4b9aec8bc22d58d1da6901b5573))
 * multi-OS, multi-IDE, dual ESM+CJS build, AI agents support ([860d52c](https://github.com/mrkanitkar/playwright-praman/commit/860d52c4cad11c2a227c2254920f1a23625beed5))
-
 
 ### Bug Fixes
 
