@@ -14,7 +14,10 @@ blob-report/
 
 # IDE
 .vscode/launch.json
-.idea/
+.idea/*
+!.idea/runConfigurations/
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
 *.swp
 *.swo
 
@@ -26,6 +29,9 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Claude Code local settings
+.claude/settings.local.json
 
 # Docs build
 docs/.docusaurus/

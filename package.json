@@ -1,6 +1,6 @@
 {
   "name": "playwright-praman",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "AI-First SAP UI5 Test Automation Platform for Playwright",
   "author": "support@zestest.in",
   "license": "Apache-2.0",
@@ -11,36 +11,63 @@
   "files": [
     "dist"
   ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "exports": {
     ".": {
+      "types": {
+        "import": "./dist/index.d.ts",
+        "require": "./dist/index.d.cts"
+      },
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./ai": {
+      "types": {
+        "import": "./dist/ai/index.d.ts",
+        "require": "./dist/ai/index.d.cts"
+      },
       "import": "./dist/ai/index.js",
-      "types": "./dist/ai/index.d.ts"
+      "require": "./dist/ai/index.cjs"
     },
     "./intents": {
+      "types": {
+        "import": "./dist/intents/index.d.ts",
+        "require": "./dist/intents/index.d.cts"
+      },
       "import": "./dist/intents/index.js",
-      "types": "./dist/intents/index.d.ts"
+      "require": "./dist/intents/index.cjs"
     },
     "./vocabulary": {
+      "types": {
+        "import": "./dist/vocabulary/index.d.ts",
+        "require": "./dist/vocabulary/index.d.cts"
+      },
       "import": "./dist/vocabulary/index.js",
-      "types": "./dist/vocabulary/index.d.ts"
+      "require": "./dist/vocabulary/index.cjs"
     },
     "./fe": {
+      "types": {
+        "import": "./dist/fe/index.d.ts",
+        "require": "./dist/fe/index.d.cts"
+      },
       "import": "./dist/fe/index.js",
-      "types": "./dist/fe/index.d.ts"
+      "require": "./dist/fe/index.cjs"
     },
     "./reporters": {
+      "types": {
+        "import": "./dist/reporters/index.d.ts",
+        "require": "./dist/reporters/index.d.cts"
+      },
       "import": "./dist/reporters/index.js",
-      "types": "./dist/reporters/index.d.ts"
+      "require": "./dist/reporters/index.cjs"
     }
   },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "clean": "rm -rf dist coverage playwright-report test-results .auth",
+    "clean": "node -e \"['dist','coverage','playwright-report','test-results','.auth'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
+    "check:exports": "attw --pack . --ignore-rules no-resolution",
     "lint": "eslint src/ tests/ --max-warnings=0",
     "lint:fix": "eslint src/ tests/ --fix --max-warnings=0",
     "typecheck": "tsc --noEmit",
@@ -49,7 +76,7 @@
     "spellcheck": "cspell \"src/**/*.ts\" \"docs/**/*.md\" --no-progress",
     "deadcode": "knip",
     "mdlint": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#docs/build\"",
-    "validate:no-js": "./scripts/check-no-js-in-src.sh",
+    "validate:no-js": "tsx scripts/check-no-js-in-src.ts",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:unit:ui": "vitest --ui",
@@ -61,10 +88,13 @@
     "docs:dev": "cd docs && npx docusaurus start",
     "docs:build": "cd docs && npx docusaurus build",
     "docs:api": "typedoc",
+    "docs:validate": "npm run docs:api && npm run lint && npm run typecheck",
+    "generate:capabilities": "tsx scripts/generate-capabilities.ts",
     "generate:proxies": "tsx scripts/generate-typed-proxies.ts",
     "generate:skill": "tsx scripts/generate-skill-md.ts",
     "generate:sbom": "cyclonedx-npm --output-file playwright-praman.sbom.json --spec-version 1.5",
     "generate:schema": "tsx scripts/generate-json-schema.ts",
+    "setup:ide": "tsx scripts/setup-ide.ts",
     "audit": "npm audit --audit-level=high",
     "audit:fix": "npm audit fix",
     "prepublishOnly": "npm run ci",
@@ -85,9 +115,11 @@
     "openai": "6.22.0"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.2",
     "@commitlint/cli": "20.4.1",
     "@commitlint/config-conventional": "20.4.1",
     "@cyclonedx/cyclonedx-npm": "4.1.2",
+    "@microsoft/api-extractor": "7.56.3",
     "@microsoft/eslint-plugin-sdl": "1.1.0",
     "@playwright/test": "1.58.2",
     "@size-limit/file": "12.0.0",
@@ -97,13 +129,14 @@
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import-x": "4.16.1",
-    "eslint-plugin-jsdoc": "62.5.5",
     "eslint-plugin-n": "17.24.0",
     "eslint-plugin-playwright": "2.5.1",
     "eslint-plugin-promise": "7.2.1",
     "eslint-plugin-security": "3.0.1",
     "eslint-plugin-sonarjs": "3.0.7",
+    "eslint-plugin-tsdoc": "0.5.0",
     "eslint-plugin-unicorn": "63.0.0",
+    "glob": "13.0.3",
     "husky": "9.1.7",
     "knip": "5.83.1",
     "lint-staged": "16.2.7",

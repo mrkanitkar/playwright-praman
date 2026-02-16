@@ -1,4 +1,6 @@
 {
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "Praman — AI-First SAP UI5 Test Automation Platform",
   "entryPoints": [
     "src/index.ts",
     "src/ai/index.ts",
@@ -7,15 +9,163 @@
     "src/fe/index.ts",
     "src/reporters/index.ts"
   ],
+  "entryPointStrategy": "resolve",
   "out": "docs/api",
+  "readme": "README.md",
+  "includeVersion": true,
   "plugin": ["typedoc-plugin-markdown"],
+
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Core",
+    "AI",
+    "Intents",
+    "Vocabulary",
+    "Fiori Elements",
+    "Reporters",
+    "Bridge",
+    "Proxy",
+    "Fixtures",
+    "Authentication",
+    "Matchers",
+    "Selectors",
+    "Errors",
+    "Configuration",
+    "Utilities",
+    "*"
+  ],
+  "defaultCategory": "Other",
+
   "validation": {
     "notExported": true,
     "invalidLink": true,
     "notDocumented": true
   },
   "treatWarningsAsErrors": true,
+  "treatValidationWarningsAsErrors": true,
+
   "excludePrivate": true,
-  "excludeProtected": true,
-  "readme": "none"
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "excludeExternals": true,
+
+  "searchInComments": true,
+  "searchInDocuments": true,
+  "cleanOutputDir": true,
+  "disableSources": false,
+  "sourceLinkTemplate": "https://github.com/mrkanitkar/playwright-praman/blob/{gitRevision}/{path}#L{line}",
+
+  "navigationLinks": {
+    "GitHub": "https://github.com/mrkanitkar/playwright-praman",
+    "npm": "https://www.npmjs.com/package/playwright-praman",
+    "Documentation": "https://mrkanitkar.github.io/playwright-praman"
+  },
+
+  "blockTags": [
+    "@param",
+    "@returns",
+    "@throws",
+    "@see",
+    "@example",
+    "@remarks",
+    "@deprecated",
+    "@internal",
+    "@public",
+    "@beta",
+    "@alpha",
+    "@experimental",
+    "@intent",
+    "@guarantee",
+    "@capability",
+    "@recipe",
+    "@ai",
+    "@aiContext",
+    "@aiHint",
+    "@aiRequired",
+    "@aiOptional",
+    "@category",
+    "@sapModule",
+    "@businessContext",
+    "@ui5Version",
+    "@fioriElement",
+    "@browserContext",
+    "@failureMode",
+    "@prerequisite",
+    "@postcondition",
+    "@alternative"
+  ],
+
+  "inlineTags": [
+    "@link",
+    "@linkcode",
+    "@linkplain",
+    "@inheritDoc",
+    "@label"
+  ],
+
+  "modifierTags": [
+    "@public",
+    "@protected",
+    "@private",
+    "@internal",
+    "@readonly",
+    "@override",
+    "@virtual",
+    "@sealed",
+    "@deprecated",
+    "@alpha",
+    "@beta",
+    "@experimental"
+  ],
+
+  "requiredToBeDocumented": [
+    "Enum",
+    "EnumMember",
+    "Variable",
+    "Function",
+    "Class",
+    "Interface",
+    "Property",
+    "Method",
+    "Accessor",
+    "TypeAlias"
+  ],
+
+  "sort": [
+    "static-first",
+    "visibility",
+    "kind",
+    "alphabetical"
+  ],
+
+  "kindSortOrder": [
+    "Reference",
+    "Project",
+    "Module",
+    "Namespace",
+    "Enum",
+    "EnumMember",
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Constructor",
+    "Property",
+    "Variable",
+    "Function",
+    "Accessor",
+    "Method",
+    "Parameter",
+    "TypeParameter",
+    "TypeLiteral",
+    "CallSignature",
+    "ConstructorSignature",
+    "IndexSignature",
+    "GetSignature",
+    "SetSignature"
+  ],
+
+  "hideGenerator": false,
+  "theme": "default",
+  "gitRevision": "main",
+  "gitRemote": "origin"
 }

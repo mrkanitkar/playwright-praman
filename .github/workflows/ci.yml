@@ -6,6 +6,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -33,11 +34,12 @@ jobs:
       - run: npx markdownlint-cli2 "**/*.md" "#node_modules" "#docs/build" "#docs/node_modules"
 
   unit-tests:
-    name: Unit Tests (Node ${{ matrix.node-version }})
-    runs-on: ubuntu-latest
+    name: Unit Tests (${{ matrix.os }}, Node ${{ matrix.node-version }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [20, 22, 24]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -50,13 +52,16 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: coverage-node-${{ matrix.node-version }}
+          name: coverage-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: coverage/
 
   build:
-    name: Build + Bundle Size
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    name: Build + Bundle Size (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
@@ -65,8 +70,16 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build
-      - run: npx size-limit
+      - name: CJS smoke test
+        run: node -e "const m = require('./dist/index.cjs'); if (!m.VERSION) throw new Error('CJS load failed')"
+      - name: Bundle size check
+        if: matrix.os == 'ubuntu-latest'
+        run: npx size-limit
+      - name: Export map validation
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run check:exports
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: matrix.os == 'ubuntu-latest'
         with:
           name: dist
           path: dist/
@@ -132,3 +145,27 @@ jobs:
       - name: Build Docusaurus
         working-directory: docs
         run: npm run build -- --no-minify
+
+  azure-playwright:
+    name: Azure Playwright Workspaces
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'azure-test')
+    needs: [quality, build]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run tests on Azure Playwright Workspaces
+        run: npx playwright test --config=playwright.service.config.ts --workers=20
+        env:
+          PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: azure-playwright-report
+          path: playwright-report/

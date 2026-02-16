@@ -1,0 +1,30 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <option name="OTHER_INDENT_OPTIONS">
+      <value>
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        <option name="TAB_SIZE" value="2" />
+        <option name="USE_TAB_CHARACTER" value="false" />
+      </value>
+    </option>
+    <TypeScriptCodeStyleSettings version="0">
+      <option name="FORCE_SEMICOLON_STYLE" value="true" />
+      <option name="USE_SEMICOLON_AFTER_STATEMENT" value="true" />
+      <option name="FORCE_QUOTE_STYlE" value="true" />
+      <option name="USE_DOUBLE_QUOTES" value="false" />
+      <option name="SPACES_WITHIN_IMPORTS" value="true" />
+    </TypeScriptCodeStyleSettings>
+    <codeStyleSettings language="TypeScript">
+      <option name="KEEP_LINE_BREAKS" value="true" />
+      <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+      <indentOptions>
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        <option name="TAB_SIZE" value="2" />
+        <option name="USE_TAB_CHARACTER" value="false" />
+      </indentOptions>
+    </codeStyleSettings>
+  </code_scheme>
+  <option name="USE_PER_PROJECT_SETTINGS" value="true" />
+</component>

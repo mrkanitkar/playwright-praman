@@ -1,0 +1,142 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+  "extends": [
+    "@microsoft/api-extractor/extends/tsdoc-base.json"
+  ],
+  "tagDefinitions": [
+    {
+      "tagName": "@module",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@category",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@intent",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@guarantee",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@capability",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@recipe",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@ai",
+      "syntaxKind": "modifier",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@aiContext",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@aiHint",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@aiRequired",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@aiOptional",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@sapModule",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@businessContext",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@ui5Version",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@fioriElement",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@browserContext",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
+      "tagName": "@failureMode",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@prerequisite",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@postcondition",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@alternative",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    }
+  ],
+  "supportForTags": {
+    "@module": true,
+    "@remarks": true,
+    "@example": true,
+    "@param": true,
+    "@returns": true,
+    "@throws": true,
+    "@see": true,
+    "@deprecated": true,
+    "@internal": true,
+    "@public": true,
+    "@category": true,
+    "@readonly": true,
+    "@packageDocumentation": true,
+    "@intent": true,
+    "@guarantee": true,
+    "@capability": true,
+    "@recipe": true,
+    "@ai": true,
+    "@aiContext": true,
+    "@aiHint": true,
+    "@aiRequired": true,
+    "@aiOptional": true,
+    "@sapModule": true,
+    "@businessContext": true,
+    "@ui5Version": true,
+    "@fioriElement": true,
+    "@browserContext": true,
+    "@failureMode": true,
+    "@prerequisite": true,
+    "@postcondition": true,
+    "@alternative": true
+  },
+  "reportUnsupportedHtmlElements": true
+}

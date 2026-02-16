@@ -2,10 +2,11 @@
 // Single source of truth for all lint rules. No .eslintrc files.
 // Configured for: TypeScript, Playwright, Node.js, Security (Microsoft SDL + OWASP)
 // Best practices: Microsoft, Node.js, Google, SonarJS quality rules
+// Documentation: Microsoft TSDoc (TypeScript Documentation Standard)
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import security from 'eslint-plugin-security';
-import jsdoc from 'eslint-plugin-jsdoc';
+import tsdoc from 'eslint-plugin-tsdoc';
 import importX from 'eslint-plugin-import-x';
 import unicorn from 'eslint-plugin-unicorn';
 import playwright from 'eslint-plugin-playwright';
@@ -123,22 +124,36 @@ export default tseslint.config(
     },
   },
 
-  // ── JSDoc/TSDoc enforcement ──────────────────────────────────────────────
-  jsdoc.configs['flat/recommended-typescript-error'],
+  // ── TSDoc enforcement (Microsoft TypeScript Documentation Standard) ───────
   {
+    plugins: {
+      tsdoc,
+    },
     rules: {
-      'jsdoc/require-description': ['error', {
-        contexts: ['TSMethodSignature', 'FunctionDeclaration', 'MethodDefinition'],
-      }],
-      'jsdoc/require-example': ['warn', {
-        contexts: ['FunctionDeclaration', 'MethodDefinition'],
-      }],
-      'jsdoc/require-param-description': 'error',
-      'jsdoc/require-returns-description': 'error',
-      'jsdoc/check-tag-names': ['error', {
-        definedTags: ['internal', 'ai', 'capability', 'recipe'],
-      }],
-      'jsdoc/tag-lines': ['error', 'any', { startLines: 1 }],
+      // ═══════════════════════════════════════════════════════════════════════
+      // Microsoft TSDoc Standard (Official TypeScript Documentation)
+      // @see https://tsdoc.org/
+      // ═══════════════════════════════════════════════════════════════════════
+      'tsdoc/syntax': 'error', // Validate TSDoc syntax
+
+      // Note: TSDoc is minimalist by design. It validates syntax and structure
+      // but does not enforce documentation completeness. For stricter enforcement,
+      // consider using TypeDoc's validation during the docs build step.
+      //
+      // TSDoc standard tags:
+      // - @remarks - Additional context
+      // - @example - Code examples
+      // - @param - Parameter documentation (no types, use TypeScript)
+      // - @returns - Return value documentation
+      // - @throws - Exception documentation (no types)
+      // - @see - Cross-references
+      // - @deprecated - Deprecation notices
+      // - @public/@internal/@private - API visibility
+      //
+      // Custom tags defined in tsdoc.json:
+      // - @intent, @guarantee, @capability - AI-first design
+      // - @sapModule, @ui5Version, @fioriElement - SAP domain
+      // - @failureMode, @prerequisite, @postcondition - Testing
     },
   },
 
@@ -149,11 +164,14 @@ export default tseslint.config(
       'import-x/no-cycle': 'error',
       'import-x/no-self-import': 'error',
       'import-x/no-useless-path-segments': 'error',
-      'import-x/order': ['error', {
-        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
-        'newlines-between': 'always',
-        alphabetize: { order: 'asc', caseInsensitive: true },
-      }],
+      'import-x/order': [
+        'error',
+        {
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
       'import-x/no-duplicates': 'error',
       'import-x/consistent-type-specifier-style': ['error', 'prefer-top-level'],
     },
@@ -193,15 +211,21 @@ export default tseslint.config(
       '@typescript-eslint/promise-function-async': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
-      '@typescript-eslint/strict-boolean-expressions': ['error', {
-        allowString: false,
-        allowNumber: false,
-        allowNullableObject: false,
-      }],
-      '@typescript-eslint/explicit-function-return-type': ['error', {
-        allowExpressions: true,
-        allowHigherOrderFunctions: true,
-      }],
+      '@typescript-eslint/strict-boolean-expressions': [
+        'error',
+        {
+          allowString: false,
+          allowNumber: false,
+          allowNullableObject: false,
+        },
+      ],
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        {
+          allowExpressions: true,
+          allowHigherOrderFunctions: true,
+        },
+      ],
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-confusing-void-expression': 'error',
       '@typescript-eslint/no-meaningless-void-operator': 'error',
@@ -210,10 +234,13 @@ export default tseslint.config(
       '@typescript-eslint/prefer-string-starts-ends-with': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
-      '@typescript-eslint/consistent-type-imports': ['error', {
-        prefer: 'type-imports',
-        fixStyle: 'separate-type-imports',
-      }],
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          fixStyle: 'separate-type-imports',
+        },
+      ],
       '@typescript-eslint/no-import-type-side-effects': 'error',
 
       // Naming conventions (Microsoft/TypeScript official style)
@@ -239,8 +266,8 @@ export default tseslint.config(
       'no-new-func': 'error',
       'prefer-const': 'error',
       'no-var': 'error',
-      'eqeqeq': ['error', 'always'],
-      'curly': ['error', 'all'],
+      eqeqeq: ['error', 'always'],
+      curly: ['error', 'all'],
       'no-throw-literal': 'error',
       'prefer-promise-reject-errors': 'error',
       'require-atomic-updates': 'error',
@@ -250,22 +277,29 @@ export default tseslint.config(
   // ── Module size warning (D27: ≤300 LOC guideline) ────────────────────────
   {
     rules: {
-      'max-lines': ['warn', {
-        max: 300,
-        skipBlankLines: true,
-        skipComments: true,
-      }],
+      'max-lines': [
+        'warn',
+        {
+          max: 300,
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
     },
   },
 
   // ── No page.waitForTimeout() (Principle 8: banned) ───────────────────────
   {
     rules: {
-      'no-restricted-properties': ['error', {
-        object: 'page',
-        property: 'waitForTimeout',
-        message: 'page.waitForTimeout() is banned (Principle 8). Use waitForUI5Stable() or auto-retry assertions.',
-      }],
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'page',
+          property: 'waitForTimeout',
+          message:
+            'page.waitForTimeout() is banned (Principle 8). Use waitForUI5Stable() or auto-retry assertions.',
+        },
+      ],
     },
   },
 
@@ -278,8 +312,6 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'off',
       'max-lines': 'off',
       'jsdoc/require-jsdoc': 'off',
-      'jsdoc/require-example': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
       'security/detect-object-injection': 'off',
       'sonarjs/no-duplicate-string': 'off',
 
