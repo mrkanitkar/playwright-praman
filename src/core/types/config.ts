@@ -2,17 +2,13 @@
  * Literal union types for configuration fields.
  *
  * @remarks
- * These types are imported by `core/config/schema.ts` to build the Zod schema.
- * Consumers import them from here for type annotations.
+ * These types define standalone config value unions (LogLevel, AuthStrategy, etc.).
+ *
+ * Strategy types (`InteractionStrategyName`, `DiscoveryStrategyName`) are derived
+ * from Zod (D11) and live in `config/schema.ts` — re-exported via `types/index.ts`.
  *
  * DO NOT re-export PramanConfig from this file — that creates a circular dependency.
  * PramanConfig is exported from `core/config/schema.js`, NOT re-exported here.
- *
- * Flow:
- * - `config.ts` (this file) defines literal unions (LogLevel, AuthStrategy, etc.)
- * - `schema.ts` imports literal values from HERE and defines PramanConfigSchema
- * - `schema.ts` exports `PramanConfig = z.output of PramanConfigSchema`
- * - Consumers import PramanConfig from `#core/config/schema.js` or `#core/config/index.js`
  *
  * @module types
  */
@@ -27,23 +23,6 @@
  * ```
  */
 export type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'verbose';
-
-/**
- * Control interaction strategy variants.
- *
- * @remarks
- * - `playwright` — Pure Playwright web-first actions
- * - `dom-first` — Direct DOM manipulation (legacy compatibility)
- * - `opa5` — SAP OPA5 framework (test automation)
- * - `hybrid` — Adaptive strategy (recommended default)
- *
- * @example
- * ```typescript
- * import type { InteractionStrategy } from '#core/types/config.js';
- * const strategy: InteractionStrategy = 'hybrid';
- * ```
- */
-export type InteractionStrategy = 'playwright' | 'dom-first' | 'opa5' | 'hybrid';
 
 /**
  * Authentication strategy variants for SAP system login.

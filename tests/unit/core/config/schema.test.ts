@@ -19,7 +19,8 @@ describe('PramanConfigSchema', () => {
         expect(result.data.logLevel).toBe('info');
         expect(result.data.ui5WaitTimeout).toBe(30_000);
         expect(result.data.controlDiscoveryTimeout).toBe(10_000);
-        expect(result.data.interactionStrategy).toBe('hybrid');
+        expect(result.data.interactionStrategy).toBe('ui5-native');
+        expect(result.data.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
         expect(result.data.skipStabilityWait).toBe(false);
         expect(result.data.preferVisibleControls).toBe(true);
         expect(result.data.ignoreAutoWaitUrls).toEqual([]);
@@ -43,7 +44,8 @@ describe('PramanConfigSchema', () => {
         logLevel: 'verbose',
         ui5WaitTimeout: 60_000,
         controlDiscoveryTimeout: 15_000,
-        interactionStrategy: 'playwright',
+        interactionStrategy: 'ui5-native',
+        discoveryStrategies: ['direct-id', 'recordreplay'],
         skipStabilityWait: true,
         preferVisibleControls: false,
         ignoreAutoWaitUrls: ['**/walkme/**', '**/analytics/**'],
@@ -112,6 +114,78 @@ describe('PramanConfigSchema', () => {
         expect(result.data.ai?.provider).toBe('azure-openai');
         expect(result.data.ai?.temperature).toBe(0.3);
       }
+    });
+
+    it('accepts discoveryStrategies reordering', () => {
+      const result = PramanConfigSchema.safeParse({
+        discoveryStrategies: ['recordreplay', 'direct-id'],
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.discoveryStrategies).toEqual(['recordreplay', 'direct-id']);
+      }
+    });
+
+    it('accepts all three discovery strategies', () => {
+      const result = PramanConfigSchema.safeParse({
+        discoveryStrategies: ['direct-id', 'recordreplay', 'registry'],
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('accepts single discovery strategy', () => {
+      const result = PramanConfigSchema.safeParse({
+        discoveryStrategies: ['recordreplay'],
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.discoveryStrategies).toEqual(['recordreplay']);
+      }
+    });
+
+    it('accepts duplicate discovery strategies (wasteful but valid)', () => {
+      const result = PramanConfigSchema.safeParse({
+        discoveryStrategies: ['direct-id', 'direct-id'],
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('applies opa5 defaults when provided as empty object', () => {
+      const result = PramanConfigSchema.safeParse({ opa5: {} });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.opa5?.interactionTimeout).toBe(5_000);
+        expect(result.data.opa5?.autoWait).toBe(true);
+        expect(result.data.opa5?.debug).toBe(false);
+      }
+    });
+
+    it('accepts valid full opa5 config', () => {
+      const result = PramanConfigSchema.safeParse({
+        opa5: { interactionTimeout: 8_000, autoWait: false, debug: true },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.opa5?.interactionTimeout).toBe(8_000);
+        expect(result.data.opa5?.autoWait).toBe(false);
+        expect(result.data.opa5?.debug).toBe(true);
+      }
+    });
+
+    it('opa5 is absent by default', () => {
+      const result = PramanConfigSchema.safeParse({});
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.opa5).toBeUndefined();
+      }
+    });
+
+    it('accepts opa5 even when interactionStrategy is not opa5', () => {
+      const result = PramanConfigSchema.safeParse({
+        interactionStrategy: 'ui5-native',
+        opa5: { interactionTimeout: 3_000 },
+      });
+      expect(result.success).toBe(true);
     });
 
     it('applies selectors section defaults', () => {
@@ -184,6 +258,46 @@ describe('PramanConfigSchema', () => {
       const result = PramanConfigSchema.safeParse({
         interactionStrategy: 'selenium',
       });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects removed interactionStrategy "playwright"', () => {
+      const result = PramanConfigSchema.safeParse({ interactionStrategy: 'playwright' });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects removed interactionStrategy "hybrid"', () => {
+      const result = PramanConfigSchema.safeParse({ interactionStrategy: 'hybrid' });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects empty discoveryStrategies array', () => {
+      const result = PramanConfigSchema.safeParse({ discoveryStrategies: [] });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects invalid discovery strategy names', () => {
+      const result = PramanConfigSchema.safeParse({ discoveryStrategies: ['cache'] });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects non-array discoveryStrategies', () => {
+      const result = PramanConfigSchema.safeParse({ discoveryStrategies: 'direct-id' });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects negative opa5 interactionTimeout', () => {
+      const result = PramanConfigSchema.safeParse({ opa5: { interactionTimeout: -1 } });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects zero opa5 interactionTimeout', () => {
+      const result = PramanConfigSchema.safeParse({ opa5: { interactionTimeout: 0 } });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects float opa5 interactionTimeout', () => {
+      const result = PramanConfigSchema.safeParse({ opa5: { interactionTimeout: 1.5 } });
       expect(result.success).toBe(false);
     });
 

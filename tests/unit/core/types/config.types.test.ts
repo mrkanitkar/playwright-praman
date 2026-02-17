@@ -1,20 +1,24 @@
 /**
- * Type-level tests for `src/core/types/config.ts`.
+ * Type-level tests for config types.
  *
  * @remarks
  * These tests verify that literal union types accept valid values and
  * that TypeScript rejects invalid values at compile time. Runtime assertions
  * confirm the types exist and are usable.
+ *
+ * `InteractionStrategyName` and `DiscoveryStrategyName` are derived from Zod
+ * (D11) and re-exported via the types barrel from `config/schema.ts`.
  */
 import { describe, expectTypeOf, it } from 'vitest';
 
 import type {
   AIProvider,
   AuthStrategy,
-  InteractionStrategy,
+  DiscoveryStrategyName,
+  InteractionStrategyName,
   LogLevel,
   TelemetryExporter,
-} from '#core/types/config.js';
+} from '#core/types/index.js';
 
 describe('LogLevel', () => {
   it('accepts all valid log levels', () => {
@@ -32,17 +36,45 @@ describe('LogLevel', () => {
   });
 });
 
-describe('InteractionStrategy', () => {
+describe('InteractionStrategyName', () => {
   it('accepts all valid strategies', () => {
-    expectTypeOf<'playwright'>().toExtend<InteractionStrategy>();
-    expectTypeOf<'dom-first'>().toExtend<InteractionStrategy>();
-    expectTypeOf<'opa5'>().toExtend<InteractionStrategy>();
-    expectTypeOf<'hybrid'>().toExtend<InteractionStrategy>();
+    expectTypeOf<'ui5-native'>().toExtend<InteractionStrategyName>();
+    expectTypeOf<'dom-first'>().toExtend<InteractionStrategyName>();
+    expectTypeOf<'opa5'>().toExtend<InteractionStrategyName>();
   });
 
-  it('rejects invalid strategies', () => {
-    expectTypeOf<'selenium'>().not.toExtend<InteractionStrategy>();
-    expectTypeOf<'cypress'>().not.toExtend<InteractionStrategy>();
+  it('rejects removed values', () => {
+    expectTypeOf<'hybrid'>().not.toExtend<InteractionStrategyName>();
+    expectTypeOf<'playwright'>().not.toExtend<InteractionStrategyName>();
+  });
+
+  it('rejects invalid values', () => {
+    expectTypeOf<'selenium'>().not.toExtend<InteractionStrategyName>();
+    expectTypeOf<'cypress'>().not.toExtend<InteractionStrategyName>();
+    expectTypeOf<number>().not.toExtend<InteractionStrategyName>();
+  });
+});
+
+describe('DiscoveryStrategyName', () => {
+  it('accepts all valid strategies', () => {
+    expectTypeOf<'direct-id'>().toExtend<DiscoveryStrategyName>();
+    expectTypeOf<'recordreplay'>().toExtend<DiscoveryStrategyName>();
+    expectTypeOf<'registry'>().toExtend<DiscoveryStrategyName>();
+  });
+
+  it('rejects internal-only strategies', () => {
+    expectTypeOf<'cache'>().not.toExtend<DiscoveryStrategyName>();
+  });
+
+  it('rejects invalid values', () => {
+    expectTypeOf<'property-match'>().not.toExtend<DiscoveryStrategyName>();
+    expectTypeOf<'xpath'>().not.toExtend<DiscoveryStrategyName>();
+    expectTypeOf<number>().not.toExtend<DiscoveryStrategyName>();
+  });
+
+  it('works as array element type', () => {
+    expectTypeOf<DiscoveryStrategyName[]>().toExtend<string[]>();
+    expectTypeOf<['direct-id', 'recordreplay']>().toExtend<readonly DiscoveryStrategyName[]>();
   });
 });
 
