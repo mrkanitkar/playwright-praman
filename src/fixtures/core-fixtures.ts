@@ -1,12 +1,10 @@
 /**
- * Worker-scoped core fixtures for the Praman Playwright test runner.
+ * Core fixtures for the Praman Playwright test runner.
  *
  * @remarks
- * Defines the foundation fixture layer using `test.extend()`. Worker-scoped
- * fixtures are created once per worker process and shared across all tests
- * running in that worker.
+ * Defines the foundation fixture layer using `test.extend()`.
  *
- * This module provides:
+ * Worker-scoped fixtures (created once per worker process):
  * - `pramanConfig` — validated, frozen configuration
  * - `rootLogger` — pino root logger with redaction
  * - `tracer` — OpenTelemetry tracer (NoOp in Phase 1)
@@ -14,8 +12,10 @@
  * - `selectorRegistration` — registers `ui5=` selector engine (auto)
  * - `matcherRegistration` — registers custom UI5 matchers (auto)
  *
- * Test-scoped fixtures (bridgeAdapter, ui5, pramanLogger) are added by
- * the B3b batch in a separate module.
+ * Test-scoped fixtures (created per test):
+ * - `bridgeAdapter` — BridgeAdapter per test with navigation listener
+ * - `pramanLogger` — child logger per test
+ * - `ui5` — UI5 handler placeholder (full UI5Handler in B3c)
  *
  * @example
  * ```typescript
@@ -32,13 +32,17 @@
  */
 
 import { test as base } from '@playwright/test';
+import type { Frame, Page } from '@playwright/test';
 import type { Logger } from 'pino';
 
+import { createBridgeAdapter } from '#bridge/adapter-factory.js';
+import type { BridgeAdapter, BridgePage } from '#bridge/adapter.js';
+import { resetPageInjection } from '#bridge/injection.js';
 import { assertMinVersion, getPlaywrightFeatures } from '#core/compat/index.js';
 import type { PlaywrightFeatures } from '#core/compat/index.js';
 import { loadConfig } from '#core/config/index.js';
 import type { PramanConfig } from '#core/config/index.js';
-import { createRootLogger } from '#core/logging/index.js';
+import { createLogger, createRootLogger } from '#core/logging/index.js';
 import { initTelemetry } from '#core/telemetry/index.js';
 import type { TracerWrapper } from '#core/telemetry/index.js';
 
@@ -46,13 +50,24 @@ import type { TracerWrapper } from '#core/telemetry/index.js';
 const MIN_PLAYWRIGHT_VERSION = '1.50.0';
 
 /**
- * Test-scoped fixture type placeholder.
+ * Test-scoped fixture types for the core layer.
  *
  * @remarks
- * Intentionally empty — test-scoped fixtures will be added by A5 (B3b).
+ * Each fixture is created per test and torn down after the test completes.
+ * - `bridgeAdapter` — fresh adapter per test with navigation re-injection
+ * - `pramanLogger` — child logger scoped to the test
+ * - `ui5` — placeholder for UI5Handler (resolves to BridgeAdapter until B3c)
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Placeholder for B3b test-scoped fixtures
-interface TestFixtures {}
+interface TestFixtures {
+  /** BridgeAdapter created and initialized per test. */
+  bridgeAdapter: BridgeAdapter;
+
+  /** Child logger scoped to the current test. */
+  pramanLogger: Logger;
+
+  /** UI5 handler placeholder — provides adapter access until B3c wires UI5Handler. */
+  ui5: BridgeAdapter;
+}
 
 /**
  * Worker-scoped fixture types for the core layer.
@@ -81,6 +96,35 @@ interface WorkerFixtures {
   /** Registers custom UI5 + table matchers via expect.extend() once per worker. */
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- Playwright fixtures use void for side-effect-only fixtures
   matcherRegistration: void;
+}
+
+/**
+ * Adapts a Playwright Page to the BridgePage interface.
+ *
+ * @remarks
+ * Playwright's `Page.waitForFunction()` returns `Promise<ElementHandle>`
+ * while `BridgePage.waitForFunction()` returns `Promise<void>`. This
+ * wrapper discards the return value to satisfy the BridgePage contract.
+ *
+ * @param page - Playwright Page from the fixture system
+ * @returns A BridgePage-compatible wrapper
+ *
+ * @example
+ * ```typescript
+ * const bridgePage = toBridgePage(page);
+ * await adapter.init(bridgePage);
+ * ```
+ */
+function toBridgePage(page: Page): BridgePage {
+  return {
+    evaluate: page.evaluate.bind(page) as BridgePage['evaluate'],
+    async waitForFunction(
+      pageFunction: string | (() => unknown),
+      options?: { readonly timeout?: number; readonly polling?: number },
+    ): Promise<void> {
+      await page.waitForFunction(pageFunction, options);
+    },
+  };
 }
 
 /**
@@ -158,6 +202,42 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
     },
     { scope: 'worker', auto: true },
   ],
+
+  // ── Test-scoped fixtures ──────────────────────────────────────────
+
+  bridgeAdapter: async ({ rootLogger, page }, use) => {
+    const logger = createLogger('bridge', rootLogger);
+    const bridgePage = toBridgePage(page);
+    const adapter = createBridgeAdapter();
+    await adapter.init(bridgePage);
+
+    // Listen for main frame navigation to reset bridge injection state.
+    // After navigation the injected bridge script is gone, so the next
+    // adapter call must re-inject.
+    const navigationListener = (frame: Frame): void => {
+      if (frame === page.mainFrame()) {
+        logger.debug('Main frame navigated — clearing bridge injection state');
+        resetPageInjection(bridgePage);
+      }
+    };
+    page.on('framenavigated', navigationListener);
+
+    await use(adapter);
+
+    // Teardown: remove listener and destroy adapter
+    page.off('framenavigated', navigationListener);
+    await adapter.destroy();
+  },
+
+  pramanLogger: async ({ rootLogger }, use) => {
+    const logger = createLogger('test', rootLogger);
+    await use(logger);
+  },
+
+  ui5: async ({ bridgeAdapter }, use) => {
+    // Placeholder — full UI5Handler wired in B3c (A9)
+    await use(bridgeAdapter);
+  },
 });
 
 export type { TestFixtures, WorkerFixtures };

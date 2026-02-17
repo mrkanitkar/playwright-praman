@@ -1,5 +1,5 @@
 /**
- * Tests for `src/fixtures/core-fixtures.ts` — worker-scoped Playwright fixtures.
+ * Tests for `src/fixtures/core-fixtures.ts` — worker + test-scoped Playwright fixtures.
  *
  * @remarks
  * Uses vitest with mocked `@playwright/test` and core module dependencies.
@@ -76,9 +76,48 @@ const mockFeatures: PlaywrightFeatures = {
 
 const mockLoadConfig = vi.fn().mockResolvedValue(mockConfig);
 const mockCreateRootLogger = vi.fn().mockReturnValue(mockRootLoggerInstance);
+const mockCreateLogger = vi.fn().mockReturnValue(mockChildLogger);
 const mockInitTelemetry = vi.fn().mockResolvedValue(mockTracerInstance);
 const mockAssertMinVersion = vi.fn();
 const mockGetPlaywrightFeatures = vi.fn().mockReturnValue(mockFeatures);
+
+// ── Bridge mocks ──────────────────────────────────────────────────
+
+const mockBridgeAdapter = {
+  init: vi.fn().mockResolvedValue(undefined),
+  isReady: vi.fn().mockResolvedValue(true),
+  destroy: vi.fn().mockResolvedValue(undefined),
+  getUI5Version: vi.fn().mockResolvedValue('1.120.0'),
+  isWebComponent: vi.fn().mockResolvedValue(false),
+  findControl: vi.fn().mockResolvedValue(null),
+  findControls: vi.fn().mockResolvedValue([]),
+  getControlProperty: vi.fn().mockResolvedValue(undefined),
+  setControlProperty: vi.fn().mockResolvedValue(undefined),
+  getControlAggregation: vi.fn().mockResolvedValue([]),
+  executeControlMethod: vi.fn().mockResolvedValue(undefined),
+  waitForUI5Stable: vi.fn().mockResolvedValue(undefined),
+  getModel: vi.fn().mockResolvedValue(undefined),
+  getBindingContext: vi.fn().mockResolvedValue(undefined),
+  describeControl: vi.fn().mockResolvedValue({}),
+  getAvailableMethods: vi.fn().mockResolvedValue([]),
+  getSelectorForControl: vi.fn().mockResolvedValue(null),
+  resetInjectionState: vi.fn(),
+};
+
+const mockCreateBridgeAdapter = vi.fn().mockReturnValue(mockBridgeAdapter);
+const mockResetPageInjection = vi.fn();
+
+/** Mock Playwright page mainFrame sentinel */
+const mockMainFrame = { url: vi.fn().mockReturnValue('https://example.com') };
+
+/** Mock Playwright page with on/off/mainFrame */
+const mockPage = {
+  evaluate: vi.fn().mockResolvedValue(undefined),
+  waitForFunction: vi.fn().mockResolvedValue(undefined),
+  on: vi.fn(),
+  off: vi.fn(),
+  mainFrame: vi.fn().mockReturnValue(mockMainFrame),
+};
 
 vi.mock('#core/config/index.js', () => ({
   loadConfig: mockLoadConfig,
@@ -86,6 +125,7 @@ vi.mock('#core/config/index.js', () => ({
 
 vi.mock('#core/logging/index.js', () => ({
   createRootLogger: mockCreateRootLogger,
+  createLogger: mockCreateLogger,
 }));
 
 vi.mock('#core/telemetry/index.js', () => ({
@@ -95,6 +135,14 @@ vi.mock('#core/telemetry/index.js', () => ({
 vi.mock('#core/compat/index.js', () => ({
   assertMinVersion: mockAssertMinVersion,
   getPlaywrightFeatures: mockGetPlaywrightFeatures,
+}));
+
+vi.mock('#bridge/adapter-factory.js', () => ({
+  createBridgeAdapter: mockCreateBridgeAdapter,
+}));
+
+vi.mock('#bridge/injection.js', () => ({
+  resetPageInjection: mockResetPageInjection,
 }));
 
 const mockTestExtend = createMockTestExtend();
@@ -180,6 +228,34 @@ async function runFixture<T>(
   return captured as T;
 }
 
+/**
+ * Resets all mocks to their default behavior.
+ *
+ * @remarks
+ * Shared across worker-scoped and test-scoped describe blocks
+ * to avoid duplicate function bodies (sonarjs/no-identical-functions).
+ *
+ * @example
+ * ```typescript
+ * beforeEach(() => { resetAllMockDefaults(); });
+ * ```
+ */
+function resetAllMockDefaults(): void {
+  vi.clearAllMocks();
+  mockLoadConfig.mockResolvedValue(mockConfig);
+  mockCreateRootLogger.mockReturnValue(mockRootLoggerInstance);
+  mockCreateLogger.mockReturnValue(mockChildLogger);
+  mockInitTelemetry.mockResolvedValue(mockTracerInstance);
+  mockAssertMinVersion.mockImplementation(() => undefined);
+  mockGetPlaywrightFeatures.mockReturnValue(mockFeatures);
+  mockCreateBridgeAdapter.mockReturnValue(mockBridgeAdapter);
+  mockBridgeAdapter.init.mockResolvedValue(undefined);
+  mockBridgeAdapter.destroy.mockResolvedValue(undefined);
+  mockPage.on.mockImplementation(() => undefined);
+  mockPage.off.mockImplementation(() => undefined);
+  mockPage.mainFrame.mockReturnValue(mockMainFrame);
+}
+
 // ── Fixture definitions reference ───────────────────────────────────
 
 const fixtures = (coreTest as unknown as { _fixtureDefinitions: Record<string, unknown> })
@@ -189,12 +265,7 @@ const fixtures = (coreTest as unknown as { _fixtureDefinitions: Record<string, u
 
 describe('core-fixtures worker-scoped fixture definitions', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    mockLoadConfig.mockResolvedValue(mockConfig);
-    mockCreateRootLogger.mockReturnValue(mockRootLoggerInstance);
-    mockInitTelemetry.mockResolvedValue(mockTracerInstance);
-    mockAssertMinVersion.mockImplementation(() => undefined);
-    mockGetPlaywrightFeatures.mockReturnValue(mockFeatures);
+    resetAllMockDefaults();
   });
 
   afterEach(() => {
@@ -409,6 +480,215 @@ describe('core-fixtures worker-scoped fixture definitions', () => {
   });
 });
 
+describe('core-fixtures test-scoped fixture definitions', () => {
+  beforeEach(() => {
+    resetAllMockDefaults();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe('test-scoped fixture scope declarations', () => {
+    it('declares bridgeAdapter as test-scoped (no worker scope tuple)', () => {
+      const options = extractFixtureOptions(fixtures['bridgeAdapter']);
+
+      // Test-scoped fixtures use bare function, not [fn, { scope: 'worker' }] tuple
+      expect(options).toBeUndefined();
+    });
+
+    it('declares pramanLogger as test-scoped (no worker scope tuple)', () => {
+      const options = extractFixtureOptions(fixtures['pramanLogger']);
+
+      expect(options).toBeUndefined();
+    });
+
+    it('declares ui5 as test-scoped (no worker scope tuple)', () => {
+      const options = extractFixtureOptions(fixtures['ui5']);
+
+      expect(options).toBeUndefined();
+    });
+  });
+
+  describe('bridgeAdapter fixture', () => {
+    it('creates adapter via createBridgeAdapter()', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      await runFixture(fn, {
+        rootLogger: mockRootLoggerInstance,
+        page: mockPage,
+      });
+
+      expect(mockCreateBridgeAdapter).toHaveBeenCalledOnce();
+    });
+
+    it('calls adapter.init() with a BridgePage wrapper', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      await runFixture(fn, {
+        rootLogger: mockRootLoggerInstance,
+        page: mockPage,
+      });
+
+      expect(mockBridgeAdapter.init).toHaveBeenCalledOnce();
+      // The fixture wraps the Playwright Page into a BridgePage interface
+      const bridgePage = mockBridgeAdapter.init.mock.calls[0]?.[0] as Record<string, unknown>;
+      expect(bridgePage).toHaveProperty('evaluate');
+      expect(bridgePage).toHaveProperty('waitForFunction');
+    });
+
+    it('creates bridge child logger from rootLogger', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      await runFixture(fn, {
+        rootLogger: mockRootLoggerInstance,
+        page: mockPage,
+      });
+
+      expect(mockCreateLogger).toHaveBeenCalledWith('bridge', mockRootLoggerInstance);
+    });
+
+    it('registers framenavigated listener on page', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      await runFixture(fn, {
+        rootLogger: mockRootLoggerInstance,
+        page: mockPage,
+      });
+
+      expect(mockPage.on).toHaveBeenCalledWith('framenavigated', expect.any(Function));
+    });
+
+    it('navigation listener calls resetPageInjection on main frame navigation', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      // Capture the listener
+      let capturedListener: ((frame: unknown) => void) | undefined;
+      mockPage.on.mockImplementation((event: string, listener: (frame: unknown) => void) => {
+        if (event === 'framenavigated') {
+          capturedListener = listener;
+        }
+      });
+
+      await runFixture(fn, {
+        rootLogger: mockRootLoggerInstance,
+        page: mockPage,
+      });
+
+      expect(capturedListener).toBeDefined();
+      // Simulate main frame navigation
+      capturedListener?.(mockMainFrame);
+
+      expect(mockResetPageInjection).toHaveBeenCalledOnce();
+      // resetPageInjection receives the BridgePage wrapper, not the raw page
+      const bridgePage = mockResetPageInjection.mock.calls[0]?.[0] as Record<string, unknown>;
+      expect(bridgePage).toHaveProperty('evaluate');
+      expect(bridgePage).toHaveProperty('waitForFunction');
+    });
+
+    it('navigation listener ignores iframe navigation (non-main frame)', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      let capturedListener: ((frame: unknown) => void) | undefined;
+      mockPage.on.mockImplementation((event: string, listener: (frame: unknown) => void) => {
+        if (event === 'framenavigated') {
+          capturedListener = listener;
+        }
+      });
+
+      await runFixture(fn, {
+        rootLogger: mockRootLoggerInstance,
+        page: mockPage,
+      });
+
+      expect(capturedListener).toBeDefined();
+      // Simulate iframe navigation (different frame object)
+      const iframeFrame = { url: vi.fn().mockReturnValue('https://iframe.example.com') };
+      capturedListener?.(iframeFrame);
+
+      expect(mockResetPageInjection).not.toHaveBeenCalled();
+    });
+
+    it('teardown removes navigation listener', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+
+      let teardownExecuted = false;
+      const useFn = async (value: unknown): Promise<void> => {
+        expect(value).toBe(mockBridgeAdapter);
+        // After use() returns, teardown runs
+        await Promise.resolve();
+      };
+
+      await fn({ rootLogger: mockRootLoggerInstance, page: mockPage }, useFn);
+
+      teardownExecuted = true;
+      expect(teardownExecuted).toBe(true);
+      expect(mockPage.off).toHaveBeenCalledWith('framenavigated', expect.any(Function));
+    });
+
+    it('teardown destroys the adapter', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      const destroySpy = vi.fn().mockResolvedValue(undefined);
+      const adapterWithSpy = { ...mockBridgeAdapter, destroy: destroySpy };
+      mockCreateBridgeAdapter.mockReturnValue(adapterWithSpy);
+
+      await runFixture(fn, {
+        rootLogger: mockRootLoggerInstance,
+        page: mockPage,
+      });
+
+      expect(destroySpy).toHaveBeenCalledOnce();
+    });
+
+    it('provides the adapter to the test via use()', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      let capturedAdapter: unknown;
+      const useFn = async (value: unknown): Promise<void> => {
+        capturedAdapter = value;
+        await Promise.resolve();
+      };
+
+      await fn({ rootLogger: mockRootLoggerInstance, page: mockPage }, useFn);
+
+      expect(capturedAdapter).toBe(mockBridgeAdapter);
+    });
+
+    it('navigation listener logs debug message on main frame navigation', async () => {
+      const fn = extractFixtureFn(fixtures['bridgeAdapter']);
+      let capturedListener: ((frame: unknown) => void) | undefined;
+      mockPage.on.mockImplementation((event: string, listener: (frame: unknown) => void) => {
+        if (event === 'framenavigated') {
+          capturedListener = listener;
+        }
+      });
+
+      await runFixture(fn, {
+        rootLogger: mockRootLoggerInstance,
+        page: mockPage,
+      });
+
+      capturedListener?.(mockMainFrame);
+
+      expect(mockChildLogger.debug).toHaveBeenCalledWith(
+        'Main frame navigated — clearing bridge injection state',
+      );
+    });
+  });
+
+  describe('pramanLogger fixture', () => {
+    it('creates child logger via createLogger("test", rootLogger)', async () => {
+      const fn = extractFixtureFn(fixtures['pramanLogger']);
+      const logger = await runFixture(fn, { rootLogger: mockRootLoggerInstance });
+
+      expect(mockCreateLogger).toHaveBeenCalledWith('test', mockRootLoggerInstance);
+      expect(logger).toBe(mockChildLogger);
+    });
+  });
+
+  describe('ui5 fixture (placeholder)', () => {
+    it('provides bridgeAdapter as the ui5 value', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5Value = await runFixture(fn, { bridgeAdapter: mockBridgeAdapter });
+
+      expect(ui5Value).toBe(mockBridgeAdapter);
+    });
+  });
+});
+
 describe('core-fixtures type-level tests', () => {
   it('coreTest exports a fixture object with _fixtureDefinitions', () => {
     expect(coreTest).toBeDefined();
@@ -424,6 +704,12 @@ describe('core-fixtures type-level tests', () => {
     expect(fixtures).toHaveProperty('matcherRegistration');
   });
 
+  it('fixture definitions contain all expected test-scoped fixtures', () => {
+    expect(fixtures).toHaveProperty('bridgeAdapter');
+    expect(fixtures).toHaveProperty('pramanLogger');
+    expect(fixtures).toHaveProperty('ui5');
+  });
+
   it('WorkerFixtures type has correct shape', () => {
     type WorkerFixtureKeys =
       | 'pramanConfig'
@@ -434,6 +720,12 @@ describe('core-fixtures type-level tests', () => {
       | 'matcherRegistration';
 
     expectTypeOf<WorkerFixtureKeys>().toExtend<string>();
+  });
+
+  it('TestFixtures type has correct shape', () => {
+    type TestFixtureKeys = 'bridgeAdapter' | 'pramanLogger' | 'ui5';
+
+    expectTypeOf<TestFixtureKeys>().toExtend<string>();
   });
 
   it('PramanConfig type is readonly', () => {
