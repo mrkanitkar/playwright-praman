@@ -3,7 +3,13 @@
  */
 // Barrel file — re-exports for auth module
 
-export type { AuthStrategy, AuthStrategyName, SAPAuthConfig, SessionInfo } from './auth-types.js';
+export type {
+  AuthPage,
+  AuthStrategy,
+  AuthStrategyName,
+  SAPAuthConfig,
+  SessionInfo,
+} from './auth-types.js';
 
 export {
   isAuthenticated,
@@ -12,3 +18,13 @@ export {
   isUI5Loaded,
   isUserMenuVisible,
 } from './auth-checks.js';
+
+export { OnPremAuthStrategy } from './strategies/onprem-strategy.js';
+
+export { CloudSAMLAuthStrategy, isCloudUrl } from './strategies/cloud-saml-strategy.js';
+
+export { Office365AuthStrategy } from './strategies/office365-strategy.js';
+
+export { APIAuthStrategy } from './strategies/api-strategy.js';
+
+export { CertificateAuthStrategy } from './strategies/certificate-strategy.js';
