@@ -23,8 +23,8 @@
  * @remarks
  * Categories (10):
  * - Config (3): schema validation, file not found, parse failure
- * - Bridge (4): timeout, injection, readiness, version mismatch
- * - Control (6): not found, visibility, enabled, interactable, property, aggregation
+ * - Bridge (5): timeout, injection, readiness, version mismatch, execution
+ * - Control (7): not found, visibility, enabled, interactable, property, aggregation, method
  * - Auth (4): failure, timeout, session expired, invalid strategy
  * - Navigation (3): tile not found, route failed, timeout
  * - OData (3): request failed, parse, CSRF token
@@ -44,6 +44,7 @@ export const ErrorCode = Object.freeze({
   ERR_BRIDGE_INJECTION: 'ERR_BRIDGE_INJECTION',
   ERR_BRIDGE_NOT_READY: 'ERR_BRIDGE_NOT_READY',
   ERR_BRIDGE_VERSION: 'ERR_BRIDGE_VERSION',
+  ERR_BRIDGE_EXECUTION: 'ERR_BRIDGE_EXECUTION',
 
   // ── Control errors ─────────────────────────────────────────────────
   ERR_CONTROL_NOT_FOUND: 'ERR_CONTROL_NOT_FOUND',
@@ -52,6 +53,7 @@ export const ErrorCode = Object.freeze({
   ERR_CONTROL_NOT_INTERACTABLE: 'ERR_CONTROL_NOT_INTERACTABLE',
   ERR_CONTROL_PROPERTY: 'ERR_CONTROL_PROPERTY',
   ERR_CONTROL_AGGREGATION: 'ERR_CONTROL_AGGREGATION',
+  ERR_CONTROL_METHOD: 'ERR_CONTROL_METHOD',
 
   // ── Auth errors ────────────────────────────────────────────────────
   ERR_AUTH_FAILED: 'ERR_AUTH_FAILED',

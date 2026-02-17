@@ -33,7 +33,8 @@ export interface BridgeErrorOptions extends Omit<PramanErrorOptions, 'code' | 'r
     | typeof ErrorCode.ERR_BRIDGE_TIMEOUT
     | typeof ErrorCode.ERR_BRIDGE_INJECTION
     | typeof ErrorCode.ERR_BRIDGE_NOT_READY
-    | typeof ErrorCode.ERR_BRIDGE_VERSION;
+    | typeof ErrorCode.ERR_BRIDGE_VERSION
+    | typeof ErrorCode.ERR_BRIDGE_EXECUTION;
   readonly retryable?: boolean;
   readonly ui5Version?: string;
   readonly adapterType?: string;

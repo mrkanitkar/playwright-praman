@@ -6,14 +6,25 @@
  * Single proxy with get trap: Playwright API → anti-thenable → direct
  * props → blacklist check → method forwarding.
  */
-/* eslint-disable @typescript-eslint/no-unsafe-call -- dynamic proxy methods aren't statically typed */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- proxy returns unknown from dynamic get */
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockBridgeAdapter } from '../../helpers/mock-bridge-adapter.js';
 
+import type { UI5ControlBase } from '#core/types/controls.js';
 import type { ControlProxyState } from '#proxy/dynamic-proxy.js';
 import { createControlProxy } from '#proxy/dynamic-proxy.js';
+
+/**
+ * Test-only interface for accessing dynamic proxy methods.
+ * The proxy supports arbitrary method calls via its get trap, but `UI5ControlBase`
+ * only declares known base methods. This extends it for test assertions.
+ */
+interface TestButtonProxy extends UI5ControlBase {
+  getText(): Promise<string>;
+  setText(text: string): Promise<void>;
+  getEnabled(): Promise<boolean>;
+  firePress(): Promise<void>;
+}
 
 function createTestState(overrides?: Partial<ControlProxyState>): ControlProxyState {
   return {
@@ -25,12 +36,10 @@ function createTestState(overrides?: Partial<ControlProxyState>): ControlProxySt
   };
 }
 
-/** Helper to access dynamic proxy methods that aren't on the static type. */
-function getDynamicMethod(
-  proxy: Record<string, unknown>,
-  name: string,
-): (...args: unknown[]) => Promise<unknown> {
-  return proxy[name] as (...args: unknown[]) => Promise<unknown>;
+/** Casts a proxy to a record for dynamic property access in tests. */
+function toRecord(proxy: TestButtonProxy): Record<string, unknown> {
+  const obj: unknown = proxy;
+  return obj as Record<string, unknown>;
 }
 
 describe('dynamic-proxy', () => {
@@ -38,31 +47,31 @@ describe('dynamic-proxy', () => {
   describe('property access', () => {
     it('proxy intercepts property access', () => {
       const state = createTestState();
-      const proxy = createControlProxy(state);
+      const proxy = createControlProxy(state) as TestButtonProxy;
       expect(typeof proxy.getText).toBe('function');
     });
 
     it('getId() returns control ID', async () => {
       const state = createTestState();
-      const proxy = createControlProxy(state);
+      const proxy = createControlProxy(state) as TestButtonProxy;
       expect(await proxy.getId()).toBe('saveBtn');
     });
 
     it('getControlType() returns type string', async () => {
       const state = createTestState();
-      const proxy = createControlProxy(state);
+      const proxy = createControlProxy(state) as TestButtonProxy;
       expect(await proxy.getControlType()).toBe('sap.m.Button');
     });
 
     it('id property returns control ID directly', () => {
       const state = createTestState();
-      const proxy = createControlProxy(state);
+      const proxy = createControlProxy(state) as TestButtonProxy;
       expect(proxy.id).toBe('saveBtn');
     });
 
     it('controlType property returns type directly', () => {
       const state = createTestState();
-      const proxy = createControlProxy(state);
+      const proxy = createControlProxy(state) as TestButtonProxy;
       expect(proxy.controlType).toBe('sap.m.Button');
     });
   });
@@ -71,19 +80,19 @@ describe('dynamic-proxy', () => {
   describe('anti-thenable', () => {
     it('then returns undefined', () => {
       const state = createTestState();
-      const proxy = createControlProxy(state) as Record<string, unknown>;
+      const proxy = toRecord(createControlProxy(state) as TestButtonProxy);
       expect(proxy['then']).toBeUndefined();
     });
 
     it('catch returns undefined', () => {
       const state = createTestState();
-      const proxy = createControlProxy(state) as Record<string, unknown>;
+      const proxy = toRecord(createControlProxy(state) as TestButtonProxy);
       expect(proxy['catch']).toBeUndefined();
     });
 
     it('finally returns undefined', () => {
       const state = createTestState();
-      const proxy = createControlProxy(state) as Record<string, unknown>;
+      const proxy = toRecord(createControlProxy(state) as TestButtonProxy);
       expect(proxy['finally']).toBeUndefined();
     });
   });
@@ -92,14 +101,14 @@ describe('dynamic-proxy', () => {
   describe('blacklist enforcement', () => {
     it('blacklisted method throws ControlError', () => {
       const state = createTestState();
-      const proxy = createControlProxy(state) as Record<string, unknown>;
+      const proxy = toRecord(createControlProxy(state) as TestButtonProxy);
       // eslint-disable-next-line @typescript-eslint/dot-notation -- testing blacklisted property access
       expect(() => proxy['constructor']).toThrow();
     });
 
     it('underscore-prefixed method throws', () => {
       const state = createTestState();
-      const proxy = createControlProxy(state) as Record<string, unknown>;
+      const proxy = toRecord(createControlProxy(state) as TestButtonProxy);
       expect(() => proxy['_internal']).toThrow();
     });
   });
@@ -116,7 +125,7 @@ describe('dynamic-proxy', () => {
         }),
       });
       const state = createTestState({ adapter });
-      const proxy = createControlProxy(state);
+      const proxy = createControlProxy(state) as TestButtonProxy;
       const result = await proxy.getText();
       expect(result).toBe('Save');
       expect(adapter.executeControlMethod).toHaveBeenCalledWith('saveBtn', 'getText', []);
@@ -132,8 +141,8 @@ describe('dynamic-proxy', () => {
         }),
       });
       const state = createTestState({ adapter });
-      const proxy = createControlProxy(state) as Record<string, unknown>;
-      const fn = getDynamicMethod(proxy, 'getCustomValue');
+      const proxy = toRecord(createControlProxy(state) as TestButtonProxy);
+      const fn = proxy['getCustomValue'] as (...args: unknown[]) => Promise<unknown>;
       expect(fn).toBeDefined();
       const result = await fn();
       expect(result).toBe('custom-result');
@@ -148,7 +157,7 @@ describe('dynamic-proxy', () => {
         }),
       });
       const state = createTestState({ adapter });
-      const proxy = createControlProxy(state);
+      const proxy = createControlProxy(state) as TestButtonProxy;
       await proxy.setText('New Text');
       expect(adapter.executeControlMethod).toHaveBeenCalledWith('saveBtn', 'setText', ['New Text']);
     });
@@ -171,7 +180,7 @@ describe('dynamic-proxy', () => {
           }),
       });
       const state = createTestState({ adapter });
-      const proxy = createControlProxy(state);
+      const proxy = createControlProxy(state) as TestButtonProxy;
       expect(await proxy.getText()).toBe('Save');
       expect(await proxy.getEnabled()).toBe(true);
     });
@@ -188,7 +197,7 @@ describe('dynamic-proxy', () => {
           duration: 1,
         }),
       });
-      const proxy = createControlProxy(createTestState({ adapter }));
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
       expect(await proxy.getText()).toBe('Save');
     });
 
@@ -200,8 +209,10 @@ describe('dynamic-proxy', () => {
           duration: 1,
         }),
       });
-      const proxy = createControlProxy(createTestState({ adapter }));
-      expect(await proxy.setText('x')).toBeUndefined();
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
+      const setTextFn = proxy.setText.bind(proxy) as (...args: unknown[]) => Promise<unknown>;
+      const result = await setTextFn('x');
+      expect(result).toBeUndefined();
     });
 
     it('returns array for "aggregation" returnType', async () => {
@@ -214,8 +225,8 @@ describe('dynamic-proxy', () => {
           duration: 1,
         }),
       });
-      const proxy = createControlProxy(createTestState({ adapter })) as Record<string, unknown>;
-      const fn = getDynamicMethod(proxy, 'getItems');
+      const proxy = toRecord(createControlProxy(createTestState({ adapter })) as TestButtonProxy);
+      const fn = proxy['getItems'] as (...args: unknown[]) => Promise<unknown>;
       const result = await fn();
       expect(Array.isArray(result)).toBe(true);
     });
@@ -232,7 +243,7 @@ describe('dynamic-proxy', () => {
           duration: 1,
         }),
       });
-      const proxy = createControlProxy(createTestState({ adapter }));
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
       await expect(proxy.getText()).rejects.toThrow('Control not found');
     });
 
@@ -240,7 +251,7 @@ describe('dynamic-proxy', () => {
       const adapter = createMockBridgeAdapter({
         executeControlMethod: vi.fn().mockRejectedValue(new Error('Network timeout')),
       });
-      const proxy = createControlProxy(createTestState({ adapter }));
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
       await expect(proxy.getText()).rejects.toThrow('Network timeout');
     });
   });
@@ -254,15 +265,13 @@ describe('dynamic-proxy', () => {
 
     it('toString() returns meaningful string', () => {
       const proxy = createControlProxy(createTestState());
-      const toStr = proxy.toString.bind(proxy) as () => string;
+      const toStr = Reflect.get(proxy, 'toString') as () => string;
       expect(toStr()).toBe('[UI5Control sap.m.Button#saveBtn]');
     });
 
     it('Symbol.toPrimitive handles string hint', () => {
       const proxy = createControlProxy(createTestState());
-      const toPrimitive = (proxy as Record<symbol, unknown>)[Symbol.toPrimitive] as (
-        hint: string,
-      ) => string;
+      const toPrimitive = Reflect.get(proxy, Symbol.toPrimitive) as (hint: string) => string;
       expect(toPrimitive('string')).toBe('[UI5Control sap.m.Button#saveBtn]');
     });
 
@@ -270,14 +279,14 @@ describe('dynamic-proxy', () => {
       const adapter = createMockBridgeAdapter({
         getControlProperty: vi.fn().mockResolvedValue('Save'),
       });
-      const proxy = createControlProxy(createTestState({ adapter }));
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
       expect(await proxy.getProperty('text')).toBe('Save');
       expect(adapter.getControlProperty).toHaveBeenCalledWith('saveBtn', 'text');
     });
 
     it('setProperty forwards to adapter.setControlProperty', async () => {
       const adapter = createMockBridgeAdapter();
-      const proxy = createControlProxy(createTestState({ adapter }));
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
       await proxy.setProperty('text', 'New');
       expect(adapter.setControlProperty).toHaveBeenCalledWith('saveBtn', 'text', 'New');
     });
@@ -288,7 +297,7 @@ describe('dynamic-proxy', () => {
           .fn()
           .mockResolvedValue([{ id: 'item1', controlType: 'sap.m.StandardListItem' }]),
       });
-      const proxy = createControlProxy(createTestState({ adapter }));
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
       const items = await proxy.getAggregation('items');
       expect(items).toHaveLength(1);
     });

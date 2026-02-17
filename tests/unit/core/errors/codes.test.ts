@@ -26,6 +26,7 @@ describe('ErrorCode', () => {
     expect(ErrorCode.ERR_BRIDGE_INJECTION).toBe('ERR_BRIDGE_INJECTION');
     expect(ErrorCode.ERR_BRIDGE_NOT_READY).toBe('ERR_BRIDGE_NOT_READY');
     expect(ErrorCode.ERR_BRIDGE_VERSION).toBe('ERR_BRIDGE_VERSION');
+    expect(ErrorCode.ERR_BRIDGE_EXECUTION).toBe('ERR_BRIDGE_EXECUTION');
   });
 
   it('defines control error codes', () => {
@@ -35,6 +36,7 @@ describe('ErrorCode', () => {
     expect(ErrorCode.ERR_CONTROL_NOT_INTERACTABLE).toBe('ERR_CONTROL_NOT_INTERACTABLE');
     expect(ErrorCode.ERR_CONTROL_PROPERTY).toBe('ERR_CONTROL_PROPERTY');
     expect(ErrorCode.ERR_CONTROL_AGGREGATION).toBe('ERR_CONTROL_AGGREGATION');
+    expect(ErrorCode.ERR_CONTROL_METHOD).toBe('ERR_CONTROL_METHOD');
   });
 
   it('defines auth error codes', () => {
@@ -89,8 +91,8 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 36 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(36);
+  it('has exactly 38 error codes', () => {
+    expect(Object.keys(ErrorCode)).toHaveLength(38);
   });
 
   // ── Immutability test ────────────────────────────────────────────────
