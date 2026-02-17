@@ -88,13 +88,16 @@ Scopes: core, config, errors, logging, bridge, adapter, proxy, fixtures, auth, a
 
 For detailed domain knowledge, see `skills/playwright-praman-sap-testing/`:
 
-| Task                           | Skill File                    |
-| ------------------------------ | ----------------------------- |
-| Architecture decisions         | `skills-architect.md`         |
-| TypeScript implementation      | `skills-implementer.md`       |
-| TDD, RED-GREEN-REFACTOR cycle  | `skills-tdd.md`               |
-| Unit/integration tests         | `skills-tester.md`            |
-| Playwright fixtures, selectors | `skills-playwright-expert.md` |
-| SAP UI5 controls, FLP, OData   | `skills-sap-ui5-expert.md`    |
-| PR review, quality gates       | `skills-reviewer.md`          |
-| CI/CD, security, build         | `skills-security-build.md`    |
+| Task                               | Skill File                               |
+| ---------------------------------- | ---------------------------------------- |
+| Architecture decisions             | `skills-architect.md`                    |
+| TypeScript implementation          | `skills-implementer.md`                  |
+| TDD, RED-GREEN-REFACTOR cycle      | `skills-tdd.md`                          |
+| Unit/integration tests             | `skills-tester.md`                       |
+| Playwright fixtures, selectors     | `skills-playwright-expert.md`            |
+| SAP UI5 controls, FLP, OData       | `skills-sap-ui5-expert.md`               |
+| SAP UI5 Web Components, Shadow DOM | `skills-sap-ui5-webcomponents-expert.md` |
+| SAP Fiori E2E scenarios, auth      | `skills-sap-fiori-consultant.md`         |
+| OData V2/V4, Gateway, mocks        | `skills-sap-odata-expert.md`             |
+| PR review, quality gates           | `skills-reviewer.md`                     |
+| CI/CD, security, build             | `skills-security-build.md`               |

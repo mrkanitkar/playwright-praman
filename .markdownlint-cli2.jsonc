@@ -10,6 +10,12 @@
     "plans/ui5summary.md",
     "plans/setup.md",
     "skills/playwright-praman-sap-testing/skills-tdd.md",
+    "skills/playwright-praman-sap-testing/skills-sap-fiori-consultant.md",
+    "skills/playwright-praman-sap-testing/skills-sap-odata-expert.md",
+    "skills/playwright-praman-sap-testing/skills-sap-ui5-webcomponents-expert.md",
+    "skills/playwright-praman-sap-testing/skills-team-overview.md",
+    "docs/mcp-sap-docs-setup.md",
+    "temp/**",
     "node_modules/"
   ]
 }

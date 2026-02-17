@@ -16,23 +16,31 @@ Ground-up rewrite — NO copy-paste from v2.5.0.
 
 Before starting work, read the appropriate skill file from `skills/playwright-praman-sap-testing/`:
 
-| Task                                              | Skill File                    |
-| ------------------------------------------------- | ----------------------------- |
-| Architecture decisions, module boundaries         | `skills-architect.md`         |
-| TypeScript implementation, proxy, bridge          | `skills-implementer.md`       |
-| Test-driven development (TDD), RED-GREEN-REFACTOR | `skills-tdd.md`               |
-| Unit/integration tests, coverage                  | `skills-tester.md`            |
-| Playwright fixtures, selectors, matchers          | `skills-playwright-expert.md` |
-| SAP UI5 controls, FLP, OData, RecordReplay        | `skills-sap-ui5-expert.md`    |
-| PR review, quality gates                          | `skills-reviewer.md`          |
-| CI/CD, security, build, release                   | `skills-security-build.md`    |
-| Team overview, collaboration model                | `skills-team-overview.md`     |
+| Task                                              | Skill File                               |
+| ------------------------------------------------- | ---------------------------------------- |
+| Architecture decisions, module boundaries         | `skills-architect.md`                    |
+| TypeScript implementation, proxy, bridge          | `skills-implementer.md`                  |
+| Test-driven development (TDD), RED-GREEN-REFACTOR | `skills-tdd.md`                          |
+| Unit/integration tests, coverage                  | `skills-tester.md`                       |
+| Playwright fixtures, selectors, matchers          | `skills-playwright-expert.md`            |
+| SAP UI5 controls, FLP, OData, RecordReplay        | `skills-sap-ui5-expert.md`               |
+| SAP Fiori consulting, E2E scenarios, auth testing | `skills-sap-fiori-consultant.md`         |
+| OData V2/V4 protocol, Gateway, mock strategies    | `skills-sap-odata-expert.md`             |
+| SAP UI5 Web Components, Shadow DOM, hybrid apps   | `skills-sap-ui5-webcomponents-expert.md` |
+| PR review, quality gates                          | `skills-reviewer.md`                     |
+| CI/CD, security, build, release                   | `skills-security-build.md`               |
+| Team overview, collaboration model                | `skills-team-overview.md`                |
 
 For multi-skill tasks, load primary + supporting skill(s). Example:
 
 - Bridge adapter implementation → `skills-tdd.md` + `skills-implementer.md` + `skills-sap-ui5-expert.md`
 - Fixture implementation → `skills-tdd.md` + `skills-implementer.md` + `skills-playwright-expert.md`
 - Integration tests → `skills-tdd.md` + `skills-tester.md` + `skills-playwright-expert.md` + `skills-sap-ui5-expert.md`
+- SAP E2E test design → `skills-sap-fiori-consultant.md` + `skills-sap-odata-expert.md` + `skills-tester.md`
+- OData service testing → `skills-sap-odata-expert.md` + `skills-tester.md` + `skills-playwright-expert.md`
+- Web Component testing → `skills-sap-ui5-webcomponents-expert.md` + `skills-playwright-expert.md` + `skills-tester.md`
+- Hybrid app testing → `skills-sap-ui5-webcomponents-expert.md` + `skills-sap-ui5-expert.md` + `skills-playwright-expert.md`
+- WC adapter implementation → `skills-tdd.md` + `skills-implementer.md` + `skills-sap-ui5-webcomponents-expert.md`
 - Bug fixes → `skills-tdd.md` + `skills-implementer.md`
 
 ## Rules

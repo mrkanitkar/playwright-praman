@@ -1,0 +1,4049 @@
+{
+  "version": "1.136.0",
+  "generated": "2026-02-17T06:51:43.945Z",
+  "totalDeprecated": 571,
+  "deprecatedNames": [
+    "addBreadCrumbLink",
+    "addButton",
+    "addContent",
+    "addFilterDialogContent",
+    "addFilterItem",
+    "addPlugin",
+    "addValidateToken",
+    "addValidator",
+    "afterOpen",
+    "appointmentsReducedHeight",
+    "ariaDescription",
+    "ariaLabelForPicture",
+    "attachAfterOpen",
+    "attachCancelButtonTap",
+    "attachCellContextmenu",
+    "attachColumnMenuOpen",
+    "attachColumnSelect",
+    "attachColumnVisibility",
+    "attachDataReceived",
+    "attachDataRequested",
+    "attachFiltersDialogSearch",
+    "attachFiltersDialogSearchForFilters",
+    "attachGroup",
+    "attachGrowingFinished",
+    "attachGrowingStarted",
+    "attachInitialise",
+    "attachLoadPage",
+    "attachNavButtonTap",
+    "attachNavigationTargetsObtained",
+    "attachOrientationChange",
+    "attachPress",
+    "attachRowHeaderClick",
+    "attachSelect",
+    "attachTap",
+    "attachTokenChange",
+    "attachTokenUpdate",
+    "attachUnloadPage",
+    "authorName",
+    "authorPicture",
+    "autoExpandMode",
+    "autoResizeColumn",
+    "badgeAttachments",
+    "badgeNotes",
+    "badgePeople",
+    "bindConditions",
+    "bounce",
+    "breadCrumbsLinks",
+    "buttons",
+    "cancelButtonTap",
+    "cellContextmenu",
+    "checkClientError",
+    "closeMultiLine",
+    "collapseRecursive",
+    "columnMenuOpen",
+    "columnSelect",
+    "columnVisibility",
+    "columnVisibilityMenuSorter",
+    "considerSelectionVariants",
+    "content",
+    "controlProposal",
+    "crossAppNavCallback",
+    "dataReceived",
+    "dataRequested",
+    "dateFormat",
+    "datetime",
+    "defaultSelectionVariantName",
+    "design",
+    "destroyBreadCrumbsLinks",
+    "destroyButtons",
+    "destroyContent",
+    "destroyControlProposal",
+    "destroyFilterItems",
+    "destroyFirstStatus",
+    "destroyFooter",
+    "destroyIcon",
+    "destroyLayout",
+    "destroyMenu",
+    "destroyPlugins",
+    "destroySecondStatus",
+    "destroyTitle",
+    "destroyToolbar",
+    "detachAfterOpen",
+    "detachCancelButtonTap",
+    "detachCellContextmenu",
+    "detachColumnMenuOpen",
+    "detachColumnSelect",
+    "detachColumnVisibility",
+    "detachDataReceived",
+    "detachDataRequested",
+    "detachFiltersDialogSearch",
+    "detachFiltersDialogSearchForFilters",
+    "detachGroup",
+    "detachGrowingFinished",
+    "detachGrowingStarted",
+    "detachInitialise",
+    "detachLoadPage",
+    "detachNavButtonTap",
+    "detachNavigationTargetsObtained",
+    "detachOrientationChange",
+    "detachPress",
+    "detachRowHeaderClick",
+    "detachSelect",
+    "detachTap",
+    "detachTokenChange",
+    "detachTokenUpdate",
+    "detachUnloadPage",
+    "determineControlByFilterItem",
+    "determineControlByName",
+    "dirty",
+    "editable",
+    "enableCustomFilter",
+    "enableFlexBox",
+    "enableGrouping",
+    "enableMultiLineMode",
+    "enableScrolling",
+    "enabled",
+    "entityType",
+    "errorMessage",
+    "expandAdvancedArea",
+    "expandFirstLevel",
+    "expandNavigationProperties",
+    "exportData",
+    "fallbackIcon",
+    "filterItems",
+    "filtersDialogSearch",
+    "filtersDialogSearchForFilters",
+    "firstStatus",
+    "fixedBottomRowCount",
+    "fixedRowCount",
+    "flexible",
+    "footer",
+    "from",
+    "getAppointmentsReducedHeight",
+    "getAriaDescription",
+    "getAriaLabelForPicture",
+    "getAuthorName",
+    "getAuthorPicture",
+    "getAutoExpandMode",
+    "getBadgeAttachments",
+    "getBadgeNotes",
+    "getBadgePeople",
+    "getBreadCrumbsLinks",
+    "getButtons",
+    "getChart",
+    "getCollapseRecursive",
+    "getColumnVisibilityMenuSorter",
+    "getConditions",
+    "getConsiderSelectionVariants",
+    "getContent",
+    "getControlByKey",
+    "getControlProposal",
+    "getCrossAppNavCallback",
+    "getDataSuiteFormat",
+    "getDataType",
+    "getDataTypeConstraints",
+    "getDataTypeFormatOptions",
+    "getDateFormat",
+    "getDatetime",
+    "getDefaultSelectionVariantName",
+    "getDesign",
+    "getDirty",
+    "getEditable",
+    "getEnableCustomFilter",
+    "getEnableFlexBox",
+    "getEnableGrouping",
+    "getEnableMultiLineMode",
+    "getEnableScrolling",
+    "getEnabled",
+    "getEntityType",
+    "getErrorMessage",
+    "getExpandFirstLevel",
+    "getExpandNavigationProperties",
+    "getFallbackIcon",
+    "getFilterDialogContent",
+    "getFilterItems",
+    "getFirstStatus",
+    "getFixedBottomRowCount",
+    "getFixedRowCount",
+    "getFlexible",
+    "getFooter",
+    "getFrom",
+    "getGroupBy",
+    "getGrouped",
+    "getHeaderDesign",
+    "getHeight",
+    "getHorizontalLayoutGroupElementMinWidth",
+    "getIcon",
+    "getIconDensityAware",
+    "getJsontype",
+    "getLabel",
+    "getLabelMinWidth",
+    "getLayout",
+    "getLeftButton",
+    "getMarkFavorite",
+    "getMarkFlagged",
+    "getMarkLocked",
+    "getMaxExcludeRanges",
+    "getMaxIncludeRanges",
+    "getMenu",
+    "getMinAutoRowCount",
+    "getMinWidth",
+    "getMultiSelect",
+    "getMultipleLines",
+    "getNavButtonText",
+    "getNavButtonType",
+    "getNavigationMode",
+    "getNoDataDescription",
+    "getNoDataIllustrationType",
+    "getNoDataText",
+    "getNumberOfExpandedLevels",
+    "getNumberUnit",
+    "getPlugins",
+    "getPopinHAlign",
+    "getPopupHeaderTitle",
+    "getPrimaryArea",
+    "getProposedControl",
+    "getRefreshButtonTooltip",
+    "getResourceUri",
+    "getRightButton",
+    "getRootLevel",
+    "getRowHeight",
+    "getSearchEnabled",
+    "getSecondStatus",
+    "getSelectOnFocus",
+    "getSelectedButton",
+    "getSelectedFilterKeys",
+    "getSelectedIndex",
+    "getSemanticObjectLabel",
+    "getShowBusyIndicator",
+    "getShowClearButton",
+    "getShowColumnVisibilityMenu",
+    "getShowGoButton",
+    "getShowMagnifier",
+    "getShowMarker",
+    "getShowMarkers",
+    "getShowOverflowSelectList",
+    "getShowSelection",
+    "getSize",
+    "getSorted",
+    "getStartsSection",
+    "getStretchOnPhone",
+    "getSumOnTop",
+    "getTable",
+    "getTitle",
+    "getTitlePrimaryArea",
+    "getTo",
+    "getToolbar",
+    "getTranslucent",
+    "getUpperCase",
+    "getUseExportToExcel",
+    "getUseHorizontalLayout",
+    "getUseListForChartTypeSelection",
+    "getUseOnlyOneSolidToolbar",
+    "getValueHelpOnly",
+    "getVisibleRowCount",
+    "getVisibleRowCountMode",
+    "group",
+    "grouped",
+    "growingFinished",
+    "growingStarted",
+    "headerDesign",
+    "height",
+    "horizontalLayoutGroupElementMinWidth",
+    "icon",
+    "iconDensityAware",
+    "indexOfBreadCrumbLink",
+    "indexOfButton",
+    "indexOfContent",
+    "indexOfFilterItem",
+    "indexOfPlugin",
+    "initialise",
+    "insertBreadCrumbLink",
+    "insertButton",
+    "insertContent",
+    "insertPlugin",
+    "jsontype",
+    "label",
+    "labelMinWidth",
+    "layout",
+    "loadPage",
+    "markFavorite",
+    "markFlagged",
+    "markLocked",
+    "maxExcludeRanges",
+    "maxIncludeRanges",
+    "menu",
+    "minAutoRowCount",
+    "minWidth",
+    "multiSelect",
+    "navButtonTap",
+    "navButtonText",
+    "navButtonType",
+    "navigationMode",
+    "navigationTargetsObtained",
+    "noDataDescription",
+    "noDataIllustrationType",
+    "noDataText",
+    "numberOfExpandedLevels",
+    "numberUnit",
+    "openMultiLine",
+    "orientationChange",
+    "plugins",
+    "popinHAlign",
+    "popupHeaderTitle",
+    "press",
+    "primaryArea",
+    "proposedControl",
+    "refreshButtonTooltip",
+    "removeAllBreadCrumbsLinks",
+    "removeAllButtons",
+    "removeAllContent",
+    "removeAllFilterItems",
+    "removeAllPlugins",
+    "removeAllValidators",
+    "removeBreadCrumbLink",
+    "removeButton",
+    "removeContent",
+    "removeFilterItem",
+    "removePlugin",
+    "removeValidator",
+    "resourceUri",
+    "rootLevel",
+    "rowHeaderClick",
+    "rowHeight",
+    "searchEnabled",
+    "secondStatus",
+    "select",
+    "selectOnFocus",
+    "selectedIndex",
+    "semanticObjectLabel",
+    "setAppointmentsReducedHeight",
+    "setAriaDescription",
+    "setAriaLabelForPicture",
+    "setAuthorName",
+    "setAuthorPicture",
+    "setAutoExpandMode",
+    "setBadgeAttachments",
+    "setBadgeNotes",
+    "setBadgePeople",
+    "setCollapseRecursive",
+    "setColumnVisibilityMenuSorter",
+    "setConditions",
+    "setConsiderSelectionVariants",
+    "setControlProposal",
+    "setCrossAppNavCallback",
+    "setDataSuiteFormat",
+    "setDataType",
+    "setDataTypeConstraints",
+    "setDataTypeFormatOptions",
+    "setDateFormat",
+    "setDatetime",
+    "setDefaultSelectionVariantName",
+    "setDesign",
+    "setDirty",
+    "setEditMode",
+    "setEditable",
+    "setEnableCustomFilter",
+    "setEnableFlexBox",
+    "setEnableGrouping",
+    "setEnableMultiLineMode",
+    "setEnableScrolling",
+    "setEnabled",
+    "setEntityType",
+    "setErrorMessage",
+    "setExpandFirstLevel",
+    "setExpandNavigationProperties",
+    "setFallbackIcon",
+    "setFirstStatus",
+    "setFixedBottomRowCount",
+    "setFixedRowCount",
+    "setFlexible",
+    "setFooter",
+    "setFrom",
+    "setGroupBy",
+    "setGrouped",
+    "setGrowing",
+    "setGrowingDirection",
+    "setGrowingScrollToLoad",
+    "setGrowingThreshold",
+    "setGrowingTriggerText",
+    "setHeaderDesign",
+    "setHeight",
+    "setHorizontalLayoutGroupElementMinWidth",
+    "setIcon",
+    "setIconDensityAware",
+    "setJsontype",
+    "setLabel",
+    "setLabelMinWidth",
+    "setLayout",
+    "setLeftButton",
+    "setMarkFavorite",
+    "setMarkFlagged",
+    "setMarkLocked",
+    "setMaxConditions",
+    "setMaxExcludeRanges",
+    "setMaxIncludeRanges",
+    "setMenu",
+    "setMinAutoRowCount",
+    "setMinWidth",
+    "setMultipleLines",
+    "setNavButtonText",
+    "setNavButtonType",
+    "setNavigationMode",
+    "setNoDataDescription",
+    "setNoDataIllustrationType",
+    "setNoDataText",
+    "setNumberOfExpandedLevels",
+    "setNumberUnit",
+    "setPopinHAlign",
+    "setPopupHeaderTitle",
+    "setPrimaryArea",
+    "setProposedControl",
+    "setRefreshButtonTooltip",
+    "setResourceUri",
+    "setRightButton",
+    "setRootLevel",
+    "setRowHeight",
+    "setSearchEnabled",
+    "setSecondStatus",
+    "setSelectOnFocus",
+    "setSelectedFilterKeys",
+    "setSemanticObjectLabel",
+    "setShowBusyIndicator",
+    "setShowClearButton",
+    "setShowColumnVisibilityMenu",
+    "setShowGoButton",
+    "setShowMagnifier",
+    "setShowMarker",
+    "setShowMarkers",
+    "setShowOverflowSelectList",
+    "setShowSelection",
+    "setSize",
+    "setSorted",
+    "setStartsSection",
+    "setStretchOnPhone",
+    "setSumOnTop",
+    "setTitle",
+    "setTo",
+    "setToolbar",
+    "setTranslucent",
+    "setUpperCase",
+    "setUseExportToExcel",
+    "setUseHorizontalLayout",
+    "setUseListForChartTypeSelection",
+    "setUseOnlyOneSolidToolbar",
+    "setValueHelpOnly",
+    "setVisibleRowCount",
+    "setVisibleRowCountMode",
+    "showBusyIndicator",
+    "showClearButton",
+    "showColumnVisibilityMenu",
+    "showGoButton",
+    "showMagnifier",
+    "showMarker",
+    "showMarkers",
+    "showOverflowSelectList",
+    "showSelection",
+    "size",
+    "sort",
+    "sorted",
+    "startsSection",
+    "stretchOnPhone",
+    "sumOnTop",
+    "tap",
+    "title",
+    "titlePrimaryArea",
+    "to",
+    "toggleSort",
+    "tokenChange",
+    "tokenUpdate",
+    "toolbar",
+    "translucent",
+    "unbindConditions",
+    "unloadPage",
+    "upperCase",
+    "useExportToExcel",
+    "useHorizontalLayout",
+    "useListForChartTypeSelection",
+    "useOnlyOneSolidToolbar",
+    "valueHelpOnly",
+    "visibleRowCount",
+    "visibleRowCountMode"
+  ],
+  "controls": {
+    "sap.m.Button": [
+      {
+        "kind": "event",
+        "name": "tap",
+        "since": "1.20",
+        "text": "replaced by <code>press</code> event"
+      },
+      {
+        "kind": "method",
+        "name": "attachTap",
+        "since": "1.20",
+        "text": "replaced by <code>press</code> event"
+      },
+      {
+        "kind": "method",
+        "name": "detachTap",
+        "since": "1.20",
+        "text": "replaced by <code>press</code> event"
+      }
+    ],
+    "sap.m.Input": [
+      {
+        "kind": "property",
+        "name": "dateFormat",
+        "since": "1.9.1",
+        "text": "<code>sap.m.DatePicker</code>, <code>sap.m.TimePicker</code> or <code>sap.m.DateTimePicker</code> should be used for date/time inputs and formating."
+      },
+      {
+        "kind": "property",
+        "name": "valueHelpOnly",
+        "since": "1.119",
+        "text": "The property valueHelpOnly should not be used anymore"
+      },
+      {
+        "kind": "method",
+        "name": "getDateFormat",
+        "since": "1.9.1",
+        "text": "<code>sap.m.DatePicker</code>, <code>sap.m.TimePicker</code> or <code>sap.m.DateTimePicker</code> should be used for date/time inputs and formating."
+      },
+      {
+        "kind": "method",
+        "name": "getValueHelpOnly",
+        "since": "1.119",
+        "text": "The property valueHelpOnly should not be used anymore"
+      },
+      {
+        "kind": "method",
+        "name": "setDateFormat",
+        "since": "1.9.1",
+        "text": "<code>sap.m.DatePicker</code>, <code>sap.m.TimePicker</code> or <code>sap.m.DateTimePicker</code> should be used for date/time inputs and formating."
+      },
+      {
+        "kind": "method",
+        "name": "setValueHelpOnly",
+        "since": "1.119",
+        "text": "The property valueHelpOnly should not be used anymore"
+      }
+    ],
+    "sap.m.SearchField": [
+      {
+        "kind": "property",
+        "name": "showMagnifier",
+        "since": "1.16.0",
+        "text": "This parameter is deprecated. Use \"showSearchButton\" instead."
+      },
+      {
+        "kind": "property",
+        "name": "refreshButtonTooltip",
+        "since": "1.110.0",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "property",
+        "name": "selectOnFocus",
+        "since": "1.38",
+        "text": "This parameter is deprecated and has no effect in run time. The cursor position of a focused search field is restored after re-rendering automatically."
+      },
+      {
+        "kind": "method",
+        "name": "getRefreshButtonTooltip",
+        "since": "1.110.0",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getSelectOnFocus",
+        "since": "1.38",
+        "text": "This parameter is deprecated and has no effect in run time. The cursor position of a focused search field is restored after re-rendering automatically."
+      },
+      {
+        "kind": "method",
+        "name": "getShowMagnifier",
+        "since": "1.16.0",
+        "text": "This parameter is deprecated. Use \"showSearchButton\" instead."
+      },
+      {
+        "kind": "method",
+        "name": "setRefreshButtonTooltip",
+        "since": "1.110.0",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setSelectOnFocus",
+        "since": "1.38",
+        "text": "This parameter is deprecated and has no effect in run time. The cursor position of a focused search field is restored after re-rendering automatically."
+      },
+      {
+        "kind": "method",
+        "name": "setShowMagnifier",
+        "since": "1.16.0",
+        "text": "This parameter is deprecated. Use \"showSearchButton\" instead."
+      }
+    ],
+    "sap.m.MultiInput": [
+      {
+        "kind": "property",
+        "name": "enableMultiLineMode",
+        "since": "1.58",
+        "text": "Replaced with N-more/N-items labels, which work in all cases."
+      },
+      {
+        "kind": "event",
+        "name": "tokenChange",
+        "since": "1.46",
+        "text": "Please use the new event tokenUpdate."
+      },
+      {
+        "kind": "method",
+        "name": "attachTokenChange",
+        "since": "1.46",
+        "text": "Please use the new event tokenUpdate."
+      },
+      {
+        "kind": "method",
+        "name": "closeMultiLine",
+        "since": "1.58",
+        "text": "replaced by N-more/N-items labels."
+      },
+      {
+        "kind": "method",
+        "name": "detachTokenChange",
+        "since": "1.46",
+        "text": "Please use the new event tokenUpdate."
+      },
+      {
+        "kind": "method",
+        "name": "getEnableMultiLineMode",
+        "since": "1.58",
+        "text": "Replaced with N-more/N-items labels, which work in all cases."
+      },
+      {
+        "kind": "method",
+        "name": "openMultiLine",
+        "since": "1.58",
+        "text": "replaced by N-more/N-items labels."
+      },
+      {
+        "kind": "method",
+        "name": "setEnableMultiLineMode",
+        "since": "1.58",
+        "text": "Replaced with N-more/N-items labels, which work in all cases."
+      }
+    ],
+    "sap.m.SegmentedButton": [
+      {
+        "kind": "aggregation",
+        "name": "buttons",
+        "since": "1.28.0",
+        "text": "replaced by <code>items</code> aggregation"
+      },
+      {
+        "kind": "event",
+        "name": "select",
+        "since": "1.52",
+        "text": "replaced by <code>selectionChange</code> event"
+      },
+      {
+        "kind": "method",
+        "name": "addButton",
+        "since": "1.28.0",
+        "text": "replaced by <code>items</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "attachSelect",
+        "since": "1.52",
+        "text": "replaced by <code>selectionChange</code> event"
+      },
+      {
+        "kind": "method",
+        "name": "destroyButtons",
+        "since": "1.28.0",
+        "text": "replaced by <code>items</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "detachSelect",
+        "since": "1.52",
+        "text": "replaced by <code>selectionChange</code> event"
+      },
+      {
+        "kind": "method",
+        "name": "getButtons",
+        "since": "1.28.0",
+        "text": "replaced by <code>items</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "getSelectedButton",
+        "since": "1.52",
+        "text": "replaced by <code>selectedItem</code> association"
+      },
+      {
+        "kind": "method",
+        "name": "indexOfButton",
+        "since": "1.28.0",
+        "text": "replaced by <code>items</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "insertButton",
+        "since": "1.28.0",
+        "text": "replaced by <code>items</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "removeAllButtons",
+        "since": "1.28.0",
+        "text": "replaced by <code>items</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "removeButton",
+        "since": "1.28.0",
+        "text": "replaced by <code>items</code> aggregation"
+      }
+    ],
+    "sap.m.upload.UploadSet": [
+      {
+        "kind": "property",
+        "name": "noDataText",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      },
+      {
+        "kind": "property",
+        "name": "noDataDescription",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      },
+      {
+        "kind": "property",
+        "name": "noDataIllustrationType",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      },
+      {
+        "kind": "method",
+        "name": "getNoDataDescription",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      },
+      {
+        "kind": "method",
+        "name": "getNoDataIllustrationType",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      },
+      {
+        "kind": "method",
+        "name": "getNoDataText",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      },
+      {
+        "kind": "method",
+        "name": "setNoDataDescription",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      },
+      {
+        "kind": "method",
+        "name": "setNoDataIllustrationType",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      },
+      {
+        "kind": "method",
+        "name": "setNoDataText",
+        "since": "1.121",
+        "text": "Use illustratedMessage instead."
+      }
+    ],
+    "sap.m.Image": [
+      {
+        "kind": "event",
+        "name": "tap",
+        "since": "1.107.0",
+        "text": "Use the {@link #event:press press} event instead."
+      },
+      {
+        "kind": "method",
+        "name": "attachTap",
+        "since": "1.107.0",
+        "text": "Use the {@link #event:press press} event instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachTap",
+        "since": "1.107.0",
+        "text": "Use the {@link #event:press press} event instead."
+      }
+    ],
+    "sap.m.ObjectNumber": [
+      {
+        "kind": "property",
+        "name": "numberUnit",
+        "since": "1.16.1",
+        "text": "replaced by <code>unit</code> property"
+      },
+      {
+        "kind": "method",
+        "name": "getNumberUnit",
+        "since": "1.16.1",
+        "text": "replaced by <code>unit</code> property"
+      },
+      {
+        "kind": "method",
+        "name": "setNumberUnit",
+        "since": "1.16.1",
+        "text": "replaced by <code>unit</code> property"
+      }
+    ],
+    "sap.m.ProgressIndicator": [
+      {
+        "kind": "property",
+        "name": "enabled",
+        "since": "1.130",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "getEnabled",
+        "since": "1.130",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "setEnabled",
+        "since": "1.130",
+        "text": "with no replacement."
+      }
+    ],
+    "sap.m.BusyIndicator": [
+      {
+        "kind": "property",
+        "name": "design",
+        "since": "1.32.1",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getDesign",
+        "since": "1.32.1",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setDesign",
+        "since": "1.32.1",
+        "text": "the concept has been discarded."
+      }
+    ],
+    "sap.m.GenericTile": [
+      {
+        "kind": "property",
+        "name": "size",
+        "since": "1.38.0",
+        "text": "The GenericTile control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      },
+      {
+        "kind": "aggregation",
+        "name": "icon",
+        "since": "1.36.0",
+        "text": "This aggregation is deprecated, use sap.m.ImageContent control to display an icon instead."
+      },
+      {
+        "kind": "method",
+        "name": "destroyIcon",
+        "since": "1.36.0",
+        "text": "This aggregation is deprecated, use sap.m.ImageContent control to display an icon instead."
+      },
+      {
+        "kind": "method",
+        "name": "getIcon",
+        "since": "1.36.0",
+        "text": "This aggregation is deprecated, use sap.m.ImageContent control to display an icon instead."
+      },
+      {
+        "kind": "method",
+        "name": "getSize",
+        "since": "1.38.0",
+        "text": "The GenericTile control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      },
+      {
+        "kind": "method",
+        "name": "setIcon",
+        "since": "1.36.0",
+        "text": "This aggregation is deprecated, use sap.m.ImageContent control to display an icon instead."
+      },
+      {
+        "kind": "method",
+        "name": "setSize",
+        "since": "1.38.0",
+        "text": "The GenericTile control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      }
+    ],
+    "sap.m.NumericContent": [
+      {
+        "kind": "property",
+        "name": "size",
+        "since": "1.38.0",
+        "text": "The NumericContent control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      },
+      {
+        "kind": "method",
+        "name": "getSize",
+        "since": "1.38.0",
+        "text": "The NumericContent control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      },
+      {
+        "kind": "method",
+        "name": "setSize",
+        "since": "1.38.0",
+        "text": "The NumericContent control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      }
+    ],
+    "sap.m.FeedListItem": [
+      {
+        "kind": "property",
+        "name": "iconDensityAware",
+        "since": "1.88",
+        "text": "Image is replaced by {@link sap.m.Avatar }"
+      },
+      {
+        "kind": "method",
+        "name": "getIconDensityAware",
+        "since": "1.88",
+        "text": "Image is replaced by {@link sap.m.Avatar }"
+      },
+      {
+        "kind": "method",
+        "name": "setIconDensityAware",
+        "since": "1.88",
+        "text": "Image is replaced by {@link sap.m.Avatar }"
+      }
+    ],
+    "sap.m.ObjectIdentifier": [
+      {
+        "kind": "property",
+        "name": "badgeNotes",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      },
+      {
+        "kind": "property",
+        "name": "badgePeople",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      },
+      {
+        "kind": "property",
+        "name": "badgeAttachments",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      },
+      {
+        "kind": "method",
+        "name": "getBadgeAttachments",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      },
+      {
+        "kind": "method",
+        "name": "getBadgeNotes",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      },
+      {
+        "kind": "method",
+        "name": "getBadgePeople",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      },
+      {
+        "kind": "method",
+        "name": "setBadgeAttachments",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      },
+      {
+        "kind": "method",
+        "name": "setBadgeNotes",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      },
+      {
+        "kind": "method",
+        "name": "setBadgePeople",
+        "since": "1.24.0",
+        "text": "There is no replacement for the moment."
+      }
+    ],
+    "sap.m.ObjectListItem": [
+      {
+        "kind": "property",
+        "name": "markFavorite",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Favorite</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior."
+      },
+      {
+        "kind": "property",
+        "name": "markFlagged",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Flagged</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior."
+      },
+      {
+        "kind": "property",
+        "name": "showMarkers",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. This property is valid only if you are using the already deprecated properties - <code>markFlagged</code>, <code>markFavorite</code>, and <code>markLocked</code>. If you are using the <code>markers</code> aggregation, the visibility of the markers depends on what is set in the aggregation itself."
+      },
+      {
+        "kind": "property",
+        "name": "markLocked",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Locked</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior.<br><br>"
+      },
+      {
+        "kind": "method",
+        "name": "getMarkFavorite",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Favorite</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior."
+      },
+      {
+        "kind": "method",
+        "name": "getMarkFlagged",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Flagged</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior."
+      },
+      {
+        "kind": "method",
+        "name": "getMarkLocked",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Locked</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior.<br><br>"
+      },
+      {
+        "kind": "method",
+        "name": "getShowMarkers",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. This property is valid only if you are using the already deprecated properties - <code>markFlagged</code>, <code>markFavorite</code>, and <code>markLocked</code>. If you are using the <code>markers</code> aggregation, the visibility of the markers depends on what is set in the aggregation itself."
+      },
+      {
+        "kind": "method",
+        "name": "setMarkFavorite",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Favorite</code>."
+      },
+      {
+        "kind": "method",
+        "name": "setMarkFlagged",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Flagged</code>."
+      },
+      {
+        "kind": "method",
+        "name": "setMarkLocked",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Locked</code>."
+      },
+      {
+        "kind": "method",
+        "name": "setShowMarkers",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation."
+      }
+    ],
+    "sap.m.Tree": [
+      {
+        "kind": "method",
+        "name": "setGrowing",
+        "since": "1.46",
+        "text": "the <code>growing</code> property is not supported by the <code>Tree</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setGrowingDirection",
+        "since": "1.46",
+        "text": "the <code>growingDirection</code> property is not supported by the <code>Tree</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setGrowingScrollToLoad",
+        "since": "1.46",
+        "text": "the <code>growingScrollToLoad</code> property is not supported by the <code>Tree</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setGrowingThreshold",
+        "since": "1.46",
+        "text": "the <code>growingThreshold</code> property is not supported by the <code>Tree</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setGrowingTriggerText",
+        "since": "1.46",
+        "text": "the <code>growingTriggerText</code> property is not supported by the <code>Tree</code> control."
+      }
+    ],
+    "sap.m.ListBase": [
+      {
+        "kind": "property",
+        "name": "headerDesign",
+        "since": "1.16",
+        "text": "No longer has any functionality."
+      },
+      {
+        "kind": "event",
+        "name": "select",
+        "since": "1.16",
+        "text": "Use the <code>selectionChange</code> event instead."
+      },
+      {
+        "kind": "event",
+        "name": "growingStarted",
+        "since": "1.16.3",
+        "text": "Instead, use <code>updateStarted</code> event with listening <code>changeReason</code>."
+      },
+      {
+        "kind": "event",
+        "name": "growingFinished",
+        "since": "1.16.3",
+        "text": "Instead, use \"updateFinished\" event."
+      },
+      {
+        "kind": "method",
+        "name": "attachGrowingFinished",
+        "since": "1.16.3",
+        "text": "Instead, use \"updateFinished\" event."
+      },
+      {
+        "kind": "method",
+        "name": "attachGrowingStarted",
+        "since": "1.16.3",
+        "text": "Instead, use <code>updateStarted</code> event with listening <code>changeReason</code>."
+      },
+      {
+        "kind": "method",
+        "name": "attachSelect",
+        "since": "1.16",
+        "text": "Use the <code>selectionChange</code> event instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachGrowingFinished",
+        "since": "1.16.3",
+        "text": "Instead, use \"updateFinished\" event."
+      },
+      {
+        "kind": "method",
+        "name": "detachGrowingStarted",
+        "since": "1.16.3",
+        "text": "Instead, use <code>updateStarted</code> event with listening <code>changeReason</code>."
+      },
+      {
+        "kind": "method",
+        "name": "detachSelect",
+        "since": "1.16",
+        "text": "Use the <code>selectionChange</code> event instead."
+      },
+      {
+        "kind": "method",
+        "name": "getHeaderDesign",
+        "since": "1.16",
+        "text": "No longer has any functionality."
+      },
+      {
+        "kind": "method",
+        "name": "setHeaderDesign",
+        "since": "1.16",
+        "text": "No longer has any functionality."
+      }
+    ],
+    "sap.m.Dialog": [
+      {
+        "kind": "property",
+        "name": "stretchOnPhone",
+        "since": "1.13.1",
+        "text": "Please use the new stretch property instead. This enables a stretched Dialog even on tablet and desktop. If you want to achieve the same effect as <code>stretchOnPhone</code>, please set the stretch with <code>Device.system.phone</code>, then the Dialog is only stretched when it runs on a phone."
+      },
+      {
+        "kind": "method",
+        "name": "getLeftButton",
+        "since": "1.15.1",
+        "text": "<code>LeftButton</code> has been deprecated since 1.15.1. Please use the <code>beginButton</code> instead which is more RTL friendly."
+      },
+      {
+        "kind": "method",
+        "name": "getRightButton",
+        "since": "1.15.1",
+        "text": "<code>RightButton</code> has been deprecated since 1.15.1. Please use the <code>endButton</code> instead which is more RTL friendly."
+      },
+      {
+        "kind": "method",
+        "name": "getStretchOnPhone",
+        "since": "1.13.1",
+        "text": "Please use the new stretch property instead. This enables a stretched Dialog even on tablet and desktop. If you want to achieve the same effect as <code>stretchOnPhone</code>, please set the stretch with <code>Device.system.phone</code>, then the Dialog is only stretched when it runs on a phone."
+      },
+      {
+        "kind": "method",
+        "name": "setLeftButton",
+        "since": "1.15.1",
+        "text": "<code>LeftButton</code> has been deprecated since 1.15.1. Please use the <code>beginButton</code> instead which is more RTL friendly."
+      },
+      {
+        "kind": "method",
+        "name": "setRightButton",
+        "since": "1.15.1",
+        "text": "<code>RightButton</code> has been deprecated since 1.15.1. Please use the <code>endButton</code> instead which is more RTL friendly."
+      },
+      {
+        "kind": "method",
+        "name": "setStretchOnPhone",
+        "since": "1.13.1",
+        "text": "Please use the new stretch property instead. This enables a stretched Dialog even on tablet and desktop. If you want to achieve the same effect as <code>stretchOnPhone</code>, please set the stretch with <code>Device.system.phone</code>, then the Dialog is only stretched when it runs on a phone."
+      }
+    ],
+    "sap.m.Popover": [
+      {
+        "kind": "property",
+        "name": "enableScrolling",
+        "since": "1.15.0",
+        "text": "replaced by verticalScrolling and horizontalScrolling properties."
+      },
+      {
+        "kind": "property",
+        "name": "bounce",
+        "since": "1.42",
+        "text": "This parameter is obsolete and has no effect."
+      },
+      {
+        "kind": "method",
+        "name": "getEnableScrolling",
+        "since": "1.15.0",
+        "text": "replaced by verticalScrolling and horizontalScrolling properties."
+      },
+      {
+        "kind": "method",
+        "name": "getLeftButton",
+        "since": "1.15.1",
+        "text": "This property has been deprecated since 1.15.1. Please use the beginButton instead."
+      },
+      {
+        "kind": "method",
+        "name": "getRightButton",
+        "since": "1.15.1",
+        "text": "This property has been deprecated since 1.15.1. Please use the endButton instead."
+      },
+      {
+        "kind": "method",
+        "name": "setEnableScrolling",
+        "since": "1.15.0",
+        "text": "replaced by verticalScrolling and horizontalScrolling properties."
+      },
+      {
+        "kind": "method",
+        "name": "setLeftButton",
+        "since": "1.15.1",
+        "text": "This property has been deprecated since 1.15.1. Please use the beginButton instead."
+      },
+      {
+        "kind": "method",
+        "name": "setRightButton",
+        "since": "1.15.1",
+        "text": "This property has been deprecated since 1.15.1. Please use the endButton instead."
+      }
+    ],
+    "sap.m.ActionSheet": [
+      {
+        "kind": "event",
+        "name": "cancelButtonTap",
+        "since": "1.20.0",
+        "text": "This event is deprecated, use the cancelButtonPress event instead."
+      },
+      {
+        "kind": "method",
+        "name": "attachCancelButtonTap",
+        "since": "1.20.0",
+        "text": "This event is deprecated, use the cancelButtonPress event instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachCancelButtonTap",
+        "since": "1.20.0",
+        "text": "This event is deprecated, use the cancelButtonPress event instead."
+      }
+    ],
+    "sap.m.ViewSettingsDialog": [
+      {
+        "kind": "method",
+        "name": "getSelectedFilterKeys",
+        "since": "1.42",
+        "text": "replaced by <code>getSelectedFilterCompoundKeys</code> method"
+      },
+      {
+        "kind": "method",
+        "name": "setSelectedFilterKeys",
+        "since": "1.42",
+        "text": "replaced by <code>setSelectedFilterCompoundKeys</code> method"
+      }
+    ],
+    "sap.m.IconTabBar": [
+      {
+        "kind": "property",
+        "name": "showSelection",
+        "since": "1.15.0",
+        "text": "Regarding to changes of this control this property is not needed anymore."
+      },
+      {
+        "kind": "property",
+        "name": "showOverflowSelectList",
+        "since": "1.77",
+        "text": "the concept has been discarded. All tab filters that don't fit in the header, will be displayed in overflow menu."
+      },
+      {
+        "kind": "method",
+        "name": "getShowOverflowSelectList",
+        "since": "1.77",
+        "text": "the concept has been discarded. All tab filters that don't fit in the header, will be displayed in overflow menu."
+      },
+      {
+        "kind": "method",
+        "name": "getShowSelection",
+        "since": "1.15.0",
+        "text": "Regarding to changes of this control this property is not needed anymore."
+      },
+      {
+        "kind": "method",
+        "name": "setShowOverflowSelectList",
+        "since": "1.77",
+        "text": "the concept has been discarded. All tab filters that don't fit in the header, will be displayed in overflow menu."
+      },
+      {
+        "kind": "method",
+        "name": "setShowSelection",
+        "since": "1.15.0",
+        "text": "Regarding to changes of this control this property is not needed anymore."
+      }
+    ],
+    "sap.m.Bar": [
+      {
+        "kind": "property",
+        "name": "enableFlexBox",
+        "since": "1.16",
+        "text": "replaced by <code>contentMiddle</code> aggregation. <code>contentMiddle</code> will always occupy of the 100% width when no <code>contentLeft</code> and <code>contentRight</code> are being set."
+      },
+      {
+        "kind": "property",
+        "name": "translucent",
+        "since": "1.18.6",
+        "text": "This property has no effect since release 1.18.6 and should not be used. Translucent bar may overlay an input and make it difficult to edit."
+      },
+      {
+        "kind": "method",
+        "name": "getEnableFlexBox",
+        "since": "1.16",
+        "text": "replaced by <code>contentMiddle</code> aggregation. <code>contentMiddle</code> will always occupy of the 100% width when no <code>contentLeft</code> and <code>contentRight</code> are being set."
+      },
+      {
+        "kind": "method",
+        "name": "getTranslucent",
+        "since": "1.18.6",
+        "text": "This property has no effect since release 1.18.6 and should not be used. Translucent bar may overlay an input and make it difficult to edit."
+      },
+      {
+        "kind": "method",
+        "name": "setEnableFlexBox",
+        "since": "1.16",
+        "text": "replaced by <code>contentMiddle</code> aggregation. <code>contentMiddle</code> will always occupy of the 100% width when no <code>contentLeft</code> and <code>contentRight</code> are being set."
+      },
+      {
+        "kind": "method",
+        "name": "setTranslucent",
+        "since": "1.18.6",
+        "text": "This property has no effect since release 1.18.6 and should not be used. Translucent bar may overlay an input and make it difficult to edit."
+      }
+    ],
+    "sap.m.Page": [
+      {
+        "kind": "property",
+        "name": "navButtonText",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property only affected the NavButton in that theme."
+      },
+      {
+        "kind": "property",
+        "name": "icon",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property only affected the NavButton in that theme."
+      },
+      {
+        "kind": "property",
+        "name": "navButtonType",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property is only usable with a Button text in that theme."
+      },
+      {
+        "kind": "event",
+        "name": "navButtonTap",
+        "since": "1.12.2",
+        "text": "the navButtonPress event is replacing this event"
+      },
+      {
+        "kind": "method",
+        "name": "attachNavButtonTap",
+        "since": "1.12.2",
+        "text": "the navButtonPress event is replacing this event"
+      },
+      {
+        "kind": "method",
+        "name": "detachNavButtonTap",
+        "since": "1.12.2",
+        "text": "the navButtonPress event is replacing this event"
+      },
+      {
+        "kind": "method",
+        "name": "getIcon",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property only affected the NavButton in that theme."
+      },
+      {
+        "kind": "method",
+        "name": "getNavButtonText",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property only affected the NavButton in that theme."
+      },
+      {
+        "kind": "method",
+        "name": "getNavButtonType",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property is only usable with a Button text in that theme."
+      },
+      {
+        "kind": "method",
+        "name": "setIcon",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property only affected the NavButton in that theme."
+      },
+      {
+        "kind": "method",
+        "name": "setNavButtonText",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property only affected the NavButton in that theme."
+      },
+      {
+        "kind": "method",
+        "name": "setNavButtonType",
+        "since": "1.20",
+        "text": "Deprecated since the MVI theme is removed now. This property is only usable with a Button text in that theme."
+      }
+    ],
+    "sap.m.Carousel": [
+      {
+        "kind": "property",
+        "name": "showBusyIndicator",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded. Therefore busy indicator is not necessary any longer."
+      },
+      {
+        "kind": "event",
+        "name": "loadPage",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded"
+      },
+      {
+        "kind": "event",
+        "name": "unloadPage",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded"
+      },
+      {
+        "kind": "method",
+        "name": "attachLoadPage",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded"
+      },
+      {
+        "kind": "method",
+        "name": "attachUnloadPage",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded"
+      },
+      {
+        "kind": "method",
+        "name": "detachLoadPage",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded"
+      },
+      {
+        "kind": "method",
+        "name": "detachUnloadPage",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded"
+      },
+      {
+        "kind": "method",
+        "name": "getShowBusyIndicator",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded. Therefore busy indicator is not necessary any longer."
+      },
+      {
+        "kind": "method",
+        "name": "setShowBusyIndicator",
+        "since": "1.18.7",
+        "text": "Since 1.18.7 pages are no longer loaded or unloaded. Therefore busy indicator is not necessary any longer."
+      }
+    ],
+    "sap.m.DateRangeSelection": [
+      {
+        "kind": "property",
+        "name": "from",
+        "since": "1.22.0",
+        "text": "replaced by <code>dateValue</code> property of the {@link sap.m.DateTimeField}"
+      },
+      {
+        "kind": "property",
+        "name": "to",
+        "since": "1.22.0",
+        "text": "replaced by <code>secondDateValue</code> property"
+      },
+      {
+        "kind": "method",
+        "name": "getFrom",
+        "since": "1.22.0",
+        "text": "replaced by <code>dateValue</code> property of the {@link sap.m.DateTimeField}"
+      },
+      {
+        "kind": "method",
+        "name": "getTo",
+        "since": "1.22.0",
+        "text": "replaced by <code>secondDateValue</code> property"
+      },
+      {
+        "kind": "method",
+        "name": "setFrom",
+        "since": "1.22.0",
+        "text": "replaced by <code>dateValue</code> property of the {@link sap.m.DateTimeField}"
+      },
+      {
+        "kind": "method",
+        "name": "setTo",
+        "since": "1.22.0",
+        "text": "replaced by <code>secondDateValue</code> property"
+      }
+    ],
+    "sap.m.PlanningCalendar": [
+      {
+        "kind": "property",
+        "name": "appointmentsReducedHeight",
+        "since": "1.119",
+        "text": "Please use the <code>appointmentHeight</code> with value \"Automatic\" property instead."
+      },
+      {
+        "kind": "event",
+        "name": "rowHeaderClick",
+        "since": "1.119",
+        "text": "replaced by <code>rowHeaderPress</code> event"
+      },
+      {
+        "kind": "method",
+        "name": "attachRowHeaderClick",
+        "since": "1.119",
+        "text": "replaced by <code>rowHeaderPress</code> event"
+      },
+      {
+        "kind": "method",
+        "name": "detachRowHeaderClick",
+        "since": "1.119",
+        "text": "replaced by <code>rowHeaderPress</code> event"
+      },
+      {
+        "kind": "method",
+        "name": "getAppointmentsReducedHeight",
+        "since": "1.119",
+        "text": "Please use the <code>appointmentHeight</code> with value \"Automatic\" property instead."
+      },
+      {
+        "kind": "method",
+        "name": "setAppointmentsReducedHeight",
+        "since": "1.119",
+        "text": "Please use the <code>appointmentHeight</code> with value \"Automatic\" property instead."
+      }
+    ],
+    "sap.m.MessageView": [
+      {
+        "kind": "event",
+        "name": "afterOpen",
+        "since": "1.72",
+        "text": "Use the appropriate event from the wrapper control, instead."
+      },
+      {
+        "kind": "method",
+        "name": "attachAfterOpen",
+        "since": "1.72",
+        "text": "Use the appropriate event from the wrapper control, instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachAfterOpen",
+        "since": "1.72",
+        "text": "Use the appropriate event from the wrapper control, instead."
+      }
+    ],
+    "sap.m.SplitApp": [
+      {
+        "kind": "event",
+        "name": "orientationChange",
+        "since": "1.87",
+        "text": "use {@link sap.ui.Device.orientation.attachHandler} instead."
+      },
+      {
+        "kind": "method",
+        "name": "attachOrientationChange",
+        "since": "1.87",
+        "text": "use {@link sap.ui.Device.orientation.attachHandler} instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachOrientationChange",
+        "since": "1.87",
+        "text": "use {@link sap.ui.Device.orientation.attachHandler} instead."
+      }
+    ],
+    "sap.m.App": [
+      {
+        "kind": "event",
+        "name": "orientationChange",
+        "since": "1.20.0",
+        "text": "use {@link sap.ui.Device.orientation.attachHandler} instead."
+      },
+      {
+        "kind": "method",
+        "name": "attachOrientationChange",
+        "since": "1.20.0",
+        "text": "use {@link sap.ui.Device.orientation.attachHandler} instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachOrientationChange",
+        "since": "1.20.0",
+        "text": "use {@link sap.ui.Device.orientation.attachHandler} instead."
+      }
+    ],
+    "sap.m.Column": [
+      {
+        "kind": "property",
+        "name": "popinHAlign",
+        "since": "1.14",
+        "text": "Use popinDisplay property instead."
+      },
+      {
+        "kind": "method",
+        "name": "getPopinHAlign",
+        "since": "1.14",
+        "text": "Use popinDisplay property instead."
+      },
+      {
+        "kind": "method",
+        "name": "setPopinHAlign",
+        "since": "1.14",
+        "text": "Use popinDisplay property instead."
+      }
+    ],
+    "sap.m.GroupHeaderListItem": [
+      {
+        "kind": "property",
+        "name": "upperCase",
+        "since": "1.40.10",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getUpperCase",
+        "since": "1.40.10",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setUpperCase",
+        "since": "1.40.10",
+        "text": "the concept has been discarded."
+      }
+    ],
+    "sap.m.Tokenizer": [
+      {
+        "kind": "event",
+        "name": "tokenChange",
+        "since": "1.82",
+        "text": "replaced by <code>tokenDelete</code> event."
+      },
+      {
+        "kind": "event",
+        "name": "tokenUpdate",
+        "since": "1.82",
+        "text": "replaced by <code>tokenDelete</code> event."
+      },
+      {
+        "kind": "method",
+        "name": "addValidateToken",
+        "since": "1.81",
+        "text": "replaced by {@link MultiInput.prototype.addValidator}"
+      },
+      {
+        "kind": "method",
+        "name": "addValidator",
+        "since": "1.81",
+        "text": "replaced by {@link MultiInput.prototype.addValidator}"
+      },
+      {
+        "kind": "method",
+        "name": "attachTokenChange",
+        "since": "1.82",
+        "text": "replaced by <code>tokenDelete</code> event."
+      },
+      {
+        "kind": "method",
+        "name": "attachTokenUpdate",
+        "since": "1.82",
+        "text": "replaced by <code>tokenDelete</code> event."
+      },
+      {
+        "kind": "method",
+        "name": "detachTokenChange",
+        "since": "1.82",
+        "text": "replaced by <code>tokenDelete</code> event."
+      },
+      {
+        "kind": "method",
+        "name": "detachTokenUpdate",
+        "since": "1.82",
+        "text": "replaced by <code>tokenDelete</code> event."
+      },
+      {
+        "kind": "method",
+        "name": "removeAllValidators",
+        "since": "1.81",
+        "text": "replaced by {@link MultiInput.prototype.addValidator}"
+      },
+      {
+        "kind": "method",
+        "name": "removeValidator",
+        "since": "1.81",
+        "text": "replaced by {@link MultiInput.prototype.addValidator}"
+      }
+    ],
+    "sap.m.ObjectHeader": [
+      {
+        "kind": "property",
+        "name": "markFavorite",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Favorite</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior."
+      },
+      {
+        "kind": "property",
+        "name": "markFlagged",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Flagged</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior."
+      },
+      {
+        "kind": "property",
+        "name": "showMarkers",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. This property is valid only if you are using the already deprecated properties - <code>markFlagged</code> and <code>markFavorite</code>. If you are using <code>markers</code>, the visibility of the markers depends on what is set in the aggregation itself."
+      },
+      {
+        "kind": "aggregation",
+        "name": "firstStatus",
+        "since": "1.16.0",
+        "text": "replaced by <code>statuses</code> aggregation"
+      },
+      {
+        "kind": "aggregation",
+        "name": "secondStatus",
+        "since": "1.16.0",
+        "text": "replaced by <code>statuses</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "destroyFirstStatus",
+        "since": "1.16.0",
+        "text": "replaced by <code>statuses</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "destroySecondStatus",
+        "since": "1.16.0",
+        "text": "replaced by <code>statuses</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "getFirstStatus",
+        "since": "1.16.0",
+        "text": "replaced by <code>statuses</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "getMarkFavorite",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Favorite</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior."
+      },
+      {
+        "kind": "method",
+        "name": "getMarkFlagged",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Flagged</code>. You should use either this property or the <code>markers</code> aggregation, using both may lead to unpredicted behavior."
+      },
+      {
+        "kind": "method",
+        "name": "getSecondStatus",
+        "since": "1.16.0",
+        "text": "replaced by <code>statuses</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "getShowMarkers",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. This property is valid only if you are using the already deprecated properties - <code>markFlagged</code> and <code>markFavorite</code>. If you are using <code>markers</code>, the visibility of the markers depends on what is set in the aggregation itself."
+      },
+      {
+        "kind": "method",
+        "name": "setFirstStatus",
+        "since": "1.16.0",
+        "text": "replaced by <code>statuses</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "setMarkFavorite",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Favorite</code>."
+      },
+      {
+        "kind": "method",
+        "name": "setMarkFlagged",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregation. Add {@link sap.m.ObjectMarker} with type <code>sap.m.ObjectMarkerType.Flagged</code>."
+      },
+      {
+        "kind": "method",
+        "name": "setSecondStatus",
+        "since": "1.16.0",
+        "text": "replaced by <code>statuses</code> aggregation"
+      },
+      {
+        "kind": "method",
+        "name": "setShowMarkers",
+        "since": "1.42.0",
+        "text": "replaced by <code>markers</code> aggregationv."
+      }
+    ],
+    "sap.m.FacetFilterList": [
+      {
+        "kind": "property",
+        "name": "multiSelect",
+        "since": "1.20.0",
+        "text": "replaced by <code>setMode</code> method. <code>FacetFilterList</code> overrides the <code>setMode</code> method to restrict the possible modes to <code>MultiSelect</code> and <code>SingleSelectMaster</code>. All other modes are ignored and will not be set."
+      },
+      {
+        "kind": "method",
+        "name": "getMultiSelect",
+        "since": "1.20.0",
+        "text": "replaced by <code>setMode</code> method. <code>FacetFilterList</code> overrides the <code>setMode</code> method to restrict the possible modes to <code>MultiSelect</code> and <code>SingleSelectMaster</code>. All other modes are ignored and will not be set."
+      }
+    ],
+    "sap.m.PDFViewer": [
+      {
+        "kind": "property",
+        "name": "errorMessage",
+        "since": "1.50.0",
+        "text": "replaced by {@link sap.m.PDFViewer#getErrorPlaceholderMessage}."
+      },
+      {
+        "kind": "property",
+        "name": "popupHeaderTitle",
+        "since": "1.50.0",
+        "text": "replaced by {@link sap.m.PDFViewer#getTitle}."
+      },
+      {
+        "kind": "method",
+        "name": "getErrorMessage",
+        "since": "1.50.0",
+        "text": "replaced by {@link sap.m.PDFViewer#getErrorPlaceholderMessage}."
+      },
+      {
+        "kind": "method",
+        "name": "getPopupHeaderTitle",
+        "since": "1.50.0",
+        "text": "replaced by {@link sap.m.PDFViewer#getTitle}."
+      },
+      {
+        "kind": "method",
+        "name": "setErrorMessage",
+        "since": "1.50.0",
+        "text": "replaced by {@link sap.m.PDFViewer#getErrorPlaceholderMessage}."
+      },
+      {
+        "kind": "method",
+        "name": "setPopupHeaderTitle",
+        "since": "1.50.0",
+        "text": "replaced by {@link sap.m.PDFViewer#getTitle}."
+      }
+    ],
+    "sap.m.FeedInput": [
+      {
+        "kind": "property",
+        "name": "iconDensityAware",
+        "since": "1.88",
+        "text": "Image replaced by {@link sap.m.Avatar }"
+      },
+      {
+        "kind": "property",
+        "name": "ariaLabelForPicture",
+        "since": "1.88",
+        "text": "This will not have any effect in code now."
+      },
+      {
+        "kind": "method",
+        "name": "getAriaLabelForPicture",
+        "since": "1.88",
+        "text": "This will not have any effect in code now."
+      },
+      {
+        "kind": "method",
+        "name": "getIconDensityAware",
+        "since": "1.88",
+        "text": "Image replaced by {@link sap.m.Avatar }"
+      },
+      {
+        "kind": "method",
+        "name": "setAriaLabelForPicture",
+        "since": "1.88",
+        "text": "This will not have any effect in code now."
+      },
+      {
+        "kind": "method",
+        "name": "setIconDensityAware",
+        "since": "1.88",
+        "text": "Image replaced by {@link sap.m.Avatar }"
+      }
+    ],
+    "sap.m.QuickViewPage": [
+      {
+        "kind": "property",
+        "name": "crossAppNavCallback",
+        "since": "1.111",
+        "text": "Attach listener to the avatar <code>press</code> event and perform navigation as appropriate in your environment instead."
+      },
+      {
+        "kind": "property",
+        "name": "icon",
+        "since": "1.92",
+        "text": "Use the <code>avatar</code> aggregation instead."
+      },
+      {
+        "kind": "property",
+        "name": "fallbackIcon",
+        "since": "1.92",
+        "text": "Use the <code>avatar</code> aggregation and use its property <code>fallbackIcon</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "getCrossAppNavCallback",
+        "since": "1.111",
+        "text": "Attach listener to the avatar <code>press</code> event and perform navigation as appropriate in your environment instead."
+      },
+      {
+        "kind": "method",
+        "name": "getFallbackIcon",
+        "since": "1.92",
+        "text": "Use the <code>avatar</code> aggregation and use its property <code>fallbackIcon</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "getIcon",
+        "since": "1.92",
+        "text": "Use the <code>avatar</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setCrossAppNavCallback",
+        "since": "1.111",
+        "text": "Attach listener to the avatar <code>press</code> event and perform navigation as appropriate in your environment instead."
+      },
+      {
+        "kind": "method",
+        "name": "setFallbackIcon",
+        "since": "1.92",
+        "text": "Use the <code>avatar</code> aggregation and use its property <code>fallbackIcon</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "setIcon",
+        "since": "1.92",
+        "text": "Use the <code>avatar</code> aggregation instead."
+      }
+    ],
+    "sap.m.TileContent": [
+      {
+        "kind": "property",
+        "name": "size",
+        "since": "1.38.0",
+        "text": "The TileContent control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      },
+      {
+        "kind": "method",
+        "name": "getSize",
+        "since": "1.38.0",
+        "text": "The TileContent control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      },
+      {
+        "kind": "method",
+        "name": "setSize",
+        "since": "1.38.0",
+        "text": "The TileContent control has now a fixed size, depending on the used media (desktop, tablet or phone)."
+      }
+    ],
+    "sap.m.NotificationListGroup": [
+      {
+        "kind": "property",
+        "name": "authorName",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "property",
+        "name": "authorPicture",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "property",
+        "name": "datetime",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getAuthorName",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getAuthorPicture",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getDatetime",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setAuthorName",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setAuthorPicture",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setDatetime",
+        "since": "1.73",
+        "text": "the concept has been discarded."
+      }
+    ],
+    "sap.m.IconTabHeader": [
+      {
+        "kind": "property",
+        "name": "showSelection",
+        "since": "1.15.0",
+        "text": "Regarding to changes of this control this property is not needed anymore."
+      },
+      {
+        "kind": "property",
+        "name": "showOverflowSelectList",
+        "since": "1.75",
+        "text": "the concept has been discarded. All tab filters that don't fit in the header, will be displayed in overflow menu."
+      },
+      {
+        "kind": "method",
+        "name": "getShowOverflowSelectList",
+        "since": "1.75",
+        "text": "the concept has been discarded. All tab filters that don't fit in the header, will be displayed in overflow menu."
+      },
+      {
+        "kind": "method",
+        "name": "getShowSelection",
+        "since": "1.15.0",
+        "text": "Regarding to changes of this control this property is not needed anymore."
+      },
+      {
+        "kind": "method",
+        "name": "setShowOverflowSelectList",
+        "since": "1.75",
+        "text": "the concept has been discarded. All tab filters that don't fit in the header, will be displayed in overflow menu."
+      },
+      {
+        "kind": "method",
+        "name": "setShowSelection",
+        "since": "1.15.0",
+        "text": "Regarding to changes of this control this property is not needed anymore."
+      }
+    ],
+    "sap.ui.table.Table": [
+      {
+        "kind": "property",
+        "name": "rowHeight",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "property",
+        "name": "visibleRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "property",
+        "name": "selectedIndex",
+        "since": "1.69",
+        "text": "replaced by {@link sap.ui.table.Table#getSelectedIndices} and {@link sap.ui.table.Table#setSelectedIndex}"
+      },
+      {
+        "kind": "property",
+        "name": "editable",
+        "since": "1.115",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "property",
+        "name": "navigationMode",
+        "since": "1.38",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "property",
+        "name": "enableGrouping",
+        "since": "1.110",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "property",
+        "name": "showColumnVisibilityMenu",
+        "since": "1.117",
+        "text": "use a <code>ColumnMenu</code> with a custom menu item in the <code>headerMenu</code> association instead."
+      },
+      {
+        "kind": "property",
+        "name": "visibleRowCountMode",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "property",
+        "name": "minAutoRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "property",
+        "name": "fixedRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "property",
+        "name": "fixedBottomRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "aggregation",
+        "name": "title",
+        "since": "1.72",
+        "text": "Use, for example, a <code>sap.m.Title</code> control in the <code>extension</code> aggregation instead."
+      },
+      {
+        "kind": "aggregation",
+        "name": "toolbar",
+        "since": "1.38",
+        "text": "This aggregation is deprecated, use the <code>extension</code> aggregation instead."
+      },
+      {
+        "kind": "aggregation",
+        "name": "plugins",
+        "since": "1.120",
+        "text": "Please add plugins to the <code>dependents</code> aggregation instead."
+      },
+      {
+        "kind": "event",
+        "name": "columnSelect",
+        "since": "1.117",
+        "text": "see the <code>headerMenu</code> aggregation of <code>sap.ui.table.Column</code> for details."
+      },
+      {
+        "kind": "event",
+        "name": "group",
+        "since": "1.118",
+        "text": "see the <code>enableGrouping</code> property for details."
+      },
+      {
+        "kind": "event",
+        "name": "columnVisibility",
+        "since": "1.117",
+        "text": "see the <code>showColumnVisibilityMenu</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "event",
+        "name": "cellContextmenu",
+        "since": "1.54",
+        "text": "replaced by <code>beforeOpenContextMenu</code>."
+      },
+      {
+        "kind": "method",
+        "name": "addPlugin",
+        "since": "1.120",
+        "text": "Please add plugins to the <code>dependents</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "attachCellContextmenu",
+        "since": "1.54",
+        "text": "replaced by <code>beforeOpenContextMenu</code>."
+      },
+      {
+        "kind": "method",
+        "name": "attachColumnSelect",
+        "since": "1.117",
+        "text": "see the <code>headerMenu</code> aggregation of <code>sap.ui.table.Column</code> for details."
+      },
+      {
+        "kind": "method",
+        "name": "attachColumnVisibility",
+        "since": "1.117",
+        "text": "see the <code>showColumnVisibilityMenu</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "method",
+        "name": "attachGroup",
+        "since": "1.118",
+        "text": "see the <code>enableGrouping</code> property for details."
+      },
+      {
+        "kind": "method",
+        "name": "autoResizeColumn",
+        "since": "1.125",
+        "text": "replaced by {@link sap.ui.table.Column#autoResize}"
+      },
+      {
+        "kind": "method",
+        "name": "destroyPlugins",
+        "since": "1.120",
+        "text": "Please add plugins to the <code>dependents</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "destroyTitle",
+        "since": "1.72",
+        "text": "Use, for example, a <code>sap.m.Title</code> control in the <code>extension</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "destroyToolbar",
+        "since": "1.38",
+        "text": "This aggregation is deprecated, use the <code>extension</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachCellContextmenu",
+        "since": "1.54",
+        "text": "replaced by <code>beforeOpenContextMenu</code>."
+      },
+      {
+        "kind": "method",
+        "name": "detachColumnSelect",
+        "since": "1.117",
+        "text": "see the <code>headerMenu</code> aggregation of <code>sap.ui.table.Column</code> for details."
+      },
+      {
+        "kind": "method",
+        "name": "detachColumnVisibility",
+        "since": "1.117",
+        "text": "see the <code>showColumnVisibilityMenu</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "method",
+        "name": "detachGroup",
+        "since": "1.118",
+        "text": "see the <code>enableGrouping</code> property for details."
+      },
+      {
+        "kind": "method",
+        "name": "exportData",
+        "since": "1.56",
+        "text": "replaced by the <code>sap.ui.export</code> library."
+      },
+      {
+        "kind": "method",
+        "name": "getEditable",
+        "since": "1.115",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getEnableGrouping",
+        "since": "1.110",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getFixedBottomRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getFixedRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getGroupBy",
+        "since": "1.110",
+        "text": "see the <code>enableGrouping</code> property for details."
+      },
+      {
+        "kind": "method",
+        "name": "getMinAutoRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getNavigationMode",
+        "since": "1.38",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getPlugins",
+        "since": "1.120",
+        "text": "Please add plugins to the <code>dependents</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getRowHeight",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getSelectedIndex",
+        "since": "1.69",
+        "text": "replaced by {@link sap.ui.table.Table#getSelectedIndices}"
+      },
+      {
+        "kind": "method",
+        "name": "getShowColumnVisibilityMenu",
+        "since": "1.117",
+        "text": "use a <code>ColumnMenu</code> with a custom menu item in the <code>headerMenu</code> association instead."
+      },
+      {
+        "kind": "method",
+        "name": "getTitle",
+        "since": "1.72",
+        "text": "Use, for example, a <code>sap.m.Title</code> control in the <code>extension</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getToolbar",
+        "since": "1.38",
+        "text": "This aggregation is deprecated, use the <code>extension</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getVisibleRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getVisibleRowCountMode",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "indexOfPlugin",
+        "since": "1.120",
+        "text": "Please add plugins to the <code>dependents</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "insertPlugin",
+        "since": "1.120",
+        "text": "Please add plugins to the <code>dependents</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "removeAllPlugins",
+        "since": "1.120",
+        "text": "Please add plugins to the <code>dependents</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "removePlugin",
+        "since": "1.120",
+        "text": "Please add plugins to the <code>dependents</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setEditable",
+        "since": "1.115",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setEnableGrouping",
+        "since": "1.110",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setFixedBottomRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setFixedRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setGroupBy",
+        "since": "1.110",
+        "text": "see the <code>enableGrouping</code> property for details."
+      },
+      {
+        "kind": "method",
+        "name": "setMinAutoRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setNavigationMode",
+        "since": "1.38",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setRowHeight",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setShowColumnVisibilityMenu",
+        "since": "1.117",
+        "text": "use a <code>ColumnMenu</code> with a custom menu item in the <code>headerMenu</code> association instead."
+      },
+      {
+        "kind": "method",
+        "name": "setTitle",
+        "since": "1.72",
+        "text": "Use, for example, a <code>sap.m.Title</code> control in the <code>extension</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setToolbar",
+        "since": "1.38",
+        "text": "This aggregation is deprecated, use the <code>extension</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setVisibleRowCount",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setVisibleRowCountMode",
+        "since": "1.119",
+        "text": "use the <code>rowMode</code> aggregation instead."
+      }
+    ],
+    "sap.ui.table.TreeTable": [
+      {
+        "kind": "property",
+        "name": "expandFirstLevel",
+        "since": "1.46.3",
+        "text": "replaced by the <code>numberOfExpandedLevels</code> binding parameter. May not work with all bindings."
+      },
+      {
+        "kind": "property",
+        "name": "collapseRecursive",
+        "since": "1.76",
+        "text": "replaced by the <code>collapseRecursive</code> binding parameter. May not work with all bindings."
+      },
+      {
+        "kind": "property",
+        "name": "rootLevel",
+        "since": "1.76",
+        "text": "replaced by the <code>rootLevel</code> binding parameter. May not work with all bindings."
+      },
+      {
+        "kind": "method",
+        "name": "getCollapseRecursive",
+        "since": "1.76",
+        "text": "replaced by the <code>collapseRecursive</code> binding parameter. May not work with all bindings."
+      },
+      {
+        "kind": "method",
+        "name": "getEnableGrouping",
+        "since": "1.28",
+        "text": "the <code>enableGrouping</code> property is not supported by the <code>TreeTable</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getExpandFirstLevel",
+        "since": "1.46.3",
+        "text": "replaced by the <code>numberOfExpandedLevels</code> binding parameter. May not work with all bindings."
+      },
+      {
+        "kind": "method",
+        "name": "getGroupBy",
+        "since": "1.28",
+        "text": "the <code>groupBy</code> association is not supported by the <code>TreeTable</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getRootLevel",
+        "since": "1.76",
+        "text": "replaced by the <code>rootLevel</code> binding parameter. May not work with all bindings."
+      },
+      {
+        "kind": "method",
+        "name": "setCollapseRecursive",
+        "since": "1.76",
+        "text": "replaced by the <code>collapseRecursive</code> binding parameter. May not work with all bindings."
+      },
+      {
+        "kind": "method",
+        "name": "setEnableGrouping",
+        "since": "1.28",
+        "text": "the <code>enableGrouping</code> property is not supported by the <code>TreeTable</code> control. To get a group-like visualization the <code>useGroupMode</code> property can be used."
+      },
+      {
+        "kind": "method",
+        "name": "setExpandFirstLevel",
+        "since": "1.46.3",
+        "text": "replaced by the <code>numberOfExpandedLevels</code> binding parameter. May not work with all bindings."
+      },
+      {
+        "kind": "method",
+        "name": "setGroupBy",
+        "since": "1.28",
+        "text": "the <code>groupBy</code> association is not supported by the <code>TreeTable</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setRootLevel",
+        "since": "1.76",
+        "text": "replaced by the <code>rootLevel</code> binding parameter. May not work with all bindings."
+      }
+    ],
+    "sap.ui.table.AnalyticalTable": [
+      {
+        "kind": "property",
+        "name": "sumOnTop",
+        "since": "1.44",
+        "text": "replaced by the <code>sumOnTop</code> binding parameter"
+      },
+      {
+        "kind": "property",
+        "name": "numberOfExpandedLevels",
+        "since": "1.44",
+        "text": "replaced by the <code>numberOfExpandedLevels</code> binding parameter"
+      },
+      {
+        "kind": "property",
+        "name": "autoExpandMode",
+        "since": "1.44",
+        "text": "replaced by the <code>autoExpandMode</code> binding parameter"
+      },
+      {
+        "kind": "property",
+        "name": "columnVisibilityMenuSorter",
+        "since": "1.117",
+        "text": "see the <code>showColumnVisibilityMenu</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "property",
+        "name": "collapseRecursive",
+        "since": "1.76",
+        "text": "replaced by the <code>collapseRecursive</code> binding parameter"
+      },
+      {
+        "kind": "property",
+        "name": "dirty",
+        "since": "1.21.2",
+        "text": "replaced by {@link sap.ui.table.Table#setShowOverlay}"
+      },
+      {
+        "kind": "method",
+        "name": "getAutoExpandMode",
+        "since": "1.44",
+        "text": "replaced by the <code>autoExpandMode</code> binding parameter"
+      },
+      {
+        "kind": "method",
+        "name": "getCollapseRecursive",
+        "since": "1.76",
+        "text": "replaced by the <code>collapseRecursive</code> binding parameter"
+      },
+      {
+        "kind": "method",
+        "name": "getColumnVisibilityMenuSorter",
+        "since": "1.117",
+        "text": "see the <code>showColumnVisibilityMenu</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "method",
+        "name": "getDirty",
+        "since": "1.21.2",
+        "text": "replaced by {@link sap.ui.table.Table#setShowOverlay}"
+      },
+      {
+        "kind": "method",
+        "name": "getEnableGrouping",
+        "since": "1.28",
+        "text": "the <code>enableGrouping</code> property is not supported by the <code>AnalyticalTable</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getGroupBy",
+        "since": "1.28",
+        "text": "the <code>groupBy</code> association is not supported by the <code>AnalyticalTable</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getNumberOfExpandedLevels",
+        "since": "1.44",
+        "text": "replaced by the <code>numberOfExpandedLevels</code> binding parameter"
+      },
+      {
+        "kind": "method",
+        "name": "getSumOnTop",
+        "since": "1.44",
+        "text": "replaced by the <code>sumOnTop</code> binding parameter"
+      },
+      {
+        "kind": "method",
+        "name": "setAutoExpandMode",
+        "since": "1.44",
+        "text": "replaced by the <code>autoExpandMode</code> binding parameter"
+      },
+      {
+        "kind": "method",
+        "name": "setCollapseRecursive",
+        "since": "1.76",
+        "text": "replaced by the <code>collapseRecursive</code> binding parameter"
+      },
+      {
+        "kind": "method",
+        "name": "setColumnVisibilityMenuSorter",
+        "since": "1.117",
+        "text": "see the <code>showColumnVisibilityMenu</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "method",
+        "name": "setDirty",
+        "since": "1.21.2",
+        "text": "replaced by {@link sap.ui.table.Table#setShowOverlay}"
+      },
+      {
+        "kind": "method",
+        "name": "setEnableGrouping",
+        "since": "1.28",
+        "text": "the <code>enableGrouping</code> property is not supported by the <code>AnalyticalTable</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setGroupBy",
+        "since": "1.28",
+        "text": "the <code>groupBy</code> association is not supported by the <code>AnalyticalTable</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setNumberOfExpandedLevels",
+        "since": "1.44",
+        "text": "replaced by the <code>numberOfExpandedLevels</code> binding parameter"
+      },
+      {
+        "kind": "method",
+        "name": "setSumOnTop",
+        "since": "1.44",
+        "text": "replaced by the <code>sumOnTop</code> binding parameter"
+      }
+    ],
+    "sap.ui.table.Column": [
+      {
+        "kind": "property",
+        "name": "flexible",
+        "since": "1.44",
+        "text": "this property has no effect. Use the property <code>minWidth</code> in combination with the property <code>width=\"auto\"</code> instead."
+      },
+      {
+        "kind": "property",
+        "name": "sorted",
+        "since": "1.120",
+        "text": "replaced by {@link sap.ui.core.SortOrder SortOrder.None} for the <code>sortOrder</code> property"
+      },
+      {
+        "kind": "property",
+        "name": "grouped",
+        "since": "1.118",
+        "text": "see the <code>enableGrouping</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "aggregation",
+        "name": "menu",
+        "since": "1.117",
+        "text": "use the <code>headerMenu</code> association instead."
+      },
+      {
+        "kind": "event",
+        "name": "columnMenuOpen",
+        "since": "1.117",
+        "text": "see the <code>headerMenu</code> aggregation for details."
+      },
+      {
+        "kind": "method",
+        "name": "attachColumnMenuOpen",
+        "since": "1.117",
+        "text": "see the <code>headerMenu</code> aggregation for details."
+      },
+      {
+        "kind": "method",
+        "name": "destroyMenu",
+        "since": "1.117",
+        "text": "use the <code>headerMenu</code> association instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachColumnMenuOpen",
+        "since": "1.117",
+        "text": "see the <code>headerMenu</code> aggregation for details."
+      },
+      {
+        "kind": "method",
+        "name": "getFlexible",
+        "since": "1.44",
+        "text": "this property has no effect. Use the property <code>minWidth</code> in combination with the property <code>width=\"auto\"</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "getGrouped",
+        "since": "1.118",
+        "text": "see the <code>enableGrouping</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "method",
+        "name": "getMenu",
+        "since": "1.117",
+        "text": "use the <code>headerMenu</code> association instead."
+      },
+      {
+        "kind": "method",
+        "name": "getSorted",
+        "since": "1.120",
+        "text": "replaced by {@link sap.ui.core.SortOrder SortOrder.None} for the <code>sortOrder</code> property"
+      },
+      {
+        "kind": "method",
+        "name": "setFlexible",
+        "since": "1.44",
+        "text": "this property has no effect. Use the property <code>minWidth</code> in combination with the property <code>width=\"auto\"</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "setGrouped",
+        "since": "1.118",
+        "text": "see the <code>enableGrouping</code> property of <code>sap.ui.table.Table</code> for details."
+      },
+      {
+        "kind": "method",
+        "name": "setMenu",
+        "since": "1.117",
+        "text": "use the <code>headerMenu</code> association instead."
+      },
+      {
+        "kind": "method",
+        "name": "setSorted",
+        "since": "1.120",
+        "text": "replaced by {@link sap.ui.core.SortOrder SortOrder.None} for the <code>sortOrder</code> property"
+      },
+      {
+        "kind": "method",
+        "name": "sort",
+        "since": "1.5.1",
+        "text": "Please use the function \"sap.ui.Table.prototype.sort\"."
+      },
+      {
+        "kind": "method",
+        "name": "toggleSort",
+        "since": "1.5.1",
+        "text": "Please use the function \"sap.ui.Table.prototype.sort\"."
+      }
+    ],
+    "sap.f.DynamicPageTitle": [
+      {
+        "kind": "property",
+        "name": "primaryArea",
+        "since": "1.54",
+        "text": "Please use the <code>areaShrinkRatio</code> property instead. The value of <code>areaShrinkRatio</code> must be set in <code>Heading:Content:Actions</code> format where Heading, Content and Actions are numbers greater than or equal to 0. The greater value a section has the faster it shrinks when the screen size is being reduced.\n\n<code>primaryArea=Begin</code> can be achieved by setting a low number for the Heading area to <code>areaShrinkRatio</code>, for example <code>1:1.6:1.6</code>.\n\n<code>primaryArea=Middle</code> can be achieved by setting a low number for the Content area to <code>areaShrinkRatio</code>, for example <code>1.6:1:1.6</code>."
+      },
+      {
+        "kind": "method",
+        "name": "getPrimaryArea",
+        "since": "1.54",
+        "text": "Please use the <code>areaShrinkRatio</code> property instead. The value of <code>areaShrinkRatio</code> must be set in <code>Heading:Content:Actions</code> format where Heading, Content and Actions are numbers greater than or equal to 0. The greater value a section has the faster it shrinks when the screen size is being reduced.\n\n<code>primaryArea=Begin</code> can be achieved by setting a low number for the Heading area to <code>areaShrinkRatio</code>, for example <code>1:1.6:1.6</code>.\n\n<code>primaryArea=Middle</code> can be achieved by setting a low number for the Content area to <code>areaShrinkRatio</code>, for example <code>1.6:1:1.6</code>."
+      },
+      {
+        "kind": "method",
+        "name": "setPrimaryArea",
+        "since": "1.54",
+        "text": "Please use the <code>areaShrinkRatio</code> property instead. The value of <code>areaShrinkRatio</code> must be set in <code>Heading:Content:Actions</code> format where Heading, Content and Actions are numbers greater than or equal to 0. The greater value a section has the faster it shrinks when the screen size is being reduced.\n\n<code>primaryArea=Begin</code> can be achieved by setting a low number for the Heading area to <code>areaShrinkRatio</code>, for example <code>1:1.6:1.6</code>.\n\n<code>primaryArea=Middle</code> can be achieved by setting a low number for the Content area to <code>areaShrinkRatio</code>, for example <code>1.6:1:1.6</code>."
+      }
+    ],
+    "sap.f.semantic.SemanticPage": [
+      {
+        "kind": "property",
+        "name": "titlePrimaryArea",
+        "since": "1.58",
+        "text": "Please use the <code>titleAreaShrinkRatio</code> property instead. The value of <code>titleAreaShrinkRatio</code> must be set in <code>Heading:Content:Actions</code> format where Heading, Content and Actions are numbers greater than or equal to 0. The greater value a section has the faster it shrinks when the screen size is being reduced.\n\n<code>titlePrimaryArea=Begin</code> can be achieved by setting a low number for the Heading area to <code>titleAreaShrinkRatio</code>, for example <code>1:1.6:1.6</code>.\n\n<code>titlePrimaryArea=Middle</code> can be achieved by setting a low number for the Content area to <code>titleAreaShrinkRatio</code>, for example <code>1.6:1:1.6</code>."
+      },
+      {
+        "kind": "method",
+        "name": "getTitlePrimaryArea",
+        "since": "1.58",
+        "text": "Please use the <code>titleAreaShrinkRatio</code> property instead. The value of <code>titleAreaShrinkRatio</code> must be set in <code>Heading:Content:Actions</code> format where Heading, Content and Actions are numbers greater than or equal to 0. The greater value a section has the faster it shrinks when the screen size is being reduced.\n\n<code>titlePrimaryArea=Begin</code> can be achieved by setting a low number for the Heading area to <code>titleAreaShrinkRatio</code>, for example <code>1:1.6:1.6</code>.\n\n<code>titlePrimaryArea=Middle</code> can be achieved by setting a low number for the Content area to <code>titleAreaShrinkRatio</code>, for example <code>1.6:1:1.6</code>."
+      }
+    ],
+    "sap.uxap.ObjectPageHeader": [
+      {
+        "kind": "property",
+        "name": "headerDesign",
+        "since": "1.40.1",
+        "text": "without replacement."
+      },
+      {
+        "kind": "aggregation",
+        "name": "breadCrumbsLinks",
+        "since": "1.50",
+        "text": "use the <code>breadcrumbs</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "addBreadCrumbLink",
+        "since": "1.50",
+        "text": "use the <code>breadcrumbs</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "destroyBreadCrumbsLinks",
+        "since": "1.50",
+        "text": "use the <code>breadcrumbs</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getBreadCrumbsLinks",
+        "since": "1.50",
+        "text": "use the <code>breadcrumbs</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getHeaderDesign",
+        "since": "1.40.1",
+        "text": "without replacement."
+      },
+      {
+        "kind": "method",
+        "name": "indexOfBreadCrumbLink",
+        "since": "1.50",
+        "text": "use the <code>breadcrumbs</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "insertBreadCrumbLink",
+        "since": "1.50",
+        "text": "use the <code>breadcrumbs</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "removeAllBreadCrumbsLinks",
+        "since": "1.50",
+        "text": "use the <code>breadcrumbs</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "removeBreadCrumbLink",
+        "since": "1.50",
+        "text": "use the <code>breadcrumbs</code> aggregation instead."
+      }
+    ],
+    "sap.ui.layout.form.SimpleForm": [
+      {
+        "kind": "property",
+        "name": "minWidth",
+        "since": "1.93",
+        "text": "use another <code>Layout</code>"
+      },
+      {
+        "kind": "property",
+        "name": "labelMinWidth",
+        "since": "1.93",
+        "text": "use another <code>Layout</code>"
+      },
+      {
+        "kind": "method",
+        "name": "getLabelMinWidth",
+        "since": "1.93",
+        "text": "use another <code>Layout</code>"
+      },
+      {
+        "kind": "method",
+        "name": "getMinWidth",
+        "since": "1.93",
+        "text": "use another <code>Layout</code>"
+      },
+      {
+        "kind": "method",
+        "name": "setLabelMinWidth",
+        "since": "1.93",
+        "text": "use another <code>Layout</code>"
+      },
+      {
+        "kind": "method",
+        "name": "setMinWidth",
+        "since": "1.93",
+        "text": "use another <code>Layout</code>"
+      }
+    ],
+    "sap.ui.comp.smarttable.SmartTable": [
+      {
+        "kind": "property",
+        "name": "useExportToExcel",
+        "since": "1.100",
+        "text": "replaced by <code>enableExport</code> property."
+      },
+      {
+        "kind": "property",
+        "name": "enableCustomFilter",
+        "since": "1.40.0",
+        "text": "After personalization dialog has been introduced in SmartTable the property <code>enableCustomFilter</code> does not make sense. When setting the property to <code>false</code>, the entered custom filter value will not be shown in personalization dialog and will also not be persisted in variant management. The custom filter will also be overwritten when rebindTable is called on the SmartTable."
+      },
+      {
+        "kind": "property",
+        "name": "useOnlyOneSolidToolbar",
+        "since": "1.29",
+        "text": "This property has no effect"
+      },
+      {
+        "kind": "event",
+        "name": "dataRequested",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindTable</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "event",
+        "name": "dataReceived",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindTable</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "method",
+        "name": "attachDataReceived",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindTable</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "method",
+        "name": "attachDataRequested",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindTable</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "method",
+        "name": "detachDataReceived",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindTable</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "method",
+        "name": "detachDataRequested",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindTable</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "method",
+        "name": "getEnableCustomFilter",
+        "since": "1.40.0",
+        "text": "After personalization dialog has been introduced in SmartTable the property <code>enableCustomFilter</code> does not make sense. When setting the property to <code>false</code>, the entered custom filter value will not be shown in personalization dialog and will also not be persisted in variant management. The custom filter will also be overwritten when rebindTable is called on the SmartTable."
+      },
+      {
+        "kind": "method",
+        "name": "getUseExportToExcel",
+        "since": "1.100",
+        "text": "replaced by <code>enableExport</code> property."
+      },
+      {
+        "kind": "method",
+        "name": "getUseOnlyOneSolidToolbar",
+        "since": "1.29",
+        "text": "This property has no effect"
+      },
+      {
+        "kind": "method",
+        "name": "setEnableCustomFilter",
+        "since": "1.40.0",
+        "text": "After personalization dialog has been introduced in SmartTable the property <code>enableCustomFilter</code> does not make sense. When setting the property to <code>false</code>, the entered custom filter value will not be shown in personalization dialog and will also not be persisted in variant management. The custom filter will also be overwritten when rebindTable is called on the SmartTable."
+      },
+      {
+        "kind": "method",
+        "name": "setUseExportToExcel",
+        "since": "1.100",
+        "text": "replaced by {@link #setEnableExport}."
+      },
+      {
+        "kind": "method",
+        "name": "setUseOnlyOneSolidToolbar",
+        "since": "1.29",
+        "text": "This property has no effect"
+      }
+    ],
+    "sap.ui.comp.smartfield.SmartField": [
+      {
+        "kind": "property",
+        "name": "jsontype",
+        "since": "1.31.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "property",
+        "name": "proposedControl",
+        "since": "1.32.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "property",
+        "name": "expandNavigationProperties",
+        "since": "1.117",
+        "text": "It is recommended the expand to be using the OData Model."
+      },
+      {
+        "kind": "aggregation",
+        "name": "controlProposal",
+        "since": "1.34.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "event",
+        "name": "press",
+        "since": "1.116.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "attachPress",
+        "since": "1.116.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "checkClientError",
+        "since": "1.64",
+        "text": "replaced by {@link sap.ui.comp.smartfield.SmartField#checkValuesValidity}"
+      },
+      {
+        "kind": "method",
+        "name": "destroyControlProposal",
+        "since": "1.34.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "detachPress",
+        "since": "1.116.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "getControlProposal",
+        "since": "1.34.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "getExpandNavigationProperties",
+        "since": "1.117",
+        "text": "It is recommended the expand to be using the OData Model."
+      },
+      {
+        "kind": "method",
+        "name": "getJsontype",
+        "since": "1.31.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "getProposedControl",
+        "since": "1.32.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "setControlProposal",
+        "since": "1.34.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "setExpandNavigationProperties",
+        "since": "1.117",
+        "text": "It is recommended the expand to be using the OData Model."
+      },
+      {
+        "kind": "method",
+        "name": "setJsontype",
+        "since": "1.31.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "setProposedControl",
+        "since": "1.32.0",
+        "text": "with no replacement."
+      }
+    ],
+    "sap.ui.comp.smartfilterbar.SmartFilterBar": [
+      {
+        "kind": "property",
+        "name": "entityType",
+        "since": "1.40",
+        "text": "Use <code>entitySet</code> property instead of this one, to enable V4 annotation support"
+      },
+      {
+        "kind": "property",
+        "name": "resourceUri",
+        "since": "1.29",
+        "text": "Set an ODataModel as the main model on your control/view instead"
+      },
+      {
+        "kind": "property",
+        "name": "considerSelectionVariants",
+        "since": "1.87",
+        "text": "Please use the <code>com.sap.vocabularies.UI.v1.SelectionPresentationVariant</code> annotation through the {@link sap.ui.comp.smartvariants.SmartVariantManagement#setEntitySet}"
+      },
+      {
+        "kind": "property",
+        "name": "defaultSelectionVariantName",
+        "since": "1.87",
+        "text": "Please use the <code>com.sap.vocabularies.UI.v1.SelectionPresentationVariant</code> annotation through the {@link sap.ui.comp.smartvariants.SmartVariantManagement#setEntitySet}"
+      },
+      {
+        "kind": "method",
+        "name": "determineControlByFilterItem",
+        "since": "1.99",
+        "text": "Use {@link sap.ui.core.Core.byId} instead."
+      },
+      {
+        "kind": "method",
+        "name": "determineControlByName",
+        "since": "1.99",
+        "text": "Use {@link sap.ui.core.Core.byId} instead."
+      },
+      {
+        "kind": "method",
+        "name": "getConsiderSelectionVariants",
+        "since": "1.87",
+        "text": "Please use the <code>com.sap.vocabularies.UI.v1.SelectionPresentationVariant</code> annotation through the {@link sap.ui.comp.smartvariants.SmartVariantManagement#setEntitySet}"
+      },
+      {
+        "kind": "method",
+        "name": "getControlByKey",
+        "since": "1.99",
+        "text": "Use {@link sap.ui.core.Core.byId} for custom controls provided by you. To modify data use {@link sap.ui.comp.smartfilterbar.SmartFilterBar#setFilterData} or {@link sap.ui.comp.filterbar.FilterBar#setUiState}."
+      },
+      {
+        "kind": "method",
+        "name": "getDefaultSelectionVariantName",
+        "since": "1.87",
+        "text": "Please use the <code>com.sap.vocabularies.UI.v1.SelectionPresentationVariant</code> annotation through the {@link sap.ui.comp.smartvariants.SmartVariantManagement#setEntitySet}"
+      },
+      {
+        "kind": "method",
+        "name": "getEntityType",
+        "since": "1.40",
+        "text": "Use <code>entitySet</code> property instead of this one, to enable V4 annotation support"
+      },
+      {
+        "kind": "method",
+        "name": "getResourceUri",
+        "since": "1.29",
+        "text": "Set an ODataModel as the main model on your control/view instead"
+      },
+      {
+        "kind": "method",
+        "name": "setConsiderSelectionVariants",
+        "since": "1.87",
+        "text": "Please use the <code>com.sap.vocabularies.UI.v1.SelectionPresentationVariant</code> annotation through the {@link sap.ui.comp.smartvariants.SmartVariantManagement#setEntitySet}"
+      },
+      {
+        "kind": "method",
+        "name": "setDefaultSelectionVariantName",
+        "since": "1.87",
+        "text": "Please use the <code>com.sap.vocabularies.UI.v1.SelectionPresentationVariant</code> annotation through the {@link sap.ui.comp.smartvariants.SmartVariantManagement#setEntitySet}"
+      },
+      {
+        "kind": "method",
+        "name": "setEntityType",
+        "since": "1.40",
+        "text": "Use <code>entitySet</code> property instead of this one, to enable V4 annotation support"
+      },
+      {
+        "kind": "method",
+        "name": "setResourceUri",
+        "since": "1.29",
+        "text": "Set an ODataModel as the main model on your control/view instead"
+      }
+    ],
+    "sap.ui.comp.smartform.SmartForm": [
+      {
+        "kind": "property",
+        "name": "useHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation."
+      },
+      {
+        "kind": "property",
+        "name": "horizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getHorizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getUseHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation."
+      },
+      {
+        "kind": "method",
+        "name": "setHorizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setUseHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation."
+      }
+    ],
+    "sap.ui.comp.smartform.Group": [
+      {
+        "kind": "property",
+        "name": "useHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "property",
+        "name": "horizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "property",
+        "name": "label",
+        "since": "1.88",
+        "text": "replaced by <code>title</code> aggregation."
+      },
+      {
+        "kind": "aggregation",
+        "name": "layout",
+        "since": "1.48.0",
+        "text": "please use <code>layoutData</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "destroyLayout",
+        "since": "1.48.0",
+        "text": "please use <code>layoutData</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getHorizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getLabel",
+        "since": "1.88",
+        "text": "replaced by <code>title</code> aggregation."
+      },
+      {
+        "kind": "method",
+        "name": "getLayout",
+        "since": "1.48.0",
+        "text": "please use <code>layoutData</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "getUseHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setEditMode",
+        "since": "1.74.0",
+        "text": "please do not change the edit mode on group level, let the SmartForm inheritance do it"
+      },
+      {
+        "kind": "method",
+        "name": "setHorizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setLabel",
+        "since": "1.88",
+        "text": "replaced by <code>title</code> aggregation."
+      },
+      {
+        "kind": "method",
+        "name": "setLayout",
+        "since": "1.48.0",
+        "text": "please use <code>layoutData</code> aggregation instead."
+      },
+      {
+        "kind": "method",
+        "name": "setUseHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation of the <code>SmartForm</code> control."
+      }
+    ],
+    "sap.ui.comp.smartform.GroupElement": [
+      {
+        "kind": "property",
+        "name": "useHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "property",
+        "name": "horizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getHorizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "getUseHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setEditMode",
+        "since": "1.74.0",
+        "text": "please do not change the edit mode on groupElement level, let the SmartForm inheritance do it"
+      },
+      {
+        "kind": "method",
+        "name": "setHorizontalLayoutGroupElementMinWidth",
+        "since": "1.48.0",
+        "text": "please do not use this property as it does not have any effect on the current layout of the <code>SmartForm</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setUseHorizontalLayout",
+        "since": "1.86",
+        "text": "replaced by {@link sap.ui.comp.smartform.ColumnLayout ColumnLayout} in the <code>layout</code> aggregation of the <code>SmartForm</code> control."
+      }
+    ],
+    "sap.ui.comp.valuehelpdialog.ValueHelpDialog": [
+      {
+        "kind": "property",
+        "name": "maxIncludeRanges",
+        "since": "1.84.1",
+        "text": "replaced by <code>maxConditions</code>."
+      },
+      {
+        "kind": "property",
+        "name": "maxExcludeRanges",
+        "since": "1.84.1",
+        "text": "replaced by <code>maxConditions</code>."
+      },
+      {
+        "kind": "method",
+        "name": "getMaxExcludeRanges",
+        "since": "1.84.1",
+        "text": "replaced by <code>maxConditions</code>."
+      },
+      {
+        "kind": "method",
+        "name": "getMaxIncludeRanges",
+        "since": "1.84.1",
+        "text": "replaced by <code>maxConditions</code>."
+      },
+      {
+        "kind": "method",
+        "name": "getTable",
+        "since": "1.60.0",
+        "text": "replaced by {@link sap.ui.comp.valuehelpdialog.ValueHelpDialog#getTableAsync} to prevent synchronous calls."
+      },
+      {
+        "kind": "method",
+        "name": "setMaxExcludeRanges",
+        "since": "1.84.1",
+        "text": "replaced by <code>maxConditions</code>."
+      },
+      {
+        "kind": "method",
+        "name": "setMaxIncludeRanges",
+        "since": "1.84.1",
+        "text": "replaced by <code>maxConditions</code>."
+      }
+    ],
+    "sap.ui.comp.smartvariants.SmartVariantManagement": [
+      {
+        "kind": "event",
+        "name": "initialise",
+        "since": "1.38.0",
+        "text": "Replaced by providing the personalizable control and the callback via the <code>initialise</code>-method."
+      },
+      {
+        "kind": "method",
+        "name": "attachInitialise",
+        "since": "1.38.0",
+        "text": "Replaced by providing the personalizable control and the callback via the <code>initialise</code>-method."
+      },
+      {
+        "kind": "method",
+        "name": "detachInitialise",
+        "since": "1.38.0",
+        "text": "Replaced by providing the personalizable control and the callback via the <code>initialise</code>-method."
+      }
+    ],
+    "sap.ui.comp.filterbar.FilterBar": [
+      {
+        "kind": "property",
+        "name": "expandAdvancedArea",
+        "since": "1.30.0",
+        "text": "Replaced by property <code>filterBarExpanded</code> This property is mapped to the filterBarExpanded property."
+      },
+      {
+        "kind": "property",
+        "name": "searchEnabled",
+        "since": "1.32.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "property",
+        "name": "showClearButton",
+        "since": "1.84",
+        "text": "with no replacement. Users can select any Variant instead."
+      },
+      {
+        "kind": "property",
+        "name": "showGoButton",
+        "since": "1.28.0",
+        "text": "Replaced by property <code>showGoOnFB</code>"
+      },
+      {
+        "kind": "aggregation",
+        "name": "filterItems",
+        "since": "1.48.0",
+        "text": "Use aggregation <code>filterGroupItems</code> instead."
+      },
+      {
+        "kind": "aggregation",
+        "name": "content",
+        "since": "1.122",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "event",
+        "name": "filtersDialogSearch",
+        "since": "1.84",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "event",
+        "name": "filtersDialogSearchForFilters",
+        "since": "1.84",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "addContent",
+        "since": "1.122",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "addFilterDialogContent",
+        "since": "1.84",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "addFilterItem",
+        "since": "1.48.0",
+        "text": "Use aggregation <code>filterGroupItems</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "attachFiltersDialogSearch",
+        "since": "1.84",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "attachFiltersDialogSearchForFilters",
+        "since": "1.84",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "destroyContent",
+        "since": "1.122",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "destroyFilterItems",
+        "since": "1.48.0",
+        "text": "Use aggregation <code>filterGroupItems</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "detachFiltersDialogSearch",
+        "since": "1.84",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "detachFiltersDialogSearchForFilters",
+        "since": "1.84",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "getContent",
+        "since": "1.122",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "getDataSuiteFormat",
+        "since": "1.48",
+        "text": "replaced by {@link sap.ui.comp.filterbar.FilterBar#getUiState}"
+      },
+      {
+        "kind": "method",
+        "name": "getFilterDialogContent",
+        "since": "1.84",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "getFilterItems",
+        "since": "1.48.0",
+        "text": "Use aggregation <code>filterGroupItems</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "getSearchEnabled",
+        "since": "1.32.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "getShowClearButton",
+        "since": "1.84",
+        "text": "with no replacement. Users can select any Variant instead."
+      },
+      {
+        "kind": "method",
+        "name": "getShowGoButton",
+        "since": "1.28.0",
+        "text": "Replaced by property <code>showGoOnFB</code>"
+      },
+      {
+        "kind": "method",
+        "name": "indexOfContent",
+        "since": "1.122",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "indexOfFilterItem",
+        "since": "1.48.0",
+        "text": "Use aggregation <code>filterGroupItems</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "insertContent",
+        "since": "1.122",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "removeAllContent",
+        "since": "1.122",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "removeAllFilterItems",
+        "since": "1.48.0",
+        "text": "Use aggregation <code>filterGroupItems</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "removeContent",
+        "since": "1.122",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "removeFilterItem",
+        "since": "1.48.0",
+        "text": "Use aggregation <code>filterGroupItems</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "setDataSuiteFormat",
+        "since": "1.48",
+        "text": "replaced by {@link sap.ui.comp.filterbar.FilterBar#setUiState}"
+      },
+      {
+        "kind": "method",
+        "name": "setSearchEnabled",
+        "since": "1.32.0",
+        "text": "with no replacement."
+      },
+      {
+        "kind": "method",
+        "name": "setShowClearButton",
+        "since": "1.84",
+        "text": "with no replacement. Users can select any Variant instead."
+      },
+      {
+        "kind": "method",
+        "name": "setShowGoButton",
+        "since": "1.28.0",
+        "text": "Replaced by property <code>showGoOnFB</code>"
+      }
+    ],
+    "sap.ui.comp.navpopover.SmartLink": [
+      {
+        "kind": "property",
+        "name": "semanticObjectLabel",
+        "since": "1.40.0",
+        "text": "Title section with <code>semanticObjectLabel</code> has been removed due to new UI design"
+      },
+      {
+        "kind": "event",
+        "name": "navigationTargetsObtained",
+        "since": "1.126",
+        "text": "replaced by <code>navigationTargetsObtainedCallback</code> property."
+      },
+      {
+        "kind": "method",
+        "name": "attachNavigationTargetsObtained",
+        "since": "1.126",
+        "text": "replaced by <code>navigationTargetsObtainedCallback</code> property."
+      },
+      {
+        "kind": "method",
+        "name": "detachNavigationTargetsObtained",
+        "since": "1.126",
+        "text": "replaced by <code>navigationTargetsObtainedCallback</code> property."
+      },
+      {
+        "kind": "method",
+        "name": "getSemanticObjectLabel",
+        "since": "1.40.0",
+        "text": "Title section with <code>semanticObjectLabel</code> has been removed due to new UI design"
+      },
+      {
+        "kind": "method",
+        "name": "setSemanticObjectLabel",
+        "since": "1.40.0",
+        "text": "Title section with <code>semanticObjectLabel</code> has been removed due to new UI design"
+      }
+    ],
+    "sap.ui.comp.smartchart.SmartChart": [
+      {
+        "kind": "property",
+        "name": "useListForChartTypeSelection",
+        "since": "1.48.0",
+        "text": "Setting the property to <code>false</code> will have no effect on the visualization of chart type selection. <code>SmartChart</code> will always show a list of chart types."
+      },
+      {
+        "kind": "event",
+        "name": "initialise",
+        "since": "1.65",
+        "text": "replaced by {@link initialized}."
+      },
+      {
+        "kind": "event",
+        "name": "dataReceived",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindChart</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "method",
+        "name": "attachDataReceived",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindChart</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "method",
+        "name": "attachInitialise",
+        "since": "1.94",
+        "text": "replaced by {@link #event:initialized}"
+      },
+      {
+        "kind": "method",
+        "name": "detachDataReceived",
+        "since": "1.56",
+        "text": "Use <code>beforeRebindChart</code> event to attach/listen to the binding \"events\" directly"
+      },
+      {
+        "kind": "method",
+        "name": "detachInitialise",
+        "since": "1.65",
+        "text": "replaced by {@link initialized}."
+      },
+      {
+        "kind": "method",
+        "name": "getChart",
+        "since": "1.57",
+        "text": "replaced by {@link #getChartAsync}"
+      },
+      {
+        "kind": "method",
+        "name": "getUseListForChartTypeSelection",
+        "since": "1.48.0",
+        "text": "Setting the property to <code>false</code> will have no effect on the visualization of chart type selection. <code>SmartChart</code> will always show a list of chart types."
+      },
+      {
+        "kind": "method",
+        "name": "setUseListForChartTypeSelection",
+        "since": "1.48.0",
+        "text": "Setting the property to <code>false</code> will have no effect on the visualization of chart type selection. <code>SmartChart</code> will always show a list of chart types."
+      }
+    ],
+    "sap.ui.mdc.Table": [
+      {
+        "kind": "property",
+        "name": "height",
+        "since": "1.115",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "getHeight",
+        "since": "1.115",
+        "text": "the concept has been discarded."
+      },
+      {
+        "kind": "method",
+        "name": "setHeight",
+        "since": "1.115",
+        "text": "the concept has been discarded."
+      }
+    ],
+    "sap.ui.mdc.Field": [
+      {
+        "kind": "method",
+        "name": "bindConditions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. Use the <code>value</code> property and <code>additionalValue</code> property to bind the control."
+      },
+      {
+        "kind": "method",
+        "name": "getConditions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. Use the <code>value</code> property and <code>additionalValue</code> property to bind the control."
+      },
+      {
+        "kind": "method",
+        "name": "getDataType",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. The type in the binding to the <code>value</code> property is used."
+      },
+      {
+        "kind": "method",
+        "name": "getDataTypeConstraints",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. The <code>Constraints</code> of the type in the binding to the <code>value</code> property is used."
+      },
+      {
+        "kind": "method",
+        "name": "getDataTypeFormatOptions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. The <code>FormatOptions</code> of the type in the binding to the <code>value</code> property is used."
+      },
+      {
+        "kind": "method",
+        "name": "setConditions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. Use the <code>value</code> property and <code>additionalValue</code> property to bind the control."
+      },
+      {
+        "kind": "method",
+        "name": "setDataType",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. The type in the binding to the <code>value</code> property is used."
+      },
+      {
+        "kind": "method",
+        "name": "setDataTypeConstraints",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. The <code>Constraints</code> of the type in the binding to the <code>value</code> property is used."
+      },
+      {
+        "kind": "method",
+        "name": "setDataTypeFormatOptions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. The <code>FormatOptions</code> of the type in the binding to the <code>value</code> property is used."
+      },
+      {
+        "kind": "method",
+        "name": "setMaxConditions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>."
+      },
+      {
+        "kind": "method",
+        "name": "unbindConditions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>Field</code>. Use the <code>value</code> property and <code>additionalValue</code> property to bind the control."
+      }
+    ],
+    "sap.ui.mdc.MultiValueField": [
+      {
+        "kind": "method",
+        "name": "bindConditions",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>. Use the <code>items</code> aggregation to bind the control."
+      },
+      {
+        "kind": "method",
+        "name": "getConditions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>MultiValueField</code>. Use the <code>items</code> aggregation to bind the control."
+      },
+      {
+        "kind": "method",
+        "name": "getDataType",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>. The type in the binding to the <code>items</code> aggregation is used."
+      },
+      {
+        "kind": "method",
+        "name": "getDataTypeConstraints",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>. The type in the binding to the <code>items</code> aggregation is used."
+      },
+      {
+        "kind": "method",
+        "name": "getDataTypeFormatOptions",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>. The type in the binding to the <code>items</code> aggregation is used."
+      },
+      {
+        "kind": "method",
+        "name": "getMultipleLines",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>."
+      },
+      {
+        "kind": "method",
+        "name": "setConditions",
+        "since": "1.54",
+        "text": "this property is not supported for the <code>MultiValueField</code>. Use the <code>items</code> aggregation to bind the control."
+      },
+      {
+        "kind": "method",
+        "name": "setDataType",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>. The type in the binding to the <code>items</code> aggregation is used."
+      },
+      {
+        "kind": "method",
+        "name": "setDataTypeConstraints",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>. The type in the binding to the <code>items</code> aggregation is used."
+      },
+      {
+        "kind": "method",
+        "name": "setDataTypeFormatOptions",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>. The type in the binding to the <code>items</code> aggregation is used."
+      },
+      {
+        "kind": "method",
+        "name": "setMaxConditions",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code> control."
+      },
+      {
+        "kind": "method",
+        "name": "setMultipleLines",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>."
+      },
+      {
+        "kind": "method",
+        "name": "unbindConditions",
+        "since": "1.93",
+        "text": "this property is not supported for the <code>MultiValueField</code>. Use the <code>items</code> aggregation to bind the control."
+      }
+    ],
+    "sap.tnt.SideNavigation": [
+      {
+        "kind": "aggregation",
+        "name": "footer",
+        "since": "1.120",
+        "text": "Use the aggregation <code>fixedItem</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "destroyFooter",
+        "since": "1.120",
+        "text": "Use the aggregation <code>fixedItem</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "getFooter",
+        "since": "1.120",
+        "text": "Use the aggregation <code>fixedItem</code> instead."
+      },
+      {
+        "kind": "method",
+        "name": "setFooter",
+        "since": "1.120",
+        "text": "Use the aggregation <code>fixedItem</code> instead."
+      }
+    ],
+    "sap.ui.unified.ShellHeadItem": [
+      {
+        "kind": "property",
+        "name": "startsSection",
+        "since": "1.18",
+        "text": "Dividers are not supported anymore."
+      },
+      {
+        "kind": "property",
+        "name": "showMarker",
+        "since": "1.18",
+        "text": "Markers should not be used anymore."
+      },
+      {
+        "kind": "method",
+        "name": "getShowMarker",
+        "since": "1.18",
+        "text": "Markers should not be used anymore."
+      },
+      {
+        "kind": "method",
+        "name": "getStartsSection",
+        "since": "1.18",
+        "text": "Dividers are not supported anymore."
+      },
+      {
+        "kind": "method",
+        "name": "setShowMarker",
+        "since": "1.18",
+        "text": "Markers should not be used anymore."
+      },
+      {
+        "kind": "method",
+        "name": "setStartsSection",
+        "since": "1.18",
+        "text": "Dividers are not supported anymore."
+      }
+    ],
+    "sap.ui.unified.Menu": [
+      {
+        "kind": "property",
+        "name": "ariaDescription",
+        "since": "1.27.0",
+        "text": "replaced by <code>ariaLabelledBy</code> association"
+      },
+      {
+        "kind": "method",
+        "name": "getAriaDescription",
+        "since": "1.27.0",
+        "text": "replaced by <code>ariaLabelledBy</code> association"
+      },
+      {
+        "kind": "method",
+        "name": "setAriaDescription",
+        "since": "1.27.0",
+        "text": "replaced by <code>ariaLabelledBy</code> association"
+      }
+    ]
+  }
+}

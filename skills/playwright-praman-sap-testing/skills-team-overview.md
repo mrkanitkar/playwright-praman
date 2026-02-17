@@ -65,9 +65,27 @@ or any future AI coding agent.
 │  │       Owns: PR review, D1–D29 compliance, quality gates, best practice   │
 │  │             verification, architecture drift detection                   │
 │  │                                                                          │
-│  └── 🔒 SECURITY & BUILD AGENT (skills-security-build.md)                   │
-│          Owns: CI/CD, GitHub Actions, npm publish, SBOM, provenance,        │
-│                dependency scanning, secret redaction, bundle size            │
+│  ├── 🔒 SECURITY & BUILD AGENT (skills-security-build.md)                   │
+│  │       Owns: CI/CD, GitHub Actions, npm publish, SBOM, provenance,        │
+│  │             dependency scanning, secret redaction, bundle size            │
+│  │                                                                          │
+│  ├── 🏢 SAP FIORI CONSULTANT (skills-sap-fiori-consultant.md)               │
+│  │       Owns: Fiori UX patterns, floorplans, E2E test scenarios,           │
+│  │             SAP business process test design, auth test strategy,         │
+│  │             Fiori Elements test patterns, test data management            │
+│  │                                                                          │
+│  ├── 📊 SAP ODATA EXPERT (skills-sap-odata-expert.md)                      │
+│  │       Owns: OData V2/V4 protocol, SAP Gateway, CSRF tokens,             │
+│  │             $batch validation, mock strategies, error taxonomy,           │
+│  │             annotation-driven testing, network interception patterns      │
+│  │                                                                          │
+│  └── 🌐 SAP UI5 WEB COMPONENTS EXPERT                                      │
+│          (skills-sap-ui5-webcomponents-expert.md)                           │
+│          Owns: SAP UI5 Web Components (@ui5/webcomponents), Shadow DOM      │
+│                testing, hybrid app automation (classic UI5 + WC),            │
+│                Web Component adapter patterns, accessibility testing,        │
+│                migration testing (classic → WC), SAP Build Apps/Code,        │
+│                OData + Web Component data binding validation                 │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -124,6 +142,20 @@ or any future AI coding agent.
 | SKILL.md generation                                | Architect        | SAP UI5 Expert                                 |
 | Bug diagnosis                                      | Implementer      | Playwright Expert or SAP UI5 Expert            |
 | Performance optimization                           | Implementer      | SAP UI5 Expert                                 |
+| SAP E2E test scenario design                       | Fiori Consultant | SAP UI5 Expert, Tester                         |
+| OData service validation tests                     | OData Expert     | Tester, Fiori Consultant                       |
+| SAP authentication test strategy                   | Fiori Consultant | Security & Build, Playwright Expert            |
+| OData mock/intercept patterns                      | OData Expert     | Tester, Playwright Expert                      |
+| Fiori Elements test patterns                       | Fiori Consultant | SAP UI5 Expert, Playwright Expert              |
+| OData error handling test patterns                 | OData Expert     | Fiori Consultant, Tester                       |
+| SAP test data management strategy                  | Fiori Consultant | OData Expert, Tester                           |
+| Web Component Shadow DOM testing                   | WC Expert        | Playwright Expert, Tester                      |
+| Hybrid app testing (classic + WC)                  | WC Expert        | SAP UI5 Expert, Playwright Expert              |
+| Migration testing (classic → Web Components)       | WC Expert        | SAP UI5 Expert, Tester                         |
+| SAP Build Apps/Code testing                        | WC Expert        | Fiori Consultant, OData Expert                 |
+| Web Component accessibility testing                | WC Expert        | Playwright Expert, Tester                      |
+| Web Component adapter implementation               | WC Expert        | Implementer, SAP UI5 Expert                    |
+| OData + Web Component data binding validation      | WC Expert        | OData Expert, Tester                           |
 
 ### 3.3 Conflict Resolution
 
@@ -134,21 +166,26 @@ When two agents produce conflicting outputs:
 3. **Test strategy** → Tester agent's output wins for test code; Implementer for production code
 4. **SAP-specific behavior** → SAP UI5 Expert's output wins; they have domain authority
 5. **Playwright patterns** → Playwright Expert's output wins; they know the framework idioms
+6. **Web Component / Shadow DOM** → WC Expert's output wins; they own Shadow DOM testing and hybrid app patterns
+7. **Hybrid app detection** → WC Expert advises; Implementer owns the production code
 
 ---
 
 ## 4. Skill File Index
 
-| File                                                       | Role                      | Key Expertise                                                                             |
-| ---------------------------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------- |
-| [skills-architect.md](skills-architect.md)                 | Principal Architect       | 5-layer architecture, D1–D29, module boundaries, API design, architectural review         |
-| [skills-implementer.md](skills-implementer.md)             | TypeScript Implementer    | Proxy patterns, bridge adapters, error hierarchy, config, logging, ESM, Zod               |
-| [skills-tdd.md](skills-tdd.md)                             | TDD Specialist            | RED-GREEN-REFACTOR cycle, test-first workflow, anti-pattern prevention, TDD compliance    |
-| [skills-tester.md](skills-tester.md)                       | Test Engineer             | Vitest (hermetic), Playwright (integration), golden master, coverage, mocking             |
-| [skills-reviewer.md](skills-reviewer.md)                   | Code Reviewer             | PR review, 29-decision compliance, quality gates, anti-pattern detection                  |
-| [skills-sap-ui5-expert.md](skills-sap-ui5-expert.md)       | SAP UI5 Domain Expert     | 500+ control types, FLP, OData V2/V4, RecordReplay, ElementRegistry, bridge scripts       |
-| [skills-playwright-expert.md](skills-playwright-expert.md) | Playwright Expert         | Fixtures, selectors, assertions, expect.extend(), project dependencies, trace             |
-| [skills-security-build.md](skills-security-build.md)       | Security & Build Engineer | GitHub Actions, npm provenance, SBOM, eslint-plugin-security, bundle size, release-please |
+| File                                                                             | Role                          | Key Expertise                                                                               |
+| -------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
+| [skills-architect.md](skills-architect.md)                                       | Principal Architect           | 5-layer architecture, D1–D29, module boundaries, API design, architectural review           |
+| [skills-implementer.md](skills-implementer.md)                                   | TypeScript Implementer        | Proxy patterns, bridge adapters, error hierarchy, config, logging, ESM, Zod                 |
+| [skills-tdd.md](skills-tdd.md)                                                   | TDD Specialist                | RED-GREEN-REFACTOR cycle, test-first workflow, anti-pattern prevention, TDD compliance      |
+| [skills-tester.md](skills-tester.md)                                             | Test Engineer                 | Vitest (hermetic), Playwright (integration), golden master, coverage, mocking               |
+| [skills-reviewer.md](skills-reviewer.md)                                         | Code Reviewer                 | PR review, 29-decision compliance, quality gates, anti-pattern detection                    |
+| [skills-sap-ui5-expert.md](skills-sap-ui5-expert.md)                             | SAP UI5 Domain Expert         | 500+ control types, FLP, OData V2/V4, RecordReplay, ElementRegistry, bridge scripts         |
+| [skills-playwright-expert.md](skills-playwright-expert.md)                       | Playwright Expert             | Fixtures, selectors, assertions, expect.extend(), project dependencies, trace               |
+| [skills-security-build.md](skills-security-build.md)                             | Security & Build Engineer     | GitHub Actions, npm provenance, SBOM, eslint-plugin-security, bundle size, release-please   |
+| [skills-sap-fiori-consultant.md](skills-sap-fiori-consultant.md)                 | SAP Fiori Consultant          | Fiori UX patterns, floorplans, E2E scenarios, auth testing, Fiori Elements, test data       |
+| [skills-sap-odata-expert.md](skills-sap-odata-expert.md)                         | SAP OData & Gateway Expert    | OData V2/V4 protocol, SAP Gateway, CSRF, $batch, annotations, mock strategies               |
+| [skills-sap-ui5-webcomponents-expert.md](skills-sap-ui5-webcomponents-expert.md) | SAP UI5 Web Components Expert | Shadow DOM testing, hybrid apps, @ui5/webcomponents, WC adapter, a11y, migration, SAP Build |
 
 ---
 

@@ -1,0 +1,30 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "praman.ui5ref",
+    "type": "application",
+    "applicationVersion": {
+      "version": "1.0.0"
+    }
+  },
+  "sap.ui5": {
+    "dependencies": {
+      "minUI5Version": "1.136.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.ui.table": {},
+        "sap.f": {},
+        "sap.ui.layout": {},
+        "sap.uxap": {},
+        "sap.ui.unified": {},
+        "sap.tnt": {},
+        "sap.ui.comp": {},
+        "sap.ui.integration": {},
+        "sap.ui.mdc": {},
+        "sap.suite.ui.commons": {},
+        "sap.gantt": {}
+      }
+    }
+  }
+}
