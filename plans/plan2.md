@@ -1577,3 +1577,355 @@ Object methods are forwarded via `clientSide_executeObjectMethod()` which:
 | A.10 | Document actual wdi5 stack accurately                                    | Low      | Architecture docs             |
 | A.11 | Match WDI5Object's UUID + bind() pattern                                 | Medium   | ui5-object.ts                 |
 | A.12 | Add Playwright API allowlist (equivalent to wdi5's wdioApi.ts)           | High     | New: proxy/playwright-api.ts  |
+
+---
+
+## Appendix B — Principal Architect Review (2026-02-17)
+
+> **Reviewer**: Principal Architect (independent)
+> **Verdict**: APPROVED WITH CONDITIONS — 3 Critical, 6 High, 9 Medium, 5 Low
+> **Source verification**: wdi5 v3.0.8 at `/consult/wdi5`, dhikraft v2.5.0 at `/package`
+> **All Appendix A claims**: 11/12 VERIFIED exact, 1 partially (A.12 count: 198 not 193)
+
+### B.1 New Binding Decisions (W14–W19)
+
+These decisions supersede or amend W6–W8 based on review findings.
+
+| #   | Question                        | Decision                                                                                       | Rationale                                                                                                        |
+| --- | ------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| W14 | Bridge injection method?        | **Lazy-only via `page.evaluate()`** — NO `addInitScript()`, NO eager injection                 | Page is `about:blank` at fixture init. UI5 not available until after navigation. Same pattern as dhikraft v2.5.0 |
+| W15 | Strategy naming?                | **`ui5-native`** (default), **`dom-first`**, **`opa5`**                                        | "playwright-native" was misleading — strategy calls `fire*` via bridge, not Playwright input simulation          |
+| W16 | Typed proxy wrappers?           | **DELETE `proxy/typed/` plan** — use auto-generated interfaces from `controls.ts` directly     | D22 auto-gen COMPLETE in Phase 1. 20 hand-written wrappers = redundant second source of truth                    |
+| W17 | Playwright API routing?         | **Add `proxy/playwright-api.ts`** with Playwright Locator method allowlist                     | Without allowlist, `proxy.click()` routes to bridge instead of Playwright. Equivalent to wdi5's wdioApi.ts       |
+| W18 | Integration testing?            | **Real SAP testing at each sub-phase gate** — SAP S/4HANA Cloud + UI5 demo apps                | Phase 7 too late for first browser test. Front-load highest-risk validation to Sub-Phase 2.1                     |
+| W19 | Adapter initialization pattern? | **Lazy init via `ensureInitialized()`** — every public method auto-injects bridge if not ready | Fixture creates adapter at `about:blank`. Bridge injected on first UI5 operation after user navigates to SAP app |
+
+### B.2 Corrections to Existing Decisions
+
+**W6 (Method blacklist count)**: dhikraft constants.ts has **47 active items** + 44 commented = 91 total (not "88"). wdi5 uses 5 + 2 rules. `METHOD_BLACKLIST.size` test should assert 47 (active dhikraft set).
+
+**W7 (Strategy names)**: Superseded by W15. Update `InteractionStrategy` type in `schema.ts`: `'ui5-native' | 'dom-first' | 'opa5' | 'hybrid'`.
+
+**W8 (Browser script format)**: Superseded by W14. Remove `addInitScript()` reference. All scripts via `page.evaluate()` only.
+
+**A.12 (wdioApi count)**: Actual count is **198 items** (not 193). May vary by wdi5 version.
+
+### B.3 Critical Findings — Pre-Implementation Required
+
+#### C1. Extend `BridgePage` interface
+
+Current `BridgePage` (Phase 1) only has `evaluate<T>(fn): Promise<T>`. Phase 2 needs:
+
+- `evaluate<R, Arg>(fn: (arg: Arg) => R, arg: Arg): Promise<R>` — pass serializable args to browser
+- `waitForFunction(fn, options?): Promise<void>` — for polling operations (UI5 stable, bridge ready)
+
+`BridgeContext` with `addInitScript()` is **NOT needed** (W14: lazy-only injection).
+
+**Action**: Update `src/core/types/bridge.ts` and `tests/helpers/mock-page.ts` before Phase 2 starts.
+
+#### C2. `MethodExecutionResult<T>` vs `BridgeResult<T>` gap
+
+The proxy layer needs `returnType` discriminant for return-type routing, but `BridgeAdapter.executeControlMethod()` returns `Promise<unknown>`. Options:
+
+1. Change return to `Promise<BridgeResult<MethodExecutionResult>>`
+2. Add internal `executeControlMethodRaw()` that returns the rich type
+
+**Action**: Resolve type contract before B16a (ClassicAdapter).
+
+#### C3. Add `'unknown'` to `BridgeReturnType`
+
+wdi5 has 8 return types. Phase 1 has 7 (missing `'unknown'`). `'unknown'` (instance check failed) differs from `'none'` (undefined/null).
+
+**Action**: One-line change in `src/core/types/bridge.ts`.
+
+### B.4 High Findings — Fix During Implementation
+
+#### H1. Delete `proxy/typed/` (20 files)
+
+Auto-generated `controls.ts` already has 201 interfaces. Hand-written wrappers = dual source of truth.
+**Removes**: 20 source files, 600 LOC, batches B20a-B20d, 20 test cases.
+**Replace**: Cast dynamic proxy to auto-generated interface based on `controlType`.
+
+#### H2. Add `proxy/playwright-api.ts`
+
+Export `PLAYWRIGHT_API_METHODS: ReadonlySet<string>` containing Playwright Locator methods (`click`, `fill`, `isVisible`, `isEnabled`, `textContent`, etc.). Proxy `get` trap checks this BEFORE blacklist.
+**Add to**: File inventory, batch B17a, test plan.
+
+#### H3. Browser script syntax validation
+
+Enhance TH6 (`browser-script-tester.ts`) with `vm.Script` validation — zero new deps:
+
+```typescript
+import vm from 'node:vm';
+new vm.Script(generatedScript); // Throws SyntaxError if invalid
+```
+
+#### H4. `page.evaluate()` serialization boundary
+
+Document in `ClassicUI5Adapter`: `findControl` internally gets a `ControlDiscoveryResult` POJO via evaluate, then constructs the proxy. `BridgeAdapter.findControl()` returning `UI5ControlBase` is the public API contract.
+
+#### H5. Timeout handling — use Playwright native (DOWNGRADED from HIGH to LOW)
+
+No custom `withBridgeTimeout()` needed. Use:
+
+- `page.waitForFunction(fn, { timeout })` for polling operations
+- Test-level timeout for quick `page.evaluate()` calls
+
+#### H6. Integration smoke tests at each gate (UPGRADED to include real SAP)
+
+See Section B.6 below.
+
+### B.5 Lazy Adapter Initialization Pattern (W19)
+
+Based on dhikraft `dhikraft-fixtures.ts:781-794` (verified):
+
+```
+Playwright fixture created → page is about:blank
+  → test navigates to SAP app (page.goto)
+    → first ui5 operation (click, getText, etc.)
+      → adapter.ensureInitialized()
+        → waitForFunction: window.sap?.ui?.require exists
+        → evaluate: createBridgeInjectionScript()
+        → waitForFunction: window.__praman_bridge?.ready
+      → actual operation executes
+```
+
+**ClassicUI5Adapter pattern**:
+
+```typescript
+class ClassicUI5Adapter implements BridgeAdapter {
+  private initialized = false;
+
+  async init(page: BridgePage): Promise<void> {
+    // Called lazily, NOT from fixture
+    await page.waitForFunction(() => window.sap?.ui?.require !== undefined, {
+      timeout: BRIDGE_TIMEOUTS.INJECTION,
+    });
+    await page.evaluate(createBridgeInjectionScript());
+    await page.waitForFunction(() => window.__praman_bridge?.ready === true, {
+      timeout: BRIDGE_TIMEOUTS.INJECTION,
+    });
+    this.initialized = true;
+  }
+
+  private async ensureInitialized(): Promise<void> {
+    if (!this.initialized) await this.init(this.page);
+  }
+
+  async findControl(selector: UI5Selector): Promise<UI5ControlBase | null> {
+    await this.ensureInitialized(); // lazy!
+    // ... actual find
+  }
+  // Every public method calls ensureInitialized()
+}
+```
+
+**injection.ts simplifies**: Single path only. Remove `'eager' | 'late'` parameter. Remove `PramanBridge.injectionMethod` field.
+
+### B.6 Integration Test Strategy (W18)
+
+#### Test Targets
+
+**Tier 1 — SAP S/4HANA Public Cloud** (credentials in `.env`):
+
+- Real OData V4 services, real authentication
+- Tests enterprise patterns: Fiori Elements, Smart Controls, FLP navigation
+- Run at Sub-Phase 2.1 and 2.2 gates
+
+**Tier 2 — SAP UI5 Demo Apps** (no auth required, mock OData):
+
+- `https://ui5.sap.com/test-resources/sap/m/demokit/cart/webapp/index.html` — Shopping Cart (richest control variety)
+- `https://ui5.sap.com/test-resources/sap/m/demokit/orderbrowser/webapp/test/mockServer.html` — Browse Orders (master-detail + FlexibleColumnLayout)
+- `https://ui5.sap.com/test-resources/sap/m/demokit/worklist/webapp/test/mockServer.html` — Worklist (table-centric)
+- `https://ui5.sap.com/test-resources/sap/tnt/demokit/toolpageapp/webapp/index.html` — Shop Admin (ToolPage + side nav)
+
+**Tier 3 — Individual Control Pages** (no auth, single control deep testing):
+
+- `https://ui5.sap.com/test-resources/sap/m/Button.html`
+- `https://ui5.sap.com/test-resources/sap/m/Input.html`
+- `https://ui5.sap.com/test-resources/sap/m/Table.html`
+- `https://ui5.sap.com/test-resources/sap/m/ComboBox.html`
+- `https://ui5.sap.com/test-resources/sap/m/Dialog.html`
+- (200+ control pages available at `test-resources/sap/m/{Control}.html`)
+
+#### Test Files
+
+```
+tests/integration/
+├── bridge-smoke.spec.ts          ← Sub-Phase 2.1 gate
+├── proxy-smoke.spec.ts           ← Sub-Phase 2.2 gate
+├── sap-cloud-smoke.spec.ts       ← Sub-Phase 2.2 gate (requires .env)
+└── playwright.integration.config.ts
+```
+
+#### Sub-Phase 2.1 Gate: `bridge-smoke.spec.ts` (~12 tests, against UI5 demo apps)
+
+| #   | Test                                            | Target App  | Validates                                |
+| --- | ----------------------------------------------- | ----------- | ---------------------------------------- |
+| 1   | Navigate to Shopping Cart, page loads           | Cart        | Playwright + UI5 demo connectivity       |
+| 2   | Inject bridge, `__praman_bridge.ready === true` | Cart        | injection.ts with real UI5               |
+| 3   | Detect UI5 version                              | Cart        | get-version.ts returns valid semver      |
+| 4   | `waitForUI5()` resolves                         | Cart        | RecordReplay.waitForUI5 available        |
+| 5   | Find control by ID via RecordReplay             | Worklist    | find-control.ts + discovery chain        |
+| 6   | Find control by type + properties               | Cart        | Matcher creation, selector serialization |
+| 7   | Execute `getText()` on found control            | Cart        | execute-method.ts + return type 'result' |
+| 8   | Execute setter, verify chaining                 | Button.html | Return type 'element' (same proxy)       |
+| 9   | Get aggregation (table items)                   | Worklist    | Return type 'aggregation'                |
+| 10  | Get model, verify object UUID                   | Cart        | Return type 'object' + objectMap         |
+| 11  | Find non-existent control                       | Cart        | BridgeError with correct error code      |
+| 12  | Bridge idempotent re-injection                  | Cart        | Second inject is no-op                   |
+
+#### Sub-Phase 2.2 Gate: `proxy-smoke.spec.ts` (~10 tests)
+
+| #   | Test                                      | Target App    | Validates                                 |
+| --- | ----------------------------------------- | ------------- | ----------------------------------------- |
+| 1   | `createControlProxy()` → method call      | Cart          | Full proxy → adapter → browser round-trip |
+| 2   | Proxy anti-thenable (`then` is undefined) | Cart          | No auto-await issues                      |
+| 3   | Blacklisted method throws `ControlError`  | Button.html   | Method filter in real flow                |
+| 4   | Object return → UI5Object → method call   | Cart          | Full object proxy chain                   |
+| 5   | Discovery cache hit on second find        | Cart          | Cache with real selectors                 |
+| 6   | Interaction: press a button (ui5-native)  | Button.html   | Real UI5 event firing                     |
+| 7   | Interaction: fill input (dom-first)       | Input.html    | DOM interaction + UI5 fallback            |
+| 8   | Error path: find non-existent control     | Cart          | BridgeError with code                     |
+| 9   | Table: get rows aggregation               | Table.html    | Aggregation return type with real data    |
+| 10  | ComboBox: special aggregation handling    | ComboBox.html | A.6 ComboBox special case                 |
+
+#### Sub-Phase 2.2 Gate: `sap-cloud-smoke.spec.ts` (~8 tests, requires `.env`)
+
+| #   | Test                                    | Validates                              |
+| --- | --------------------------------------- | -------------------------------------- |
+| 1   | Authenticate to SAP S/4HANA Cloud       | Auth flow with real credentials        |
+| 2   | Navigate to FLP, detect UI5 version     | Real FLP with production UI5           |
+| 3   | Find control in Fiori app               | Discovery against real app             |
+| 4   | Execute method on real control          | Bridge execution in production context |
+| 5   | Get OData model from control            | Object proxy with real OData model     |
+| 6   | Interaction strategy on real button     | ui5-native strategy in production      |
+| 7   | Navigate between apps                   | FLP cross-app navigation               |
+| 8   | Verify cache invalidation on navigation | Proxy cache clears on app switch       |
+
+**npm scripts**:
+
+```json
+"test:integration": "playwright test --config playwright.integration.config.ts",
+"test:integration:demo": "playwright test --config playwright.integration.config.ts --grep @demo",
+"test:integration:sap": "playwright test --config playwright.integration.config.ts --grep @sap-cloud"
+```
+
+### B.7 Revised File Inventory (Section 9 amendments)
+
+**Files REMOVED from plan** (H1: delete proxy/typed/):
+
+- ~~`src/proxy/typed/ui5-button.ts` .. `ui5-multi-input.ts` (20 files)~~
+- ~~`src/proxy/typed/index.ts`~~
+- ~~`tests/unit/proxy/typed/typed-controls.test.ts`~~
+
+**Files ADDED to plan**:
+
+- `src/proxy/playwright-api.ts` — Playwright Locator method allowlist (H2)
+- `tests/unit/proxy/playwright-api.test.ts` — Tests for allowlist
+- `tests/integration/bridge-smoke.spec.ts` — Integration smoke (Sub-Phase 2.1)
+- `tests/integration/proxy-smoke.spec.ts` — Integration smoke (Sub-Phase 2.2)
+- `tests/integration/sap-cloud-smoke.spec.ts` — SAP Cloud smoke (Sub-Phase 2.2)
+- `tests/integration/playwright.integration.config.ts` — Integration config
+
+**Net effect**: -21 source files, +2 source files, +4 test files = **33 source files** (was 52), **37 test files** (was 33)
+
+### B.8 Revised Batch Schedule Amendments
+
+**Batches REMOVED**: B20a, B20b, B20c, B20d (proxy/typed/ wrappers)
+
+**Batches MODIFIED**:
+
+- B17a: Add `proxy/playwright-api.ts` alongside `method-filter.ts`
+
+**Batches ADDED**:
+
+- **INT1**: `tests/integration/bridge-smoke.spec.ts` + `playwright.integration.config.ts` — runs after B16d (Sub-Phase 2.1 gate)
+- **INT2**: `tests/integration/proxy-smoke.spec.ts` + `sap-cloud-smoke.spec.ts` — runs after B21b (Sub-Phase 2.2 gate)
+
+**Revised critical path**:
+
+```
+TH6 → B13a → B13c → B13d → B16a → B16d → INT1 → B19c → B21b → INT2 → B21c
+```
+
+### B.9 Revised Quality Gates
+
+#### Sub-Phase 2.1 Gate (amended)
+
+```bash
+npm run typecheck        # Zero errors
+npm run lint             # Zero errors, zero warnings
+npm run test:unit        # All tests pass
+npm run build            # tsup succeeds
+npm run test:integration:demo  # Bridge smoke tests pass against UI5 demo apps
+```
+
+#### Sub-Phase 2.2 Gate (amended)
+
+```bash
+npm run ci               # Full pipeline green
+npm run test:integration:demo  # Proxy smoke tests pass
+npm run test:integration:sap   # SAP Cloud smoke tests pass (if .env configured)
+```
+
+#### Sub-Phase 2.3 Gate (unchanged)
+
+```bash
+npm run ci               # Full pipeline green
+npm run check:exports    # attw validates all export maps
+```
+
+### B.10 Medium/Low Findings (implement during development)
+
+| ID  | Finding                                           | Resolution                                                                            |
+| --- | ------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| M1  | `inject-ui5.ts` packs 5+ concerns into 250 LOC    | Split into composable snippet builders, test each independently                       |
+| M4  | Proxy cache stale after navigation                | Register `page.on('framenavigated')` listener in adapter to call `cache.clear()`      |
+| M5  | `XHR_IGNORE_PATTERNS` not merged with user config | Add `getXhrIgnorePatterns(config)` that merges built-in + `config.ignoreAutoWaitUrls` |
+| M6  | No input validation on controlId/methodName       | Validate format before `page.evaluate()` — defense-in-depth                           |
+| M7  | `classic-adapter.ts` 16 methods — monitor SRP     | Keep method bodies thin (max ~15 LOC). Extract helpers if they grow                   |
+| M8  | `method-filter.ts` overlaps `method-blacklist.ts` | Ensure delegation, zero redundant logic                                               |
+| M9  | `WeakRef` for object storage unreliable           | Drop `WeakRef`, use TTL-only cleanup                                                  |
+| L1  | No `AbortController` cancellation                 | Phase 3+ enhancement                                                                  |
+| L2  | No OpenTelemetry instrumentation                  | Phase 4+, but design span boundaries now                                              |
+| L3  | `UI5Object` returns `Promise<unknown>`            | Correct trade-off, add clear TSDoc                                                    |
+| L5  | No CSP compliance                                 | Phase 7 per plan.md                                                                   |
+
+### B.11 Revised Impact Analysis
+
+| Metric            | Before (v2.1.0) | After (v2.2.0) | Delta  |
+| ----------------- | --------------- | -------------- | ------ |
+| Source files      | 52 new          | 33 new         | -19    |
+| Test files        | 33 new          | 37 new         | +4     |
+| Unit test cases   | ~338            | ~298           | -40    |
+| Integration tests | 0               | ~30            | +30    |
+| Est. dist/ size   | ~200-250 KB     | ~180-220 KB    | -20 KB |
+| Batches           | 38              | 36             | -2     |
+
+### B.12 Source Code Verification Summary
+
+| Claim                              | Source                         | Status                     |
+| ---------------------------------- | ------------------------------ | -------------------------- |
+| A.1: wdi5 5-item filter + 2 rules  | injectUI5.ts:485-523           | **VERIFIED**               |
+| A.2: wdi5 .bind() not Proxy        | wdi5-control.ts:697-708        | **VERIFIED**               |
+| A.3: RecordReplay only discovery   | getControl.ts:84-134           | **VERIFIED**               |
+| A.4: 8 return types                | executeControlMethod.ts:94-229 | **VERIFIED**               |
+| A.5: waitForUI5 before every op    | All 8 browser files            | **VERIFIED**               |
+| A.6: 3 aggregation special cases   | injectUI5.ts:731-755           | **VERIFIED**               |
+| A.7: closestTo vs jQuery split     | injectUI5.ts:442-449           | **VERIFIED**               |
+| A.8: Two browser script patterns   | Multiple files                 | **VERIFIED**               |
+| A.9: Matcher version handling      | injectUI5.ts:303-411           | **VERIFIED**               |
+| A.10: Architecture stack           | All source files               | **VERIFIED**               |
+| A.11: WDI5Object .bind() pattern   | wdi5-object.ts:222-236         | **VERIFIED**               |
+| A.12: wdioApi allowlist            | wdioApi.ts                     | **PARTIAL** (198, not 193) |
+| dhikraft: method blacklist count   | constants.ts:25-146            | **47 active** (not 88)     |
+| dhikraft: 3 interaction strategies | interaction-strategies/        | **VERIFIED**               |
+| dhikraft: 5-level discovery        | control-discovery-factory.ts   | **VERIFIED**               |
+| dhikraft: lazy fixture injection   | dhikraft-fixtures.ts:781-794   | **VERIFIED**               |
+
+---
+
+> **Plan version**: 2.2.0 (revised 2026-02-17 — Architect Review + integration testing)
+> **Status**: APPROVED WITH CONDITIONS — all critical items have clear resolution paths
+> **Next step**: Resolve C1-C3 (pre-Phase-2 type changes), then begin Sub-Phase 2.1
