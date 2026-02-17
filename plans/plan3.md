@@ -437,8 +437,116 @@ proxy/proxy-converter                → proxy layer (control vs non-control rou
   convertToObjectProxy()             → creates object proxy from result
 
 proxy/method-filter                  → proxy layer (delegates to bridge blacklist)
-proxy/playwright-api                 → proxy layer (Playwright method allowlist, 50+ methods)
+proxy/playwright-api                 → proxy GET trap (interaction method routing)
+  isPlaywrightMethod()               → checks if method should route to InteractionStrategy
+  PLAYWRIGHT_API_METHODS             → 50+ Playwright Locator method names
 ```
+
+#### Playwright API Wiring (aligned with dhikraft interaction routing)
+
+> **dhikraft pattern**: Interaction methods (`click`, `fill`, `press`, `check`, etc.)
+> are explicit class methods on `UI5ControlProxy` that delegate to the configured
+> `InteractionStrategy`. The strategy then decides: try UI5 `fire*` methods first
+> → fallback to Playwright Locator (`getDomRef()` → `page.locator('#domId').click()`).
+> Non-interaction methods (`getText`, `getProperty`, etc.) forward to the bridge via
+> `callMethod()` → `page.evaluate()`.
+>
+> **Praman adaptation (D16 single proxy)**: Since Praman uses a single `Proxy` get trap
+> (no class with explicit methods), `playwright-api.ts` serves as the routing decision
+> mechanism. The allowlist replaces dhikraft's "is method on the class?" check.
+
+**Current state (Phase 2)**: `playwright-api.ts` exists with allowlist + `isPlaywrightMethod()`,
+but is NOT wired into `dynamic-proxy.ts`. All methods currently fall through to bridge.
+
+**Phase 3 wiring required**:
+
+1. **Expand `ControlProxyState`** — add `page` + `interactionStrategy` references:
+
+```typescript
+export interface ControlProxyState {
+  readonly id: string;
+  readonly controlType: string;
+  readonly methods: ReadonlySet<string>;
+  readonly adapter: BridgeAdapter;
+  readonly page: Page; // NEW: needed for Locator creation
+  readonly interactionStrategy: InteractionStrategy; // NEW: routes interactions
+}
+```
+
+2. **Update proxy get trap** — insert Playwright check before blacklist:
+
+```typescript
+// In createControlProxy() get trap, AFTER built-in methods, BEFORE blacklist:
+
+// ★ Playwright interaction methods → route to InteractionStrategy
+if (isPlaywrightMethod(prop)) {
+  return (...args: unknown[]) =>
+    routeToInteractionStrategy(state, prop, args);
+}
+
+// Blacklist check → throw ControlError
+if (isBlacklisted(prop)) { ... }
+```
+
+3. **`routeToInteractionStrategy`** — bridges proxy call to strategy:
+
+```typescript
+// Gets DOM ref from UI5 control → creates Playwright Locator → calls method
+async function routeToInteractionStrategy(
+  state: ControlProxyState,
+  methodName: string,
+  args: unknown[],
+): Promise<unknown> {
+  // For known interaction verbs (click, fill, press, check, etc.)
+  // → delegate to strategy which handles UI5 fire* → Locator fallback
+  if (isInteractionVerb(methodName)) {
+    return state.interactionStrategy[methodName](state.page, state.id, ...args);
+  }
+
+  // For query methods (textContent, innerHTML, getAttribute, etc.)
+  // and state methods (isVisible, isEnabled, etc.)
+  // → get DOM ref → create Locator → call Playwright method directly
+  const domId = await getDomRefId(state.page, state.adapter, state.id);
+  const locator = state.page.locator(`#${CSS.escape(domId)}`);
+  return (locator[methodName] as Function)(...args);
+}
+```
+
+4. **Locator creation flow** (aligned with dhikraft):
+
+```
+proxy.click()
+  ↓
+isPlaywrightMethod('click') → YES
+  ↓
+routeToInteractionStrategy(state, 'click', [])
+  ↓
+strategy.press(page, controlId)
+  ↓
+┌──────────────────────────────────────────┐
+│ InteractionStrategy (ui5-native default) │
+│                                          │
+│ 1. page.evaluate: try control.firePress()│
+│    → if UI5 fire* exists → done          │
+│                                          │
+│ 2. fallback: getDomRef() → domId         │
+│    → page.locator('#domId').click()       │
+│    → Playwright handles the DOM click     │
+└──────────────────────────────────────────┘
+```
+
+**Test cases for Playwright API wiring**:
+
+| #   | Test Case                                | Input                       | Expected                                             |
+| --- | ---------------------------------------- | --------------------------- | ---------------------------------------------------- |
+| 1   | `proxy.click()` routes to strategy       | Button proxy + click        | `interactionStrategy.press()` called                 |
+| 2   | `proxy.fill()` routes to strategy        | Input proxy + fill          | `interactionStrategy.enterText()` called             |
+| 3   | `proxy.isVisible()` routes to Locator    | Any proxy + isVisible       | DOM ref obtained → `locator.isVisible()` called      |
+| 4   | `proxy.getAttribute()` routes to Locator | Any proxy + getAttribute    | DOM ref obtained → `locator.getAttribute()` called   |
+| 5   | `proxy.getText()` routes to bridge       | Any proxy + getText         | NOT a Playwright method → bridge `callMethod()` used |
+| 6   | `proxy.getProperty()` routes to built-in | Any proxy + getProperty     | Built-in resolves first (before Playwright check)    |
+| 7   | Strategy fallback when no fire\* method  | Control without `firePress` | getDomRef → Locator click                            |
+| 8   | Locator chain methods return Locator     | `proxy.locator('.child')`   | Returns new Playwright Locator (not proxy)           |
 
 #### Bridge Injection Lifecycle (aligned with dhikraft)
 
@@ -1640,17 +1748,17 @@ export type { UI5NavigationAPI, BTPWorkZoneAPI } from './nav-fixtures.js';
 
 ### 8.2 Source Files (Modified)
 
-| #   | File Path                            | Change                                                               | Sub-Phase |
-| --- | ------------------------------------ | -------------------------------------------------------------------- | --------- |
-| 20  | `src/proxy/dynamic-proxy.ts`         | Remove 4 G2 hardcoded stubs                                          | 3.1       |
-| 21  | `src/bridge/adapter.ts`              | Add `getSelectorForControl()` + `resetInjectionState()` to interface | 3.1       |
-| 22  | `src/bridge/classic-adapter.ts`      | Import object-map + get-selector, implement both new methods         | 3.1       |
-| 23  | `src/bridge/webcomponent-adapter.ts` | Add `getSelectorForControl()` + `resetInjectionState()` stubs        | 3.1       |
-| 24  | `src/bridge/hybrid-adapter.ts`       | Delegate both new methods to active adapter                          | 3.1       |
-| 24b | `src/bridge/injection.ts`            | Add `resetPageInjection()` export for navigation re-injection        | 3.1       |
-| 25  | `src/auth/index.ts`                  | Update barrel with auth exports                                      | 3.3       |
-| 26  | `src/modules/index.ts`               | Update barrel with navigation + workzone exports                     | 3.3       |
-| 27  | `src/index.ts`                       | Add `test`, `expect` re-exports from fixtures                        | 3.3       |
+| #   | File Path                            | Change                                                                  | Sub-Phase |
+| --- | ------------------------------------ | ----------------------------------------------------------------------- | --------- |
+| 20  | `src/proxy/dynamic-proxy.ts`         | Remove 4 G2 stubs (3.1) + wire Playwright API interaction routing (3.2) | 3.1, 3.2  |
+| 21  | `src/bridge/adapter.ts`              | Add `getSelectorForControl()` + `resetInjectionState()` to interface    | 3.1       |
+| 22  | `src/bridge/classic-adapter.ts`      | Import object-map + get-selector, implement both new methods            | 3.1       |
+| 23  | `src/bridge/webcomponent-adapter.ts` | Add `getSelectorForControl()` + `resetInjectionState()` stubs           | 3.1       |
+| 24  | `src/bridge/hybrid-adapter.ts`       | Delegate both new methods to active adapter                             | 3.1       |
+| 24b | `src/bridge/injection.ts`            | Add `resetPageInjection()` export for navigation re-injection           | 3.1       |
+| 25  | `src/auth/index.ts`                  | Update barrel with auth exports                                         | 3.3       |
+| 26  | `src/modules/index.ts`               | Update barrel with navigation + workzone exports                        | 3.3       |
+| 27  | `src/index.ts`                       | Add `test`, `expect` re-exports from fixtures                           | 3.3       |
 
 ### 8.3 Test Files (New)
 
@@ -1947,14 +2055,15 @@ export {
 
 ### 14.2 Sub-Phase 3.2 Batches (Wiring + Auth Setup)
 
-| Batch   | Files                                                   | Est. LOC | Depends On |
-| ------- | ------------------------------------------------------- | -------- | ---------- |
-| **B4a** | `fixtures/stability-fixtures.ts` + tests                | ~180     | B3b        |
-| **B4b** | `auth/auth-handler.ts` + test                           | ~270     | B2f        |
-| **B4c** | `auth/auth.setup.ts` + `auth/auth.teardown.ts`          | ~110     | B4b        |
-| **B5a** | `fixtures/auth-fixtures.ts` + test                      | ~180     | B4b, B3b   |
-| **B5b** | `modules/navigation.ts` + test                          | ~350     | B3b        |
-| **B5c** | `fixtures/nav-fixtures.ts` + test (without btpWorkZone) | ~280     | B5b, B3b   |
+| Batch   | Files                                                                                                                                                                                  | Est. LOC | Depends On |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| **B4a** | `fixtures/stability-fixtures.ts` + tests                                                                                                                                               | ~180     | B3b        |
+| **B4b** | `auth/auth-handler.ts` + test                                                                                                                                                          | ~270     | B2f        |
+| **B4c** | `auth/auth.setup.ts` + `auth/auth.teardown.ts`                                                                                                                                         | ~110     | B4b        |
+| **B5a** | `fixtures/auth-fixtures.ts` + test                                                                                                                                                     | ~180     | B4b, B3b   |
+| **B5b** | `modules/navigation.ts` + test                                                                                                                                                         | ~350     | B3b        |
+| **B5c** | `fixtures/nav-fixtures.ts` + test (without btpWorkZone)                                                                                                                                | ~280     | B5b, B3b   |
+| **B5d** | Wire `playwright-api.ts` into `dynamic-proxy.ts`: expand `ControlProxyState` (page + strategy), add interaction routing in get trap, add `routeToInteractionStrategy()` helper + tests | ~200     | B3b        |
 
 ### 14.3 Sub-Phase 3.3 Batches (Assembly)
 
@@ -1964,7 +2073,7 @@ export {
 | **B6b** | `fixtures/nav-fixtures.ts` update (wire btpWorkZone) + test update                                                                           | ~40      | B6a, B5c   |
 | **B7**  | `fixtures/index.ts` assembly + barrel updates (`auth/index.ts`, `modules/index.ts`, `src/index.ts`) + `npm run ci` + `npm run check:exports` | ~200     | All above  |
 
-**Total: 20 batches** (11 code + 1 test helper + 8 code continued)
+**Total: 21 batches** (12 code + 1 test helper + 8 code continued)
 
 ### 14.4 Parallel Agent Delivery Schedule
 
@@ -1974,7 +2083,7 @@ Wave 2 (after B2a):  B2b, B2c, B2d, B2e              [4 agents — auth strategi
 Wave 3 (after TH1):  B3a, B2f                         [2 agents]
 Wave 4 (after B3a):  B3b                               [1 agent — critical path]
 ── Sub-Phase 3.1 Gate ──
-Wave 5 (after B3b):  B4a, B4b, B5b                    [3 agents — parallel]
+Wave 5 (after B3b):  B4a, B4b, B5b, B5d               [4 agents — parallel]
 Wave 6 (after B4b):  B4c, B5a                          [2 agents]
 Wave 7 (after B5b):  B5c                               [1 agent]
 ── Sub-Phase 3.2 Gate ──
@@ -2011,14 +2120,14 @@ Both chains converge at B7 (assembly). **Critical path: 7 steps.**
 | Metric                     | Value                                         |
 | -------------------------- | --------------------------------------------- |
 | **New source files**       | 19                                            |
-| **Modified source files**  | 8                                             |
+| **Modified source files**  | 9 (added dynamic-proxy.ts 3.2 modification)   |
 | **New test files**         | 16 + 2 helpers = 18                           |
-| **Total new source LOC**   | ~2,530                                        |
-| **Total new test cases**   | ~115                                          |
+| **Total new source LOC**   | ~2,730                                        |
+| **Total new test cases**   | ~123                                          |
 | **New npm dependencies**   | 0                                             |
 | **Breaking changes**       | 0 (external), 1 (internal: adapter interface) |
 | **Sub-phases**             | 3 — Foundation → Wiring → Assembly            |
-| **Implementation batches** | 20                                            |
+| **Implementation batches** | 21                                            |
 | **Critical path**          | 7 steps                                       |
 | **Risk items**             | 10                                            |
 | **Phase 1 modules wired**  | 8/8 (all unconsumed modules consumed)         |
