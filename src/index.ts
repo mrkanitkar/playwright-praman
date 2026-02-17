@@ -2,7 +2,7 @@
  * Praman v1.0 — AI-First SAP UI5 Test Automation Platform for Playwright.
  *
  * @remarks
- * Phase 1 GATE: Core infrastructure, selectors, and matchers complete.
+ * Phase 2 GATE: Core + Bridge + Proxy layers complete.
  *
  * @packageDocumentation
  *
@@ -77,6 +77,33 @@ export {
   checkUI5Visible,
 } from './matchers/index.js';
 export type { MatcherResult } from './matchers/index.js';
+
+// ── Bridge ──────────────────────────────────────────────────────────
+export {
+  createBridgeAdapter,
+  ClassicUI5Adapter,
+  HybridAdapter,
+  WebComponentAdapter,
+  ensureBridgeInjected,
+  isBridgeReady,
+  waitForBridgeReady,
+} from './bridge/index.js';
+export type {
+  BridgeAdapter,
+  BridgePage,
+  AdapterMode,
+  MethodExecutionResult,
+} from './bridge/index.js';
+
+// ── Proxy ───────────────────────────────────────────────────────────
+export {
+  createControlProxy,
+  ControlProxyCache,
+  discoverControl,
+  UI5Object,
+  UI5ObjectCache,
+} from './proxy/index.js';
+export type { ControlProxyState } from './proxy/index.js';
 
 // ── Version ──────────────────────────────────────────────────────────
 export { PACKAGE_NAME, VERSION } from './version.js';
