@@ -23,6 +23,7 @@
  * - `aggregation` — array of child controls
  * - `object` — non-control UI5 object (e.g., model, binding)
  * - `none` — unclassified return (logged as warning)
+ * - `unknown` — instance check failed (differs from `none` which is undefined/null)
  *
  * @example
  * ```typescript
@@ -38,7 +39,8 @@ export type BridgeReturnType =
   | 'newElement'
   | 'aggregation'
   | 'object'
-  | 'none';
+  | 'none'
+  | 'unknown';
 
 /**
  * Descriptor for a method call to be executed on a UI5 control via the bridge.
