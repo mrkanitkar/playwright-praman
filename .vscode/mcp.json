@@ -7,6 +7,26 @@
         "playwright",
         "run-test-mcp-server"
       ]
+    },
+    "sap-docs": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/maheshwar/Documents/projects/mcp-sap-docs/dist/index.js"
+      ],
+      "env": {
+        "MCP_VARIANT": "sap-docs"
+      }
+    },
+    "ui5-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@ui5/mcp-server"
+      ],
+      "env": {
+        "UI5_MCP_WORKSPACE": "/Users/maheshwar/Documents/projects/mk1"
+      }
     }
   },
   "inputs": []

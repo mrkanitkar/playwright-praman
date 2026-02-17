@@ -1,0 +1,4852 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.56.3",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@jsx",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@jsxRuntime",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@jsxFrag",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@jsxImportSource",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@betaDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@internalRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@preapproved",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@module",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@category",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@intent",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@guarantee",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@capability",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@recipe",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@ai",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@aiContext",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@aiHint",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@aiRequired",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@aiOptional",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@sapModule",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@businessContext",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@ui5Version",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@fioriElement",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@browserContext",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@failureMode",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@prerequisite",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@postcondition",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@alternative",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        }
+      ],
+      "supportForTags": {
+        "@alpha": true,
+        "@beta": true,
+        "@defaultValue": true,
+        "@decorator": true,
+        "@deprecated": true,
+        "@eventProperty": true,
+        "@example": true,
+        "@experimental": true,
+        "@inheritDoc": true,
+        "@internal": true,
+        "@label": true,
+        "@link": true,
+        "@override": true,
+        "@packageDocumentation": true,
+        "@param": true,
+        "@privateRemarks": true,
+        "@public": true,
+        "@readonly": true,
+        "@remarks": true,
+        "@returns": true,
+        "@sealed": true,
+        "@see": true,
+        "@throws": true,
+        "@typeParam": true,
+        "@virtual": true,
+        "@betaDocumentation": true,
+        "@internalRemarks": true,
+        "@preapproved": true,
+        "@module": true,
+        "@category": true,
+        "@intent": true,
+        "@guarantee": true,
+        "@capability": true,
+        "@recipe": true,
+        "@ai": true,
+        "@aiContext": true,
+        "@aiHint": true,
+        "@aiRequired": true,
+        "@aiOptional": true,
+        "@sapModule": true,
+        "@businessContext": true,
+        "@ui5Version": true,
+        "@fioriElement": true,
+        "@browserContext": true,
+        "@failureMode": true,
+        "@prerequisite": true,
+        "@postcondition": true,
+        "@alternative": true
+      },
+      "reportUnsupportedHtmlElements": true
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "playwright-praman!",
+  "docComment": "",
+  "name": "playwright-praman",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "playwright-praman!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!AIError:class",
+          "docComment": "/**\n * Error subclass for AI provider failures.\n *\n * @example\n * ```typescript\n * const error = new AIError({\n *   message: 'Provider unavailable',\n *   attempted: 'Generate test steps',\n *   provider: 'azure-openai',\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class AIError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "AIError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!AIError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `AIError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorOptions",
+                  "canonicalReference": "playwright-praman!~AIErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!AIError#model:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly model: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "model",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!AIError#provider:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly provider: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "provider",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!AIError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly provider: string | undefined;\n        readonly model: string | undefined;\n        readonly tokenUsage: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TokenUsage",
+                  "canonicalReference": "playwright-praman!~TokenUsage:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!AIError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly provider: string | undefined;\n        readonly model: string | undefined;\n        readonly tokenUsage: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TokenUsage",
+                  "canonicalReference": "playwright-praman!~TokenUsage:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!AIError#tokenUsage:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly tokenUsage: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TokenUsage",
+                  "canonicalReference": "playwright-praman!~TokenUsage:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "tokenUsage",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!AuthError:class",
+          "docComment": "/**\n * Error subclass for authentication failures.\n *\n * @example\n * ```typescript\n * const error = new AuthError({\n *   message: 'Auth failed',\n *   attempted: 'Login to SAP',\n *   strategy: 'btp-saml',\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class AuthError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "AuthError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!AuthError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `AuthError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AuthErrorOptions",
+                  "canonicalReference": "playwright-praman!~AuthErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!AuthError#loginUrl:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly loginUrl: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "loginUrl",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!AuthError#strategy:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly strategy: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "strategy",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!AuthError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly strategy: string | undefined;\n        readonly loginUrl: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!AuthError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly strategy: string | undefined;\n        readonly loginUrl: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!BridgeError:class",
+          "docComment": "/**\n * Error subclass for bridge adapter failures.\n *\n * @example\n * ```typescript\n * const error = new BridgeError({\n *   message: 'Bridge not ready',\n *   attempted: 'Inject bridge adapter',\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class BridgeError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "BridgeError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!BridgeError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `BridgeError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BridgeErrorOptions",
+                  "canonicalReference": "playwright-praman!~BridgeErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!BridgeError#adapterType:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly adapterType: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "adapterType",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!BridgeError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly ui5Version: string | undefined;\n        readonly adapterType: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!BridgeError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly ui5Version: string | undefined;\n        readonly adapterType: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!BridgeError#ui5Version:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly ui5Version: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "ui5Version",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!checkUI5CellText:function(1)",
+          "docComment": "/**\n * Checks that a specific cell in a UI5 table has the expected text.\n *\n * @remarks\n *\n * Navigates the table structure via aggregations: 1. Gets rows via `adapter.getControlAggregation(controlId, 'items')` 2. Gets cells of the target row via `adapter.getControlAggregation(row.id, 'cells')` 3. Gets text of the target cell via `adapter.getControlProperty(cell.id, 'text')`\n *\n * Supports both exact string comparison and RegExp pattern matching.\n *\n * @param adapter - The bridge adapter to query the table control.\n *\n * @param controlId - The ID of the sap.m.Table control.\n *\n * @param row - Zero-based row index.\n *\n * @param column - Zero-based column index.\n *\n * @param expected - The expected text value (string for exact match, RegExp for pattern).\n *\n * @returns A {@link MatcherResult} indicating pass/fail with cell text details.\n *\n * @example\n * ```typescript\n * const result = await checkUI5CellText(adapter, 'table1', 0, 2, 'Active');\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function checkUI5CellText(adapter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BridgeAdapter",
+              "canonicalReference": "playwright-praman!~BridgeAdapter:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", controlId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", row: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ", column: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ", expected: "
+            },
+            {
+              "kind": "Content",
+              "text": "string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "RegExp",
+              "canonicalReference": "!RegExp:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MatcherResult",
+              "canonicalReference": "playwright-praman!MatcherResult:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 12,
+            "endIndex": 16
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "adapter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "controlId",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "row",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "column",
+              "parameterTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 8
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "expected",
+              "parameterTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 11
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "checkUI5CellText"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!checkUI5Enabled:function(1)",
+          "docComment": "/**\n * Checks that a UI5 control is enabled.\n *\n * @remarks\n *\n * Reads the `enabled` property via the bridge adapter. A control is considered enabled only when the property is strictly `true`.\n *\n * @param adapter - The bridge adapter to query the control.\n *\n * @param controlId - The ID of the UI5 control.\n *\n * @returns A {@link MatcherResult} indicating whether the control is enabled.\n *\n * @example\n * ```typescript\n * const result = await checkUI5Enabled(adapter, 'btn1');\n * expect(result.pass).toBe(true);\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function checkUI5Enabled(adapter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BridgeAdapter",
+              "canonicalReference": "playwright-praman!~BridgeAdapter:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", controlId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MatcherResult",
+              "canonicalReference": "playwright-praman!MatcherResult:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 9
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "adapter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "controlId",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "checkUI5Enabled"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!checkUI5Property:function(1)",
+          "docComment": "/**\n * Checks that a UI5 control property matches the expected value.\n *\n * @remarks\n *\n * Uses strict equality (`===`) for primitive values and `JSON.stringify` comparison for objects. The message includes the property name, actual value, and expected value for debugging.\n *\n * @param adapter - The bridge adapter to query the control.\n *\n * @param controlId - The ID of the UI5 control.\n *\n * @param propertyName - The name of the property to check.\n *\n * @param expected - The expected property value.\n *\n * @returns A {@link MatcherResult} indicating pass/fail with property details.\n *\n * @example\n * ```typescript\n * const result = await checkUI5Property(adapter, 'input1', 'value', 'Hello');\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function checkUI5Property(adapter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BridgeAdapter",
+              "canonicalReference": "playwright-praman!~BridgeAdapter:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", controlId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", propertyName: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", expected: "
+            },
+            {
+              "kind": "Content",
+              "text": "unknown"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MatcherResult",
+              "canonicalReference": "playwright-praman!MatcherResult:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 9,
+            "endIndex": 13
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "adapter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "controlId",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "propertyName",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "expected",
+              "parameterTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 8
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "checkUI5Property"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!checkUI5RowCount:function(1)",
+          "docComment": "/**\n * Checks that a UI5 table has the expected number of rows.\n *\n * @remarks\n *\n * Retrieves rows via `adapter.getControlAggregation(controlId, 'items')` and compares the array length to the expected count.\n *\n * @param adapter - The bridge adapter to query the table control.\n *\n * @param controlId - The ID of the sap.m.Table control.\n *\n * @param expected - The expected number of rows.\n *\n * @returns A {@link MatcherResult} indicating pass/fail with row count details.\n *\n * @example\n * ```typescript\n * const result = await checkUI5RowCount(adapter, 'productTable', 5);\n * expect(result.pass).toBe(true);\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function checkUI5RowCount(adapter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BridgeAdapter",
+              "canonicalReference": "playwright-praman!~BridgeAdapter:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", controlId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", expected: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MatcherResult",
+              "canonicalReference": "playwright-praman!MatcherResult:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 7,
+            "endIndex": 11
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "adapter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "controlId",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "expected",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "checkUI5RowCount"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!checkUI5SelectedRows:function(1)",
+          "docComment": "/**\n * Checks that a UI5 table has the expected number of selected rows.\n *\n * @remarks\n *\n * Reads `selectedItems` property from the table control. If the value is an array, compares its length to the expected count. Otherwise, the check fails.\n *\n * @param adapter - The bridge adapter to query the table control.\n *\n * @param controlId - The ID of the sap.m.Table control.\n *\n * @param expected - The expected number of selected rows.\n *\n * @returns A {@link MatcherResult} indicating pass/fail with selection count details.\n *\n * @example\n * ```typescript\n * const result = await checkUI5SelectedRows(adapter, 'table1', 2);\n * expect(result.pass).toBe(true);\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function checkUI5SelectedRows(adapter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BridgeAdapter",
+              "canonicalReference": "playwright-praman!~BridgeAdapter:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", controlId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", expected: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MatcherResult",
+              "canonicalReference": "playwright-praman!MatcherResult:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 7,
+            "endIndex": 11
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "adapter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "controlId",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "expected",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "checkUI5SelectedRows"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!checkUI5Text:function(1)",
+          "docComment": "/**\n * Checks that a UI5 control's `text` property matches the expected value.\n *\n * @remarks\n *\n * Supports both exact string comparison and RegExp pattern matching. Uses `adapter.getControlProperty(controlId, 'text')` to retrieve the value.\n *\n * @param adapter - The bridge adapter to query the control.\n *\n * @param controlId - The ID of the UI5 control.\n *\n * @param expected - The expected text value (string for exact match, RegExp for pattern).\n *\n * @returns A {@link MatcherResult} indicating pass/fail with a descriptive message.\n *\n * @example\n * ```typescript\n * const result = await checkUI5Text(adapter, 'btn1', 'Save');\n * // or with RegExp:\n * const regexResult = await checkUI5Text(adapter, 'btn1', /Save/);\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function checkUI5Text(adapter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BridgeAdapter",
+              "canonicalReference": "playwright-praman!~BridgeAdapter:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", controlId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", expected: "
+            },
+            {
+              "kind": "Content",
+              "text": "string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "RegExp",
+              "canonicalReference": "!RegExp:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MatcherResult",
+              "canonicalReference": "playwright-praman!MatcherResult:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 8,
+            "endIndex": 12
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "adapter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "controlId",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "expected",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 7
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "checkUI5Text"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!checkUI5ValueState:function(1)",
+          "docComment": "/**\n * Checks that a UI5 control's `valueState` property matches the expected state.\n *\n * @remarks\n *\n * Common value states in UI5: `'None'`, `'Error'`, `'Warning'`, `'Success'`, `'Information'`. Uses exact string comparison.\n *\n * @param adapter - The bridge adapter to query the control.\n *\n * @param controlId - The ID of the UI5 control.\n *\n * @param expected - The expected value state string.\n *\n * @returns A {@link MatcherResult} indicating pass/fail with state details.\n *\n * @example\n * ```typescript\n * const result = await checkUI5ValueState(adapter, 'input1', 'Error');\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function checkUI5ValueState(adapter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BridgeAdapter",
+              "canonicalReference": "playwright-praman!~BridgeAdapter:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", controlId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", expected: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MatcherResult",
+              "canonicalReference": "playwright-praman!MatcherResult:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 7,
+            "endIndex": 11
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "adapter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "controlId",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "expected",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "checkUI5ValueState"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!checkUI5Visible:function(1)",
+          "docComment": "/**\n * Checks that a UI5 control is visible.\n *\n * @remarks\n *\n * Reads the `visible` property via the bridge adapter. A control is considered visible only when the property is strictly `true`.\n *\n * @param adapter - The bridge adapter to query the control.\n *\n * @param controlId - The ID of the UI5 control.\n *\n * @returns A {@link MatcherResult} indicating whether the control is visible.\n *\n * @example\n * ```typescript\n * const result = await checkUI5Visible(adapter, 'panel1');\n * expect(result.pass).toBe(true);\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function checkUI5Visible(adapter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BridgeAdapter",
+              "canonicalReference": "playwright-praman!~BridgeAdapter:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", controlId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MatcherResult",
+              "canonicalReference": "playwright-praman!MatcherResult:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 9
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "adapter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "controlId",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "checkUI5Visible"
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!ConfigError:class",
+          "docComment": "/**\n * Error subclass for configuration failures.\n *\n * @example\n * ```typescript\n * const error = new ConfigError({\n *   message: 'Invalid auth strategy',\n *   attempted: 'Validate config',\n *   validationErrors: [{ path: ['auth'], message: 'Invalid', code: 'invalid_enum_value' }],\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class ConfigError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "ConfigError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!ConfigError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `ConfigError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConfigErrorOptions",
+                  "canonicalReference": "playwright-praman!~ConfigErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!ConfigError#configPath:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly configPath: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "configPath",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!ConfigError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly validationErrors: readonly "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ValidationIssue",
+                  "canonicalReference": "playwright-praman!~ValidationIssue:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[];\n        readonly configPath: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!ConfigError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly validationErrors: readonly "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ValidationIssue",
+                  "canonicalReference": "playwright-praman!~ValidationIssue:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[];\n        readonly configPath: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!ConfigError#validationErrors:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly validationErrors: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "readonly "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ValidationIssue",
+                  "canonicalReference": "playwright-praman!~ValidationIssue:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "validationErrors",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!ControlError:class",
+          "docComment": "/**\n * Error subclass for UI5 control interaction failures.\n *\n * @example\n * ```typescript\n * const error = new ControlError({\n *   message: 'Button not found',\n *   attempted: 'Find button with ID: submitBtn',\n *   suggestedSelector: { id: 'btn1' },\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class ControlError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "ControlError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!ControlError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `ControlError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ControlErrorOptions",
+                  "canonicalReference": "playwright-praman!~ControlErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!ControlError#availableControls:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly availableControls: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "readonly string[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "availableControls",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!ControlError#lastKnownSelector:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly lastKnownSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "lastKnownSelector",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!ControlError#suggestedSelector:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly suggestedSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "suggestedSelector",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!ControlError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly lastKnownSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined;\n        readonly availableControls: readonly string[];\n        readonly suggestedSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 7
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!ControlError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly lastKnownSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined;\n        readonly availableControls: readonly string[];\n        readonly suggestedSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 7
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!createLogger:function(1)",
+          "docComment": "/**\n * Creates a child logger bound to a specific module.\n *\n * @param module - Module name for the `{ module }` binding.\n *\n * @param parentLogger - Optional parent logger. Falls back to the cached default.\n *\n * @returns A child pino Logger with module context.\n *\n * @example\n * ```typescript\n * import { createLogger } from '#core/logging/logger.js';\n *\n * const log = createLogger('bridge');\n * log.info('Bridge initialized');\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function createLogger(module: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", parentLogger?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Logger",
+              "canonicalReference": "pino!pino.Logger:type"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Logger",
+              "canonicalReference": "pino!pino.Logger:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "module",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "parentLogger",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "createLogger"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!createRootLogger:function(1)",
+          "docComment": "/**\n * Creates a root pino logger configured from PramanConfig.\n *\n * @param config - Validated Praman configuration.\n *\n * @returns A configured pino Logger instance.\n *\n * @example\n * ```typescript\n * import { createRootLogger } from '#core/logging/logger.js';\n * import { PramanConfigSchema } from '#core/config/schema.js';\n *\n * const config = PramanConfigSchema.parse({ logLevel: 'debug' });\n * const logger = createRootLogger(config);\n * logger.info('Logger initialized');\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function createRootLogger(config: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Readonly",
+              "canonicalReference": "!Readonly:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanConfig",
+              "canonicalReference": "playwright-praman!PramanConfig:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Logger",
+              "canonicalReference": "pino!pino.Logger:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 6,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "config",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "createRootLogger"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!createUI5SelectorEngineScript:function(1)",
+          "docComment": "/**\n * Creates a UI5 selector engine script for Playwright registration.\n *\n * @remarks\n *\n * Phase 1 implementation uses DOM attribute-based queries: - `data-sap-ui` attribute for control ID matching - `data-sap-ui-type` attribute for control type matching\n *\n * The returned object conforms to the Playwright custom selector engine interface and can be passed to `selectors.register('ui5', engine)`.\n *\n * @returns A selector engine script with `query` and `queryAll` methods\n *\n * @example\n * ```typescript\n * import { createUI5SelectorEngineScript } from './ui5-selector-engine.js';\n *\n * const engine = createUI5SelectorEngineScript();\n * // Later: selectors.register('ui5', engine);\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function createUI5SelectorEngineScript(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "UI5SelectorEngineScript",
+              "canonicalReference": "playwright-praman!~UI5SelectorEngineScript:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "createUI5SelectorEngineScript"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "playwright-praman!DEFAULT_TIMEOUTS:var",
+          "docComment": "/**\n * Default timeout values (in milliseconds) for UI5 operations.\n *\n * @remarks\n *\n * These timeouts are calibrated from production SAP BTP deployments: - `UI5_WAIT`: General UI5 stability wait (covers most XHR/Promise settling) - `CONTROL_DISCOVERY`: Finding controls after navigation or dialog open - `UI5_BOOTSTRAP`: Initial UI5 library + component loading (slow on first load) - `DOM_SETTLE`: DOM mutation settling after property changes - `POLLING_INTERVAL`: Bridge polling loop interval - `CACHE_TTL`: Control metadata cache time-to-live\n *\n * All values are positive integers representing milliseconds.\n *\n * @example\n * ```typescript\n * import { DEFAULT_TIMEOUTS } from '#core/utils/constants.js';\n *\n * await page.waitForFunction(() => window.sap !== undefined, {\n *   timeout: DEFAULT_TIMEOUTS.UI5_BOOTSTRAP,\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DEFAULT_TIMEOUTS: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Readonly",
+              "canonicalReference": "!Readonly:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    readonly UI5_WAIT: 15000;\n    readonly CONTROL_DISCOVERY: 10000;\n    readonly UI5_BOOTSTRAP: 60000;\n    readonly DOM_SETTLE: 500;\n    readonly POLLING_INTERVAL: 100;\n    readonly CACHE_TTL: 5000;\n}>"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DEFAULT_TIMEOUTS",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!defineConfig:function(1)",
+          "docComment": "/**\n * Type helper for Praman config files — returns input unchanged.\n *\n * @remarks\n *\n * Used in `praman.config.ts` for IDE autocomplete and type checking.\n *\n * @param input - Config input to pass through.\n *\n * @returns The input unchanged.\n *\n * @example\n * ```typescript\n * // praman.config.ts\n * import { defineConfig } from 'playwright-praman';\n * export default defineConfig({ logLevel: 'debug' });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function defineConfig(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanConfigInput",
+              "canonicalReference": "playwright-praman!PramanConfigInput:type"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanConfigInput",
+              "canonicalReference": "playwright-praman!PramanConfigInput:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "input",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "defineConfig"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "playwright-praman!ErrorCode:type",
+          "docComment": "/**\n * Union type of all valid Praman error code string literals.\n *\n * @example\n * ```typescript\n * import type { ErrorCode } from '#core/errors/codes.js';\n * function handleError(code: ErrorCode): void { ... }\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "type ErrorCode = "
+            },
+            {
+              "kind": "Content",
+              "text": "(typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "ErrorCode",
+              "canonicalReference": "playwright-praman!ErrorCode:var"
+            },
+            {
+              "kind": "Content",
+              "text": ")[keyof typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "ErrorCode",
+              "canonicalReference": "playwright-praman!ErrorCode:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "name": "ErrorCode",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "playwright-praman!ErrorCode:var",
+          "docComment": "/**\n * All Praman error codes as a frozen constant object.\n *\n * @remarks\n *\n * Categories (10): - Config (3): schema validation, file not found, parse failure - Bridge (4): timeout, injection, readiness, version mismatch - Control (6): not found, visibility, enabled, interactable, property, aggregation - Auth (4): failure, timeout, session expired, invalid strategy - Navigation (3): tile not found, route failed, timeout - OData (3): request failed, parse, CSRF token - Selector (3): invalid, ambiguous, parse - Timeout (3): UI5 stability, control discovery, generic operation - AI (4): provider unavailable, invalid response, token limit, rate limited - Plugin (3): load failure, init failure, incompatible version\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "ErrorCode: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Readonly",
+              "canonicalReference": "!Readonly:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    readonly ERR_CONFIG_INVALID: \"ERR_CONFIG_INVALID\";\n    readonly ERR_CONFIG_NOT_FOUND: \"ERR_CONFIG_NOT_FOUND\";\n    readonly ERR_CONFIG_PARSE: \"ERR_CONFIG_PARSE\";\n    readonly ERR_BRIDGE_TIMEOUT: \"ERR_BRIDGE_TIMEOUT\";\n    readonly ERR_BRIDGE_INJECTION: \"ERR_BRIDGE_INJECTION\";\n    readonly ERR_BRIDGE_NOT_READY: \"ERR_BRIDGE_NOT_READY\";\n    readonly ERR_BRIDGE_VERSION: \"ERR_BRIDGE_VERSION\";\n    readonly ERR_CONTROL_NOT_FOUND: \"ERR_CONTROL_NOT_FOUND\";\n    readonly ERR_CONTROL_NOT_VISIBLE: \"ERR_CONTROL_NOT_VISIBLE\";\n    readonly ERR_CONTROL_NOT_ENABLED: \"ERR_CONTROL_NOT_ENABLED\";\n    readonly ERR_CONTROL_NOT_INTERACTABLE: \"ERR_CONTROL_NOT_INTERACTABLE\";\n    readonly ERR_CONTROL_PROPERTY: \"ERR_CONTROL_PROPERTY\";\n    readonly ERR_CONTROL_AGGREGATION: \"ERR_CONTROL_AGGREGATION\";\n    readonly ERR_AUTH_FAILED: \"ERR_AUTH_FAILED\";\n    readonly ERR_AUTH_TIMEOUT: \"ERR_AUTH_TIMEOUT\";\n    readonly ERR_AUTH_SESSION_EXPIRED: \"ERR_AUTH_SESSION_EXPIRED\";\n    readonly ERR_AUTH_STRATEGY_INVALID: \"ERR_AUTH_STRATEGY_INVALID\";\n    readonly ERR_NAV_TILE_NOT_FOUND: \"ERR_NAV_TILE_NOT_FOUND\";\n    readonly ERR_NAV_ROUTE_FAILED: \"ERR_NAV_ROUTE_FAILED\";\n    readonly ERR_NAV_TIMEOUT: \"ERR_NAV_TIMEOUT\";\n    readonly ERR_ODATA_REQUEST_FAILED: \"ERR_ODATA_REQUEST_FAILED\";\n    readonly ERR_ODATA_PARSE: \"ERR_ODATA_PARSE\";\n    readonly ERR_ODATA_CSRF: \"ERR_ODATA_CSRF\";\n    readonly ERR_SELECTOR_INVALID: \"ERR_SELECTOR_INVALID\";\n    readonly ERR_SELECTOR_AMBIGUOUS: \"ERR_SELECTOR_AMBIGUOUS\";\n    readonly ERR_SELECTOR_PARSE: \"ERR_SELECTOR_PARSE\";\n    readonly ERR_TIMEOUT_UI5_STABLE: \"ERR_TIMEOUT_UI5_STABLE\";\n    readonly ERR_TIMEOUT_CONTROL_DISCOVERY: \"ERR_TIMEOUT_CONTROL_DISCOVERY\";\n    readonly ERR_TIMEOUT_OPERATION: \"ERR_TIMEOUT_OPERATION\";\n    readonly ERR_AI_PROVIDER_UNAVAILABLE: \"ERR_AI_PROVIDER_UNAVAILABLE\";\n    readonly ERR_AI_RESPONSE_INVALID: \"ERR_AI_RESPONSE_INVALID\";\n    readonly ERR_AI_TOKEN_LIMIT: \"ERR_AI_TOKEN_LIMIT\";\n    readonly ERR_AI_RATE_LIMITED: \"ERR_AI_RATE_LIMITED\";\n    readonly ERR_PLUGIN_LOAD: \"ERR_PLUGIN_LOAD\";\n    readonly ERR_PLUGIN_INIT: \"ERR_PLUGIN_INIT\";\n    readonly ERR_PLUGIN_INCOMPATIBLE: \"ERR_PLUGIN_INCOMPATIBLE\";\n}>"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "ErrorCode",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!getPlaywrightVersion:function(1)",
+          "docComment": "/**\n * Reads the installed `@playwright/test` version from disk.\n *\n * @remarks\n *\n * Uses `createRequire` to resolve and load the `@playwright/test/package.json`. This works in both ESM and CJS contexts.\n *\n * @returns Parsed Playwright version.\n *\n * @example\n * ```typescript\n * const version = getPlaywrightVersion();\n * console.log(version.raw); // '1.58.2'\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function getPlaywrightVersion(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "PlaywrightVersion",
+              "canonicalReference": "playwright-praman!~PlaywrightVersion:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "getPlaywrightVersion"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!hasFeature:function(1)",
+          "docComment": "/**\n * Returns whether a specific Playwright feature is available.\n *\n * @param feature - Feature flag key from {@link PlaywrightFeatures}.\n *\n * @returns True if the installed Playwright version supports the feature.\n *\n * @example\n * ```typescript\n * if (hasFeature('hasAriaSnapshot')) {\n *   // aria snapshot assertions available\n * }\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function hasFeature(feature: "
+            },
+            {
+              "kind": "Content",
+              "text": "keyof "
+            },
+            {
+              "kind": "Reference",
+              "text": "PlaywrightFeatures",
+              "canonicalReference": "playwright-praman!~PlaywrightFeatures:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 4,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "feature",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "hasFeature"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!initTelemetry:function(1)",
+          "docComment": "/**\n * Initializes telemetry based on the provided configuration.\n *\n * @remarks\n *\n * If `config.telemetry?.openTelemetry` is not `true`, returns a NoOpTracer immediately with zero overhead.\n *\n * Phase 1: Always returns NoOpTracer. Real OTel SDK initialization (including exporter-specific validation such as Jaeger endpoint URL) is deferred to Phase 2 (tracked as issue M2).\n *\n * @param config - The validated Praman configuration\n *\n * @returns A TracerWrapper instance (NoOpTracer in Phase 1)\n *\n * @example\n * ```typescript\n * import { initTelemetry } from '#core/telemetry/otel.js';\n * import { PramanConfigSchema } from '#core/config/schema.js';\n *\n * const config = PramanConfigSchema.parse({});\n * const tracer = await initTelemetry(config);\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function initTelemetry(config: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Readonly",
+              "canonicalReference": "!Readonly:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanConfig",
+              "canonicalReference": "playwright-praman!PramanConfig:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TracerWrapper",
+              "canonicalReference": "playwright-praman!~TracerWrapper:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 6,
+            "endIndex": 10
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "config",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "initTelemetry"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!isUI5SelectorString:function(1)",
+          "docComment": "/**\n * Checks whether a string is a `ui5=...` selector string.\n *\n * @param value - The string to check\n *\n * @returns `true` if the string starts with `ui5=`, `false` otherwise\n *\n * @example\n * ```typescript\n * import { isUI5SelectorString } from './selector-parser.js';\n *\n * isUI5SelectorString('ui5=sap.m.Button'); // true\n * isUI5SelectorString('sap.m.Button');     // false\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function isUI5SelectorString(value: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "value",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "isUI5SelectorString"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!loadConfig:function(1)",
+          "docComment": "/**\n * Loads, validates, and freezes Praman configuration.\n *\n * @param options - Optional inline overrides.\n *\n * @returns Frozen, validated PramanConfig with all defaults applied.\n *\n * @example\n * ```typescript\n * const config = await loadConfig({ overrides: { logLevel: 'debug' } });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function loadConfig(options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "LoadConfigOptions",
+              "canonicalReference": "playwright-praman!LoadConfigOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Readonly",
+              "canonicalReference": "!Readonly:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanConfig",
+              "canonicalReference": "playwright-praman!PramanConfig:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 9
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "options",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "loadConfig"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "playwright-praman!LoadConfigOptions:interface",
+          "docComment": "/**\n * Options for loading Praman configuration.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface LoadConfigOptions "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "name": "LoadConfigOptions",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "playwright-praman!LoadConfigOptions#overrides:member",
+              "docComment": "/**\n * Inline config overrides (lower priority than env vars).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly overrides?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PramanConfigInput",
+                  "canonicalReference": "playwright-praman!PramanConfigInput:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "overrides",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "playwright-praman!MatcherResult:interface",
+          "docComment": "/**\n * Result of a matcher check.\n *\n * @example\n * ```typescript\n * const result: MatcherResult = {\n *   pass: true,\n *   message: () => 'Expected text to match',\n *   actual: 'Save',\n *   expected: 'Save',\n * };\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "interface MatcherResult "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "name": "MatcherResult",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "playwright-praman!MatcherResult#actual:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly actual?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "actual",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "playwright-praman!MatcherResult#expected:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly expected?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "expected",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "playwright-praman!MatcherResult#message:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly message: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "() => string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "message",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "playwright-praman!MatcherResult#pass:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly pass: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pass",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!NavigationError:class",
+          "docComment": "/**\n * Error subclass for FLP/route navigation failures.\n *\n * @example\n * ```typescript\n * const error = new NavigationError({\n *   message: 'Route failed',\n *   attempted: 'Navigate to app',\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class NavigationError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "NavigationError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!NavigationError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `NavigationError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "NavigationErrorOptions",
+                  "canonicalReference": "playwright-praman!~NavigationErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!NavigationError#currentUrl:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly currentUrl: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "currentUrl",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!NavigationError#targetUrl:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly targetUrl: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "targetUrl",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!NavigationError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly targetUrl: string | undefined;\n        readonly currentUrl: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!NavigationError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly targetUrl: string | undefined;\n        readonly currentUrl: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!ODataError:class",
+          "docComment": "/**\n * Error subclass for OData request failures.\n *\n * @example\n * ```typescript\n * const error = new ODataError({\n *   message: 'OData request failed',\n *   attempted: 'Fetch entity set',\n *   statusCode: 500,\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class ODataError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "ODataError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!ODataError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `ODataError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ODataErrorOptions",
+                  "canonicalReference": "playwright-praman!~ODataErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!ODataError#entitySet:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly entitySet: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "entitySet",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!ODataError#requestUrl:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly requestUrl: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "requestUrl",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!ODataError#statusCode:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly statusCode: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "statusCode",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!ODataError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly statusCode: number | undefined;\n        readonly requestUrl: string | undefined;\n        readonly entitySet: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!ODataError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly statusCode: number | undefined;\n        readonly requestUrl: string | undefined;\n        readonly entitySet: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "playwright-praman!PACKAGE_NAME:var",
+          "docComment": "/**\n * Package name — used in telemetry and error reporting.\n *\n * @example\n * ```typescript\n * import { PACKAGE_NAME } from './version.js';\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "PACKAGE_NAME: "
+            },
+            {
+              "kind": "Content",
+              "text": "\"playwright-praman\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "PACKAGE_NAME",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!parseUI5Selector:function(1)",
+          "docComment": "/**\n * Parses a `ui5=...` selector string into a structured {@link UI5Selector} object.\n *\n * @remarks\n *\n * The selector format is: `ui5=controlType#id[prop1=value1][prop2=value2]`. All parts are optional except the `ui5=` prefix plus at least some content.\n *\n * Boolean string values (`\"true\"`, `\"false\"`) are coerced to booleans. Numeric strings that round-trip through `Number()` are coerced to numbers.\n *\n * @param selectorString - The raw selector string (must start with `ui5=`)\n *\n * @returns A parsed UI5Selector object\n *\n * @throws\n *\n * {@link SelectorError} with code `ERR_SELECTOR_PARSE` if the string is empty, missing the `ui5=` prefix, or exceeds 10,000 characters\n *\n * @throws\n *\n * {@link SelectorError} with code `ERR_SELECTOR_INVALID` if the content after the prefix is empty\n *\n * @example\n * ```typescript\n * import { parseUI5Selector } from './selector-parser.js';\n *\n * const selector = parseUI5Selector('ui5=sap.m.Button#saveBtn[text=Save]');\n * // { controlType: 'sap.m.Button', id: 'saveBtn', properties: { text: 'Save' } }\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function parseUI5Selector(selectorString: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "UI5Selector",
+              "canonicalReference": "playwright-praman!~UI5Selector:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "selectorString",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "parseUI5Selector"
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!PluginError:class",
+          "docComment": "/**\n * Error subclass for plugin lifecycle failures.\n *\n * @example\n * ```typescript\n * const error = new PluginError({\n *   message: 'Plugin failed to load',\n *   attempted: 'Load plugin',\n *   pluginName: 'my-plugin',\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class PluginError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "PluginError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!PluginError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `PluginError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PluginErrorOptions",
+                  "canonicalReference": "playwright-praman!~PluginErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PluginError#pluginName:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly pluginName: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pluginName",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PluginError#pluginVersion:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly pluginVersion: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pluginVersion",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!PluginError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly pluginName: string;\n        readonly pluginVersion: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!PluginError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly pluginName: string;\n        readonly pluginVersion: string | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "playwright-praman!PramanConfig:type",
+          "docComment": "/**\n * Validated, defaults-applied Praman configuration type.\n *\n * @remarks\n *\n * Derived from the Zod schema. Do NOT create a manual interface. Import this type from `#core/config/schema.js` or `#core/config/index.js`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "type PramanConfig = "
+            },
+            {
+              "kind": "Reference",
+              "text": "z.output",
+              "canonicalReference": "zod!output:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanConfigSchema",
+              "canonicalReference": "playwright-praman!~PramanConfigSchema:var"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "name": "PramanConfig",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "playwright-praman!PramanConfigInput:type",
+          "docComment": "/**\n * User-facing input type for Praman configuration (pre-defaults).\n *\n * @remarks\n *\n * All fields are optional. Used by `defineConfig()` and `loadConfig()`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "type PramanConfigInput = "
+            },
+            {
+              "kind": "Reference",
+              "text": "z.input",
+              "canonicalReference": "zod!input:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanConfigSchema",
+              "canonicalReference": "playwright-praman!~PramanConfigSchema:var"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "name": "PramanConfigInput",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!PramanError:class",
+          "docComment": "/**\n * Base error class for all Praman errors.\n *\n * @remarks\n *\n * Extends `Error` with structured diagnostic fields: - `code` — machine-readable error code from `ErrorCode` - `attempted` — human description of the operation that failed - `retryable` — whether the caller can retry the operation - `severity` — 'error', 'warning', or 'info' - `details` — structured key-value context - `suggestions` — recovery hints for humans and AI agents - `timestamp` — ISO 8601 creation time\n *\n * @example\n * ```typescript\n * const error = new PramanError({\n *   code: 'ERR_CONFIG_INVALID',\n *   message: 'Invalid config',\n *   attempted: 'Load config',\n *   retryable: false,\n * });\n * console.log(error.toUserMessage());\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class PramanError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "Error",
+              "canonicalReference": "!Error:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "PramanError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!PramanError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `PramanError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PramanErrorOptions",
+                  "canonicalReference": "playwright-praman!~PramanErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PramanError#attempted:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly attempted: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "attempted",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PramanError#code:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly code: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ErrorCode",
+                  "canonicalReference": "playwright-praman!ErrorCode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "code",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PramanError#details:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly details: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Readonly",
+                  "canonicalReference": "!Readonly:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "details",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PramanError#retryable:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly retryable: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "retryable",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PramanError#severity:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly severity: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "'error' | 'warning' | 'info'"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "severity",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PramanError#suggestions:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly suggestions: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "readonly string[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "suggestions",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!PramanError#timestamp:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly timestamp: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "timestamp",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!PramanError#toAIContext:member(1)",
+              "docComment": "/**\n * Returns structured context for AI agents to reason about the error.\n *\n * @remarks\n *\n * Same as `toJSON()` but omits `stack` and `name` — AI agents don't need stack traces, and the error type is conveyed by `code`.\n *\n * @returns AI-friendly context object.\n *\n * @example\n * ```typescript\n * const context = error.toAIContext();\n * // Send to LLM for self-healing analysis\n * ```\n *\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!PramanError#toJSON:member(1)",
+              "docComment": "/**\n * Serializes the error to a plain JSON-safe object.\n *\n * @returns Structured representation with all diagnostic fields.\n *\n * @example\n * ```typescript\n * const json = error.toJSON();\n * console.log(JSON.stringify(json, null, 2));\n * ```\n *\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!PramanError#toUserMessage:member(1)",
+              "docComment": "/**\n * Formats the error for human-readable console output.\n *\n * @returns Multi-line formatted string with all diagnostic sections.\n *\n * @example\n * ```typescript\n * console.error(error.toUserMessage());\n * ```\n *\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toUserMessage(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toUserMessage"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!retry:function(1)",
+          "docComment": "/**\n * Retries an async operation with exponential backoff + jitter.\n *\n * @remarks\n *\n * WARNING: `retry()` is for infrastructure only — config loading, OTel init, bridge injection. Do NOT use for UI interactions — use Playwright's native auto-retry or `waitForUI5Stable()` instead.\n *\n * @param fn - Async function to attempt.\n *\n * @param options - Retry configuration.\n *\n * @returns The result of `fn` on success.\n *\n * @throws\n *\n * The last error after all retries are exhausted.\n *\n * @example\n * ```typescript\n * const result = await retry(\n *   () => fetchWithTimeout('/api/data'),\n *   { maxRetries: 3, baseDelay: 200, shouldRetry: (err) => err.message !== 'AUTH_FAILED' },\n * );\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function retry<T>(fn: "
+            },
+            {
+              "kind": "Content",
+              "text": "() => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<T>"
+            },
+            {
+              "kind": "Content",
+              "text": ", options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "RetryOptions",
+              "canonicalReference": "playwright-praman!~RetryOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<T>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 7,
+            "endIndex": 9
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "fn",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "options",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": true
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "retry"
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!SelectorError:class",
+          "docComment": "/**\n * Error subclass for selector parsing/resolution failures.\n *\n * @example\n * ```typescript\n * const error = new SelectorError({\n *   message: 'Invalid selector',\n *   attempted: 'Parse selector string',\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class SelectorError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "SelectorError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!SelectorError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `SelectorError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SelectorErrorOptions",
+                  "canonicalReference": "playwright-praman!~SelectorErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!SelectorError#parsedSelector:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly parsedSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "parsedSelector",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!SelectorError#selectorString:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly selectorString: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "selectorString",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!SelectorError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly selectorString: string | undefined;\n        readonly parsedSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!SelectorError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly selectorString: string | undefined;\n        readonly parsedSelector: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UI5Selector",
+                  "canonicalReference": "playwright-praman!~UI5Selector:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!serializeUI5Selector:function(1)",
+          "docComment": "/**\n * Serializes a {@link UI5Selector} object into a `ui5=...` selector string.\n *\n * @remarks\n *\n * This is the inverse of {@link parseUI5Selector}. It builds a string in the format `ui5=controlType#id[key=value]`. Undefined fields are omitted. RegExp `id` values are serialized using their `.source` property.\n *\n * @param selector - The UI5Selector to serialize\n *\n * @returns The serialized selector string\n *\n * @example\n * ```typescript\n * import { serializeUI5Selector } from './selector-parser.js';\n *\n * const str = serializeUI5Selector({\n *   controlType: 'sap.m.Button',\n *   id: 'saveBtn',\n *   properties: { text: 'Save' },\n * });\n * // 'ui5=sap.m.Button#saveBtn[text=Save]'\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function serializeUI5Selector(selector: "
+            },
+            {
+              "kind": "Reference",
+              "text": "UI5Selector",
+              "canonicalReference": "playwright-praman!~UI5Selector:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "selector",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "serializeUI5Selector"
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "playwright-praman!TimeoutError:class",
+          "docComment": "/**\n * Error subclass for operation timeout failures.\n *\n * @example\n * ```typescript\n * const error = new TimeoutError({\n *   message: 'Timed out',\n *   attempted: 'Wait for stability',\n *   timeoutMs: 5000,\n * });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare class TimeoutError extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "PramanError",
+              "canonicalReference": "playwright-praman!PramanError:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "TimeoutError",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "playwright-praman!TimeoutError:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `TimeoutError` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TimeoutErrorOptions",
+                  "canonicalReference": "playwright-praman!~TimeoutErrorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!TimeoutError#elapsed:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly elapsed: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "elapsed",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "playwright-praman!TimeoutError#timeoutMs:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly timeoutMs: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "timeoutMs",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!TimeoutError#toAIContext:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toAIContext(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AIErrorContext",
+                  "canonicalReference": "playwright-praman!~AIErrorContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly timeoutMs: number;\n        readonly elapsed: number | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toAIContext"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "playwright-praman!TimeoutError#toJSON:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "toJSON(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SerializedPramanError",
+                  "canonicalReference": "playwright-praman!~SerializedPramanError:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " & {\n        readonly timeoutMs: number;\n        readonly elapsed: number | undefined;\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "toJSON"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!validateUI5Selector:function(1)",
+          "docComment": "/**\n * Validates a {@link UI5Selector} and returns an array of error messages.\n *\n * @remarks\n *\n * An empty array indicates a valid selector. Checks include: - At least one of `controlType`, `id`, or `properties` must be present - `controlType` must be a dot-separated namespace (e.g., `sap.m.Button`) - `id` must not be an empty string if provided\n *\n * @param selector - The UI5Selector to validate\n *\n * @returns A readonly array of validation error strings (empty if valid)\n *\n * @example\n * ```typescript\n * import { validateUI5Selector } from './selector-parser.js';\n *\n * const errors = validateUI5Selector({ controlType: 'Button' });\n * // ['controlType must be a dot-separated namespace (e.g., sap.m.Button)']\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function validateUI5Selector(selector: "
+            },
+            {
+              "kind": "Reference",
+              "text": "UI5Selector",
+              "canonicalReference": "playwright-praman!~UI5Selector:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Content",
+              "text": "readonly string[]"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "selector",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "validateUI5Selector"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "playwright-praman!VERSION:var",
+          "docComment": "/**\n * Package version — kept in sync with package.json via build script.\n *\n * @remarks\n *\n * Read at runtime by telemetry (`service.version`) and user-agent headers.\n *\n * @example\n * ```typescript\n * import { VERSION, PACKAGE_NAME } from './version.js';\n * console.log(`${PACKAGE_NAME}@${VERSION}`);\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "VERSION: "
+            },
+            {
+              "kind": "Content",
+              "text": "\"1.0.1\""
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "VERSION",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!waitForUI5Bootstrap:function(1)",
+          "docComment": "/**\n * Waits for SAP UI5 to finish bootstrapping (core library loaded).\n *\n * @remarks\n *\n * Polls for `window.sap?.ui?.getCore` existence using `page.waitForFunction()`.\n *\n * V16 tracked issue: Default timeout is {@link DEFAULT_TIMEOUTS.UI5_BOOTSTRAP} (60 000 ms) to accommodate slow first-load scenarios on SAP BTP.\n *\n * @param page - Playwright Page (or compatible subset).\n *\n * @param options - Optional timeout configuration.\n *\n * @example\n * ```typescript\n * await waitForUI5Bootstrap(page, { timeout: 30_000 });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function waitForUI5Bootstrap(page: "
+            },
+            {
+              "kind": "Reference",
+              "text": "WaitPage",
+              "canonicalReference": "playwright-praman!~WaitPage:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", options?: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    readonly timeout?: number;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<void>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "page",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "options",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "waitForUI5Bootstrap"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "playwright-praman!waitForUI5Stable:function(1)",
+          "docComment": "/**\n * Waits for SAP UI5 to report zero pending async operations.\n *\n * @remarks\n *\n * Uses `page.waitForFunction()` to poll `sap.ui.getCore().getUIPending() === 0`. When `skipStabilityWait` is true, falls back to {@link briefDOMSettle} instead.\n *\n * Timeout errors are wrapped in {@link TimeoutError} with code `ERR_TIMEOUT_OPERATION`.\n *\n * @param page - Playwright Page (or compatible subset).\n *\n * @param options - Wait configuration options.\n *\n * @example\n * ```typescript\n * await waitForUI5Stable(page, { timeout: 10_000, polling: 200 });\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "declare function waitForUI5Stable(page: "
+            },
+            {
+              "kind": "Reference",
+              "text": "WaitPage",
+              "canonicalReference": "playwright-praman!~WaitPage:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "WaitForUI5StableOptions",
+              "canonicalReference": "playwright-praman!~WaitForUI5StableOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<void>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "page",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "options",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "waitForUI5Stable"
+        }
+      ]
+    }
+  ]
+}

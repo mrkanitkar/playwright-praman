@@ -16,17 +16,20 @@ Ground-up rewrite — NO copy-paste from v2.5.0.
 
 Load the appropriate skill file based on the task:
 
-| Task                                              | Skill File                                                         |
-| ------------------------------------------------- | ------------------------------------------------------------------ |
-| Architecture decisions, module boundaries         | `skills/playwright-praman-sap-testing/skills-architect.md`         |
-| TypeScript implementation, proxy, bridge          | `skills/playwright-praman-sap-testing/skills-implementer.md`       |
-| Test-driven development (TDD), RED-GREEN-REFACTOR | `skills/playwright-praman-sap-testing/skills-tdd.md`               |
-| Unit/integration tests, coverage                  | `skills/playwright-praman-sap-testing/skills-tester.md`            |
-| Playwright fixtures, selectors, matchers          | `skills/playwright-praman-sap-testing/skills-playwright-expert.md` |
-| SAP UI5 controls, FLP, OData, RecordReplay        | `skills/playwright-praman-sap-testing/skills-sap-ui5-expert.md`    |
-| PR review, quality gates                          | `skills/playwright-praman-sap-testing/skills-reviewer.md`          |
-| CI/CD, security, build, release                   | `skills/playwright-praman-sap-testing/skills-security-build.md`    |
-| Team overview, collaboration model                | `skills/playwright-praman-sap-testing/skills-team-overview.md`     |
+| Task                                               | Skill File                                                                    |
+| -------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Architecture decisions, module boundaries          | `skills/playwright-praman-sap-testing/skills-architect.md`                    |
+| TypeScript implementation, proxy, bridge           | `skills/playwright-praman-sap-testing/skills-implementer.md`                  |
+| Test-driven development (TDD), RED-GREEN-REFACTOR  | `skills/playwright-praman-sap-testing/skills-tdd.md`                          |
+| Unit/integration tests, coverage                   | `skills/playwright-praman-sap-testing/skills-tester.md`                       |
+| Playwright fixtures, selectors, matchers           | `skills/playwright-praman-sap-testing/skills-playwright-expert.md`            |
+| SAP UI5 controls, FLP, OData, RecordReplay         | `skills/playwright-praman-sap-testing/skills-sap-ui5-expert.md`               |
+| SAP UI5 Web Components, Shadow DOM, hybrid testing | `skills/playwright-praman-sap-testing/skills-sap-ui5-webcomponents-expert.md` |
+| SAP Fiori consulting, E2E scenarios, auth testing  | `skills/playwright-praman-sap-testing/skills-sap-fiori-consultant.md`         |
+| OData V2/V4 protocol, Gateway, mock strategies     | `skills/playwright-praman-sap-testing/skills-sap-odata-expert.md`             |
+| PR review, quality gates                           | `skills/playwright-praman-sap-testing/skills-reviewer.md`                     |
+| CI/CD, security, build, release                    | `skills/playwright-praman-sap-testing/skills-security-build.md`               |
+| Team overview, collaboration model                 | `skills/playwright-praman-sap-testing/skills-team-overview.md`                |
 
 ## Code Standards
 

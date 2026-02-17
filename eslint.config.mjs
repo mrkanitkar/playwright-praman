@@ -15,6 +15,7 @@ import promisePlugin from 'eslint-plugin-promise';
 import sonarjs from 'eslint-plugin-sonarjs';
 import microsoftSdl from '@microsoft/eslint-plugin-sdl';
 import prettier from 'eslint-config-prettier';
+import pramanPlugin from './eslint-rules/index.js';
 
 export default tseslint.config(
   // ── Global ignores ───────────────────────────────────────────────────────
@@ -25,6 +26,7 @@ export default tseslint.config(
       'node_modules/**',
       'docs/**',
       '*.config.{js,mjs,ts}',
+      'eslint-rules/**',
       'scripts/**',
     ],
   },
@@ -348,6 +350,15 @@ export default tseslint.config(
       'max-lines': 'off',
       'security/detect-new-buffer': 'off',
       'no-eval': 'off',
+    },
+  },
+
+  // ── UI5 deprecated API detection (warn, non-blocking in CI) ─────────────
+  {
+    plugins: { praman: pramanPlugin },
+    rules: {
+      'praman/no-deprecated-ui5-globals': 'warn',
+      'praman/no-deprecated-ui5-api': 'warn',
     },
   },
 

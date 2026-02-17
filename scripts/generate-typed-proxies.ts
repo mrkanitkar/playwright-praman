@@ -20,6 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = join(__dirname, '..');
 const CACHE_DIR = join(__dirname, 'data', 'api-cache');
 const OUTPUT_FILE = join(PROJECT_ROOT, 'src', 'core', 'types', 'controls.ts');
+const DEPRECATION_REPORT = join(__dirname, 'data', 'deprecated-ui5-apis.json');
 
 // ─── CLI ─────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -587,6 +588,22 @@ const CONTAINER_CONTROLS = new Set([
 ]);
 
 // ═══════════════════════════════════════════════════════════════════════
+// Deprecation tracking
+// ═══════════════════════════════════════════════════════════════════════
+interface DeprecatedInfo {
+  since?: string;
+  text?: string;
+}
+
+interface DeprecatedEntry {
+  control: string;
+  kind: 'method' | 'property' | 'aggregation' | 'event';
+  name: string;
+  since?: string;
+  text?: string;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // API JSON types
 // ═══════════════════════════════════════════════════════════════════════
 interface ApiJson {
@@ -612,7 +629,7 @@ interface ApiProperty {
   name: string;
   type: string;
   visibility: string;
-  deprecated?: object;
+  deprecated?: DeprecatedInfo;
   methods?: string[];
 }
 
@@ -621,14 +638,14 @@ interface ApiAggregation {
   type: string;
   cardinality: string;
   visibility: string;
-  deprecated?: object;
+  deprecated?: DeprecatedInfo;
   methods?: string[];
 }
 
 interface ApiEvent {
   name: string;
   visibility: string;
-  deprecated?: object;
+  deprecated?: DeprecatedInfo;
   methods?: string[];
 }
 
@@ -644,7 +661,7 @@ interface ApiMethod {
   name: string;
   visibility: string;
   static?: boolean;
-  deprecated?: object;
+  deprecated?: DeprecatedInfo;
   returnValue?: { type: string };
   parameters?: Array<{ name: string; type: string; optional?: boolean }>;
 }
@@ -783,7 +800,11 @@ interface MethodSig {
   line: string; // e.g., "getText(): Promise<string>;"
 }
 
-function extractMethods(symbol: ApiSymbol): MethodSig[] {
+function extractMethods(
+  symbol: ApiSymbol,
+  controlName: string,
+  deprecatedCollector: DeprecatedEntry[],
+): MethodSig[] {
   const results: MethodSig[] = [];
   const meta = symbol['ui5-metadata'];
 
@@ -795,7 +816,17 @@ function extractMethods(symbol: ApiSymbol): MethodSig[] {
 
   if (meta) {
     for (const prop of meta.properties ?? []) {
-      if (prop.visibility !== 'public' || prop.deprecated) continue;
+      if (prop.visibility !== 'public') continue;
+      if (prop.deprecated) {
+        deprecatedCollector.push({
+          control: controlName,
+          kind: 'property',
+          name: prop.name,
+          since: prop.deprecated.since,
+          text: prop.deprecated.text,
+        });
+        continue;
+      }
       if (PROPERTY_SKIP.has(prop.name)) {
         for (const m of prop.methods ?? []) skippedMethods.add(m);
         continue;
@@ -806,10 +837,32 @@ function extractMethods(symbol: ApiSymbol): MethodSig[] {
       }
     }
     for (const agg of meta.aggregations ?? []) {
-      if (agg.visibility !== 'public' || agg.deprecated) continue;
+      if (agg.visibility !== 'public') continue;
+      if (agg.deprecated) {
+        deprecatedCollector.push({
+          control: controlName,
+          kind: 'aggregation',
+          name: agg.name,
+          since: agg.deprecated.since,
+          text: agg.deprecated.text,
+        });
+        continue;
+      }
       aggregationTypeCache.add(agg.type);
       for (const m of agg.methods ?? []) {
         if (m.startsWith('get')) aggGetters.set(m, { type: agg.type, card: agg.cardinality });
+      }
+    }
+    for (const evt of meta.events ?? []) {
+      if (evt.visibility !== 'public') continue;
+      if (evt.deprecated) {
+        deprecatedCollector.push({
+          control: controlName,
+          kind: 'event',
+          name: evt.name,
+          since: evt.deprecated.since,
+          text: evt.deprecated.text,
+        });
       }
     }
   }
@@ -818,7 +871,16 @@ function extractMethods(symbol: ApiSymbol): MethodSig[] {
   for (const method of symbol.methods ?? []) {
     if (method.visibility !== 'public') continue;
     if (method.static) continue;
-    if (method.deprecated) continue;
+    if (method.deprecated) {
+      deprecatedCollector.push({
+        control: controlName,
+        kind: 'method',
+        name: method.name,
+        since: method.deprecated.since,
+        text: method.deprecated.text,
+      });
+      continue;
+    }
     if (METHOD_BLACKLIST.has(method.name)) continue;
     if (skippedMethods.has(method.name)) continue;
     if (isExcludedByPattern(method.name)) continue;
@@ -863,9 +925,13 @@ function extractMethods(symbol: ApiSymbol): MethodSig[] {
 // ═══════════════════════════════════════════════════════════════════════
 // Interface generation
 // ═══════════════════════════════════════════════════════════════════════
-function generateInterface(controlName: string, symbol: ApiSymbol): string {
+function generateInterface(
+  controlName: string,
+  symbol: ApiSymbol,
+  deprecatedCollector: DeprecatedEntry[],
+): string {
   const ifName = getInterfaceName(controlName);
-  const methods = extractMethods(symbol);
+  const methods = extractMethods(symbol, controlName, deprecatedCollector);
 
   // Framework overrides
   const overrides = FRAMEWORK_METHODS[controlName] ?? [];
@@ -1129,6 +1195,7 @@ async function main(): Promise<void> {
 
   // Generate interfaces
   const interfaces: Array<{ controlName: string; code: string; lib: string }> = [];
+  const allDeprecated: DeprecatedEntry[] = [];
   let found = 0;
   let missing = 0;
 
@@ -1140,7 +1207,7 @@ async function main(): Promise<void> {
         missing++;
         continue;
       }
-      const code = generateInterface(controlName, symbol);
+      const code = generateInterface(controlName, symbol, allDeprecated);
       interfaces.push({ controlName, code, lib });
       found++;
     }
@@ -1161,6 +1228,29 @@ async function main(): Promise<void> {
     console.log(`\nWrote ${OUTPUT_FILE}`);
     console.log(`  ${interfaces.length} interfaces  |  ${lineCount} lines`);
   }
+
+  // Emit deprecation report
+  const reportByControl: Record<string, Omit<DeprecatedEntry, 'control'>[]> = {};
+  for (const entry of allDeprecated) {
+    (reportByControl[entry.control] ??= []).push({
+      kind: entry.kind,
+      name: entry.name,
+      since: entry.since,
+      text: entry.text,
+    });
+  }
+  const deprecatedNames = [...new Set(allDeprecated.map((e) => e.name))].sort();
+  const report = {
+    version: UI5_VERSION,
+    generated: new Date().toISOString(),
+    totalDeprecated: allDeprecated.length,
+    deprecatedNames,
+    controls: reportByControl,
+  };
+  writeFileSync(DEPRECATION_REPORT, JSON.stringify(report, null, 2) + '\n', 'utf-8');
+  console.log(
+    `  Deprecation report: ${allDeprecated.length} items (${deprecatedNames.length} unique names) → ${DEPRECATION_REPORT}`,
+  );
 
   // Summary
   const interactiveCount = interfaces.filter((i) => INTERACTIVE_CONTROLS.has(i.controlName)).length;

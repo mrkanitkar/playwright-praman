@@ -482,6 +482,25 @@ npm run typecheck          # Validate TypeScript
 
 ---
 
+## SAP UI5 API Compliance
+
+Control interfaces in `src/core/types/controls.ts` must match the official SAP UI5 API reference.
+
+### Rules
+
+- **No fictional methods**: Every method on a control interface must exist in the real SAP UI5 API
+- **No namespace-as-control**: `sap.m.MessageBox`, `sap.m.MessageToast` are namespaces (`kind: "namespace"`), not instantiable controls — do not model them as control interfaces
+- **Correct return types**: Match SAP API return types — `getVisible()` not `isVisible()`, `Element | null` not `string | null` for `getDomRef()`
+- **Correct aggregation cardinality**: 0..1 aggregations return single control (`T | null`), not arrays (`T[]`)
+- **Nullable associations**: Association getters (e.g., `getCurrentStep()`, `getActivePage()`) can return `null`
+- **Proxy convenience methods**: Methods not in the real SAP API (e.g., `getControlType()`) must be documented with `@remarks` as Praman proxy convenience methods
+
+### Verification
+
+Use `@ui5/mcp-server` `get_api_reference` tool to verify interfaces against the official SAP API. See tracked issue V17 in `plans/phase1-tracker.md` for the full audit results.
+
+---
+
 ## References
 
 - [Microsoft TSDoc](https://tsdoc.org/)
