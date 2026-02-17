@@ -21,6 +21,7 @@ export {
   ensureBridgeInjected,
   injectBridge,
   isBridgeReady,
+  resetPageInjection,
   waitForBridgeReady,
 } from './injection.js';
 export type { Opa5StrategyConfig } from './interaction-strategies/opa5-strategy.js';

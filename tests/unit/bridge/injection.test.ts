@@ -15,6 +15,7 @@ import {
   ensureBridgeInjected,
   injectBridge,
   isBridgeReady,
+  resetPageInjection,
   waitForBridgeReady,
 } from '#bridge/injection.js';
 
@@ -133,5 +134,49 @@ describe('waitForBridgeReady', () => {
     await waitForBridgeReady(page, 5000);
     const call = page.waitForFunction.mock.calls[0] as unknown[];
     expect(call[1]).toEqual(expect.objectContaining({ timeout: 5000 }));
+  });
+});
+
+describe('resetPageInjection', () => {
+  it('clears injection tracking so re-injection occurs', async () => {
+    const page = createMockBridgePage({
+      evaluate: vi.fn().mockResolvedValue(undefined),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
+    });
+    // First injection
+    await ensureBridgeInjected(page);
+    const callsAfterFirst = page.waitForFunction.mock.calls.length;
+
+    // Second call without reset — should skip injection
+    await ensureBridgeInjected(page);
+    expect(page.waitForFunction.mock.calls).toHaveLength(callsAfterFirst);
+
+    // Reset and call again — should re-inject
+    resetPageInjection(page);
+    await ensureBridgeInjected(page);
+    expect(page.waitForFunction.mock.calls.length).toBeGreaterThan(callsAfterFirst);
+  });
+
+  it('is a no-op on a page that was never injected', () => {
+    const page = createMockBridgePage({
+      evaluate: vi.fn().mockResolvedValue(undefined),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
+    });
+    // Should not throw
+    expect(() => {
+      resetPageInjection(page);
+    }).not.toThrow();
+  });
+
+  it('allows re-injection after reset', async () => {
+    const page = createMockBridgePage({
+      evaluate: vi.fn().mockResolvedValue(undefined),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
+    });
+    await ensureBridgeInjected(page);
+    resetPageInjection(page);
+    await ensureBridgeInjected(page);
+    // waitForFunction called 4 times: 2 for first inject, 2 for re-inject
+    expect(page.waitForFunction).toHaveBeenCalledTimes(4);
   });
 });

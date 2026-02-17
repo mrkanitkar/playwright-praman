@@ -6,7 +6,8 @@
  * with lazy initialization (W19) and full BridgeAdapter interface.
  *
  * init() calls: waitForFunction (UI5 avail) → evaluate (injection) →
- * waitForFunction (bridge ready) → evaluate (version detection).
+ * evaluate (object-map) → waitForFunction (bridge ready) →
+ * evaluate (version detection).
  */
 import { describe, expect, it, vi } from 'vitest';
 
@@ -17,12 +18,15 @@ import { ClassicUI5Adapter } from '#bridge/classic-adapter.js';
 /**
  * Helper: creates a mock page pre-configured for a successful init().
  * After init, evaluate defaults to `fallback` for subsequent calls.
+ *
+ * init() calls: injection script → object-map script → version detection
  */
 function mockPageForInit(fallback?: unknown): ReturnType<typeof createMockBridgePage> {
   return createMockBridgePage({
     evaluate: vi
       .fn()
       .mockResolvedValueOnce(undefined) // injection script
+      .mockResolvedValueOnce(undefined) // object-map script
       .mockResolvedValueOnce('1.120.0') // version detection
       .mockResolvedValue(fallback), // subsequent calls
     waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -37,6 +41,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce(true), // isReady → isBridgeReady
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -91,6 +96,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce(discoveryResult), // findControl
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -113,6 +119,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce(emptyResult), // findControl
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -134,6 +141,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce(results), // findControls
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -152,6 +160,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({
             success: true,
@@ -174,6 +183,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce(undefined), // setProperty
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -181,8 +191,8 @@ describe('ClassicUI5Adapter', () => {
       const adapter = new ClassicUI5Adapter();
       await adapter.init(page);
       await adapter.setControlProperty('btn1', 'text', 'New Text');
-      // 3 evaluate calls: injection + version + setProperty
-      expect(page.evaluate).toHaveBeenCalledTimes(3);
+      // 4 evaluate calls: injection + object-map + version + setProperty
+      expect(page.evaluate).toHaveBeenCalledTimes(4);
     });
   });
 
@@ -192,6 +202,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({
             success: true,
@@ -213,6 +224,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({
             success: true,
@@ -235,6 +247,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({
             success: true,
@@ -279,6 +292,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({ name: 'default' }), // getModel
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -294,6 +308,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({ name: 'odata' }), // getModel with name
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -311,6 +326,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({ path: '/Products(1)' }), // getBindingContext
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -326,6 +342,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({ path: '/Orders(2)' }), // getBindingContext with name
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -344,6 +361,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce({
             id: 'btn1',
@@ -365,6 +383,7 @@ describe('ClassicUI5Adapter', () => {
         evaluate: vi
           .fn()
           .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
           .mockResolvedValueOnce('1.120.0') // version
           .mockResolvedValueOnce(['getText', 'setText', 'getEnabled']),
         waitForFunction: vi.fn().mockResolvedValue(undefined),
@@ -373,6 +392,64 @@ describe('ClassicUI5Adapter', () => {
       await adapter.init(page);
       const methods = await adapter.getAvailableMethods('btn1');
       expect(methods).toContain('getText');
+    });
+  });
+
+  // ── getSelectorForControl ─────────────────────────────────────────
+  describe('getSelectorForControl', () => {
+    it('returns selector info for known control', async () => {
+      const selectorResult = {
+        selector: { controlType: 'sap.m.Button', properties: { text: 'Save' } },
+        strategy: 'properties',
+      };
+      const page = createMockBridgePage({
+        evaluate: vi
+          .fn()
+          .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
+          .mockResolvedValueOnce('1.120.0') // version
+          .mockResolvedValueOnce(selectorResult), // getSelectorForControl
+        waitForFunction: vi.fn().mockResolvedValue(undefined),
+      });
+      const adapter = new ClassicUI5Adapter();
+      await adapter.init(page);
+      const result = await adapter.getSelectorForControl('btn1');
+      expect(result).toEqual(selectorResult);
+    });
+
+    it('returns null for unknown control', async () => {
+      const page = createMockBridgePage({
+        evaluate: vi
+          .fn()
+          .mockResolvedValueOnce(undefined) // injection
+          .mockResolvedValueOnce(undefined) // object-map
+          .mockResolvedValueOnce('1.120.0') // version
+          .mockResolvedValueOnce(null), // getSelectorForControl
+        waitForFunction: vi.fn().mockResolvedValue(undefined),
+      });
+      const adapter = new ClassicUI5Adapter();
+      await adapter.init(page);
+      const result = await adapter.getSelectorForControl('nonexistent');
+      expect(result).toBeNull();
+    });
+  });
+
+  // ── resetInjectionState ───────────────────────────────────────────
+  describe('resetInjectionState', () => {
+    it('resets injection state without error', async () => {
+      const page = mockPageForInit();
+      const adapter = new ClassicUI5Adapter();
+      await adapter.init(page);
+      expect(() => {
+        adapter.resetInjectionState();
+      }).not.toThrow();
+    });
+
+    it('is a no-op when adapter not initialized', () => {
+      const adapter = new ClassicUI5Adapter();
+      expect(() => {
+        adapter.resetInjectionState();
+      }).not.toThrow();
     });
   });
 

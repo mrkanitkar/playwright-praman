@@ -48,6 +48,11 @@ describe('BridgeAdapter', () => {
   it('has AI introspection methods', () => {
     expectTypeOf<BridgeAdapter>().toHaveProperty('describeControl');
     expectTypeOf<BridgeAdapter>().toHaveProperty('getAvailableMethods');
+    expectTypeOf<BridgeAdapter>().toHaveProperty('getSelectorForControl');
+  });
+
+  it('has injection management methods', () => {
+    expectTypeOf<BridgeAdapter>().toHaveProperty('resetInjectionState');
   });
 
   // ── Mock adapter satisfies interface ─────────────────────────────────
@@ -89,6 +94,10 @@ describe('BridgeAdapter', () => {
       getAvailableMethods: vi
         .fn<(id: string) => Promise<readonly string[]>>()
         .mockResolvedValue([]),
+      getSelectorForControl: vi
+        .fn<(id: string) => Promise<{ selector: UI5Selector; strategy: string } | null>>()
+        .mockResolvedValue(null),
+      resetInjectionState: vi.fn<() => void>(),
     };
 
     expect(mockAdapter).toBeDefined();

@@ -128,4 +128,17 @@ export class HybridAdapter implements BridgeAdapter {
   async getAvailableMethods(controlId: string): Promise<readonly string[]> {
     return this.classic.getAvailableMethods(controlId);
   }
+
+  /** {@inheritDoc BridgeAdapter.getSelectorForControl} */
+  async getSelectorForControl(
+    controlId: string,
+  ): Promise<{ selector: UI5Selector; strategy: string } | null> {
+    return this.classic.getSelectorForControl(controlId);
+  }
+
+  /** {@inheritDoc BridgeAdapter.resetInjectionState} */
+  resetInjectionState(): void {
+    this.classic.resetInjectionState();
+    this.webComponent.resetInjectionState();
+  }
 }

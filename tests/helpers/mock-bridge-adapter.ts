@@ -71,6 +71,10 @@ export interface MockBridgeAdapter extends BridgeAdapter {
   // ── Introspection (AI-first) ─────────────────────────────────────────
   readonly describeControl: Mock<BridgeAdapter['describeControl']>;
   readonly getAvailableMethods: Mock<BridgeAdapter['getAvailableMethods']>;
+  readonly getSelectorForControl: Mock<BridgeAdapter['getSelectorForControl']>;
+
+  // ── Injection management ──────────────────────────────────────────────
+  readonly resetInjectionState: Mock<BridgeAdapter['resetInjectionState']>;
 }
 
 /**
@@ -139,6 +143,10 @@ export function createMockBridgeAdapter(overrides?: Partial<MockBridgeAdapter>):
     // ── Introspection (AI-first) ───────────────────────────────────────
     describeControl: vi.fn<BridgeAdapter['describeControl']>().mockResolvedValue({}),
     getAvailableMethods: vi.fn<BridgeAdapter['getAvailableMethods']>().mockResolvedValue([]),
+    getSelectorForControl: vi.fn<BridgeAdapter['getSelectorForControl']>().mockResolvedValue(null),
+
+    // ── Injection management ───────────────────────────────────────────
+    resetInjectionState: vi.fn<BridgeAdapter['resetInjectionState']>(),
 
     // Apply overrides last to allow customization
     ...overrides,

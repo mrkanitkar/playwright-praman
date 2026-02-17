@@ -126,4 +126,31 @@ export interface BridgeAdapter {
   describeControl(controlId: string): Promise<Record<string, unknown>>;
   /** List all available methods on a control for AI discovery. */
   getAvailableMethods(controlId: string): Promise<readonly string[]>;
+
+  /**
+   * Reverse-engineer a selector from a discovered control.
+   *
+   * @param controlId - The UI5 control ID to extract a selector for.
+   * @returns Selector info with strategy used, or null if control not found.
+   *
+   * @example
+   * ```typescript
+   * const info = await adapter.getSelectorForControl('__button0');
+   * // { selector: { controlType: 'sap.m.Button', properties: { text: 'Save' } }, strategy: 'properties' }
+   * ```
+   */
+  getSelectorForControl(
+    controlId: string,
+  ): Promise<{ selector: UI5Selector; strategy: string } | null>;
+
+  // ── Injection management ──────────────────────────────────────────
+
+  /**
+   * Resets bridge injection tracking for this adapter's page.
+   *
+   * @remarks
+   * Called after page navigation events to allow re-injection
+   * on the next UI5 operation.
+   */
+  resetInjectionState(): void;
 }

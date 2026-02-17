@@ -134,4 +134,16 @@ export class WebComponentAdapter implements BridgeAdapter {
   async getAvailableMethods(_controlId: string): Promise<readonly string[]> {
     return [];
   }
+
+  /** {@inheritDoc BridgeAdapter.getSelectorForControl} */
+  async getSelectorForControl(
+    _controlId: string,
+  ): Promise<{ selector: UI5Selector; strategy: string } | null> {
+    return null;
+  }
+
+  /** {@inheritDoc BridgeAdapter.resetInjectionState} */
+  resetInjectionState(): void {
+    // Stub — WebComponent adapter Phase 3+
+  }
 }
