@@ -83,6 +83,7 @@
     "test:unit:ui": "vitest --ui",
     "test:unit:coverage": "vitest run --coverage",
     "test:integration": "playwright test",
+    "test:integration:demo": "playwright test --config tests/integration/playwright.integration.config.ts",
     "test:integration:ui": "playwright test --ui",
     "ci": "npm run validate:no-js && npm run lint && npm run typecheck && npm run test:unit && npm run build && npm run lint:ui5-deprecated",
     "ci:full": "npm run ci && npm run test:integration && npm run spellcheck && npm run deadcode && npm run mdlint",

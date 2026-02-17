@@ -159,6 +159,13 @@ export function createBridgeInjectionScript(): string {
         }
       };
 
+      window.${ns} = bridge;
+
+      function markReady() {
+        window.${readyFlag} = true;
+        bridge.ready = true;
+      }
+
       try {
         if (typeof sap !== 'undefined' && sap.ui && sap.ui.require) {
           sap.ui.require([
@@ -169,15 +176,18 @@ export function createBridgeInjectionScript(): string {
             bridge.RecordReplay = RecordReplay || null;
             bridge.Element = Element || null;
             bridge.Log = Log || null;
+            markReady();
+          }, function() {
+            // Module loading failed — mark ready without RecordReplay
+            markReady();
           });
+        } else {
+          markReady();
         }
       } catch (e) {
-        // Module loading is best-effort
+        // Module loading failed — mark ready without RecordReplay
+        markReady();
       }
-
-      window.${ns} = bridge;
-      window.${readyFlag} = true;
-      bridge.ready = true;
     } catch (e) {
       // Fatal injection error — bridge remains uninitialized
     }
