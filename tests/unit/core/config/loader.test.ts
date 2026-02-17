@@ -21,6 +21,7 @@ describe('loadConfig', () => {
     expect(config.ui5WaitTimeout).toBe(30_000);
     expect(config.controlDiscoveryTimeout).toBe(10_000);
     expect(config.interactionStrategy).toBe('ui5-native');
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
     expect(config.skipStabilityWait).toBe(false);
     expect(config.preferVisibleControls).toBe(true);
     expect(config.ignoreAutoWaitUrls).toEqual([]);
@@ -84,6 +85,44 @@ describe('loadConfig', () => {
     expect(config.logLevel).toBe('error');
   });
 
+  // ── discoveryStrategies env var ─────────────────────────────────────
+  it('parses PRAMAN_DISCOVERY_STRATEGIES as comma-separated array', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', 'direct-id,recordreplay');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  it('parses single discovery strategy value as single-element array', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', 'recordreplay');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['recordreplay']);
+  });
+
+  it('trims whitespace around discovery strategy values', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', ' direct-id , recordreplay ');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  it('filters empty segments from trailing comma', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', 'direct-id,,recordreplay');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  it('falls back to default on invalid strategy in env var', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', 'direct-id,invalid');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  it('falls back to default on empty env var', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', '');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  // ── Invalid / fallback ────────────────────────────────────────────
   it('ignores invalid env var values (falls back to default)', async () => {
     vi.stubEnv('PRAMAN_LOG_LEVEL', 'invalid-level');
     const config = await loadConfig();
