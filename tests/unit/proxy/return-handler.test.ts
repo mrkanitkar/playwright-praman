@@ -110,6 +110,42 @@ describe('return-handler', () => {
       expect(handleBridgeReturn(result)).toBeUndefined();
     });
 
+    it('aggregation defaults missing uuids to empty array', () => {
+      const result: MethodExecutionResult = {
+        success: true,
+        returnType: 'aggregation',
+        duration: 1,
+      };
+      const returned = handleBridgeReturn(result) as readonly unknown[];
+      expect(returned).toEqual([]);
+    });
+
+    it('aggregation defaults missing objectTypes', () => {
+      const result: MethodExecutionResult = {
+        success: true,
+        returnType: 'aggregation',
+        uuids: ['uuid-1'],
+        duration: 1,
+      };
+      const returned = handleBridgeReturn(result) as readonly {
+        uuid: string;
+        objectType: string;
+      }[];
+      expect(returned).toHaveLength(1);
+      expect(returned[0]?.objectType).toBe('unknown');
+    });
+
+    it('object defaults missing uuid and objectType', () => {
+      const result: MethodExecutionResult = {
+        success: true,
+        returnType: 'object',
+        duration: 1,
+      };
+      const returned = handleBridgeReturn(result) as { uuid: string; objectType: string };
+      expect(returned.uuid).toBe('');
+      expect(returned.objectType).toBe('unknown');
+    });
+
     it('throws for failed execution', () => {
       const result: MethodExecutionResult = {
         success: false,
@@ -118,6 +154,15 @@ describe('return-handler', () => {
         duration: 1,
       };
       expect(() => handleBridgeReturn(result)).toThrow('Control not found');
+    });
+
+    it('throws with default message for failed execution without error', () => {
+      const result: MethodExecutionResult = {
+        success: false,
+        returnType: 'result',
+        duration: 1,
+      };
+      expect(() => handleBridgeReturn(result)).toThrow('Bridge method execution failed');
     });
 
     it('returns numeric value for "result" returnType', () => {

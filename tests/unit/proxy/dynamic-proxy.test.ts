@@ -24,6 +24,9 @@ interface TestButtonProxy extends UI5ControlBase {
   setText(text: string): Promise<void>;
   getEnabled(): Promise<boolean>;
   firePress(): Promise<void>;
+  getModel(name?: string): Promise<unknown>;
+  getVisible(): Promise<boolean>;
+  isBound(name: string): Promise<boolean>;
 }
 
 function createTestState(overrides?: Partial<ControlProxyState>): ControlProxyState {
@@ -300,6 +303,45 @@ describe('dynamic-proxy', () => {
       const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
       const items = await proxy.getAggregation('items');
       expect(items).toHaveLength(1);
+    });
+
+    it('getBindingInfo returns undefined', async () => {
+      const proxy = createControlProxy(createTestState()) as TestButtonProxy;
+      expect(await proxy.getBindingInfo('text')).toBeUndefined();
+    });
+
+    it('getDomRef returns null', async () => {
+      const proxy = createControlProxy(createTestState()) as TestButtonProxy;
+      expect(await proxy.getDomRef()).toBeNull();
+    });
+
+    it('getVisible returns true', async () => {
+      const proxy = createControlProxy(createTestState()) as TestButtonProxy;
+      expect(await proxy.getVisible()).toBe(true);
+    });
+
+    it('isBound returns false', async () => {
+      const proxy = createControlProxy(createTestState()) as TestButtonProxy;
+      expect(await proxy.isBound('text')).toBe(false);
+    });
+
+    it('getModel forwards to adapter.getModel', async () => {
+      const adapter = createMockBridgeAdapter({
+        getModel: vi.fn().mockResolvedValue({ uuid: 'model-uuid' }),
+      });
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
+      expect(await proxy.getModel('named')).toEqual({ uuid: 'model-uuid' });
+      expect(adapter.getModel).toHaveBeenCalledWith('saveBtn', 'named');
+    });
+
+    it('preventExtensions returns true', () => {
+      const proxy = createControlProxy(createTestState());
+      expect(Object.preventExtensions(proxy)).toBe(proxy);
+    });
+
+    it('symbol access returns undefined for non-toPrimitive', () => {
+      const proxy = createControlProxy(createTestState());
+      expect(Reflect.get(proxy, Symbol.iterator)).toBeUndefined();
     });
   });
 });
