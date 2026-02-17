@@ -4,7 +4,13 @@
  * @remarks
  * Orchestrates control lookup using a configurable strategy chain.
  * The cache is always checked first (tier 0), then configured strategies
- * are tried in order. On success, the discovered proxy is cached.
+ * are tried in priority order. On success, the discovered proxy is cached.
+ *
+ * Strategy chain (W9/W20):
+ * - `cache` — always first (internal, tier 0)
+ * - `direct-id` — strips selector to id-only for fastest `getById()` path
+ * - `recordreplay` — passes full selector for `RecordReplay.findDOMElementByControlSelector()`
+ * - `registry` — Phase 3+ placeholder (skipped)
  *
  * @example
  * ```typescript
@@ -22,12 +28,37 @@
  */
 
 import type { ControlProxyCache } from './cache.js';
+import { getDiscoveryPriorities } from './discovery-factory.js';
 import { createControlProxy } from './dynamic-proxy.js';
 
 import type { BridgeAdapter } from '#bridge/adapter.js';
+import type { BridgeControlRef } from '#bridge/bridge-types.js';
 import type { DiscoveryStrategyName } from '#core/config/schema.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
+
+/**
+ * Attempts a single discovery strategy against the adapter.
+ *
+ * @returns The control ref, or `null` if the strategy did not find it.
+ */
+async function tryStrategy(
+  strategy: string,
+  selector: UI5Selector,
+  adapter: BridgeAdapter,
+): Promise<BridgeControlRef | null> {
+  if (strategy === 'direct-id') {
+    if (selector.id === undefined) return null;
+    return adapter.findControl({ id: selector.id });
+  }
+
+  if (strategy === 'recordreplay') {
+    return adapter.findControl(selector);
+  }
+
+  // 'registry' and unknown strategies are no-ops (Phase 3+)
+  return null;
+}
 
 /**
  * Discovers a control by selector using the configured strategy chain.
@@ -55,8 +86,7 @@ export async function discoverControl(
   selector: UI5Selector,
   adapter: BridgeAdapter,
   cache: ControlProxyCache,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- reserved for strategy-chain impl
-  _discoveryStrategies: readonly DiscoveryStrategyName[],
+  discoveryStrategies: readonly DiscoveryStrategyName[],
 ): Promise<UI5ControlBase | null> {
   // Tier 0: Cache lookup
   const cached = cache.get(selector);
@@ -64,8 +94,16 @@ export async function discoverControl(
     return cached;
   }
 
-  // Tier 1+: Bridge adapter lookup
-  const controlRef = await adapter.findControl(selector);
+  // Build priority chain (W9/W20) and try each strategy in order
+  const priorities = getDiscoveryPriorities(selector, discoveryStrategies);
+  let controlRef: BridgeControlRef | null = null;
+
+  for (const strategy of priorities) {
+    if (strategy === 'cache') continue; // Already handled above
+    controlRef = await tryStrategy(strategy, selector, adapter);
+    if (controlRef !== null) break;
+  }
+
   if (controlRef === null) {
     return null;
   }

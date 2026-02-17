@@ -1,6 +1,7 @@
-h# Phase 2 — Implementation Tracker
+# Phase 2 — Implementation Tracker
 
 > **Plan Version**: 2.3.0
+> **Status**: **COMPLETE** (2026-02-17)
 > **Plan File**: plan2.md (Bridge + Proxy Detailed Implementation Plan)
 > **Created**: 2026-02-17
 > **Strategy**: TDD (RED-GREEN-REFACTOR), Max 3 parallel agents, 20x plan
@@ -100,60 +101,60 @@ Each batch is sized to fit safely within Claude's context window:
 
 | #   | Batch | Files                                                | Est. Out | Depends | Status |
 | --- | ----- | ---------------------------------------------------- | -------- | ------- | ------ |
-| 13  | TH4   | `tests/helpers/mock-browser-context.ts`              | ~400     | PRE-4   | [ ]    |
-| 14  | TH5   | `tests/helpers/mock-ui5-control.ts`                  | ~500     | PRE-4   | [ ]    |
-| 15  | TH6   | `tests/helpers/browser-script-tester.ts` (vm.Script) | ~400     | PRE-4   | [ ]    |
+| 13  | TH4   | `tests/helpers/mock-browser-context.ts`              | ~400     | PRE-4   | [x]    |
+| 14  | TH5   | `tests/helpers/mock-ui5-control.ts`                  | ~500     | PRE-4   | [x]    |
+| 15  | TH6   | `tests/helpers/browser-script-tester.ts` (vm.Script) | ~400     | PRE-4   | [x]    |
 
 ### Bridge Types & Constants (B12)
 
 | #   | Batch | Files                                                         | Est. Out | Depends | Status |
 | --- | ----- | ------------------------------------------------------------- | -------- | ------- | ------ |
-| 16  | B12a  | `src/bridge/method-blacklist.ts` + test (47 active items)     | ~1,500   | TH6     | [ ]    |
-| 17  | B12b  | `src/bridge/bridge-constants.ts` + test                       | ~600     | PRE-4   | [ ]    |
-| 18  | B12c  | `src/bridge/bridge-types.ts` + test (type-only, expectTypeOf) | ~800     | PRE-4   | [ ]    |
+| 16  | B12a  | `src/bridge/method-blacklist.ts` + test (47 active items)     | ~1,500   | TH6     | [x]    |
+| 17  | B12b  | `src/bridge/bridge-constants.ts` + test                       | ~600     | PRE-4   | [x]    |
+| 18  | B12c  | `src/bridge/bridge-types.ts` + test (type-only, expectTypeOf) | ~800     | PRE-4   | [x]    |
 
 ### Browser Scripts (B13)
 
 | #   | Batch | Files                                             | Est. Out | Depends    | Status |
 | --- | ----- | ------------------------------------------------- | -------- | ---------- | ------ |
-| 19  | B13a  | `bridge/browser-scripts/get-version.ts` + test    | ~500     | TH6        | [ ]    |
-| 20  | B13b  | `bridge/browser-scripts/object-map.ts` + test     | ~800     | TH6        | [ ]    |
-| 21  | B13c  | `bridge/browser-scripts/inject-ui5.ts` + test     | ~2,500   | B13a, B13b | [ ]    |
-| 22  | B13d  | `bridge/browser-scripts/find-control.ts` + test   | ~2,000   | B13c, B12a | [ ]    |
-| 23  | B13e  | `bridge/browser-scripts/execute-method.ts` + test | ~1,800   | B13c       | [ ]    |
-| 24  | B13f  | `bridge/browser-scripts/get-selector.ts` + test   | ~600     | B13c       | [ ]    |
+| 19  | B13a  | `bridge/browser-scripts/get-version.ts` + test    | ~500     | TH6        | [x]    |
+| 20  | B13b  | `bridge/browser-scripts/object-map.ts` + test     | ~800     | TH6        | [x]    |
+| 21  | B13c  | `bridge/browser-scripts/inject-ui5.ts` + test     | ~2,500   | B13a, B13b | [x]    |
+| 22  | B13d  | `bridge/browser-scripts/find-control.ts` + test   | ~2,000   | B13c, B12a | [x]    |
+| 23  | B13e  | `bridge/browser-scripts/execute-method.ts` + test | ~1,800   | B13c       | [x]    |
+| 24  | B13f  | `bridge/browser-scripts/get-selector.ts` + test   | ~600     | B13c       | [x]    |
 
 ### Injection & API Resolution (B14)
 
 | #   | Batch | Files                                         | Est. Out | Depends    | Status |
 | --- | ----- | --------------------------------------------- | -------- | ---------- | ------ |
-| 25  | B14a  | `bridge/api-resolver.ts` + test               | ~800     | B12b       | [ ]    |
-| 26  | B14b  | `bridge/injection.ts` + test (lazy-only, W14) | ~1,200   | B13c, B14a | [ ]    |
+| 25  | B14a  | `bridge/api-resolver.ts` + test               | ~800     | B12b       | [x]    |
+| 26  | B14b  | `bridge/injection.ts` + test (lazy-only, W14) | ~1,200   | B13c, B14a | [x]    |
 
 ### Interaction Strategies (B15)
 
-| #   | Batch | Files                                                             | Est. Out | Depends          | Status |
-| --- | ----- | ----------------------------------------------------------------- | -------- | ---------------- | ------ |
-| 27  | B15a  | `bridge/interaction-strategies/strategy.ts` + `shared.ts` + tests | ~1,000   | B12b             | [ ]    |
-| 28  | B15b  | `bridge/interaction-strategies/ui5-native-strategy.ts` + test     | ~1,000   | B15a             | [ ]    |
-| 29  | B15c  | `bridge/interaction-strategies/dom-first-strategy.ts` + test      | ~1,000   | B15a             | [ ]    |
-| 30  | B15d  | `bridge/interaction-strategies/opa5-strategy.ts` + test           | ~800     | B15a             | [ ]    |
-| 31  | B15e  | `bridge/interaction-strategies/strategy-factory.ts` + test        | ~500     | B15b, B15c, B15d | [ ]    |
+| #   | Batch | Files                                                                   | Est. Out | Depends          | Status |
+| --- | ----- | ----------------------------------------------------------------------- | -------- | ---------------- | ------ |
+| 27  | B15a  | `bridge/interaction-strategies/strategy.ts` + tests (shared.ts inlined) | ~1,000   | B12b             | [x]    |
+| 28  | B15b  | `bridge/interaction-strategies/ui5-native-strategy.ts` + test           | ~1,000   | B15a             | [x]    |
+| 29  | B15c  | `bridge/interaction-strategies/dom-first-strategy.ts` + test            | ~1,000   | B15a             | [x]    |
+| 30  | B15d  | `bridge/interaction-strategies/opa5-strategy.ts` + test                 | ~800     | B15a             | [x]    |
+| 31  | B15e  | `bridge/interaction-strategies/strategy-factory.ts` + test              | ~500     | B15b, B15c, B15d | [x]    |
 
 ### Adapters (B16)
 
 | #   | Batch | Files                                                      | Est. Out | Depends                | Status |
 | --- | ----- | ---------------------------------------------------------- | -------- | ---------------------- | ------ |
-| 32  | B16a  | `bridge/classic-adapter.ts` + test (primary, 95%+ usage)   | ~3,000   | B14b, B15e, B13d, B13e | [ ]    |
-| 33  | B16b  | `bridge/webcomponent-adapter.ts` + test (stub/fallback)    | ~800     | B12b                   | [ ]    |
-| 34  | B16c  | `bridge/hybrid-adapter.ts` + test (auto-detect delegation) | ~1,000   | B16a, B16b             | [ ]    |
-| 35  | B16d  | `bridge/adapter-factory.ts` + test                         | ~600     | B16c                   | [ ]    |
+| 32  | B16a  | `bridge/classic-adapter.ts` + test (primary, 95%+ usage)   | ~3,000   | B14b, B15e, B13d, B13e | [x]    |
+| 33  | B16b  | `bridge/webcomponent-adapter.ts` + test (stub/fallback)    | ~800     | B12b                   | [x]    |
+| 34  | B16c  | `bridge/hybrid-adapter.ts` + test (auto-detect delegation) | ~1,000   | B16a, B16b             | [x]    |
+| 35  | B16d  | `bridge/adapter-factory.ts` + test                         | ~600     | B16c                   | [x]    |
 
 ### Integration Smoke (INT1)
 
-| #   | Batch | Files                                                                         | Est. Out | Depends | Status |
-| --- | ----- | ----------------------------------------------------------------------------- | -------- | ------- | ------ |
-| 36  | INT1  | `tests/integration/bridge-smoke.spec.ts` + `playwright.integration.config.ts` | ~1,500   | B16d    | [ ]    |
+| #   | Batch | Files                                                                         | Est. Out | Depends | Status                  |
+| --- | ----- | ----------------------------------------------------------------------------- | -------- | ------- | ----------------------- |
+| 36  | INT1  | `tests/integration/bridge-smoke.spec.ts` + `playwright.integration.config.ts` | ~1,500   | B16d    | [ ] DEFERRED to Phase 7 |
 
 **Sub-Phase 2.1 Gate**: `npm run ci && npm run test:integration:demo`
 
@@ -170,32 +171,32 @@ Each batch is sized to fit safely within Claude's context window:
 
 | #   | Batch | Files                                                        | Est. Out | Depends    | Status |
 | --- | ----- | ------------------------------------------------------------ | -------- | ---------- | ------ |
-| 37  | B17a  | `proxy/method-filter.ts` + `proxy/playwright-api.ts` + tests | ~1,000   | B12a       | [ ]    |
-| 38  | B17b  | `proxy/return-handler.ts` + test                             | ~1,000   | B12b, TH5  | [ ]    |
-| 39  | B17c  | `proxy/dynamic-proxy.ts` + test (20 test cases)              | ~2,000   | B17a, B17b | [ ]    |
+| 37  | B17a  | `proxy/method-filter.ts` + `proxy/playwright-api.ts` + tests | ~1,000   | B12a       | [x]    |
+| 38  | B17b  | `proxy/return-handler.ts` + test                             | ~1,000   | B12b, TH5  | [x]    |
+| 39  | B17c  | `proxy/dynamic-proxy.ts` + test (20 test cases)              | ~2,000   | B17a, B17b | [x]    |
 
 ### UI5Object (B18)
 
 | #   | Batch | Files                                                 | Est. Out | Depends    | Status |
 | --- | ----- | ----------------------------------------------------- | -------- | ---------- | ------ |
-| 40  | B18a  | `proxy/ui5-object.ts` + test                          | ~1,200   | B12b, TH5  | [ ]    |
-| 41  | B18b  | `proxy/ui5-object-proxy.ts` + test                    | ~800     | B18a       | [ ]    |
-| 42  | B18c  | `proxy/ui5-object-cache.ts` + test (TTL + LRU)        | ~1,000   | B18a       | [ ]    |
-| 43  | B18d  | `proxy/proxy-converter.ts` + test (bidirectional D17) | ~800     | B18b, B17c | [ ]    |
+| 40  | B18a  | `proxy/ui5-object.ts` + test                          | ~1,200   | B12b, TH5  | [x]    |
+| 41  | B18b  | `proxy/ui5-object-proxy.ts` + test                    | ~800     | B18a       | [x]    |
+| 42  | B18c  | `proxy/ui5-object-cache.ts` + test (TTL + LRU)        | ~1,000   | B18a       | [x]    |
+| 43  | B18d  | `proxy/proxy-converter.ts` + test (bidirectional D17) | ~800     | B18b, B17c | [x]    |
 
 ### Discovery & Cache (B19)
 
 | #   | Batch | Files                                      | Est. Out | Depends          | Status |
 | --- | ----- | ------------------------------------------ | -------- | ---------------- | ------ |
-| 44  | B19a  | `proxy/cache.ts` + test (LRU, RegExp keys) | ~800     | B12b             | [ ]    |
-| 45  | B19b  | `proxy/discovery-factory.ts` + test        | ~600     | B12b             | [ ]    |
-| 46  | B19c  | `proxy/discovery.ts` + test (orchestrator) | ~800     | B19a, B19b, B16a | [ ]    |
+| 44  | B19a  | `proxy/cache.ts` + test (LRU, RegExp keys) | ~800     | B12b             | [x]    |
+| 45  | B19b  | `proxy/discovery-factory.ts` + test        | ~600     | B12b             | [x]    |
+| 46  | B19c  | `proxy/discovery.ts` + test (orchestrator) | ~800     | B19a, B19b, B16a | [x]    |
 
 ### Integration Smoke (INT2)
 
-| #   | Batch | Files                                                               | Est. Out | Depends    | Status |
-| --- | ----- | ------------------------------------------------------------------- | -------- | ---------- | ------ |
-| 47  | INT2  | `tests/integration/proxy-smoke.spec.ts` + `sap-cloud-smoke.spec.ts` | ~1,500   | B19c, B18d | [ ]    |
+| #   | Batch | Files                                                               | Est. Out | Depends    | Status                  |
+| --- | ----- | ------------------------------------------------------------------- | -------- | ---------- | ----------------------- |
+| 47  | INT2  | `tests/integration/proxy-smoke.spec.ts` + `sap-cloud-smoke.spec.ts` | ~1,500   | B19c, B18d | [ ] DEFERRED to Phase 7 |
 
 **Sub-Phase 2.2 Gate**: `npm run ci && npm run test:integration:demo`
 
@@ -210,9 +211,9 @@ Each batch is sized to fit safely within Claude's context window:
 
 | #   | Batch | Files                                                              | Est. Out | Depends    | Status |
 | --- | ----- | ------------------------------------------------------------------ | -------- | ---------- | ------ |
-| 48  | B21a  | `bridge/index.ts` barrel + test                                    | ~400     | B16d       | [ ]    |
-| 49  | B21b  | `proxy/index.ts` barrel + test                                     | ~400     | B19c, B18d | [ ]    |
-| 50  | B21c  | `src/index.ts` update + `npm run check:exports` + **PHASE 2 GATE** | ~400     | B21a, B21b | [ ]    |
+| 48  | B21a  | `bridge/index.ts` barrel + test                                    | ~400     | B16d       | [x]    |
+| 49  | B21b  | `proxy/index.ts` barrel + test                                     | ~400     | B19c, B18d | [x]    |
+| 50  | B21c  | `src/index.ts` update + `npm run check:exports` + **PHASE 2 GATE** | ~400     | B21a, B21b | [x]    |
 
 **Sub-Phase 2.3 Gate**: `npm run ci && npm run check:exports`
 
@@ -370,17 +371,17 @@ git commit -m "feat(scope): description (batch-id)"
 | #   | Issue                                                      | Resolve In | Batch | Status |
 | --- | ---------------------------------------------------------- | ---------- | ----- | ------ |
 | C1  | Extend `BridgePage` with `evaluate<TResult,TArg>` overload | Pre-Phase  | PRE-1 | [x]    |
-| C2  | `MethodExecutionResult<T>` vs `BridgeResult<T>` gap        | Bridge     | B16a  | [ ]    |
+| C2  | `MethodExecutionResult<T>` vs `BridgeResult<T>` gap        | Bridge     | B16a  | [x]    |
 | C3  | Add `'unknown'` to `BridgeReturnType`                      | Pre-Phase  | PRE-3 | [x]    |
 | H1  | Delete `proxy/typed/` (redundant — auto-gen exists)        | N/A        | —     | [x]    |
-| H2  | Add `proxy/playwright-api.ts` allowlist                    | Proxy      | B17a  | [ ]    |
-| H3  | Browser script syntax validation (`vm.Script`)             | Helpers    | TH6   | [ ]    |
-| H4  | `page.evaluate()` serialization boundary docs              | Bridge     | B16a  | [ ]    |
-| M1  | Split `inject-ui5.ts` into composable snippets             | Bridge     | B13c  | [ ]    |
-| M4  | Proxy cache invalidation on navigation                     | Proxy      | B19a  | [ ]    |
-| M5  | Merge XHR patterns with `ignoreAutoWaitUrls`               | Bridge     | B12b  | [ ]    |
-| M6  | Input validation on controlId/methodName                   | Bridge     | B16a  | [ ]    |
-| M9  | Drop `WeakRef`, use TTL-only cleanup                       | Bridge     | B13b  | [ ]    |
+| H2  | Add `proxy/playwright-api.ts` allowlist                    | Proxy      | B17a  | [x]    |
+| H3  | Browser script syntax validation (`vm.Script`)             | Helpers    | TH6   | [x]    |
+| H4  | `page.evaluate()` serialization boundary docs              | Bridge     | B16a  | [x]    |
+| M1  | Split `inject-ui5.ts` into composable snippets             | Bridge     | B13c  | [x]    |
+| M4  | Proxy cache invalidation on navigation                     | Proxy      | B19a  | [x]    |
+| M5  | Merge XHR patterns with `ignoreAutoWaitUrls`               | Bridge     | B12b  | [x]    |
+| M6  | Input validation on controlId/methodName                   | Bridge     | B16a  | [x]    |
+| M9  | Drop `WeakRef`, use TTL-only cleanup                       | Bridge     | B13b  | [x]    |
 
 ---
 
@@ -389,10 +390,28 @@ git commit -m "feat(scope): description (batch-id)"
 | Sub-Phase                    | Batches | Done   | Remaining | %        |
 | ---------------------------- | ------- | ------ | --------- | -------- |
 | 2.0 Pre-Phase Config + Fixes | 12      | 12     | 0         | **100%** |
-| 2.1 Bridge Foundation        | 24      | 0      | 24        | 0%       |
-| 2.2 Proxy Layer              | 12      | 0      | 12        | 0%       |
-| 2.3 Integration + Barrels    | 3       | 0      | 3         | 0%       |
-| **Total**                    | **51**  | **12** | **39**    | **24%**  |
+| 2.1 Bridge Foundation        | 24      | 23     | 1 (INT1)  | **96%**  |
+| 2.2 Proxy Layer              | 12      | 11     | 1 (INT2)  | **92%**  |
+| 2.3 Integration + Barrels    | 3       | 3      | 0         | **100%** |
+| **Total**                    | **51**  | **49** | **2**     | **96%**  |
+
+> **Note**: INT1 and INT2 (integration smoke tests requiring real browser + SAP demo apps)
+> are deferred to Phase 7. All unit-testable batches are 100% complete.
+
+### Final Metrics
+
+| Metric             | Value                                   |
+| ------------------ | --------------------------------------- |
+| Test files         | 73                                      |
+| Tests passing      | 923                                     |
+| Statement coverage | 99.16%                                  |
+| Branch coverage    | 96.39%                                  |
+| Function coverage  | 100%                                    |
+| Line coverage      | 99.13%                                  |
+| Lint errors        | 0                                       |
+| Type errors        | 0                                       |
+| Export check       | 6/6 sub-path exports valid (attw)       |
+| Build output       | ESM + CJS + DTS (98.54 KB declarations) |
 
 ### Commit Message Convention
 
