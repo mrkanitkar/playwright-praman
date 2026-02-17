@@ -1,4 +1,9 @@
 /**
+ * Fixtures module — Playwright fixture composition for Praman.
+ *
  * @module fixtures
  */
-// Barrel file — re-exports for fixtures module
+
+// ── Core worker-scoped fixtures ─────────────────────────────────────
+export { coreTest } from './core-fixtures.js';
+export type { TestFixtures, WorkerFixtures } from './core-fixtures.js';
