@@ -28,3 +28,12 @@ export { Office365AuthStrategy } from './strategies/office365-strategy.js';
 export { APIAuthStrategy } from './strategies/api-strategy.js';
 
 export { CertificateAuthStrategy } from './strategies/certificate-strategy.js';
+
+export { MultiTenantAuthStrategy, buildTenantUrl } from './strategies/multi-tenant-strategy.js';
+
+export {
+  createAuthStrategy,
+  registerAuthStrategy,
+  clearCustomStrategies,
+  detectSystemType,
+} from './auth-factory.js';
