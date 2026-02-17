@@ -70,6 +70,28 @@ describe('ui5-object-proxy', () => {
     expect(proxy.toString()).toContain('UI5Object');
   });
 
+  it('returns undefined for symbol access', () => {
+    const page = createMockBridgePage();
+    const obj = UI5Object.create({ uuid: 'u1', type: 'Type', page });
+    const proxy = createUI5ObjectProxy(obj);
+    expect(Reflect.get(proxy as object, Symbol.iterator)).toBeUndefined();
+  });
+
+  it('preventExtensions returns true', () => {
+    const page = createMockBridgePage();
+    const obj = UI5Object.create({ uuid: 'u1', type: 'Type', page });
+    const proxy = createUI5ObjectProxy(obj);
+    expect(Object.preventExtensions(proxy as object)).toBe(proxy);
+  });
+
+  it('toJSON returns string representation', () => {
+    const page = createMockBridgePage();
+    const obj = UI5Object.create({ uuid: 'u1', type: 'sap.ui.model.json.JSONModel', page });
+    const proxy = createUI5ObjectProxy(obj) as TestModelProxy;
+    const toJsonFn = Reflect.get(proxy, 'toJSON') as () => string;
+    expect(toJsonFn()).toContain('UI5Object');
+  });
+
   it('is not extensible', () => {
     const page = createMockBridgePage();
     const obj = UI5Object.create({ uuid: 'u1', type: 'Type', page });

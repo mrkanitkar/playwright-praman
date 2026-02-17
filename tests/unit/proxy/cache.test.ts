@@ -83,6 +83,15 @@ describe('ControlProxyCache', () => {
     expect(cache.get({ id: 'c' })).toBeDefined();
   });
 
+  it('evicts down to maxSize when multiple entries exceed limit', () => {
+    const cache = new ControlProxyCache(1);
+    cache.set({ id: 'a' }, createMockUI5Control({ id: 'a' }));
+    cache.set({ id: 'b' }, createMockUI5Control({ id: 'b' }));
+    expect(cache.size).toBe(1);
+    expect(cache.get({ id: 'a' })).toBeUndefined();
+    expect(cache.get({ id: 'b' })).toBeDefined();
+  });
+
   it('overwrites existing entry with same selector', () => {
     const cache = new ControlProxyCache();
     const selectorA = { id: 'btn1' };
