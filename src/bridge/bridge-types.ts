@@ -58,6 +58,29 @@ export interface PramanBridge {
 }
 
 /**
+ * Minimal control reference returned by the bridge adapter.
+ *
+ * @remarks
+ * Contains only the `id` and `controlType` — the minimum data needed for
+ * subsequent bridge calls. The proxy layer enriches this into a full
+ * `UI5ControlBase` with methods.
+ *
+ * @example
+ * ```typescript
+ * const ref = await adapter.findControl({ id: 'btn1' });
+ * if (ref) {
+ *   const text = await adapter.getControlProperty(ref.id, 'text');
+ * }
+ * ```
+ */
+export interface BridgeControlRef {
+  /** UI5 control ID. */
+  readonly id: string;
+  /** Fully qualified control type (e.g., `'sap.m.Button'`). */
+  readonly controlType: string;
+}
+
+/**
  * Result of control discovery via the bridge.
  *
  * @remarks
