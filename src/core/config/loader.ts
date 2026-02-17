@@ -40,7 +40,7 @@ export interface LoadConfigOptions {
 interface EnvMapping {
   readonly envVar: string;
   readonly configKey: string;
-  readonly type: 'string' | 'number' | 'boolean';
+  readonly type: 'string' | 'number' | 'boolean' | 'string-array';
 }
 
 const ENV_MAPPINGS: readonly EnvMapping[] = [
@@ -52,6 +52,11 @@ const ENV_MAPPINGS: readonly EnvMapping[] = [
     type: 'number',
   },
   { envVar: 'PRAMAN_INTERACTION_STRATEGY', configKey: 'interactionStrategy', type: 'string' },
+  {
+    envVar: 'PRAMAN_DISCOVERY_STRATEGIES',
+    configKey: 'discoveryStrategies',
+    type: 'string-array',
+  },
   { envVar: 'PRAMAN_SKIP_STABILITY_WAIT', configKey: 'skipStabilityWait', type: 'boolean' },
   { envVar: 'PRAMAN_PREFER_VISIBLE', configKey: 'preferVisibleControls', type: 'boolean' },
 ];
@@ -82,6 +87,16 @@ function readEnvOverrides(): Record<string, unknown> {
       case 'string':
         envConfig[mapping.configKey] = value;
         break;
+      case 'string-array': {
+        const items = value
+          .split(',')
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0);
+        if (items.length > 0) {
+          envConfig[mapping.configKey] = items;
+        }
+        break;
+      }
     }
   }
 
