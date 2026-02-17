@@ -122,7 +122,9 @@ Phase 3.3 — WorkZone + Assembly (Week 3)
     ┌─────────▼──────────┐               ┌─────────▼──────────────┐
     │ fixtures/           │               │ fixtures/              │
     │ auth-fixtures       │               │ nav-fixtures           │
-    │ (sapAuth handler)   │               │ (btpWorkZone)          │
+    │ (sapAuth: status    │               │ (btpWorkZone)          │
+    │  checks only, NO    │               │                        │
+    │  auto-login/logout) │               │                        │
     └─────────┬──────────┘               └─────────┬──────────────┘
               │                                     │
               └──────────────┬──────────────────────┘
@@ -171,39 +173,49 @@ Worker starts
 
 ### 4.2 Fixture Initialization Flow (per test)
 
+> **Auth model (aligned with dhikraft)**: Authentication is handled ONCE by the
+> setup project (Section 4.3). Tests receive pre-authenticated `storageState`
+> via `playwright.config.ts`. The `sapAuth` fixture does NOT auto-login —
+> it only initializes the auth strategy for status checks (`isAuthenticated()`)
+> and explicit operations (manual login/logout). Session persists across all
+> tests in the suite. No per-test auth, no per-test cleanup.
+
 ```
-Test starts
+Test starts (with pre-authenticated storageState from setup project)
     │
     ▼
-┌─────────────────────────────────────────┐
-│ Test-scoped fixtures (fresh per test):  │
-│ 1. pramanLogger: createLogger('test',   │
-│    rootLogger) + testInfo binding        │
-│ 2. bridgeAdapter: createBridgeAdapter() │
-│    from adapter-factory (lazy inject)    │
-│ 3. ui5: createControlProxy(adapter)     │
-│ 4. stability: route.abort() for WalkMe, │
-│    page.on('framenavigated', stable)     │
-│ 5. sapAuth: (lazy) auth handler          │
-│ 6. ui5Navigation: (lazy) nav methods    │
-│ 7. btpWorkZone: (lazy) iframe switch    │
-└──────────────────┬──────────────────────┘
+┌──────────────────────────────────────────────┐
+│ Test-scoped fixtures (fresh per test):       │
+│ 1. pramanLogger: createLogger('test',        │
+│    rootLogger) + testInfo binding             │
+│ 2. bridgeAdapter: createBridgeAdapter()      │
+│    from adapter-factory (lazy inject)         │
+│ 3. ui5: createControlProxy(adapter)          │
+│ 4. stability: route.abort() for WalkMe,      │
+│    page.on('framenavigated', stable)          │
+│ 5. sapAuth: init strategy for status checks  │
+│    only — NO auto-login (session from         │
+│    storageState via setup project D28)        │
+│ 6. ui5Navigation: (lazy) nav methods         │
+│ 7. btpWorkZone: (lazy) iframe switch         │
+└──────────────────┬───────────────────────────┘
                    │
                    ▼
     Test executes with fixtures
                    │
                    ▼
-┌─────────────────────────────────────────┐
-│ Teardown (reverse order):               │
-│ 7. btpWorkZone cleanup (if activated)   │
-│ 6. ui5Navigation cleanup (noop)         │
-│ 5. sapAuth cleanup (noop, state in      │
-│    storageState)                         │
-│ 4. stability cleanup: remove listeners  │
-│ 3. ui5 proxy detach                     │
-│ 2. bridgeAdapter.destroy()              │
-│ 1. pramanLogger flush                   │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│ Teardown (reverse order):                    │
+│ 7. btpWorkZone cleanup (if activated)        │
+│ 6. ui5Navigation cleanup (noop)              │
+│ 5. sapAuth: NO logout — session managed      │
+│    globally by setup project. Auth session    │
+│    persists for next tests in suite.          │
+│ 4. stability cleanup: remove listeners       │
+│ 3. ui5 proxy detach                          │
+│ 2. bridgeAdapter.destroy()                   │
+│ 1. pramanLogger flush                        │
+└──────────────────────────────────────────────┘
 ```
 
 ### 4.3 Auth Setup Project Flow (D28)
@@ -1087,25 +1099,48 @@ export const authTest = base.extend<AuthFixtures & AuthFixtureOptions>({
     { option: true },
   ],
 
+  // AUTH MODEL (aligned with dhikraft):
+  // - Auth is handled ONCE by setup project (auth.setup.ts, Section 4.3)
+  // - Tests receive pre-authenticated storageState via playwright.config.ts
+  // - This fixture does NOT auto-login
+  // - It only initializes the strategy for status checks (isAuthenticated())
+  //   and explicit operations (manual login/logout if needed)
+  // - No auto-logout on cleanup — session managed globally by setup project
+  //   and persists across all tests in the suite
   sapAuth: async ({ page, sapAuthConfig, pramanConfig }, use) => {
     const logger = createLogger('auth');
+    const handler = new SAPAuthHandler(page, pramanConfig.logLevel);
+
+    // Initialize strategy for auth status checks only (no auto-login)
+    // This allows isAuthenticated() to work with setup project's storageState
     const strategy = AuthStrategyFactory.create(sapAuthConfig, logger);
-    const handler = new SAPAuthHandler({ strategy, logger });
+    handler.initializeStrategy(strategy);
+
+    // NOTE: No auto-authentication — relies on setup project (D28)
+    // Tests should use setup project to authenticate once before all tests
+    // This fixture is available for explicit auth operations only
+
     await use(handler);
+
+    // No auto-logout on cleanup — session managed by setup project
+    // Auth session persists for next tests in the suite
   },
 });
 ```
 
 **Tests** (`tests/unit/fixtures/auth-fixtures.test.ts`):
 
-| #   | Test Case                       | Input                          | Expected                     |
-| --- | ------------------------------- | ------------------------------ | ---------------------------- |
-| 1   | sapAuth fixture creates handler | Valid config                   | `SAPAuthHandler` instance    |
-| 2   | sapAuthConfig is fixture option | Custom config per project      | Config passed to handler     |
-| 3   | Strategy auto-detected from URL | Cloud URL in config            | `CloudSAMLStrategy` selected |
-| 4   | Strategy explicit override      | `strategy: 'onprem'` in config | `OnPremStrategy` selected    |
+| #   | Test Case                               | Input                          | Expected                                    |
+| --- | --------------------------------------- | ------------------------------ | ------------------------------------------- |
+| 1   | sapAuth fixture creates handler         | Valid config                   | `SAPAuthHandler` instance                   |
+| 2   | sapAuth does NOT auto-login             | Handler after fixture init     | `authenticated === false` (no auto-login)   |
+| 3   | sapAuth does NOT auto-logout on cleanup | Handler after fixture teardown | No `logout()` called                        |
+| 4   | sapAuth initializes strategy for checks | Valid config                   | `isAuthenticated()` works with storageState |
+| 5   | sapAuthConfig is fixture option         | Custom config per project      | Config passed to handler                    |
+| 6   | Strategy auto-detected from URL         | Cloud URL in config            | `CloudSAMLStrategy` selected                |
+| 7   | Strategy explicit override              | `strategy: 'onprem'` in config | `OnPremStrategy` selected                   |
 
-**Estimated LOC**: ~120 source, ~60 tests
+**Estimated LOC**: ~140 source, ~80 tests
 
 ---
 
