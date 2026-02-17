@@ -16,7 +16,10 @@
  * @module test-helpers
  */
 
+import type { Mock } from 'vitest';
 import { vi } from 'vitest';
+
+import type { BridgePage } from '#bridge/adapter.js';
 
 /** Minimal mock of Playwright's Page for unit testing. */
 export interface MockPage {
@@ -27,6 +30,20 @@ export interface MockPage {
   readonly waitForSelector: ReturnType<typeof vi.fn>;
   readonly waitForLoadState: ReturnType<typeof vi.fn>;
   readonly locator: ReturnType<typeof vi.fn>;
+}
+
+/**
+ * BridgePage-compatible mock with properly typed evaluate/waitForFunction.
+ *
+ * @remarks
+ * Extends `BridgePage` so it can be passed directly to bridge functions
+ * that accept `BridgePage` without type errors.
+ */
+export interface MockBridgePage extends BridgePage {
+  /** Mock evaluate — use `.mockResolvedValue()` to set return values. */
+  readonly evaluate: Mock<(...args: any[]) => any> & BridgePage['evaluate'];
+  /** Mock waitForFunction — use `.mockResolvedValue()` to set return values. */
+  readonly waitForFunction: Mock<(...args: any[]) => any> & BridgePage['waitForFunction'];
 }
 
 /**
@@ -53,4 +70,26 @@ export function createMockPage(overrides?: Partial<MockPage>): MockPage {
     locator: vi.fn(),
     ...overrides,
   };
+}
+
+/**
+ * Creates a BridgePage-compatible mock for bridge function tests.
+ *
+ * @param overrides - Optional method overrides for specific test scenarios.
+ * @returns MockBridgePage that satisfies the BridgePage interface.
+ *
+ * @example
+ * ```typescript
+ * const page = createMockBridgePage({
+ *   evaluate: vi.fn().mockResolvedValue(true),
+ * });
+ * await isBridgeReady(page); // works without type errors
+ * ```
+ */
+export function createMockBridgePage(overrides?: Partial<MockBridgePage>): MockBridgePage {
+  return {
+    evaluate: vi.fn(),
+    waitForFunction: vi.fn(),
+    ...overrides,
+  } as MockBridgePage;
 }
