@@ -332,7 +332,9 @@ btpWorkZone.switchToShell()
     → Shell bar, tile, navigation operations
 ```
 
-### 4.7 Phase 1 Module Wiring Map
+### 4.7 Module Wiring Map (Phase 1 + Phase 2)
+
+#### Phase 1 Modules → Phase 3 Consumption Points
 
 ```
 Phase 1 Module              → Phase 3 Consumption Point
@@ -364,6 +366,155 @@ selectors/selector-engine   → core-fixtures.ts (worker auto: register engine)
 
 matchers/*                  → core-fixtures.ts (worker auto: expect.extend)
 ```
+
+#### Phase 2 Modules → Phase 3 Consumption Points
+
+```
+Phase 2 Module                       → Phase 3 Consumption Point
+──────────────────────────────────────────────────────────────────
+bridge/adapter-factory               → core-fixtures.ts (test-scoped: createBridgeAdapter())
+  createBridgeAdapter()              → adapter mode from config (classic/hybrid/webcomponent)
+
+bridge/classic-adapter               → Primary adapter (95%+ SAP FLP use cases)
+  init(page)                         → core-fixtures.ts bridgeAdapter fixture setup
+  destroy()                          → core-fixtures.ts bridgeAdapter fixture teardown
+
+bridge/hybrid-adapter                → Mixed FLP pages (shell WCs + classic app)
+  init(page)/destroy()               → same pattern as classic-adapter
+
+bridge/webcomponent-adapter          → Pure WC apps (Phase 3+ stub, no-crash fallback)
+  init(page)/destroy()               → same pattern as classic-adapter
+
+bridge/injection                     → Called internally by every adapter method
+  ensureBridgeInjected(page)         → Lazy: first UI5 operation triggers injection
+  isBridgeReady(page)                → Fixture debug/diagnostics
+  injectBridge(page)                 → WorkZone dual-frame injection
+
+bridge/bridge-constants              → stability-fixtures.ts (XHR_IGNORE_PATTERNS)
+  BRIDGE_GLOBALS, BRIDGE_TIMEOUTS    → injection, adapter operations
+  XHR_IGNORE_PATTERNS                → merge with user config ignoreAutoWaitUrls
+
+bridge/interaction-strategies/       → core-fixtures.ts (strategy selection from config)
+  createInteractionStrategy()        → Default: 'ui5-native' (direct UI5 fire* calls)
+  UI5NativeStrategy (DEFAULT)        → press(), enterText(), select() via UI5 events
+  DomFirstStrategy                   → DOM events first, UI5 fallback
+  Opa5Strategy                       → RecordReplay API (when explicitly configured)
+
+bridge/method-blacklist              → proxy layer (block internal UI5 methods)
+  isBlacklisted(), METHOD_BLACKLIST  → checked before forwarding method calls
+
+bridge/browser-scripts/*             → Called internally by adapters via page.evaluate()
+  inject-ui5.ts                      → bridge injection script generator
+  find-control.ts                    → control discovery script
+  execute-method.ts                  → method execution script
+  get-version.ts                     → UI5 version detection
+  object-map.ts (R3)                 → UUID storage for non-control objects (Models, etc.)
+  get-selector.ts (R3)              → reverse selector generation from control
+
+proxy/dynamic-proxy                  → core-fixtures.ts (ui5 fixture wraps adapter)
+  createControlProxy()               → wraps bridge adapter for method forwarding
+
+proxy/discovery + discovery-factory  → core-fixtures.ts (control lookup chain)
+  discoverControl()                  → cache → direct-id → recordreplay → registry
+  getDiscoveryPriorities()           → strategy chain from selector shape + config
+
+proxy/cache                          → core-fixtures.ts (test-scoped: ControlProxyCache)
+  ControlProxyCache                  → LRU cache, init per test, clear() on teardown
+
+proxy/ui5-object + ui5-object-proxy  → return-handler routes non-control results
+  UI5Object, createUI5ObjectProxy()  → wraps UUID refs for Models, BindingContexts
+
+proxy/ui5-object-cache               → core-fixtures.ts (test-scoped: UI5ObjectCache)
+  UI5ObjectCache                     → TTL-based (5 min) + LRU, clear() on teardown
+
+proxy/return-handler                 → proxy layer (routes method results)
+  handleBridgeReturn()               → 7 result types: result, empty, element,
+                                       newElement, aggregation, object, none
+
+proxy/proxy-converter                → proxy layer (control vs non-control routing)
+  isControlResult()                  → discriminates result type
+  convertToControlProxy()            → creates control proxy from result
+  convertToObjectProxy()             → creates object proxy from result
+
+proxy/method-filter                  → proxy layer (delegates to bridge blacklist)
+proxy/playwright-api                 → proxy layer (Playwright method allowlist, 50+ methods)
+```
+
+#### Bridge Injection Lifecycle (aligned with dhikraft)
+
+> **CRITICAL**: Bridge injection is NOT one-time. After page navigation
+> (e.g., FLP tile click, hash change, app-to-app navigation), the bridge
+> may be invalidated. dhikraft handles this via:
+>
+> 1. `page.on('framenavigated', listener)` — clears control cache on
+>    main frame navigation
+> 2. Next `control()` / `ui5` method call → `ensureBridgeInjected()` →
+>    re-checks `isBridgeReady()` → re-injects if bridge is gone
+> 3. `ensureBridgeInjected()` must be idempotent (safe to call repeatedly)
+>
+> **Praman current state**: `injection.ts` uses a `WeakSet<BridgePage>` to
+> track injected pages. This prevents re-injection after navigation because
+> the page reference is the same object. **Phase 3 must add**:
+>
+> - `framenavigated` listener in `bridgeAdapter` fixture (or adapter init)
+> - On main-frame navigation: remove page from `injectedPages` WeakSet
+>   (or check `isBridgeReady()` instead of WeakSet membership)
+> - Next adapter method call triggers re-injection automatically
+>
+> This ensures bridge survives page navigations within the same test.
+
+```
+Page loads → about:blank (no bridge)
+    │
+    ▼
+test navigates → page.goto('https://sap-app.example.com')
+    │
+    ▼
+First ui5 method call (e.g., ui5.findControl())
+    │
+    ▼
+adapter.findControl() → ensureBridgeInjected(page)
+    │
+    ├─ WeakSet has page? NO → injectBridge(page)
+    │   ├─ waitForFunction('sap.ui.require')  ← wait for UI5
+    │   ├─ page.evaluate(bridgeScript)         ← inject bridge
+    │   ├─ waitForFunction('__praman_ready')   ← wait for ready
+    │   └─ WeakSet.add(page)
+    │
+    ▼
+Bridge ready → method executes → result returned
+    │
+    ▼
+User clicks FLP tile → framenavigated event fires
+    │
+    ▼
+Navigation listener → WeakSet.delete(page) + proxyCache.clear()
+    │
+    ▼
+Next ui5 method call → ensureBridgeInjected(page)
+    │
+    ├─ WeakSet has page? NO → re-inject bridge
+    │   (same flow as above)
+    │
+    ▼
+Bridge re-injected → test continues with fresh bridge
+```
+
+#### Default Interaction Strategy (aligned with dhikraft)
+
+> **Default**: `ui5-native` (direct UI5 fire\* calls — press, enterText, select).
+> This matches dhikraft's `playwright-native` strategy (renamed in Praman).
+> **RecordReplay is NOT the default** — it is loaded into the bridge but only
+> used when explicitly configured via `interactionStrategy: 'opa5'`.
+>
+> Praman's `strategy-factory.ts` already has this correct:
+> `default → UI5NativeStrategy`.
+>
+> | Strategy     | Default? | Usage                              | Speed             |
+> | ------------ | -------- | ---------------------------------- | ----------------- |
+> | `ui5-native` | **YES**  | Direct UI5 fire\* calls via bridge | ~50ms/action      |
+> | `dom-first`  | No       | DOM events first, UI5 fallback     | ~100-200ms/action |
+> | `opa5`       | No       | SAP's OPA5 RecordReplay API        | Enterprise-grade  |
 
 ---
 
@@ -478,11 +629,61 @@ async getSelectorForControl(
 
 **Estimated LOC change**: +5 (adapter.ts interface), +15 (classic-adapter), +5 (webcomponent stub), +5 (hybrid delegate), +40 (tests)
 
-#### 5.2.3 Update bridge barrel
+#### 5.2.3 Add `resetInjectionState()` to BridgeAdapter interface
+
+**File**: `src/bridge/adapter.ts` (MODIFY — add method to interface)
+
+```typescript
+/**
+ * Resets bridge injection tracking for this adapter's page.
+ * Called after page navigation events (framenavigated on main frame)
+ * to allow re-injection on next UI5 operation.
+ *
+ * @remarks
+ * dhikraft pattern: After FLP tile click, hash change, or app-to-app
+ * navigation, the bridge may be invalidated. Calling this method removes
+ * the page from the injection tracking WeakSet so ensureBridgeInjected()
+ * will re-inject on the next adapter method call.
+ */
+resetInjectionState(): void;
+```
+
+**File**: `src/bridge/classic-adapter.ts` (MODIFY — implement)
+
+```typescript
+resetInjectionState(): void {
+  // Remove page from injectedPages WeakSet in injection.ts
+  resetPageInjection(this.page);
+}
+```
+
+**File**: `src/bridge/injection.ts` (MODIFY — add reset function)
+
+```typescript
+/**
+ * Resets injection tracking for a page, allowing re-injection.
+ * Called after page navigation invalidates the bridge.
+ */
+export function resetPageInjection(page: BridgePage): void {
+  injectedPages.delete(page);
+}
+```
+
+**Tests**: Add test cases for reset + re-injection.
+
+| #   | Test Case                              | Input                            | Expected                            |
+| --- | -------------------------------------- | -------------------------------- | ----------------------------------- |
+| 1   | resetInjectionState clears WeakSet     | Injected page → reset            | `ensureBridgeInjected` re-injects   |
+| 2   | Re-injection after navigation succeeds | Navigate → reset → next UI5 call | Bridge re-injected, method succeeds |
+| 3   | Reset on non-injected page is no-op    | Page never injected → reset      | No error thrown                     |
+
+**Estimated LOC change**: +3 (adapter.ts interface), +5 (classic-adapter), +5 (injection.ts), +3 (webcomponent stub), +3 (hybrid delegate), +30 (tests)
+
+#### 5.2.4 Update bridge barrel
 
 **File**: `src/bridge/index.ts` (MODIFY — add exports for get-selector types if needed)
 
-No additional barrel exports needed — `getSelectorForControl` is a method on the existing `BridgeAdapter` interface.
+**Bridge barrel update needed**: `src/bridge/index.ts` — add `resetPageInjection` export from `injection.ts`. The `getSelectorForControl` and `resetInjectionState` methods are on the `BridgeAdapter` interface (already exported as type).
 
 ---
 
@@ -513,7 +714,7 @@ This is the foundation fixture file. It provides:
 
 **Design Decisions**:
 
-1. **Lazy bridge injection** (W6 from plan2.md): Bridge is NOT injected during fixture setup. Page starts at `about:blank`. Bridge injects on first `ui5` method call (after navigation). This prevents 30s timeout on fixture init.
+1. **Lazy bridge injection with re-injection on navigation** (W6 from plan2.md, aligned with dhikraft): Bridge is NOT injected during fixture setup. Page starts at `about:blank`. Bridge injects on first `ui5` method call (after navigation). After page navigation events (`framenavigated` on main frame), injection state is reset so the next `ui5` call triggers re-injection. This prevents 30s timeout on fixture init AND ensures bridge survives FLP tile clicks, hash changes, and app-to-app navigation. Default interaction strategy: `ui5-native` (direct UI5 fire\* calls, NOT RecordReplay).
 
 2. **Config loading** (D7): `loadConfig()` reads `praman.config.ts` → env overrides → Zod validation → freeze. Worker-scoped means loaded once, shared across all tests in worker.
 
@@ -565,19 +766,22 @@ import type { BridgeAdapter } from '#bridge/index.js';
 
 **Unit Tests** (`tests/unit/fixtures/core-fixtures.test.ts`):
 
-| #   | Test Case                             | Input                           | Expected                                         |
-| --- | ------------------------------------- | ------------------------------- | ------------------------------------------------ |
-| 1   | Config loaded once per worker         | Two tests in same worker        | `loadConfig()` called once                       |
-| 2   | Root logger created with config       | Config with `logLevel: 'debug'` | pino logger at debug level                       |
-| 3   | Child logger has test context         | Test named 'my test'            | Logger has `{ module: 'test', test: 'my test' }` |
-| 4   | Tracer initialized (NoOp)             | Default config                  | `TracerWrapper` with no-op spans                 |
-| 5   | Selector engine registered once       | Worker with 3 tests             | `selectors.register()` called once               |
-| 6   | Matchers registered via expect.extend | Worker init                     | `expect.extend()` called with 8 matchers         |
-| 7   | Playwright version checked            | Version >= 1.50.0               | No error thrown                                  |
-| 8   | Playwright version too old            | Version < 1.50.0                | `PramanError` with `ERR_CONFIG_INVALID`          |
-| 9   | Bridge adapter lazy-initialized       | Access `ui5` without navigation | Adapter not injected until first call            |
-| 10  | Bridge adapter destroyed on teardown  | Test completes                  | `adapter.destroy()` called                       |
-| 11  | Proxy wraps adapter                   | Access `ui5.getVisible()`       | Delegates to `adapter.executeControlMethod()`    |
+| #   | Test Case                               | Input                           | Expected                                         |
+| --- | --------------------------------------- | ------------------------------- | ------------------------------------------------ |
+| 1   | Config loaded once per worker           | Two tests in same worker        | `loadConfig()` called once                       |
+| 2   | Root logger created with config         | Config with `logLevel: 'debug'` | pino logger at debug level                       |
+| 3   | Child logger has test context           | Test named 'my test'            | Logger has `{ module: 'test', test: 'my test' }` |
+| 4   | Tracer initialized (NoOp)               | Default config                  | `TracerWrapper` with no-op spans                 |
+| 5   | Selector engine registered once         | Worker with 3 tests             | `selectors.register()` called once               |
+| 6   | Matchers registered via expect.extend   | Worker init                     | `expect.extend()` called with 8 matchers         |
+| 7   | Playwright version checked              | Version >= 1.50.0               | No error thrown                                  |
+| 8   | Playwright version too old              | Version < 1.50.0                | `PramanError` with `ERR_CONFIG_INVALID`          |
+| 9   | Bridge adapter lazy-initialized         | Access `ui5` without navigation | Adapter not injected until first call            |
+| 10  | Bridge re-injects after navigation      | `framenavigated` fires on main  | Injection state reset, next call re-injects      |
+| 11  | Bridge ignores iframe navigation        | `framenavigated` on non-main    | Injection state NOT reset                        |
+| 12  | Navigation listener removed on teardown | Test completes                  | `page.off('framenavigated')` called              |
+| 13  | Bridge adapter destroyed on teardown    | Test completes                  | `adapter.destroy()` called                       |
+| 14  | Proxy wraps adapter                     | Access `ui5.getVisible()`       | Delegates to `adapter.executeControlMethod()`    |
 
 **Estimated LOC**: ~250 source, ~200 tests
 
@@ -810,15 +1014,34 @@ This is the R2 resolution — wiring 8 unconsumed Phase 1 modules into the fixtu
 
 ```typescript
 bridgeAdapter: async ({ pramanConfig, rootLogger, tracer, page }, use) => {
+  const logger = createLogger('bridge', rootLogger);
   const adapter = createBridgeAdapter({
     mode: pramanConfig.adapterMode ?? 'auto',
-    page,
   });
+
+  // Initialize adapter with page (bridge injection is lazy — triggers on first UI5 op)
+  await adapter.init(page);
+
+  // CRITICAL (dhikraft pattern): Listen for page navigation events.
+  // After navigation (FLP tile click, hash change, app-to-app),
+  // bridge may be invalidated. Clear injection tracking so next
+  // adapter method call triggers re-injection via ensureBridgeInjected().
+  const navigationListener = (frame: import('@playwright/test').Frame) => {
+    if (frame === page.mainFrame()) {
+      logger.debug('Main frame navigated — clearing bridge injection state');
+      adapter.resetInjectionState();  // removes page from WeakSet
+      // proxyCache.clear() handled separately in proxy fixture
+    }
+  };
+  page.on('framenavigated', navigationListener);
 
   // Wrap adapter methods with telemetry spans
   const tracedAdapter = wrapAdapterWithTelemetry(adapter, tracer);
 
   await use(tracedAdapter);
+
+  // Teardown: remove listener + destroy adapter
+  page.off('framenavigated', navigationListener);
   await adapter.destroy();
 },
 ```
@@ -1417,22 +1640,23 @@ export type { UI5NavigationAPI, BTPWorkZoneAPI } from './nav-fixtures.js';
 
 ### 8.2 Source Files (Modified)
 
-| #   | File Path                            | Change                                               | Sub-Phase |
-| --- | ------------------------------------ | ---------------------------------------------------- | --------- |
-| 20  | `src/proxy/dynamic-proxy.ts`         | Remove 4 G2 hardcoded stubs                          | 3.1       |
-| 21  | `src/bridge/adapter.ts`              | Add `getSelectorForControl()` to interface           | 3.1       |
-| 22  | `src/bridge/classic-adapter.ts`      | Import object-map + get-selector, implement method   | 3.1       |
-| 23  | `src/bridge/webcomponent-adapter.ts` | Add `getSelectorForControl()` stub                   | 3.1       |
-| 24  | `src/bridge/hybrid-adapter.ts`       | Delegate `getSelectorForControl()` to active adapter | 3.1       |
-| 25  | `src/auth/index.ts`                  | Update barrel with auth exports                      | 3.3       |
-| 26  | `src/modules/index.ts`               | Update barrel with navigation + workzone exports     | 3.3       |
-| 27  | `src/index.ts`                       | Add `test`, `expect` re-exports from fixtures        | 3.3       |
+| #   | File Path                            | Change                                                               | Sub-Phase |
+| --- | ------------------------------------ | -------------------------------------------------------------------- | --------- |
+| 20  | `src/proxy/dynamic-proxy.ts`         | Remove 4 G2 hardcoded stubs                                          | 3.1       |
+| 21  | `src/bridge/adapter.ts`              | Add `getSelectorForControl()` + `resetInjectionState()` to interface | 3.1       |
+| 22  | `src/bridge/classic-adapter.ts`      | Import object-map + get-selector, implement both new methods         | 3.1       |
+| 23  | `src/bridge/webcomponent-adapter.ts` | Add `getSelectorForControl()` + `resetInjectionState()` stubs        | 3.1       |
+| 24  | `src/bridge/hybrid-adapter.ts`       | Delegate both new methods to active adapter                          | 3.1       |
+| 24b | `src/bridge/injection.ts`            | Add `resetPageInjection()` export for navigation re-injection        | 3.1       |
+| 25  | `src/auth/index.ts`                  | Update barrel with auth exports                                      | 3.3       |
+| 26  | `src/modules/index.ts`               | Update barrel with navigation + workzone exports                     | 3.3       |
+| 27  | `src/index.ts`                       | Add `test`, `expect` re-exports from fixtures                        | 3.3       |
 
 ### 8.3 Test Files (New)
 
 | #   | Test File Path                                             | Tests Est. | Sub-Phase |
 | --- | ---------------------------------------------------------- | ---------- | --------- |
-| 1   | `tests/unit/fixtures/core-fixtures.test.ts`                | 11         | 3.1       |
+| 1   | `tests/unit/fixtures/core-fixtures.test.ts`                | 14         | 3.1       |
 | 2   | `tests/unit/auth/strategies/onprem-strategy.test.ts`       | 7          | 3.1       |
 | 3   | `tests/unit/auth/strategies/cloud-saml-strategy.test.ts`   | 7          | 3.1       |
 | 4   | `tests/unit/auth/strategies/office365-strategy.test.ts`    | 8          | 3.1       |
@@ -1443,7 +1667,7 @@ export type { UI5NavigationAPI, BTPWorkZoneAPI } from './nav-fixtures.js';
 | 9   | `tests/unit/auth/auth-checks.test.ts`                      | 5          | 3.1       |
 | 10  | `tests/unit/fixtures/stability-fixtures.test.ts`           | 6          | 3.2       |
 | 11  | `tests/unit/auth/auth-handler.test.ts`                     | 12         | 3.2       |
-| 12  | `tests/unit/fixtures/auth-fixtures.test.ts`                | 4          | 3.2       |
+| 12  | `tests/unit/fixtures/auth-fixtures.test.ts`                | 7          | 3.2       |
 | 13  | `tests/unit/modules/navigation.test.ts`                    | 10         | 3.2       |
 | 14  | `tests/unit/fixtures/nav-fixtures.test.ts`                 | 6          | 3.2       |
 | 15  | `tests/unit/modules/workzone.test.ts`                      | 8          | 3.3       |
@@ -1541,7 +1765,7 @@ For each module:
 
 **None** for external consumers. All new exports are additive. The main `src/index.ts` gains `test` and `expect` exports but existing exports remain unchanged.
 
-**Internal breaking change**: `BridgeAdapter` interface gains `getSelectorForControl()` method. All 3 adapter implementations must be updated (done in batch B1b).
+**Internal breaking change**: `BridgeAdapter` interface gains `getSelectorForControl()` and `resetInjectionState()` methods. All 3 adapter implementations must be updated (done in batch B1b). `injection.ts` gains `resetPageInjection()` export.
 
 ### 10.4 Dependency Impact
 
