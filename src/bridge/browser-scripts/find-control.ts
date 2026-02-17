@@ -81,11 +81,12 @@ const BUILD_RESULT_SNIPPET = `
 export function createFindControlScript(): string {
   const ns = BRIDGE_GLOBALS.NAMESPACE;
 
-  return `(function() {
+  return `(async function() {
+    var empty = { id: '', controlType: 'unknown', methods: [], domId: null, visible: false };
     try {
       var bridge = window.${ns};
       if (!bridge) {
-        return { id: '', controlType: 'unknown', methods: [], domId: null, visible: false };
+        return empty;
       }
 
       ${METHOD_EXTRACTION_SNIPPET}
@@ -93,7 +94,7 @@ export function createFindControlScript(): string {
 
       var selector = arguments[0];
       if (!selector) {
-        return { id: '', controlType: 'unknown', methods: [], domId: null, visible: false };
+        return empty;
       }
 
       if (typeof selector === 'string') {
@@ -105,7 +106,7 @@ export function createFindControlScript(): string {
 
       if (bridge.RecordReplay) {
         try {
-          var domElement = bridge.RecordReplay.findDOMElementByControlSelector(selector);
+          var domElement = await bridge.RecordReplay.findDOMElementByControlSelector({ selector: selector });
           if (domElement) {
             var ui5Ctrl = null;
 
@@ -132,7 +133,7 @@ export function createFindControlScript(): string {
         }
       }
 
-      return { id: '', controlType: 'unknown', methods: [], domId: null, visible: false };
+      return empty;
     } catch (e) {
       return { id: '', controlType: 'unknown', methods: [], domId: null, visible: false };
     }
@@ -157,7 +158,7 @@ export function createFindControlScript(): string {
 export function createFindAllControlsScript(): string {
   const ns = BRIDGE_GLOBALS.NAMESPACE;
 
-  return `(function() {
+  return `(async function() {
     try {
       var bridge = window.${ns};
       if (!bridge) {
@@ -176,7 +177,7 @@ export function createFindAllControlsScript(): string {
         return [];
       }
 
-      var domElements = bridge.RecordReplay.findAllDOMElementsByControlSelector(selector);
+      var domElements = await bridge.RecordReplay.findAllDOMElementsByControlSelector({ selector: selector });
       if (!domElements || !domElements.length) {
         return [];
       }
