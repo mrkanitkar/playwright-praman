@@ -2,9 +2,12 @@
 
 > **Plan Version**: 2.1.0 (COMPLETE)
 > **Created**: 2026-02-16
+> **Updated**: 2026-02-17 — Auto-gen utility (D22) pulled forward from Phase 6 and completed
 > **Strategy**: TDD (RED-GREEN-REFACTOR), Max 3 parallel agents, 20x plan
 > **Branch**: main (direct commits, Husky hooks enabled)
 > **Quality Gate**: Full `npm run ci` after every wave
+>
+> **Post-Phase 1 Addition**: `scripts/generate-typed-proxies.ts` auto-generated 199 typed control interfaces (4,092 methods) from SAP UI5 api.json (v1.136.0), replacing the original 84 hand-written interfaces. All 10 libraries now covered. D22 complete (170 initial + 29 gap expansion).
 
 ---
 
@@ -232,15 +235,15 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 
 ### Final Metrics
 
-| Metric        | Value                                      |
-| ------------- | ------------------------------------------ |
-| Test files    | 37                                         |
-| Tests passing | 459                                        |
-| Lint errors   | 0                                          |
-| Type errors   | 0                                          |
-| Export check  | 6/6 sub-path exports valid (attw)          |
-| Build output  | ESM 38.66 KB + CJS 40.18 KB + DTS 70.87 KB |
-| Commits       | Wave 1-5 (5 commits on main)               |
+| Metric        | Value                                        |
+| ------------- | -------------------------------------------- |
+| Test files    | 40                                           |
+| Tests passing | 511                                          |
+| Lint errors   | 0                                            |
+| Type errors   | 0                                            |
+| Export check  | 6/6 sub-path exports valid (attw)            |
+| Build output  | ESM 39.14 KB + CJS 40.68 KB + DTS 71.02 KB   |
+| Commits       | Wave 1-5 (5 commits on main) + API audit fix |
 
 ---
 
@@ -266,3 +269,34 @@ chore(config): wire barrel + sub-phase 1.1 gate (B3c)
 | M13 | Move `serializeSelectorForBrowser()` from selectors.ts to parser   | B9a        | [x]    |
 | V15 | Selector parser edge cases (Unicode, `=` in values)                | B9a        | [x]    |
 | V16 | `waitForUI5Bootstrap` default timeout in signature                 | B6b        | [x]    |
+| V17 | SAP API audit: controls.ts fictional methods/controls              | Post-Phase | [x]    |
+
+### V17 — SAP UI5 API Audit (Post-Phase 1)
+
+Verified 70+ control interfaces (~180 methods) against SAP UI5 1.144.1 API via `@ui5/mcp-server`. Found and fixed 14 issues:
+
+**CRITICAL (removed):**
+
+- `UI5MessageBox` — `sap.m.MessageBox` is a namespace, not a control
+- `UI5MessageToast` — `sap.m.MessageToast` is a namespace, not a control
+
+**HIGH (fixed in UI5ControlBase — affects all controls):**
+
+- `isVisible()` → renamed to `getVisible()` (matches `sap.ui.core.Control`)
+- `isEnabled()` → removed (not a base method; individual controls have `getEnabled()`)
+- `getView()` → removed (fictional, doesn't exist on any base class)
+- `getControlType()` → kept as proxy convenience, TSDoc updated
+- `getDomRef()` → return type fixed: `string | null` → `Element | null`
+
+**MEDIUM (fixed per-control):**
+
+- `DynamicPage#getContent()` → `UI5ControlBase[]` → `UI5ControlBase | null` (0..1 aggregation)
+- `DatePicker#getDateValue()` → `string` → `Date | null`
+- `ViewSettingsDialog#isOpen()` → removed (fictional)
+
+**LOW (nullable associations fixed):**
+
+- `Wizard#getCurrentStep()`, `Carousel#getActivePage()`, `ObjectPageLayout#getSelectedSection()` → added `| null`
+
+**Files changed:** `controls.ts`, `index.ts`, `controls.types.test.ts`, `table-matchers.test.ts`
+**CI:** 511 tests passing, 0 lint/type errors, build success.

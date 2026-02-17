@@ -35,11 +35,9 @@ function createMockControl(id: string, controlType: string): UI5ControlBase {
     getAggregation: vi.fn<UI5ControlBase['getAggregation']>().mockResolvedValue([]),
     getBindingInfo: vi.fn<UI5ControlBase['getBindingInfo']>().mockResolvedValue(undefined),
     getDomRef: vi.fn<UI5ControlBase['getDomRef']>().mockResolvedValue(null),
-    isVisible: vi.fn<UI5ControlBase['isVisible']>().mockResolvedValue(true),
-    isEnabled: vi.fn<UI5ControlBase['isEnabled']>().mockResolvedValue(true),
+    getVisible: vi.fn<UI5ControlBase['getVisible']>().mockResolvedValue(true),
     isBound: vi.fn<UI5ControlBase['isBound']>().mockResolvedValue(false),
     getModel: vi.fn<UI5ControlBase['getModel']>().mockResolvedValue(undefined),
-    getView: vi.fn<UI5ControlBase['getView']>().mockResolvedValue(undefined),
   };
 }
 

@@ -1,7 +1,7 @@
 # Phase 1 — Core Infrastructure: Detailed Implementation Plan
 
 > **Version**: 1.5.0
-> **Status**: ✅ COMPLETE — 2026-02-16 | 504 tests, 40 test files, 36 source files, 12 barrels, 98.92% stmt coverage
+> **Status**: ✅ COMPLETE — 2026-02-16 | 511 tests, 40 test files, 36 source files, 12 barrels, 98.92% stmt coverage
 > **Parent**: plan.md v2.1.0 (Phase 0 COMPLETE)
 > **Duration**: 3 weeks (3 sub-phases)
 > **Approach**: TDD (tests first)
@@ -3996,7 +3996,7 @@ export type {
 | **New test files**              | 40 (actual, includes 4 helpers)                                              |
 | **Barrel file updates**         | 12 (actual)                                                                  |
 | **Total source LOC**            | ~4,200 (actual)                                                              |
-| **Total test cases**            | 504 (actual — exceeded ~414 estimate)                                        |
+| **Total test cases**            | 511 (actual — exceeded ~414 estimate)                                        |
 | **Statement coverage**          | 98.92% (actual — exceeds all tier thresholds)                                |
 | **New npm dependencies**        | 0                                                                            |
 | **Breaking changes**            | 0                                                                            |
@@ -4323,6 +4323,6 @@ Full three-agent parallel consistency audit across all 4,200+ lines. LSP verifie
 ---
 
 > **Phase 1 COMPLETE** — 2026-02-16
-> 504 tests passing | 40 test files | 36 source files | 12 barrels | 98.92% statement coverage
+> 511 tests passing | 40 test files | 36 source files | 12 barrels | 98.92% statement coverage
 > ESLint: 0 errors, 0 warnings | TypeCheck: 0 errors | Build: ESM + CJS dual output validated
 > **Next step**: Phase 2 — Bridge Adapters

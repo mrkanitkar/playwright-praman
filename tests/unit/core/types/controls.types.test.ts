@@ -15,8 +15,12 @@ import type {
   UI5ControlBase,
   UI5ControlMap,
   UI5Dialog,
+  UI5FSemanticPage,
   UI5Input,
+  UI5MdcFilterField,
+  UI5SmartChart,
   UI5Table,
+  UI5VariantManagement,
 } from '#core/types/controls.js';
 
 describe('UI5ControlBase', () => {
@@ -27,7 +31,7 @@ describe('UI5ControlBase', () => {
 
   it('has base methods returning promises', () => {
     expectTypeOf<UI5ControlBase['getId']>().returns.toExtend<Promise<string>>();
-    expectTypeOf<UI5ControlBase['isVisible']>().returns.toExtend<Promise<boolean>>();
+    expectTypeOf<UI5ControlBase['getVisible']>().returns.toExtend<Promise<boolean>>();
     expectTypeOf<UI5ControlBase['getProperty']>().returns.toExtend<Promise<unknown>>();
   });
 });
@@ -60,6 +64,34 @@ describe('UI5Control discriminated union', () => {
       expectTypeOf(control).toExtend<UI5Dialog>();
     }
   });
+
+  it('narrows to UI5VariantManagement via controlType', () => {
+    const control = {} as UI5Control;
+    if (control.controlType === 'sap.m.VariantManagement') {
+      expectTypeOf(control).toExtend<UI5VariantManagement>();
+    }
+  });
+
+  it('narrows to UI5SmartChart via controlType', () => {
+    const control = {} as UI5Control;
+    if (control.controlType === 'sap.ui.comp.smartchart.SmartChart') {
+      expectTypeOf(control).toExtend<UI5SmartChart>();
+    }
+  });
+
+  it('narrows to UI5MdcFilterField via controlType', () => {
+    const control = {} as UI5Control;
+    if (control.controlType === 'sap.ui.mdc.FilterField') {
+      expectTypeOf(control).toExtend<UI5MdcFilterField>();
+    }
+  });
+
+  it('narrows to UI5FSemanticPage via controlType', () => {
+    const control = {} as UI5Control;
+    if (control.controlType === 'sap.f.semantic.SemanticPage') {
+      expectTypeOf(control).toExtend<UI5FSemanticPage>();
+    }
+  });
 });
 
 describe('UI5ControlMap', () => {
@@ -74,6 +106,15 @@ describe('UI5ControlMap', () => {
   it('maps sap.m.Table to UI5Table', () => {
     expectTypeOf<UI5ControlMap['sap.m.Table']>().toEqualTypeOf<UI5Table>();
   });
+
+  it('maps gap expansion controls correctly', () => {
+    expectTypeOf<UI5ControlMap['sap.m.VariantManagement']>().toEqualTypeOf<UI5VariantManagement>();
+    expectTypeOf<
+      UI5ControlMap['sap.ui.comp.smartchart.SmartChart']
+    >().toEqualTypeOf<UI5SmartChart>();
+    expectTypeOf<UI5ControlMap['sap.ui.mdc.FilterField']>().toEqualTypeOf<UI5MdcFilterField>();
+    expectTypeOf<UI5ControlMap['sap.f.semantic.SemanticPage']>().toEqualTypeOf<UI5FSemanticPage>();
+  });
 });
 
 describe('InteractiveControlType', () => {
@@ -83,9 +124,17 @@ describe('InteractiveControlType', () => {
     expectTypeOf<'sap.m.CheckBox'>().toExtend<InteractiveControlType>();
   });
 
+  it('accepts gap expansion interactive controls', () => {
+    expectTypeOf<'sap.m.VariantManagement'>().toExtend<InteractiveControlType>();
+    expectTypeOf<'sap.m.DynamicDateRange'>().toExtend<InteractiveControlType>();
+    expectTypeOf<'sap.ui.mdc.FilterField'>().toExtend<InteractiveControlType>();
+  });
+
   it('rejects non-interactive control types', () => {
     expectTypeOf<'sap.m.Text'>().not.toExtend<InteractiveControlType>();
     expectTypeOf<'sap.m.Label'>().not.toExtend<InteractiveControlType>();
+    expectTypeOf<'sap.m.ToolbarSpacer'>().not.toExtend<InteractiveControlType>();
+    expectTypeOf<'sap.m.IllustratedMessage'>().not.toExtend<InteractiveControlType>();
   });
 });
 
@@ -96,8 +145,16 @@ describe('ContainerControlType', () => {
     expectTypeOf<'sap.m.Table'>().toExtend<ContainerControlType>();
   });
 
+  it('accepts gap expansion container controls', () => {
+    expectTypeOf<'sap.m.NotificationListGroup'>().toExtend<ContainerControlType>();
+    expectTypeOf<'sap.f.semantic.SemanticPage'>().toExtend<ContainerControlType>();
+    expectTypeOf<'sap.tnt.NavigationList'>().toExtend<ContainerControlType>();
+  });
+
   it('rejects non-container control types', () => {
     expectTypeOf<'sap.m.Button'>().not.toExtend<ContainerControlType>();
     expectTypeOf<'sap.m.Input'>().not.toExtend<ContainerControlType>();
+    expectTypeOf<'sap.m.ColorPalette'>().not.toExtend<ContainerControlType>();
+    expectTypeOf<'sap.tnt.InfoLabel'>().not.toExtend<ContainerControlType>();
   });
 });
