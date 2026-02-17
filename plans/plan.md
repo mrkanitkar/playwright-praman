@@ -1003,7 +1003,7 @@ Every decision in this plan was verified against official best practices from th
 | ----------- | ------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Phase 0** | Architecture & Design     | 2 weeks  | ✅ COMPLETE. plan.md v2.1.0, npm v1.0.1, 10 ESLint plugins, dual ESM+CJS, 6 AI agents, 8 skill files, CI/CD 3 OS × 3 Node.                                                                                                                                                                                                                                                           |
 | **Phase 1** | Core Infrastructure       | 3 weeks  | ✅ COMPLETE. 511 tests, 40 test files, 36 source files, 12 barrels. Config (Zod), errors (10 subclasses), logging (pino+redaction), OTel (NoOp), types (199 auto-gen interfaces, 4,092 methods), PlaywrightCompat, selector engine, matchers, retry, version-compare, step-decorator, wait-helpers. 98.92% stmt coverage. **Auto-gen (D22) pulled forward from Phase 6 — COMPLETE.** |
-| **Phase 2** | Bridge + Proxy            | 4 weeks  | ✅ COMPLETE. 923 tests, 73 test files, 35 source files (23 bridge + 12 proxy). ClassicUI5Adapter (full), WebComponentAdapter (stub), HybridAdapter (delegation), 6 browser scripts, 3 interaction strategies, single unified proxy (D16), UI5Object chain (D17), API resolver (D19), discovery factory (D18), object map (D20). 99.16% stmt coverage. INT1/INT2 deferred to Phase 7. |
+| **Phase 2** | Bridge + Proxy            | 4 weeks  | ✅ COMPLETE. 929 tests, 73 test files, 35 source files (23 bridge + 12 proxy). ClassicUI5Adapter (full), WebComponentAdapter (stub), HybridAdapter (delegation), 6 browser scripts, 3 interaction strategies, single unified proxy (D16), UI5Object chain (D17), API resolver (D19), discovery factory (D18), object map (D20). 99.18% stmt coverage. INT1/INT2 deferred to Phase 7. |
 | **Phase 3** | Fixtures + Auth + Nav     | 3 weeks  | All fixtures assembled, global setup, auth strategies, FLP navigation, WorkZone                                                                                                                                                                                                                                                                                                      |
 | **Phase 4** | Modules + Table + FE      | 3 weeks  | UI5 modules, Fiori Elements (ListReport, ObjectPage)                                                                                                                                                                                                                                                                                                                                 |
 | **Phase 5** | AI + Intents + Vocabulary | 3 weeks  | LLM service, agentic fixture, registries, intent wrappers, procurement domain, vocabulary                                                                                                                                                                                                                                                                                            |
@@ -1043,7 +1043,7 @@ Every decision in this plan was verified against official best practices from th
 
 ### Phase 2 — Bridge + Proxy (Weeks 6–9) ✅ COMPLETE
 
-**Completed**: 2026-02-17 | **Tests**: 929 | **Files**: 35 source (23 bridge + 12 proxy) + 73 test files | **Coverage**: 99.16% stmts, 96.39% branches, 100% functions
+**Completed**: 2026-02-17 | **Tests**: 929 | **Files**: 35 source (23 bridge + 12 proxy) + 73 test files | **Coverage**: 99.18% stmts, 96.47% branches, 100% functions
 
 | Task                                 | Files                                                                    | Tests                                                  | Decision | Status |
 | ------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------ | -------- | ------ |
@@ -1070,27 +1070,48 @@ Every decision in this plan was verified against official best practices from th
 
 ### Phase 3 — Fixtures + Auth + Navigation (Weeks 10–12)
 
-| Task               | Files                                                      | Tests                                              |
-| ------------------ | ---------------------------------------------------------- | -------------------------------------------------- |
-| Core fixtures      | `fixtures/core-fixtures.ts`                                | Fixture lifecycle                                  |
-| Auth strategies    | `auth/strategies/*.ts`, `auth/auth-handler.ts`             | BTP SAML, Basic, Office365                         |
-| Auth setup project | `auth/auth.setup.ts`                                       | BP-PLAYWRIGHT: setup project produces storageState |
-| Navigation         | `modules/navigation.ts`, `fixtures/navigation-fixtures.ts` | Tile, route, intent nav                            |
-| WorkZone           | `fixtures/workzone-fixtures.ts`                            | iframe context switching (G6)                      |
-| Fixture assembly   | `fixtures/index.ts`                                        | All fixtures via extend()                          |
+> **Detailed plan**: [`plans/plan3.md`](plan3.md) — 20 batches, 3 sub-phases, ~2,530 LOC, ~115 tests
+>
+> **Sub-phases**: 3.1 Foundation → 3.2 Wiring+Auth → 3.3 WorkZone+Assembly
+> **Key decisions**: W1–W14 in plan3.md. D2 (fixture composition), D28 (setup project auth).
+
+| Task                          | Files                                                                 | Tests                                                  | Status |
+| ----------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------ | ------ |
+| G2: Fix proxy stub methods    | `proxy/dynamic-proxy.ts`                                              | Bridge round-trips for getBindingInfo, getDomRef, etc. | ⏳     |
+| Wire orphaned browser scripts | `bridge/classic-adapter.ts`, `bridge/adapter.ts`                      | Object map lifecycle, selector extraction (R3)         | ⏳     |
+| Core fixtures (worker + test) | `fixtures/core-fixtures.ts`                                           | Config, logger, tracer, compat, selectors, matchers    | ⏳     |
+| Auth strategies (6)           | `auth/strategies/*.ts`, `auth/auth-factory.ts`, `auth/auth-checks.ts` | OnPrem, CloudSAML, Office365, API, Cert, MultiTenant   | ⏳     |
+| Stability fixtures            | `fixtures/stability-fixtures.ts`                                      | WalkMe/analytics interception, auto UI5 stability      | ⏳     |
+| Auth handler + setup project  | `auth/auth-handler.ts`, `auth/auth.setup.ts`, `auth/auth.teardown.ts` | D28 pattern: storageState, retry, session management   | ⏳     |
+| Auth fixtures                 | `fixtures/auth-fixtures.ts`                                           | sapAuth fixture with fixture options                   | ⏳     |
+| Navigation module             | `modules/navigation.ts`                                               | Tile, intent, hash, search, back/forward               | ⏳     |
+| Navigation fixtures           | `fixtures/nav-fixtures.ts`                                            | Step-decorated nav API, WorkZone stub                  | ⏳     |
+| WorkZone module               | `modules/workzone.ts`                                                 | Dual-frame bridge injection, context switching (G6)    | ⏳     |
+| Fixture assembly              | `fixtures/index.ts`                                                   | `mergeTests()` chain → single `test` + `expect` export | ⏳     |
+| Phase 1 infra wiring (R2)     | All fixture + auth + nav files                                        | 8/8 unconsumed modules consumed in fixture lifecycle   | ⏳     |
 
 ### Phase 4 — Modules + Table + FE (Weeks 13–15)
 
-| Task               | Files                                    | Tests                                     |
-| ------------------ | ---------------------------------------- | ----------------------------------------- |
-| Table operations   | `modules/table.ts`                       | Get rows, cells, filter, sort, pagination |
-| Assertions         | `modules/assertion.ts`                   | UI5-specific assertions                   |
-| Element operations | `modules/element.ts`                     | Existence, visibility, properties         |
-| Control operations | `modules/control.ts`                     | Properties, aggregations, bindings        |
-| Date handling      | `modules/date.ts`                        | Date picker, time picker                  |
-| Dialog helpers     | `modules/dialog.ts`                      | Dialog/popover interactions               |
-| OData handler      | `modules/odata.ts`                       | CRUD with optional Zod schema             |
-| Fiori Elements     | `fe/list-report.ts`, `fe/object-page.ts` | FE test library                           |
+> **Prerequisites from Phase 2 Review** (2026-02-17):
+>
+> WebComponentAdapter is a stub (Phase 2). Full `@ui5/webcomponents` support needed here
+> for hybrid apps that mix classic UI5 controls with Web Components.
+> `registry` discovery strategy is a no-op placeholder — implement or remove.
+> All modules consume the proxy layer (discoverControl → proxy → adapter).
+
+| Task                            | Files                                    | Tests                                         | Notes                                             |
+| ------------------------------- | ---------------------------------------- | --------------------------------------------- | ------------------------------------------------- |
+| WebComponentAdapter full impl   | `bridge/webcomponent-adapter.ts`         | Shadow DOM traversal, `@ui5/webcomponents`    | Upgrade Phase 2 stub to real adapter              |
+| HybridAdapter element detection | `bridge/hybrid-adapter.ts`               | Per-element classic vs WC routing             | Phase 2 delegates all to classic; add real detect |
+| Registry discovery strategy     | `proxy/discovery.ts`                     | `registry` strategy implementation or removal | Currently a no-op (Phase 3+ placeholder)          |
+| Table operations                | `modules/table.ts`                       | Get rows, cells, filter, sort, pagination     | Uses proxy + `getControlAggregation`              |
+| Assertions                      | `modules/assertion.ts`                   | UI5-specific assertions                       | Wraps raw matchers from Phase 1                   |
+| Element operations              | `modules/element.ts`                     | Existence, visibility, properties             | —                                                 |
+| Control operations              | `modules/control.ts`                     | Properties, aggregations, bindings            | —                                                 |
+| Date handling                   | `modules/date.ts`                        | Date picker, time picker                      | —                                                 |
+| Dialog helpers                  | `modules/dialog.ts`                      | Dialog/popover interactions                   | —                                                 |
+| OData handler                   | `modules/odata.ts`                       | CRUD with optional Zod schema                 | —                                                 |
+| Fiori Elements                  | `fe/list-report.ts`, `fe/object-page.ts` | FE test library                               | —                                                 |
 
 ### Phase 5 — AI + Intents + Vocabulary (Weeks 16–18)
 
@@ -1106,29 +1127,139 @@ Every decision in this plan was verified against official best practices from th
 
 ### Phase 6 — CLI + Reporters + Docs (Weeks 19–20)
 
-> **Note**: Auto-gen typed proxies (`scripts/generate-typed-proxies.ts`) was originally planned for this phase but was **pulled forward to Phase 1** and completed (199 interfaces, 4,092 methods from SAP UI5 api.json). Phase 6 scope reduced accordingly.
+> **Scope reductions from earlier phases** (verified 2026-02-17):
+>
+> - D22 auto-gen (`scripts/generate-typed-proxies.ts`) — **pulled forward to Phase 1, COMPLETE**
+> - `scripts/generate-capabilities.ts` (430 LOC) — **already implemented**, extracts @capability tags
+> - `scripts/setup-ide.ts` (150 LOC) — **already implemented**, interactive IDE config wizard
+> - `scripts/generate-json-schema.ts` — stub only (4 LOC), needs implementation
+> - `scripts/generate-skill-md.ts` — stub only (4 LOC), needs implementation
 
-| Task                 | Files                               | Tests                    |
-| -------------------- | ----------------------------------- | ------------------------ |
-| CLI init             | `cli/init.ts`                       | Project scaffolding      |
-| CLI doctor           | `cli/doctor.ts`                     | Health check             |
-| Compliance reporter  | `reporters/compliance-reporter.ts`  | Praman compliance report |
-| OData trace reporter | `reporters/odata-trace-reporter.ts` | OData call logging       |
-| Docusaurus site      | `docs/`                             | All user guide pages     |
-| TypeDoc generation   | Build script                        | API reference            |
-| SKILL.md generation  | `scripts/generate-skill-md.ts`      | AI agent skill file      |
+| Task                       | Files                                   | Tests                    | Status      |
+| -------------------------- | --------------------------------------- | ------------------------ | ----------- |
+| CLI init                   | `cli/init.ts`                           | Project scaffolding      | —           |
+| CLI doctor                 | `cli/doctor.ts`                         | Health check             | —           |
+| Compliance reporter        | `reporters/compliance-reporter.ts`      | Praman compliance report | —           |
+| OData trace reporter       | `reporters/odata-trace-reporter.ts`     | OData call logging       | —           |
+| Docusaurus site            | `docs/`                                 | All user guide pages     | —           |
+| TypeDoc generation         | Build script                            | API reference            | —           |
+| SKILL.md generation        | `scripts/generate-skill-md.ts`          | AI agent skill file      | Stub exists |
+| JSON Schema generation     | `scripts/generate-json-schema.ts`       | Config schema for IDEs   | Stub exists |
+| ~~Auto-gen typed proxies~~ | ~~`scripts/generate-typed-proxies.ts`~~ | ~~199 interfaces~~       | ✅ Phase 1  |
+| ~~Capability registry~~    | ~~`scripts/generate-capabilities.ts`~~  | ~~TSDoc extraction~~     | ✅ Done     |
+| ~~IDE setup wizard~~       | ~~`scripts/setup-ide.ts`~~              | ~~IDE config~~           | ✅ Done     |
 
 ### Phase 7 — Hardening + Certification (Weeks 21–22)
 
-| Task                         | Deliverable                                              |
-| ---------------------------- | -------------------------------------------------------- |
-| SBOM generation              | CycloneDX per release                                    |
-| npm provenance               | `--provenance` publish                                   |
-| Behavioral equivalence tests | Golden master tests vs. wdi5                             |
-| Performance benchmarks       | Bridge injection, control discovery, method call latency |
-| Security audit               | Final Snyk + npm audit review                            |
-| Migration guide              | Docusaurus page: v2.5.0 → v3.0                           |
-| CSP assessment               | Document CSP dependency; `respectCSP` config placeholder |
+> **Deferred items absorbed into Phase 7** (verified 2026-02-17):
+>
+> - INT1/INT2 integration smoke tests (deferred from Phase 2) — need real browser + SAP demo apps
+> - GitHub issue #7 (parent) remains open until INT1/INT2 complete
+
+| Task                           | Deliverable                                                    | Notes                              |
+| ------------------------------ | -------------------------------------------------------------- | ---------------------------------- |
+| INT1: Bridge integration smoke | `tests/integration/bridge-smoke.spec.ts` against SAP demo apps | Deferred from Phase 2 (batch INT1) |
+| INT2: Proxy integration smoke  | `tests/integration/proxy-smoke.spec.ts` + SAP cloud smoke      | Deferred from Phase 2 (batch INT2) |
+| SBOM generation                | CycloneDX per release                                          | —                                  |
+| npm provenance                 | `--provenance` publish                                         | —                                  |
+| Behavioral equivalence tests   | Golden master tests vs. wdi5                                   | —                                  |
+| Performance benchmarks         | Bridge injection, control discovery, method call latency       | —                                  |
+| Security audit                 | Final Snyk + npm audit review                                  | —                                  |
+| Migration guide                | Docusaurus page: v2.5.0 → v3.0                                 | —                                  |
+| CSP assessment                 | Document CSP dependency; `respectCSP` config placeholder       | —                                  |
+
+---
+
+### 11.1 Post-Phase 2 Architect Review (2026-02-17)
+
+Full codebase audit against plan.md, plan1.md, plan2.md. Trust source code only.
+
+**Current Metrics** (verified `npm run test:unit -- --coverage`):
+
+| Metric     | Value                                                                        |
+| ---------- | ---------------------------------------------------------------------------- |
+| Tests      | 929 passing (73 test files)                                                  |
+| Statements | 99.18%                                                                       |
+| Branches   | 96.47%                                                                       |
+| Functions  | 100%                                                                         |
+| Lines      | 99.14%                                                                       |
+| Lint       | 0 errors, 0 warnings                                                         |
+| TypeCheck  | 0 errors                                                                     |
+| Build      | ESM + CJS + DTS (attw 6/6)                                                   |
+| Source     | 90 files (48 core, 3 sel, 3 mat, 23 bridge, 12 proxy, 9 placeholder barrels) |
+
+#### R1. Layer Hierarchy — CLEAN
+
+No circular dependencies. No upward violations.
+
+```
+Core (types, errors, config, logging, telemetry, utils, compat)
+  ↓
+Selectors & Matchers
+  ↓
+Bridge (adapters, browser-scripts, interaction-strategies)
+  ↓
+Proxy (dynamic-proxy, discovery, cache, ui5-object, converter)
+```
+
+Verified: core never imports bridge/proxy. Bridge never imports proxy.
+
+#### R2. Phase 1 Consumption in Phase 2 — PARTIAL (by design)
+
+| Phase 1 Module                  | Consumed by Phase 2?                                   | Deferred To |
+| ------------------------------- | ------------------------------------------------------ | ----------- |
+| `core/errors/*`                 | YES — ControlError, BridgeError used in bridge + proxy | —           |
+| `core/utils/version-compare`    | YES — used in `bridge/api-resolver.ts`                 | —           |
+| `selectors/selector-parser`     | YES — `serializeUI5Selector` used in `proxy/cache.ts`  | —           |
+| `core/config/schema`            | YES — types used across bridge + proxy                 | —           |
+| `core/logging`                  | NO — exported but not used internally                  | Phase 3     |
+| `core/telemetry`                | NO — exported but not used internally                  | Phase 3     |
+| `core/utils/retry`              | NO — exported but not used internally                  | Phase 3     |
+| `core/utils/step-decorator`     | NO — not even in main barrel                           | Phase 3     |
+| `core/utils/wait-helpers`       | NO — exported at top level only                        | Phase 3     |
+| `core/compat/playwright-compat` | NO — exported but not used internally                  | Phase 3     |
+| `selectors/ui5-selector-engine` | NO — exported, awaiting fixture registration           | Phase 3     |
+| `matchers/*`                    | NO — exported, awaiting `expect.extend()`              | Phase 3     |
+
+**Action**: Phase 3 must wire all 8 unconsumed modules into fixtures.
+
+#### R3. Orphaned Source Files — 2 FOUND
+
+| File                                     | Status                                                        | Resolution                                                 |
+| ---------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------- |
+| `bridge/browser-scripts/object-map.ts`   | Tested but not imported by any src file, not in bridge barrel | Phase 3: wire into classic-adapter or fixture lifecycle    |
+| `bridge/browser-scripts/get-selector.ts` | Tested but not imported by any src file, not in bridge barrel | Phase 3: wire into adapter for reverse selector extraction |
+
+#### R4. Features Already Implemented for Future Phases
+
+| Feature                           | Planned Phase | Actual Status     | Evidence                                           |
+| --------------------------------- | ------------- | ----------------- | -------------------------------------------------- |
+| D22 auto-gen typed proxies        | Phase 6       | ✅ Phase 1        | `scripts/generate-typed-proxies.ts` (1,266 LOC)    |
+| Capability generator              | Unplanned     | ✅ Done           | `scripts/generate-capabilities.ts` (430 LOC)       |
+| IDE setup wizard                  | Unplanned     | ✅ Done           | `scripts/setup-ide.ts` (150 LOC)                   |
+| Bridge smoke tests (INT1 partial) | Phase 2 INT1  | Partially written | `tests/integration/bridge-smoke.spec.ts` (165 LOC) |
+
+#### R5. Deferred Items Tracking
+
+| Item                             | Original Phase  | Deferred To | GitHub Issue |
+| -------------------------------- | --------------- | ----------- | ------------ |
+| INT1 bridge integration smoke    | Phase 2         | Phase 7     | #7 (parent)  |
+| INT2 proxy + SAP cloud smoke     | Phase 2         | Phase 7     | #7 (parent)  |
+| G2 proxy stub methods            | Phase 2         | Phase 3     | #22          |
+| WebComponentAdapter full support | Phase 2 (stub)  | Phase 4     | —            |
+| `registry` discovery strategy    | Phase 2 (no-op) | Phase 4     | —            |
+| CSP compliance                   | Phase 2         | Phase 7     | —            |
+
+#### R6. Duplicate Scope — NONE CRITICAL
+
+| Check                           | Result                                                              |
+| ------------------------------- | ------------------------------------------------------------------- |
+| D22 listed in Phase 6?          | Resolved — note at line 1109 acknowledges pull-forward              |
+| Typed proxies in Phase 2?       | Resolved — marked N/A, replaced by auto-gen                         |
+| INT1/INT2 in Phase 7 task list? | **Fixed** — explicitly added to Phase 7 table                       |
+| Matchers Phase 1 vs Phase 3     | By design — raw functions (P1) wired into fixtures (P3)             |
+| Error classes in later phases   | None planned — all 10 subclasses created in Phase 1                 |
+| Config schema extensions        | By design — Zod schema is extensible, Phase 2 added strategy fields |
 
 ---
 
