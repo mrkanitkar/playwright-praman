@@ -367,6 +367,152 @@ selectors/selector-engine   → core-fixtures.ts (worker auto: register engine)
 matchers/*                  → core-fixtures.ts (worker auto: expect.extend)
 ```
 
+#### Phase 1 Modules → Phase 2 Consumption Points (already wired)
+
+> **8 Phase 1 entities** consumed by Phase 2. This section documents what is
+> already wired (completed in Phase 2) so the full dependency chain is visible.
+
+```
+Phase 1 Module                → Phase 2 Consumer                → Import Type
+─────────────────────────────────────────────────────────────────────────────────
+core/types/selectors           → bridge/adapter.ts               → type (UI5Selector)
+  UI5Selector                  → bridge/classic-adapter.ts       → type (UI5Selector)
+                               → bridge/hybrid-adapter.ts        → type (UI5Selector)
+                               → bridge/webcomponent-adapter.ts  → type (UI5Selector)
+                               → proxy/cache.ts                  → type (UI5Selector)
+                               → proxy/discovery.ts              → type (UI5Selector)
+                               → proxy/discovery-factory.ts      → type (UI5Selector)
+                                                                   [7 consumers]
+
+core/types/controls            → proxy/dynamic-proxy.ts          → type (UI5ControlBase)
+  UI5ControlBase               → proxy/proxy-converter.ts        → type (UI5ControlBase)
+                               → proxy/discovery.ts              → type (UI5ControlBase)
+                               → proxy/cache.ts                  → type (UI5ControlBase)
+                                                                   [4 consumers]
+
+core/types/bridge              → bridge/bridge-types.ts          → type (BridgeReturnType)
+  BridgeReturnType               discriminant in MethodExecutionResult
+                                                                   [1 consumer]
+
+core/config/schema             → proxy/discovery.ts              → type (DiscoveryStrategyName)
+  DiscoveryStrategyName          strategy chain configuration
+                                                                   [1 consumer]
+
+core/errors/control-error      → proxy/dynamic-proxy.ts          → class (ControlError)
+  ControlError                   thrown on blacklisted method access
+                                                                   [1 consumer]
+
+core/errors/bridge-error       → proxy/return-handler.ts         → class (BridgeError)
+  BridgeError                    thrown on bridge execution failures
+                                                                   [1 consumer]
+
+core/utils/version-compare     → bridge/api-resolver.ts          → function (isAtLeast)
+  isAtLeast()                    UI5 version ≥ 1.119.0 / 1.108.0 checks
+                                                                   [1 consumer]
+
+selectors/selector-parser      → proxy/cache.ts                  → function (serializeUI5Selector)
+  serializeUI5Selector()         stable cache key generation
+                                                                   [1 consumer]
+```
+
+#### Phase 1 Types/Interfaces → Phase 3 Consumption Points (NEW wiring)
+
+> **Phase 1 defined many types/interfaces that Phase 2 does NOT use.**
+> These must be consumed in Phase 3 (fixtures, auth, navigation, WorkZone).
+> This is the complete "types gap" — every type below needs a consumer.
+
+```
+Phase 1 Type/Interface         → Phase 3 Consumer                     → Usage
+──────────────────────────────────────────────────────────────────────────────────
+CONFIG TYPES (core/config/schema):
+  PramanConfig                 → fixtures/core-fixtures.ts            → worker fixture type
+                               → auth/auth-handler.ts                 → config parameter
+                               → modules/navigation.ts                → config parameter
+  InteractionStrategyName      → fixtures/core-fixtures.ts            → strategy selection
+  LogLevel                     → fixtures/core-fixtures.ts            → logger config
+
+ERROR CLASSES (core/errors/):
+  AuthError                    → auth/strategies/*.ts                 → thrown on auth failure
+                               → auth/auth-handler.ts                 → thrown on login/retry failure
+  NavigationError              → modules/navigation.ts                → thrown on nav failure
+                               → modules/workzone.ts                  → thrown on iframe switch failure
+  TimeoutError                 → auth/strategies/*.ts                 → thrown on auth timeout
+                               → modules/navigation.ts                → thrown on nav timeout
+  SelectorError                → fixtures/core-fixtures.ts            → thrown on selector reg failure
+  ConfigError                  → fixtures/core-fixtures.ts            → thrown on config validation
+  PramanError (base)           → auth/auth-checks.ts                  → base class for custom errors
+  AIError                      → (Phase 4+ — AI layer)
+  ODataError                   → (Phase 4+ — OData module)
+  PluginError                  → (Phase 4+ — plugin system)
+
+SELECTOR TYPES (core/types/selectors):
+  SerializedUI5Selector        → fixtures/core-fixtures.ts            → selector engine registration
+  UI5SelectorString            → modules/navigation.ts                → intent-based navigation
+  UI5Interaction               → (Phase 4+ — interaction recording)
+
+BRIDGE TYPES (core/types/bridge):
+  BridgeResult<T>              → fixtures/core-fixtures.ts            → adapter result handling
+  BridgeMethodDescriptor       → (Phase 4+ — AI method discovery)
+
+VALIDATION TYPES (core/types/validation):
+  ValidationIssue              → fixtures/core-fixtures.ts            → config validation reporting
+
+UTIL FUNCTIONS (core/utils/):
+  retry()                      → auth/auth-handler.ts                 → login retry with backoff
+  calculateBackoff()           → auth/auth-handler.ts                 → exponential backoff
+  waitForUI5Stable()           → stability-fixtures.ts                → auto stability fixture
+                               → modules/navigation.ts                → after every navigation
+  waitForUI5Bootstrap()        → fixtures/core-fixtures.ts            → bridge init wait
+  DEFAULT_TIMEOUTS             → fixtures/core-fixtures.ts            → timeout constants
+                               → auth/auth-handler.ts                 → auth timeout defaults
+  withStep()                   → fixtures/nav-fixtures.ts             → step-decorated nav
+                               → fixtures/auth-fixtures.ts            → step-decorated auth
+                               → fixtures/core-fixtures.ts            → step-decorated init
+
+COMPAT FUNCTIONS (core/compat/):
+  assertMinVersion()           → fixtures/core-fixtures.ts            → worker auto: version check
+  getPlaywrightFeatures()      → fixtures/core-fixtures.ts            → feature-gated behavior
+  PlaywrightFeatures           → fixtures/core-fixtures.ts            → type for feature flags
+  PlaywrightVersion            → fixtures/core-fixtures.ts            → type for version info
+
+LOGGING (core/logging/):
+  createRootLogger()           → fixtures/core-fixtures.ts            → worker auto: root logger
+  createLogger()               → all fixture, auth, nav, workzone     → child logger per module
+  REDACTION_PATHS              → fixtures/core-fixtures.ts            → pino redaction config
+
+TELEMETRY (core/telemetry/):
+  initTelemetry()              → fixtures/core-fixtures.ts            → worker auto: tracer init
+  TracerWrapper                → fixtures/core-fixtures.ts            → type for tracer fixture
+  createSpanName()             → fixtures/core-fixtures.ts            → span naming convention
+  spanAttributes()             → fixtures/core-fixtures.ts            → OTel span attributes
+
+SELECTORS (selectors/):
+  createUI5SelectorEngineScript()  → fixtures/core-fixtures.ts        → worker auto: register engine
+
+MATCHERS (matchers/):
+  checkUI5Text, checkUI5Visible,   → fixtures/core-fixtures.ts        → worker auto: expect.extend
+  checkUI5Enabled, etc. (8)
+
+CONSTANTS (core/utils/constants):
+  DEFAULT_IGNORE_PATTERNS      → stability-fixtures.ts                → WalkMe/analytics URLs
+  BRIDGE_READY_CHECK_INTERVAL  → fixtures/core-fixtures.ts            → bridge polling interval
+```
+
+**Summary: Phase 1 Consumption Across Phases**
+
+| Phase 1 Category                    | Phase 2 Consumers   | Phase 3 Consumers     | Phase 4+ (Future) |
+| ----------------------------------- | ------------------- | --------------------- | ----------------- |
+| Types (selectors, controls, bridge) | 3 types / 12 files  | 4 types / 5 files     | 2 types           |
+| Config types                        | 1 type / 1 file     | 3 types / 4 files     | —                 |
+| Error classes                       | 2 classes / 2 files | 5 classes / 8 files   | 3 classes         |
+| Util functions                      | 1 fn / 1 file       | 6 fns / 10 files      | —                 |
+| Compat                              | 0                   | 4 exports / 1 file    | —                 |
+| Logging                             | 0                   | 3 exports / 10+ files | —                 |
+| Telemetry                           | 0                   | 4 exports / 1 file    | —                 |
+| Selectors                           | 1 fn / 1 file       | 1 fn / 1 file         | —                 |
+| Matchers                            | 0                   | 8 fns / 1 file        | —                 |
+| **Total**                           | **8 entities**      | **~34 entities**      | **~5 entities**   |
+
 #### Phase 2 Modules → Phase 3 Consumption Points
 
 ```

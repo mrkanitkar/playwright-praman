@@ -1070,7 +1070,7 @@ Every decision in this plan was verified against official best practices from th
 
 ### Phase 3 — Fixtures + Auth + Navigation (Weeks 10–12)
 
-> **Detailed plan**: [`plans/plan3.md`](plan3.md) — 20 batches, 3 sub-phases, ~2,530 LOC, ~115 tests
+> **Detailed plan**: [`plans/plan3.md`](plan3.md) — 21 batches, 3 sub-phases, ~2,730 LOC, ~123 tests
 >
 > **Sub-phases**: 3.1 Foundation → 3.2 Wiring+Auth → 3.3 WorkZone+Assembly
 > **Key decisions**: W1–W14 in plan3.md. D2 (fixture composition), D28 (setup project auth).
