@@ -33,14 +33,28 @@ import type { UI5ControlBase } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
 
 /**
- * Minimal Page interface for bridge initialization.
+ * Minimal Page interface for bridge operations.
  *
  * @remarks
  * Uses a minimal subset of Playwright's Page to avoid coupling
  * the interface definition to the full Playwright dependency.
+ *
+ * Two `evaluate` overloads:
+ * - No-arg: `evaluate<TResult>(fn: () => TResult): Promise<TResult>`
+ * - With-arg: `evaluate<TResult, TArg>(fn: (arg: TArg) => TResult, arg: TArg): Promise<TResult>`
+ *
+ * `waitForFunction` supports polling operations (UI5 stability, bridge ready).
  */
 export interface BridgePage {
-  evaluate<T>(pageFunction: string | ((...args: unknown[]) => T)): Promise<T>;
+  /** Evaluate a function in the browser context (no arguments). */
+  evaluate<TResult>(pageFunction: string | (() => TResult)): Promise<TResult>;
+  /** Evaluate a function in the browser context with a serializable argument. */
+  evaluate<TResult, TArg>(pageFunction: (arg: TArg) => TResult, arg: TArg): Promise<TResult>;
+  /** Wait for a function to return a truthy value in the browser context. */
+  waitForFunction(
+    pageFunction: string | (() => unknown),
+    options?: { readonly timeout?: number; readonly polling?: number },
+  ): Promise<void>;
 }
 
 /**

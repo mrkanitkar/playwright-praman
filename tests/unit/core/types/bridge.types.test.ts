@@ -7,10 +7,11 @@
  */
 import { describe, expectTypeOf, it } from 'vitest';
 
+import type { BridgePage } from '#bridge/adapter.js';
 import type { BridgeMethodDescriptor, BridgeResult, BridgeReturnType } from '#core/types/bridge.js';
 
 describe('BridgeReturnType', () => {
-  it('accepts all seven return type values', () => {
+  it('accepts all eight return type values', () => {
     expectTypeOf<'empty'>().toExtend<BridgeReturnType>();
     expectTypeOf<'result'>().toExtend<BridgeReturnType>();
     expectTypeOf<'element'>().toExtend<BridgeReturnType>();
@@ -18,11 +19,27 @@ describe('BridgeReturnType', () => {
     expectTypeOf<'aggregation'>().toExtend<BridgeReturnType>();
     expectTypeOf<'object'>().toExtend<BridgeReturnType>();
     expectTypeOf<'none'>().toExtend<BridgeReturnType>();
+    expectTypeOf<'unknown'>().toExtend<BridgeReturnType>();
   });
 
   it('rejects invalid return types', () => {
     expectTypeOf<'void'>().not.toExtend<BridgeReturnType>();
     expectTypeOf<'string'>().not.toExtend<BridgeReturnType>();
+  });
+});
+
+describe('BridgePage', () => {
+  it('has evaluate method with no-arg overload', () => {
+    expectTypeOf<BridgePage>().toHaveProperty('evaluate');
+  });
+
+  it('has waitForFunction method', () => {
+    expectTypeOf<BridgePage>().toHaveProperty('waitForFunction');
+  });
+
+  it('evaluate returns a Promise', () => {
+    type EvalResult = ReturnType<BridgePage['evaluate']>;
+    expectTypeOf<EvalResult>().toExtend<Promise<unknown>>();
   });
 });
 
