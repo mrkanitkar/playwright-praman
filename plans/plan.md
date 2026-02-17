@@ -1041,27 +1041,32 @@ Every decision in this plan was verified against official best practices from th
 | Selector engine          | `selectors/*.ts`                                      | Parser + DOM engine registration, DoS protection                                                          | ✅     |
 | Custom matchers          | `matchers/*.ts`                                       | 8 check functions (UI5 + table matchers), raw logic for Phase 2 fixture wiring                            | ✅     |
 
-### Phase 2 — Bridge + Proxy (Weeks 6–9)
+### Phase 2 — Bridge + Proxy (Weeks 6–9) ✅ COMPLETE
 
-| Task                                 | Files                                                                    | Tests                                                  | Decision |
-| ------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------ | -------- |
-| BridgeAdapter interface              | `bridge/adapter.ts`                                                      | Interface compliance                                   | D3       |
-| ClassicUI5Adapter                    | `bridge/classic-adapter.ts`, `bridge/browser-scripts/*.ts`               | Integration: SAP demo apps                             | D3       |
-| WebComponentAdapter                  | `bridge/webcomponent-adapter.ts`                                         | Integration: FLP shell bar                             | D3       |
-| HybridAdapter + factory              | `bridge/hybrid-adapter.ts`, `bridge/adapter-factory.ts`                  | Auto-detection tests                                   | D3       |
-| Bridge injection                     | `bridge/injection.ts`                                                    | Eager/late injection                                   | —        |
-| Centralized API resolver             | `bridge/api-resolver.ts`                                                 | 3-tier chain: ElementRegistry→Core.byId→RecordReplay   | D19      |
-| Browser object map                   | `bridge/browser-scripts/object-map.ts`                                   | TTL cleanup, WeakRef, no leaks                         | D20      |
-| Shared interaction logic             | `bridge/interaction-strategies/shared.ts`                                | Shared fireEvent + bridge accessor                     | D21      |
-| Interaction strategies               | `bridge/interaction-strategies/playwright.ts`, `dom-first.ts`, `opa5.ts` | Strategy parity, no duplication                        | D21      |
-| Discovery factory integration        | `bridge/browser-scripts/find-control.ts`                                 | Strategy priorities aligned with factory               | D18      |
-| Single unified proxy                 | `proxy/dynamic-proxy.ts`                                                 | No double-proxy; single handler per control            | D16      |
-| UI5Object proxy                      | `proxy/ui5-object-proxy.ts`, `proxy/ui5-object-cache.ts`                 | Method forwarding, cache TTL/LRU                       | D17, D20 |
-| Proxy converter                      | `proxy/proxy-converter.ts`                                               | Bidirectional UI5Object ↔ UI5ControlProxy              | D17      |
-| Browser object map lifecycle         | `proxy/browser-object-map.ts`                                            | Cleanup integration with cache                         | D20      |
-| Typed proxies (20 controls)          | `proxy/typed/*.ts`                                                       | IntelliSense, method bridging                          | D4       |
-| ~~Auto-generated method signatures~~ | ~~Build-time generator from `api.json`~~                                 | ✅ **DONE in Phase 1** — 199 interfaces, 4,092 methods | D22      |
-| `getSelectorForElement`              | `bridge/browser-scripts/get-selector.ts`                                 | G5 carry-forward (already ported)                      | —        |
+**Completed**: 2026-02-17 | **Tests**: 929 | **Files**: 35 source (23 bridge + 12 proxy) + 73 test files | **Coverage**: 99.16% stmts, 96.39% branches, 100% functions
+
+| Task                                 | Files                                                                    | Tests                                                  | Decision | Status |
+| ------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------ | -------- | ------ |
+| BridgeAdapter interface              | `bridge/adapter.ts`                                                      | Interface compliance                                   | D3       | ✅     |
+| ClassicUI5Adapter                    | `bridge/classic-adapter.ts`, `bridge/browser-scripts/*.ts`               | Unit tests (integration deferred to Phase 7)           | D3       | ✅     |
+| WebComponentAdapter                  | `bridge/webcomponent-adapter.ts`                                         | Stub/fallback unit tests                               | D3       | ✅     |
+| HybridAdapter + factory              | `bridge/hybrid-adapter.ts`, `bridge/adapter-factory.ts`                  | Auto-detection tests                                   | D3       | ✅     |
+| Bridge injection                     | `bridge/injection.ts`                                                    | Lazy-only injection (W14)                              | —        | ✅     |
+| Centralized API resolver             | `bridge/api-resolver.ts`                                                 | 3-tier chain: ElementRegistry→Core.byId→RecordReplay   | D19      | ✅     |
+| Browser object map                   | `bridge/browser-scripts/object-map.ts`                                   | TTL cleanup, no leaks                                  | D20      | ✅     |
+| Shared interaction logic             | Inlined into `strategy.ts` (no separate `shared.ts`)                     | Shared fireEvent + bridge accessor                     | D21      | ✅     |
+| Interaction strategies               | `bridge/interaction-strategies/ui5-native.ts`, `dom-first.ts`, `opa5.ts` | Strategy parity, factory routing                       | D21      | ✅     |
+| Discovery factory + chain (G1)       | `proxy/discovery-factory.ts`, `proxy/discovery.ts`                       | Strategy priorities wired, fallback chain              | D18      | ✅     |
+| Single unified proxy                 | `proxy/dynamic-proxy.ts`                                                 | No double-proxy; single handler per control            | D16      | ✅     |
+| UI5Object proxy                      | `proxy/ui5-object-proxy.ts`, `proxy/ui5-object-cache.ts`                 | Method forwarding, cache TTL/LRU                       | D17, D20 | ✅     |
+| Proxy converter                      | `proxy/proxy-converter.ts`                                               | Bidirectional UI5Object ↔ UI5ControlProxy              | D17      | ✅     |
+| Method filter + Playwright API       | `proxy/method-filter.ts`, `proxy/playwright-api.ts`                      | Blocklist filtering, allowlist                         | —        | ✅     |
+| Return handler                       | `proxy/return-handler.ts`                                                | Result type routing                                    | —        | ✅     |
+| ~~Typed proxies (20 controls)~~      | ~~`proxy/typed/*.ts`~~                                                   | Replaced by auto-gen interfaces (D22, Phase 1)         | D4       | N/A    |
+| ~~Auto-generated method signatures~~ | ~~Build-time generator from `api.json`~~                                 | ✅ **DONE in Phase 1** — 199 interfaces, 4,092 methods | D22      | ✅     |
+| `getSelectorForElement`              | `bridge/browser-scripts/get-selector.ts`                                 | G5 carry-forward                                       | —        | ✅     |
+| Barrel exports                       | `bridge/index.ts`, `proxy/index.ts`, `src/index.ts`                      | Export validation (attw 6/6)                           | —        | ✅     |
+| INT1/INT2 integration smoke          | Deferred to Phase 7 (requires real browser + SAP demo apps)              | —                                                      | —        | ⏳     |
 
 ### Phase 3 — Fixtures + Auth + Navigation (Weeks 10–12)
 
