@@ -125,9 +125,9 @@ export class ControlProxyCache {
   /** Evicts the oldest entry if cache exceeds maxSize. */
   private evictIfNeeded(): void {
     while (this.cache.size > this.maxSize) {
-      const oldestKey = this.cache.keys().next();
-      if (oldestKey.done !== true) {
-        this.cache.delete(oldestKey.value);
+      for (const key of this.cache.keys()) {
+        this.cache.delete(key);
+        break;
       }
     }
   }
