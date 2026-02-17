@@ -42,13 +42,15 @@ These decisions were made during Phase 2 planning and are **binding** for implem
 | W4  | Proxy pattern?                     | **Single unified Proxy** per control (D16) — NO double-proxy from dhikraft v2.5.0                                                                                                                                     | wdi5 uses `.bind()` not Proxy (see A.2); Praman uses Proxy for dynamic method interception — cleaner than pre-binding all methods at discovery time |
 | W5  | Object proxy approach?             | **UUID-based persistence** with TTL cleanup — `window.__praman_objectMap`                                                                                                                                             | Proven pattern from both wdi5 and dhikraft; prevents memory leaks in long runs                                                                      |
 | W6  | Method filtering?                  | **Hybrid**: dhikraft 88-item blocklist + wdi5 dynamic rules (`_` prefix, `Render` filter, 5 explicit exclusions)                                                                                                      | See Appendix A.1 — wdi5 uses 5-item filter + 2 rules, NOT 88-item list. Praman combines both for maximum safety                                     |
-| W7  | Interaction strategies?            | **3 strategies**: playwright-native (default), dom-first, opa5-recordreplay                                                                                                                                           | Same as dhikraft v2.5.0; strategy selection via PramanConfig                                                                                        |
+| W7  | Interaction strategies?            | **3 strategies**: ui5-native (default), dom-first, opa5 — superseded by W15, W21                                                                                                                                      | Renamed per W15: `playwright-native` → `ui5-native`. `hybrid` removed (D3). Strategy selection via PramanConfig                                     |
 | W8  | Browser script format?             | **Serialized string functions** for `page.evaluate()` + `addInitScript()`                                                                                                                                             | Playwright constraint: browser scripts must be serializable                                                                                         |
-| W9  | Discovery priority chain?          | **2-tier**: RecordReplay.findDOMElementByControlSelector (primary) → getById fallback (ID-only selectors)                                                                                                             | wdi5 uses RecordReplay ONLY (see A.3). 5-level chain was dhikraft-specific. Registry iteration / property matching deferred to Phase 3+             |
+| W9  | Discovery priority chain?          | **Configurable priority chain** (W20). Default: `['direct-id', 'recordreplay']`. User-configurable via `discoveryStrategies` config. Cache (tier 0) is internal, always first.                                        | User confirmed direct-id works best. RecordReplay as fallback for complex selectors. Registry deferred to Phase 3+. Supersedes original 2-tier.     |
 | W10 | Typed proxy generation?            | ~~Manual interfaces for top 20 controls in Phase 2; auto-gen in Phase 6~~ → **D22 COMPLETE**: Auto-gen pulled forward to Phase 1. 199 interfaces, 4,092 methods generated from api.json. Phase 2 uses these directly. | Original plan superseded. `scripts/generate-typed-proxies.ts` operational.                                                                          |
 | W11 | Development approach?              | **TDD** (tests first) — Red-Green-Refactor for every module                                                                                                                                                           | Proven in Phase 1 (511 tests); non-negotiable                                                                                                       |
 | W12 | RegExp serialization?              | Serialize via `{ source, flags }` pair; reconstruct in browser with `new RegExp()`                                                                                                                                    | Phase 1 `serializeSelectorForBrowser()` already handles this                                                                                        |
 | W13 | Error handling in browser scripts? | **Try-catch → BridgeResult envelope** — all browser errors wrapped, never thrown raw                                                                                                                                  | Consistent with Phase 1 `BridgeResult<T>` type contract                                                                                             |
+| W20 | Configurable discovery chain?      | `discoveryStrategies: DiscoveryStrategyName[]` with default `['direct-id', 'recordreplay']`. Ordered array (D1). Cache (tier 0) internal (D9). `'registry'` in enum for Phase 3+ (D6).                                | User confirmed direct-id works best. Configurable for SAP enterprise (OPA5 compliance may prefer recordreplay first). See Appendix C.               |
+| W21 | Strategy rename + OPA5 config?     | Rename `'playwright-native'` → `'ui5-native'`, remove `'hybrid'` (D3). Add `opa5` sub-schema: `{ interactionTimeout, autoWait, debug }` (D7). Types derived from Zod (D11). See Appendix C for full implementation.   | Clean break (pre-release). `opa5` sub-schema keeps strategy-specific config separated. Derive from Zod = single source of truth.                    |
 
 ---
 
@@ -63,7 +65,7 @@ Phase 2 — Bridge + Proxy (4 weeks)
 │   │   └── bridge-constants.ts (timeouts, XHR patterns, globals)
 │   ├── Browser scripts
 │   │   ├── inject-ui5.ts (RecordReplay attach, __praman namespace setup)
-│   │   ├── find-control.ts (5-level discovery chain)
+│   │   ├── find-control.ts (configurable discovery chain)
 │   │   ├── execute-method.ts (method call + 7-type return detection)
 │   │   ├── get-version.ts (UI5 version detection)
 │   │   ├── object-map.ts (UUID storage + TTL cleanup)
@@ -75,7 +77,7 @@ Phase 2 — Bridge + Proxy (4 weeks)
 │   ├── Interaction strategies
 │   │   ├── strategy.ts (InteractionStrategy interface)
 │   │   ├── shared.ts (shared fireEvent + bridge accessor)
-│   │   ├── playwright-strategy.ts (fire* methods, default)
+│   │   ├── ui5-native-strategy.ts (fire* methods, default)
 │   │   ├── dom-first-strategy.ts (DOM clicks + UI5 fallback)
 │   │   ├── opa5-strategy.ts (RecordReplay.interactWithControl)
 │   │   └── strategy-factory.ts (config-driven selection)
@@ -243,10 +245,10 @@ Phase 2 — Bridge + Proxy (4 weeks)
 │                                                                     │
 │  Interaction Strategies (strategy pattern):                         │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐               │
-│  │ playwright-  │ │ dom-first    │ │ opa5-record  │               │
-│  │ native       │ │ (DOM clicks  │ │ replay       │               │
-│  │ (fire* API)  │ │ + UI5 fall.) │ │ (SAP OPA5)   │               │
-│  │ DEFAULT      │ │              │ │              │               │
+│  │ ui5-native   │ │ dom-first    │ │ opa5         │               │
+│  │ (fire* API)  │ │ (DOM clicks  │ │ (SAP Record  │               │
+│  │ DEFAULT      │ │ + UI5 fall.) │ │  Replay)     │               │
+│  │              │ │              │ │              │               │
 │  └──────────────┘ └──────────────┘ └──────────────┘               │
 └─────────────────────────────────┬───────────────────────────────────┘
                                   │ page.evaluate()
@@ -274,13 +276,14 @@ Phase 2 — Bridge + Proxy (4 weeks)
 │  │ 3. Core.byId(id)                 [LEGACY, deprecated 1.118] │   │
 │  └──────────────────────────────────────────────────────────────┘   │
 │                                                                     │
-│  Control Discovery Chain (W9 — revised per Appendix A.3):           │
+│  Control Discovery Chain (W9/W20 — configurable, see Appendix C):   │
 │  ┌──────────────────────────────────────────────────────────────┐   │
 │  │ Tier 0: Node-side cache (LRU, skip browser round-trip)       │   │
-│  │ Tier 1: RecordReplay.findDOMElementByControlSelector()       │   │
-│  │         (PRIMARY — handles all selector types, wdi5-proven)  │   │
-│  │ Tier 2: Direct getById(id) fallback for ID-only selectors    │   │
-│  │         (Element.getElementById → Registry → Core.byId)      │   │
+│  │ Tier 1+: Configurable via discoveryStrategies config         │   │
+│  │          Default: ['direct-id', 'recordreplay']              │   │
+│  │          direct-id: Element.getElementById → Registry →      │   │
+│  │                     Core.byId (3-level internal chain)       │   │
+│  │          recordreplay: RecordReplay.findDOMElementBy...      │   │
 │  └──────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -352,8 +355,8 @@ TEST CODE: await button.press();
 
 1. Proxy get trap intercepts 'press'
 2. Method not in BLACKLIST → proceed
-3. InteractionStrategy selected (default: playwright-native)
-4. PlaywrightStrategy.interact(page, controlId, 'press', [])
+3. InteractionStrategy selected (default: ui5-native)
+4. UI5NativeStrategy.interact(page, controlId, 'press', [])
    ├─ page.evaluate(interactionScript, { id, method: 'press' })
    │   ┌─── BROWSER CONTEXT ──────────────────────────────────┐
    │   │ 1. const control = __praman_bridge.getById('saveBtn') │
@@ -659,7 +662,7 @@ export function getApiResolverPriority(ui5Version: string): readonly string[];
 
 ### 6.12 Module: bridge/interaction-strategies/
 
-**6 files**: `strategy.ts`, `shared.ts`, `playwright-strategy.ts`, `dom-first-strategy.ts`, `opa5-strategy.ts`, `strategy-factory.ts`
+**6 files**: `strategy.ts`, `shared.ts`, `ui5-native-strategy.ts`, `dom-first-strategy.ts`, `opa5-strategy.ts`, `strategy-factory.ts`
 
 ```typescript
 // strategy.ts
@@ -675,8 +678,14 @@ export interface InteractionStrategy {
   press(page: BridgePage, controlId: string): Promise<void>;
 }
 
+// opa5-strategy.ts — constructor receives opa5 sub-config (Appendix C D7)
+// class OPA5Strategy implements InteractionStrategy {
+//   constructor(opa5Config: { interactionTimeout: number; autoWait: boolean; debug: boolean })
+// }
+
 // strategy-factory.ts
 export function createInteractionStrategy(config: Readonly<PramanConfig>): InteractionStrategy;
+// Factory passes config.opa5 ?? { interactionTimeout: 5_000, autoWait: true, debug: false } to OPA5Strategy
 ```
 
 **Estimated LOC**: ~400 total (6 files)
@@ -841,19 +850,24 @@ export function convertToObjectProxy(
 
 ### 7.6 Module: proxy/discovery.ts + proxy/discovery-factory.ts
 
-**Purpose**: Node-side control discovery orchestration with 2-tier selection (revised per A.3).
+**Purpose**: Node-side control discovery orchestration with configurable strategy chain (W9/W20).
 
 ```typescript
-// discovery.ts
+// discovery.ts — accepts configuredStrategies from PramanConfig.discoveryStrategies
 export async function discoverControl(
   selector: UI5Selector,
   adapter: BridgeAdapter,
   cache: ControlProxyCache,
+  discoveryStrategies: readonly DiscoveryStrategyName[],
 ): Promise<UI5ControlBase | null>;
 
-// discovery-factory.ts
+// discovery-factory.ts — builds ordered strategy list from config
 export type DiscoveryStrategy = 'cache' | 'recordreplay' | 'direct-id';
-export function getDiscoveryPriorities(selector: UI5Selector): readonly DiscoveryStrategy[];
+export function getDiscoveryPriorities(
+  selector: UI5Selector,
+  configuredStrategies: readonly DiscoveryStrategyName[],
+): readonly DiscoveryStrategy[];
+// Always prepends 'cache' as tier 0 (internal, D9). Uses configuredStrategies for remaining order.
 ```
 
 **Estimated LOC**: ~120 total
@@ -913,7 +927,7 @@ export { WebComponentAdapter } from './webcomponent-adapter.js';
 export { HybridAdapter } from './hybrid-adapter.js';
 export { createAdapter } from './adapter-factory.js';
 export { ensureBridgeInjected, isBridgeReady, waitForBridgeReady } from './injection.js';
-export type { InteractionStrategy } from './interaction-strategies/strategy.js';
+export type { InteractionStrategy } from './interaction-strategies/strategy.js'; // runtime interface
 export { createInteractionStrategy } from './interaction-strategies/strategy-factory.js';
 export { METHOD_BLACKLIST, isBlacklisted } from './method-blacklist.js';
 export { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS, XHR_IGNORE_PATTERNS } from './bridge-constants.js';
@@ -956,7 +970,7 @@ Add re-exports from bridge and proxy barrels for the public API.
 | 11        | `src/bridge/api-resolver.ts`                               | Bridge | 80         | 2.1       |
 | 12        | `src/bridge/interaction-strategies/strategy.ts`            | Bridge | 30         | 2.1       |
 | 13        | `src/bridge/interaction-strategies/shared.ts`              | Bridge | 80         | 2.1       |
-| 14        | `src/bridge/interaction-strategies/playwright-strategy.ts` | Bridge | 100        | 2.1       |
+| 14        | `src/bridge/interaction-strategies/ui5-native-strategy.ts` | Bridge | 100        | 2.1       |
 | 15        | `src/bridge/interaction-strategies/dom-first-strategy.ts`  | Bridge | 100        | 2.1       |
 | 16        | `src/bridge/interaction-strategies/opa5-strategy.ts`       | Bridge | 100        | 2.1       |
 | 17        | `src/bridge/interaction-strategies/strategy-factory.ts`    | Bridge | 50         | 2.1       |
@@ -994,7 +1008,7 @@ Add re-exports from bridge and proxy barrels for the public API.
 | 10        | `tests/unit/bridge/injection.test.ts`                                  | 12         |
 | 11        | `tests/unit/bridge/api-resolver.test.ts`                               | 10         |
 | 12        | `tests/unit/bridge/interaction-strategies/shared.test.ts`              | 8          |
-| 13        | `tests/unit/bridge/interaction-strategies/playwright-strategy.test.ts` | 10         |
+| 13        | `tests/unit/bridge/interaction-strategies/ui5-native-strategy.test.ts` | 10         |
 | 14        | `tests/unit/bridge/interaction-strategies/dom-first-strategy.test.ts`  | 10         |
 | 15        | `tests/unit/bridge/interaction-strategies/opa5-strategy.test.ts`       | 8          |
 | 16        | `tests/unit/bridge/interaction-strategies/strategy-factory.test.ts`    | 6          |
@@ -1604,7 +1618,7 @@ These decisions supersede or amend W6–W8 based on review findings.
 
 **W6 (Method blacklist count)**: dhikraft constants.ts has **47 active items** + 44 commented = 91 total (not "88"). wdi5 uses 5 + 2 rules. `METHOD_BLACKLIST.size` test should assert 47 (active dhikraft set).
 
-**W7 (Strategy names)**: Superseded by W15. Update `InteractionStrategy` type in `schema.ts`: `'ui5-native' | 'dom-first' | 'opa5' | 'hybrid'`.
+**W7 (Strategy names)**: Superseded by W15 + W21. Update `interactionStrategy` enum in `schema.ts`: `'ui5-native' | 'dom-first' | 'opa5'`. `'hybrid'` REMOVED (D3 in Appendix C).
 
 **W8 (Browser script format)**: Superseded by W14. Remove `addInitScript()` reference. All scripts via `page.evaluate()` only.
 
@@ -1926,6 +1940,555 @@ npm run check:exports    # attw validates all export maps
 
 ---
 
-> **Plan version**: 2.2.0 (revised 2026-02-17 — Architect Review + integration testing)
+> **Plan version**: 2.3.0 (revised 2026-02-17 — Strategy Config + Architect Review + integration testing)
 > **Status**: APPROVED WITH CONDITIONS — all critical items have clear resolution paths
-> **Next step**: Resolve C1-C3 (pre-Phase-2 type changes), then begin Sub-Phase 2.1
+> **Next step**: Implement Appendix C (strategy config changes), then resolve C1-C3, then begin Sub-Phase 2.1
+
+---
+
+## Appendix C — Configurable Strategy Config Implementation (2026-02-17)
+
+> **Status**: Pre-implementation — config layer changes required before Phase 2 bridge work
+> **Scope**: Adds configurable control discovery + interaction strategy to PramanConfig
+> **Reviews**: TDD Specialist, Principal Architect, Playwright Expert
+> **User decisions**: D4 (direct-id first), D5 (ui5-native default), D11 (Derive from Zod)
+
+### C.1 Design Decisions
+
+| #   | Decision                                           | Rationale                                                                                                                                      |
+| --- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Discovery is an **ordered array** (priority chain) | Chain semantics: try first, if not found try next. Genuine need for fallback ordering.                                                         |
+| D2  | Interaction is a **single enum** (not array)       | Each strategy has internal fallbacks (e.g., ui5-native: firePress → fireSelect → fireTap → DOM click). No inter-strategy chaining.             |
+| D3  | Remove `'hybrid'` and `'playwright'` values        | `'hybrid'` was vague. `'playwright'` renamed to `'ui5-native'` (W15). Clean break — pre-release, no users.                                     |
+| D4  | Default discovery: `['direct-id', 'recordreplay']` | User confirmed direct-id works best. RecordReplay as fallback for complex selectors.                                                           |
+| D5  | Default interaction: `'ui5-native'`                | User confirmed this works best.                                                                                                                |
+| D6  | `'registry'` in discovery enum but Phase 3+        | Include in type for forward-compat. Warn at runtime if selected before implementation.                                                         |
+| D7  | Add `opa5` sub-schema for OPA5-specific options    | Keeps strategy-specific config cleanly separated.                                                                                              |
+| D8  | No backward-compat migration needed                | Pre-release, no users. Old values simply removed. No Zod preprocess.                                                                           |
+| D9  | `'cache'` is internal, not user-facing             | Cache is always checked first (optimization). Not a selectable discovery strategy.                                                             |
+| D10 | `direct-id` keeps `Core.byId()` legacy fallback    | `Core.byId()` deprecated since UI5 1.118 but kept as last-resort. Internal chain: Element.getElementById → ElementRegistry.get → Core.byId.    |
+| D11 | **Derive types from Zod** (single source of truth) | Define enums as `z.enum([...])` in schema.ts, export TypeScript types via `z.infer<>`. Eliminates manual sync between config.ts and schema.ts. |
+| D12 | Duplicates in `discoveryStrategies` are valid      | Zod `.array(z.enum(...)).min(1)` does not prevent duplicates. Wasteful but harmless. No `.refine()` for Phase 2.                               |
+
+### C.2 Config Shape
+
+```typescript
+// User-facing config (praman.config.ts or playwright.config.ts):
+{
+  // ... existing fields ...
+
+  // Control discovery priority chain (tried in order)
+  discoveryStrategies: ['direct-id', 'recordreplay'],  // default
+
+  // Interaction strategy (single selection)
+  interactionStrategy: 'ui5-native',  // default
+
+  // OPA5-specific options (only when interactionStrategy is 'opa5')
+  opa5: {
+    interactionTimeout: 5_000,
+    autoWait: true,
+    debug: false,
+  },
+}
+```
+
+**Available discovery values**: `'direct-id'` | `'recordreplay'` | `'registry'`
+**Available interaction values**: `'ui5-native'` | `'dom-first'` | `'opa5'`
+
+### C.3 Type Architecture (Derive from Zod — D11)
+
+**Before** (manual sync, two files define same values independently):
+
+```
+config.ts:  export type InteractionStrategy = 'playwright' | 'dom-first' | ... ← manual
+schema.ts:  z.enum(['playwright', 'dom-first', ...])                           ← duplicated, no compile-time sync
+```
+
+**After** (single source of truth in schema.ts):
+
+```typescript
+// schema.ts — enums defined as named constants, types derived
+const interactionStrategyEnum = z.enum(['ui5-native', 'dom-first', 'opa5']);
+export type InteractionStrategyName = z.infer<typeof interactionStrategyEnum>;
+
+const discoveryStrategyEnum = z.enum(['direct-id', 'recordreplay', 'registry']);
+export type DiscoveryStrategyName = z.infer<typeof discoveryStrategyEnum>;
+```
+
+**Import paths** (no circular dependency — one-directional flow):
+
+```
+types/index.ts → config/schema.ts → zod/v4
+```
+
+- Type tests: `import type { InteractionStrategyName } from '#core/types/index.js'` (barrel)
+- Runtime code: `import type { InteractionStrategyName } from '#core/config/schema.js'`
+
+**Naming distinction** (two different concerns, no conflict):
+
+- `InteractionStrategyName` — config type (string literal union) in `config/schema.ts`
+- `InteractionStrategy` — runtime interface (strategy pattern) in `bridge/interaction-strategies/strategy.ts`
+
+### C.4 Files to Modify
+
+| #   | File                                         | Changes                                                                                                                                                                                          |
+| --- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | `src/core/types/config.ts`                   | Remove `InteractionStrategy` type. Other types (`LogLevel`, `AuthStrategy`, `AIProvider`, `TelemetryExporter`) unchanged.                                                                        |
+| 2   | `src/core/types/index.ts`                    | Remove `InteractionStrategy` re-export from `./config.js`. Add `InteractionStrategyName` + `DiscoveryStrategyName` re-exports from `../config/schema.js`.                                        |
+| 3   | `src/core/config/schema.ts`                  | Add `interactionStrategyEnum`, `discoveryStrategyEnum` named constants. Export inferred types. Add `opa5Schema` sub-schema. Update `interactionStrategy` field. Add `discoveryStrategies` array. |
+| 4   | `src/core/config/index.ts`                   | Add re-exports: `InteractionStrategyName`, `DiscoveryStrategyName` from `./schema.js`.                                                                                                           |
+| 5   | `src/core/config/loader.ts`                  | Add `'string-array'` to `EnvMapping.type`. Add `PRAMAN_DISCOVERY_STRATEGIES` mapping. Add `case 'string-array'` parsing.                                                                         |
+| 6   | `tests/unit/core/types/config.types.test.ts` | Remove `InteractionStrategy` tests. Add `InteractionStrategyName` + `DiscoveryStrategyName` tests. Update imports to barrel.                                                                     |
+| 7   | `tests/unit/core/config/schema.test.ts`      | Update interaction defaults (`'hybrid'` → `'ui5-native'`). Add `discoveryStrategies` + `opa5` tests. Update full config fixture.                                                                 |
+| 8   | `tests/unit/core/config/loader.test.ts`      | Update env var tests. Add comma-separated parsing. Add discovery env tests.                                                                                                                      |
+
+### C.5 TDD Execution Strategy
+
+> **Iron Law**: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+> **Approach**: 2 TDD batches + 1 doc batch, each following RED → VERIFY RED → GREEN → VERIFY GREEN
+
+---
+
+#### TDD Batch 1: Types + Schema (merged — D11 makes types and schema atomic)
+
+Since types are derived from Zod in schema.ts, type changes and schema changes must happen together.
+
+**RED — Write/update tests first:**
+
+**File 1: `tests/unit/core/types/config.types.test.ts`**
+
+Remove entire `InteractionStrategy` describe block (lines 35-47). Update imports. Add:
+
+```typescript
+import type {
+  AIProvider,
+  AuthStrategy,
+  DiscoveryStrategyName,
+  InteractionStrategyName,
+  LogLevel,
+  TelemetryExporter,
+} from '#core/types/index.js';
+
+// ... existing LogLevel, AuthStrategy, AIProvider, TelemetryExporter tests unchanged ...
+
+describe('InteractionStrategyName', () => {
+  it('accepts all valid strategies', () => {
+    expectTypeOf<'ui5-native'>().toExtend<InteractionStrategyName>();
+    expectTypeOf<'dom-first'>().toExtend<InteractionStrategyName>();
+    expectTypeOf<'opa5'>().toExtend<InteractionStrategyName>();
+  });
+
+  it('rejects removed values', () => {
+    expectTypeOf<'hybrid'>().not.toExtend<InteractionStrategyName>();
+    expectTypeOf<'playwright'>().not.toExtend<InteractionStrategyName>();
+  });
+
+  it('rejects invalid values', () => {
+    expectTypeOf<'selenium'>().not.toExtend<InteractionStrategyName>();
+    expectTypeOf<'cypress'>().not.toExtend<InteractionStrategyName>();
+    expectTypeOf<number>().not.toExtend<InteractionStrategyName>();
+  });
+});
+
+describe('DiscoveryStrategyName', () => {
+  it('accepts all valid strategies', () => {
+    expectTypeOf<'direct-id'>().toExtend<DiscoveryStrategyName>();
+    expectTypeOf<'recordreplay'>().toExtend<DiscoveryStrategyName>();
+    expectTypeOf<'registry'>().toExtend<DiscoveryStrategyName>();
+  });
+
+  it('rejects internal-only strategies', () => {
+    expectTypeOf<'cache'>().not.toExtend<DiscoveryStrategyName>();
+  });
+
+  it('rejects invalid values', () => {
+    expectTypeOf<'property-match'>().not.toExtend<DiscoveryStrategyName>();
+    expectTypeOf<'xpath'>().not.toExtend<DiscoveryStrategyName>();
+    expectTypeOf<number>().not.toExtend<DiscoveryStrategyName>();
+  });
+
+  it('works as array element type', () => {
+    expectTypeOf<DiscoveryStrategyName[]>().toExtend<string[]>();
+    expectTypeOf<['direct-id', 'recordreplay']>().toExtend<readonly DiscoveryStrategyName[]>();
+  });
+});
+```
+
+**File 2: `tests/unit/core/config/schema.test.ts`**
+
+Update existing assertions + add new describe blocks:
+
+Existing changes:
+
+- Line 22: `expect(result.data.interactionStrategy).toBe('hybrid')` → `'ui5-native'`
+- Line 22 (add): `expect(result.data.discoveryStrategies).toEqual(['direct-id', 'recordreplay'])`
+- Line 46: `interactionStrategy: 'playwright'` → `'ui5-native'`
+- Line 46 (add): `discoveryStrategies: ['direct-id', 'recordreplay']` to full config fixture
+
+New test blocks:
+
+```typescript
+// Inside 'valid inputs' describe:
+
+it('accepts discoveryStrategies reordering', () => {
+  const result = PramanConfigSchema.safeParse({
+    discoveryStrategies: ['recordreplay', 'direct-id'],
+  });
+  expect(result.success).toBe(true);
+  if (result.success) {
+    expect(result.data.discoveryStrategies).toEqual(['recordreplay', 'direct-id']);
+  }
+});
+
+it('accepts all three discovery strategies', () => {
+  const result = PramanConfigSchema.safeParse({
+    discoveryStrategies: ['direct-id', 'recordreplay', 'registry'],
+  });
+  expect(result.success).toBe(true);
+});
+
+it('accepts single discovery strategy', () => {
+  const result = PramanConfigSchema.safeParse({
+    discoveryStrategies: ['recordreplay'],
+  });
+  expect(result.success).toBe(true);
+  if (result.success) {
+    expect(result.data.discoveryStrategies).toEqual(['recordreplay']);
+  }
+});
+
+it('accepts duplicate discovery strategies (wasteful but valid)', () => {
+  const result = PramanConfigSchema.safeParse({
+    discoveryStrategies: ['direct-id', 'direct-id'],
+  });
+  expect(result.success).toBe(true);
+});
+
+it('applies opa5 defaults when provided as empty object', () => {
+  const result = PramanConfigSchema.safeParse({ opa5: {} });
+  expect(result.success).toBe(true);
+  if (result.success) {
+    expect(result.data.opa5?.interactionTimeout).toBe(5_000);
+    expect(result.data.opa5?.autoWait).toBe(true);
+    expect(result.data.opa5?.debug).toBe(false);
+  }
+});
+
+it('accepts valid full opa5 config', () => {
+  const result = PramanConfigSchema.safeParse({
+    opa5: { interactionTimeout: 8_000, autoWait: false, debug: true },
+  });
+  expect(result.success).toBe(true);
+  if (result.success) {
+    expect(result.data.opa5?.interactionTimeout).toBe(8_000);
+    expect(result.data.opa5?.autoWait).toBe(false);
+    expect(result.data.opa5?.debug).toBe(true);
+  }
+});
+
+it('opa5 is absent by default', () => {
+  const result = PramanConfigSchema.safeParse({});
+  expect(result.success).toBe(true);
+  if (result.success) {
+    expect(result.data.opa5).toBeUndefined();
+  }
+});
+
+it('accepts opa5 even when interactionStrategy is not opa5', () => {
+  const result = PramanConfigSchema.safeParse({
+    interactionStrategy: 'ui5-native',
+    opa5: { interactionTimeout: 3_000 },
+  });
+  expect(result.success).toBe(true);
+});
+
+// Inside 'invalid inputs' describe:
+
+it('rejects empty discoveryStrategies array', () => {
+  const result = PramanConfigSchema.safeParse({ discoveryStrategies: [] });
+  expect(result.success).toBe(false);
+});
+
+it('rejects invalid discovery strategy names', () => {
+  const result = PramanConfigSchema.safeParse({ discoveryStrategies: ['cache'] });
+  expect(result.success).toBe(false);
+});
+
+it('rejects non-array discoveryStrategies', () => {
+  const result = PramanConfigSchema.safeParse({ discoveryStrategies: 'direct-id' });
+  expect(result.success).toBe(false);
+});
+
+it('rejects removed interactionStrategy "playwright"', () => {
+  const result = PramanConfigSchema.safeParse({ interactionStrategy: 'playwright' });
+  expect(result.success).toBe(false);
+});
+
+it('rejects removed interactionStrategy "hybrid"', () => {
+  const result = PramanConfigSchema.safeParse({ interactionStrategy: 'hybrid' });
+  expect(result.success).toBe(false);
+});
+
+it('rejects negative opa5 interactionTimeout', () => {
+  const result = PramanConfigSchema.safeParse({ opa5: { interactionTimeout: -1 } });
+  expect(result.success).toBe(false);
+});
+
+it('rejects zero opa5 interactionTimeout', () => {
+  const result = PramanConfigSchema.safeParse({ opa5: { interactionTimeout: 0 } });
+  expect(result.success).toBe(false);
+});
+
+it('rejects float opa5 interactionTimeout', () => {
+  const result = PramanConfigSchema.safeParse({ opa5: { interactionTimeout: 1.5 } });
+  expect(result.success).toBe(false);
+});
+```
+
+**VERIFY RED**: Tests fail because `InteractionStrategyName`, `DiscoveryStrategyName` types don't exist, `discoveryStrategies` / `opa5` fields don't exist in schema, `interactionStrategy` still has old enum values.
+
+**GREEN — Update production code (4 files):**
+
+1. **`src/core/config/schema.ts`**: Add named enum constants, export inferred types, add opa5 sub-schema, update interactionStrategy, add discoveryStrategies:
+
+```typescript
+// Add before root schema:
+const interactionStrategyEnum = z.enum(['ui5-native', 'dom-first', 'opa5']);
+const discoveryStrategyEnum = z.enum(['direct-id', 'recordreplay', 'registry']);
+
+const opa5Schema = z.object({
+  interactionTimeout: z.number().int().positive().default(5_000),
+  autoWait: z.boolean().default(true),
+  debug: z.boolean().default(false),
+});
+
+// Export inferred types:
+export type InteractionStrategyName = z.infer<typeof interactionStrategyEnum>;
+export type DiscoveryStrategyName = z.infer<typeof discoveryStrategyEnum>;
+
+// In PramanConfigSchema, replace interactionStrategy line and add new fields:
+//   interactionStrategy: interactionStrategyEnum.default('ui5-native'),
+//   discoveryStrategies: z.array(discoveryStrategyEnum).min(1).default(['direct-id', 'recordreplay']),
+//   opa5: opa5Schema.optional(),
+```
+
+2. **`src/core/types/config.ts`**: Remove `InteractionStrategy` type and its TSDoc block (lines 31-46).
+
+3. **`src/core/types/index.ts`**: Remove `InteractionStrategy` from `./config.js` re-exports. Add:
+
+```typescript
+export type { DiscoveryStrategyName, InteractionStrategyName } from '../config/schema.js';
+```
+
+4. **`src/core/config/index.ts`**: Add type re-exports:
+
+```typescript
+export type { DiscoveryStrategyName, InteractionStrategyName } from './schema.js';
+```
+
+**VERIFY GREEN**: `npm run typecheck && npm run test:unit && npm run lint`
+
+---
+
+#### TDD Batch 2: Config Loader (env var parsing)
+
+**RED — Write/update loader tests first** (`tests/unit/core/config/loader.test.ts`):
+
+Existing changes:
+
+- Line 23: `expect(config.interactionStrategy).toBe('hybrid')` → `'ui5-native'`
+- Line 23 (add): `expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay'])`
+- Lines 62-65: `vi.stubEnv('PRAMAN_INTERACTION_STRATEGY', 'playwright')` → `'ui5-native'`
+
+New test blocks:
+
+```typescript
+describe('discoveryStrategies env var', () => {
+  it('parses PRAMAN_DISCOVERY_STRATEGIES as comma-separated array', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', 'direct-id,recordreplay');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  it('parses single value as single-element array', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', 'recordreplay');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['recordreplay']);
+  });
+
+  it('trims whitespace around values', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', ' direct-id , recordreplay ');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  it('filters empty segments from trailing comma', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', 'direct-id,,recordreplay');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  it('falls back to default on invalid strategy in env var', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', 'direct-id,invalid');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+
+  it('falls back to default on empty env var', async () => {
+    vi.stubEnv('PRAMAN_DISCOVERY_STRATEGIES', '');
+    const config = await loadConfig();
+    expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
+  });
+});
+
+describe('interactionStrategy env var (updated values)', () => {
+  it('overrides with ui5-native', async () => {
+    vi.stubEnv('PRAMAN_INTERACTION_STRATEGY', 'ui5-native');
+    const config = await loadConfig();
+    expect(config.interactionStrategy).toBe('ui5-native');
+  });
+
+  it('overrides with opa5', async () => {
+    vi.stubEnv('PRAMAN_INTERACTION_STRATEGY', 'opa5');
+    const config = await loadConfig();
+    expect(config.interactionStrategy).toBe('opa5');
+  });
+
+  it('falls back on removed value "hybrid"', async () => {
+    vi.stubEnv('PRAMAN_INTERACTION_STRATEGY', 'hybrid');
+    const config = await loadConfig();
+    expect(config.interactionStrategy).toBe('ui5-native');
+  });
+
+  it('falls back on removed value "playwright"', async () => {
+    vi.stubEnv('PRAMAN_INTERACTION_STRATEGY', 'playwright');
+    const config = await loadConfig();
+    expect(config.interactionStrategy).toBe('ui5-native');
+  });
+});
+```
+
+**VERIFY RED**: Tests fail because `'string-array'` type doesn't exist, `PRAMAN_DISCOVERY_STRATEGIES` env mapping missing.
+
+**GREEN — Update production code:**
+
+**`src/core/config/loader.ts`**: Add `'string-array'` to `EnvMapping.type`, add mapping, add parsing:
+
+```typescript
+// Update EnvMapping type:
+readonly type: 'string' | 'number' | 'boolean' | 'string-array';
+
+// Add to ENV_MAPPINGS array:
+{ envVar: 'PRAMAN_DISCOVERY_STRATEGIES', configKey: 'discoveryStrategies', type: 'string-array' },
+
+// Add case in readEnvOverrides switch:
+case 'string-array': {
+  const items = value.split(',').map((s) => s.trim()).filter((s) => s.length > 0);
+  if (items.length > 0) {
+    envConfig[mapping.configKey] = items;
+  }
+  break;
+}
+```
+
+**VERIFY GREEN**: `npm run ci` — all tests pass, 0 lint errors, 0 type errors.
+
+---
+
+### C.6 Existing Tests That Must Be Updated (Breaking Changes)
+
+| File                   | Line(s) | Current Assertion                         | New Assertion                                                               |
+| ---------------------- | ------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| `config.types.test.ts` | 11-17   | Imports `InteractionStrategy`             | Replace with `InteractionStrategyName`, `DiscoveryStrategyName` from barrel |
+| `config.types.test.ts` | 35-47   | `InteractionStrategy` describe block      | Replace with `InteractionStrategyName` + `DiscoveryStrategyName` blocks     |
+| `schema.test.ts`       | 22      | `interactionStrategy` defaults `'hybrid'` | Defaults to `'ui5-native'`; add `discoveryStrategies` default               |
+| `schema.test.ts`       | 46      | Full config: `'playwright'`               | Change to `'ui5-native'`; add `discoveryStrategies` field                   |
+| `schema.test.ts`       | 183-188 | Rejects `'selenium'`                      | Keep + add rejects `'playwright'`, `'hybrid'`                               |
+| `loader.test.ts`       | 23      | `interactionStrategy` defaults `'hybrid'` | Defaults to `'ui5-native'`; add `discoveryStrategies`                       |
+| `loader.test.ts`       | 62-65   | Env override with `'playwright'`          | Change to `'ui5-native'`                                                    |
+
+### C.7 Test Count Summary
+
+| File                   | Existing | Updated | New                       | Total   |
+| ---------------------- | -------- | ------- | ------------------------- | ------- |
+| `config.types.test.ts` | 10       | 2       | 7 (2 new blocks)          | ~14     |
+| `schema.test.ts`       | 17       | 3       | ~16 (8 valid + 8 invalid) | ~30     |
+| `loader.test.ts`       | 13       | 2       | ~10 (6 + 4)               | ~23     |
+| **Totals**             | **40**   | **7**   | **~33**                   | **~67** |
+
+### C.8 Environment Variable Quick Reference
+
+| Env Var                            | Type            | Example                  | Config Key                |
+| ---------------------------------- | --------------- | ------------------------ | ------------------------- |
+| `PRAMAN_INTERACTION_STRATEGY`      | string          | `ui5-native`             | `interactionStrategy`     |
+| `PRAMAN_DISCOVERY_STRATEGIES`      | comma-separated | `direct-id,recordreplay` | `discoveryStrategies`     |
+| `PRAMAN_LOG_LEVEL`                 | string          | `debug`                  | `logLevel`                |
+| `PRAMAN_CONTROL_DISCOVERY_TIMEOUT` | number          | `15000`                  | `controlDiscoveryTimeout` |
+
+### C.9 User-Facing Config Examples
+
+```typescript
+// Default (no config needed — these are the defaults):
+// discoveryStrategies: ['direct-id', 'recordreplay']
+// interactionStrategy: 'ui5-native'
+
+// SAP enterprise with OPA5 compliance:
+defineConfig({
+  discoveryStrategies: ['recordreplay', 'direct-id'],
+  interactionStrategy: 'opa5',
+  opa5: { interactionTimeout: 8_000, debug: true },
+});
+
+// DOM-first for accessibility testing:
+defineConfig({
+  interactionStrategy: 'dom-first',
+});
+
+// All three discovery strategies (Phase 3+):
+defineConfig({
+  discoveryStrategies: ['direct-id', 'recordreplay', 'registry'],
+});
+```
+
+```bash
+# Via environment variables:
+PRAMAN_INTERACTION_STRATEGY=opa5 npx playwright test
+PRAMAN_DISCOVERY_STRATEGIES=recordreplay,direct-id npx playwright test
+```
+
+### C.10 Playwright Expert Review — Integration Gap Fixes
+
+> **Reviewer**: Playwright Expert
+> **Verdict**: Config plan is sound. 3 gaps in plan2.md fixed via inline edits above.
+
+**GAP 1 (Fixed)**: W9 discovery ordering now aligns with D4 (direct-id first, configurable).
+**GAP 2 (Fixed)**: `getDiscoveryPriorities()` and `discoverControl()` signatures updated in Section 7.6 to accept `configuredStrategies` parameter.
+**GAP 3 (Fixed)**: `OPA5Strategy` constructor documented to receive `opa5Config` in Section 6.12.
+
+**Verified correct** (no changes needed):
+
+- Single entry point via fixtures
+- Config flow: config → fixture → bridge (worker-scoped config, per-test adapter)
+- `InteractionStrategy` (interface) vs `InteractionStrategyName` (type) — different concerns
+- Lazy injection (W14/W19) — compatible with configurable strategies
+- Env var override for CI — config loader precedence (env > inline > defaults)
+- Multi-page/iframe re-injection — `ensureInitialized()` checks bridge per page
+
+### C.11 CI Gate
+
+After both TDD batches:
+
+```bash
+npm run ci  # lint + typecheck + test:unit + build
+```
+
+Expected: 0 errors, 0 warnings, ~67 tests affected (rest unchanged), coverage meets Tier 2 thresholds (95% statements for `src/core/`).
+
+### C.12 Implementation Order
+
+```
+1. Appendix C TDD Batch 1 (types + schema)  ← this plan
+2. Appendix C TDD Batch 2 (loader)          ← this plan
+3. C1-C3 pre-Phase-2 type changes           ← Appendix B
+4. Sub-Phase 2.1 Bridge Foundation           ← main plan
+```
