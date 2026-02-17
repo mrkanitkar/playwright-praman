@@ -1,4 +1,4 @@
-# Phase 2 — Implementation Tracker
+h# Phase 2 — Implementation Tracker
 
 > **Plan Version**: 2.3.0
 > **Plan File**: plan2.md (Bridge + Proxy Detailed Implementation Plan)
@@ -69,23 +69,23 @@ Each batch is sized to fit safely within Claude's context window:
 
 | #   | Batch | Files                                                                            | Est. Out | Depends | Status |
 | --- | ----- | -------------------------------------------------------------------------------- | -------- | ------- | ------ |
-| 1   | C-B1a | Update `tests/unit/core/types/config.types.test.ts` (RED)                        | ~800     | —       | [ ]    |
-| 2   | C-B1b | Update `tests/unit/core/config/schema.test.ts` (RED)                             | ~1,200   | —       | [ ]    |
-| 3   | C-B1c | Update `src/core/config/schema.ts` (GREEN — add enums + opa5)                    | ~1,000   | C-B1a   | [ ]    |
-| 4   | C-B1d | Update `src/core/types/config.ts` + `types/index.ts` + `config/index.ts` (GREEN) | ~600     | C-B1c   | [ ]    |
-| 5   | C-B1e | VERIFY GREEN: `npm run typecheck && npm run test:unit && npm run lint`           | —        | C-B1d   | [ ]    |
-| 6   | C-B2a | Update `tests/unit/core/config/loader.test.ts` (RED)                             | ~800     | C-B1e   | [ ]    |
-| 7   | C-B2b | Update `src/core/config/loader.ts` (GREEN — string-array type)                   | ~400     | C-B2a   | [ ]    |
-| 8   | C-B2c | VERIFY GREEN: `npm run ci`                                                       | —        | C-B2b   | [ ]    |
+| 1   | C-B1a | Update `tests/unit/core/types/config.types.test.ts` (RED)                        | ~800     | —       | [x]    |
+| 2   | C-B1b | Update `tests/unit/core/config/schema.test.ts` (RED)                             | ~1,200   | —       | [x]    |
+| 3   | C-B1c | Update `src/core/config/schema.ts` (GREEN — add enums + opa5)                    | ~1,000   | C-B1a   | [x]    |
+| 4   | C-B1d | Update `src/core/types/config.ts` + `types/index.ts` + `config/index.ts` (GREEN) | ~600     | C-B1c   | [x]    |
+| 5   | C-B1e | VERIFY GREEN: `npm run typecheck && npm run test:unit && npm run lint`           | —        | C-B1d   | [x]    |
+| 6   | C-B2a | Update `tests/unit/core/config/loader.test.ts` (RED)                             | ~800     | C-B1e   | [x]    |
+| 7   | C-B2b | Update `src/core/config/loader.ts` (GREEN — string-array type)                   | ~400     | C-B2a   | [x]    |
+| 8   | C-B2c | VERIFY GREEN: `npm run ci`                                                       | —        | C-B2b   | [x]    |
 
 ### Critical Type Fixes (Appendix B: C1-C3)
 
-| #   | Batch | Files                                                                         | Est. Out | Depends | Status |
-| --- | ----- | ----------------------------------------------------------------------------- | -------- | ------- | ------ |
-| 9   | PRE-1 | Extend `BridgePage` — add `evaluate<R,Arg>()` + `waitForFunction()` overloads | ~600     | C-B2c   | [ ]    |
-| 10  | PRE-2 | Update `tests/helpers/mock-page.ts` — match new `BridgePage`                  | ~400     | PRE-1   | [ ]    |
-| 11  | PRE-3 | Add `'unknown'` to `BridgeReturnType` in `bridge.ts` + update test            | ~300     | PRE-1   | [ ]    |
-| 12  | PRE-4 | GATE: `npm run ci` — **Sub-Phase 2.0 COMPLETE**                               | —        | PRE-3   | [ ]    |
+| #   | Batch | Files                                                                      | Est. Out | Depends | Status |
+| --- | ----- | -------------------------------------------------------------------------- | -------- | ------- | ------ |
+| 9   | PRE-1 | Extend `BridgePage` — add `evaluate<TResult,TArg>()` + `waitForFunction()` | ~600     | C-B2c   | [x]    |
+| 10  | PRE-2 | Update `tests/helpers/mock-page.ts` — match new `BridgePage`               | ~400     | PRE-1   | [x]    |
+| 11  | PRE-3 | Add `'unknown'` to `BridgeReturnType` in `bridge.ts` + update test         | ~300     | PRE-1   | [x]    |
+| 12  | PRE-4 | GATE: `npm run ci` — **Sub-Phase 2.0 COMPLETE**                            | —        | PRE-3   | [x]    |
 
 **Sub-Phase 2.0 Total**: 12 batches, ~6,100 output tokens
 
@@ -367,32 +367,32 @@ git commit -m "feat(scope): description (batch-id)"
 
 ## Tracked Issues
 
-| #   | Issue                                               | Resolve In | Batch | Status |
-| --- | --------------------------------------------------- | ---------- | ----- | ------ |
-| C1  | Extend `BridgePage` with `evaluate<R,Arg>` overload | Pre-Phase  | PRE-1 | [ ]    |
-| C2  | `MethodExecutionResult<T>` vs `BridgeResult<T>` gap | Bridge     | B16a  | [ ]    |
-| C3  | Add `'unknown'` to `BridgeReturnType`               | Pre-Phase  | PRE-3 | [ ]    |
-| H1  | Delete `proxy/typed/` (redundant — auto-gen exists) | N/A        | —     | [x]    |
-| H2  | Add `proxy/playwright-api.ts` allowlist             | Proxy      | B17a  | [ ]    |
-| H3  | Browser script syntax validation (`vm.Script`)      | Helpers    | TH6   | [ ]    |
-| H4  | `page.evaluate()` serialization boundary docs       | Bridge     | B16a  | [ ]    |
-| M1  | Split `inject-ui5.ts` into composable snippets      | Bridge     | B13c  | [ ]    |
-| M4  | Proxy cache invalidation on navigation              | Proxy      | B19a  | [ ]    |
-| M5  | Merge XHR patterns with `ignoreAutoWaitUrls`        | Bridge     | B12b  | [ ]    |
-| M6  | Input validation on controlId/methodName            | Bridge     | B16a  | [ ]    |
-| M9  | Drop `WeakRef`, use TTL-only cleanup                | Bridge     | B13b  | [ ]    |
+| #   | Issue                                                      | Resolve In | Batch | Status |
+| --- | ---------------------------------------------------------- | ---------- | ----- | ------ |
+| C1  | Extend `BridgePage` with `evaluate<TResult,TArg>` overload | Pre-Phase  | PRE-1 | [x]    |
+| C2  | `MethodExecutionResult<T>` vs `BridgeResult<T>` gap        | Bridge     | B16a  | [ ]    |
+| C3  | Add `'unknown'` to `BridgeReturnType`                      | Pre-Phase  | PRE-3 | [x]    |
+| H1  | Delete `proxy/typed/` (redundant — auto-gen exists)        | N/A        | —     | [x]    |
+| H2  | Add `proxy/playwright-api.ts` allowlist                    | Proxy      | B17a  | [ ]    |
+| H3  | Browser script syntax validation (`vm.Script`)             | Helpers    | TH6   | [ ]    |
+| H4  | `page.evaluate()` serialization boundary docs              | Bridge     | B16a  | [ ]    |
+| M1  | Split `inject-ui5.ts` into composable snippets             | Bridge     | B13c  | [ ]    |
+| M4  | Proxy cache invalidation on navigation                     | Proxy      | B19a  | [ ]    |
+| M5  | Merge XHR patterns with `ignoreAutoWaitUrls`               | Bridge     | B12b  | [ ]    |
+| M6  | Input validation on controlId/methodName                   | Bridge     | B16a  | [ ]    |
+| M9  | Drop `WeakRef`, use TTL-only cleanup                       | Bridge     | B13b  | [ ]    |
 
 ---
 
 ## Progress Summary
 
-| Sub-Phase                    | Batches | Done  | Remaining | %      |
-| ---------------------------- | ------- | ----- | --------- | ------ |
-| 2.0 Pre-Phase Config + Fixes | 12      | 0     | 12        | 0%     |
-| 2.1 Bridge Foundation        | 24      | 0     | 24        | 0%     |
-| 2.2 Proxy Layer              | 12      | 0     | 12        | 0%     |
-| 2.3 Integration + Barrels    | 3       | 0     | 3         | 0%     |
-| **Total**                    | **51**  | **0** | **51**    | **0%** |
+| Sub-Phase                    | Batches | Done   | Remaining | %        |
+| ---------------------------- | ------- | ------ | --------- | -------- |
+| 2.0 Pre-Phase Config + Fixes | 12      | 12     | 0         | **100%** |
+| 2.1 Bridge Foundation        | 24      | 0      | 24        | 0%       |
+| 2.2 Proxy Layer              | 12      | 0      | 12        | 0%       |
+| 2.3 Integration + Barrels    | 3       | 0      | 3         | 0%       |
+| **Total**                    | **51**  | **12** | **39**    | **24%**  |
 
 ### Commit Message Convention
 
