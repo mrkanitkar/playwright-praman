@@ -29,7 +29,8 @@
  * @module bridge
  */
 
-import type { UI5ControlBase } from '#core/types/controls.js';
+import type { BridgeControlRef } from './bridge-types.js';
+
 import type { UI5Selector } from '#core/types/selectors.js';
 
 /**
@@ -89,9 +90,9 @@ export interface BridgeAdapter {
 
   // ── Control discovery ──────────────────────────────────────────────
   /** Find a single control matching the selector, or null if not found. */
-  findControl(selector: UI5Selector): Promise<UI5ControlBase | null>;
+  findControl(selector: UI5Selector): Promise<BridgeControlRef | null>;
   /** Find all controls matching the selector. */
-  findControls(selector: UI5Selector): Promise<readonly UI5ControlBase[]>;
+  findControls(selector: UI5Selector): Promise<readonly BridgeControlRef[]>;
 
   // ── Control interaction ────────────────────────────────────────────
   /** Get a property value from a control by ID. */
@@ -102,7 +103,7 @@ export interface BridgeAdapter {
   getControlAggregation(
     controlId: string,
     aggregationName: string,
-  ): Promise<readonly UI5ControlBase[]>;
+  ): Promise<readonly BridgeControlRef[]>;
   /** Execute a method on a control by ID with arguments. */
   executeControlMethod(
     controlId: string,
