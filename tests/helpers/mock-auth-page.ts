@@ -17,7 +17,10 @@
  * @module test-helpers
  */
 
+import type { Mock } from 'vitest';
 import { vi } from 'vitest';
+
+import type { AuthPage } from '../../src/auth/auth-types.js';
 
 /** Mock Playwright Locator with chainable methods for auth testing. */
 export interface MockLocator {
@@ -37,15 +40,36 @@ export interface MockAuthPageOptions {
   readonly shellHeaderVisible?: boolean;
 }
 
-/** Mock Playwright page with SAP auth-specific locator support. */
-export interface MockAuthPage {
-  readonly goto: ReturnType<typeof vi.fn>;
-  readonly url: ReturnType<typeof vi.fn>;
-  readonly waitForSelector: ReturnType<typeof vi.fn>;
-  readonly waitForURL: ReturnType<typeof vi.fn>;
-  readonly waitForLoadState: ReturnType<typeof vi.fn>;
+/**
+ * Mock Playwright page with SAP auth-specific support.
+ *
+ * @remarks
+ * Extends `AuthPage` so it can be passed directly to auth strategy
+ * methods without type errors. Uses intersection types with `Mock`
+ * to allow `.mockResolvedValue()` and other Vitest mock methods.
+ */
+export interface MockAuthPage extends AuthPage {
+  readonly goto: Mock<(...args: Parameters<AuthPage['goto']>) => ReturnType<AuthPage['goto']>> &
+    AuthPage['goto'];
+  readonly url: Mock<() => string> & AuthPage['url'];
+  readonly waitForSelector: Mock<
+    (...args: Parameters<AuthPage['waitForSelector']>) => ReturnType<AuthPage['waitForSelector']>
+  > &
+    AuthPage['waitForSelector'];
+  readonly waitForURL: Mock<
+    (...args: Parameters<AuthPage['waitForURL']>) => ReturnType<AuthPage['waitForURL']>
+  > &
+    AuthPage['waitForURL'];
+  readonly waitForLoadState: Mock<
+    (...args: Parameters<AuthPage['waitForLoadState']>) => ReturnType<AuthPage['waitForLoadState']>
+  > &
+    AuthPage['waitForLoadState'];
+  readonly waitForFunction: Mock<
+    (...args: Parameters<AuthPage['waitForFunction']>) => ReturnType<AuthPage['waitForFunction']>
+  > &
+    AuthPage['waitForFunction'];
+  readonly evaluate: Mock<(...args: any[]) => any> & AuthPage['evaluate'];
   readonly locator: ReturnType<typeof vi.fn>;
-  readonly evaluate: ReturnType<typeof vi.fn>;
 }
 
 /**
@@ -122,7 +146,8 @@ export function createMockAuthPage(options?: MockAuthPageOptions): MockAuthPage 
     waitForSelector: vi.fn().mockResolvedValue(undefined),
     waitForURL: vi.fn().mockResolvedValue(undefined),
     waitForLoadState: vi.fn().mockResolvedValue(undefined),
+    waitForFunction: vi.fn().mockResolvedValue(undefined),
     locator: locatorFactory,
     evaluate: vi.fn().mockResolvedValue(undefined),
-  };
+  } as MockAuthPage;
 }

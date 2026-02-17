@@ -12,6 +12,45 @@
 import type { BridgePage } from '#bridge/adapter.js';
 
 /**
+ * Extended page interface for authentication operations.
+ *
+ * @remarks
+ * Extends `BridgePage` with navigation and DOM interaction methods
+ * required by auth strategies (goto, url, waitForSelector, waitForURL,
+ * waitForLoadState). These methods are available on Playwright's `Page`
+ * but not on the minimal `BridgePage` interface. Auth strategies need
+ * navigation capabilities that pure bridge operations do not.
+ *
+ * @example
+ * ```typescript
+ * const page: AuthPage = playwrightPage; // Playwright Page satisfies AuthPage
+ * await page.goto('https://sap.example.com');
+ * await page.waitForSelector('#shell-header', { timeout: 30_000 });
+ * ```
+ */
+export interface AuthPage extends BridgePage {
+  /** Navigate to the given URL. */
+  goto(url: string, options?: { readonly timeout?: number }): Promise<unknown>;
+  /** Return the current page URL. */
+  url(): string;
+  /** Wait for a CSS selector to appear in the DOM. */
+  waitForSelector(
+    selector: string,
+    options?: { readonly timeout?: number; readonly state?: string },
+  ): Promise<unknown>;
+  /** Wait for the page URL to match the given pattern. */
+  waitForURL(
+    url: string | RegExp | ((url: URL) => boolean),
+    options?: { readonly timeout?: number },
+  ): Promise<void>;
+  /** Wait for a specific load state (e.g., 'networkidle', 'domcontentloaded'). */
+  waitForLoadState(
+    state?: 'load' | 'domcontentloaded' | 'networkidle',
+    options?: { readonly timeout?: number },
+  ): Promise<void>;
+}
+
+/**
  * Authentication strategy interface.
  *
  * @remarks
@@ -41,7 +80,7 @@ export interface AuthStrategy {
    * await strategy.authenticate(page, config);
    * ```
    */
-  authenticate(page: BridgePage, config: Readonly<SAPAuthConfig>): Promise<void>;
+  authenticate(page: AuthPage, config: Readonly<SAPAuthConfig>): Promise<void>;
 
   /**
    * Check if the current page session is authenticated.
