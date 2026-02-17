@@ -24,8 +24,10 @@ import {
   createFindAllControlsScript,
   createFindControlScript,
 } from './browser-scripts/find-control.js';
+import { createGetSelectorScript } from './browser-scripts/get-selector.js';
 import { createGetVersionScript } from './browser-scripts/get-version.js';
-import { ensureBridgeInjected, isBridgeReady } from './injection.js';
+import { createObjectCleanupScript, createObjectMapScript } from './browser-scripts/object-map.js';
+import { ensureBridgeInjected, isBridgeReady, resetPageInjection } from './injection.js';
 import { filterMethods } from './method-blacklist.js';
 
 import type { UI5Selector } from '#core/types/selectors.js';
@@ -54,6 +56,7 @@ export class ClassicUI5Adapter implements BridgeAdapter {
   async init(page: BridgePage): Promise<void> {
     this.page = page;
     await ensureBridgeInjected(page);
+    await page.evaluate(createObjectMapScript());
     this.cachedVersion = await page.evaluate<string>(createGetVersionScript());
     this.initialized = true;
   }
@@ -65,8 +68,10 @@ export class ClassicUI5Adapter implements BridgeAdapter {
   }
 
   /** {@inheritDoc BridgeAdapter.destroy} */
-  // eslint-disable-next-line @typescript-eslint/require-await
   async destroy(): Promise<void> {
+    if (this.page !== null) {
+      await this.page.evaluate(createObjectCleanupScript());
+    }
     this.page = null;
     this.initialized = false;
     this.cachedVersion = null;
@@ -294,6 +299,23 @@ export class ClassicUI5Adapter implements BridgeAdapter {
       })()`,
     );
     return filterMethods(allMethods);
+  }
+
+  /** {@inheritDoc BridgeAdapter.getSelectorForControl} */
+  async getSelectorForControl(
+    controlId: string,
+  ): Promise<{ selector: UI5Selector; strategy: string } | null> {
+    const page = this.requirePage();
+    const script = createGetSelectorScript();
+    const withArgs = script.replace(/\)\(\)$/, `)(${JSON.stringify(controlId)})`);
+    return page.evaluate<{ selector: UI5Selector; strategy: string } | null>(withArgs);
+  }
+
+  /** {@inheritDoc BridgeAdapter.resetInjectionState} */
+  resetInjectionState(): void {
+    if (this.page !== null) {
+      resetPageInjection(this.page);
+    }
   }
 
   /**

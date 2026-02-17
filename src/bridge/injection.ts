@@ -94,6 +94,25 @@ export async function ensureBridgeInjected(page: BridgePage): Promise<void> {
 }
 
 /**
+ * Resets injection tracking for a page, allowing re-injection.
+ *
+ * @remarks
+ * Called after page navigation invalidates the bridge.
+ * The next call to `ensureBridgeInjected()` will re-inject.
+ *
+ * @param page - The page to reset injection state for.
+ *
+ * @example
+ * ```typescript
+ * resetPageInjection(page);
+ * // Next ensureBridgeInjected() call will re-inject
+ * ```
+ */
+export function resetPageInjection(page: BridgePage): void {
+  injectedPages.delete(page);
+}
+
+/**
  * Waits for the bridge to become ready on the given page.
  *
  * @param page - The Playwright page to wait on.

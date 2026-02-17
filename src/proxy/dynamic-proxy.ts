@@ -105,14 +105,6 @@ function resolveBuiltinMethod(
         state.adapter.setControlProperty(state.id, name, value);
     case 'getAggregation':
       return async (name: string) => state.adapter.getControlAggregation(state.id, name);
-    case 'getBindingInfo':
-      return async () => undefined;
-    case 'getDomRef':
-      return async () => null;
-    case 'getVisible':
-      return async () => true;
-    case 'isBound':
-      return async () => false;
     case 'getModel':
       return async (name?: string) => state.adapter.getModel(state.id, name);
     default:

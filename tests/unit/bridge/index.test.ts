@@ -44,6 +44,10 @@ describe('bridge barrel', () => {
     expect(bridge.waitForBridgeReady).toBeTypeOf('function');
   });
 
+  it('exports resetPageInjection', () => {
+    expect(bridge.resetPageInjection).toBeTypeOf('function');
+  });
+
   // ── Interaction strategies ─────────────────────────────────────────
   it('exports createInteractionStrategy', () => {
     expect(bridge.createInteractionStrategy).toBeTypeOf('function');

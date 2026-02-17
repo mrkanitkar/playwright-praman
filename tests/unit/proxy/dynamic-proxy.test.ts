@@ -10,6 +10,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createMockBridgeAdapter } from '../../helpers/mock-bridge-adapter.js';
 
+import type { MethodExecutionResult } from '#bridge/bridge-types.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type { ControlProxyState } from '#proxy/dynamic-proxy.js';
 import { createControlProxy } from '#proxy/dynamic-proxy.js';
@@ -305,24 +306,68 @@ describe('dynamic-proxy', () => {
       expect(items).toHaveLength(1);
     });
 
-    it('getBindingInfo returns undefined', async () => {
-      const proxy = createControlProxy(createTestState()) as TestButtonProxy;
-      expect(await proxy.getBindingInfo('text')).toBeUndefined();
+    it('getBindingInfo routes through bridge', async () => {
+      const mockResult: MethodExecutionResult = {
+        success: true,
+        returnType: 'result',
+        value: { path: '/ProductSet' },
+        duration: 1,
+      };
+      const adapter = createMockBridgeAdapter({
+        executeControlMethod: vi.fn().mockResolvedValue(mockResult),
+      });
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
+      await proxy.getBindingInfo('value');
+      expect(adapter.executeControlMethod).toHaveBeenCalledWith('saveBtn', 'getBindingInfo', [
+        'value',
+      ]);
     });
 
-    it('getDomRef returns null', async () => {
-      const proxy = createControlProxy(createTestState()) as TestButtonProxy;
-      expect(await proxy.getDomRef()).toBeNull();
+    it('getDomRef routes through bridge', async () => {
+      const mockResult: MethodExecutionResult = {
+        success: true,
+        returnType: 'result',
+        value: null,
+        duration: 1,
+      };
+      const adapter = createMockBridgeAdapter({
+        executeControlMethod: vi.fn().mockResolvedValue(mockResult),
+      });
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
+      await proxy.getDomRef();
+      expect(adapter.executeControlMethod).toHaveBeenCalledWith('saveBtn', 'getDomRef', []);
     });
 
-    it('getVisible returns true', async () => {
-      const proxy = createControlProxy(createTestState()) as TestButtonProxy;
-      expect(await proxy.getVisible()).toBe(true);
+    it('getVisible routes through bridge', async () => {
+      const mockResult: MethodExecutionResult = {
+        success: true,
+        returnType: 'result',
+        value: true,
+        duration: 1,
+      };
+      const adapter = createMockBridgeAdapter({
+        executeControlMethod: vi.fn().mockResolvedValue(mockResult),
+      });
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
+      const result = await proxy.getVisible();
+      expect(result).toBe(true);
+      expect(adapter.executeControlMethod).toHaveBeenCalledWith('saveBtn', 'getVisible', []);
     });
 
-    it('isBound returns false', async () => {
-      const proxy = createControlProxy(createTestState()) as TestButtonProxy;
-      expect(await proxy.isBound('text')).toBe(false);
+    it('isBound routes through bridge', async () => {
+      const mockResult: MethodExecutionResult = {
+        success: true,
+        returnType: 'result',
+        value: false,
+        duration: 1,
+      };
+      const adapter = createMockBridgeAdapter({
+        executeControlMethod: vi.fn().mockResolvedValue(mockResult),
+      });
+      const proxy = createControlProxy(createTestState({ adapter })) as TestButtonProxy;
+      const result = await proxy.isBound('value');
+      expect(result).toBe(false);
+      expect(adapter.executeControlMethod).toHaveBeenCalledWith('saveBtn', 'isBound', ['value']);
     });
 
     it('getModel forwards to adapter.getModel', async () => {

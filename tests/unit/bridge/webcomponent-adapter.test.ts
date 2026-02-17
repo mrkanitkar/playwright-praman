@@ -182,4 +182,26 @@ describe('WebComponentAdapter', () => {
     await adapter.init(page);
     expect(await adapter.getAvailableMethods('wc1')).toEqual([]);
   });
+
+  it('getSelectorForControl returns null (stub)', async () => {
+    const page = createMockBridgePage({
+      evaluate: vi.fn().mockResolvedValueOnce(undefined).mockResolvedValueOnce('1.120.0'),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
+    });
+    const adapter = new WebComponentAdapter();
+    await adapter.init(page);
+    expect(await adapter.getSelectorForControl('wc1')).toBeNull();
+  });
+
+  it('resetInjectionState is a no-op (stub)', async () => {
+    const page = createMockBridgePage({
+      evaluate: vi.fn().mockResolvedValueOnce(undefined).mockResolvedValueOnce('1.120.0'),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
+    });
+    const adapter = new WebComponentAdapter();
+    await adapter.init(page);
+    expect(() => {
+      adapter.resetInjectionState();
+    }).not.toThrow();
+  });
 });
