@@ -20,7 +20,7 @@ describe('loadConfig', () => {
     expect(config.logLevel).toBe('info');
     expect(config.ui5WaitTimeout).toBe(30_000);
     expect(config.controlDiscoveryTimeout).toBe(10_000);
-    expect(config.interactionStrategy).toBe('hybrid');
+    expect(config.interactionStrategy).toBe('ui5-native');
     expect(config.skipStabilityWait).toBe(false);
     expect(config.preferVisibleControls).toBe(true);
     expect(config.ignoreAutoWaitUrls).toEqual([]);
@@ -59,9 +59,9 @@ describe('loadConfig', () => {
   });
 
   it('overrides interactionStrategy from env var', async () => {
-    vi.stubEnv('PRAMAN_INTERACTION_STRATEGY', 'playwright');
+    vi.stubEnv('PRAMAN_INTERACTION_STRATEGY', 'dom-first');
     const config = await loadConfig();
-    expect(config.interactionStrategy).toBe('playwright');
+    expect(config.interactionStrategy).toBe('dom-first');
   });
 
   it('overrides skipStabilityWait from env var', async () => {

@@ -6,7 +6,12 @@
 
 // ── Schema ───────────────────────────────────────────────────────────
 export { PramanConfigSchema } from './schema.js';
-export type { PramanConfig, PramanConfigInput } from './schema.js';
+export type {
+  DiscoveryStrategyName,
+  InteractionStrategyName,
+  PramanConfig,
+  PramanConfigInput,
+} from './schema.js';
 
 // ── Loader ───────────────────────────────────────────────────────────
 export { defineConfig, loadConfig } from './loader.js';

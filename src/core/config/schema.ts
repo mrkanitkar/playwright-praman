@@ -61,6 +61,52 @@ const selectorsSchema = z.object({
   skipStabilityWait: z.boolean().default(false),
 });
 
+// ── Strategy enums (D11: single source of truth) ────────────────────
+
+/**
+ * Named Zod enum for interaction strategy values.
+ *
+ * @remarks
+ * `InteractionStrategyName` is derived from this via `z.infer<>`.
+ * Values: `'ui5-native'` (default), `'dom-first'`, `'opa5'`.
+ * `'hybrid'` and `'playwright'` were removed (W15/W21, pre-release).
+ */
+const interactionStrategyEnum = z.enum(['ui5-native', 'dom-first', 'opa5']);
+
+/**
+ * Named Zod enum for discovery strategy values.
+ *
+ * @remarks
+ * `DiscoveryStrategyName` is derived from this via `z.infer<>`.
+ * Values: `'direct-id'`, `'recordreplay'`, `'registry'` (Phase 3+).
+ * `'cache'` is internal (D9) — not user-configurable.
+ */
+const discoveryStrategyEnum = z.enum(['direct-id', 'recordreplay', 'registry']);
+
+/**
+ * Interaction strategy config type — string literal union derived from Zod.
+ *
+ * @remarks
+ * This is the CONFIG type (which strategy to use). Not to be confused with
+ * `InteractionStrategy` (runtime interface in `bridge/interaction-strategies/strategy.ts`).
+ */
+export type InteractionStrategyName = z.infer<typeof interactionStrategyEnum>;
+
+/**
+ * Discovery strategy config type — string literal union derived from Zod.
+ *
+ * @remarks
+ * Used in `PramanConfig.discoveryStrategies` as an ordered priority chain.
+ */
+export type DiscoveryStrategyName = z.infer<typeof discoveryStrategyEnum>;
+
+// ── OPA5 sub-schema (D7) ────────────────────────────────────────────
+const opa5Schema = z.object({
+  interactionTimeout: z.number().int().positive().default(5_000),
+  autoWait: z.boolean().default(true),
+  debug: z.boolean().default(false),
+});
+
 // ── Root schema ──────────────────────────────────────────────────────
 
 /**
@@ -81,7 +127,11 @@ export const PramanConfigSchema = z
     logLevel: z.enum(['error', 'warn', 'info', 'debug', 'verbose']).default('info'),
     ui5WaitTimeout: z.number().int().positive().default(30_000),
     controlDiscoveryTimeout: z.number().int().positive().default(10_000),
-    interactionStrategy: z.enum(['playwright', 'dom-first', 'opa5', 'hybrid']).default('hybrid'),
+    interactionStrategy: interactionStrategyEnum.default('ui5-native'),
+    discoveryStrategies: z
+      .array(discoveryStrategyEnum)
+      .min(1)
+      .default(['direct-id', 'recordreplay']),
     skipStabilityWait: z.boolean().default(false),
     preferVisibleControls: z.boolean().default(true),
     ignoreAutoWaitUrls: z.array(z.string()).default([]),
@@ -89,6 +139,7 @@ export const PramanConfigSchema = z
     ai: aiSchema.optional(),
     telemetry: telemetrySchema.optional(),
     selectors: selectorsSchema.optional(),
+    opa5: opa5Schema.optional(),
   })
   .strict();
 

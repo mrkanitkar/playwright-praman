@@ -5,13 +5,10 @@
  */
 
 // ── Literal union types (config.ts) ─────────────────────────────────
-export type {
-  AIProvider,
-  AuthStrategy,
-  InteractionStrategy,
-  LogLevel,
-  TelemetryExporter,
-} from './config.js';
+export type { AIProvider, AuthStrategy, LogLevel, TelemetryExporter } from './config.js';
+
+// ── Strategy types derived from Zod (D11) — config/schema.ts ────────
+export type { DiscoveryStrategyName, InteractionStrategyName } from '../config/schema.js';
 
 // NOTE: PramanConfig is NOT re-exported from here.
 // It lives in core/config/schema.ts to avoid circular dependency.
