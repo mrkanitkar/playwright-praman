@@ -11,3 +11,7 @@ export type { TestFixtures, WorkerFixtures } from './core-fixtures.js';
 // ── Stability fixtures (auto test-scoped) ───────────────────────────
 export { stabilityTest } from './stability-fixtures.js';
 export type { StabilityFixtures, StabilityWorkerFixtures } from './stability-fixtures.js';
+
+// ── Auth fixtures (sapAuth handler + sapAuthConfig option) ──────────
+export { authTest } from './auth-fixtures.js';
+export type { AuthFixtureOptions, AuthFixtures } from './auth-fixtures.js';
