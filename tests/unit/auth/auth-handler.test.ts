@@ -7,6 +7,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { AuthLogger } from '../../../src/auth/auth-handler.js';
 import { SAPAuthHandler } from '../../../src/auth/auth-handler.js';
 import type { AuthStrategy, SAPAuthConfig } from '../../../src/auth/auth-types.js';
 import { AuthError } from '../../../src/core/errors/auth-error.js';
@@ -81,7 +82,10 @@ describe('SAPAuthHandler', () => {
     page = createMockAuthPage();
     config = makeConfig();
 
-    handler = new SAPAuthHandler({ strategy: mockStrategy, logger: mockLogger });
+    handler = new SAPAuthHandler({
+      strategy: mockStrategy,
+      logger: mockLogger as any as AuthLogger,
+    });
 
     // Get the mocked retry function
     const retryModule = await import('#core/utils/retry.js');
