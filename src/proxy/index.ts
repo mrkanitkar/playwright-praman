@@ -12,7 +12,12 @@ export { getDiscoveryPriorities } from './discovery-factory.js';
 export type { ControlProxyState } from './dynamic-proxy.js';
 export { createControlProxy } from './dynamic-proxy.js';
 export { extractAllowedMethods, isMethodAllowed } from './method-filter.js';
-export { isPlaywrightMethod, PLAYWRIGHT_API_METHODS } from './playwright-api.js';
+export {
+  cssEscapeId,
+  isPlaywrightMethod,
+  PLAYWRIGHT_API_METHODS,
+  routeToInteractionStrategy,
+} from './playwright-api.js';
 export { isControlResult, convertToControlProxy, convertToObjectProxy } from './proxy-converter.js';
 export type { AggregationItemRef, ObjectRef } from './return-handler.js';
 export { handleBridgeReturn } from './return-handler.js';

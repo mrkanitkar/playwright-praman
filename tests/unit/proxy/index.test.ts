@@ -58,6 +58,14 @@ describe('proxy barrel', () => {
     expect(proxy.isPlaywrightMethod).toBeTypeOf('function');
   });
 
+  it('exports routeToInteractionStrategy', () => {
+    expect(proxy.routeToInteractionStrategy).toBeTypeOf('function');
+  });
+
+  it('exports cssEscapeId', () => {
+    expect(proxy.cssEscapeId).toBeTypeOf('function');
+  });
+
   // ── Return handler ─────────────────────────────────────────────────
   it('exports handleBridgeReturn', () => {
     expect(proxy.handleBridgeReturn).toBeTypeOf('function');
