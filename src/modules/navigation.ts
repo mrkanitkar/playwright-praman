@@ -83,9 +83,9 @@ async function stabilityWait(page: NavigationPage, options?: NavigationOptions):
 
 /** Sets the FLP hash via `page.evaluate` using `window.hasher.setHash`. */
 async function setHash(page: NavigationPage, hash: string): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- browser-evaluated: window.hasher has no Node types
   await page.evaluate(
     ((h: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- browser-evaluated: window.hasher has no Node types
       (window as any).hasher.setHash(h);
     }) as (...args: never[]) => unknown,
     hash,
