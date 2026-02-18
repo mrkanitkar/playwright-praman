@@ -15,3 +15,7 @@ export type { StabilityFixtures, StabilityWorkerFixtures } from './stability-fix
 // ── Auth fixtures (sapAuth handler + sapAuthConfig option) ──────────
 export { authTest } from './auth-fixtures.js';
 export type { AuthFixtureOptions, AuthFixtures } from './auth-fixtures.js';
+
+// ── Navigation fixtures (ui5Navigation + btpWorkZone) ────────────────
+export { navTest } from './nav-fixtures.js';
+export type { NavFixtures, UI5NavigationAPI } from './nav-fixtures.js';
