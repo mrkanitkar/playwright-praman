@@ -1,0 +1,285 @@
+/**
+ * Navigation fixtures — Playwright fixture wrapping FLP navigation functions.
+ *
+ * @remarks
+ * Provides two fixtures for SAP Fiori Launchpad navigation:
+ *
+ * - `ui5Navigation` — wraps all 9 navigation module functions, injecting
+ *   `page` and `baseURL` automatically. Creates a `'nav'` child logger.
+ *
+ * - `btpWorkZone` — creates a BTP WorkZone manager for dual-frame environments.
+ *
+ * Cross-fixture dependencies (`pramanConfig`, `bridgeAdapter`, `rootLogger`)
+ * are declared as `option` placeholders (PW-MERGE-1) so they can be
+ * provided by `coreTest` via `mergeTests()`.
+ *
+ * @example
+ * ```typescript
+ * import { navTest } from '#fixtures/nav-fixtures.js';
+ *
+ * navTest('navigates to app', async ({ ui5Navigation }) => {
+ *   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+ * });
+ * ```
+ *
+ * @module fixtures
+ */
+
+import { test as base } from '@playwright/test';
+import type { Logger } from 'pino';
+
+import type { NavigationIntent, NavigationOptions } from '../modules/navigation.js';
+import {
+  getCurrentHash,
+  navigateBack,
+  navigateForward,
+  navigateToApp,
+  navigateToHash,
+  navigateToHome,
+  navigateToIntent,
+  navigateToTile,
+  searchAndOpenApp,
+} from '../modules/navigation.js';
+import type { BTPWorkZoneManager } from '../modules/workzone.js';
+import { createWorkZoneManager } from '../modules/workzone.js';
+
+import type { BridgeAdapter } from '#bridge/adapter.js';
+import type { PramanConfig } from '#core/config/index.js';
+import { createLogger } from '#core/logging/index.js';
+
+/**
+ * UI5 Navigation API provided by the `ui5Navigation` fixture.
+ *
+ * @remarks
+ * Wraps all 9 FLP navigation module functions. The `page` argument is
+ * injected automatically from the Playwright fixture system.
+ *
+ * @example
+ * ```typescript
+ * test('navigate to app', async ({ ui5Navigation }) => {
+ *   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+ *   const hash = await ui5Navigation.getCurrentHash();
+ * });
+ * ```
+ */
+export interface UI5NavigationAPI {
+  /**
+   * Navigates to a SAP app by semantic object hash.
+   *
+   * @param appId - Semantic object hash (e.g., 'PurchaseOrder-manage').
+   * @param options - Navigation options.
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+   * ```
+   */
+  navigateToApp(appId: string, options?: NavigationOptions): Promise<void>;
+
+  /**
+   * Navigates to an FLP tile by its title text.
+   *
+   * @param title - Title text of the FLP tile.
+   * @param options - Navigation options.
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateToTile('Purchase Orders');
+   * ```
+   */
+  navigateToTile(title: string, options?: NavigationOptions): Promise<void>;
+
+  /**
+   * Navigates to an SAP intent with optional parameters.
+   *
+   * @param intent - Semantic object and action descriptor.
+   * @param params - Optional query parameters for the intent.
+   * @param options - Navigation options.
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateToIntent(
+   *   { semanticObject: 'PurchaseOrder', action: 'manage' },
+   *   { CompanyCode: '1000' },
+   * );
+   * ```
+   */
+  navigateToIntent(
+    intent: NavigationIntent,
+    params?: Readonly<Record<string, string>>,
+    options?: NavigationOptions,
+  ): Promise<void>;
+
+  /**
+   * Navigates to a specific hash directly.
+   *
+   * @param hash - The hash to navigate to (without leading '#').
+   * @param options - Navigation options.
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateToHash('Shell-home');
+   * ```
+   */
+  navigateToHash(hash: string, options?: NavigationOptions): Promise<void>;
+
+  /**
+   * Navigates to the FLP home screen.
+   *
+   * @param options - Navigation options.
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateToHome();
+   * ```
+   */
+  navigateToHome(options?: NavigationOptions): Promise<void>;
+
+  /**
+   * Navigates back in browser history.
+   *
+   * @param options - Navigation options.
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateBack();
+   * ```
+   */
+  navigateBack(options?: NavigationOptions): Promise<void>;
+
+  /**
+   * Navigates forward in browser history.
+   *
+   * @param options - Navigation options.
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateForward();
+   * ```
+   */
+  navigateForward(options?: NavigationOptions): Promise<void>;
+
+  /**
+   * Searches for an app in the FLP shell search bar and opens it.
+   *
+   * @param title - Title of the app to search for.
+   * @param options - Navigation options.
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.searchAndOpenApp('Purchase Orders');
+   * ```
+   */
+  searchAndOpenApp(title: string, options?: NavigationOptions): Promise<void>;
+
+  /**
+   * Returns the current URL hash (without leading '#').
+   *
+   * @returns The current hash string.
+   *
+   * @example
+   * ```typescript
+   * const hash = await ui5Navigation.getCurrentHash();
+   * ```
+   */
+  getCurrentHash(): Promise<string>;
+}
+
+/**
+ * Navigation fixture types for Playwright's `test.extend()`.
+ *
+ * @example
+ * ```typescript
+ * import type { NavFixtures } from '#fixtures/nav-fixtures.js';
+ * ```
+ */
+export interface NavFixtures {
+  /** Wraps all 9 FLP navigation functions with automatic page injection. */
+  ui5Navigation: UI5NavigationAPI;
+  /** BTP WorkZone manager for dual-frame environments. */
+  btpWorkZone: BTPWorkZoneManager;
+}
+
+/**
+ * Cross-fixture dependencies provided by coreTest via mergeTests.
+ *
+ * @remarks
+ * Declared as `option: true` placeholders (PW-MERGE-1).
+ * Values are provided at runtime by coreTest when composed via mergeTests.
+ */
+interface NavDeps {
+  pramanConfig: Readonly<PramanConfig>;
+  bridgeAdapter: BridgeAdapter;
+  rootLogger: Logger;
+}
+
+// ── NavigationPage / WorkZonePage compatibility ──────────────────────
+//
+// The module functions accept minimal `NavigationPage` / `WorkZonePage`
+// interfaces. Playwright's `Page` satisfies both at runtime. Using
+// `as never` casts here to avoid importing Playwright's full `Page` type
+// while maintaining type safety at the module boundary.
+
+/**
+ * Playwright test object extended with navigation fixtures.
+ *
+ * @remarks
+ * Provides `ui5Navigation` (all 9 nav functions) and `btpWorkZone`
+ * (WorkZone manager). Dependencies from coreTest (`pramanConfig`,
+ * `bridgeAdapter`, `rootLogger`) are declared as option placeholders.
+ *
+ * @example
+ * ```typescript
+ * import { navTest } from '#fixtures/nav-fixtures.js';
+ *
+ * navTest('navigate to app', async ({ ui5Navigation }) => {
+ *   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+ * });
+ * ```
+ */
+export const navTest = base.extend<NavFixtures & NavDeps>({
+  // ── Cross-fixture option placeholders (PW-MERGE-1) ────────────────
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
+  pramanConfig: [undefined!, { option: true }],
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
+  bridgeAdapter: [undefined!, { option: true }],
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
+  rootLogger: [undefined!, { option: true }],
+
+  // ── ui5Navigation fixture ─────────────────────────────────────────
+
+  ui5Navigation: async ({ page, pramanConfig, rootLogger }, use) => {
+    const log = createLogger('nav', rootLogger);
+    log.debug('Initializing ui5Navigation fixture');
+
+    const baseURL = pramanConfig.auth?.baseUrl;
+
+    const nav: UI5NavigationAPI = {
+      navigateToApp: async (appId, options?) =>
+        navigateToApp(
+          page as never,
+          appId,
+          baseURL !== undefined ? { baseURL, ...options } : options,
+        ),
+      navigateToTile: async (title, options?) => navigateToTile(page as never, title, options),
+      navigateToIntent: async (intent, params?, options?) =>
+        navigateToIntent(page as never, intent, params, options),
+      navigateToHash: async (hash, options?) => navigateToHash(page as never, hash, options),
+      navigateToHome: async (options?) => navigateToHome(page as never, options),
+      navigateBack: async (options?) => navigateBack(page as never, options),
+      navigateForward: async (options?) => navigateForward(page as never, options),
+      searchAndOpenApp: async (title, options?) => searchAndOpenApp(page as never, title, options),
+      getCurrentHash: async () => getCurrentHash(page as never),
+    };
+
+    await use(nav);
+  },
+
+  // ── btpWorkZone fixture ───────────────────────────────────────────
+
+  btpWorkZone: async ({ page, bridgeAdapter }, use) => {
+    const manager = createWorkZoneManager(page as never, bridgeAdapter as never);
+    await use(manager);
+  },
+});
