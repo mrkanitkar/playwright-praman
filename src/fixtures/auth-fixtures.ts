@@ -77,7 +77,7 @@ export interface AuthFixtures {
  * so TypeScript understands the dependency chain. At runtime, coreTest
  * supplies the real value via `mergeTests(coreTest, authTest)`.
  */
-interface AuthDeps {
+export interface AuthDeps {
   /** Validated, frozen Praman configuration from coreTest. */
   readonly pramanConfig: Readonly<Record<string, unknown>>;
 }

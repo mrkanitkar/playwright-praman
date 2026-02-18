@@ -207,7 +207,7 @@ export interface NavFixtures {
  * Declared as `option: true` placeholders (PW-MERGE-1).
  * Values are provided at runtime by coreTest when composed via mergeTests.
  */
-interface NavDeps {
+export interface NavDeps {
   pramanConfig: Readonly<PramanConfig>;
   bridgeAdapter: BridgeAdapter;
   rootLogger: Logger;

@@ -2,7 +2,7 @@
  * Praman v1.0 — AI-First SAP UI5 Test Automation Platform for Playwright.
  *
  * @remarks
- * Phase 2 GATE: Core + Bridge + Proxy layers complete.
+ * Phase 3 GATE: Core + Bridge + Proxy + Fixtures + Auth + Navigation complete.
  *
  * @packageDocumentation
  *
@@ -10,14 +10,16 @@
  * ```typescript
  * import { test, expect } from 'playwright-praman';
  *
- * test('create purchase order', async ({ page, ui5, navigation }) => {
- *   await navigation.openTileByTitle('Create Purchase Order');
+ * test('create purchase order', async ({ ui5, ui5Navigation }) => {
+ *   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
  *   const input = await ui5.control({ id: 'vendorInput' });
- *   await input.setValue('V001');
+ *   expect(input).toBeDefined();
  * });
  * ```
  */
-export { test, expect } from '@playwright/test';
+
+// ── Fixtures (merged test + expect) ─────────────────────────────────
+export { expect, test } from './fixtures/index.js';
 
 // ── Config ──────────────────────────────────────────────────────────
 export { defineConfig, loadConfig } from './core/config/index.js';
@@ -104,6 +106,21 @@ export {
   UI5ObjectCache,
 } from './proxy/index.js';
 export type { ControlProxyState } from './proxy/index.js';
+
+// ── Auth ────────────────────────────────────────────────────────────
+export { createAuthStrategy, SAPAuthHandler } from './auth/index.js';
+export type { AuthStrategy, SAPAuthConfig, SessionInfo } from './auth/index.js';
+
+// ── Navigation ──────────────────────────────────────────────────────
+export {
+  navigateBack,
+  navigateForward,
+  navigateToApp,
+  navigateToHash,
+  navigateToHome,
+  navigateToIntent,
+  navigateToTile,
+} from './modules/index.js';
 
 // ── Version ──────────────────────────────────────────────────────────
 export { PACKAGE_NAME, VERSION } from './version.js';
