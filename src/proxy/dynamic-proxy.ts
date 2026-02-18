@@ -7,9 +7,10 @@
  * 1. Anti-thenable (`then`/`catch`/`finally` return `undefined`)
  * 2. Direct properties (`id`, `controlType`)
  * 3. Built-in methods (`getId`, `getControlType`, `getProperty`, etc.)
- * 4. Blacklist check (throws ControlError)
- * 5. Symbol handling (`toString`, `Symbol.toPrimitive`)
- * 6. Dynamic method forwarding via adapter
+ * 4. Playwright API routing (when page + strategy present)
+ * 5. Blacklist check (throws ControlError)
+ * 6. Symbol handling (`toString`, `Symbol.toPrimitive`)
+ * 7. Dynamic method forwarding via adapter
  *
  * @example
  * ```typescript
@@ -27,10 +28,12 @@
  * @module proxy
  */
 
+import { isPlaywrightMethod, routeToInteractionStrategy } from './playwright-api.js';
 import { handleBridgeReturn } from './return-handler.js';
 
-import type { BridgeAdapter } from '#bridge/adapter.js';
+import type { BridgeAdapter, BridgePage } from '#bridge/adapter.js';
 import type { MethodExecutionResult } from '#bridge/bridge-types.js';
+import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
 import { isBlacklisted } from '#bridge/method-blacklist.js';
 import { ControlError } from '#core/errors/control-error.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
@@ -60,6 +63,10 @@ export interface ControlProxyState {
   readonly methods: ReadonlySet<string>;
   /** Bridge adapter for method execution. */
   readonly adapter: BridgeAdapter;
+  /** Playwright Page for DOM-level interaction (optional). */
+  readonly page?: BridgePage;
+  /** Interaction strategy for press/enterText/select (optional). */
+  readonly interactionStrategy?: InteractionStrategy;
 }
 
 /**
@@ -115,6 +122,41 @@ function resolveBuiltinMethod(
 /* eslint-enable @typescript-eslint/require-await */
 
 /**
+ * Checks if the property is Playwright-routable and returns a handler.
+ */
+function resolvePlaywrightMethod(
+  prop: string,
+  state: ControlProxyState,
+): ((...args: unknown[]) => Promise<unknown>) | undefined {
+  if (
+    state.page !== undefined &&
+    state.interactionStrategy !== undefined &&
+    isPlaywrightMethod(prop)
+  ) {
+    return async (...args: unknown[]) => routeToInteractionStrategy(state, prop, args);
+  }
+  return undefined;
+}
+
+/**
+ * Throws a ControlError if the prop is blacklisted.
+ */
+function throwIfBlacklisted(prop: string, state: ControlProxyState): void {
+  if (isBlacklisted(prop)) {
+    throw new ControlError({
+      code: 'ERR_CONTROL_METHOD',
+      message: `Method '${prop}' is blacklisted and cannot be called on ${state.controlType}#${state.id}`,
+      attempted: `Call blacklisted method '${prop}'`,
+      retryable: false,
+      suggestions: [
+        `Method '${prop}' is an internal UI5 method that should not be called directly`,
+        'Use the appropriate public API method instead',
+      ],
+    });
+  }
+}
+
+/**
  * Creates a single unified Proxy for a UI5 control.
  *
  * @param state - The control state including ID, type, methods, and adapter.
@@ -154,18 +196,10 @@ export function createControlProxy(state: ControlProxyState): UI5ControlBase {
         return () => proxyToString(state);
       }
 
-      if (isBlacklisted(prop)) {
-        throw new ControlError({
-          code: 'ERR_CONTROL_METHOD',
-          message: `Method '${prop}' is blacklisted and cannot be called on ${state.controlType}#${state.id}`,
-          attempted: `Call blacklisted method '${prop}'`,
-          retryable: false,
-          suggestions: [
-            `Method '${prop}' is an internal UI5 method that should not be called directly`,
-            'Use the appropriate public API method instead',
-          ],
-        });
-      }
+      const playwrightMethod = resolvePlaywrightMethod(prop, state);
+      if (playwrightMethod !== undefined) return playwrightMethod;
+
+      throwIfBlacklisted(prop, state);
 
       return createMethodForwarder(state, prop);
     },
