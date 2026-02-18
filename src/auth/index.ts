@@ -37,3 +37,6 @@ export {
   clearCustomStrategies,
   detectSystemType,
 } from './auth-factory.js';
+
+export { SAPAuthHandler } from './auth-handler.js';
+export type { AuthLogger, SAPAuthHandlerOptions } from './auth-handler.js';
