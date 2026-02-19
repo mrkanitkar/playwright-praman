@@ -25,7 +25,8 @@
 import { expect, mergeTests } from '@playwright/test';
 
 import { authTest } from './auth-fixtures.js';
-import { coreTest } from './core-fixtures.js';
+import { feTest } from './fe-fixtures.js';
+import { moduleTest } from './module-fixtures.js';
 import { navTest } from './nav-fixtures.js';
 import { stabilityTest } from './stability-fixtures.js';
 
@@ -35,20 +36,22 @@ import { stabilityTest } from './stability-fixtures.js';
  * Unified Playwright test object with all Praman fixtures.
  *
  * @remarks
- * Combines coreTest (config, logger, adapter, ui5), authTest (sapAuth),
- * navTest (ui5Navigation, btpWorkZone), and stabilityTest (auto-wait,
- * request interception) via `mergeTests()`.
+ * Combines moduleTest (config, logger, ui5 + table/dialog/date/odata),
+ * authTest (sapAuth), navTest (ui5Navigation, btpWorkZone),
+ * stabilityTest (auto-wait, request interception), and feTest (fe).
  *
  * @example
  * ```typescript
  * import { test } from 'playwright-praman';
  *
- * test('navigate to app', async ({ ui5Navigation, pramanConfig }) => {
+ * test('table and FE ops', async ({ ui5, ui5Navigation, fe }) => {
  *   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+ *   await ui5.table.getRows('myTable');
+ *   await fe.listReport.search();
  * });
  * ```
  */
-export const test = mergeTests(coreTest, authTest, navTest, stabilityTest);
+export const test = mergeTests(moduleTest, authTest, navTest, stabilityTest, feTest);
 
 export { expect };
 
@@ -56,6 +59,11 @@ export { expect };
 
 export { coreTest } from './core-fixtures.js';
 export type { TestFixtures, WorkerFixtures } from './core-fixtures.js';
+
+export { moduleTest } from './module-fixtures.js';
+export type { ExtendedUI5Handler } from './module-fixtures.js';
+
+export { feTest } from './fe-fixtures.js';
 
 export { stabilityTest } from './stability-fixtures.js';
 export type { StabilityFixtures, StabilityWorkerFixtures } from './stability-fixtures.js';

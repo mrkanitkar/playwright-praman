@@ -40,6 +40,8 @@ import {
   checkUI5SelectedRows,
 } from '../matchers/table-matchers.js';
 import {
+  checkUI5Binding,
+  checkUI5ControlType,
   checkUI5Enabled,
   checkUI5Property,
   checkUI5Text,
@@ -184,6 +186,8 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
         toHaveUI5RowCount: checkUI5RowCount,
         toHaveUI5CellText: checkUI5CellText,
         toHaveUI5SelectedRows: checkUI5SelectedRows,
+        toHaveUI5Binding: checkUI5Binding,
+        toBeUI5ControlType: checkUI5ControlType,
       });
       await use();
     },

@@ -7,6 +7,8 @@
  * @module matchers
  */
 export {
+  checkUI5Binding,
+  checkUI5ControlType,
   checkUI5Enabled,
   checkUI5Property,
   checkUI5Text,
@@ -14,4 +16,5 @@ export {
   checkUI5Visible,
 } from './ui5-matchers.js';
 export type { MatcherOptions, MatcherResult } from './ui5-matchers.js';
+export type { MatcherPage, UI5BindingInfo } from './matcher-utils.js';
 export { checkUI5CellText, checkUI5RowCount, checkUI5SelectedRows } from './table-matchers.js';

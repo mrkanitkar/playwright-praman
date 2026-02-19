@@ -1,5 +1,5 @@
 /**
- * Modules barrel -- re-exports for FLP navigation and WorkZone functions.
+ * Modules barrel -- re-exports for navigation, WorkZone, table, dialog, date, and OData.
  *
  * @module modules
  */
@@ -27,3 +27,126 @@ export type {
   WorkZoneFrameLocator,
   WorkZonePage,
 } from './workzone.js';
+
+// ── Table (core) ─────────────────────────────────────────────────────
+export {
+  deselectAllTableRows,
+  detectTableType,
+  getSelectedRows,
+  getTableCellValue,
+  getTableData,
+  getTableRowCount,
+  getTableRows,
+  selectAllTableRows,
+  selectTableRow,
+  waitForTableData,
+} from './table.js';
+export type {
+  TableInfo,
+  TableOptions,
+  TablePage,
+  TableVariant,
+  WaitForTableDataOptions,
+} from './table.js';
+
+// ── Table (operations) ───────────────────────────────────────────────
+export {
+  clickRow,
+  ensureRowVisible,
+  findRowByValues,
+  getCellByColumnName,
+  getColumnNames,
+  getRowCount,
+  selectRowByValues,
+  setTableCellValue,
+} from './table-operations.js';
+export type { ColumnValueCriteria, TableOperationsPage } from './table-operations.js';
+
+// ── Table (filter/sort) ──────────────────────────────────────────────
+export {
+  clickTableSettingsButton,
+  exportTableData,
+  filterByColumn,
+  getFilterValue,
+  getSortOrder,
+  sortByColumn,
+} from './table-filter-sort.js';
+export type {
+  SortOrderInfo,
+  TableExportOptions,
+  TableFilterOptions,
+  TableFilterSortPage,
+  TableSortOptions,
+} from './table-filter-sort.js';
+
+// ── Dialog ───────────────────────────────────────────────────────────
+export {
+  confirmDialog,
+  DIALOG_CONTROL_TYPES,
+  dismissDialog,
+  getDialogButtons,
+  getOpenDialogs,
+  isDialogOpen,
+  waitForDialog,
+  waitForDialogClosed,
+} from './dialog.js';
+export type {
+  DialogButtonInfo,
+  DialogControlType,
+  DialogInfo,
+  DialogOptions,
+  DialogPage,
+  FindDialogOptions,
+} from './dialog.js';
+
+// ── Date ─────────────────────────────────────────────────────────────
+export {
+  DATE_FORMATS,
+  formatDateForUI5,
+  getDatePickerValue,
+  getDateRangeSelection,
+  getTimePickerValue,
+  setAndValidateDate,
+  setDatePickerValue,
+  setDateRangeSelection,
+  setTimePickerValue,
+} from './date.js';
+export type {
+  DateFormatPattern,
+  DateInput,
+  DateOptions,
+  DatePage,
+  DateRangeResult,
+} from './date.js';
+
+// ── OData (model-level) ─────────────────────────────────────────────
+export {
+  fetchCSRFToken,
+  getEntityCount,
+  getModelData,
+  getModelProperty,
+  hasPendingChanges,
+  waitForODataLoad,
+} from './odata.js';
+export type {
+  CSRFTokenResult,
+  ODataCSRFPage,
+  ODataOptions,
+  ODataPage,
+  WaitForODataLoadOptions,
+} from './odata.js';
+
+// ── OData (HTTP-level) ──────────────────────────────────────────────
+export {
+  callFunctionImport,
+  createEntity,
+  deleteEntity,
+  queryEntities,
+  updateEntity,
+} from './odata-http.js';
+export type {
+  ODataHttpOptions,
+  ODataHttpPage,
+  ODataHttpResult,
+  ODataQueryOptions,
+} from './odata-http.js';
