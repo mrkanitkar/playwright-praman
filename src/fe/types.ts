@@ -165,6 +165,7 @@ export interface FioriElementsFixture {
     readonly navigateToItem: (rowIndex: number) => Promise<void>;
     readonly getVariants: () => Promise<readonly string[]>;
     readonly selectVariant: (name: string) => Promise<void>;
+    readonly getFilterValue: (fieldName: string) => Promise<string>;
   };
   readonly objectPage: ObjectPageFixture;
   readonly table: {

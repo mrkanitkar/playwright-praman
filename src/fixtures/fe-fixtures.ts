@@ -30,6 +30,7 @@ import {
   executeSearch,
   getAvailableVariants,
   getFilterBar,
+  getFilterBarFieldValue,
   getListReportTable,
   navigateToItem,
   selectVariant,
@@ -68,6 +69,7 @@ export function createFEFixture(page: never): FioriElementsFixture {
       navigateToItem: async (rowIndex: number) => navigateToItem(page, '', rowIndex),
       getVariants: async () => getAvailableVariants(page),
       selectVariant: async (name: string) => selectVariant(page, name),
+      getFilterValue: async (fieldName: string) => getFilterBarFieldValue(page, '', fieldName),
     },
     objectPage: {
       navigateToSection: async (sectionTitleOrId: string) =>
