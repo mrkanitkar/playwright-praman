@@ -395,12 +395,12 @@ describe('isUI5Loaded', () => {
 
     it('returns true when sap.ui.require is a function', async () => {
       const setup = createCallbackInvokingPage(() => {
-        const origSap = (globalThis as Record<string, unknown>).sap;
-        (globalThis as Record<string, unknown>).sap = {
+        const origSap = (globalThis as Record<string, unknown>)['sap'];
+        (globalThis as Record<string, unknown>)['sap'] = {
           ui: { require: vi.fn() },
         };
         return () => {
-          (globalThis as Record<string, unknown>).sap = origSap;
+          (globalThis as Record<string, unknown>)['sap'] = origSap;
         };
       });
       cleanup = setup.cleanup;
@@ -411,10 +411,10 @@ describe('isUI5Loaded', () => {
 
     it('returns false when sap is undefined', async () => {
       const setup = createCallbackInvokingPage(() => {
-        const origSap = (globalThis as Record<string, unknown>).sap;
-        delete (globalThis as Record<string, unknown>).sap;
+        const origSap = (globalThis as Record<string, unknown>)['sap'];
+        delete (globalThis as Record<string, unknown>)['sap'];
         return () => {
-          (globalThis as Record<string, unknown>).sap = origSap;
+          (globalThis as Record<string, unknown>)['sap'] = origSap;
         };
       });
       cleanup = setup.cleanup;
@@ -425,10 +425,10 @@ describe('isUI5Loaded', () => {
 
     it('returns false when sap.ui is undefined', async () => {
       const setup = createCallbackInvokingPage(() => {
-        const origSap = (globalThis as Record<string, unknown>).sap;
-        (globalThis as Record<string, unknown>).sap = {};
+        const origSap = (globalThis as Record<string, unknown>)['sap'];
+        (globalThis as Record<string, unknown>)['sap'] = {};
         return () => {
-          (globalThis as Record<string, unknown>).sap = origSap;
+          (globalThis as Record<string, unknown>)['sap'] = origSap;
         };
       });
       cleanup = setup.cleanup;
@@ -439,12 +439,12 @@ describe('isUI5Loaded', () => {
 
     it('returns false when sap.ui.require is not a function', async () => {
       const setup = createCallbackInvokingPage(() => {
-        const origSap = (globalThis as Record<string, unknown>).sap;
-        (globalThis as Record<string, unknown>).sap = {
+        const origSap = (globalThis as Record<string, unknown>)['sap'];
+        (globalThis as Record<string, unknown>)['sap'] = {
           ui: { require: 'not-a-function' },
         };
         return () => {
-          (globalThis as Record<string, unknown>).sap = origSap;
+          (globalThis as Record<string, unknown>)['sap'] = origSap;
         };
       });
       cleanup = setup.cleanup;
