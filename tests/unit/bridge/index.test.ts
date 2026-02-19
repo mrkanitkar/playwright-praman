@@ -10,23 +10,6 @@ import { describe, expect, it } from 'vitest';
 import * as bridge from '#bridge/index.js';
 
 describe('bridge barrel', () => {
-  // ── Adapter types & factory ────────────────────────────────────────
-  it('exports createBridgeAdapter', () => {
-    expect(bridge.createBridgeAdapter).toBeTypeOf('function');
-  });
-
-  it('exports ClassicUI5Adapter', () => {
-    expect(bridge.ClassicUI5Adapter).toBeTypeOf('function');
-  });
-
-  it('exports HybridAdapter', () => {
-    expect(bridge.HybridAdapter).toBeTypeOf('function');
-  });
-
-  it('exports WebComponentAdapter', () => {
-    expect(bridge.WebComponentAdapter).toBeTypeOf('function');
-  });
-
   // ── Injection ──────────────────────────────────────────────────────
   it('exports isBridgeReady', () => {
     expect(bridge.isBridgeReady).toBeTypeOf('function');

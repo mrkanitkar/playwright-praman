@@ -20,10 +20,6 @@ describe('proxy barrel', () => {
     expect(proxy.UI5Object).toBeTypeOf('function');
   });
 
-  it('exports createUI5ObjectProxy', () => {
-    expect(proxy.createUI5ObjectProxy).toBeTypeOf('function');
-  });
-
   it('exports UI5ObjectCache', () => {
     expect(proxy.UI5ObjectCache).toBeTypeOf('function');
   });
@@ -41,46 +37,12 @@ describe('proxy barrel', () => {
     expect(proxy.getDiscoveryPriorities).toBeTypeOf('function');
   });
 
-  // ── Method filter & Playwright API ─────────────────────────────────
+  // ── Method filter ──────────────────────────────────────────────────
   it('exports isMethodAllowed', () => {
     expect(proxy.isMethodAllowed).toBeTypeOf('function');
   });
 
   it('exports extractAllowedMethods', () => {
     expect(proxy.extractAllowedMethods).toBeTypeOf('function');
-  });
-
-  it('exports PLAYWRIGHT_API_METHODS', () => {
-    expect(proxy.PLAYWRIGHT_API_METHODS).toBeInstanceOf(Set);
-  });
-
-  it('exports isPlaywrightMethod', () => {
-    expect(proxy.isPlaywrightMethod).toBeTypeOf('function');
-  });
-
-  it('exports routeToInteractionStrategy', () => {
-    expect(proxy.routeToInteractionStrategy).toBeTypeOf('function');
-  });
-
-  it('exports cssEscapeId', () => {
-    expect(proxy.cssEscapeId).toBeTypeOf('function');
-  });
-
-  // ── Return handler ─────────────────────────────────────────────────
-  it('exports handleBridgeReturn', () => {
-    expect(proxy.handleBridgeReturn).toBeTypeOf('function');
-  });
-
-  // ── Proxy converter ────────────────────────────────────────────────
-  it('exports isControlResult', () => {
-    expect(proxy.isControlResult).toBeTypeOf('function');
-  });
-
-  it('exports convertToControlProxy', () => {
-    expect(proxy.convertToControlProxy).toBeTypeOf('function');
-  });
-
-  it('exports convertToObjectProxy', () => {
-    expect(proxy.convertToObjectProxy).toBeTypeOf('function');
   });
 });

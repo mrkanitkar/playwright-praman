@@ -65,7 +65,7 @@ export interface WorkZoneFrame {
 }
 
 /**
- * Minimal subset of BridgeAdapter used by WorkZone manager.
+ * Minimal adapter interface used by WorkZone manager.
  */
 export interface WorkZoneAdapter {
   init(page: WorkZonePage | WorkZoneFrame): Promise<void>;
@@ -162,7 +162,7 @@ export function createWorkZoneManager(
 
     async enableDualBridge(): Promise<void> {
       // Inject bridge in main frame (shell)
-      await ensureBridgeInjected(page);
+      await ensureBridgeInjected(page as never);
 
       // Inject bridge in app iframe via Frame.evaluate
       const appFrame = findAppFrame(page);

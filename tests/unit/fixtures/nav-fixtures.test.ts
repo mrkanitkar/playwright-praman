@@ -105,13 +105,6 @@ const mockPage = {
   mainFrame: vi.fn(),
 };
 
-// ── Mock bridge adapter ───────────────────────────────────────────────
-const mockBridgeAdapter = {
-  init: vi.fn().mockResolvedValue(undefined),
-  destroy: vi.fn().mockResolvedValue(undefined),
-  resetInjectionState: vi.fn(),
-};
-
 // ── Mock config ───────────────────────────────────────────────────────
 const mockConfig: Readonly<PramanConfig> = Object.freeze(
   PramanConfigSchema.parse({ logLevel: 'info' }),
@@ -349,12 +342,17 @@ describe('nav-fixtures fixture definitions', () => {
       const fn = extractFixtureFn(fixtures['btpWorkZone']);
       const wz = await runFixture(fn, {
         page: mockPage,
-        bridgeAdapter: mockBridgeAdapter,
       });
 
       expect(wz).toBe(mockWorkZoneManager);
       expect(mockCreateWorkZoneManager).toHaveBeenCalledOnce();
-      expect(mockCreateWorkZoneManager).toHaveBeenCalledWith(mockPage, mockBridgeAdapter);
+      expect(mockCreateWorkZoneManager).toHaveBeenCalledWith(
+        mockPage,
+        expect.objectContaining({
+          init: expect.any(Function) as unknown,
+          resetInjectionState: expect.any(Function) as unknown,
+        }),
+      );
     });
   });
 
@@ -379,13 +377,6 @@ describe('nav-fixtures fixture definitions', () => {
   describe('cross-fixture dependency declarations', () => {
     it('declares pramanConfig as option placeholder', () => {
       const options = extractFixtureOptions(fixtures['pramanConfig']);
-
-      expect(options).toBeDefined();
-      expect(options?.['option']).toBe(true);
-    });
-
-    it('declares bridgeAdapter as option placeholder', () => {
-      const options = extractFixtureOptions(fixtures['bridgeAdapter']);
 
       expect(options).toBeDefined();
       expect(options?.['option']).toBe(true);

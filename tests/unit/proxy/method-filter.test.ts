@@ -24,8 +24,12 @@ describe('method-filter', () => {
 
     it('blocks blacklisted methods', () => {
       expect(isMethodAllowed('constructor')).toBe(false);
-      expect(isMethodAllowed('destroy')).toBe(false);
       expect(isMethodAllowed('rerender')).toBe(false);
+      expect(isMethodAllowed('fireEvent')).toBe(false);
+    });
+
+    it('allows destroy (intentionally not blacklisted for test cleanup)', () => {
+      expect(isMethodAllowed('destroy')).toBe(true);
     });
 
     it('blocks underscore-prefixed internal methods', () => {
@@ -49,11 +53,12 @@ describe('method-filter', () => {
     it('filters out blacklisted methods', () => {
       const all = ['getText', 'constructor', 'destroy', 'setValue', '_internal'];
       const allowed = extractAllowedMethods(all);
-      expect(allowed).toEqual(['getText', 'setValue']);
+      // destroy is intentionally NOT blacklisted (GAP-06: needed for test cleanup)
+      expect(allowed).toEqual(['getText', 'destroy', 'setValue']);
     });
 
     it('returns empty array for all-blacklisted input', () => {
-      const all = ['constructor', 'destroy', '_foo'];
+      const all = ['constructor', 'fireEvent', '_foo'];
       expect(extractAllowedMethods(all)).toEqual([]);
     });
 

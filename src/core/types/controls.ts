@@ -64,6 +64,32 @@ export interface UI5ControlBase {
   isBound(propertyName: string): Promise<boolean>;
   /** Returns the named model, or the default model if no name given. */
   getModel(name?: string): Promise<unknown>;
+
+  /**
+   * Dynamic method access — the proxy forwards any UI5 method call to the bridge.
+   *
+   * @remarks
+   * UI5 controls have hundreds of methods (getters, setters, actions) that vary
+   * by control type. The runtime Proxy intercepts property access and routes it
+   * through `page.evaluate()`. This index signature allows TypeScript to accept
+   * any method call without requiring explicit type narrowing.
+   *
+   * `any` is required here because the Proxy returns heterogeneous types per
+   * property: `string` for id/controlType, `undefined` for anti-thenable,
+   * and `(...args) => Promise` for dynamic methods. No single non-`any` type
+   * can express this while remaining compatible with the typed members above.
+   *
+   * @example
+   * ```typescript
+   * const button = await ui5.control({ id: 'btn1' });
+   * await button.press();           // sap.m.Button method
+   * await button.getText();         // sap.m.Button method
+   * const table = await ui5.control({ id: 'tbl1' });
+   * const rows = await table.getRows();  // sap.ui.table.Table method
+   * ```
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Proxy returns heterogeneous types per property
+  [method: string]: any;
 }
 
 // ═══════════════════════════════════════════════════════════════════════

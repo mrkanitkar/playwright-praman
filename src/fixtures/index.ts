@@ -64,4 +64,4 @@ export { authTest } from './auth-fixtures.js';
 export type { AuthDeps, AuthFixtureOptions, AuthFixtures } from './auth-fixtures.js';
 
 export { navTest } from './nav-fixtures.js';
-export type { NavDeps, NavFixtures, UI5NavigationAPI } from './nav-fixtures.js';
+export type { NavFixtures, NavWorkerDeps, UI5NavigationAPI } from './nav-fixtures.js';

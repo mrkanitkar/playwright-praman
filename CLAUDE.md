@@ -60,6 +60,15 @@ For multi-skill tasks, load primary + supporting skill(s). Example:
 13. ESM only — `import`, never `require`
 14. No `I` prefix on interfaces — `BridgeAdapter` not `IBridgeAdapter`
 
+## LSP Workflow Rules
+
+- Before modifying any function you didn't write: use goToDefinition first
+- Before renaming or changing a signature: use findReferences to assess impact
+- Before claiming a change is complete: check LSP diagnostics for errors
+- Use hover to read TSDoc before calling unfamiliar functions
+- Use documentSymbol to understand file structure instead of reading entire files
+- Prefer LSP operations over grep/glob for navigating code — they're faster and semantic
+
 ## Documentation Standard: TSDoc
 
 - This project uses **Microsoft TSDoc exclusively** — NOT JSDoc

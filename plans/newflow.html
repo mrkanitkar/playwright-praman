@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture Comparison: dhikraft vs Praman</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-subtle: #1f6feb22;
+      --green: #3fb950;
+      --red: #f85149;
+      --orange: #d29922;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── sticky nav ─────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      overflow-x: auto;
+      backdrop-filter: blur(12px);
+    }
+    nav .logo {
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+      color: var(--accent);
+    }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    nav a:hover { color: var(--text); }
+    nav a.active { color: var(--accent); }
+
+    /* ── layout ──────────────────────────────────── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    header {
+      text-align: center;
+      padding: 3rem 0 2rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge--blue  { background: #1f6feb33; color: #58a6ff; }
+    .badge--green { background: #23863633; color: #3fb950; }
+    .badge--red   { background: #f8514933; color: #f85149; }
+
+    /* ── sections ────────────────────────────────── */
+    section {
+      margin-top: 3rem;
+      scroll-margin-top: 3.5rem;
+    }
+    section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    section h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin: 1.5rem 0 0.75rem;
+    }
+    section h3 .tag {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      vertical-align: middle;
+      margin-left: 0.5rem;
+    }
+    .tag--dhikraft { background: #da3633aa; color: #fff; }
+    .tag--praman   { background: #238636aa; color: #fff; }
+
+    /* ── diagram cards ───────────────────────────── */
+    .diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    .diagram:hover { border-color: var(--accent); }
+    .diagram img {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: zoom-in;
+    }
+
+    /* ── side-by-side layout ─────────────────────── */
+    .side-by-side {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 900px) {
+      .side-by-side { grid-template-columns: 1fr; }
+    }
+    .side-by-side .col h3 { margin-top: 0; }
+
+    /* ── tables ───────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1rem 0 1.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: var(--surface);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      position: sticky;
+      top: 0;
+    }
+    td code {
+      background: #ffffff0d;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+    tr:hover td { background: var(--accent-subtle); }
+    .cell--change { font-weight: 700; }
+    .cell--green  { color: var(--green); }
+    .cell--red    { color: var(--red); }
+
+    /* ── lightbox overlay ────────────────────────── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 92vh;
+      border-radius: 6px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+    }
+
+    /* ── footer ───────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Praman Arch</span>
+  <a href="#e2e-flow">E2E Flow</a>
+  <a href="#bridge-injection">Bridge Injection</a>
+  <a href="#interaction">Interaction</a>
+  <a href="#return-types">Return Types</a>
+  <a href="#discovery">Discovery</a>
+  <a href="#layers">Layers</a>
+  <a href="#summary">Summary</a>
+</nav>
+
+<div class="container">
+
+  <header>
+    <h1>Architecture Comparison</h1>
+    <p>dhikraft v2.5.0 vs Praman v1.0 — post-Phase 3 simplification.
+      Every diagram references exact <code>file:line</code> from the codebases.</p>
+    <div class="badges">
+      <span class="badge badge--red">dhikraft 4,145 LOC</span>
+      <span class="badge badge--green">Praman 897 LOC</span>
+      <span class="badge badge--blue">-78% core LOC</span>
+    </div>
+  </header>
+
+  <!-- ── 1. E2E Flow ─────────────────────────────── -->
+  <section id="e2e-flow">
+    <h2>1. End-to-End Flow Comparison</h2>
+    <div class="side-by-side">
+      <div class="col">
+        <h3>dhikraft <span class="tag tag--dhikraft">v2.5.0</span></h3>
+        <div class="diagram"><img src="diagrams/01-dhikraft-e2e-flow.png" alt="dhikraft End-to-End Flow"></div>
+      </div>
+      <div class="col">
+        <h3>Praman <span class="tag tag--praman">v1.0</span></h3>
+        <div class="diagram"><img src="diagrams/02-praman-e2e-flow.png" alt="Praman End-to-End Flow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. Bridge Injection ─────────────────────── -->
+  <section id="bridge-injection">
+    <h2>2. Bridge Injection Flow</h2>
+    <div class="diagram"><img src="diagrams/03-bridge-injection.png" alt="Bridge Injection Comparison"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspect</th><th>dhikraft</th><th>Praman</th></tr></thead>
+        <tbody>
+          <tr><td>Tracking</td><td>Status check via <code>isBridgeInjected()</code></td><td><code>WeakSet&lt;Page&gt;</code> &mdash; O(1) lookup</td></tr>
+          <tr><td>Ready check</td><td>Separate <code>waitForUI5BridgeReady</code> polling</td><td>Single <code>injectBridge</code> call</td></tr>
+          <tr><td>Nav reset</td><td>Implicit (full reload clears <code>window._ui5Bridge</code>)</td><td>Explicit <code>framenavigated</code> listener resets WeakSet</td></tr>
+          <tr><td>Fixture wiring</td><td>Bridge deferred, handler self-heals</td><td><code>core-fixtures.ts:187-193</code> registers listener</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 3. Interaction ──────────────────────────── -->
+  <section id="interaction">
+    <h2>3. Interaction Flow</h2>
+    <div class="side-by-side">
+      <div class="col">
+        <h3>dhikraft: <code>await button.press()</code> <span class="tag tag--dhikraft">v2.5.0</span></h3>
+        <div class="diagram"><img src="diagrams/04-dhikraft-interaction.png" alt="dhikraft Interaction Flow"></div>
+      </div>
+      <div class="col">
+        <h3>Praman: <code>await button.press()</code> <span class="tag tag--praman">v1.0</span></h3>
+        <div class="diagram"><img src="diagrams/05-praman-interaction.png" alt="Praman Interaction Flow"></div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspect</th><th>dhikraft</th><th>Praman</th></tr></thead>
+        <tbody>
+          <tr><td>Proxy resolution</td><td><code>press</code> is a class method on UI5ControlProxy</td><td><code>press</code> resolved via <code>resolveKnownProperty</code> switch</td></tr>
+          <tr><td>Strategy binding</td><td>Strategy instantiated in handler constructor</td><td>Strategy passed via <code>ControlProxyState</code></td></tr>
+          <tr><td>Fallback chain</td><td>Inline in <code>PlaywrightStrategy.press()</code></td><td>Same chain but in pluggable strategy impl</td></tr>
+          <tr><td>DOM fallback</td><td><code>page.locator('#' + CSS.escape(id)).click()</code></td><td>Same pattern, delegated to strategy</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 4. Return Types ─────────────────────────── -->
+  <section id="return-types">
+    <h2>4. Return Type Handling</h2>
+    <div class="side-by-side">
+      <div class="col">
+        <h3>dhikraft: 7-Type Detection <span class="tag tag--dhikraft">v2.5.0</span></h3>
+        <div class="diagram"><img src="diagrams/06-dhikraft-return-types.png" alt="dhikraft Return Type Handling"></div>
+      </div>
+      <div class="col">
+        <h3>Praman: Inline Handler <span class="tag tag--praman">v1.0</span></h3>
+        <div class="diagram"><img src="diagrams/07-praman-return-types.png" alt="Praman Return Type Handling"></div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspect</th><th>dhikraft</th><th>Praman</th></tr></thead>
+        <tbody>
+          <tr><td>7-type detection</td><td>Browser-side (in page.evaluate)</td><td>Browser-side (bridge script)</td></tr>
+          <tr><td>Sub-proxy creation</td><td>Node-side: <code>new UI5ControlProxy()</code> per ref</td><td>Node-side: <code>createControlProxy()</code> per ref</td></tr>
+          <tr><td>aggregation proxy</td><td><code>Promise.all(refs.map(&rarr; new proxy))</code> &mdash; async</td><td><code>controlIds.map(&rarr; createControlProxy)</code> &mdash; sync</td></tr>
+          <tr><td>element proxy</td><td><code>new UI5ControlProxy(selector, page)</code> (re-discovers)</td><td><code>createControlProxy(state)</code> (ID-based, no re-discover)</td></tr>
+          <tr><td>object proxy</td><td><code>UI5Object.create()</code> (returns UI5Object)</td><td><code>UI5Object.create().toProxy()</code> (returns Proxy)</td></tr>
+          <tr><td>Error handling</td><td>Throws generic <code>Error</code></td><td>Throws typed <code>BridgeError</code> with code + suggestions</td></tr>
+          <tr><td>Location</td><td>Split: browser (1256-1409) + node (1417-1467)</td><td>Unified: <code>handleReturn()</code> (105-172) &mdash; 67 lines</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 5. Discovery ────────────────────────────── -->
+  <section id="discovery">
+    <h2>5. Discovery Chain Comparison</h2>
+    <div class="diagram"><img src="diagrams/08-discovery-chain.png" alt="Discovery Chain Comparison"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aspect</th><th>dhikraft</th><th>Praman</th></tr></thead>
+        <tbody>
+          <tr><td>Priority levels</td><td>3: P0 Registry &rarr; P1 Direct ID &rarr; P2 RecordReplay</td><td>2: direct-id &rarr; recordreplay (configurable)</td></tr>
+          <tr><td>Registry scan (P0)</td><td>Iterates ALL controls in <code>Element.registry.all()</code></td><td>Not implemented (unnecessary with modern UI5)</td></tr>
+          <tr><td>Direct ID APIs</td><td>3-API fallback chain</td><td>Single <code>page.evaluate</code> call (bridge handles API)</td></tr>
+          <tr><td>Visibility check</td><td>Filters visible vs hidden, prefers visible</td><td>Not in discovery (trusts UI5 registry)</td></tr>
+          <tr><td>Configurability</td><td>Hardcoded chain</td><td><code>discoveryStrategies</code> array in config</td></tr>
+          <tr><td>Cache</td><td>LRU+TTL (100 entries, 60s)</td><td><code>ControlProxyCache</code> (Map + selector hash)</td></tr>
+          <tr><td>Error</td><td>Generic <code>Error('Control not found')</code></td><td>Typed <code>ControlError</code> with code + suggestions</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 6. Architecture Layers ──────────────────── -->
+  <section id="layers">
+    <h2>6. Architecture Layer Comparison</h2>
+    <div class="diagram"><img src="diagrams/09-architecture-layers.png" alt="Architecture Layer Comparison"></div>
+    <h3>What Was Removed in Phase 3</h3>
+    <div class="diagram"><img src="diagrams/10-files-removed.png" alt="Files Removed in Phase 3"></div>
+  </section>
+
+  <!-- ── Summary Table ───────────────────────────── -->
+  <section id="summary">
+    <h2>Summary</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Dimension</th><th>dhikraft (v2.5.0)</th><th>Praman (v1.0)</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td>Handler LOC</td><td>2,317 (class)</td><td>590 (class)</td><td class="cell--change cell--green">-74%</td></tr>
+          <tr><td>Proxy LOC</td><td>1,828 (class + fluent proxy)</td><td>307 (functional)</td><td class="cell--change cell--green">-83%</td></tr>
+          <tr><td>Total core LOC</td><td>~4,145</td><td>~897</td><td class="cell--change cell--green">-78%</td></tr>
+          <tr><td>Proxy pattern</td><td>Class + <code>createFluentProxy()</code></td><td><code>createControlProxy()</code> &mdash; single <code>new Proxy()</code></td><td>Functional</td></tr>
+          <tr><td>Bridge abstraction</td><td><code>BridgeAdapter</code> + <code>BridgePage</code> + factory</td><td><code>page.evaluate()</code> direct, WeakSet tracking</td><td class="cell--green">No adapter</td></tr>
+          <tr><td>Injection tracking</td><td><code>isBridgeInjected()</code> + <code>BridgeStatus</code></td><td><code>WeakSet&lt;Page&gt;</code> &mdash; O(1)</td><td>Simpler</td></tr>
+          <tr><td>Navigation reset</td><td>Implicit (full reload)</td><td>Explicit <code>framenavigated</code> + <code>resetPageInjection</code></td><td>More reliable</td></tr>
+          <tr><td>Discovery chain</td><td>P0 &rarr; P1 (3 APIs) &rarr; P2</td><td>direct-id &rarr; recordreplay (configurable)</td><td>Pluggable</td></tr>
+          <tr><td>Return handling</td><td>Split: browser (154) + node (50)</td><td>Unified <code>handleReturn()</code> &mdash; 67 LOC</td><td>Single fn</td></tr>
+          <tr><td>Sub-proxy creation</td><td><code>new UI5ControlProxy()</code> (re-discovers)</td><td><code>createControlProxy(state)</code> (ID-based)</td><td>No re-discovery</td></tr>
+          <tr><td>Cache</td><td>LRU+TTL (100, 60s), RegExp-safe</td><td><code>ControlProxyCache</code> (Map + hash)</td><td>Simplified</td></tr>
+          <tr><td>Error types</td><td>Generic <code>Error</code> + console.log</td><td><code>ControlError</code> / <code>BridgeError</code> with suggestions</td><td class="cell--green">Structured</td></tr>
+          <tr><td>Logging</td><td><code>console.log</code> / <code>console.debug</code></td><td>pino (structured, configurable)</td><td class="cell--green">Production</td></tr>
+          <tr><td>Files removed</td><td>N/A</td><td>11 files (adapter, converter, etc.)</td><td class="cell--green">-11 files</td></tr>
+          <tr><td>TypeScript</td><td><code>as unknown as T</code>, <code>any</code></td><td>Strict: no <code>any</code>, no unsafe casts</td><td class="cell--green">Strict mode</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Praman v1.0 &mdash; Architecture Comparison &mdash; Generated 2026-02-18
+</footer>
+
+<!-- ── lightbox ─────────────────────────────────── -->
+<div class="lightbox" id="lightbox">
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  // lightbox
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+
+  document.querySelectorAll('.diagram img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+    });
+  });
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') lb.classList.remove('open');
+  });
+
+  // nav active highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.toggle('active',
+          a.getAttribute('href') === '#' + entry.target.id));
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

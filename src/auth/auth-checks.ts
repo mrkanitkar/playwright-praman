@@ -9,7 +9,7 @@
  * @module auth
  */
 
-import type { BridgePage } from '#bridge/adapter.js';
+import type { AuthPage } from './auth-types.js';
 
 /**
  * Check if the SAP Fiori shell header is visible.
@@ -22,7 +22,7 @@ import type { BridgePage } from '#bridge/adapter.js';
  * const shellVisible = await isShellVisible(page);
  * ```
  */
-export async function isShellVisible(page: BridgePage): Promise<boolean> {
+export async function isShellVisible(page: AuthPage): Promise<boolean> {
   try {
     return await page.evaluate(() => {
       const shellHeader =
@@ -49,7 +49,7 @@ export async function isShellVisible(page: BridgePage): Promise<boolean> {
  * const menuVisible = await isUserMenuVisible(page);
  * ```
  */
-export async function isUserMenuVisible(page: BridgePage): Promise<boolean> {
+export async function isUserMenuVisible(page: AuthPage): Promise<boolean> {
   try {
     return await page.evaluate(() => {
       const userMenu =
@@ -77,7 +77,7 @@ export async function isUserMenuVisible(page: BridgePage): Promise<boolean> {
  * const ui5Ready = await isUI5Loaded(page);
  * ```
  */
-export async function isUI5Loaded(page: BridgePage): Promise<boolean> {
+export async function isUI5Loaded(page: AuthPage): Promise<boolean> {
   try {
     return await page.evaluate(() => {
       /* eslint-disable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison */
@@ -108,7 +108,7 @@ export async function isUI5Loaded(page: BridgePage): Promise<boolean> {
  * const hasLoginForm = await isLoginPageVisible(page);
  * ```
  */
-export async function isLoginPageVisible(page: BridgePage): Promise<boolean> {
+export async function isLoginPageVisible(page: AuthPage): Promise<boolean> {
   try {
     return await page.evaluate(() => {
       const loginSelectors = [
@@ -144,7 +144,7 @@ export async function isLoginPageVisible(page: BridgePage): Promise<boolean> {
  * }
  * ```
  */
-export async function isAuthenticated(page: BridgePage): Promise<boolean> {
+export async function isAuthenticated(page: AuthPage): Promise<boolean> {
   try {
     const shellVisible = await isShellVisible(page);
     if (!shellVisible) {

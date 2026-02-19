@@ -3,27 +3,42 @@
  *
  * @remarks
  * NOT exported from any barrel. Used internally by the `ui5` fixture.
- * Wraps adapter, cache, discovery, and interaction strategy into a clean API.
+ * Wraps page, cache, discovery, and interaction strategy into a clean API.
+ * Uses Playwright's `Page` directly — no adapter abstraction.
  *
  * Each method follows the pattern:
  * 1. Validate selector (non-empty)
- * 2. Wait for UI5 stability
+ * 2. Ensure bridge injected + wait for UI5 stability
  * 3. Discover control via strategy chain
- * 4. Execute action via adapter or interaction strategy
+ * 4. Execute action via page.evaluate() or interaction strategy
  *
  * @example
  * ```typescript
  * import { UI5Handler } from './ui5-handler.js';
  *
- * const handler = new UI5Handler({ adapter, page, strategy, discoveryStrategies: ['direct-id'] });
+ * const handler = new UI5Handler({ page, interactionStrategy, discoveryStrategies: ['direct-id'] });
  * const button = await handler.control({ id: 'btn1' });
  * ```
  *
  * @module fixtures
  */
 
-import type { BridgeAdapter, BridgePage } from '#bridge/adapter.js';
+import type { Page } from '@playwright/test';
+
+import { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS } from '#bridge/bridge-constants.js';
+import type {
+  BridgeControlRef,
+  ControlDiscoveryResult,
+  MethodExecutionResult,
+} from '#bridge/bridge-types.js';
+import { createExecuteMethodScript } from '#bridge/browser-scripts/execute-method.js';
+import {
+  createFindAllControlsScript,
+  createFindControlScript,
+} from '#bridge/browser-scripts/find-control.js';
+import { ensureBridgeInjected } from '#bridge/injection.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
+import { filterMethods } from '#bridge/method-blacklist.js';
 import type { DiscoveryStrategyName } from '#core/config/schema.js';
 import { ControlError } from '#core/errors/control-error.js';
 import { SelectorError } from '#core/errors/selector-error.js';
@@ -31,8 +46,7 @@ import { TimeoutError } from '#core/errors/timeout-error.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
 import { ControlProxyCache } from '#proxy/cache.js';
-import { discoverControl } from '#proxy/discovery.js';
-import { createControlProxy } from '#proxy/dynamic-proxy.js';
+import { createControlProxy } from '#proxy/control-proxy.js';
 
 /** Default UI5 wait timeout in milliseconds. */
 const DEFAULT_UI5_WAIT_TIMEOUT = 30_000;
@@ -49,17 +63,15 @@ const DEFAULT_POLL_INTERVAL = 250;
  * @example
  * ```typescript
  * const options: UI5HandlerOptions = {
- *   adapter,
  *   page,
- *   strategy,
+ *   interactionStrategy,
  *   discoveryStrategies: ['direct-id', 'recordreplay'],
  * };
  * ```
  */
 export interface UI5HandlerOptions {
-  readonly adapter: BridgeAdapter;
-  readonly page: BridgePage;
-  readonly strategy: InteractionStrategy;
+  readonly page: Page;
+  readonly interactionStrategy: InteractionStrategy;
   readonly discoveryStrategies: readonly DiscoveryStrategyName[];
   readonly config?: {
     readonly ui5WaitTimeout?: number;
@@ -98,8 +110,7 @@ function validateSelector(selector: UI5Selector): void {
  * ```
  */
 export class UI5Handler {
-  private readonly adapter: BridgeAdapter;
-  private readonly page: BridgePage;
+  private readonly page: Page;
   private readonly strategy: InteractionStrategy;
   private readonly discoveryStrategies: readonly DiscoveryStrategyName[];
   private readonly ui5WaitTimeout: number;
@@ -107,9 +118,8 @@ export class UI5Handler {
   private cache: ControlProxyCache;
 
   constructor(options: UI5HandlerOptions) {
-    this.adapter = options.adapter;
     this.page = options.page;
-    this.strategy = options.strategy;
+    this.strategy = options.interactionStrategy;
     this.discoveryStrategies = options.discoveryStrategies;
     this.ui5WaitTimeout = options.config?.ui5WaitTimeout ?? DEFAULT_UI5_WAIT_TIMEOUT;
     this.discoveryTimeout = options.config?.controlDiscoveryTimeout ?? DEFAULT_DISCOVERY_TIMEOUT;
@@ -117,28 +127,149 @@ export class UI5Handler {
   }
 
   /**
+   * Ensures the bridge is injected before any browser operation.
+   *
+   * @remarks
+   * Delegates to `ensureBridgeInjected()` which is idempotent.
+   */
+  private async ensureReady(): Promise<void> {
+    await ensureBridgeInjected(this.page);
+  }
+
+  /**
+   * Waits for UI5 to become stable via page.waitForFunction().
+   *
+   * @param timeout - Max wait time in ms.
+   */
+  private async internalWaitForUI5Stable(timeout?: number): Promise<void> {
+    await this.ensureReady();
+    const ns = BRIDGE_GLOBALS.NAMESPACE;
+    const effectiveTimeout = timeout ?? BRIDGE_TIMEOUTS.UI5_STABLE;
+    await this.page.waitForFunction(
+      `(function() {
+        var bridge = window.${ns};
+        if (!bridge) return false;
+        if (typeof sap === 'undefined' || !sap.ui) return false;
+        try {
+          var pending = sap.ui.getCore().getUIDirty();
+          return !pending;
+        } catch (e) {
+          return true;
+        }
+      })()`,
+      { timeout: effectiveTimeout },
+    );
+  }
+
+  /**
+   * Finds a single control via page.evaluate() with the find-control browser script.
+   *
+   * @param selector - The UI5 selector to search for.
+   * @returns The control ref, or null if not found.
+   */
+  private async internalFindControl(selector: UI5Selector): Promise<BridgeControlRef | null> {
+    await this.ensureReady();
+    const selectorJson = JSON.stringify(selector);
+    const script = createFindControlScript();
+    const withArgs = script.replace(/\)\(\)$/, `)(${selectorJson})`);
+    const result = await this.page.evaluate<ControlDiscoveryResult>(withArgs);
+
+    if (result.id === '') return null;
+    return { id: result.id, controlType: result.controlType };
+  }
+
+  /**
+   * Finds all controls matching a selector via page.evaluate().
+   *
+   * @param selector - The UI5 selector to search for.
+   * @returns Array of control refs.
+   */
+  private async internalFindControls(selector: UI5Selector): Promise<readonly BridgeControlRef[]> {
+    await this.ensureReady();
+    const selectorJson = JSON.stringify(selector);
+    const script = createFindAllControlsScript();
+    const withArgs = script.replace(/\)\(\)$/, `)(${selectorJson})`);
+    const results = await this.page.evaluate<readonly ControlDiscoveryResult[]>(withArgs);
+
+    return results.map((r) => ({ id: r.id, controlType: r.controlType }));
+  }
+
+  /**
+   * Executes a method on a control via page.evaluate() with the execute-method browser script.
+   *
+   * @param controlId - The control ID.
+   * @param methodName - The method name.
+   * @param args - Arguments to pass.
+   * @returns The method execution result value.
+   */
+  private async internalExecuteControlMethod(
+    controlId: string,
+    methodName: string,
+    args: readonly unknown[],
+  ): Promise<unknown> {
+    await this.ensureReady();
+    const script = createExecuteMethodScript();
+    const withArgs = script.replace(
+      /\)\(\)$/,
+      `)(${JSON.stringify(controlId)}, ${JSON.stringify(methodName)}, ${JSON.stringify(args)})`,
+    );
+    const result = await this.page.evaluate<MethodExecutionResult>(withArgs);
+    return result.value;
+  }
+
+  /**
+   * Gets available methods for a control via page.evaluate().
+   *
+   * @param controlId - The control ID.
+   * @returns Array of method names.
+   */
+  private async internalGetAvailableMethods(controlId: string): Promise<readonly string[]> {
+    await this.ensureReady();
+    const ns = BRIDGE_GLOBALS.NAMESPACE;
+    const allMethods = await this.page.evaluate<string[]>(
+      `(function() {
+        var bridge = window.${ns};
+        if (!bridge) return [];
+        if (!bridge.utils || typeof bridge.utils.retrieveControlMethods !== 'function') return [];
+        return bridge.utils.retrieveControlMethods('${controlId}');
+      })()`,
+    );
+    return filterMethods(allMethods);
+  }
+
+  /**
    * Discovers a single control matching the selector.
    *
    * @param selector - The UI5 selector to search for.
+   * @param options - Optional discovery options.
    * @returns The discovered control proxy.
    * @throws ControlError if control not found.
    * @throws SelectorError if selector is empty.
+   * @throws TimeoutError if control not found within timeout.
    *
    * @example
    * ```typescript
    * const button = await handler.control({ id: 'btn1' });
+   *
+   * // With extended timeout for slow-loading views:
+   * const tile = await handler.control(
+   *   { controlType: 'sap.m.GenericTile', properties: { header: 'My App' } },
+   *   { timeout: 60000 },
+   * );
    * ```
    */
-  async control(selector: UI5Selector): Promise<UI5ControlBase> {
+  async control(
+    selector: UI5Selector,
+    options?: { readonly timeout?: number },
+  ): Promise<UI5ControlBase> {
     validateSelector(selector);
-    await this.adapter.waitForUI5Stable();
 
-    const proxy = await discoverControl(
-      selector,
-      this.adapter,
-      this.cache,
-      this.discoveryStrategies,
-    );
+    // Always poll for control discovery — use explicit timeout or configured default
+    await this.waitFor(selector, { timeout: options?.timeout ?? this.discoveryTimeout });
+
+    await this.internalWaitForUI5Stable();
+
+    const proxy = await this.discoverSingleControl(selector);
 
     if (proxy === null) {
       throw new ControlError({
@@ -168,21 +299,22 @@ export class UI5Handler {
    */
   async controls(selector: UI5Selector): Promise<readonly UI5ControlBase[]> {
     validateSelector(selector);
-    await this.adapter.waitForUI5Stable();
+    await this.internalWaitForUI5Stable();
 
-    const refs = await this.adapter.findControls(selector);
+    const refs = await this.internalFindControls(selector);
     if (refs.length === 0) {
       return [];
     }
 
     const proxies: UI5ControlBase[] = [];
     for (const ref of refs) {
-      const methods = await this.adapter.getAvailableMethods(ref.id);
+      const methods = await this.internalGetAvailableMethods(ref.id);
       const proxy = createControlProxy({
         id: ref.id,
         controlType: ref.controlType,
         methods: new Set(methods),
-        adapter: this.adapter,
+        page: this.page,
+        interactionStrategy: this.strategy,
       });
       proxies.push(proxy);
     }
@@ -263,7 +395,7 @@ export class UI5Handler {
    */
   async check(selector: UI5Selector): Promise<void> {
     const proxy = await this.control(selector);
-    await this.adapter.executeControlMethod(proxy.id, 'setSelected', [true]);
+    await this.internalExecuteControlMethod(proxy.id, 'setSelected', [true]);
   }
 
   /**
@@ -278,7 +410,7 @@ export class UI5Handler {
    */
   async uncheck(selector: UI5Selector): Promise<void> {
     const proxy = await this.control(selector);
-    await this.adapter.executeControlMethod(proxy.id, 'setSelected', [false]);
+    await this.internalExecuteControlMethod(proxy.id, 'setSelected', [false]);
   }
 
   /**
@@ -309,7 +441,7 @@ export class UI5Handler {
    */
   async getText(selector: UI5Selector): Promise<string> {
     const proxy = await this.control(selector);
-    const result = await this.adapter.executeControlMethod(proxy.id, 'getText', []);
+    const result = await this.internalExecuteControlMethod(proxy.id, 'getText', []);
     return result as string;
   }
 
@@ -326,7 +458,7 @@ export class UI5Handler {
    */
   async getValue(selector: UI5Selector): Promise<string> {
     const proxy = await this.control(selector);
-    const result = await this.adapter.executeControlMethod(proxy.id, 'getValue', []);
+    const result = await this.internalExecuteControlMethod(proxy.id, 'getValue', []);
     return result as string;
   }
 
@@ -341,7 +473,7 @@ export class UI5Handler {
    * ```
    */
   async waitForUI5(timeout?: number): Promise<void> {
-    await this.adapter.waitForUI5Stable(timeout ?? this.ui5WaitTimeout);
+    await this.internalWaitForUI5Stable(timeout ?? this.ui5WaitTimeout);
   }
 
   /**
@@ -365,12 +497,7 @@ export class UI5Handler {
     const deadline = Date.now() + timeout;
 
     while (Date.now() < deadline) {
-      const proxy = await discoverControl(
-        selector,
-        this.adapter,
-        this.cache,
-        this.discoveryStrategies,
-      );
+      const proxy = await this.discoverSingleControl(selector);
       if (proxy !== null) {
         return;
       }
@@ -414,8 +541,55 @@ export class UI5Handler {
    * await handler.destroy();
    * ```
    */
+  // eslint-disable-next-line @typescript-eslint/require-await -- interface consistency: destroy() is async for future cleanup needs
   async destroy(): Promise<void> {
     this.cache = new ControlProxyCache();
-    await this.adapter.destroy();
+  }
+
+  /**
+   * Discovers a single control using the configured strategy chain.
+   *
+   * @param selector - The UI5 selector to search for.
+   * @returns The discovered proxy, or null if not found.
+   */
+  private async discoverSingleControl(selector: UI5Selector): Promise<UI5ControlBase | null> {
+    // Tier 0: Cache lookup
+    const cached = this.cache.get(selector);
+    if (cached !== undefined) {
+      return cached;
+    }
+
+    // Try each configured strategy in order
+    let controlRef: BridgeControlRef | null = null;
+    for (const strategyName of this.discoveryStrategies) {
+      if (strategyName === 'direct-id') {
+        if (selector.id !== undefined) {
+          controlRef = await this.internalFindControl({ id: selector.id });
+        }
+      } else if (strategyName === 'recordreplay') {
+        controlRef = await this.internalFindControl(selector);
+      }
+      if (controlRef !== null) break;
+    }
+
+    if (controlRef === null) {
+      return null;
+    }
+
+    // Get available methods for the proxy
+    const methods = await this.internalGetAvailableMethods(controlRef.id);
+
+    const proxy = createControlProxy({
+      id: controlRef.id,
+      controlType: controlRef.controlType,
+      methods: new Set(methods),
+      page: this.page,
+      interactionStrategy: this.strategy,
+    });
+
+    // Cache the proxy for future lookups
+    this.cache.set(selector, proxy);
+
+    return proxy;
   }
 }

@@ -4,11 +4,14 @@
  * @remarks
  * Hybrid approach combining:
  * - wdi5 dynamic rules: `_` prefix, `Render` suffix, event methods
- * - dhikraft static set: 47 active items (field-tested in production)
+ * - dhikraft static set: field-tested production blacklist
+ * - Praman additions: aggregation, association, delegate, and state methods
  *
  * The blacklist prevents the proxy from forwarding internal UI5 methods
  * that would cause side effects, infinite loops, or expose implementation
  * details. Methods not in the blacklist are forwarded to the bridge.
+ *
+ * Total: 71 explicit items + 2 dynamic rules (`_` prefix, `Render` suffix).
  *
  * @example
  * ```typescript
@@ -19,7 +22,7 @@
  * }
  *
  * const safeMethods = filterMethods(['getText', 'constructor', 'destroy']);
- * // → ['getText']
+ * // → ['getText', 'destroy']
  * ```
  *
  * @module bridge
@@ -29,13 +32,28 @@
  * Static set of blacklisted method names.
  *
  * @remarks
- * Sourced from dhikraft v2.5.0 constants.ts (47 active items) merged with
- * wdi5 bridge conventions. These methods are either:
- * - Internal lifecycle methods (`constructor`, `destroy`, `init`, `clone`)
- * - Event system internals (`attachEvent`, `detachEvent`, `fireEvent`)
- * - Rendering internals (`rerender`, `invalidate`, `onBeforeRendering`)
- * - Framework internals (`getMetadata`, `getInterface`, `getEventingParent`)
- * - Bridge-reserved (`$`, `getAggregation`)
+ * Merged from dhikraft v2.5.0 production blacklist and wdi5 bridge conventions.
+ * Categories:
+ * - Bridge-reserved: `$`, `getAggregation`, `constructor`, `fireEvent`, `init`
+ * - Lifecycle: `clone`, `exit`, `onInit`, `onExit`, show/hide hooks, `applySettings`
+ * - Rendering internals: `rerender`, `invalidate`, `onBefore/AfterRendering`, etc.
+ * - Event system: `attach/detachEvent`, `attach/detachBrowserEvent`, field group events
+ * - Aggregation manipulation: `set/add/remove/insert/destroy/validateAggregation`, etc.
+ * - Association methods: `get/set/add/remove/removeAllAssociation`
+ * - Property validation: `validateProperty`
+ * - Delegate management: `addDelegate`, `removeDelegate`
+ * - State methods: `isActive`, `isDestroyStarted`
+ * - Debug/inspection: `inspect`, `data`
+ * - Internal methods: explicit `_`-prefixed (also caught by dynamic rule)
+ * - Binding internals: `bind/unbindElement`, `bind/unbindAggregation`, `bind/unbindProperty`
+ *
+ * Items intentionally NOT blacklisted (test authors need these):
+ * - `destroy` — standard lifecycle method for test cleanup
+ * - `getMetadata` — essential for control inspection and type checking
+ * - `getInterface` — standard interface access API
+ * - `getBusy`/`setBusy` — useful for wait assertions
+ * - `getTooltip`/`setTooltip` — useful for a11y tests
+ * - `getCustomData`/`addCustomData`/`removeCustomData` — useful for data-driven tests
  */
 export const METHOD_BLACKLIST: ReadonlySet<string> = new Set([
   // ── wdi5 bridge-reserved ──────────────────────────────────────────
@@ -46,7 +64,6 @@ export const METHOD_BLACKLIST: ReadonlySet<string> = new Set([
   'init',
 
   // ── Lifecycle methods ─────────────────────────────────────────────
-  'destroy',
   'clone',
   'exit',
   'onInit',
@@ -55,6 +72,7 @@ export const METHOD_BLACKLIST: ReadonlySet<string> = new Set([
   'onAfterShow',
   'onBeforeHide',
   'onAfterHide',
+  'applySettings',
 
   // ── Rendering internals ───────────────────────────────────────────
   'rerender',
@@ -76,23 +94,56 @@ export const METHOD_BLACKLIST: ReadonlySet<string> = new Set([
   'getEventingParent',
 
   // ── Metadata / framework internals ────────────────────────────────
-  'getMetadata',
-  'getInterface',
   'getIdForLabel',
   'getAccessibilityInfo',
   'getLayoutData',
   'setLayoutData',
-  'getBusy',
-  'setBusy',
   'getBusyIndicatorDelay',
   'setBusyIndicatorDelay',
   'getFieldGroupIds',
   'setFieldGroupIds',
-  'getTooltip',
-  'setTooltip',
-  'getCustomData',
-  'addCustomData',
-  'removeCustomData',
+
+  // ── Aggregation manipulation (dhikraft) ───────────────────────────
+  'setAggregation',
+  'addAggregation',
+  'removeAggregation',
+  'removeAllAggregation',
+  'insertAggregation',
+  'indexOfAggregation',
+  'destroyAggregation',
+  'validateAggregation',
+  'propagateProperties',
+  'findAggregatedObjects',
+
+  // ── Association methods (dhikraft) ────────────────────────────────
+  'getAssociation',
+  'setAssociation',
+  'addAssociation',
+  'removeAssociation',
+  'removeAllAssociation',
+
+  // ── Property validation (dhikraft) ────────────────────────────────
+  'validateProperty',
+
+  // ── Delegate management (dhikraft) ────────────────────────────────
+  'removeDelegate',
+  'addDelegate',
+
+  // ── State methods (dhikraft) ──────────────────────────────────────
+  'isActive',
+  'isDestroyStarted',
+
+  // ── Debug/inspection (dhikraft) ───────────────────────────────────
+  'inspect',
+  'data',
+
+  // ── Internal methods (explicit, also caught by _ prefix rule) ─────
+  '_getBindingContext',
+  '_setBindingContext',
+  '_getPropertiesToPropagate',
+  '_callMethodInManagedObject',
+  '_observeChanges',
+  '_propagateProperties',
 
   // ── Binding internals ─────────────────────────────────────────────
   'bindElement',

@@ -8,7 +8,8 @@
  * @module interaction-strategies
  */
 
-import type { BridgePage } from '../adapter.js';
+import type { Page } from '@playwright/test';
+
 import { BRIDGE_GLOBALS } from '../bridge-constants.js';
 
 import type { InteractionStrategy } from './strategy.js';
@@ -30,7 +31,7 @@ export class UI5NativeStrategy implements InteractionStrategy {
   readonly name = 'ui5-native';
 
   /** {@inheritDoc InteractionStrategy.press} */
-  async press(page: BridgePage, controlId: string): Promise<void> {
+  async press(page: Page, controlId: string): Promise<void> {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     await page.evaluate(
       `(function() {
@@ -48,7 +49,7 @@ export class UI5NativeStrategy implements InteractionStrategy {
   }
 
   /** {@inheritDoc InteractionStrategy.enterText} */
-  async enterText(page: BridgePage, controlId: string, text: string): Promise<void> {
+  async enterText(page: Page, controlId: string, text: string): Promise<void> {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     const escaped = text.replaceAll('\\', '\\\\').replaceAll("'", "\\'");
     await page.evaluate(
@@ -66,7 +67,7 @@ export class UI5NativeStrategy implements InteractionStrategy {
   }
 
   /** {@inheritDoc InteractionStrategy.select} */
-  async select(page: BridgePage, controlId: string, itemId: string): Promise<void> {
+  async select(page: Page, controlId: string, itemId: string): Promise<void> {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     await page.evaluate(
       `(function() {

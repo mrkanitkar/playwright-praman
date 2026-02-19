@@ -13,7 +13,7 @@
  * ```typescript
  * import { FooterHandler } from '#fixtures/footer-handler.js';
  *
- * const footer = new FooterHandler({ adapter, page });
+ * const footer = new FooterHandler({ page });
  * await footer.clickSave();
  * await footer.clickCancel();
  * ```
@@ -21,9 +21,9 @@
  * @module fixtures
  */
 
+import type { Page } from '@playwright/test';
 import type { Logger } from 'pino';
 
-import type { BridgePage } from '#bridge/adapter.js';
 import { ControlError } from '#core/errors/control-error.js';
 import { createLogger } from '#core/logging/logger.js';
 
@@ -32,12 +32,11 @@ import { createLogger } from '#core/logging/logger.js';
  *
  * @example
  * ```typescript
- * const options: FooterHandlerOptions = { adapter, page };
+ * const options: FooterHandlerOptions = { page };
  * ```
  */
 export interface FooterHandlerOptions {
-  readonly adapter: unknown;
-  readonly page: BridgePage;
+  readonly page: Page;
 }
 
 /**
@@ -50,13 +49,13 @@ export interface FooterHandlerOptions {
  *
  * @example
  * ```typescript
- * const footer = new FooterHandler({ adapter, page });
+ * const footer = new FooterHandler({ page });
  * await footer.clickSave();
  * await footer.clickEdit();
  * ```
  */
 export class FooterHandler {
-  private readonly page: BridgePage;
+  private readonly page: Page;
   private readonly log: Logger;
 
   constructor(options: FooterHandlerOptions) {

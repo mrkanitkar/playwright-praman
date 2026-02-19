@@ -9,9 +9,9 @@
  *
  * - `btpWorkZone` — creates a BTP WorkZone manager for dual-frame environments.
  *
- * Cross-fixture dependencies (`pramanConfig`, `bridgeAdapter`, `rootLogger`)
- * are declared as `option` placeholders (PW-MERGE-1) so they can be
- * provided by `coreTest` via `mergeTests()`.
+ * Cross-fixture dependencies (`pramanConfig`, `rootLogger`) are declared
+ * as `option` placeholders (PW-MERGE-1) so they can be provided by
+ * `coreTest` via `mergeTests()`.
  *
  * @example
  * ```typescript
@@ -43,7 +43,7 @@ import {
 import type { BTPWorkZoneManager } from '../modules/workzone.js';
 import { createWorkZoneManager } from '../modules/workzone.js';
 
-import type { BridgeAdapter } from '#bridge/adapter.js';
+import { resetPageInjection } from '#bridge/injection.js';
 import type { PramanConfig } from '#core/config/index.js';
 import { createLogger } from '#core/logging/index.js';
 
@@ -201,15 +201,13 @@ export interface NavFixtures {
 }
 
 /**
- * Cross-fixture dependencies provided by coreTest via mergeTests.
+ * Worker-scoped cross-fixture dependencies provided by coreTest via mergeTests.
  *
  * @remarks
- * Declared as `option: true` placeholders (PW-MERGE-1).
- * Values are provided at runtime by coreTest when composed via mergeTests.
+ * Declared as `{ option: true, scope: 'worker' }` placeholders (PW-MERGE-1).
  */
-export interface NavDeps {
+export interface NavWorkerDeps {
   pramanConfig: Readonly<PramanConfig>;
-  bridgeAdapter: BridgeAdapter;
   rootLogger: Logger;
 }
 
@@ -226,7 +224,7 @@ export interface NavDeps {
  * @remarks
  * Provides `ui5Navigation` (all 9 nav functions) and `btpWorkZone`
  * (WorkZone manager). Dependencies from coreTest (`pramanConfig`,
- * `bridgeAdapter`, `rootLogger`) are declared as option placeholders.
+ * `rootLogger`) are declared as option placeholders.
  *
  * @example
  * ```typescript
@@ -237,15 +235,13 @@ export interface NavDeps {
  * });
  * ```
  */
-export const navTest = base.extend<NavFixtures & NavDeps>({
+export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
   // ── Cross-fixture option placeholders (PW-MERGE-1) ────────────────
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true }],
+  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  bridgeAdapter: [undefined!, { option: true }],
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  rootLogger: [undefined!, { option: true }],
+  rootLogger: [undefined!, { option: true, scope: 'worker' }],
 
   // ── ui5Navigation fixture ─────────────────────────────────────────
 
@@ -278,8 +274,17 @@ export const navTest = base.extend<NavFixtures & NavDeps>({
 
   // ── btpWorkZone fixture ───────────────────────────────────────────
 
-  btpWorkZone: async ({ page, bridgeAdapter }, use) => {
-    const manager = createWorkZoneManager(page as never, bridgeAdapter as never);
+  btpWorkZone: async ({ page }, use) => {
+    // Create a minimal WorkZoneAdapter shim that delegates to page-level injection
+    const adapterShim = {
+      async init(): Promise<void> {
+        // No-op: bridge injection is handled lazily by ensureBridgeInjected
+      },
+      resetInjectionState(): void {
+        resetPageInjection(page);
+      },
+    };
+    const manager = createWorkZoneManager(page as never, adapterShim as never);
     await use(manager);
   },
 });

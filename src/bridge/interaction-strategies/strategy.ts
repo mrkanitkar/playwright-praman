@@ -9,7 +9,7 @@
  * @module interaction-strategies
  */
 
-import type { BridgePage } from '../adapter.js';
+import type { Page } from '@playwright/test';
 
 /**
  * Contract for control interaction strategies.
@@ -34,7 +34,7 @@ export interface InteractionStrategy {
    * @param page - The browser page.
    * @param controlId - UI5 control ID.
    */
-  press(page: BridgePage, controlId: string): Promise<void>;
+  press(page: Page, controlId: string): Promise<void>;
 
   /**
    * Enter text into a control.
@@ -43,7 +43,7 @@ export interface InteractionStrategy {
    * @param controlId - UI5 control ID.
    * @param text - Text to enter.
    */
-  enterText(page: BridgePage, controlId: string, text: string): Promise<void>;
+  enterText(page: Page, controlId: string, text: string): Promise<void>;
 
   /**
    * Select an item in a control.
@@ -52,5 +52,5 @@ export interface InteractionStrategy {
    * @param controlId - UI5 control ID.
    * @param itemId - ID or key of the item to select.
    */
-  select(page: BridgePage, controlId: string, itemId: string): Promise<void>;
+  select(page: Page, controlId: string, itemId: string): Promise<void>;
 }

@@ -5,7 +5,7 @@
  * Verifies that each check function correctly evaluates page state
  * and handles errors gracefully by returning `false`.
  */
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   isAuthenticated,
@@ -14,14 +14,29 @@ import {
   isUI5Loaded,
   isUserMenuVisible,
 } from '../../../src/auth/auth-checks.js';
-import { createMockBridgePage } from '../../helpers/mock-page.js';
-import type { MockBridgePage } from '../../helpers/mock-page.js';
+import type { AuthPage } from '../../../src/auth/auth-types.js';
+
+/** Mock page with a mocked evaluate method for auth check tests. */
+interface MockEvaluatePage {
+  readonly evaluate: ReturnType<typeof vi.fn>;
+}
+
+/**
+ * Creates a mock page for auth check tests.
+ *
+ * @returns A mock page with `evaluate` stubbed, typed as both mock and AuthPage.
+ */
+function createMockAuthPage(): MockEvaluatePage & AuthPage {
+  return {
+    evaluate: vi.fn(),
+  } as unknown as MockEvaluatePage & AuthPage;
+}
 
 describe('isShellVisible', () => {
-  let page: MockBridgePage;
+  let page: MockEvaluatePage & AuthPage;
 
   beforeEach(() => {
-    page = createMockBridgePage();
+    page = createMockAuthPage();
   });
 
   it('returns true when shell header exists', async () => {
@@ -50,10 +65,10 @@ describe('isShellVisible', () => {
 });
 
 describe('isUserMenuVisible', () => {
-  let page: MockBridgePage;
+  let page: MockEvaluatePage & AuthPage;
 
   beforeEach(() => {
-    page = createMockBridgePage();
+    page = createMockAuthPage();
   });
 
   it('returns true when user menu button exists', async () => {
@@ -82,10 +97,10 @@ describe('isUserMenuVisible', () => {
 });
 
 describe('isUI5Loaded', () => {
-  let page: MockBridgePage;
+  let page: MockEvaluatePage & AuthPage;
 
   beforeEach(() => {
-    page = createMockBridgePage();
+    page = createMockAuthPage();
   });
 
   it('returns true when UI5 framework is loaded', async () => {
@@ -114,10 +129,10 @@ describe('isUI5Loaded', () => {
 });
 
 describe('isLoginPageVisible', () => {
-  let page: MockBridgePage;
+  let page: MockEvaluatePage & AuthPage;
 
   beforeEach(() => {
-    page = createMockBridgePage();
+    page = createMockAuthPage();
   });
 
   it('returns true when login form is visible', async () => {
@@ -146,10 +161,10 @@ describe('isLoginPageVisible', () => {
 });
 
 describe('isAuthenticated', () => {
-  let page: MockBridgePage;
+  let page: MockEvaluatePage & AuthPage;
 
   beforeEach(() => {
-    page = createMockBridgePage();
+    page = createMockAuthPage();
   });
 
   it('returns true when shell is visible and login page is not visible', async () => {

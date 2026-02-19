@@ -22,6 +22,7 @@
  * - `newElement` — newly created element handle
  * - `aggregation` — array of child controls
  * - `object` — non-control UI5 object (e.g., model, binding)
+ * - `objectArray` — array of non-control UI5 objects (each stored with UUID)
  * - `none` — unclassified return (logged as warning)
  * - `unknown` — instance check failed (differs from `none` which is undefined/null)
  *
@@ -39,6 +40,7 @@ export type BridgeReturnType =
   | 'newElement'
   | 'aggregation'
   | 'object'
+  | 'objectArray'
   | 'none'
   | 'unknown';
 

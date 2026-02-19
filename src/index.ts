@@ -81,21 +81,8 @@ export {
 export type { MatcherResult } from './matchers/index.js';
 
 // ── Bridge ──────────────────────────────────────────────────────────
-export {
-  createBridgeAdapter,
-  ClassicUI5Adapter,
-  HybridAdapter,
-  WebComponentAdapter,
-  ensureBridgeInjected,
-  isBridgeReady,
-  waitForBridgeReady,
-} from './bridge/index.js';
-export type {
-  BridgeAdapter,
-  BridgePage,
-  AdapterMode,
-  MethodExecutionResult,
-} from './bridge/index.js';
+export { ensureBridgeInjected, isBridgeReady, waitForBridgeReady } from './bridge/index.js';
+export type { MethodExecutionResult } from './bridge/index.js';
 
 // ── Proxy ───────────────────────────────────────────────────────────
 export {
@@ -113,6 +100,7 @@ export type { AuthStrategy, SAPAuthConfig, SessionInfo } from './auth/index.js';
 
 // ── Navigation ──────────────────────────────────────────────────────
 export {
+  getCurrentHash,
   navigateBack,
   navigateForward,
   navigateToApp,
@@ -120,6 +108,7 @@ export {
   navigateToHome,
   navigateToIntent,
   navigateToTile,
+  searchAndOpenApp,
 } from './modules/index.js';
 
 // ── Version ──────────────────────────────────────────────────────────

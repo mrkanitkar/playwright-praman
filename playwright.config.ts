@@ -1,11 +1,17 @@
+import 'dotenv/config';
+
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright configuration for Praman v1.0 integration tests.
+ * Playwright configuration for Praman v1.0.
+ *
+ * Projects:
+ * - 'setup' / 'sap-tests' — integration tests (existing)
+ * - 'e2e-auth-setup' / 'e2e-auth-teardown' / 'e2e-sap-cloud' — e2e tests
  *
  * Uses project dependencies pattern (BP-PLAYWRIGHT D28):
- * - 'setup' project handles auth, produces storageState
- * - 'sap-tests' project depends on setup, consumes storageState
+ * - Setup project handles auth, produces storageState
+ * - Test projects depend on setup, consume storageState
  */
 export default defineConfig({
   testDir: './tests/integration',
@@ -13,15 +19,13 @@ export default defineConfig({
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
   workers: 1,
-  reporter: [
-    ['html', { open: 'never' }],
-    ['list'],
-  ],
+  reporter: [['html', { open: 'never' }], ['list']],
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
   projects: [
+    // ── Integration test projects ──────────────────────────────────
     {
       name: 'setup',
       testMatch: /.*\.setup\.ts/,
@@ -33,6 +37,38 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         storageState: '.auth/sap-session.json',
+      },
+    },
+
+    // ── E2E test projects (SAP Cloud) ──────────────────────────────
+    {
+      name: 'e2e-auth-setup',
+      testMatch: /auth-setup\.ts/,
+      testDir: './src/auth',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: false,
+        launchOptions: { slowMo: 500 },
+      },
+    },
+    {
+      name: 'e2e-auth-teardown',
+      testMatch: /auth-teardown\.ts/,
+      testDir: './src/auth',
+    },
+    {
+      name: 'e2e-sap-cloud',
+      testDir: './tests/e2e/sap-cloud',
+      dependencies: ['e2e-auth-setup'],
+      teardown: 'e2e-auth-teardown',
+      timeout: 300_000,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: '.auth/sap-session.json',
+        baseURL: process.env['SAP_CLOUD_BASE_URL'],
+        headless: false,
+        actionTimeout: 30_000,
+        navigationTimeout: 120_000,
       },
     },
   ],

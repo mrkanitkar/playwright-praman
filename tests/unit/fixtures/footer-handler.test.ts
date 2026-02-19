@@ -2,19 +2,17 @@
  * Tests for `src/fixtures/footer-handler.ts` -- FooterHandler class.
  *
  * @remarks
- * Strict TDD RED phase: all 8 tests written before production code.
  * FooterHandler provides footer bar button operations for Fiori apps:
  * Save, Apply, Cancel, Edit, Delete, Create.
+ * Uses Playwright's Page directly (no adapter).
  *
- * Mock strategy: vi.mock() for logger module, vi.fn() for adapter/page.
+ * Mock strategy: vi.mock() for logger module, inline vi.fn() for page.
  *
  * @module fixtures
  */
 
+import type { Page } from '@playwright/test';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { createMockBridgeAdapter } from '../../helpers/mock-bridge-adapter.js';
-import { createMockBridgePage } from '../../helpers/mock-page.js';
 
 import { ControlError } from '#core/errors/control-error.js';
 
@@ -38,16 +36,20 @@ const { FooterHandler } = await import('#fixtures/footer-handler.js');
 // ── Tests ───────────────────────────────────────────────────────────────
 
 describe('FooterHandler', () => {
-  let adapter: ReturnType<typeof createMockBridgeAdapter>;
-  let page: ReturnType<typeof createMockBridgePage>;
+  let page: Page & { evaluate: ReturnType<typeof vi.fn> };
   let handler: InstanceType<typeof FooterHandler>;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    adapter = createMockBridgeAdapter();
-    page = createMockBridgePage();
+    page = {
+      evaluate: vi.fn().mockResolvedValue(undefined),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn(),
+      off: vi.fn(),
+      mainFrame: vi.fn(),
+    } as unknown as Page & { evaluate: ReturnType<typeof vi.fn> };
 
-    handler = new FooterHandler({ adapter, page });
+    handler = new FooterHandler({ page: page as unknown as Page });
   });
 
   // ═══════════════════════════════════════════════════════════════════════
