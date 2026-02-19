@@ -26,10 +26,12 @@ const mockClearFilterBar = vi.fn().mockResolvedValue(undefined);
 const mockNavigateToItem = vi.fn().mockResolvedValue(undefined);
 const mockGetAvailableVariants = vi.fn().mockResolvedValue(['Standard', 'Custom']);
 const mockSelectVariant = vi.fn().mockResolvedValue(undefined);
+const mockGetFilterBarFieldValue = vi.fn().mockResolvedValue('1000');
 
 vi.mock('../../../src/fe/list-report.js', () => ({
   getListReportTable: mockGetListReportTable,
   getFilterBar: mockGetFilterBar,
+  getFilterBarFieldValue: mockGetFilterBarFieldValue,
   setFilterBarField: mockSetFilterBarField,
   executeSearch: mockExecuteSearch,
   clearFilterBar: mockClearFilterBar,
@@ -181,6 +183,7 @@ function resetAllMockDefaults(): void {
   mockNavigateToItem.mockResolvedValue(undefined);
   mockGetAvailableVariants.mockResolvedValue(['Standard', 'Custom']);
   mockSelectVariant.mockResolvedValue(undefined);
+  mockGetFilterBarFieldValue.mockResolvedValue('1000');
   mockNavigateToSection.mockResolvedValue(undefined);
   mockGetSectionData.mockResolvedValue({ title: 'General' });
   mockClickObjectPageButton.mockResolvedValue(undefined);
@@ -239,6 +242,16 @@ describe('fe-fixtures fixture definitions', () => {
 
       expect(mockSetFilterBarField).toHaveBeenCalledOnce();
       expect(mockSetFilterBarField).toHaveBeenCalledWith(mockPage, '', 'Status', 'Active');
+    });
+
+    it('listReport.getFilterValue delegates to getFilterBarFieldValue(page, "", fieldName)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const value = await fe.listReport.getFilterValue('CompanyCode');
+
+      expect(value).toBe('1000');
+      expect(mockGetFilterBarFieldValue).toHaveBeenCalledOnce();
+      expect(mockGetFilterBarFieldValue).toHaveBeenCalledWith(mockPage, '', 'CompanyCode');
     });
 
     it('listReport.navigateToItem delegates to navigateToItem(page, "", rowIndex)', async () => {
