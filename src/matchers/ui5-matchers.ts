@@ -26,9 +26,8 @@
 
 import type { Page } from '@playwright/test';
 
-import type { MethodExecutionResult } from '#bridge/bridge-types.js';
-import { createExecuteMethodScript } from '#bridge/browser-scripts/execute-method.js';
-import { ensureBridgeInjected } from '#bridge/injection.js';
+import { getControlProperty, getUI5BindingInfo, getUI5ControlType } from './matcher-utils.js';
+import type { MatcherPage } from './matcher-utils.js';
 
 /**
  * Result of a matcher check.
@@ -60,35 +59,6 @@ export interface MatcherResult {
  */
 export interface MatcherOptions {
   readonly timeout?: number;
-}
-
-/**
- * Retrieves a control property via `page.evaluate()` using the bridge.
- *
- * @remarks
- * Ensures the bridge is injected, then executes the getter method for
- * the given property on the target control. Mirrors the logic from
- * `ClassicUI5Adapter.getControlProperty()`.
- *
- * @param page - The Playwright page to evaluate on.
- * @param controlId - The ID of the UI5 control.
- * @param propertyName - The property to read (e.g., `'text'`, `'visible'`).
- * @returns The property value from the browser context.
- */
-async function getControlProperty(
-  page: Page,
-  controlId: string,
-  propertyName: string,
-): Promise<unknown> {
-  await ensureBridgeInjected(page);
-  const methodName = `get${propertyName.charAt(0).toUpperCase()}${propertyName.slice(1)}`;
-  const script = createExecuteMethodScript();
-  const withArgs = script.replace(
-    /\)\(\)$/,
-    `)(${JSON.stringify(controlId)}, ${JSON.stringify(methodName)}, [])`,
-  );
-  const result = await page.evaluate<MethodExecutionResult>(withArgs);
-  return result.value;
 }
 
 /**
@@ -268,6 +238,112 @@ export async function checkUI5ValueState(
         ? `Expected control '${controlId}' valueState not to be '${expected}', but it was`
         : `Expected control '${controlId}' valueState to be '${expected}', but got '${actualString}'`,
     actual: actualString,
+    expected,
+  };
+}
+
+/**
+ * Checks that a UI5 control has a binding on a specified property.
+ *
+ * @remarks
+ * Uses {@link getUI5BindingInfo} to retrieve the binding information.
+ * Optionally verifies that the binding path matches an expected value.
+ *
+ * @param page - The Playwright page to query the control on.
+ * @param controlId - The ID of the UI5 control.
+ * @param propertyName - The property to check binding for.
+ * @param expectedPath - Optional expected binding path.
+ * @returns A {@link MatcherResult} indicating pass/fail.
+ *
+ * @example
+ * ```typescript
+ * const result = await checkUI5Binding(page, 'input1', 'value');
+ * const pathResult = await checkUI5Binding(page, 'input1', 'value', '/ProductName');
+ * ```
+ */
+export async function checkUI5Binding(
+  page: Page,
+  controlId: string,
+  propertyName: string,
+  expectedPath?: string,
+): Promise<MatcherResult> {
+  const info = await getUI5BindingInfo(page as MatcherPage, controlId, propertyName);
+
+  if (info === null) {
+    return {
+      pass: false,
+      message: () =>
+        `Expected control '${controlId}' to have a binding on property '${propertyName}', but no binding found`,
+      actual: null,
+      expected: expectedPath ?? 'any binding',
+    };
+  }
+
+  if (expectedPath !== undefined && info.path !== expectedPath) {
+    return {
+      pass: false,
+      message: () =>
+        `Expected control '${controlId}' binding path to be '${expectedPath}', but got '${info.path}'`,
+      actual: info.path,
+      expected: expectedPath,
+    };
+  }
+
+  return {
+    pass: true,
+    message: () =>
+      expectedPath !== undefined
+        ? `Expected control '${controlId}' binding path not to be '${expectedPath}', but it was`
+        : `Expected control '${controlId}' not to have a binding on property '${propertyName}', but it does`,
+    actual: info.path,
+    expected: expectedPath ?? 'any binding',
+  };
+}
+
+/**
+ * Checks that a UI5 control is of the expected type.
+ *
+ * @remarks
+ * Uses {@link getUI5ControlType} to retrieve the fully qualified control
+ * type string (e.g., `'sap.m.Button'`) and compares it to the expected value.
+ *
+ * @param page - The Playwright page to query the control on.
+ * @param controlId - The ID of the UI5 control.
+ * @param expected - The expected fully qualified control type string.
+ * @returns A {@link MatcherResult} indicating pass/fail.
+ *
+ * @example
+ * ```typescript
+ * const result = await checkUI5ControlType(page, 'btn1', 'sap.m.Button');
+ * expect(result.pass).toBe(true);
+ * ```
+ */
+export async function checkUI5ControlType(
+  page: Page,
+  controlId: string,
+  expected: string,
+): Promise<MatcherResult> {
+  const actual = await getUI5ControlType(page as MatcherPage, controlId);
+
+  if (actual === null) {
+    return {
+      pass: false,
+      message: () =>
+        `Expected control '${controlId}' to be of type '${expected}', but control was not found`,
+      actual: null,
+      expected,
+    };
+  }
+
+  const pass = actual === expected;
+
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `Expected control '${controlId}' not to be of type '${expected}', but it was`
+        : `Expected control '${controlId}' to be of type '${expected}', but got '${actual}'`,
+    actual,
     expected,
   };
 }

@@ -1,0 +1,220 @@
+/**
+ * Tests for `src/matchers/matcher-utils.ts` — shared matcher utilities.
+ *
+ * @remarks
+ * Covers getControlProperty, getControlAggregation, getUI5BindingInfo,
+ * getUI5ControlType, and the MatcherPage/UI5BindingInfo types.
+ *
+ * @module matchers
+ */
+import { describe, expect, expectTypeOf, it, vi } from 'vitest';
+
+import { ControlError } from '../../../src/core/errors/control-error.js';
+import type { MatcherPage, UI5BindingInfo } from '../../../src/matchers/matcher-utils.js';
+import {
+  getControlAggregation,
+  getControlProperty,
+  getUI5BindingInfo,
+  getUI5ControlType,
+} from '../../../src/matchers/matcher-utils.js';
+
+vi.mock('#bridge/injection.js', () => ({
+  ensureBridgeInjected: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('#bridge/browser-scripts/execute-method.js', () => ({
+  createExecuteMethodScript: vi.fn().mockReturnValue('(function(){})()'),
+}));
+
+/**
+ * Creates a minimal MatcherPage mock with a stubbed evaluate method.
+ *
+ * @param resolvedValue - The value that page.evaluate will resolve with.
+ * @returns A MatcherPage with evaluate stubbed.
+ */
+function createMockPage(
+  resolvedValue?: unknown,
+): MatcherPage & { evaluate: ReturnType<typeof vi.fn> } {
+  return {
+    evaluate: vi.fn().mockResolvedValue(resolvedValue),
+  };
+}
+
+describe('getControlProperty', () => {
+  it('returns string value', async () => {
+    const page = createMockPage({ value: 'Save' });
+
+    const result = await getControlProperty(page, 'btn1', 'text');
+
+    expect(result).toBe('Save');
+    expect(page.evaluate).toHaveBeenCalled();
+  });
+
+  it('returns boolean value', async () => {
+    const page = createMockPage({ value: true });
+
+    const result = await getControlProperty(page, 'ctrl1', 'visible');
+
+    expect(result).toBe(true);
+  });
+
+  it('returns number value', async () => {
+    const page = createMockPage({ value: 42 });
+
+    const result = await getControlProperty(page, 'ctrl1', 'maxLength');
+
+    expect(result).toBe(42);
+  });
+
+  it('returns undefined for missing property', async () => {
+    const page = createMockPage({ value: undefined });
+
+    const result = await getControlProperty(page, 'ctrl1', 'nonexistent');
+
+    expect(result).toBeUndefined();
+  });
+
+  it('throws ControlError when page.evaluate rejects', async () => {
+    const page: MatcherPage = {
+      evaluate: vi.fn().mockRejectedValue(new Error('Control not found')),
+    };
+
+    await expect(getControlProperty(page, 'btn1', 'text')).rejects.toThrow(ControlError);
+    await expect(getControlProperty(page, 'btn1', 'text')).rejects.toThrow(
+      /Failed to read property 'text' from control 'btn1'/,
+    );
+  });
+});
+
+describe('getControlAggregation', () => {
+  it('returns array of refs', async () => {
+    const page = createMockPage({
+      success: true,
+      returnType: 'aggregation',
+      uuids: ['row0', 'row1', 'row2'],
+      objectTypes: ['sap.m.ColumnListItem', 'sap.m.ColumnListItem', 'sap.m.ColumnListItem'],
+      duration: 0,
+    });
+
+    const result = await getControlAggregation(page, 'table1', 'items');
+
+    expect(result).toHaveLength(3);
+    expect(result[0]).toEqual({ id: 'row0', controlType: 'sap.m.ColumnListItem' });
+    expect(result[1]).toEqual({ id: 'row1', controlType: 'sap.m.ColumnListItem' });
+    expect(result[2]).toEqual({ id: 'row2', controlType: 'sap.m.ColumnListItem' });
+  });
+
+  it('returns empty array for no items', async () => {
+    const page = createMockPage({
+      success: true,
+      returnType: 'empty',
+      value: [],
+      duration: 0,
+    });
+
+    const result = await getControlAggregation(page, 'table1', 'items');
+
+    expect(result).toEqual([]);
+  });
+
+  it('handles nested aggregations with mixed types', async () => {
+    const page = createMockPage({
+      success: true,
+      returnType: 'aggregation',
+      uuids: ['cell0', 'cell1'],
+      objectTypes: ['sap.m.Text', 'sap.m.Input'],
+      duration: 0,
+    });
+
+    const result = await getControlAggregation(page, 'row0', 'cells');
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({ id: 'cell0', controlType: 'sap.m.Text' });
+    expect(result[1]).toEqual({ id: 'cell1', controlType: 'sap.m.Input' });
+  });
+
+  it('throws ControlError when page.evaluate rejects', async () => {
+    const page: MatcherPage = {
+      evaluate: vi.fn().mockRejectedValue(new Error('Control not found')),
+    };
+
+    await expect(getControlAggregation(page, 'table1', 'items')).rejects.toThrow(ControlError);
+    await expect(getControlAggregation(page, 'table1', 'items')).rejects.toThrow(
+      /Failed to read aggregation 'items' from control 'table1'/,
+    );
+  });
+});
+
+describe('getUI5BindingInfo', () => {
+  it('returns binding path and model', async () => {
+    const page = createMockPage({ path: '/ProductName', model: '', value: 'Widget A' });
+
+    const result = await getUI5BindingInfo(page, 'input1', 'value');
+
+    expect(result).toEqual({ path: '/ProductName', model: '', value: 'Widget A' });
+  });
+
+  it('returns null for unbound property', async () => {
+    const page = createMockPage(null);
+
+    const result = await getUI5BindingInfo(page, 'input1', 'value');
+
+    expect(result).toBeNull();
+  });
+
+  it('throws ControlError when page.evaluate rejects', async () => {
+    const page: MatcherPage = {
+      evaluate: vi.fn().mockRejectedValue(new Error('Evaluate failed')),
+    };
+
+    await expect(getUI5BindingInfo(page, 'input1', 'value')).rejects.toThrow(ControlError);
+    await expect(getUI5BindingInfo(page, 'input1', 'value')).rejects.toThrow(
+      /Failed to read binding info for property 'value' on control 'input1'/,
+    );
+  });
+});
+
+describe('getUI5ControlType', () => {
+  it('returns full type string', async () => {
+    const page = createMockPage('sap.m.Button');
+
+    const result = await getUI5ControlType(page, 'btn1');
+
+    expect(result).toBe('sap.m.Button');
+  });
+
+  it('returns null for missing control', async () => {
+    const page = createMockPage(null);
+
+    const result = await getUI5ControlType(page, 'nonexistent');
+
+    expect(result).toBeNull();
+  });
+
+  it('throws ControlError when page.evaluate rejects', async () => {
+    const page: MatcherPage = {
+      evaluate: vi.fn().mockRejectedValue(new Error('Evaluate failed')),
+    };
+
+    await expect(getUI5ControlType(page, 'btn1')).rejects.toThrow(ControlError);
+    await expect(getUI5ControlType(page, 'btn1')).rejects.toThrow(
+      /Failed to read control type for 'btn1'/,
+    );
+  });
+});
+
+describe('MatcherPage type', () => {
+  it('accepts minimal page object', () => {
+    expectTypeOf<{
+      evaluate: <TResult>(script: string, arg?: unknown) => Promise<TResult>;
+    }>().toExtend<MatcherPage>();
+  });
+});
+
+describe('UI5BindingInfo type', () => {
+  it('has required readonly fields', () => {
+    expectTypeOf<UI5BindingInfo>().toHaveProperty('path');
+    expectTypeOf<UI5BindingInfo>().toHaveProperty('model');
+    expectTypeOf<UI5BindingInfo>().toHaveProperty('value');
+  });
+});

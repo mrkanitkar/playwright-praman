@@ -2,7 +2,7 @@
  * Praman v1.0 — AI-First SAP UI5 Test Automation Platform for Playwright.
  *
  * @remarks
- * Phase 3 GATE: Core + Bridge + Proxy + Fixtures + Auth + Navigation complete.
+ * Phase 4: Core + Bridge + Proxy + Fixtures + Auth + Navigation + Table + Dialog + Date + OData + FE.
  *
  * @packageDocumentation
  *
@@ -69,7 +69,9 @@ export {
 
 // ── Matchers ────────────────────────────────────────────────────────
 export {
+  checkUI5Binding,
   checkUI5CellText,
+  checkUI5ControlType,
   checkUI5Enabled,
   checkUI5Property,
   checkUI5RowCount,
@@ -110,6 +112,109 @@ export {
   navigateToTile,
   searchAndOpenApp,
 } from './modules/index.js';
+
+// ── Table (core) ────────────────────────────────────────────────────
+export {
+  deselectAllTableRows,
+  detectTableType,
+  getSelectedRows,
+  getTableCellValue,
+  getTableData,
+  getTableRowCount,
+  getTableRows,
+  selectAllTableRows,
+  selectTableRow,
+  waitForTableData,
+} from './modules/table.js';
+export type {
+  TableInfo,
+  TableOptions,
+  TableVariant,
+  WaitForTableDataOptions,
+} from './modules/table.js';
+
+// ── Table (operations) ──────────────────────────────────────────────
+export {
+  clickRow,
+  ensureRowVisible,
+  findRowByValues,
+  getCellByColumnName,
+  getColumnNames,
+  getRowCount,
+  selectRowByValues,
+  setTableCellValue,
+} from './modules/table-operations.js';
+export type { ColumnValueCriteria } from './modules/table-operations.js';
+
+// ── Table (filter/sort) ─────────────────────────────────────────────
+export {
+  clickTableSettingsButton,
+  exportTableData,
+  filterByColumn,
+  getFilterValue,
+  getSortOrder,
+  sortByColumn,
+} from './modules/table-filter-sort.js';
+export type {
+  SortOrderInfo,
+  TableExportOptions,
+  TableFilterOptions,
+  TableSortOptions,
+} from './modules/table-filter-sort.js';
+
+// ── Dialog ──────────────────────────────────────────────────────────
+export {
+  confirmDialog,
+  DIALOG_CONTROL_TYPES,
+  dismissDialog,
+  getDialogButtons,
+  getOpenDialogs,
+  isDialogOpen,
+  waitForDialog,
+  waitForDialogClosed,
+} from './modules/dialog.js';
+export type {
+  DialogButtonInfo,
+  DialogControlType,
+  DialogInfo,
+  DialogOptions,
+  FindDialogOptions,
+} from './modules/dialog.js';
+
+// ── Date ────────────────────────────────────────────────────────────
+export {
+  DATE_FORMATS,
+  formatDateForUI5,
+  getDatePickerValue,
+  getDateRangeSelection,
+  getTimePickerValue,
+  setAndValidateDate,
+  setDatePickerValue,
+  setDateRangeSelection,
+  setTimePickerValue,
+} from './modules/date.js';
+export type { DateFormatPattern, DateInput, DateOptions, DateRangeResult } from './modules/date.js';
+
+// ── OData (model-level) ─────────────────────────────────────────────
+export {
+  fetchCSRFToken,
+  getEntityCount,
+  getModelData,
+  getModelProperty,
+  hasPendingChanges,
+  waitForODataLoad,
+} from './modules/odata.js';
+export type { CSRFTokenResult, ODataOptions, WaitForODataLoadOptions } from './modules/odata.js';
+
+// ── OData (HTTP-level) ──────────────────────────────────────────────
+export {
+  callFunctionImport,
+  createEntity,
+  deleteEntity,
+  queryEntities,
+  updateEntity,
+} from './modules/odata-http.js';
+export type { ODataHttpOptions, ODataHttpResult, ODataQueryOptions } from './modules/odata-http.js';
 
 // ── Version ──────────────────────────────────────────────────────────
 export { PACKAGE_NAME, VERSION } from './version.js';

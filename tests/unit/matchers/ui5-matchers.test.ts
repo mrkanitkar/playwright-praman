@@ -10,7 +10,11 @@
 import type { Page } from '@playwright/test';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { UI5BindingInfo } from '../../../src/matchers/matcher-utils.js';
+import { getUI5BindingInfo, getUI5ControlType } from '../../../src/matchers/matcher-utils.js';
 import {
+  checkUI5Binding,
+  checkUI5ControlType,
   checkUI5Enabled,
   checkUI5Property,
   checkUI5Text,
@@ -25,6 +29,15 @@ vi.mock('#bridge/injection.js', () => ({
 vi.mock('#bridge/browser-scripts/execute-method.js', () => ({
   createExecuteMethodScript: vi.fn().mockReturnValue('(function(){})()'),
 }));
+
+vi.mock('../../../src/matchers/matcher-utils.js', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...(actual as Record<string, unknown>),
+    getUI5BindingInfo: vi.fn(),
+    getUI5ControlType: vi.fn(),
+  };
+});
 
 /**
  * Creates a mock Playwright Page that returns a MethodExecutionResult
@@ -245,5 +258,102 @@ describe('checkUI5ValueState', () => {
 
     expect(result.pass).toBe(true);
     expect(result.message()).toContain('not to be');
+  });
+});
+
+// ── M1-M4: checkUI5Binding ──────────────────────────────────────────
+
+describe('checkUI5Binding', () => {
+  it('M1: passes when binding exists (no path assertion)', async () => {
+    const bindingInfo: UI5BindingInfo = { path: '/Name', model: '', value: 'test' };
+    vi.mocked(getUI5BindingInfo).mockResolvedValue(bindingInfo);
+    const page = createMockPage();
+
+    const result = await checkUI5Binding(page, 'input1', 'value');
+
+    expect(result.pass).toBe(true);
+    expect(result.actual).toBe('/Name');
+  });
+
+  it('M2: passes when binding path matches expected', async () => {
+    const bindingInfo: UI5BindingInfo = { path: '/ProductName', model: '', value: 'Widget' };
+    vi.mocked(getUI5BindingInfo).mockResolvedValue(bindingInfo);
+    const page = createMockPage();
+
+    const result = await checkUI5Binding(page, 'input1', 'value', '/ProductName');
+
+    expect(result.pass).toBe(true);
+    expect(result.actual).toBe('/ProductName');
+  });
+
+  it('M3: fails when no binding exists', async () => {
+    vi.mocked(getUI5BindingInfo).mockResolvedValue(null);
+    const page = createMockPage();
+
+    const result = await checkUI5Binding(page, 'input1', 'value');
+
+    expect(result.pass).toBe(false);
+    expect(result.message()).toContain('no binding found');
+  });
+
+  it('M4: fails when binding path does not match expected', async () => {
+    const bindingInfo: UI5BindingInfo = { path: '/WrongPath', model: '', value: 'x' };
+    vi.mocked(getUI5BindingInfo).mockResolvedValue(bindingInfo);
+    const page = createMockPage();
+
+    const result = await checkUI5Binding(page, 'input1', 'value', '/ProductName');
+
+    expect(result.pass).toBe(false);
+    expect(result.message()).toContain('/ProductName');
+    expect(result.message()).toContain('/WrongPath');
+    expect(result.actual).toBe('/WrongPath');
+    expect(result.expected).toBe('/ProductName');
+  });
+});
+
+// ── M5-M8: checkUI5ControlType ──────────────────────────────────────
+
+describe('checkUI5ControlType', () => {
+  it('M5: passes when control type matches', async () => {
+    vi.mocked(getUI5ControlType).mockResolvedValue('sap.m.Button');
+    const page = createMockPage();
+
+    const result = await checkUI5ControlType(page, 'btn1', 'sap.m.Button');
+
+    expect(result.pass).toBe(true);
+    expect(result.actual).toBe('sap.m.Button');
+  });
+
+  it('M6: fails when control type does not match', async () => {
+    vi.mocked(getUI5ControlType).mockResolvedValue('sap.m.Input');
+    const page = createMockPage();
+
+    const result = await checkUI5ControlType(page, 'ctrl1', 'sap.m.Button');
+
+    expect(result.pass).toBe(false);
+    expect(result.message()).toContain('sap.m.Button');
+    expect(result.message()).toContain('sap.m.Input');
+    expect(result.actual).toBe('sap.m.Input');
+  });
+
+  it('M7: fails when control is not found (null)', async () => {
+    vi.mocked(getUI5ControlType).mockResolvedValue(null);
+    const page = createMockPage();
+
+    const result = await checkUI5ControlType(page, 'missing', 'sap.m.Button');
+
+    expect(result.pass).toBe(false);
+    expect(result.message()).toContain('control was not found');
+    expect(result.actual).toBeNull();
+  });
+
+  it('M8: pass message mentions "not to be of type" for negated assertion', async () => {
+    vi.mocked(getUI5ControlType).mockResolvedValue('sap.m.Button');
+    const page = createMockPage();
+
+    const result = await checkUI5ControlType(page, 'btn1', 'sap.m.Button');
+
+    expect(result.pass).toBe(true);
+    expect(result.message()).toContain('not to be of type');
   });
 });

@@ -19,72 +19,8 @@
 
 import type { Page } from '@playwright/test';
 
+import { getControlAggregation, getControlProperty } from './matcher-utils.js';
 import type { MatcherResult } from './ui5-matchers.js';
-
-import type { BridgeControlRef, MethodExecutionResult } from '#bridge/bridge-types.js';
-import { createExecuteMethodScript } from '#bridge/browser-scripts/execute-method.js';
-import { ensureBridgeInjected } from '#bridge/injection.js';
-
-/**
- * Retrieves a control property via `page.evaluate()` using the bridge.
- *
- * @param page - The Playwright page to evaluate on.
- * @param controlId - The ID of the UI5 control.
- * @param propertyName - The property to read (e.g., `'text'`, `'selectedItems'`).
- * @returns The property value from the browser context.
- */
-async function getControlProperty(
-  page: Page,
-  controlId: string,
-  propertyName: string,
-): Promise<unknown> {
-  await ensureBridgeInjected(page);
-  const methodName = `get${propertyName.charAt(0).toUpperCase()}${propertyName.slice(1)}`;
-  const script = createExecuteMethodScript();
-  const withArgs = script.replace(
-    /\)\(\)$/,
-    `)(${JSON.stringify(controlId)}, ${JSON.stringify(methodName)}, [])`,
-  );
-  const result = await page.evaluate<MethodExecutionResult>(withArgs);
-  return result.value;
-}
-
-/**
- * Retrieves a control aggregation via `page.evaluate()` using the bridge.
- *
- * @param page - The Playwright page to evaluate on.
- * @param controlId - The ID of the UI5 control.
- * @param aggregationName - The aggregation to read (e.g., `'items'`, `'cells'`).
- * @returns An array of control references from the browser context.
- */
-async function getControlAggregation(
-  page: Page,
-  controlId: string,
-  aggregationName: string,
-): Promise<readonly BridgeControlRef[]> {
-  await ensureBridgeInjected(page);
-  const methodName = `get${aggregationName.charAt(0).toUpperCase()}${aggregationName.slice(1)}`;
-  const script = createExecuteMethodScript();
-  const withArgs = script.replace(
-    /\)\(\)$/,
-    `)(${JSON.stringify(controlId)}, ${JSON.stringify(methodName)}, [])`,
-  );
-  const result = await page.evaluate<MethodExecutionResult>(withArgs);
-
-  if (
-    result.returnType === 'aggregation' &&
-    result.uuids !== undefined &&
-    result.objectTypes !== undefined
-  ) {
-    const types = result.objectTypes;
-    return result.uuids.map((id, i) => ({
-      id,
-      // eslint-disable-next-line security/detect-object-injection
-      controlType: types[i] ?? 'unknown',
-    }));
-  }
-  return [];
-}
 
 /**
  * Checks that a UI5 table has the expected number of rows.
