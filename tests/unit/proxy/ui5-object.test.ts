@@ -1085,32 +1085,34 @@ describe('UI5Object', () => {
       page: Page;
       evaluateFn: ReturnType<typeof vi.fn>;
     } {
-      const evaluateFn = vi.fn().mockImplementation(
-        // eslint-disable-next-line @typescript-eslint/promise-function-async -- synchronous mock wrapping; page.evaluate signature expects Promise return
-        (
-          fn: (params: { uuid: string; bridgeNs: string }) => string[],
-          args: { uuid: string; bridgeNs: string },
-        ): Promise<string[]> => {
-          const bridgeNs = args.bridgeNs;
-          // In Node.js, `window` is not defined. The callback references it
-          // via `Reflect.get(window, ...)`, so we temporarily define it.
-          const hadWindow = 'window' in globalThis;
-          if (!hadWindow) {
-            Reflect.set(globalThis, 'window', globalThis);
-          }
-          if (bridgeSetup !== undefined) {
-            Reflect.set(globalThis, bridgeNs, bridgeSetup);
-          }
-          try {
-            return Promise.resolve(fn(args));
-          } finally {
-            Reflect.deleteProperty(globalThis, bridgeNs);
+      const evaluateFn = vi
+        .fn()
+        .mockImplementation(
+          (
+            fn: (params: { uuid: string; bridgeNs: string }) => string[],
+            args: { uuid: string; bridgeNs: string },
+          ): Promise<string[]> => {
+            // eslint-disable-line @typescript-eslint/promise-function-async -- synchronous mock wrapping; page.evaluate signature expects Promise return
+            const bridgeNs = args.bridgeNs;
+            // In Node.js, `window` is not defined. The callback references it
+            // via `Reflect.get(window, ...)`, so we temporarily define it.
+            const hadWindow = 'window' in globalThis;
             if (!hadWindow) {
-              Reflect.deleteProperty(globalThis, 'window');
+              Reflect.set(globalThis, 'window', globalThis);
             }
-          }
-        },
-      );
+            if (bridgeSetup !== undefined) {
+              Reflect.set(globalThis, bridgeNs, bridgeSetup);
+            }
+            try {
+              return Promise.resolve(fn(args));
+            } finally {
+              Reflect.deleteProperty(globalThis, bridgeNs);
+              if (!hadWindow) {
+                Reflect.deleteProperty(globalThis, 'window');
+              }
+            }
+          },
+        );
       return {
         page: { evaluate: evaluateFn, waitForFunction: vi.fn() } as unknown as Page,
         evaluateFn,

@@ -56,7 +56,7 @@ function createCallbackInvokingAuthPage(): MockAuthPage {
   });
 
   // Store the original document for cleanup
-  (page as unknown as Record<string, unknown>).__origDocument = origDocument;
+  (page as unknown as Record<string, unknown>)['__origDocument'] = origDocument;
 
   return page;
 }
