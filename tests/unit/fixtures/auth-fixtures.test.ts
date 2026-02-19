@@ -358,6 +358,45 @@ describe('auth-fixtures sapAuth fixture', () => {
       }),
     );
   });
+
+  // Test: fixtureLogger no-op functions execute without error
+  it('fixtureLogger.info() is a no-op that does not throw', async () => {
+    const fn = extractFixtureFn(fixtures['sapAuth']);
+    // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+    const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
+
+    await runFixture(fn, { sapAuthConfig: config });
+
+    // Extract the logger passed to SAPAuthHandler constructor
+    const constructorCall = mockSAPAuthHandler.mock.calls[0] as [
+      { readonly strategy: unknown; readonly logger: { info(): void; error(): void } },
+    ];
+    const logger = constructorCall[0].logger;
+
+    // Calling no-op info should not throw
+    expect(() => {
+      logger.info();
+    }).not.toThrow();
+  });
+
+  it('fixtureLogger.error() is a no-op that does not throw', async () => {
+    const fn = extractFixtureFn(fixtures['sapAuth']);
+    // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+    const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
+
+    await runFixture(fn, { sapAuthConfig: config });
+
+    // Extract the logger passed to SAPAuthHandler constructor
+    const constructorCall = mockSAPAuthHandler.mock.calls[0] as [
+      { readonly strategy: unknown; readonly logger: { info(): void; error(): void } },
+    ];
+    const logger = constructorCall[0].logger;
+
+    // Calling no-op error should not throw
+    expect(() => {
+      logger.error();
+    }).not.toThrow();
+  });
 });
 
 describe('auth-fixtures type exports', () => {

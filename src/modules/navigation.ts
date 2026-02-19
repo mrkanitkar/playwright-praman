@@ -84,10 +84,12 @@ async function stabilityWait(page: NavigationPage, options?: NavigationOptions):
 /** Sets the FLP hash via `page.evaluate` using `window.hasher.setHash`. */
 async function setHash(page: NavigationPage, hash: string): Promise<void> {
   await page.evaluate(
+    /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
     ((h: string) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- browser-evaluated: window.hasher has no Node types
       (window as any).hasher.setHash(h);
     }) as (...args: never[]) => unknown,
+    /* v8 ignore stop */
     hash,
   );
 }
@@ -304,8 +306,10 @@ export async function searchAndOpenApp(
  * ```
  */
 export async function getCurrentHash(page: NavigationPage): Promise<string> {
-  const hash = await page.evaluate((() => window.location.hash.replace('#', '')) as (
-    ...args: never[]
-  ) => unknown);
+  const hash = await page.evaluate(
+    /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
+    (() => window.location.hash.replace('#', '')) as (...args: never[]) => unknown,
+    /* v8 ignore stop */
+  );
   return hash as string;
 }

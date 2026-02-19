@@ -5,8 +5,12 @@
  * Validates SAML-based login flow via SAP Identity Authentication Service,
  * selector fallback chains, redirect handling, cloud URL detection,
  * input validation, and error handling.
+ *
+ * The `evaluate callback coverage` sections exercise the browser-context
+ * code inside `page.evaluate()` calls by making the mock invoke the
+ * callback with a minimal DOM stub.
  */
-import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import type { AuthStrategy, SAPAuthConfig } from '../../../../src/auth/auth-types.js';
 import {
@@ -19,6 +23,43 @@ import type { MockAuthPage } from '../../../helpers/mock-auth-page.js';
 
 // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
 const TEST_PASSWORD = 'test-secret-value';
+
+/**
+ * Creates a mock page whose `evaluate` invokes the callback with
+ * the provided argument, using a minimal DOM stub so that
+ * `document.querySelector` and element methods work.
+ *
+ * @returns MockAuthPage with callback-invoking evaluate.
+ */
+function createCallbackInvokingAuthPage(): MockAuthPage {
+  const mockElement = {
+    value: '',
+    click: vi.fn(),
+    dispatchEvent: vi.fn(),
+  };
+
+  const origDocument = globalThis.document;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub for evaluate callback
+  globalThis.document = {
+    querySelector: vi.fn().mockReturnValue(mockElement),
+  } as any;
+
+  const page = createMockAuthPage();
+  // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must call callback then wrap in Promise
+  page.evaluate.mockImplementation((fn: (...args: never[]) => unknown, arg?: unknown) => {
+    try {
+      const result = (fn as (a: unknown) => unknown)(arg);
+      return Promise.resolve(result);
+    } catch (error: unknown) {
+      return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+    }
+  });
+
+  // Store the original document for cleanup
+  (page as unknown as Record<string, unknown>).__origDocument = origDocument;
+
+  return page;
+}
 
 describe('CloudSAMLAuthStrategy', () => {
   let strategy: CloudSAMLAuthStrategy;
@@ -119,6 +160,26 @@ describe('CloudSAMLAuthStrategy', () => {
       );
     });
 
+    it('invokes waitForURL callback with the cloud domain predicate', async () => {
+      // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock implementation requires explicit Promise returns
+      page.waitForURL.mockImplementation((predicate: unknown) => {
+        // Invoke the predicate callback to cover the anonymous function
+        if (typeof predicate === 'function') {
+          const matchUrl = new URL('https://my-tenant.s4hana.cloud.sap/some/path');
+          const noMatchUrl = new URL('https://other-domain.com');
+          const matchResult = (predicate as (url: URL) => boolean)(matchUrl);
+          const noMatchResult = (predicate as (url: URL) => boolean)(noMatchUrl);
+          expect(matchResult).toBe(true);
+          expect(noMatchResult).toBe(false);
+        }
+        return Promise.resolve();
+      });
+
+      await strategy.authenticate(page, config);
+
+      expect(page.waitForURL).toHaveBeenCalled();
+    });
+
     it('uses custom timeout from config', async () => {
       const customTimeoutConfig: Readonly<SAPAuthConfig> = {
         ...config,
@@ -194,6 +255,71 @@ describe('CloudSAMLAuthStrategy', () => {
         expect(authError.code).toBe('ERR_AUTH_TIMEOUT');
         expect(authError.strategy).toBe('cloud-saml');
       }
+    });
+
+    describe('evaluate callback coverage', () => {
+      let callbackPage: MockAuthPage;
+      let origDocument: typeof globalThis.document;
+
+      beforeEach(() => {
+        origDocument = globalThis.document;
+      });
+
+      afterEach(() => {
+        globalThis.document = origDocument;
+      });
+
+      it('fills username and password fields via evaluate callback', async () => {
+        callbackPage = createCallbackInvokingAuthPage();
+
+        await strategy.authenticate(callbackPage, config);
+
+        // The evaluate callback should have been invoked — verify DOM interactions
+        expect(callbackPage.evaluate).toHaveBeenCalled();
+        expect(callbackPage.waitForSelector).toHaveBeenCalled();
+      });
+
+      it('handles null element in fillWithFallback callback gracefully', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(null),
+        } as any;
+
+        const nullPage = createMockAuthPage();
+        nullPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        await strategy.authenticate(nullPage, config);
+
+        // Should complete without error -- null element is handled gracefully
+        expect(nullPage.evaluate).toHaveBeenCalled();
+      });
+
+      it('handles null element in clickWithFallback callback gracefully', async () => {
+        const querySelectorMock = vi.fn().mockReturnValue(null);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: querySelectorMock,
+        } as any;
+
+        const nullClickPage = createMockAuthPage();
+        nullClickPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        await strategy.authenticate(nullClickPage, config);
+
+        expect(nullClickPage.evaluate).toHaveBeenCalled();
+      });
     });
   });
 

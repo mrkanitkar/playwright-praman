@@ -381,6 +381,7 @@ function resolveKnownProperty(
       ): Promise<unknown> => {
         const fnString = fn.toString();
         return state.page.evaluate(
+          /* v8 ignore start -- browser-context function: runs in Chromium, not Node.js */
           ({ controlId, bridgeNs, fnBody, execArgs: browserArgs }) => {
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             // eslint-disable-next-line sonarjs/no-duplicate-string -- self-contained browser function cannot reference Node-side constants
@@ -399,6 +400,7 @@ function resolveKnownProperty(
             ) => unknown;
             return userFn(ctrl, ...browserArgs);
           },
+          /* v8 ignore stop */
           {
             controlId: state.id,
             bridgeNs: BRIDGE_GLOBALS.NAMESPACE,
@@ -410,6 +412,7 @@ function resolveKnownProperty(
     case 'renewWebElementReference':
       return async (): Promise<void> => {
         const exists = await state.page.evaluate(
+          /* v8 ignore start -- browser-context function: runs in Chromium, not Node.js */
           ({ controlId, bridgeNs }) => {
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) return false;
@@ -420,6 +423,7 @@ function resolveKnownProperty(
             const ctrl = getById(controlId);
             return ctrl !== null;
           },
+          /* v8 ignore stop */
           { controlId: state.id, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
         );
         if (!exists) {
@@ -439,6 +443,7 @@ function resolveKnownProperty(
     case 'getControlMetadata':
       return async (): Promise<ControlMetadataResult> =>
         state.page.evaluate(
+          /* v8 ignore start -- browser-context function: runs in Chromium, not Node.js */
           ({ controlId, bridgeNs }) => {
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) throw new Error('Bridge not initialized');
@@ -470,11 +475,13 @@ function resolveKnownProperty(
               events: getAllEvents !== undefined ? Object.keys(getAllEvents.call(meta)) : [],
             };
           },
+          /* v8 ignore stop */
           { controlId: state.id, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
         );
     case 'getControlInfoFull':
       return async (): Promise<ControlInfoFull> =>
         state.page.evaluate(
+          /* v8 ignore start -- browser-context function: runs in Chromium, not Node.js */
           ({ controlId, bridgeNs }) => {
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) throw new Error('Bridge not initialized');
@@ -537,11 +544,13 @@ function resolveKnownProperty(
               return result;
             }
           },
+          /* v8 ignore stop */
           { controlId: state.id, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
         );
     case 'retrieveMembers':
       return async (): Promise<readonly string[]> =>
         state.page.evaluate(
+          /* v8 ignore start -- browser-context function: runs in Chromium, not Node.js */
           ({ controlId, bridgeNs }) => {
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) throw new Error('Bridge not initialized');
@@ -582,6 +591,7 @@ function resolveKnownProperty(
               return result;
             }
           },
+          /* v8 ignore stop */
           { controlId: state.id, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
         );
     default:

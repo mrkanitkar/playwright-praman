@@ -4,8 +4,12 @@
  * @remarks
  * Validates form-based login flow, selector fallback chains,
  * input validation, and error handling for on-premise SAP systems.
+ *
+ * The `evaluate callback coverage` sections exercise the browser-context
+ * code inside `page.evaluate()` calls by making the mock invoke the
+ * callback with a minimal DOM stub.
  */
-import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import type { AuthStrategy, SAPAuthConfig } from '../../../../src/auth/auth-types.js';
 import { OnPremAuthStrategy } from '../../../../src/auth/strategies/onprem-strategy.js';
@@ -79,6 +83,32 @@ describe('OnPremAuthStrategy', () => {
       await strategy.authenticate(page, noLangConfig);
 
       expect(page.goto).toHaveBeenCalledWith(noLangConfig.url, { timeout: 30_000 });
+    });
+
+    it('skips client field when client is empty string', async () => {
+      const emptyClientConfig: Readonly<SAPAuthConfig> = {
+        url: 'https://sap.example.com',
+        username: 'admin',
+        password: TEST_PASSWORD,
+        client: '',
+      };
+
+      await strategy.authenticate(page, emptyClientConfig);
+
+      expect(page.goto).toHaveBeenCalledWith(emptyClientConfig.url, { timeout: 30_000 });
+    });
+
+    it('skips language field when language is empty string', async () => {
+      const emptyLangConfig: Readonly<SAPAuthConfig> = {
+        url: 'https://sap.example.com',
+        username: 'admin',
+        password: TEST_PASSWORD,
+        language: '',
+      };
+
+      await strategy.authenticate(page, emptyLangConfig);
+
+      expect(page.goto).toHaveBeenCalledWith(emptyLangConfig.url, { timeout: 30_000 });
     });
 
     it('throws AuthError when login form username field not found', async () => {
@@ -209,6 +239,136 @@ describe('OnPremAuthStrategy', () => {
       // Should not throw even though client field is missing
       await strategy.authenticate(page, config);
       expect(page.goto).toHaveBeenCalled();
+    });
+
+    it('continues when optional language field is not found', async () => {
+      // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock implementation requires explicit Promise returns
+      page.waitForSelector.mockImplementation((selector: string) => {
+        // Language selector fails
+        if (selector === 'input[name="sap-language"]') {
+          return Promise.reject(new Error('Timeout'));
+        }
+        return Promise.resolve(undefined);
+      });
+
+      // Should not throw even though language field is missing
+      await strategy.authenticate(page, config);
+      expect(page.goto).toHaveBeenCalled();
+    });
+
+    it('throws AuthError when submit button not found', async () => {
+      // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock implementation
+      page.waitForSelector.mockImplementation((selector: string) => {
+        // Submit selectors fail
+        if (selector === '#LOGIN_LINK' || selector === 'button[type="submit"]') {
+          return Promise.reject(new Error('Timeout'));
+        }
+        return Promise.resolve(undefined);
+      });
+
+      // With client and language in config, client/language fill also calls
+      // fillWithFallback which may catch. Let's use config without optional fields.
+      const basicConfig: Readonly<SAPAuthConfig> = {
+        url: 'https://sap.example.com',
+        username: 'admin',
+        password: TEST_PASSWORD,
+      };
+
+      await expect(strategy.authenticate(page, basicConfig)).rejects.toThrow(AuthError);
+
+      try {
+        await strategy.authenticate(page, basicConfig);
+      } catch (error) {
+        expect(error).toBeInstanceOf(AuthError);
+        const authError = error as AuthError;
+        expect(authError.code).toBe('ERR_AUTH_FAILED');
+        expect(authError.message).toContain('submit');
+      }
+    });
+
+    describe('evaluate callback coverage', () => {
+      let origDocument: typeof globalThis.document;
+
+      beforeEach(() => {
+        origDocument = globalThis.document;
+      });
+
+      afterEach(() => {
+        globalThis.document = origDocument;
+      });
+
+      it('fills all form fields via evaluate callback', async () => {
+        const mockElement = {
+          value: '',
+          click: vi.fn(),
+          dispatchEvent: vi.fn(),
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(mockElement),
+        } as any;
+
+        const cbPage = createMockAuthPage();
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        await strategy.authenticate(cbPage, config);
+
+        // Should have called evaluate for username, password, client, language, submit
+        expect(cbPage.evaluate).toHaveBeenCalled();
+        expect(cbPage.evaluate.mock.calls.length).toBeGreaterThanOrEqual(5);
+      });
+
+      it('handles null element in fillWithFallback callback gracefully', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(null),
+        } as any;
+
+        const cbPage = createMockAuthPage();
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        await strategy.authenticate(cbPage, config);
+
+        expect(cbPage.evaluate).toHaveBeenCalled();
+      });
+
+      it('handles null element in clickWithFallback callback gracefully', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(null),
+        } as any;
+
+        const cbPage = createMockAuthPage();
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        const basicConfig: Readonly<SAPAuthConfig> = {
+          url: 'https://sap.example.com',
+          username: 'admin',
+          password: TEST_PASSWORD,
+        };
+
+        await strategy.authenticate(cbPage, basicConfig);
+
+        expect(cbPage.evaluate).toHaveBeenCalled();
+      });
     });
   });
 
