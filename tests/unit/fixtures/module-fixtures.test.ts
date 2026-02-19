@@ -23,12 +23,30 @@ import { PramanConfigSchema } from '#core/config/schema.js';
 /** Shape of the extended UI5Handler with sub-namespaces returned by the ui5 fixture. */
 interface TestExtendedUI5Handler {
   readonly table: {
+    readonly detectType: (...args: unknown[]) => Promise<unknown>;
     readonly getRows: (...args: unknown[]) => Promise<unknown>;
-    readonly clickRow: (...args: unknown[]) => Promise<unknown>;
-    readonly findRowByValues: (...args: unknown[]) => Promise<unknown>;
+    readonly getRowCount: (...args: unknown[]) => Promise<unknown>;
+    readonly getCellValue: (...args: unknown[]) => Promise<unknown>;
+    readonly getData: (...args: unknown[]) => Promise<unknown>;
+    readonly selectRow: (...args: unknown[]) => Promise<unknown>;
+    readonly selectAll: (...args: unknown[]) => Promise<unknown>;
+    readonly deselectAll: (...args: unknown[]) => Promise<unknown>;
+    readonly waitForData: (...args: unknown[]) => Promise<unknown>;
+    readonly getSelectedRows: (...args: unknown[]) => Promise<unknown>;
     readonly getColumnNames: (...args: unknown[]) => Promise<unknown>;
+    readonly findRowByValues: (...args: unknown[]) => Promise<unknown>;
+    readonly getCellByColumnName: (...args: unknown[]) => Promise<unknown>;
+    readonly clickRow: (...args: unknown[]) => Promise<unknown>;
+    readonly selectRowByValues: (...args: unknown[]) => Promise<unknown>;
+    readonly ensureRowVisible: (...args: unknown[]) => Promise<unknown>;
+    readonly setTableCellValue: (...args: unknown[]) => Promise<unknown>;
+    readonly getRowCountAlt: (...args: unknown[]) => Promise<unknown>;
     readonly filterByColumn: (...args: unknown[]) => Promise<unknown>;
     readonly sortByColumn: (...args: unknown[]) => Promise<unknown>;
+    readonly getSortOrder: (...args: unknown[]) => Promise<unknown>;
+    readonly getFilterValue: (...args: unknown[]) => Promise<unknown>;
+    readonly exportData: (...args: unknown[]) => Promise<unknown>;
+    readonly clickSettings: (...args: unknown[]) => Promise<unknown>;
     readonly [key: string]: (...args: unknown[]) => Promise<unknown>;
   };
   readonly dialog: {
@@ -37,6 +55,8 @@ interface TestExtendedUI5Handler {
     readonly dismiss: (...args: unknown[]) => Promise<unknown>;
     readonly getOpen: (...args: unknown[]) => Promise<unknown>;
     readonly isOpen: (...args: unknown[]) => Promise<unknown>;
+    readonly waitForClosed: (...args: unknown[]) => Promise<unknown>;
+    readonly getButtons: (...args: unknown[]) => Promise<unknown>;
     readonly [key: string]: (...args: unknown[]) => Promise<unknown>;
   };
   readonly date: {
@@ -46,15 +66,21 @@ interface TestExtendedUI5Handler {
     readonly getDateRange: (...args: unknown[]) => Promise<unknown>;
     readonly setTimePicker: (...args: unknown[]) => Promise<unknown>;
     readonly getTimePicker: (...args: unknown[]) => Promise<unknown>;
+    readonly setAndValidate: (...args: unknown[]) => Promise<unknown>;
     readonly [key: string]: (...args: unknown[]) => Promise<unknown>;
   };
   readonly odata: {
     readonly getModelData: (...args: unknown[]) => Promise<unknown>;
+    readonly getModelProperty: (...args: unknown[]) => Promise<unknown>;
+    readonly waitForLoad: (...args: unknown[]) => Promise<unknown>;
+    readonly fetchCSRFToken: (...args: unknown[]) => Promise<unknown>;
+    readonly getEntityCount: (...args: unknown[]) => Promise<unknown>;
+    readonly hasPendingChanges: (...args: unknown[]) => Promise<unknown>;
     readonly createEntity: (...args: unknown[]) => Promise<unknown>;
     readonly updateEntity: (...args: unknown[]) => Promise<unknown>;
     readonly deleteEntity: (...args: unknown[]) => Promise<unknown>;
     readonly queryEntities: (...args: unknown[]) => Promise<unknown>;
-    readonly fetchCSRFToken: (...args: unknown[]) => Promise<unknown>;
+    readonly callFunctionImport: (...args: unknown[]) => Promise<unknown>;
     readonly [key: string]: (...args: unknown[]) => Promise<unknown>;
   };
 }
@@ -518,6 +544,317 @@ describe('module-fixtures fixture definitions', () => {
       expect(mockFindRowByValues).toHaveBeenCalledOnce();
       expect(mockFindRowByValues).toHaveBeenCalledWith(mockPage, 'productsTable', values);
     });
+
+    it('detectType delegates to detectTableType with page and tableId', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.detectType('myTable');
+
+      expect(result).toBe('responsive');
+      expect(mockDetectTableType).toHaveBeenCalledOnce();
+      expect(mockDetectTableType).toHaveBeenCalledWith(mockPage, 'myTable');
+    });
+
+    it('getRowCount delegates to getTableRowCount with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getRowCount('myTable');
+
+      expect(result).toBe(0);
+      expect(mockGetTableRowCount).toHaveBeenCalledOnce();
+      expect(mockGetTableRowCount).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
+
+    it('getCellValue delegates to getTableCellValue with page, tableId, row, col, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getCellValue('myTable', 1, 2);
+
+      expect(result).toBe('');
+      expect(mockGetTableCellValue).toHaveBeenCalledOnce();
+      expect(mockGetTableCellValue).toHaveBeenCalledWith(mockPage, 'myTable', 1, 2, undefined);
+    });
+
+    it('getData delegates to getTableData with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getData('myTable');
+
+      expect(result).toEqual([]);
+      expect(mockGetTableData).toHaveBeenCalledOnce();
+      expect(mockGetTableData).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
+
+    it('selectRow delegates to selectTableRow with page, tableId, row, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.selectRow('myTable', 3);
+
+      expect(mockSelectTableRow).toHaveBeenCalledOnce();
+      expect(mockSelectTableRow).toHaveBeenCalledWith(mockPage, 'myTable', 3, undefined);
+    });
+
+    it('selectAll delegates to selectAllTableRows with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.selectAll('myTable');
+
+      expect(mockSelectAllTableRows).toHaveBeenCalledOnce();
+      expect(mockSelectAllTableRows).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
+
+    it('deselectAll delegates to deselectAllTableRows with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.deselectAll('myTable');
+
+      expect(mockDeselectAllTableRows).toHaveBeenCalledOnce();
+      expect(mockDeselectAllTableRows).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
+
+    it('waitForData delegates to waitForTableData with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.waitForData('myTable');
+
+      expect(mockWaitForTableData).toHaveBeenCalledOnce();
+      expect(mockWaitForTableData).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
+
+    it('getSelectedRows delegates to getSelectedRows with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getSelectedRows('myTable');
+
+      expect(result).toEqual([]);
+      expect(mockGetSelectedRows).toHaveBeenCalledOnce();
+      expect(mockGetSelectedRows).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
+
+    it('getColumnNames delegates to getColumnNames with page and tableId', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getColumnNames('myTable');
+
+      expect(result).toEqual([]);
+      expect(mockGetColumnNames).toHaveBeenCalledOnce();
+      expect(mockGetColumnNames).toHaveBeenCalledWith(mockPage, 'myTable');
+    });
+
+    it('getCellByColumnName delegates with page, tableId, row, colName, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getCellByColumnName('myTable', 0, 'Name');
+
+      expect(result).toBe('');
+      expect(mockGetCellByColumnName).toHaveBeenCalledOnce();
+      expect(mockGetCellByColumnName).toHaveBeenCalledWith(
+        mockPage,
+        'myTable',
+        0,
+        'Name',
+        undefined,
+      );
+    });
+
+    it('selectRowByValues delegates with page, tableId, values, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const values = { Status: 'Active' };
+      await ui5.table.selectRowByValues('myTable', values);
+
+      expect(mockSelectRowByValues).toHaveBeenCalledOnce();
+      expect(mockSelectRowByValues).toHaveBeenCalledWith(mockPage, 'myTable', values, undefined);
+    });
+
+    it('ensureRowVisible delegates with page, tableId, and row', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.ensureRowVisible('myTable', 5);
+
+      expect(mockEnsureRowVisible).toHaveBeenCalledOnce();
+      expect(mockEnsureRowVisible).toHaveBeenCalledWith(mockPage, 'myTable', 5);
+    });
+
+    it('setTableCellValue delegates with page, tableId, row, col, and value', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.setTableCellValue('myTable', 1, 2, 'newValue');
+
+      expect(mockSetTableCellValue).toHaveBeenCalledOnce();
+      expect(mockSetTableCellValue).toHaveBeenCalledWith(mockPage, 'myTable', 1, 2, 'newValue');
+    });
+
+    it('getRowCountAlt delegates to getRowCount with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getRowCountAlt('myTable');
+
+      expect(result).toBe(0);
+      expect(mockGetRowCount).toHaveBeenCalledOnce();
+      expect(mockGetRowCount).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
+
+    it('filterByColumn delegates with page, tableId, col, value, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.filterByColumn('myTable', 1, 'Active');
+
+      expect(mockFilterByColumn).toHaveBeenCalledOnce();
+      expect(mockFilterByColumn).toHaveBeenCalledWith(mockPage, 'myTable', 1, 'Active', undefined);
+    });
+
+    it('sortByColumn delegates with page, tableId, col, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.sortByColumn('myTable', 0);
+
+      expect(mockSortByColumn).toHaveBeenCalledOnce();
+      expect(mockSortByColumn).toHaveBeenCalledWith(mockPage, 'myTable', 0, undefined);
+    });
+
+    it('getSortOrder delegates with page, tableId, and col', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getSortOrder('myTable', 0);
+
+      expect(result).toBe('ascending');
+      expect(mockGetSortOrder).toHaveBeenCalledOnce();
+      expect(mockGetSortOrder).toHaveBeenCalledWith(mockPage, 'myTable', 0);
+    });
+
+    it('getFilterValue delegates with page, tableId, and col', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.table.getFilterValue('myTable', 2);
+
+      expect(result).toBe('');
+      expect(mockGetFilterValue).toHaveBeenCalledOnce();
+      expect(mockGetFilterValue).toHaveBeenCalledWith(mockPage, 'myTable', 2);
+    });
+
+    it('exportData delegates to exportTableData with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.exportData('myTable');
+
+      expect(mockExportTableData).toHaveBeenCalledOnce();
+      expect(mockExportTableData).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
+
+    it('clickSettings delegates to clickTableSettingsButton with page, tableId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.table.clickSettings('myTable');
+
+      expect(mockClickTableSettingsButton).toHaveBeenCalledOnce();
+      expect(mockClickTableSettingsButton).toHaveBeenCalledWith(mockPage, 'myTable', undefined);
+    });
   });
 
   describe('dialog delegation', () => {
@@ -547,6 +884,81 @@ describe('module-fixtures fixture definitions', () => {
 
       expect(mockConfirmDialog).toHaveBeenCalledOnce();
       expect(mockConfirmDialog).toHaveBeenCalledWith(mockPage, undefined);
+    });
+
+    it('getOpen delegates to getOpenDialogs with page', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.dialog.getOpen();
+
+      expect(result).toEqual([]);
+      expect(mockGetOpenDialogs).toHaveBeenCalledOnce();
+      expect(mockGetOpenDialogs).toHaveBeenCalledWith(mockPage);
+    });
+
+    it('isOpen delegates to isDialogOpen with page and dialogId', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.dialog.isOpen('confirmDialog');
+
+      expect(result).toBe(false);
+      expect(mockIsDialogOpen).toHaveBeenCalledOnce();
+      expect(mockIsDialogOpen).toHaveBeenCalledWith(mockPage, 'confirmDialog');
+    });
+
+    it('dismiss delegates to dismissDialog with page and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.dialog.dismiss({ title: 'Warning' });
+
+      expect(mockDismissDialog).toHaveBeenCalledOnce();
+      expect(mockDismissDialog).toHaveBeenCalledWith(mockPage, { title: 'Warning' });
+    });
+
+    it('waitForClosed delegates to waitForDialogClosed with page, dialogId, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.dialog.waitForClosed('confirmDialog', { timeout: 3000 });
+
+      expect(mockWaitForDialogClosed).toHaveBeenCalledOnce();
+      expect(mockWaitForDialogClosed).toHaveBeenCalledWith(mockPage, 'confirmDialog', {
+        timeout: 3000,
+      });
+    });
+
+    it('getButtons delegates to getDialogButtons with page and dialogId', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.dialog.getButtons('confirmDialog');
+
+      expect(result).toEqual([]);
+      expect(mockGetDialogButtons).toHaveBeenCalledOnce();
+      expect(mockGetDialogButtons).toHaveBeenCalledWith(mockPage, 'confirmDialog');
     });
   });
 
@@ -580,6 +992,84 @@ describe('module-fixtures fixture definitions', () => {
       expect(value).toBe('2024-01-15');
       expect(mockGetDatePickerValue).toHaveBeenCalledOnce();
       expect(mockGetDatePickerValue).toHaveBeenCalledWith(mockPage, 'dp1');
+    });
+
+    it('setDateRange delegates to setDateRangeSelection with page, controlId, start, end, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.date.setDateRange('dr1', '2024-01-01', '2024-01-31');
+
+      expect(mockSetDateRangeSelection).toHaveBeenCalledOnce();
+      expect(mockSetDateRangeSelection).toHaveBeenCalledWith(
+        mockPage,
+        'dr1',
+        '2024-01-01',
+        '2024-01-31',
+        undefined,
+      );
+    });
+
+    it('getDateRange delegates to getDateRangeSelection with page and controlId', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.date.getDateRange('dr1');
+
+      expect(result).toEqual({ start: '', end: '' });
+      expect(mockGetDateRangeSelection).toHaveBeenCalledOnce();
+      expect(mockGetDateRangeSelection).toHaveBeenCalledWith(mockPage, 'dr1');
+    });
+
+    it('setTimePicker delegates to setTimePickerValue with page, controlId, time, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.date.setTimePicker('tp1', '14:30');
+
+      expect(mockSetTimePickerValue).toHaveBeenCalledOnce();
+      expect(mockSetTimePickerValue).toHaveBeenCalledWith(mockPage, 'tp1', '14:30', undefined);
+    });
+
+    it('getTimePicker delegates to getTimePickerValue with page and controlId', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.date.getTimePicker('tp1');
+
+      expect(result).toBe('10:30');
+      expect(mockGetTimePickerValue).toHaveBeenCalledOnce();
+      expect(mockGetTimePickerValue).toHaveBeenCalledWith(mockPage, 'tp1');
+    });
+
+    it('setAndValidate delegates to setAndValidateDate with page, controlId, date, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.date.setAndValidate('dp1', '2024-03-15');
+
+      expect(mockSetAndValidateDate).toHaveBeenCalledOnce();
+      expect(mockSetAndValidateDate).toHaveBeenCalledWith(mockPage, 'dp1', '2024-03-15', undefined);
     });
   });
 
@@ -618,6 +1108,164 @@ describe('module-fixtures fixture definitions', () => {
         undefined,
       );
     });
+
+    it('getModelProperty delegates to getModelProperty with page, path, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.odata.getModelProperty('/Products(1)/Name');
+
+      expect(result).toBeNull();
+      expect(mockGetModelProperty).toHaveBeenCalledOnce();
+      expect(mockGetModelProperty).toHaveBeenCalledWith(mockPage, '/Products(1)/Name', undefined);
+    });
+
+    it('waitForLoad delegates to waitForODataLoad with page and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.odata.waitForLoad();
+
+      expect(mockWaitForODataLoad).toHaveBeenCalledOnce();
+      expect(mockWaitForODataLoad).toHaveBeenCalledWith(mockPage, undefined);
+    });
+
+    it('fetchCSRFToken delegates to fetchCSRFToken with page and serviceUrl', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.odata.fetchCSRFToken('/sap/opu/odata/svc');
+
+      expect(result).toBe('token-123');
+      expect(mockFetchCSRFToken).toHaveBeenCalledOnce();
+      expect(mockFetchCSRFToken).toHaveBeenCalledWith(mockPage, '/sap/opu/odata/svc');
+    });
+
+    it('getEntityCount delegates to getEntityCount with page, path, and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.odata.getEntityCount('/Products');
+
+      expect(result).toBe(0);
+      expect(mockGetEntityCount).toHaveBeenCalledOnce();
+      expect(mockGetEntityCount).toHaveBeenCalledWith(mockPage, '/Products', undefined);
+    });
+
+    it('hasPendingChanges delegates to hasPendingChanges with page and opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.odata.hasPendingChanges();
+
+      expect(result).toBe(false);
+      expect(mockHasPendingChanges).toHaveBeenCalledOnce();
+      expect(mockHasPendingChanges).toHaveBeenCalledWith(mockPage, undefined);
+    });
+
+    it('updateEntity delegates to updateEntity with page, serviceUrl, entitySet, key, data, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const entityData = { Name: 'Updated' };
+      await ui5.odata.updateEntity('/sap/opu/odata/svc', 'Products', '1', entityData);
+
+      expect(mockUpdateEntity).toHaveBeenCalledOnce();
+      expect(mockUpdateEntity).toHaveBeenCalledWith(
+        mockPage,
+        '/sap/opu/odata/svc',
+        'Products',
+        '1',
+        entityData,
+        undefined,
+      );
+    });
+
+    it('deleteEntity delegates to deleteEntity with page, serviceUrl, entitySet, key, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await ui5.odata.deleteEntity('/sap/opu/odata/svc', 'Products', '1');
+
+      expect(mockDeleteEntity).toHaveBeenCalledOnce();
+      expect(mockDeleteEntity).toHaveBeenCalledWith(
+        mockPage,
+        '/sap/opu/odata/svc',
+        'Products',
+        '1',
+        undefined,
+      );
+    });
+
+    it('queryEntities delegates to queryEntities with page, serviceUrl, entitySet, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const result = await ui5.odata.queryEntities('/sap/opu/odata/svc', 'Products');
+
+      expect(result).toEqual([]);
+      expect(mockQueryEntities).toHaveBeenCalledOnce();
+      expect(mockQueryEntities).toHaveBeenCalledWith(
+        mockPage,
+        '/sap/opu/odata/svc',
+        'Products',
+        undefined,
+      );
+    });
+
+    it('callFunctionImport delegates to callFunctionImport with page, serviceUrl, fn, params, method, opts', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      const ui5 = await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      const params = { ProductId: '1' };
+      await ui5.odata.callFunctionImport('/sap/opu/odata/svc', 'ActivateProduct', params, 'POST');
+
+      expect(mockCallFunctionImport).toHaveBeenCalledOnce();
+      expect(mockCallFunctionImport).toHaveBeenCalledWith(
+        mockPage,
+        '/sap/opu/odata/svc',
+        'ActivateProduct',
+        params,
+        'POST',
+        undefined,
+      );
+    });
   });
 
   describe('fixture setup and teardown', () => {
@@ -647,6 +1295,68 @@ describe('module-fixtures fixture definitions', () => {
 
       // After use() completes, teardown should have removed the listener
       expect(mockPage.off).toHaveBeenCalledWith('framenavigated', expect.any(Function));
+    });
+
+    it('navigationListener calls resetPageInjection when frame is mainFrame', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+
+      const mainFrame = { name: 'main' };
+      mockPage.mainFrame.mockReturnValue(mainFrame);
+
+      let capturedListener: ((frame: unknown) => void) | undefined;
+      mockPage.on.mockImplementation((event: string, listener: (frame: unknown) => void) => {
+        if (event === 'framenavigated') {
+          capturedListener = listener;
+        }
+      });
+
+      await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      expect(capturedListener).toBeDefined();
+      if (capturedListener === undefined) {
+        throw new Error('capturedListener was not set');
+      }
+
+      // Call with the mainFrame — should trigger resetPageInjection
+      capturedListener(mainFrame);
+
+      expect(mockResetPageInjection).toHaveBeenCalledOnce();
+      expect(mockResetPageInjection).toHaveBeenCalledWith(mockPage);
+    });
+
+    it('navigationListener does NOT call resetPageInjection when frame is not mainFrame', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+
+      const mainFrame = { name: 'main' };
+      const childFrame = { name: 'child' };
+      mockPage.mainFrame.mockReturnValue(mainFrame);
+
+      let capturedListener: ((frame: unknown) => void) | undefined;
+      mockPage.on.mockImplementation((event: string, listener: (frame: unknown) => void) => {
+        if (event === 'framenavigated') {
+          capturedListener = listener;
+        }
+      });
+
+      await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      expect(capturedListener).toBeDefined();
+      if (capturedListener === undefined) {
+        throw new Error('capturedListener was not set');
+      }
+
+      // Call with a child frame — should NOT trigger resetPageInjection
+      capturedListener(childFrame);
+
+      expect(mockResetPageInjection).not.toHaveBeenCalled();
     });
   });
 });

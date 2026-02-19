@@ -142,6 +142,21 @@ describe('date module', () => {
         ControlError,
       );
     });
+
+    it('throws ControlError when control is not found', async () => {
+      const page = createMockPage([
+        { error: 'not_found' }, // format query returns not_found
+      ]);
+
+      const error = await setDatePickerValue(asPage(page), 'dp1', '2024-01-15').catch(
+        (e: unknown) => e,
+      );
+
+      expect(error).toBeInstanceOf(ControlError);
+      expect((error as ControlError).code).toBe('ERR_CONTROL_NOT_FOUND');
+      expect((error as ControlError).message).toContain('DatePicker control not found: dp1');
+      expect((error as ControlError).retryable).toBe(true);
+    });
   });
 
   // ── getDatePickerValue ────────────────────────────────────────────────
@@ -289,6 +304,12 @@ describe('date module', () => {
       const result = formatDateForUI5(new Date(2024, 0, 15), 'yyyyMMdd');
 
       expect(result).toBe('20240115');
+    });
+
+    it('formats date as yyyy/MM/dd (Japanese)', () => {
+      const result = formatDateForUI5(new Date(2024, 0, 15), 'yyyy/MM/dd');
+
+      expect(result).toBe('2024/01/15');
     });
 
     it('throws ControlError for unsupported format', () => {

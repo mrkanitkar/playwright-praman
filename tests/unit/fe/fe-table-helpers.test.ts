@@ -59,6 +59,13 @@ describe('feGetTableRowCount', () => {
     expect(count).toBe(0);
   });
 
+  it('returns 0 when __count is undefined (fallback)', async () => {
+    const mock = createMockPage();
+    mock.evaluate.mockResolvedValue({});
+    const count = await feGetTableRowCount(asPage(mock), 'myTable');
+    expect(count).toBe(0);
+  });
+
   it('throws ERR_CONTROL_NOT_FOUND when table is not found', async () => {
     const mock = createMockPage();
     mock.evaluate.mockResolvedValue({ __error: 'Table not found' });
@@ -111,6 +118,30 @@ describe('feGetCellValue', () => {
       expect(controlErr.code).toBe(ErrorCode.ERR_CONTROL_AGGREGATION);
     }
   });
+
+  it('throws ERR_CONTROL_NOT_FOUND when table is not found', async () => {
+    const mock = createMockPage();
+    mock.evaluate.mockResolvedValue({ __error: 'Table not found' });
+    await expect(feGetCellValue(asPage(mock), 'missing', 0, 'Product')).rejects.toThrow(
+      ControlError,
+    );
+    try {
+      await feGetCellValue(asPage(mock), 'missing', 0, 'Product');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(ControlError);
+      const controlErr = error as ControlError;
+      expect(controlErr.code).toBe(ErrorCode.ERR_CONTROL_NOT_FOUND);
+      expect(controlErr.message).toContain('missing');
+      expect(controlErr.retryable).toBe(true);
+    }
+  });
+
+  it('returns empty string when __val is undefined (fallback)', async () => {
+    const mock = createMockPage();
+    mock.evaluate.mockResolvedValue({});
+    const value = await feGetCellValue(asPage(mock), 'myTable', 0, 'Product');
+    expect(value).toBe('');
+  });
 });
 
 describe('feFindRowByValues', () => {
@@ -145,6 +176,13 @@ describe('feFindRowByValues', () => {
       const controlErr = error as ControlError;
       expect(controlErr.code).toBe(ErrorCode.ERR_CONTROL_NOT_FOUND);
     }
+  });
+
+  it('returns -1 when __index is undefined (fallback)', async () => {
+    const mock = createMockPage();
+    mock.evaluate.mockResolvedValue({});
+    const index = await feFindRowByValues(asPage(mock), 'myTable', { Product: 'Widget A' });
+    expect(index).toBe(-1);
   });
 });
 
@@ -210,5 +248,13 @@ describe('feGetColumnNames', () => {
       const controlErr = error as ControlError;
       expect(controlErr.code).toBe(ErrorCode.ERR_CONTROL_NOT_FOUND);
     }
+  });
+
+  it('returns frozen empty array when __names is undefined (fallback)', async () => {
+    const mock = createMockPage();
+    mock.evaluate.mockResolvedValue({});
+    const names = await feGetColumnNames(asPage(mock), 'myTable');
+    expect(names).toEqual([]);
+    expect(Object.isFrozen(names)).toBe(true);
   });
 });

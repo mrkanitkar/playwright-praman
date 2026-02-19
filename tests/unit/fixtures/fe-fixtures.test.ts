@@ -329,6 +329,169 @@ describe('fe-fixtures fixture definitions', () => {
       expect(mockFeClickListItem).toHaveBeenCalledOnce();
       expect(mockFeClickListItem).toHaveBeenCalledWith(mockPage, 'ordersList', 1);
     });
+
+    // ── listReport: remaining delegation tests ────────────────────────
+
+    it('listReport.getTable delegates to getListReportTable(page)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.listReport.getTable();
+
+      expect(result).toBe('tableId');
+      expect(mockGetListReportTable).toHaveBeenCalledOnce();
+      expect(mockGetListReportTable).toHaveBeenCalledWith(mockPage);
+    });
+
+    it('listReport.getFilterBar delegates to getFilterBar(page)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.listReport.getFilterBar();
+
+      expect(result).toBe('filterBarId');
+      expect(mockGetFilterBar).toHaveBeenCalledOnce();
+      expect(mockGetFilterBar).toHaveBeenCalledWith(mockPage);
+    });
+
+    it('listReport.clearFilters delegates to clearFilterBar(page, "")', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      await fe.listReport.clearFilters();
+
+      expect(mockClearFilterBar).toHaveBeenCalledOnce();
+      expect(mockClearFilterBar).toHaveBeenCalledWith(mockPage, '');
+    });
+
+    it('listReport.getVariants delegates to getAvailableVariants(page)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.listReport.getVariants();
+
+      expect(result).toEqual(['Standard', 'Custom']);
+      expect(mockGetAvailableVariants).toHaveBeenCalledOnce();
+      expect(mockGetAvailableVariants).toHaveBeenCalledWith(mockPage);
+    });
+
+    it('listReport.selectVariant delegates to selectVariant(page, name)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      await fe.listReport.selectVariant('Custom');
+
+      expect(mockSelectVariant).toHaveBeenCalledOnce();
+      expect(mockSelectVariant).toHaveBeenCalledWith(mockPage, 'Custom');
+    });
+
+    // ── objectPage: remaining delegation tests ────────────────────────
+
+    it('objectPage.getSectionData delegates to getSectionData(page, sectionId)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.objectPage.getSectionData('GeneralInfo');
+
+      expect(result).toEqual({ title: 'General' });
+      expect(mockGetSectionData).toHaveBeenCalledOnce();
+      expect(mockGetSectionData).toHaveBeenCalledWith(mockPage, 'GeneralInfo');
+    });
+
+    it('objectPage.clickButton delegates to clickObjectPageButton(page, buttonName)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      await fe.objectPage.clickButton('Approve');
+
+      expect(mockClickObjectPageButton).toHaveBeenCalledOnce();
+      expect(mockClickObjectPageButton).toHaveBeenCalledWith(mockPage, 'Approve');
+    });
+
+    it('objectPage.clickSave delegates to clickSaveButton(page)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      await fe.objectPage.clickSave();
+
+      expect(mockClickSaveButton).toHaveBeenCalledOnce();
+      expect(mockClickSaveButton).toHaveBeenCalledWith(mockPage);
+    });
+
+    it('objectPage.getSections delegates to getObjectPageSections(page)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.objectPage.getSections();
+
+      expect(result).toEqual([{ title: 'General', id: 'sec1' }]);
+      expect(mockGetObjectPageSections).toHaveBeenCalledOnce();
+      expect(mockGetObjectPageSections).toHaveBeenCalledWith(mockPage);
+    });
+
+    it('objectPage.isInEditMode delegates to isInEditMode(page)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.objectPage.isInEditMode();
+
+      expect(result).toBe(false);
+      expect(mockIsInEditMode).toHaveBeenCalledOnce();
+      expect(mockIsInEditMode).toHaveBeenCalledWith(mockPage);
+    });
+
+    // ── table: remaining delegation tests ─────────────────────────────
+
+    it('table.findRow delegates to feFindRowByValues(page, tableId, values)', async () => {
+      const fe = createFEFixture(mockPage as never);
+      const values = { Name: 'Widget', Status: 'Active' } as const;
+
+      const result = await fe.table.findRow('productsTable', values);
+
+      expect(result).toBe(2);
+      expect(mockFeFindRowByValues).toHaveBeenCalledOnce();
+      expect(mockFeFindRowByValues).toHaveBeenCalledWith(mockPage, 'productsTable', values);
+    });
+
+    it('table.clickRow delegates to feClickRow(page, tableId, rowIndex)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      await fe.table.clickRow('productsTable', 3);
+
+      expect(mockFeClickRow).toHaveBeenCalledOnce();
+      expect(mockFeClickRow).toHaveBeenCalledWith(mockPage, 'productsTable', 3);
+    });
+
+    it('table.getColumnNames delegates to feGetColumnNames(page, tableId)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.table.getColumnNames('productsTable');
+
+      expect(result).toEqual(['Name', 'Status']);
+      expect(mockFeGetColumnNames).toHaveBeenCalledOnce();
+      expect(mockFeGetColumnNames).toHaveBeenCalledWith(mockPage, 'productsTable');
+    });
+
+    // ── list: remaining delegation tests ──────────────────────────────
+
+    it('list.getItemTitle delegates to feGetListItemTitle(page, listId, index)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.list.getItemTitle('ordersList', 0);
+
+      expect(result).toBe('Item Title');
+      expect(mockFeGetListItemTitle).toHaveBeenCalledOnce();
+      expect(mockFeGetListItemTitle).toHaveBeenCalledWith(mockPage, 'ordersList', 0);
+    });
+
+    it('list.findItemByTitle delegates to feFindListItemByTitle(page, listId, title)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      const result = await fe.list.findItemByTitle('ordersList', 'Order 42');
+
+      expect(result).toBe(1);
+      expect(mockFeFindListItemByTitle).toHaveBeenCalledOnce();
+      expect(mockFeFindListItemByTitle).toHaveBeenCalledWith(mockPage, 'ordersList', 'Order 42');
+    });
+
+    it('list.selectItem delegates to feSelectListItem(page, listId, index, selected)', async () => {
+      const fe = createFEFixture(mockPage as never);
+
+      await fe.list.selectItem('ordersList', 2, true);
+
+      expect(mockFeSelectListItem).toHaveBeenCalledOnce();
+      expect(mockFeSelectListItem).toHaveBeenCalledWith(mockPage, 'ordersList', 2, true);
+    });
   });
 
   describe('feTest fixture definition', () => {
