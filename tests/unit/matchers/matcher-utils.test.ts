@@ -84,6 +84,19 @@ describe('getControlProperty', () => {
       /Failed to read property 'text' from control 'btn1'/,
     );
   });
+
+  it('wraps non-Error thrown values in ControlError details', async () => {
+    const page: MatcherPage = {
+      evaluate: vi.fn().mockRejectedValue('string-error'),
+    };
+
+    const error = await getControlProperty(page, 'btn1', 'text').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ControlError);
+    expect((error as ControlError).code).toBe('ERR_CONTROL_NOT_FOUND');
+    expect((error as ControlError).retryable).toBe(true);
+    expect((error as ControlError).details).toHaveProperty('cause', 'string-error');
+  });
 });
 
 describe('getControlAggregation', () => {
@@ -143,6 +156,36 @@ describe('getControlAggregation', () => {
       /Failed to read aggregation 'items' from control 'table1'/,
     );
   });
+
+  it('wraps non-Error thrown values in ControlError details', async () => {
+    const page: MatcherPage = {
+      evaluate: vi.fn().mockRejectedValue('string-error'),
+    };
+
+    const error = await getControlAggregation(page, 'table1', 'items').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ControlError);
+    expect((error as ControlError).code).toBe('ERR_CONTROL_AGGREGATION');
+    expect((error as ControlError).retryable).toBe(true);
+    expect((error as ControlError).details).toHaveProperty('cause', 'string-error');
+  });
+
+  it('falls back to "unknown" when objectTypes is shorter than uuids', async () => {
+    const page = createMockPage({
+      success: true,
+      returnType: 'aggregation',
+      uuids: ['cell0', 'cell1', 'cell2'],
+      objectTypes: ['sap.m.Text'],
+      duration: 0,
+    });
+
+    const result = await getControlAggregation(page, 'row0', 'cells');
+
+    expect(result).toHaveLength(3);
+    expect(result[0]).toEqual({ id: 'cell0', controlType: 'sap.m.Text' });
+    expect(result[1]).toEqual({ id: 'cell1', controlType: 'unknown' });
+    expect(result[2]).toEqual({ id: 'cell2', controlType: 'unknown' });
+  });
 });
 
 describe('getUI5BindingInfo', () => {
@@ -172,6 +215,31 @@ describe('getUI5BindingInfo', () => {
       /Failed to read binding info for property 'value' on control 'input1'/,
     );
   });
+
+  it('wraps non-Error thrown values in ControlError details', async () => {
+    const page: MatcherPage = {
+      evaluate: vi.fn().mockRejectedValue('string-error'),
+    };
+
+    const error = await getUI5BindingInfo(page, 'input1', 'value').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ControlError);
+    expect((error as ControlError).code).toBe('ERR_CONTROL_NOT_FOUND');
+    expect((error as ControlError).retryable).toBe(true);
+    expect((error as ControlError).details).toHaveProperty('cause', 'string-error');
+  });
+
+  it('returns binding info with named model', async () => {
+    const page = createMockPage({
+      path: 'ProductName',
+      model: 'i18n',
+      value: 'Translated Widget',
+    });
+
+    const result = await getUI5BindingInfo(page, 'input1', 'value');
+
+    expect(result).toEqual({ path: 'ProductName', model: 'i18n', value: 'Translated Widget' });
+  });
 });
 
 describe('getUI5ControlType', () => {
@@ -200,6 +268,27 @@ describe('getUI5ControlType', () => {
     await expect(getUI5ControlType(page, 'btn1')).rejects.toThrow(
       /Failed to read control type for 'btn1'/,
     );
+  });
+
+  it('wraps non-Error thrown values in ControlError details', async () => {
+    const page: MatcherPage = {
+      evaluate: vi.fn().mockRejectedValue('string-error'),
+    };
+
+    const error = await getUI5ControlType(page, 'btn1').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ControlError);
+    expect((error as ControlError).code).toBe('ERR_CONTROL_NOT_FOUND');
+    expect((error as ControlError).retryable).toBe(true);
+    expect((error as ControlError).details).toHaveProperty('cause', 'string-error');
+  });
+
+  it('returns type for composite control', async () => {
+    const page = createMockPage('sap.ui.comp.smartfield.SmartField');
+
+    const result = await getUI5ControlType(page, 'smartField1');
+
+    expect(result).toBe('sap.ui.comp.smartfield.SmartField');
   });
 });
 

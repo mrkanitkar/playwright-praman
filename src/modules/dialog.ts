@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- 7 public functions with TSDoc + browser scripts exceed 300 LOC */
 /**
  * Dialog discovery, waiting, and interaction for UI5 dialogs in the static UI area.
  *

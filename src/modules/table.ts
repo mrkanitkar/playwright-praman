@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- 10 public functions with TSDoc + 6 variant scripts exceed 300 LOC */
 /**
  * Table abstraction module for 6 SAP UI5 table variants.
  * @remarks Pure-function module. Browser-context code uses string scripts via `page.evaluate()`.

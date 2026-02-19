@@ -369,6 +369,22 @@ describe('table-operations module', () => {
       const script = page.evaluate.mock.calls[1]?.[0] as string;
       expect(script).toContain('true');
     });
+
+    it('throws ControlError when sort fails', async () => {
+      const page = createMockPage([
+        RESPONSIVE_DETECT, // detectTableType
+        false, // sortByColumnScript returns false
+      ]);
+
+      const error = await sortByColumn(asFSPage(page), 'myTable', 99).catch((e: unknown) => e);
+
+      expect(error).toBeInstanceOf(ControlError);
+      expect((error as ControlError).code).toBe('ERR_CONTROL_AGGREGATION');
+      expect((error as ControlError).message).toContain(
+        'Failed to sort column 99 in table myTable',
+      );
+      expect((error as ControlError).retryable).toBe(false);
+    });
   });
 
   // -- getSortOrder ---------------------------------------------------------
@@ -448,6 +464,24 @@ describe('table-operations module', () => {
         true, // clickTableSettingsButtonScript result
       ]);
       await expect(clickTableSettingsButton(asFSPage(page), 'myTable')).resolves.toBeUndefined();
+    });
+
+    it('throws ControlError when settings button is not found', async () => {
+      const page = createMockPage([
+        RESPONSIVE_DETECT, // detectTableType
+        false, // clickTableSettingsButtonScript returns false
+      ]);
+
+      const error = await clickTableSettingsButton(asFSPage(page), 'myTable').catch(
+        (e: unknown) => e,
+      );
+
+      expect(error).toBeInstanceOf(ControlError);
+      expect((error as ControlError).code).toBe('ERR_CONTROL_NOT_FOUND');
+      expect((error as ControlError).message).toContain(
+        'Settings button not found in table toolbar: myTable',
+      );
+      expect((error as ControlError).retryable).toBe(true);
     });
   });
 });

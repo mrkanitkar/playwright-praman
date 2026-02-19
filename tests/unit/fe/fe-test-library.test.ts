@@ -166,6 +166,53 @@ describe('initializeFETestLibrary', () => {
       VALID_CONFIG,
     );
   });
+
+  it('detects WorkZone when detectWorkZone option is true', async () => {
+    const page = createMockPage({
+      includeDetect: true,
+      detectResult: { isWorkZone: true, hasShell: true, hasIframe: true },
+    });
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG, {
+      detectWorkZone: true,
+    });
+
+    expect(instance.getShellInstance()).toEqual({
+      isWorkZone: true,
+      hasShell: true,
+      hasIframe: true,
+    });
+  });
+
+  it('does not detect WorkZone when detectWorkZone option is false', async () => {
+    const page = createMockPage();
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG, {
+      detectWorkZone: false,
+    });
+
+    expect(instance.getShellInstance()).toBeUndefined();
+  });
+
+  it('does not set WorkZone when detection returns isWorkZone false', async () => {
+    const page = createMockPage({
+      includeDetect: true,
+      detectResult: { isWorkZone: false, hasShell: false, hasIframe: false },
+    });
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG, {
+      detectWorkZone: true,
+    });
+
+    expect(instance.getShellInstance()).toBeUndefined();
+  });
+
+  it('throws BridgeError with fallback message when load script error has no message', async () => {
+    const page = createMockPage({
+      loadResult: { type: 'error', message: '' },
+    });
+
+    await expect(initializeFETestLibrary(asPage(page), VALID_CONFIG)).rejects.toThrow(
+      'Failed to load FE test libraries',
+    );
+  });
 });
 
 describe('FETestLibraryInstance.execute', () => {
@@ -250,6 +297,15 @@ describe('FETestLibraryInstance.execute', () => {
     await expect(instance.execute(invokeWhenProxy)).rejects.toThrow('queue add failed');
   });
 
+  it('throws BridgeError with fallback message when add-to-queue fails without message', async () => {
+    const page = createMockPage({
+      addResult: { type: 'error' },
+    });
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG);
+
+    await expect(instance.execute(invokeWhenProxy)).rejects.toThrow('Unknown error');
+  });
+
   it('throws BridgeError when empty-queue execution fails', async () => {
     const page = createMockPage({
       execResult: { type: 'error', message: 'OPA5 assertion failed' },
@@ -257,6 +313,25 @@ describe('FETestLibraryInstance.execute', () => {
     const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG);
 
     await expect(instance.execute(invokeWhenProxy)).rejects.toThrow('queue execution failed');
+  });
+
+  it('throws BridgeError with fallback message when empty-queue fails without message', async () => {
+    const page = createMockPage({
+      execResult: { type: 'error' },
+    });
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG);
+
+    await expect(instance.execute(invokeWhenProxy)).rejects.toThrow('Unknown error');
+  });
+
+  it('returns empty array when feLogs is undefined (fallback)', async () => {
+    const page = createMockPage({
+      execResult: { type: 'success' },
+    });
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG);
+
+    const logs = await instance.execute(invokeWhenProxy);
+    expect(logs).toEqual([]);
   });
 });
 
@@ -311,6 +386,53 @@ describe('FETestLibraryInstance.getShellInstance', () => {
     const shell = instance.getShellInstance();
 
     expect(shell).toBeUndefined();
+  });
+
+  it('returns WorkZone detection info after toShell()', async () => {
+    const page = createMockPage();
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG);
+
+    instance.toShell();
+    const shell = instance.getShellInstance();
+
+    expect(shell).toEqual({ isWorkZone: true, hasShell: true, hasIframe: true });
+  });
+});
+
+describe('FETestLibraryInstance.toShell / toApp', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('toShell() sets WorkZone detected to true', async () => {
+    const page = createMockPage();
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG);
+
+    instance.toShell();
+
+    expect(instance.getShellInstance()).toBeDefined();
+  });
+
+  it('toApp() sets WorkZone detected to false', async () => {
+    const page = createMockPage();
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG);
+
+    instance.toShell();
+    expect(instance.getShellInstance()).toBeDefined();
+
+    instance.toApp();
+    expect(instance.getShellInstance()).toBeUndefined();
+  });
+
+  it('setWorkZoneDetected(true) enables shell instance', async () => {
+    const page = createMockPage();
+    const instance = await initializeFETestLibrary(asPage(page), VALID_CONFIG);
+
+    instance.setWorkZoneDetected(true);
+    expect(instance.getShellInstance()).toBeDefined();
+
+    instance.setWorkZoneDetected(false);
+    expect(instance.getShellInstance()).toBeUndefined();
   });
 });
 
