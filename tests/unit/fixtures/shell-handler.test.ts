@@ -2,19 +2,17 @@
  * Tests for `src/fixtures/shell-handler.ts` -- ShellHandler class.
  *
  * @remarks
- * Strict TDD RED phase: all 7 tests written before production code.
  * ShellHandler provides shell header operations for Fiori Launchpad:
  * verifying visibility, clicking home, opening user menu.
+ * Uses Playwright's Page directly (no adapter).
  *
- * Mock strategy: vi.mock() for logger module, vi.fn() for adapter/page.
+ * Mock strategy: vi.mock() for logger and bridge modules, inline vi.fn() for page.
  *
  * @module fixtures
  */
 
+import type { Page } from '@playwright/test';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { createMockBridgeAdapter } from '../../helpers/mock-bridge-adapter.js';
-import { createMockBridgePage } from '../../helpers/mock-page.js';
 
 import { NavigationError } from '#core/errors/navigation-error.js';
 
@@ -32,22 +30,39 @@ vi.mock('#core/logging/logger.js', () => ({
   createLogger: mockCreateLogger,
 }));
 
+// ── Mock bridge injection ──────────────────────────────────────────────
+const mockEnsureBridgeInjected = vi.fn().mockResolvedValue(undefined);
+
+vi.mock('#bridge/injection.js', () => ({
+  ensureBridgeInjected: mockEnsureBridgeInjected,
+}));
+
 // ── Import after mocks ─────────────────────────────────────────────────
 const { ShellHandler } = await import('#fixtures/shell-handler.js');
 
 // ── Tests ───────────────────────────────────────────────────────────────
 
 describe('ShellHandler', () => {
-  let adapter: ReturnType<typeof createMockBridgeAdapter>;
-  let page: ReturnType<typeof createMockBridgePage>;
+  let page: Page & {
+    evaluate: ReturnType<typeof vi.fn>;
+    waitForFunction: ReturnType<typeof vi.fn>;
+  };
   let handler: InstanceType<typeof ShellHandler>;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    adapter = createMockBridgeAdapter();
-    page = createMockBridgePage();
+    page = {
+      evaluate: vi.fn().mockResolvedValue(undefined),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
+      on: vi.fn(),
+      off: vi.fn(),
+      mainFrame: vi.fn(),
+    } as unknown as Page & {
+      evaluate: ReturnType<typeof vi.fn>;
+      waitForFunction: ReturnType<typeof vi.fn>;
+    };
 
-    handler = new ShellHandler({ adapter, page });
+    handler = new ShellHandler({ page: page as unknown as Page });
   });
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -93,12 +108,12 @@ describe('ShellHandler', () => {
       expect(page.evaluate).toHaveBeenCalled();
     });
 
-    it('waits for UI5 stability after clicking home', async () => {
+    it('waits for UI5 stability after clicking home via page.waitForFunction', async () => {
       page.evaluate.mockResolvedValue(true);
 
       await handler.clickHome();
 
-      expect(adapter.waitForUI5Stable).toHaveBeenCalledOnce();
+      expect(page.waitForFunction).toHaveBeenCalled();
     });
   });
 

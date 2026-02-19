@@ -55,14 +55,15 @@ export interface StabilityFixtures {
 }
 
 /**
- * Worker fixture types required by stability fixtures.
+ * Dependency fixture types required by stability fixtures.
  *
  * @remarks
  * These come from coreTest via mergeTests and are declared here
- * so TypeScript knows the fixture dependency chain.
+ * as `{ option: true }` placeholders (PW-MERGE-1 pattern) so
+ * they don't collide with the real definitions in coreTest.
  */
-interface StabilityWorkerFixtures {
-  /** Validated, frozen Praman configuration. */
+interface StabilityDeps {
+  /** Validated, frozen Praman configuration (from coreTest). */
   pramanConfig: Readonly<PramanConfig>;
 }
 
@@ -91,7 +92,11 @@ interface StabilityWorkerFixtures {
  * });
  * ```
  */
-export const stabilityTest = base.extend<StabilityFixtures, StabilityWorkerFixtures>({
+export const stabilityTest = base.extend<StabilityFixtures, StabilityDeps>({
+  // Placeholder — provided by coreTest via mergeTests (PW-MERGE-1)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
+  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
+
   requestInterceptor: [
     async ({ page, pramanConfig }: { page: Page; pramanConfig: Readonly<PramanConfig> }, use) => {
       const patterns = [...DEFAULT_IGNORE_PATTERNS, ...pramanConfig.ignoreAutoWaitUrls];
@@ -144,4 +149,4 @@ export const stabilityTest = base.extend<StabilityFixtures, StabilityWorkerFixtu
   ],
 });
 
-export type { StabilityWorkerFixtures };
+export type { StabilityDeps as StabilityWorkerFixtures };

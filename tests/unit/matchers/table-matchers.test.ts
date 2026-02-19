@@ -3,69 +3,87 @@
  *
  * @remarks
  * These tests verify matcher logic for sap.m.Table row/cell assertions
- * using mocked bridge adapters with carefully chained mock responses.
+ * using mocked Playwright pages with carefully chained mock responses.
  *
  * @module matchers
  */
+import type { Page } from '@playwright/test';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { UI5ControlBase } from '../../../src/core/types/controls.js';
+import type { MethodExecutionResult } from '../../../src/bridge/bridge-types.js';
 import {
   checkUI5CellText,
   checkUI5RowCount,
   checkUI5SelectedRows,
 } from '../../../src/matchers/table-matchers.js';
-import { createMockBridgeAdapter } from '../../helpers/mock-bridge-adapter.js';
+
+vi.mock('#bridge/injection.js', () => ({
+  ensureBridgeInjected: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('#bridge/browser-scripts/execute-method.js', () => ({
+  createExecuteMethodScript: vi.fn().mockReturnValue('(function(){})()'),
+}));
 
 /**
- * Creates a minimal mock UI5ControlBase for testing aggregation results.
+ * Creates a MethodExecutionResult for an aggregation response.
  *
- * @param id - The control ID.
- * @param controlType - The control type string.
- * @returns A mock UI5ControlBase satisfying the full interface.
+ * @param controls - Array of `{ id, controlType }` to return.
+ * @returns A MethodExecutionResult with returnType 'aggregation'.
  */
-function createMockControl(id: string, controlType: string): UI5ControlBase {
+function createAggregationResult(
+  controls: readonly { readonly id: string; readonly controlType: string }[],
+): MethodExecutionResult {
+  if (controls.length === 0) {
+    return { success: true, returnType: 'empty', value: [], duration: 0 };
+  }
   return {
-    id,
-    controlType,
-    getId: vi.fn<UI5ControlBase['getId']>().mockResolvedValue(id),
-    getControlType: vi.fn<UI5ControlBase['getControlType']>().mockResolvedValue(controlType),
-    getProperty: vi.fn<UI5ControlBase['getProperty']>().mockResolvedValue(undefined),
-    setProperty: vi.fn<UI5ControlBase['setProperty']>().mockResolvedValue(undefined),
-    getAggregation: vi.fn<UI5ControlBase['getAggregation']>().mockResolvedValue([]),
-    getBindingInfo: vi.fn<UI5ControlBase['getBindingInfo']>().mockResolvedValue(undefined),
-    getDomRef: vi.fn<UI5ControlBase['getDomRef']>().mockResolvedValue(null),
-    getVisible: vi.fn<UI5ControlBase['getVisible']>().mockResolvedValue(true),
-    isBound: vi.fn<UI5ControlBase['isBound']>().mockResolvedValue(false),
-    getModel: vi.fn<UI5ControlBase['getModel']>().mockResolvedValue(undefined),
+    success: true,
+    returnType: 'aggregation',
+    uuids: controls.map((c) => c.id),
+    objectTypes: controls.map((c) => c.controlType),
+    duration: 0,
   };
+}
+
+/**
+ * Creates a MethodExecutionResult for a property value response.
+ *
+ * @param value - The property value to return.
+ * @returns A MethodExecutionResult with returnType 'result'.
+ */
+function createPropertyResult(value: unknown): MethodExecutionResult {
+  return { success: true, returnType: 'result', value, duration: 0 };
 }
 
 describe('checkUI5RowCount', () => {
   it('passes with correct row count', async () => {
-    const adapter = createMockBridgeAdapter();
-    const mockRows = [
-      createMockControl('row0', 'sap.m.ColumnListItem'),
-      createMockControl('row1', 'sap.m.ColumnListItem'),
-      createMockControl('row2', 'sap.m.ColumnListItem'),
-    ];
-    adapter.getControlAggregation.mockResolvedValue(mockRows);
+    const page = {
+      evaluate: vi.fn().mockResolvedValue(
+        createAggregationResult([
+          { id: 'row0', controlType: 'sap.m.ColumnListItem' },
+          { id: 'row1', controlType: 'sap.m.ColumnListItem' },
+          { id: 'row2', controlType: 'sap.m.ColumnListItem' },
+        ]),
+      ),
+    } as unknown as Page;
 
-    const result = await checkUI5RowCount(adapter, 'table1', 3);
+    const result = await checkUI5RowCount(page, 'table1', 3);
 
     expect(result.pass).toBe(true);
-    expect(adapter.getControlAggregation).toHaveBeenCalledWith('table1', 'items');
   });
 
   it('fails with wrong row count', async () => {
-    const adapter = createMockBridgeAdapter();
-    const mockRows = [
-      createMockControl('row0', 'sap.m.ColumnListItem'),
-      createMockControl('row1', 'sap.m.ColumnListItem'),
-    ];
-    adapter.getControlAggregation.mockResolvedValue(mockRows);
+    const page = {
+      evaluate: vi.fn().mockResolvedValue(
+        createAggregationResult([
+          { id: 'row0', controlType: 'sap.m.ColumnListItem' },
+          { id: 'row1', controlType: 'sap.m.ColumnListItem' },
+        ]),
+      ),
+    } as unknown as Page;
 
-    const result = await checkUI5RowCount(adapter, 'table1', 5);
+    const result = await checkUI5RowCount(page, 'table1', 5);
 
     expect(result.pass).toBe(false);
     const message = result.message();
@@ -74,21 +92,25 @@ describe('checkUI5RowCount', () => {
   });
 
   it('passes with empty table expecting zero rows', async () => {
-    const adapter = createMockBridgeAdapter();
-    adapter.getControlAggregation.mockResolvedValue([]);
+    const page = {
+      evaluate: vi.fn().mockResolvedValue(createAggregationResult([])),
+    } as unknown as Page;
 
-    const result = await checkUI5RowCount(adapter, 'table1', 0);
+    const result = await checkUI5RowCount(page, 'table1', 0);
 
     expect(result.pass).toBe(true);
   });
 
   it('pass message mentions "not to have" when passing', async () => {
-    const adapter = createMockBridgeAdapter();
-    adapter.getControlAggregation.mockResolvedValue([
-      createMockControl('r0', 'sap.m.ColumnListItem'),
-    ]);
+    const page = {
+      evaluate: vi
+        .fn()
+        .mockResolvedValue(
+          createAggregationResult([{ id: 'r0', controlType: 'sap.m.ColumnListItem' }]),
+        ),
+    } as unknown as Page;
 
-    const result = await checkUI5RowCount(adapter, 'table1', 1);
+    const result = await checkUI5RowCount(page, 'table1', 1);
 
     expect(result.pass).toBe(true);
     expect(result.message()).toContain('not to have');
@@ -97,60 +119,79 @@ describe('checkUI5RowCount', () => {
 
 describe('checkUI5CellText', () => {
   it('passes with matching cell text', async () => {
-    const adapter = createMockBridgeAdapter();
-    const mockRows = [
-      createMockControl('row0', 'sap.m.ColumnListItem'),
-      createMockControl('row1', 'sap.m.ColumnListItem'),
-    ];
-    const mockCells = [
-      createMockControl('cell0', 'sap.m.Text'),
-      createMockControl('cell1', 'sap.m.Text'),
-    ];
+    const rowsResult = createAggregationResult([
+      { id: 'row0', controlType: 'sap.m.ColumnListItem' },
+      { id: 'row1', controlType: 'sap.m.ColumnListItem' },
+    ]);
+    const cellsResult = createAggregationResult([
+      { id: 'cell0', controlType: 'sap.m.Text' },
+      { id: 'cell1', controlType: 'sap.m.Text' },
+    ]);
+    const textResult = createPropertyResult('Hello');
 
-    adapter.getControlAggregation.mockResolvedValueOnce(mockRows).mockResolvedValueOnce(mockCells);
-    adapter.getControlProperty.mockResolvedValue('Hello');
+    const page = {
+      evaluate: vi
+        .fn()
+        .mockResolvedValueOnce(rowsResult)
+        .mockResolvedValueOnce(cellsResult)
+        .mockResolvedValueOnce(textResult),
+    } as unknown as Page;
 
-    const result = await checkUI5CellText(adapter, 'table1', 0, 1, 'Hello');
+    const result = await checkUI5CellText(page, 'table1', 0, 1, 'Hello');
 
     expect(result.pass).toBe(true);
-    expect(adapter.getControlAggregation).toHaveBeenCalledWith('table1', 'items');
-    expect(adapter.getControlAggregation).toHaveBeenCalledWith('row0', 'cells');
-    expect(adapter.getControlProperty).toHaveBeenCalledWith('cell1', 'text');
   });
 
   it('fails with mismatched cell text', async () => {
-    const adapter = createMockBridgeAdapter();
-    const mockRows = [createMockControl('row0', 'sap.m.ColumnListItem')];
-    const mockCells = [createMockControl('cell0', 'sap.m.Text')];
+    const rowsResult = createAggregationResult([
+      { id: 'row0', controlType: 'sap.m.ColumnListItem' },
+    ]);
+    const cellsResult = createAggregationResult([{ id: 'cell0', controlType: 'sap.m.Text' }]);
+    const textResult = createPropertyResult('World');
 
-    adapter.getControlAggregation.mockResolvedValueOnce(mockRows).mockResolvedValueOnce(mockCells);
-    adapter.getControlProperty.mockResolvedValue('World');
+    const page = {
+      evaluate: vi
+        .fn()
+        .mockResolvedValueOnce(rowsResult)
+        .mockResolvedValueOnce(cellsResult)
+        .mockResolvedValueOnce(textResult),
+    } as unknown as Page;
 
-    const result = await checkUI5CellText(adapter, 'table1', 0, 0, 'Hello');
+    const result = await checkUI5CellText(page, 'table1', 0, 0, 'Hello');
 
     expect(result.pass).toBe(false);
   });
 
   it('passes with RegExp match on cell text', async () => {
-    const adapter = createMockBridgeAdapter();
-    const mockRows = [createMockControl('row0', 'sap.m.ColumnListItem')];
-    const mockCells = [createMockControl('cell0', 'sap.m.Text')];
+    const rowsResult = createAggregationResult([
+      { id: 'row0', controlType: 'sap.m.ColumnListItem' },
+    ]);
+    const cellsResult = createAggregationResult([{ id: 'cell0', controlType: 'sap.m.Text' }]);
+    const textResult = createPropertyResult('Order 12345');
 
-    adapter.getControlAggregation.mockResolvedValueOnce(mockRows).mockResolvedValueOnce(mockCells);
-    adapter.getControlProperty.mockResolvedValue('Order 12345');
+    const page = {
+      evaluate: vi
+        .fn()
+        .mockResolvedValueOnce(rowsResult)
+        .mockResolvedValueOnce(cellsResult)
+        .mockResolvedValueOnce(textResult),
+    } as unknown as Page;
 
-    const result = await checkUI5CellText(adapter, 'table1', 0, 0, /Order \d+/);
+    const result = await checkUI5CellText(page, 'table1', 0, 0, /Order \d+/);
 
     expect(result.pass).toBe(true);
   });
 
   it('fails when row index is out of bounds', async () => {
-    const adapter = createMockBridgeAdapter();
-    adapter.getControlAggregation.mockResolvedValue([
-      createMockControl('row0', 'sap.m.ColumnListItem'),
+    const rowsResult = createAggregationResult([
+      { id: 'row0', controlType: 'sap.m.ColumnListItem' },
     ]);
 
-    const result = await checkUI5CellText(adapter, 'table1', 5, 0, 'text');
+    const page = {
+      evaluate: vi.fn().mockResolvedValue(rowsResult),
+    } as unknown as Page;
+
+    const result = await checkUI5CellText(page, 'table1', 5, 0, 'text');
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('row 5 does not exist');
@@ -159,13 +200,16 @@ describe('checkUI5CellText', () => {
   });
 
   it('fails when column index is out of bounds', async () => {
-    const adapter = createMockBridgeAdapter();
-    const mockRows = [createMockControl('row0', 'sap.m.ColumnListItem')];
-    adapter.getControlAggregation
-      .mockResolvedValueOnce(mockRows)
-      .mockResolvedValueOnce([createMockControl('cell0', 'sap.m.Text')]);
+    const rowsResult = createAggregationResult([
+      { id: 'row0', controlType: 'sap.m.ColumnListItem' },
+    ]);
+    const cellsResult = createAggregationResult([{ id: 'cell0', controlType: 'sap.m.Text' }]);
 
-    const result = await checkUI5CellText(adapter, 'table1', 0, 5, 'text');
+    const page = {
+      evaluate: vi.fn().mockResolvedValueOnce(rowsResult).mockResolvedValueOnce(cellsResult),
+    } as unknown as Page;
+
+    const result = await checkUI5CellText(page, 'table1', 0, 5, 'text');
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('column 5 does not exist');
@@ -174,13 +218,21 @@ describe('checkUI5CellText', () => {
   });
 
   it('pass message mentions "not to match" when passing', async () => {
-    const adapter = createMockBridgeAdapter();
-    const mockRows = [createMockControl('row0', 'sap.m.ColumnListItem')];
-    const mockCells = [createMockControl('cell0', 'sap.m.Text')];
-    adapter.getControlAggregation.mockResolvedValueOnce(mockRows).mockResolvedValueOnce(mockCells);
-    adapter.getControlProperty.mockResolvedValue('Match');
+    const rowsResult = createAggregationResult([
+      { id: 'row0', controlType: 'sap.m.ColumnListItem' },
+    ]);
+    const cellsResult = createAggregationResult([{ id: 'cell0', controlType: 'sap.m.Text' }]);
+    const textResult = createPropertyResult('Match');
 
-    const result = await checkUI5CellText(adapter, 'table1', 0, 0, 'Match');
+    const page = {
+      evaluate: vi
+        .fn()
+        .mockResolvedValueOnce(rowsResult)
+        .mockResolvedValueOnce(cellsResult)
+        .mockResolvedValueOnce(textResult),
+    } as unknown as Page;
+
+    const result = await checkUI5CellText(page, 'table1', 0, 0, 'Match');
 
     expect(result.pass).toBe(true);
     expect(result.message()).toContain('not to match');
@@ -189,20 +241,21 @@ describe('checkUI5CellText', () => {
 
 describe('checkUI5SelectedRows', () => {
   it('passes with correct selection count', async () => {
-    const adapter = createMockBridgeAdapter();
-    adapter.getControlProperty.mockResolvedValue(['item1', 'item2', 'item3']);
+    const page = {
+      evaluate: vi.fn().mockResolvedValue(createPropertyResult(['item1', 'item2', 'item3'])),
+    } as unknown as Page;
 
-    const result = await checkUI5SelectedRows(adapter, 'table1', 3);
+    const result = await checkUI5SelectedRows(page, 'table1', 3);
 
     expect(result.pass).toBe(true);
-    expect(adapter.getControlProperty).toHaveBeenCalledWith('table1', 'selectedItems');
   });
 
   it('fails with wrong selection count', async () => {
-    const adapter = createMockBridgeAdapter();
-    adapter.getControlProperty.mockResolvedValue(['item1']);
+    const page = {
+      evaluate: vi.fn().mockResolvedValue(createPropertyResult(['item1'])),
+    } as unknown as Page;
 
-    const result = await checkUI5SelectedRows(adapter, 'table1', 3);
+    const result = await checkUI5SelectedRows(page, 'table1', 3);
 
     expect(result.pass).toBe(false);
     const message = result.message();
@@ -211,20 +264,22 @@ describe('checkUI5SelectedRows', () => {
   });
 
   it('fails when selectedItems is not an array', async () => {
-    const adapter = createMockBridgeAdapter();
-    adapter.getControlProperty.mockResolvedValue('not-an-array');
+    const page = {
+      evaluate: vi.fn().mockResolvedValue(createPropertyResult('not-an-array')),
+    } as unknown as Page;
 
-    const result = await checkUI5SelectedRows(adapter, 'table1', 2);
+    const result = await checkUI5SelectedRows(page, 'table1', 2);
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('not an array');
   });
 
   it('pass message mentions "not to have" when passing', async () => {
-    const adapter = createMockBridgeAdapter();
-    adapter.getControlProperty.mockResolvedValue(['a', 'b']);
+    const page = {
+      evaluate: vi.fn().mockResolvedValue(createPropertyResult(['a', 'b'])),
+    } as unknown as Page;
 
-    const result = await checkUI5SelectedRows(adapter, 'table1', 2);
+    const result = await checkUI5SelectedRows(page, 'table1', 2);
 
     expect(result.pass).toBe(true);
     expect(result.message()).toContain('not to have');

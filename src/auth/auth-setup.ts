@@ -69,10 +69,7 @@ setup('SAP authentication', async ({ page, context }) => {
     ? (process.env['SAP_CLOUD_PASSWORD'] ?? '')
     : (process.env['SAP_ONPREM_PASSWORD'] ?? '');
 
-  // Playwright's Page is a structural superset of AuthPage. The only type
-  // mismatch is waitForFunction return type (ElementHandle vs void). Auth
-  // strategies only await this method and discard the return value.
-  // @ts-expect-error -- Page satisfies AuthPage at runtime; TS strict sees return type mismatch
+  // Playwright's Page is a structural superset of AuthPage.
   const authPage: AuthPage = page;
 
   await handler.login(authPage, {

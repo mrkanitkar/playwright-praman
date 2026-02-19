@@ -13,9 +13,8 @@
  * - `matcherRegistration` — registers custom UI5 matchers (auto)
  *
  * Test-scoped fixtures (created per test):
- * - `bridgeAdapter` — BridgeAdapter per test with navigation listener
  * - `pramanLogger` — child logger per test
- * - `ui5` — UI5 handler placeholder (full UI5Handler in B3c)
+ * - `ui5` — UI5Handler for control discovery, interaction, and lifecycle
  *
  * @example
  * ```typescript
@@ -31,13 +30,27 @@
  * @module fixtures
  */
 
-import { test as base } from '@playwright/test';
-import type { Frame, Page } from '@playwright/test';
+import { expect, test as base } from '@playwright/test';
+import type { Frame } from '@playwright/test';
 import type { Logger } from 'pino';
 
-import { createBridgeAdapter } from '#bridge/adapter-factory.js';
-import type { BridgeAdapter, BridgePage } from '#bridge/adapter.js';
+import {
+  checkUI5CellText,
+  checkUI5RowCount,
+  checkUI5SelectedRows,
+} from '../matchers/table-matchers.js';
+import {
+  checkUI5Enabled,
+  checkUI5Property,
+  checkUI5Text,
+  checkUI5ValueState,
+  checkUI5Visible,
+} from '../matchers/ui5-matchers.js';
+
+import { UI5Handler } from './ui5-handler.js';
+
 import { resetPageInjection } from '#bridge/injection.js';
+import { createInteractionStrategy } from '#bridge/interaction-strategies/strategy-factory.js';
 import { assertMinVersion, getPlaywrightFeatures } from '#core/compat/index.js';
 import type { PlaywrightFeatures } from '#core/compat/index.js';
 import { loadConfig } from '#core/config/index.js';
@@ -54,19 +67,15 @@ const MIN_PLAYWRIGHT_VERSION = '1.50.0';
  *
  * @remarks
  * Each fixture is created per test and torn down after the test completes.
- * - `bridgeAdapter` — fresh adapter per test with navigation re-injection
  * - `pramanLogger` — child logger scoped to the test
- * - `ui5` — placeholder for UI5Handler (resolves to BridgeAdapter until B3c)
+ * - `ui5` — UI5Handler for control discovery, interaction, and lifecycle
  */
 interface TestFixtures {
-  /** BridgeAdapter created and initialized per test. */
-  bridgeAdapter: BridgeAdapter;
-
   /** Child logger scoped to the current test. */
   pramanLogger: Logger;
 
-  /** UI5 handler placeholder — provides adapter access until B3c wires UI5Handler. */
-  ui5: BridgeAdapter;
+  /** UI5Handler providing control(), controls(), click(), fill(), waitFor(), etc. */
+  ui5: UI5Handler;
 }
 
 /**
@@ -96,35 +105,6 @@ interface WorkerFixtures {
   /** Registers custom UI5 + table matchers via expect.extend() once per worker. */
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- Playwright fixtures use void for side-effect-only fixtures
   matcherRegistration: void;
-}
-
-/**
- * Adapts a Playwright Page to the BridgePage interface.
- *
- * @remarks
- * Playwright's `Page.waitForFunction()` returns `Promise<ElementHandle>`
- * while `BridgePage.waitForFunction()` returns `Promise<void>`. This
- * wrapper discards the return value to satisfy the BridgePage contract.
- *
- * @param page - Playwright Page from the fixture system
- * @returns A BridgePage-compatible wrapper
- *
- * @example
- * ```typescript
- * const bridgePage = toBridgePage(page);
- * await adapter.init(bridgePage);
- * ```
- */
-function toBridgePage(page: Page): BridgePage {
-  return {
-    evaluate: page.evaluate.bind(page) as BridgePage['evaluate'],
-    async waitForFunction(
-      pageFunction: string | (() => unknown),
-      options?: { readonly timeout?: number; readonly polling?: number },
-    ): Promise<void> {
-      await page.waitForFunction(pageFunction, options);
-    },
-  };
 }
 
 /**
@@ -195,9 +175,16 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
   matcherRegistration: [
     // eslint-disable-next-line no-empty-pattern -- Playwright fixture pattern: ({}, use) is required when no deps
     async ({}, use) => {
-      // Matcher registration via expect.extend() will be wired here
-      // in a later phase. This registers UI5-specific custom matchers
-      // (toHaveUI5Text, toBeUI5Visible, etc.) and table matchers.
+      expect.extend({
+        toHaveUI5Text: checkUI5Text,
+        toBeUI5Visible: checkUI5Visible,
+        toBeUI5Enabled: checkUI5Enabled,
+        toHaveUI5Property: checkUI5Property,
+        toHaveUI5ValueState: checkUI5ValueState,
+        toHaveUI5RowCount: checkUI5RowCount,
+        toHaveUI5CellText: checkUI5CellText,
+        toHaveUI5SelectedRows: checkUI5SelectedRows,
+      });
       await use();
     },
     { scope: 'worker', auto: true },
@@ -205,38 +192,40 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
 
   // ── Test-scoped fixtures ──────────────────────────────────────────
 
-  bridgeAdapter: async ({ rootLogger, page }, use) => {
-    const logger = createLogger('bridge', rootLogger);
-    const bridgePage = toBridgePage(page);
-    const adapter = createBridgeAdapter();
-    await adapter.init(bridgePage);
-
-    // Listen for main frame navigation to reset bridge injection state.
-    // After navigation the injected bridge script is gone, so the next
-    // adapter call must re-inject.
-    const navigationListener = (frame: Frame): void => {
-      if (frame === page.mainFrame()) {
-        logger.debug('Main frame navigated — clearing bridge injection state');
-        resetPageInjection(bridgePage);
-      }
-    };
-    page.on('framenavigated', navigationListener);
-
-    await use(adapter);
-
-    // Teardown: remove listener and destroy adapter
-    page.off('framenavigated', navigationListener);
-    await adapter.destroy();
-  },
-
   pramanLogger: async ({ rootLogger }, use) => {
     const logger = createLogger('test', rootLogger);
     await use(logger);
   },
 
-  ui5: async ({ bridgeAdapter }, use) => {
-    // Placeholder — full UI5Handler wired in B3c (A9)
-    await use(bridgeAdapter);
+  ui5: async ({ page, pramanConfig, rootLogger }, use) => {
+    const logger = createLogger('bridge', rootLogger);
+    const strategy = createInteractionStrategy(pramanConfig.interactionStrategy);
+
+    // Listen for main frame navigation to reset bridge injection state.
+    // After navigation the injected bridge script is gone, so the next
+    // bridge operation must re-inject.
+    const navigationListener = (frame: Frame): void => {
+      if (frame === page.mainFrame()) {
+        logger.debug('Main frame navigated — clearing bridge injection state');
+        resetPageInjection(page);
+      }
+    };
+    page.on('framenavigated', navigationListener);
+
+    const handler = new UI5Handler({
+      page,
+      interactionStrategy: strategy,
+      discoveryStrategies: pramanConfig.discoveryStrategies,
+      config: {
+        ui5WaitTimeout: pramanConfig.ui5WaitTimeout,
+        controlDiscoveryTimeout: pramanConfig.controlDiscoveryTimeout,
+      },
+    });
+
+    await use(handler);
+
+    // Teardown: remove navigation listener
+    page.off('framenavigated', navigationListener);
   },
 });
 

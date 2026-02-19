@@ -68,12 +68,13 @@ function createDefaultMethods(
 export function createMockUI5Control(overrides?: Partial<UI5ControlBase>): UI5ControlBase {
   const id = overrides?.id ?? 'mockControl-001';
   const controlType = overrides?.controlType ?? DEFAULT_CONTROL_TYPE;
-  return {
-    id,
-    controlType,
-    ...createDefaultMethods(id, controlType),
-    ...overrides,
-  };
+  // createDefaultMethods() provides all required UI5ControlBase methods.
+  // Object.assign preserves the type annotation while applying overrides.
+  return Object.assign(
+    { id, controlType },
+    createDefaultMethods(id, controlType),
+    overrides,
+  ) as UI5ControlBase;
 }
 
 /**

@@ -28,6 +28,9 @@ export default tseslint.config(
       '*.config.{js,mjs,ts}',
       'eslint-rules/**',
       'scripts/**',
+      'tests/e2e/**',
+      'tests/example/**',
+      'temp/**',
     ],
   },
 

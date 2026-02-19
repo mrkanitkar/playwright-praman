@@ -1,10 +1,13 @@
 /**
- * Node-side bridge injection engine (W14: lazy-only injection).
+ * Node-side bridge injection engine (W14: lazy + eager injection).
  *
  * @remarks
  * Manages the lifecycle of bridge injection into the browser context.
- * All injection is lazy — triggered on first UI5 operation, not at
- * fixture initialization (page is `about:blank` at that point).
+ * Supports two injection modes:
+ *
+ * - **Lazy** (default): Triggered on first UI5 operation via `ensureBridgeInjected()`.
+ * - **Eager**: Registered via `addInitScript()` before any page loads,
+ *   ensuring the bridge is available as soon as UI5 initializes.
  *
  * Pattern: Every adapter public method calls `ensureBridgeInjected()`
  * before executing browser operations (W19).
@@ -12,12 +15,62 @@
  * @module bridge
  */
 
-import type { BridgePage } from './adapter.js';
+import type { BrowserContext, Page } from '@playwright/test';
+
 import { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS } from './bridge-constants.js';
 import { createBridgeInjectionScript } from './browser-scripts/inject-ui5.js';
 
-/** Tracks which pages have been injected (WeakSet avoids memory leaks). */
-const injectedPages = new WeakSet<BridgePage>();
+/** Tracks which pages have been lazily injected (WeakSet avoids memory leaks). */
+const injectedPages = new WeakSet<Page>();
+
+/** Tracks which targets have been eagerly injected via `addInitScript()`. */
+const eagerInjectedTargets = new WeakSet<Page | BrowserContext>();
+
+/**
+ * Eagerly injects the bridge via `addInitScript()`.
+ *
+ * @remarks
+ * Uses Playwright's `addInitScript()` to inject the bridge code before any
+ * page loads. This ensures the bridge is available even when UI5 loads before
+ * test code runs (e.g., during page navigation or SPA routing).
+ *
+ * The eager script includes a poller that waits for `sap.ui.require` to become
+ * available, then initializes the bridge. This handles the timing gap between
+ * page load and UI5 framework initialization.
+ *
+ * Idempotent --- calling multiple times on the same target is a no-op.
+ *
+ * @param target - Playwright Page or BrowserContext to inject into.
+ *
+ * @example
+ * ```typescript
+ * // Inject before any navigation (recommended for auth flows)
+ * await injectBridgeEager(page);
+ * await page.goto('https://sap-system.example.com/app');
+ * // Bridge is already available when UI5 loads
+ * ```
+ */
+export async function injectBridgeEager(target: Page | BrowserContext): Promise<void> {
+  if (eagerInjectedTargets.has(target)) {
+    return;
+  }
+
+  const bridgeScript = createBridgeInjectionScript();
+
+  const eagerScript = `(function waitForUI5AndInject() {
+  function tryInject() {
+    if (typeof sap !== 'undefined' && sap.ui && typeof sap.ui.require === 'function') {
+      ${bridgeScript}
+    } else {
+      setTimeout(tryInject, ${String(BRIDGE_TIMEOUTS.POLLING_INTERVAL)});
+    }
+  }
+  tryInject();
+})();`;
+
+  await target.addInitScript(eagerScript);
+  eagerInjectedTargets.add(target);
+}
 
 /**
  * Checks whether the bridge is ready on the given page.
@@ -31,7 +84,7 @@ const injectedPages = new WeakSet<BridgePage>();
  * if (!ready) await injectBridge(page);
  * ```
  */
-export async function isBridgeReady(page: BridgePage): Promise<boolean> {
+export async function isBridgeReady(page: Page): Promise<boolean> {
   const ns = BRIDGE_GLOBALS.NAMESPACE;
   return page.evaluate<boolean>(`!!(window.${ns} && window.${ns}.ready)`);
 }
@@ -52,7 +105,7 @@ export async function isBridgeReady(page: BridgePage): Promise<boolean> {
  * // Bridge is now ready for operations
  * ```
  */
-export async function injectBridge(page: BridgePage): Promise<void> {
+export async function injectBridge(page: Page): Promise<void> {
   const timeout = BRIDGE_TIMEOUTS.INJECTION;
   const readyFlag = BRIDGE_GLOBALS.READY_FLAG;
 
@@ -86,7 +139,7 @@ export async function injectBridge(page: BridgePage): Promise<void> {
  * await ensureBridgeInjected(page);
  * ```
  */
-export async function ensureBridgeInjected(page: BridgePage): Promise<void> {
+export async function ensureBridgeInjected(page: Page): Promise<void> {
   if (injectedPages.has(page)) {
     return;
   }
@@ -108,7 +161,7 @@ export async function ensureBridgeInjected(page: BridgePage): Promise<void> {
  * // Next ensureBridgeInjected() call will re-inject
  * ```
  */
-export function resetPageInjection(page: BridgePage): void {
+export function resetPageInjection(page: Page): void {
   injectedPages.delete(page);
 }
 
@@ -123,7 +176,7 @@ export function resetPageInjection(page: BridgePage): void {
  * await waitForBridgeReady(page, 5000);
  * ```
  */
-export async function waitForBridgeReady(page: BridgePage, timeout?: number): Promise<void> {
+export async function waitForBridgeReady(page: Page, timeout?: number): Promise<void> {
   const readyFlag = BRIDGE_GLOBALS.READY_FLAG;
   await page.waitForFunction(`window.${readyFlag} === true`, {
     timeout: timeout ?? BRIDGE_TIMEOUTS.INJECTION,

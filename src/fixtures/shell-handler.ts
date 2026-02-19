@@ -12,7 +12,7 @@
  * ```typescript
  * import { ShellHandler } from '#fixtures/shell-handler.js';
  *
- * const shell = new ShellHandler({ adapter, page });
+ * const shell = new ShellHandler({ page });
  * await shell.expectShellHeader();
  * await shell.clickHome();
  * await shell.openUserMenu();
@@ -21,9 +21,11 @@
  * @module fixtures
  */
 
+import type { Page } from '@playwright/test';
 import type { Logger } from 'pino';
 
-import type { BridgeAdapter, BridgePage } from '#bridge/adapter.js';
+import { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS } from '#bridge/bridge-constants.js';
+import { ensureBridgeInjected } from '#bridge/injection.js';
 import { NavigationError } from '#core/errors/navigation-error.js';
 import { createLogger } from '#core/logging/logger.js';
 
@@ -32,12 +34,11 @@ import { createLogger } from '#core/logging/logger.js';
  *
  * @example
  * ```typescript
- * const options: ShellHandlerOptions = { adapter, page };
+ * const options: ShellHandlerOptions = { page };
  * ```
  */
 export interface ShellHandlerOptions {
-  readonly adapter: BridgeAdapter;
-  readonly page: BridgePage;
+  readonly page: Page;
 }
 
 /**
@@ -50,18 +51,16 @@ export interface ShellHandlerOptions {
  *
  * @example
  * ```typescript
- * const shell = new ShellHandler({ adapter, page });
+ * const shell = new ShellHandler({ page });
  * await shell.expectShellHeader();
  * await shell.clickHome();
  * ```
  */
 export class ShellHandler {
-  private readonly adapter: BridgeAdapter;
-  private readonly page: BridgePage;
+  private readonly page: Page;
   private readonly log: Logger;
 
   constructor(options: ShellHandlerOptions) {
-    this.adapter = options.adapter;
     this.page = options.page;
     this.log = createLogger('shell-handler');
   }
@@ -130,7 +129,29 @@ export class ShellHandler {
       /* v8 ignore stop */
     );
 
-    await this.adapter.waitForUI5Stable();
+    await this.waitForUI5Stable();
+  }
+
+  /**
+   * Waits for UI5 to become stable via page.waitForFunction().
+   */
+  private async waitForUI5Stable(): Promise<void> {
+    await ensureBridgeInjected(this.page);
+    const ns = BRIDGE_GLOBALS.NAMESPACE;
+    await this.page.waitForFunction(
+      `(function() {
+        var bridge = window.${ns};
+        if (!bridge) return false;
+        if (typeof sap === 'undefined' || !sap.ui) return false;
+        try {
+          var pending = sap.ui.getCore().getUIDirty();
+          return !pending;
+        } catch (e) {
+          return true;
+        }
+      })()`,
+      { timeout: BRIDGE_TIMEOUTS.UI5_STABLE },
+    );
   }
 
   /**

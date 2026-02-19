@@ -6,11 +6,13 @@
  * The cache is always checked first (tier 0), then configured strategies
  * are tried in priority order. On success, the discovered proxy is cached.
  *
+ * Uses `page.evaluate()` directly with browser scripts — no adapter layer.
+ *
  * Strategy chain (W9/W20):
  * - `cache` — always first (internal, tier 0)
  * - `direct-id` — strips selector to id-only for fastest `getById()` path
  * - `recordreplay` — passes full selector for `RecordReplay.findDOMElementByControlSelector()`
- * - `registry` — Phase 3+ placeholder (skipped)
+ * - `registry` — full registry scan with enhanced matching (GAP-02/GAP-21)
  *
  * @example
  * ```typescript
@@ -18,7 +20,8 @@
  *
  * const proxy = await discoverControl(
  *   { id: 'btn1' },
- *   adapter,
+ *   page,
+ *   interactionStrategy,
  *   cache,
  *   ['recordreplay', 'direct-id'],
  * );
@@ -27,36 +30,80 @@
  * @module proxy
  */
 
-import type { ControlProxyCache } from './cache.js';
-import { getDiscoveryPriorities } from './discovery-factory.js';
-import { createControlProxy } from './dynamic-proxy.js';
+import type { Page } from '@playwright/test';
 
-import type { BridgeAdapter } from '#bridge/adapter.js';
-import type { BridgeControlRef } from '#bridge/bridge-types.js';
+import type { ControlProxyCache } from './cache.js';
+import { createControlProxy } from './control-proxy.js';
+import { getDiscoveryPriorities } from './discovery-factory.js';
+
+import { BRIDGE_GLOBALS } from '#bridge/bridge-constants.js';
+import type { ControlDiscoveryResult } from '#bridge/bridge-types.js';
+import { browserFindControl } from '#bridge/browser-scripts/find-control-fn.js';
+import { ensureBridgeInjected } from '#bridge/injection.js';
+import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
+import { filterMethods } from '#bridge/method-blacklist.js';
 import type { DiscoveryStrategyName } from '#core/config/schema.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
 
 /**
- * Attempts a single discovery strategy against the adapter.
+ * Attempts a single discovery strategy via direct `page.evaluate()`.
  *
- * @returns The control ref, or `null` if the strategy did not find it.
+ * @param strategy - The strategy name to attempt.
+ * @param selector - The UI5 selector to search for.
+ * @param page - Playwright Page for browser evaluation.
+ * @param preferVisibleControls - When true, prefer visible controls in registry scan.
+ * @returns The discovery result, or `null` if the strategy did not find it.
+ *
+ * @example
+ * ```typescript
+ * const result = await tryStrategy('registry', { controlType: 'sap.m.Button' }, page, true);
+ * ```
  */
 async function tryStrategy(
   strategy: string,
   selector: UI5Selector,
-  adapter: BridgeAdapter,
-): Promise<BridgeControlRef | null> {
+  page: Page,
+  preferVisibleControls: boolean,
+): Promise<ControlDiscoveryResult | null> {
   if (strategy === 'direct-id') {
     if (selector.id === undefined) return null;
-    return adapter.findControl({ id: selector.id });
+    // Function-form page.evaluate uses CDP Runtime.callFunctionOn (GAP-01).
+    // Pass id-only selector for fastest getById() path.
+    const result = await page.evaluate(browserFindControl, {
+      selector: { id: selector.id },
+      bridgeNs: BRIDGE_GLOBALS.NAMESPACE,
+      preferVisibleControls,
+    });
+    if (result.id === '') return null;
+    return result;
   }
 
   if (strategy === 'recordreplay') {
-    return adapter.findControl(selector);
+    // Pass full selector for RecordReplay.findDOMElementByControlSelector().
+    const result = await page.evaluate(browserFindControl, {
+      selector: { ...selector },
+      bridgeNs: BRIDGE_GLOBALS.NAMESPACE,
+      preferVisibleControls,
+    });
+    if (result.id === '') return null;
+    return result;
   }
 
-  // 'registry' and unknown strategies are no-ops (Phase 3+)
+  if (strategy === 'registry') {
+    // Full registry scan with enhanced matching (GAP-02/GAP-21).
+    // Forces Tier 2 as the primary path, skipping Tier 1 direct-id.
+    const result = await page.evaluate(browserFindControl, {
+      selector: { ...selector },
+      bridgeNs: BRIDGE_GLOBALS.NAMESPACE,
+      preferVisibleControls,
+      forceRegistryScan: true,
+    });
+    if (result.id === '') return null;
+    return result;
+  }
+
+  // Unknown strategies are no-ops
   return null;
 }
 
@@ -64,18 +111,22 @@ async function tryStrategy(
  * Discovers a control by selector using the configured strategy chain.
  *
  * @param selector - The UI5Selector to search for.
- * @param adapter - Bridge adapter for control lookup.
+ * @param page - Playwright Page for direct browser calls.
+ * @param interactionStrategy - Interaction strategy for press/enterText/select routing.
  * @param cache - Proxy cache for fast repeat lookups.
  * @param discoveryStrategies - Configured strategy names from PramanConfig.
+ * @param preferVisibleControls - When true, prefer visible controls in registry scan (default: true).
  * @returns The discovered proxy, or `null` if not found.
  *
  * @example
  * ```typescript
  * const control = await discoverControl(
  *   { controlType: 'sap.m.Button', properties: { text: 'Save' } },
- *   adapter,
+ *   page,
+ *   interactionStrategy,
  *   cache,
  *   ['recordreplay'],
+ *   true,
  * );
  * if (control) {
  *   const text = await control.getText();
@@ -84,9 +135,11 @@ async function tryStrategy(
  */
 export async function discoverControl(
   selector: UI5Selector,
-  adapter: BridgeAdapter,
+  page: Page,
+  interactionStrategy: InteractionStrategy,
   cache: ControlProxyCache,
   discoveryStrategies: readonly DiscoveryStrategyName[],
+  preferVisibleControls = true,
 ): Promise<UI5ControlBase | null> {
   // Tier 0: Cache lookup
   const cached = cache.get(selector);
@@ -94,29 +147,33 @@ export async function discoverControl(
     return cached;
   }
 
+  // Ensure bridge is injected before any page.evaluate() calls
+  await ensureBridgeInjected(page);
+
   // Build priority chain (W9/W20) and try each strategy in order
   const priorities = getDiscoveryPriorities(selector, discoveryStrategies);
-  let controlRef: BridgeControlRef | null = null;
+  let discoveryResult: ControlDiscoveryResult | null = null;
 
   for (const strategy of priorities) {
     if (strategy === 'cache') continue; // Already handled above
-    controlRef = await tryStrategy(strategy, selector, adapter);
-    if (controlRef !== null) break;
+    discoveryResult = await tryStrategy(strategy, selector, page, preferVisibleControls);
+    if (discoveryResult !== null) break;
   }
 
-  if (controlRef === null) {
+  if (discoveryResult === null) {
     return null;
   }
 
-  // Get available methods for the proxy
-  const methods = await adapter.getAvailableMethods(controlRef.id);
+  // Filter methods through blacklist
+  const methods = filterMethods(discoveryResult.methods);
 
-  // Create proxy
+  // Create proxy with page + interaction strategy for full functionality
   const proxy = createControlProxy({
-    id: controlRef.id,
-    controlType: controlRef.controlType,
+    id: discoveryResult.id,
+    controlType: discoveryResult.controlType,
     methods: new Set(methods),
-    adapter,
+    page,
+    interactionStrategy,
   });
 
   // Cache the proxy for future lookups

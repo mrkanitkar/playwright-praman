@@ -1,10 +1,13 @@
 /**
- * Browser scripts for UI5 control method execution.
+ * Browser scripts for UI5 control method execution (string-form).
  *
  * @remarks
  * Generates JavaScript strings for executing methods on UI5 controls and
  * non-control objects with 7-type return detection (A.4) and special-case
  * aggregation handling (A.6) for ComboBox, MultiComboBox, PlanningCalendar.
+ *
+ * These string-form scripts are used by `ui5-handler.ts` (Path B).
+ * For function-form scripts (preferred), see `execute-method-fn.ts`.
  *
  * @module bridge/browser-scripts
  */
@@ -144,27 +147,35 @@ export function createExecuteMethodScript(): string {
       }
 
       if (typeof result.getId === 'function' && typeof result.getParent === 'function') {
-        return {
-          success: true,
-          returnType: 'newElement',
-          value: { id: result.getId() },
-          duration: duration
-        };
+        var resultId = result.getId();
+        var existingControl = bridge.getById(resultId);
+        if (existingControl) {
+          var meta = result.getMetadata ? result.getMetadata() : null;
+          var typeName = meta && meta.getName ? meta.getName() : 'unknown';
+          return {
+            success: true,
+            returnType: 'newElement',
+            value: { id: resultId, controlType: typeName },
+            duration: duration
+          };
+        }
+        // Not in element registry — fall through to object storage
+        // (e.g., ManagedObject subclasses not yet rendered, or non-Element objects
+        // like BindingContext that happen to have getId/getParent)
       }
 
       var uuid = bridge.saveObject(result, 'object');
-      var collapsed;
-      try {
-        collapsed = JSON.parse(JSON.stringify(result, bridge.getCircularReplacer()));
-      } catch (e) {
-        collapsed = { _serializationError: true };
-      }
+      // Do NOT JSON.stringify non-serializable objects — objects like
+      // sap.ui.model.Context reference the entire model tree and deep
+      // serialization blocks the main thread for seconds, risking
+      // "Execution context destroyed" errors. The proxy only needs the
+      // UUID to call methods on the saved object via the bridge.
       return {
         success: true,
         returnType: 'object',
         uuid: uuid,
         objectType: typeof result,
-        value: collapsed,
+        value: null,
         duration: duration
       };
     } catch (e) {

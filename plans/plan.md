@@ -2,14 +2,14 @@
 
 ## Architecture & Rebuild Plan
 
-| Property         | Value                                                           |
-| ---------------- | --------------------------------------------------------------- |
-| **Document ID**  | PRAMAN-ARCH-PLAN-001                                            |
-| **Version**      | 2.1.0                                                           |
-| **Status**       | 🟢 Phase 1 COMPLETE — 511 tests, 40 test files, 36 source files |
-| **Author**       | Principal Architect                                             |
-| **Created**      | 2025-02-14                                                      |
-| **Last Updated** | 2026-02-16                                                      |
+| Property         | Value                                                                     |
+| ---------------- | ------------------------------------------------------------------------- |
+| **Document ID**  | PRAMAN-ARCH-PLAN-001                                                      |
+| **Version**      | 3.0.0                                                                     |
+| **Status**       | 🟢 Phase 3 COMPLETE — 1,394 tests, 99 test files, 109 source files, 1 E2E |
+| **Author**       | Principal Architect                                                       |
+| **Created**      | 2025-02-14                                                                |
+| **Last Updated** | 2026-02-19 (Post-Phase 3 Architect Review)                                |
 
 ---
 
@@ -103,7 +103,7 @@ This document defines the architecture and implementation plan for **Praman v1.0
 
 - **AI-First**: Native support for AI agents (GitHub Copilot, LLM-based test generators) as first-class consumers alongside human testers.
 - **Enterprise-Grade**: Strict TypeScript, comprehensive logging, security hardening, and SAP/Playwright certification readiness.
-- **Future-Proof**: Bridge adapters decouple from specific Playwright/UI5 versions; Web Component support designed in from day one.
+- **Future-Proof**: Browser scripts decouple from specific UI5 versions; `PlaywrightCompat` layer decouples from Playwright versions. Bridge adapter abstraction was removed in Phase 3 as premature — browser scripts are the correct abstraction boundary.
 - **Plug-and-Play**: Single `npm install playwright-praman` — zero-config defaults with progressive disclosure of advanced options.
 
 ### Origin
@@ -116,7 +116,7 @@ Praman (registered as `playwright-praman` on npm) is a port of [wdi5](https://ui
 | --- | --------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | **Single package** (`playwright-praman`) with sub-path exports — not a monorepo                                                   |
 | D2  | **Internal fixture composition** — all fixtures in one package, conditionally loaded                                              |
-| D3  | **Version-negotiated bridge adapters** — Classic UI5 + WebComponent + Hybrid                                                      |
+| D3  | ~~**Version-negotiated bridge adapters**~~ — REMOVED Phase 3: adapter was premature abstraction, caused data loss                 |
 | D4  | **Hybrid typed proxy** — typed interfaces for top ~20 controls over dynamic Proxy                                                 |
 | D5  | **4-layer observability** — Playwright Reporter + pino + OpenTelemetry + AI telemetry                                             |
 | D6  | **Boundary validation** — Zod at external boundaries only                                                                         |
@@ -275,59 +275,84 @@ Praman (registered as `playwright-praman` on npm) is a port of [wdi5](https://ui
 
 ## 5. Target Architecture
 
-### 5.1 Architecture Overview
+### 5.1 Architecture Overview (Post-Phase 3 — Actual Implementation)
+
+> **Updated**: 2026-02-19 — Reflects actual implemented architecture after Phase 3 simplification.
+> Bridge adapter layer (ClassicUI5/WebComponent/Hybrid) was **removed** in Phase 3.
+> Evidence: 5 adapter files deleted from `src/bridge/`, confirmed by git status.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        Test Author / AI Agent                       │
 │  import { test, expect } from 'playwright-praman';                  │
-│  import { procurementAPI } from 'playwright-praman/intents';        │
+│  import { procurementAPI } from 'playwright-praman/intents';  STUB  │
 └────────────────────────────┬────────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
-│  Layer 5: AI & Intent API                   (playwright-praman/ai,  │
-│  ┌──────────────┐ ┌──────────────┐          playwright-praman/      │
-│  │ SKILL.md     │ │ Agentic      │          intents, vocabulary)    │
-│  │ Capabilities │ │ Fixture      │                                  │
-│  │ Recipes      │ │ LLM Service  │                                  │
-│  └──────────────┘ └──────────────┘                                  │
-│  ┌──────────────┐ ┌──────────────┐                                  │
-│  │ Intent       │ │ Vocabulary   │                                  │
-│  │ Wrappers     │ │ Matcher      │                                  │
-│  └──────────────┘ └──────────────┘                                  │
+│  Layer 5: AI & Intent API           ⚠️  ALL STUBS (4 LOC each)      │
+│  Sub-path exports configured but empty:                             │
+│  playwright-praman/ai, /intents, /vocabulary, /fe, /reporters       │
 ├─────────────────────────────────────────────────────────────────────┤
-│  Layer 4: Domain Fixtures                   (playwright-praman)      │
-│  ┌──────────┐ ┌────────┐ ┌──────┐ ┌────────┐ ┌─────────────┐      │
-│  │ Auth     │ │ Nav    │ │ Table│ │ OData  │ │ FE          │      │
-│  │ Fixture  │ │Fixture │ │Fixtu │ │Fixture │ │ Fixture     │      │
-│  └──────────┘ └────────┘ └──────┘ └────────┘ └─────────────┘      │
-├─────────────────────────────────────────────────────────────────────┤
-│  Layer 3: Typed Control Proxy + UI5Object Proxy                     │
+│  Layer 4: Fixtures + Auth + Navigation  ✅ IMPLEMENTED (Phase 3)    │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌───────────┐             │
+│  │ Core     │ │ Auth     │ │ Nav      │ │ Stability │             │
+│  │ Fixtures │ │ Fixtures │ │ Fixtures │ │ Fixtures  │             │
+│  │ (232 LOC)│ │ (162 LOC)│ │ (136 LOC)│ │ (219 LOC) │             │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └─────┬─────┘             │
+│       └──────────┬──┴──────────┬─┘             │                   │
+│            mergeTests() assembly               │                   │
 │  ┌──────────────────────────────────────────────────────────┐      │
-│  │  UI5Button │ UI5Input │ UI5Table │ UI5ComboBox │ ...     │      │
-│  │  (typed interfaces — auto-generated from api.json)       │      │
+│  │  UI5Handler (588 LOC) — 18 methods                       │      │
+│  │  control(), controls(), click(), fill(), press(),        │      │
+│  │  select(), getText(), getValue(), waitForUI5(),          │      │
+│  │  waitFor(), clearCache(), destroy()                      │      │
+│  └──────────────────────────┬───────────────────────────────┘      │
+│  ┌──────────────────────────┼───────────────────────────────┐      │
+│  │  Auth Handler (261 LOC)  │  Shell Handler (102 LOC)      │      │
+│  │  6 strategies (BTP SAML, │  Footer Handler (119 LOC)     │      │
+│  │  Basic, O365, API, Cert, │  WorkZone module (128 LOC)    │      │
+│  │  MultiTenant, Custom)    │  Navigation module (201 LOC)  │      │
+│  └──────────────────────────┼───────────────────────────────┘      │
+├─────────────────────────────┼───────────────────────────────────────┤
+│  Layer 3: Control Proxy + UI5Object  ✅ IMPLEMENTED (Phase 2+3)    │
+│  ┌──────────────────────────┼───────────────────────────────┐      │
+│  │  control-proxy.ts (653 LOC) — unified proxy handler      │      │
+│  │  - Inline return handling (7 types)                       │      │
+│  │  - Method forwarder caching                               │      │
+│  │  - Sub-proxy creation for aggregations/objects            │      │
+│  │  - Fluent chaining support                                │      │
 │  ├──────────────────────────────────────────────────────────┤      │
-│  │  Dynamic Proxy (single unified handler per control)       │      │
+│  │  ui5-object.ts (383 LOC) — non-control object proxy      │      │
+│  │  UI5ObjectCache (187 LOC) — TTL + LRU eviction            │      │
+│  │  discovery.ts (111 LOC) — 3-tier: cache→ID→RecordReplay  │      │
+│  │  method-filter.ts (83 LOC) — blacklist enforcement        │      │
+│  │  cache.ts (104 LOC) — control proxy cache (RegExp keys)   │      │
+│  └──────────────────────────┬───────────────────────────────┘      │
+├─────────────────────────────┼───────────────────────────────────────┤
+│  Layer 2: Bridge + Browser Scripts  ✅ IMPLEMENTED (Phase 2+3)     │
+│  ⚠️  NO adapter layer — proxy calls page.evaluate() DIRECTLY       │
+│  ┌──────────────────────────┼───────────────────────────────┐      │
+│  │  injection.ts (224 LOC) — lazy bridge injection           │      │
+│  │  browser-scripts/ (8 files, 5 active + 3 dead):          │      │
+│  │    inject-ui5.ts, find-control.ts, execute-method.ts,    │      │
+│  │    get-methods.ts, wait-for-ui5.ts                       │      │
 │  ├──────────────────────────────────────────────────────────┤      │
-│  │  UI5Object Proxy (Models, Routers, Bindings, etc.)       │      │
-│  │  ┌────────────┐ ┌────────────┐ ┌───────────────────┐    │      │
-│  │  │ AI Intro-  │ │ Object     │ │ Proxy Converter   │    │      │
-│  │  │ spection   │ │ Cache+TTL  │ │ (Ctrl↔Object)     │    │      │
-│  │  └────────────┘ └────────────┘ └───────────────────┘    │      │
-│  └──────────────────────────────────────────────────────────┘      │
-├─────────────────────────────────────────────────────────────────────┤
-│  Layer 2: Bridge Adapters                                           │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐               │
-│  │ ClassicUI5   │ │ WebComponent │ │ Hybrid       │               │
-│  │ Adapter      │ │ Adapter      │ │ Adapter      │               │
-│  │ (RecordReplay│ │ (Shadow DOM  │ │ (auto-detect │               │
-│  │  + Registry) │ │  + Custom El)│ │  per element)│               │
-│  └──────────────┘ └──────────────┘ └──────────────┘               │
-├─────────────────────────────────────────────────────────────────────┤
-│  Layer 1: Core Infrastructure                                       │
+│  │  Interaction Strategies (3):                              │      │
+│  │    UI5NativeStrategy — fire* → fireTap → DOM click       │      │
+│  │    DomFirstStrategy — DOM click + auto-detect input       │      │
+│  │    Opa5Strategy — RecordReplay.interactWithControl        │      │
+│  └──────────────────────────┬───────────────────────────────┘      │
+├─────────────────────────────┼───────────────────────────────────────┤
+│  Layer 1.5: Selectors + Matchers  ✅ IMPLEMENTED (Phase 1)         │
+│  ┌──────────────────────────┼───────────────────────────────┐      │
+│  │  Selector Engine (3 files) — ui5= prefix + parser        │      │
+│  │  Custom Matchers (3 files) — 8 matchers, expect.extend() │      │
+│  └──────────────────────────┬───────────────────────────────┘      │
+├─────────────────────────────┼───────────────────────────────────────┤
+│  Layer 1: Core Infrastructure  ✅ IMPLEMENTED (Phase 1)            │
 │  ┌─────────┐ ┌────────┐ ┌────────┐ ┌──────┐ ┌───────┐ ┌────────┐ │
 │  │ Config  │ │ Errors │ │ Logger │ │ OTel │ │ Types │ │Compat  │ │
-│  │ (Zod)   │ │(unified)│ │(pino) │ │(opt) │ │      │ │(PW ver)│ │
+│  │ (Zod)   │ │(10 sub)│ │(pino)  │ │(NoOp)│ │(199IF)│ │(PW ver)│ │
 │  └─────────┘ └────────┘ └────────┘ └──────┘ └───────┘ └────────┘ │
 ├─────────────────────────────────────────────────────────────────────┤
 │  Layer 0: Playwright Test Runner                                    │
@@ -337,339 +362,495 @@ Praman (registered as `playwright-praman` on npm) is a port of [wdi5](https://ui
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 5.2 Core Principles
+#### 5.1.1 Architecture Metrics (2026-02-19, verified from source)
 
-1. **Separation of Concerns** — Each module ≤300 LOC; SRP enforced via ESLint import rules
-2. **AI-First API Surface** — Every public API designed for both human and AI consumption; typed interfaces with TSDoc
-3. **Progressive Disclosure** — `import { test } from 'playwright-praman'` works with zero config; advanced features via sub-path exports
-4. **Version Resilience** — `BridgeAdapter` interface decouples from UI5 versions; `PlaywrightCompat` layer decouples from Playwright versions
-5. **Enterprise Compliance** — Strict TypeScript, pino logging, SBOM, npm provenance, Apache 2.0
-6. **Ground-Up Quality** — No copy-paste from v2.5.0; every line is new, tested, documented
-7. **Web-First Assertions** — All UI5 assertions use Playwright's auto-retry mechanism via `expect.extend()`. Custom matchers (`toHaveUI5Text`, `toBeUI5Visible`, `toHaveUI5Property`) poll the control until timeout — never snapshot-then-assert. _(Playwright best practice: web-first assertions eliminate flakiness from async rendering.)_
-8. **No Fixed Waits** — `page.waitForTimeout()` is **banned** for UI5 interactions. Use `waitForUI5Stable()` (polling-based) or Playwright auto-retry assertions instead. _(Playwright best practice: fixed waits are the #1 cause of flaky tests.)_
-9. **Hermetic Unit Tests** — All unit tests run without network, SAP systems, or external services. Bridge interactions are mocked via typed test doubles. Integration tests use real SAP systems; unit tests never do. _(Google Testing Blog: hermetic tests are deterministic, fast, and parallelizable.)_
-10. **Immutable Configuration** — After Zod validation, the config object is `Readonly<PramanConfig>` — no runtime mutation. Overrides use spread operators, never direct assignment. _(Google TypeScript Style Guide: prefer `readonly` for properties that should not be reassigned.)_
+| Metric            | Value                                                   | Evidence                                 |
+| ----------------- | ------------------------------------------------------- | ---------------------------------------- |
+| Source files      | 109                                                     | `find src/ -name "*.ts" \| wc -l`        |
+| Test files        | 99 (86 unit, 1 E2E, 1 integration, 11 helpers/examples) | `find tests/ -name "*.ts" \| wc -l`      |
+| Unit tests        | 1,394 passing                                           | `npm run test:unit`                      |
+| Core files        | 42 (38.5%)                                              | `src/core/`                              |
+| Bridge files      | 21 (19.3%)                                              | `src/bridge/`                            |
+| Auth files        | 13 (11.9%)                                              | `src/auth/`                              |
+| Proxy files       | 8 (7.3%)                                                | `src/proxy/`                             |
+| Fixture files     | 8 (7.3%)                                                | `src/fixtures/`                          |
+| Stub barrels      | 6 (ai, cli, fe, intents, reporters, vocabulary)         | 4 LOC each, empty                        |
+| Dead/unwired code | ~950 LOC across 9 files                                 | See Section 5.4.5                        |
+| Lint errors       | 0                                                       | `npm run lint`                           |
+| Type errors       | 0                                                       | `npm run typecheck`                      |
+| Build             | ESM + CJS + DTS, attw 6/6 exports valid                 | `npm run build && npm run check:exports` |
 
-### 5.3 Data Flow
+### 5.2 Core Principles (Original vs Actual)
+
+> **Updated**: 2026-02-19 — Annotated with implementation status and lessons learned.
+
+| #   | Principle                   | Original Statement                   | Actual Implementation                                                                                                                                                                    | Status                      |
+| --- | --------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| 1   | **Separation of Concerns**  | Each module ≤300 LOC; SRP enforced   | 2 justified exceptions: `control-proxy.ts` (653 LOC), `ui5-handler.ts` (588 LOC). Both have documented justification. All other files comply.                                            | ✅ With exceptions          |
+| 2   | **AI-First API Surface**    | Every public API for human + AI      | Types exported (199 auto-gen interfaces). AI introspection methods (describe, suggestOperations) NOT YET IMPLEMENTED on UI5Object — still on proxy only.                                 | 🔄 Partial                  |
+| 3   | **Progressive Disclosure**  | Zero-config import works             | `import { test } from 'playwright-praman'` works. Sub-path exports (`/ai`, `/intents`, `/vocabulary`, `/fe`, `/reporters`) are **stubs** — configured but empty.                         | ✅ Core, stubs for advanced |
+| 4   | **Version Resilience**      | BridgeAdapter decouples UI5 versions | **CHANGED**: Adapter removed in Phase 3. Browser scripts (`inject-ui5.ts`, `find-control.ts`) decouple UI5 versions. `PlaywrightCompat` (8 feature flags) decouples Playwright versions. | ✅ Redesigned               |
+| 5   | **Enterprise Compliance**   | Strict TS, pino, SBOM, provenance    | Strict TS ✅, pino logging ✅, SBOM ⏳ (Phase 7), npm provenance ⏳ (Phase 7), Apache 2.0 ✅                                                                                             | 🔄 Partial                  |
+| 6   | **Ground-Up Quality**       | No copy-paste from v2.5.0            | All code is new. dhikraft patterns (UI5Handler, proxy, interaction strategies) were **re-implemented** from scratch with functional style, not copy-pasted. E2E test validates parity.   | ✅                          |
+| 7   | **Web-First Assertions**    | Custom matchers with auto-retry      | 8 matchers implemented: 5 UI5 + 3 table. Wired into `expect.extend()` in `core-fixtures.ts` `matcherRegistration` worker fixture. E2E test uses custom matchers.                         | ✅                          |
+| 8   | **No Fixed Waits**          | `page.waitForTimeout()` banned       | `waitForUI5Stable()` implemented. E2E gold standard test reduced from 21 to 2 `waitForTimeout()` calls (the 2 remaining are polling loop retries).                                       | ✅                          |
+| 9   | **Hermetic Unit Tests**     | No network, no SAP systems           | 1,394 unit tests, all hermetic. Bridge mocked via `vi.fn()`. Zero network calls. E2E tests separate project.                                                                             | ✅                          |
+| 10  | **Immutable Configuration** | `Readonly<PramanConfig>`             | Config frozen via `Object.freeze()` in `core-fixtures.ts` line 131. Zod schema outputs readonly type.                                                                                    | ✅                          |
+
+### 5.3 Data Flow (Actual Implementation — Post-Phase 3)
+
+> **Updated**: 2026-02-19 — Shows actual call chain verified from source code.
+
+#### 5.3.1 Original Planned Flow (Pre-Phase 3)
+
+```
+Test → Fixture → BridgeAdapter (ClassicUI5/WebComponent/Hybrid)
+                    ↓
+              page.evaluate() via adapter.executeControlMethod()
+                    ↓
+              dynamic-proxy.ts → return-handler.ts → proxy-converter.ts
+```
+
+5 layers, 7 files in proxy chain, adapter abstraction between proxy and page.
+
+#### 5.3.2 Actual Implemented Flow (Post-Phase 3)
 
 ```
 Test Code
   │
-  ├─ ui5.button({ text: 'Save' })
+  ├─ ui5.control({ controlType: 'sap.m.Button', properties: { text: 'Save' } })
   │    │
-  │    ├─ [Layer 3] UI5Button typed proxy
-  │    │    │
-  │    │    ├─ [Layer 2] HybridAdapter.findControl(selector)
-  │    │    │    │
-  │    │    │    ├─ Detects: is this Classic UI5 or Web Component?
-  │    │    │    │
-  │    │    │    ├─ Classic: page.evaluate(() => __praman_getById(id))
-  │    │    │    │    └─ API resolver: ElementRegistry.get() → Core.byId() → RecordReplay
-  │    │    │    └─ WebComp: page.locator('ui5-button[text="Save"]')
-  │    │    │
-  │    │    └─ Returns: typed UI5Button proxy (single unified Proxy handler)
+  │    ├─ [Layer 4] UI5Handler.control(selector, options?)
+  │    │    ├─ validateSelector(selector)
+  │    │    ├─ internalWaitForUI5Stable()
+  │    │    │    ├─ ensureBridgeInjected(page)  ← injection.ts (lazy, idempotent)
+  │    │    │    └─ page.waitForFunction(stabilityScript)  ← wait-for-ui5.ts
+  │    │    ├─ discoverSingleControl(selector)
+  │    │    │    ├─ page.evaluate<ControlDiscoveryResult>(findControlScript)  ← find-control.ts
+  │    │    │    └─ page.evaluate<string[]>(getMethodsScript)  ← get-methods.ts
+  │    │    └─ createControlProxy({ id, controlType, methods, page, strategy })
+  │    │         └─ [Layer 3] control-proxy.ts — single unified Proxy handler
   │    │
   │    ├─ .press()
-  │    │    │
-  │    │    ├─ [Layer 2] Adapter executes interaction (via InteractionStrategy)
-  │    │    ├─ [Layer 1] pino logs { action: 'press', control: 'Button', dur: 45 }
-  │    │    ├─ [Layer 1] OTel span (if enabled)
-  │    │    └─ [Layer 0] Playwright test.step('Press Save button')
+  │    │    ├─ [Layer 3] getOrCreateForwarder('press')
+  │    │    ├─ [Layer 2] InteractionStrategy.press(page, controlId)
+  │    │    │    ├─ UI5NativeStrategy: firePress() → fireTap() → DOM click (3-step fallback)
+  │    │    │    ├─ DomFirstStrategy: DOM Element.click() directly
+  │    │    │    └─ Opa5Strategy: RecordReplay.interactWithControl()
+  │    │    └─ Returns: same proxy (fluent chaining)
   │    │
   │    └─ .getModel()  →  returnType: 'object'
-  │         │
-  │         ├─ [Layer 2] Browser stores object in __praman_objectMap[uuid]
-  │         ├─ [Layer 3] UI5Object.create({ uuid, type: 'sap.ui.model.json.JSONModel', page })
-  │         ├─ [Layer 3] UI5Object Proxy wraps → AI introspection available
-  │         │    ├─ .describe()  →  AI-friendly object summary
-  │         │    ├─ .getProperty('/path')  →  recursive UI5Object or value
-  │         │    └─ .methodCall()  →  proxy-converter detects Control → returns UI5ControlProxy
-  │         └─ [Layer 3] Object cache (TTL + LRU) stores proxy for reuse
+  │         ├─ [Layer 3] page.evaluate(executeMethodScript, { controlId, method: 'getModel' })
+  │         │    └─ execute-method.ts — classifies return into 7 types
+  │         ├─ [Layer 3] handleReturn(result) — INLINE in control-proxy.ts
+  │         │    ├─ 'result'/'empty'/'none' → return primitive/undefined
+  │         │    ├─ 'element'/'newElement' → return same/new control proxy
+  │         │    ├─ 'aggregation' → return array of control proxies
+  │         │    └─ 'object' → UI5Object.create({ uuid, type, page })
+  │         └─ [Layer 3] UI5ObjectCache stores by UUID (TTL + LRU)
   │
-  └─ expect(messageStrip).toHaveText('Saved')
-       └─ [Layer 0] Playwright assertion
+  ├─ expect(proxy).toHaveUI5Text('Saved')
+  │    └─ [Layer 1.5] Custom matcher: checkUI5Text() → polls via page.evaluate()
+  │
+  └─ await ui5.waitForUI5()
+       └─ [Layer 4] UI5Handler.waitForUI5()
+            ├─ ensureBridgeInjected(page)
+            └─ page.waitForFunction(stabilityScript)  ← polls getUIDirty() === false
 ```
+
+Key architectural differences from original plan:
+
+1. **No adapter middleman** — `page.evaluate()` called directly by proxy and handler
+2. **Full typed return** — `page.evaluate<ControlDiscoveryResult>()` eliminates `unknown`
+3. **Inline return handling** — has full proxy state for sub-proxy creation
+4. **Method forwarder caching** — avoids re-creating functions per property access (wdi5 insight)
+5. **UI5Handler is the orchestrator** — manages lifecycle: ensureReady → waitForStable → find → getMethods → createProxy
+
+### 5.4 Lessons Learnt — Architecture Simplification (Phase 3 Refactoring)
+
+> **Date**: 2026-02-18
+> **Scope**: Removed BridgeAdapter/BridgePage abstraction, consolidated proxy to 2 files
+> **Evidence**: Commit history main branch, dhikraft-flow-analysis.md, plan3.md section 15
+
+#### 5.4.1 Architecture Overview — Old vs New
+
+**OLD (Plan.md v2.1.0, Section 5.1):**
+
+```
+Test → Fixture → BridgeAdapter (ClassicUI5/WebComponent/Hybrid)
+                    ↓
+              page.evaluate() via adapter
+                    ↓
+              dynamic-proxy.ts → return-handler.ts → proxy-converter.ts
+```
+
+5 layers, 7 files in proxy chain, adapter abstraction between proxy and page.
+
+**NEW (Post-Simplification):**
+
+```
+Test → Fixture → UI5Handler → page.evaluate() directly
+                    ↓
+              control-proxy.ts (inline return handling + sub-proxy creation)
+```
+
+3 layers, 2 files in proxy chain, direct Page usage.
+
+| Aspect              | Old Architecture                                                                           | New Architecture                                      | Rationale                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Page type           | BridgePage (Object.assign wrapper)                                                         | Playwright Page directly                              | BridgePage added no value, just type confusion                                           |
+| Adapter layer       | ClassicUI5Adapter (353 LOC) + interface                                                    | REMOVED                                               | Adapter was pure passthrough, caused data loss bug                                       |
+| Proxy files         | 5 files (dynamic-proxy, return-handler, proxy-converter, playwright-api, ui5-object-proxy) | 2 files (control-proxy, ui5-object)                   | Consolidation eliminates inter-file data loss                                            |
+| Return handling     | Separate return-handler.ts without adapter context                                         | Inline in control-proxy.ts with full state            | CRITICAL: old handler returned raw refs, breaking sub-proxy chains                       |
+| Interaction routing | playwright-api.ts (100-method allowlist)                                                   | Explicit press/enterText/select on proxy via strategy | No allowlist maintenance, explicit is better                                             |
+| Method execution    | adapter.executeControlMethod() → result.value (STRIPPED)                                   | page.evaluate() → full MethodExecutionResult          | Fixed critical data-loss bug                                                             |
+| Handler layer       | No handler (fixture exposed bare proxy)                                                    | UI5Handler class (590 LOC)                            | Matches dhikraft's proven pattern                                                        |
+| Discovery           | proxy/discovery.ts (standalone function)                                                   | UI5Handler.discoverSingleControl() (inline)           | Handler manages lifecycle: ensureReady → waitForStable → find → getMethods → createProxy |
+
+#### 5.4.2 Core Principles — Old vs New
+
+| #   | Principle              | Old Interpretation                             | New Interpretation                                                            | Change                                           |
+| --- | ---------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------ |
+| 4   | Version Resilience     | BridgeAdapter interface decouples UI5 versions | Browser scripts decouple UI5 versions; adapter was wrong abstraction boundary | Adapter removed, scripts remain                  |
+| 1   | Separation of Concerns | Adapter = separate concern                     | Adapter was accidental complexity, not essential complexity                   | Fewer files, same concerns                       |
+| 6   | Ground-Up Quality      | Each layer independently tested                | Inline return handling tested as unit within proxy                            | Integration > isolation for tightly coupled code |
+
+#### 5.4.3 Data Flow — Old vs New
+
+**OLD Flow (ui5.control → proxy.getText()):**
+
+```
+UI5Handler.control(selector)
+  → discoverControl(selector, adapter, cache, strategies)
+    → adapter.findControl(selector)  ← adapter wraps page.evaluate
+      → page.evaluate(findControlScript)
+    → createControlProxy({ id, controlType, methods, adapter })
+      → proxy.getText() → createMethodForwarder()
+        → adapter.executeControlMethod(id, 'getText', [])
+          → page.evaluate(executeMethodScript)
+          → RETURNS result.value  ← DATA LOSS: returnType/uuids/objectTypes STRIPPED
+        → handleBridgeReturn(result)  ← receives stripped data, cannot create sub-proxies
+```
+
+**NEW Flow (ui5.control → proxy.getText()):**
+
+```
+UI5Handler.control(selector)
+  → validateSelector()
+  → internalWaitForUI5Stable()
+    → ensureBridgeInjected(page)
+    → page.waitForFunction(stabilityScript)
+  → discoverSingleControl(selector)
+    → ensureReady()
+    → internalFindControl(selector)
+      → page.evaluate<ControlDiscoveryResult>(findControlScript)  ← TYPED return
+    → internalGetAvailableMethods(controlId)
+      → page.evaluate<string[]>(getMethodsScript)
+    → createControlProxy({ id, controlType, methods, page, interactionStrategy })
+      → proxy.getText() → getOrCreateForwarder('getText')
+        → page.evaluate(executeMethodScript)  ← DIRECT page call
+        → handleReturn(result, state)  ← FULL MethodExecutionResult, creates sub-proxies
+```
+
+Key differences:
+
+1. No adapter middleman — page.evaluate() is called directly
+2. Full typed return — `page.evaluate<ControlDiscoveryResult>()` eliminates `unknown`
+3. Inline return handling — has full state for sub-proxy creation
+4. Method forwarder caching — avoids re-creating functions per access (wdi5 insight)
+
+#### 5.4.4 Key Lessons
+
+1. **Premature abstraction caused data loss**: The BridgeAdapter was designed for future WebComponent/Hybrid adapters, but it introduced a critical bug where `executeControlMethod()` returned `result.value` instead of the full `MethodExecutionResult`, stripping returnType, uuids, and objectTypes needed for sub-proxy creation.
+
+2. **dhikraft's pattern is proven**: dhikraft's single `UI5ControlProxy` class with `page.evaluate()` directly works because the proxy NEEDS full result context. Praman adopted this pattern with functional style (createControlProxy + closure state instead of class + this).
+
+3. **Adapter boundary was wrong**: The real abstraction boundary in UI5 testing is between browser scripts (which deal with UI5 API differences) and node-side proxy (which deals with Playwright API). The adapter sat between them, adding hops without adding value.
+
+4. **Inline return handling is correct**: Separating return handling into a different file required passing context (page, strategy, methods) through function parameters. Inlining it in control-proxy.ts gives natural access to the proxy's state for creating sub-proxies.
+
+5. **Fewer files, better cohesion**: Going from 5 proxy files to 2 improved cohesion. The return handler, proxy converter, and method forwarder are all tightly coupled to the proxy's state — they belong together.
+
+6. **page.evaluate() serialization is the #1 footgun**: Browser scripts must contain ALL helper functions as inner declarations. Module-level functions, imports, and closures are NOT available in the serialized function body. Unit tests give FALSE POSITIVES for this bug because they run in Node.js where module-level functions ARE accessible. Only E2E tests catch `ReferenceError: fail is not defined` errors.
+
+7. **Fixture assembly pattern works**: `mergeTests(coreTest, authTest, navTest, stabilityTest)` cleanly composes independent fixture files. Worker-scoped fixtures (config, logger, tracer, compat) run once per worker; test-scoped fixtures (ui5, pramanLogger) run per test.
+
+#### 5.4.5 Dead Code & Unwired Infrastructure Inventory
+
+> **Updated**: 2026-02-19 — Verified by grep for imports across all `src/` files.
+
+| File                                                             | LOC      | Status                                                                           | Evidence                                                                    | Recommendation                                          |
+| ---------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `src/core/utils/step-decorator.ts`                               | 79       | **DEAD** — not imported anywhere in `src/`                                       | `grep -r "step-decorator" src/` returns 0 results                           | DELETE or wire into UI5Handler methods                  |
+| `src/core/constants/control-types.ts`                            | 163      | **UNWIRED** — no barrel, no imports from `src/`                                  | No `core/constants/index.ts` barrel; not in `core/index.ts`                 | Wire into discovery or DELETE                           |
+| `src/core/constants/object-categories.ts`                        | 114      | **UNWIRED** — no barrel, no imports from `src/`                                  | Same: no barrel, no imports                                                 | Wire into UI5Object or DELETE                           |
+| `src/core/examples/documentation-example.ts`                     | 254      | **DOCUMENTATION ONLY** — never imported                                          | Example file for developers                                                 | Keep as-is (documentation)                              |
+| `src/bridge/browser-scripts/get-version.ts`                      | 47       | **DEAD** — functionality inlined in `inject-ui5.ts`                              | `inject-ui5.ts` has version detection inline; `get-version.ts` not imported | DELETE                                                  |
+| `src/bridge/browser-scripts/get-selector.ts`                     | 102      | **DEAD** — not imported by any `src/` file                                       | Tested but not wired into any flow                                          | DELETE or wire into future selector-for-element feature |
+| `src/bridge/browser-scripts/object-map.ts`                       | 104      | **DEAD** — cleanup script exists but NEVER CALLED                                | `objectMapCleanup()` exported but not invoked; **memory leak risk**         | Wire cleanup into fixture teardown or DELETE            |
+| `src/bridge/api-resolver.ts`                                     | 113      | **DEAD** — not imported in `src/`                                                | Functionality inlined in `inject-ui5.ts`; `api-resolver.ts` is standalone   | DELETE (already inlined)                                |
+| `src/core/telemetry/spans.ts`                                    | 87       | **PARTIALLY DEAD** — `createSpanName()` and `spanAttributes` exported but unused | Only `initTelemetry()` consumed from telemetry module                       | Wire spans into handler/proxy or mark as Phase 5        |
+| **6 stub barrels** (ai, cli, fe, intents, reporters, vocabulary) | 24 total | **STUBS** — placeholder `export {}` files                                        | Configured in `tsup.config.ts` and package.json exports                     | Keep as scaffolding for future phases                   |
+
+**Total dead/unwired code**: ~950 LOC across 9 files (excluding stubs and documentation example).
+
+**Memory leak risk**: `object-map.ts` defines `objectMapCleanup()` for browser-side `window._objects` Map eviction, but this function is NEVER called. Long-running test suites accumulate UI5 object references in browser memory without cleanup.
+
+#### 5.4.6 Deleted Files (Phase 3 Simplification)
+
+| Deleted File                         | LOC    | Replacement                                      |
+| ------------------------------------ | ------ | ------------------------------------------------ |
+| `src/bridge/adapter-factory.ts`      | ~80    | N/A — adapters removed                           |
+| `src/bridge/adapter.ts`              | ~50    | N/A — interface removed                          |
+| `src/bridge/classic-adapter.ts`      | ~353   | `page.evaluate()` called directly from proxy     |
+| `src/bridge/hybrid-adapter.ts`       | ~120   | N/A                                              |
+| `src/bridge/webcomponent-adapter.ts` | ~80    | N/A                                              |
+| `src/proxy/dynamic-proxy.ts`         | ~400   | Replaced by `control-proxy.ts` (653 LOC)         |
+| `src/proxy/playwright-api.ts`        | ~150   | Removed — interaction strategies handle directly |
+| `src/proxy/proxy-converter.ts`       | ~200   | Inlined in `control-proxy.ts` handleReturn()     |
+| `src/proxy/return-handler.ts`        | ~250   | Inlined in `control-proxy.ts` handleReturn()     |
+| `src/proxy/ui5-object-proxy.ts`      | ~300   | Replaced by `ui5-object.ts` (383 LOC)            |
+| **16 test files + 3 test helpers**   | ~2,000 | Replaced by new test files for new modules       |
+
+**Net result**: ~4,000 LOC removed, ~2,500 LOC added → ~1,500 LOC net reduction.
 
 ---
 
 ## 6. Module Decomposition
 
-### 6.1 Directory Structure
+### 6.1 Directory Structure (Actual — 2026-02-19)
+
+> **Updated**: Verified against actual filesystem. Files marked ⚠️ are dead/unwired.
+> Files marked 📌 are stubs (4 LOC, `export {}`). Files marked ❌ were in original plan but never created.
 
 ```
 playwright-praman/
 ├── package.json                    # Single package: "playwright-praman"
 ├── tsconfig.json                   # Strict mode, moduleResolution: "node16" (BP-TS)
 ├── tsup.config.ts                  # Multi-entry build (., /ai, /intents, /vocabulary, /fe, /reporters)
-├── eslint.config.mjs               # Flat config + eslint-plugin-security
+├── eslint.config.mjs               # Flat config + 10 plugins
 ├── vitest.config.ts                # Unit test config
-├── playwright.config.ts            # Integration test config
+├── playwright.config.ts            # E2E + integration test config
+├── tsdoc.json                      # TSDoc config (extends API Extractor)
 ├── .env.example                    # Template for SAP credentials
 ├── LICENSE                         # Apache 2.0
 ├── README.md
-├── CONTRIBUTING.md
-├── CHANGELOG.md
 │
 ├── src/
-│   ├── index.ts                    # Main entry: export { test, expect, defineConfig }
-│   │                               # BP-GOOGLE: barrel files export public API only — no deep re-exports that create circular deps
+│   ├── index.ts                    # Main barrel: test, expect, config, errors, logging, bridge, proxy, auth, nav
+│   ├── version.ts                  # PACKAGE_NAME + VERSION constants
 │   │
-│   ├── core/                       # Layer 1 — Core Infrastructure
+│   ├── core/                       # Layer 1 — Core Infrastructure (42 files)
+│   │   ├── index.ts                # Core barrel
 │   │   ├── config/
-│   │   │   ├── schema.ts           # PramanConfigSchema (Zod) — returns Readonly<PramanConfig> (BP-GOOGLE)
-│   │   │   ├── loader.ts           # loadConfig() — parse, validate, env override
+│   │   │   ├── schema.ts           # PramanConfigSchema (Zod) → Readonly<PramanConfig>
+│   │   │   ├── loader.ts           # loadConfig() — parse, validate, env override, Object.freeze()
 │   │   │   └── index.ts
 │   │   ├── errors/
 │   │   │   ├── base.ts             # PramanError base class
-│   │   │   ├── codes.ts            # BP-GOOGLE: const enum of all error codes (ERR_BRIDGE_TIMEOUT, etc.)
-│   │   │   ├── bridge-error.ts
-│   │   │   ├── control-error.ts    # BP-CLAUDE: adds lastKnownSelector, availableControls[], suggestedSelector
-│   │   │   ├── config-error.ts     # ConfigError (wraps ZodError)
-│   │   │   ├── auth-error.ts
-│   │   │   ├── navigation-error.ts
-│   │   │   ├── odata-error.ts
-│   │   │   ├── selector-error.ts
-│   │   │   ├── timeout-error.ts
-│   │   │   ├── ai-error.ts
+│   │   │   ├── codes.ts            # ErrorCode const enum (ERR_BRIDGE_TIMEOUT, etc.)
+│   │   │   ├── bridge-error.ts     # ✅ Used by bridge layer
+│   │   │   ├── control-error.ts    # ✅ Used by proxy layer — has self-healing fields
+│   │   │   ├── config-error.ts     # ✅ Used by config loader
+│   │   │   ├── auth-error.ts       # ✅ Used by auth handler
+│   │   │   ├── navigation-error.ts # ✅ Used by navigation module
+│   │   │   ├── odata-error.ts      # ✅ Available for Phase 4
+│   │   │   ├── selector-error.ts   # ✅ Used by selector parser
+│   │   │   ├── timeout-error.ts    # ✅ Used by wait helpers
+│   │   │   ├── ai-error.ts         # Available for Phase 5
 │   │   │   └── index.ts
 │   │   ├── logging/
-│   │   │   ├── logger.ts           # pino instance factory, child loggers
-│   │   │   ├── redaction.ts        # Secret field redaction paths
+│   │   │   ├── logger.ts           # ✅ pino factory, child loggers — used by fixtures
+│   │   │   ├── redaction.ts        # ✅ 14 secret redaction paths
 │   │   │   └── index.ts
 │   │   ├── telemetry/
-│   │   │   ├── otel.ts             # OpenTelemetry (opt-in, no-op when disabled)
-│   │   │   ├── spans.ts            # Span helpers
+│   │   │   ├── otel.ts             # ✅ initTelemetry() — NoOp when disabled
+│   │   │   ├── spans.ts            # ⚠️ PARTIALLY DEAD — createSpanName() unused
 │   │   │   └── index.ts
 │   │   ├── compat/
-│   │   │   ├── playwright-compat.ts # Version differences abstraction
+│   │   │   ├── playwright-compat.ts # ✅ 8 feature flags — used by core-fixtures
+│   │   │   ├── path-helpers.ts     # fileURLToPath helper for ESM __dirname
 │   │   │   └── index.ts
+│   │   ├── constants/
+│   │   │   ├── control-types.ts    # ⚠️ UNWIRED — 163 LOC, no barrel, no imports
+│   │   │   └── object-categories.ts # ⚠️ UNWIRED — 114 LOC, no barrel, no imports
 │   │   ├── types/
-│   │   │   ├── config.ts           # PramanConfig (z.infer<typeof Schema>)
-│   │   │   ├── selectors.ts        # UI5Selector (one canonical definition)
-│   │   │   ├── controls.ts         # UI5Control base types
+│   │   │   ├── config.ts           # PramanConfig type definition
+│   │   │   ├── selectors.ts        # UI5Selector canonical type
+│   │   │   ├── controls.ts         # 199 auto-generated control interfaces (5,802 LOC)
+│   │   │   ├── bridge.ts           # Bridge communication types
 │   │   │   ├── ui5-types.d.ts      # SAP UI5 global type augmentation
 │   │   │   └── index.ts
-│   │   └── utils/
-│   │       ├── wait-helpers.ts     # UI5 readiness, polling, retries
-│   │       ├── retry.ts            # BP-GOOGLE/SRE: exponential backoff + jitter helper
-│   │       ├── step-decorator.ts   # test.step() wrapper
-│   │       ├── version-compare.ts  # Semver comparison
-│   │       └── index.ts
-│   │
-│   ├── bridge/                     # Layer 2 — Bridge Adapters
-│   │   ├── adapter.ts              # BridgeAdapter interface
-│   │   ├── classic-adapter.ts      # ClassicUI5Adapter (RecordReplay, Registry)
-│   │   ├── webcomponent-adapter.ts # WebComponentAdapter (Shadow DOM, Custom Elements)
-│   │   ├── hybrid-adapter.ts       # HybridAdapter (auto-detect per element)
-│   │   ├── adapter-factory.ts      # Create adapter from detected UI5 version
-│   │   ├── injection.ts            # Browser-side script injection (eager + late)
-│   │   ├── api-resolver.ts         # Centralized 3-tier API chain (registered as __praman_getById)
-│   │   ├── method-blacklist.ts     # 88-item method blacklist (wdi5 parity)
-│   │   ├── interaction-strategies/ # Pluggable interaction strategies
-│   │   │   ├── strategy.ts         # InteractionStrategy interface
-│   │   │   ├── playwright.ts       # PlaywrightStrategy (default v3.0: fire* methods)
-│   │   │   ├── dom-first.ts        # DOMFirstStrategy (DOM clicks + auto-detect input types)
-│   │   │   ├── opa5.ts             # OPA5Strategy (RecordReplay.interactWithControl)
-│   │   │   ├── shared.ts           # Shared bridge accessor + shared fireEvent logic
-│   │   │   └── factory.ts          # InteractionStrategyFactory
-│   │   ├── browser-scripts/        # Scripts for page.evaluate()
-│   │   │   ├── inject-ui5.ts       # Setup window._ui5Bridge
-│   │   │   ├── find-control.ts     # Control lookup (integrated with discovery-factory)
-│   │   │   ├── interact.ts         # Control interaction
-│   │   │   ├── get-version.ts      # UI5 version detection
-│   │   │   ├── get-selector.ts     # Reverse selector engineering (migrated from selector-discovery.ts)
-│   │   │   └── object-map.ts       # Browser-side UUID→object storage with TTL cleanup
-│   │   └── index.ts
-│   │
-│   ├── proxy/                      # Layer 3 — Typed Control Proxy + Object Proxy
-│   │   ├── dynamic-proxy.ts        # Single unified Proxy handler (merged fluent + method interception)
-│   │   ├── ui5-object-proxy.ts     # UI5Object proxy for non-control objects (Models, Routers, Bindings)
-│   │   ├── ui5-object-cache.ts     # UUID-based cache with TTL + LRU eviction
-│   │   ├── browser-object-map.ts   # Browser-side object storage lifecycle (cleanup/WeakRef)
-│   │   ├── proxy-converter.ts      # Bidirectional: UI5Object ↔ UI5ControlProxy conversion
-│   │   ├── typed/                  # Auto-generated typed interfaces
-│   │   │   ├── ui5-button.ts
-│   │   │   ├── ui5-input.ts
-│   │   │   ├── ui5-table.ts
-│   │   │   ├── ui5-combobox.ts
-│   │   │   ├── ui5-select.ts
-│   │   │   ├── ui5-checkbox.ts
-│   │   │   ├── ui5-radio-button.ts
-│   │   │   ├── ui5-text-area.ts
-│   │   │   ├── ui5-date-picker.ts
-│   │   │   ├── ui5-generic-tile.ts
-│   │   │   ├── ui5-list.ts
-│   │   │   ├── ui5-icon-tab-bar.ts
-│   │   │   ├── ui5-dialog.ts
-│   │   │   ├── ui5-message-strip.ts
-│   │   │   ├── ui5-smart-table.ts
-│   │   │   ├── ui5-smart-filter-bar.ts
-│   │   │   ├── ui5-dynamic-page.ts
-│   │   │   ├── ui5-overflow-toolbar.ts
-│   │   │   ├── ui5-multi-input.ts
+│   │   ├── utils/
+│   │   │   ├── wait-helpers.ts     # ✅ waitForUI5Bootstrap, waitForUI5Stable — used by ui5-handler
+│   │   │   ├── retry.ts            # ✅ Exponential backoff + jitter — used by auth-handler
+│   │   │   ├── step-decorator.ts   # ⚠️ DEAD CODE — 79 LOC, not imported anywhere in src/
+│   │   │   ├── version-compare.ts  # ✅ Semver comparison
+│   │   │   ├── constants.ts        # ✅ DEFAULT_TIMEOUTS
 │   │   │   └── index.ts
-│   │   ├── cache.ts                # Control proxy cache (LRU, RegExp-safe keys)
-│   │   ├── discovery.ts            # 3-tier: registry → ID → RecordReplay (integrated with factory)
-│   │   ├── discovery-factory.ts    # Control discovery strategy selection (5 strategies)
+│   │   └── examples/
+│   │       └── documentation-example.ts  # Documentation only (254 LOC)
+│   │
+│   ├── bridge/                     # Layer 2 — Bridge + Browser Scripts (21 files)
+│   │   ├── index.ts                # Bridge barrel
+│   │   ├── injection.ts            # ✅ Lazy bridge injection (224 LOC) — ensureBridgeInjected()
+│   │   ├── api-resolver.ts         # ⚠️ DEAD — 113 LOC, functionality inlined in inject-ui5.ts
+│   │   ├── method-blacklist.ts     # ✅ 88-item method blacklist
+│   │   ├── bridge-types.ts         # Bridge type definitions
+│   │   ├── bridge-constants.ts     # BRIDGE_GLOBALS, BRIDGE_TIMEOUTS, XHR_IGNORE_PATTERNS
+│   │   ├── interaction-strategies/
+│   │   │   ├── strategy.ts         # ✅ InteractionStrategy interface
+│   │   │   ├── strategy-factory.ts # ✅ createInteractionStrategy()
+│   │   │   ├── ui5-native-strategy.ts # ✅ Default — fire* → fireTap → DOM (3-step fallback)
+│   │   │   ├── dom-first-strategy.ts  # ✅ DOM click + auto-detect input
+│   │   │   └── opa5-strategy.ts       # ✅ RecordReplay.interactWithControl
+│   │   ├── browser-scripts/
+│   │   │   ├── inject-ui5.ts       # ✅ Bridge setup — window._ui5Bridge (166 LOC)
+│   │   │   ├── find-control.ts     # ✅ Control discovery script (89 LOC)
+│   │   │   ├── execute-method.ts   # ✅ Method execution + 7-type return (169 LOC)
+│   │   │   ├── get-methods.ts      # ✅ Method introspection (46 LOC)
+│   │   │   ├── wait-for-ui5.ts     # ✅ UI5 stability polling (81 LOC)
+│   │   │   ├── get-version.ts      # ⚠️ DEAD — 47 LOC, inlined in inject-ui5.ts
+│   │   │   ├── get-selector.ts     # ⚠️ DEAD — 102 LOC, not imported
+│   │   │   └── object-map.ts       # ⚠️ DEAD — 104 LOC, cleanup never called (MEMORY LEAK RISK)
+│   │   │
+│   │   │   ❌ NOT CREATED (from original plan):
+│   │   │   # interact.ts — interaction inlined in strategies
+│   │   │   # shared.ts — shared logic inlined in strategy.ts
+│   │   │
+│   │   ❌ DELETED (Phase 3 simplification):
+│   │   # adapter.ts, classic-adapter.ts, hybrid-adapter.ts
+│   │   # webcomponent-adapter.ts, adapter-factory.ts
+│   │
+│   ├── proxy/                      # Layer 3 — Control Proxy + Object Proxy (8 files)
+│   │   ├── index.ts                # Proxy barrel
+│   │   ├── control-proxy.ts        # ✅ Unified proxy handler (653 LOC) — justified exception to 300 LOC
+│   │   ├── ui5-object.ts           # ✅ Non-control object proxy (383 LOC) — justified exception
+│   │   ├── ui5-object-cache.ts     # ✅ TTL + LRU cache (187 LOC) — exported but NOT used internally
+│   │   ├── discovery.ts            # ✅ 3-tier control discovery (111 LOC)
+│   │   ├── discovery-factory.ts    # ✅ Strategy chain configuration (74 LOC)
+│   │   ├── method-filter.ts        # ✅ Blacklist enforcement (83 LOC)
+│   │   ├── cache.ts                # ✅ Control proxy cache with RegExp keys (104 LOC)
+│   │   │
+│   │   ❌ DELETED (Phase 3 simplification):
+│   │   # dynamic-proxy.ts, return-handler.ts, proxy-converter.ts
+│   │   # playwright-api.ts, ui5-object-proxy.ts
+│   │   ❌ NOT CREATED (from original plan):
+│   │   # typed/ directory (replaced by auto-gen interfaces in core/types/controls.ts)
+│   │   # browser-object-map.ts (dead object-map.ts remains in bridge/)
+│   │
+│   ├── selectors/                  # Layer 1.5 — Selector Engine (3 files)
+│   │   ├── ui5-selector-engine.ts  # ✅ Custom Playwright selector: ui5=...
+│   │   ├── selector-parser.ts      # ✅ Parse selector strings → UI5Selector
 │   │   └── index.ts
 │   │
-│   ├── selectors/                  # Selector Engine
-│   │   ├── ui5-selector-engine.ts  # Custom Playwright selector: ui5=...
-│   │   ├── selector-parser.ts      # Parse selector strings → UI5Selector
+│   ├── matchers/                   # Layer 1.5 — Custom expect matchers (3 files)
+│   │   ├── ui5-matchers.ts         # ✅ 5 matchers: Text, Visible, Enabled, Property, ValueState
+│   │   ├── table-matchers.ts       # ✅ 3 matchers: RowCount, CellText, SelectedRows
 │   │   └── index.ts
 │   │
-│   ├── matchers/                   # Custom expect matchers (BP-PLAYWRIGHT: web-first)
-│   │   ├── ui5-matchers.ts         # toHaveUI5Text, toBeUI5Visible, toHaveUI5Property
-│   │   ├── table-matchers.ts       # toHaveUI5RowCount, toHaveUI5CellText
-│   │   └── index.ts               # expect.extend() registration
+│   ├── fixtures/                   # Layer 4 — Fixtures (8 files) ✅ IMPLEMENTED
+│   │   ├── index.ts                # ✅ mergeTests(coreTest, authTest, navTest, stabilityTest) assembly
+│   │   ├── core-fixtures.ts        # ✅ Worker: config, logger, tracer, compat, selectors, matchers
+│   │   │                           #    Test: pramanLogger, ui5 (UI5Handler)
+│   │   ├── auth-fixtures.ts        # ✅ sapAuth fixture with configurable strategy
+│   │   ├── nav-fixtures.ts         # ✅ ui5Navigation fixture (tile, hash, intent nav)
+│   │   ├── stability-fixtures.ts   # ✅ Auto UI5 stability + WalkMe/analytics interception
+│   │   ├── ui5-handler.ts          # ✅ UI5Handler class — 18 methods (588 LOC)
+│   │   ├── shell-handler.ts        # ✅ FLP shell bar operations (102 LOC)
+│   │   └── footer-handler.ts       # ✅ Footer bar operations (119 LOC)
+│   │   │
+│   │   ❌ NOT CREATED (from original plan — deferred to future phases):
+│   │   # table-fixtures.ts, odata-fixtures.ts, assertion-fixtures.ts
+│   │   # interaction-fixtures.ts, shell-fixtures.ts, workzone-fixtures.ts
+│   │   # ai-fixtures.ts, intent-fixtures.ts, vocabulary-fixtures.ts, fe-fixtures.ts
 │   │
-│   ├── fixtures/                   # Layer 4 — Fixtures (assembled here)
-│   │   ├── core-fixtures.ts        # ui5, config, page enhancements
-│   │   ├── auth-fixtures.ts        # sapAuth, auth
-│   │   ├── navigation-fixtures.ts  # navigation, ui5Navigation
-│   │   ├── table-fixtures.ts       # ui5Table
-│   │   ├── odata-fixtures.ts       # odata
-│   │   ├── assertion-fixtures.ts   # ui5Assertion
-│   │   ├── interaction-fixtures.ts # ui5Interact
-│   │   ├── shell-fixtures.ts       # ui5Shell
-│   │   ├── workzone-fixtures.ts    # workzone (G6)
-│   │   ├── ai-fixtures.ts          # aiService, agentic
-│   │   ├── intent-fixtures.ts      # intentWrappers, procurementAPI
-│   │   ├── vocabulary-fixtures.ts  # vocabulary
-│   │   ├── fe-fixtures.ts          # fioriElements
-│   │   └── index.ts               # Assembles all via test.extend() chain
-│   │
-│   ├── auth/                       # Authentication
-│   │   ├── auth.setup.ts           # BP-PLAYWRIGHT: Setup project test file (produces storageState)
-│   │   ├── global-teardown.ts
+│   ├── auth/                       # Authentication (13 files) ✅ IMPLEMENTED
+│   │   ├── index.ts
+│   │   ├── auth-handler.ts         # ✅ SAPAuthHandler (261 LOC) — strategy orchestration
+│   │   ├── auth-setup.ts           # ✅ Setup project test file (storageState)
+│   │   ├── auth-teardown.ts        # ✅ Session cleanup
+│   │   ├── auth-checks.ts          # ✅ FLP/Fiori login detection (180 LOC)
+│   │   ├── auth-types.ts           # Auth type definitions
+│   │   ├── auth-errors.ts          # Auth-specific errors
 │   │   ├── strategies/
-│   │   │   ├── base.ts             # AuthStrategy interface
-│   │   │   ├── btp-saml.ts
-│   │   │   ├── basic.ts
-│   │   │   ├── office365.ts
-│   │   │   └── custom.ts
-│   │   ├── auth-handler.ts
-│   │   └── index.ts
+│   │   │   ├── index.ts            # Strategy barrel + factory
+│   │   │   ├── btp-saml.ts         # ✅ BTP SAML strategy
+│   │   │   ├── basic-auth.ts       # ✅ Basic authentication
+│   │   │   ├── office365.ts        # ✅ Office 365 / Entra ID
+│   │   │   ├── api-auth.ts         # ✅ API key authentication
+│   │   │   └── certificate-auth.ts # ✅ Client certificate authentication
+│   │   └── multi-tenant.ts         # ✅ Multi-tenant support
 │   │
-│   ├── modules/                    # UI5 Domain Operations
-│   │   ├── navigation.ts
-│   │   ├── table.ts
-│   │   ├── assertion.ts
-│   │   ├── element.ts
-│   │   ├── control.ts
-│   │   ├── date.ts
-│   │   ├── dialog.ts
-│   │   ├── odata.ts                # OData V2/V4 CRUD (optional Zod schema)
-│   │   └── index.ts
+│   ├── modules/                    # UI5 Domain Operations (3 files, mostly planned)
+│   │   ├── index.ts                # Module barrel
+│   │   ├── navigation.ts           # ✅ Tile, intent, hash navigation (201 LOC)
+│   │   └── workzone.ts             # ✅ Dual-frame bridge injection (128 LOC)
+│   │   │
+│   │   ❌ NOT CREATED (from original plan — Phase 4):
+│   │   # table.ts, assertion.ts, element.ts, control.ts
+│   │   # date.ts, dialog.ts, odata.ts
 │   │
-│   ├── fe/                         # Fiori Elements (playwright-praman/fe)
-│   │   ├── list-report.ts
-│   │   ├── object-page.ts
-│   │   └── index.ts
-│   │
-│   ├── ai/                         # AI Layer (playwright-praman/ai)
-│   │   ├── llm-service.ts          # LLM provider abstraction
-│   │   ├── method-discovery.ts     # AI-driven method discovery
-│   │   ├── recommendation.ts
-│   │   ├── agentic-handler.ts      # Autonomous multi-step operations
-│   │   ├── capabilities/
-│   │   │   ├── registry.ts
-│   │   │   └── generated.ts        # Auto-generated
-│   │   ├── recipes/
-│   │   │   ├── registry.ts
-│   │   │   └── generated.ts        # Auto-generated
-│   │   ├── schemas/                # Zod schemas for LLM response validation
-│   │   │   ├── method-discovery.ts
-│   │   │   └── recommendation.ts
-│   │   └── index.ts
-│   │
-│   ├── intents/                    # Intent API (playwright-praman/intents)
-│   │   ├── core-wrappers.ts        # fillField, clickButton, etc.
-│   │   ├── operation-catalog.ts
-│   │   ├── domains/
-│   │   │   └── procurement.ts      # Reference implementation
-│   │   └── index.ts
-│   │
-│   ├── vocabulary/                 # Vocabulary System (playwright-praman/vocabulary)
-│   │   ├── service.ts
-│   │   ├── matcher.ts              # Fuzzy matcher
-│   │   ├── loader.ts
-│   │   ├── schema.ts               # Vocabulary Zod schema (replaces Ajv)
-│   │   ├── domains/
-│   │   │   ├── procurement.json
-│   │   │   ├── sales.json
-│   │   │   ├── finance.json
-│   │   │   ├── manufacturing.json
-│   │   │   ├── master-data.json
-│   │   │   └── common.json
-│   │   └── index.ts
-│   │
-│   ├── reporters/                  # Reporters (playwright-praman/reporters)
-│   │   ├── compliance-reporter.ts
-│   │   ├── odata-trace-reporter.ts
-│   │   └── index.ts
-│   │
-│   └── cli/                        # CLI (npx playwright-praman init|doctor)
-│       ├── init.ts
-│       ├── doctor.ts
-│       ├── validator.ts
-│       └── index.ts
+│   ├── ai/index.ts                 # 📌 STUB — 4 LOC
+│   ├── cli/index.ts                # 📌 STUB — 4 LOC (NOT in tsup/exports)
+│   ├── fe/index.ts                 # 📌 STUB — 4 LOC
+│   ├── intents/index.ts            # 📌 STUB — 4 LOC
+│   ├── reporters/index.ts          # 📌 STUB — 4 LOC
+│   └── vocabulary/index.ts         # 📌 STUB — 4 LOC
 │
-├── tests/
-│   ├── unit/                       # Vitest — no browser
-│   │   ├── core/
-│   │   ├── bridge/
-│   │   ├── proxy/
-│   │   ├── selectors/
-│   │   ├── auth/
-│   │   ├── modules/
-│   │   ├── ai/
-│   │   ├── intents/
-│   │   └── vocabulary/
-│   ├── integration/                # Playwright against SAP demo apps
-│   │   ├── bridge/
-│   │   ├── proxy/
-│   │   ├── auth/
-│   │   ├── table/
-│   │   ├── navigation/
-│   │   └── behavioral/            # Golden master equivalence
-│   └── e2e/                        # Full SAP cloud scenarios
-│       └── sap-cloud/
+├── tests/                          # 99 test files
+│   ├── unit/                       # 86 unit test files — Vitest, no browser
+│   │   ├── core/                   # Config, errors, logging, telemetry, compat, types, utils
+│   │   ├── bridge/                 # Injection, strategies, browser scripts
+│   │   ├── proxy/                  # Control proxy, UI5Object, cache, discovery
+│   │   ├── selectors/              # Selector engine, parser
+│   │   ├── auth/                   # Auth handler, checks, strategies
+│   │   ├── matchers/               # UI5 + table matchers
+│   │   ├── modules/                # Navigation, workzone
+│   │   └── fixtures/               # Core, auth, nav, stability, handlers
+│   ├── integration/                # 1 integration test file
+│   │   └── bridge-smoke.spec.ts    # Partially written (165 LOC, deferred to Phase 7)
+│   ├── e2e/                        # 1 E2E test file
+│   │   └── sap-cloud/
+│   │       └── bom-e2e-gold-standard.spec.ts  # ✅ 6 steps passing (BOM CRUD)
+│   ├── example/                    # Example tests for documentation
+│   │   └── example-bom-e2e-gold-standard.spec.ts
+│   └── helpers/                    # 6 test helpers
+│       ├── mock-auth-page.ts       # Auth page mock factory
+│       ├── mock-ui5-handler.ts     # UI5Handler mock
+│       ├── mock-strategy.ts        # Interaction strategy mock
+│       ├── mock-logger.ts          # Logger mock
+│       └── ...
 │
 ├── scripts/
-│   ├── generate-typed-proxies.ts   # From SAP api.json
-│   ├── generate-skill-md.ts        # From TypeDoc output
-│   ├── generate-sbom.ts            # CycloneDX
-│   └── generate-json-schema.ts     # Config JSON Schema from Zod
+│   ├── generate-typed-proxies.ts   # ✅ Implemented (1,266 LOC) — 199 interfaces from api.json
+│   ├── generate-capabilities.ts    # ✅ Implemented (430 LOC) — TSDoc @capability extraction
+│   ├── setup-ide.ts                # ✅ Implemented (150 LOC) — interactive IDE config wizard
+│   ├── generate-skill-md.ts        # 📌 STUB — 4 LOC
+│   └── generate-json-schema.ts     # 📌 STUB — 4 LOC
 │
-├── docs/                           # Docusaurus site
-│   ├── docusaurus.config.ts
-│   ├── docs/
-│   │   ├── getting-started.md
-│   │   ├── configuration.md
-│   │   ├── ui5-controls.md
-│   │   ├── authentication.md
-│   │   ├── fiori-elements.md
-│   │   ├── ai-integration.md
-│   │   ├── intent-api.md
-│   │   ├── migration-v2-to-v3.md
-│   │   └── architecture.md
-│   └── blog/
-│
-├── skills/                         # AI Agent skill files
+├── skills/                         # AI Agent skill files (12 files)
 │   └── playwright-praman-sap-testing/
-│       ├── SKILL.md
-│       ├── ai-quick-reference.md
-│       └── examples.ts
+│       ├── skills-architect.md, skills-implementer.md, skills-tdd.md
+│       ├── skills-tester.md, skills-playwright-expert.md
+│       ├── skills-sap-ui5-expert.md, skills-sap-fiori-consultant.md
+│       ├── skills-sap-odata-expert.md, skills-sap-ui5-webcomponents-expert.md
+│       ├── skills-reviewer.md, skills-security-build.md
+│       └── skills-team-overview.md
+│
+├── plans/                          # Architecture + phase plans
+│   ├── plan.md                     # Master architecture document (this file)
+│   ├── plan3.md                    # Phase 3 detailed plan (21 batches)
+│   ├── phase1-tracker.md           # Phase 1 tracker (COMPLETE)
+│   ├── phase3-tracker.md           # Phase 3 tracker (COMPLETE)
+│   └── diagrams/                   # Architecture diagrams
+│
+├── docs/                           # ❌ Docusaurus NOT YET CREATED (Phase 6)
+│   └── documentation-standards.md  # TSDoc standards reference
 │
 └── .github/
-    ├── workflows/
-    │   ├── ci.yml                  # lint + typecheck + test:unit + build
-    │   │                           # BP-MICROSOFT: pin action versions to SHA, minimal permissions
-    │   ├── release.yml             # npm publish with provenance (via release-please)
-    │   └── docs.yml                # Docusaurus + TypeDoc → GitHub Pages
-    ├── copilot-instructions.md
-    └── CODEOWNERS
+    ├── copilot-instructions.md     # ✅ GitHub Copilot instructions
+    └── agents/                     # ✅ Copilot Coding Agent config
 ```
 
 ### 6.2 Sub-Path Exports (package.json)
@@ -1004,8 +1185,8 @@ Every decision in this plan was verified against official best practices from th
 | **Phase 0** | Architecture & Design     | 2 weeks  | ✅ COMPLETE. plan.md v2.1.0, npm v1.0.1, 10 ESLint plugins, dual ESM+CJS, 6 AI agents, 8 skill files, CI/CD 3 OS × 3 Node.                                                                                                                                                                                                                                                           |
 | **Phase 1** | Core Infrastructure       | 3 weeks  | ✅ COMPLETE. 511 tests, 40 test files, 36 source files, 12 barrels. Config (Zod), errors (10 subclasses), logging (pino+redaction), OTel (NoOp), types (199 auto-gen interfaces, 4,092 methods), PlaywrightCompat, selector engine, matchers, retry, version-compare, step-decorator, wait-helpers. 98.92% stmt coverage. **Auto-gen (D22) pulled forward from Phase 6 — COMPLETE.** |
 | **Phase 2** | Bridge + Proxy            | 4 weeks  | ✅ COMPLETE. 929 tests, 73 test files, 35 source files (23 bridge + 12 proxy). ClassicUI5Adapter (full), WebComponentAdapter (stub), HybridAdapter (delegation), 6 browser scripts, 3 interaction strategies, single unified proxy (D16), UI5Object chain (D17), API resolver (D19), discovery factory (D18), object map (D20). 99.18% stmt coverage. INT1/INT2 deferred to Phase 7. |
-| **Phase 3** | Fixtures + Auth + Nav     | 3 weeks  | All fixtures assembled, global setup, auth strategies, FLP navigation, WorkZone                                                                                                                                                                                                                                                                                                      |
-| **Phase 4** | Modules + Table + FE      | 3 weeks  | UI5 modules, Fiori Elements (ListReport, ObjectPage)                                                                                                                                                                                                                                                                                                                                 |
+| **Phase 3** | Fixtures + Auth + Nav     | 3 weeks  | ✅ COMPLETE. 1,394 tests, 99 test files, 109 source files. **Major simplification**: adapter layer removed (5 files), proxy consolidated from 5→2 files. Fixtures: core+auth+nav+stability assembled via mergeTests(). Auth: 6 strategies, SAPAuthHandler, setup project pattern. UI5Handler: 18 methods. E2E gold standard: 6 steps passing against SAP BTP cloud.                  |
+| **Phase 4** | Modules + Table + FE      | 3 weeks  | UI5 modules, Fiori Elements (ListReport, ObjectPage), dead code cleanup                                                                                                                                                                                                                                                                                                              |
 | **Phase 5** | AI + Intents + Vocabulary | 3 weeks  | LLM service, agentic fixture, registries, intent wrappers, procurement domain, vocabulary                                                                                                                                                                                                                                                                                            |
 | **Phase 6** | CLI + Reporters + Docs    | 2 weeks  | CLI, reporters, Docusaurus site, TypeDoc, SKILL.md                                                                                                                                                                                                                                                                                                                                   |
 | **Phase 7** | Hardening + Certification | 2 weeks  | SBOM, provenance, behavioral tests, benchmarks, security audit, migration guide                                                                                                                                                                                                                                                                                                      |
@@ -1047,10 +1228,10 @@ Every decision in this plan was verified against official best practices from th
 
 | Task                                 | Files                                                                    | Tests                                                  | Decision | Status |
 | ------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------ | -------- | ------ |
-| BridgeAdapter interface              | `bridge/adapter.ts`                                                      | Interface compliance                                   | D3       | ✅     |
-| ClassicUI5Adapter                    | `bridge/classic-adapter.ts`, `bridge/browser-scripts/*.ts`               | Unit tests (integration deferred to Phase 7)           | D3       | ✅     |
-| WebComponentAdapter                  | `bridge/webcomponent-adapter.ts`                                         | Stub/fallback unit tests                               | D3       | ✅     |
-| HybridAdapter + factory              | `bridge/hybrid-adapter.ts`, `bridge/adapter-factory.ts`                  | Auto-detection tests                                   | D3       | ✅     |
+| ~~BridgeAdapter interface~~          | ~~`bridge/adapter.ts`~~                                                  | ~~Interface compliance~~ **DELETED in Phase 3**        | ~~D3~~   | ❌     |
+| ~~ClassicUI5Adapter~~                | ~~`bridge/classic-adapter.ts`~~                                          | ~~Unit tests~~ **DELETED in Phase 3**                  | ~~D3~~   | ❌     |
+| ~~WebComponentAdapter~~              | ~~`bridge/webcomponent-adapter.ts`~~                                     | ~~Stub/fallback~~ **DELETED in Phase 3**               | ~~D3~~   | ❌     |
+| ~~HybridAdapter + factory~~          | ~~`bridge/hybrid-adapter.ts`, `bridge/adapter-factory.ts`~~              | ~~Auto-detection~~ **DELETED in Phase 3**              | ~~D3~~   | ❌     |
 | Bridge injection                     | `bridge/injection.ts`                                                    | Lazy-only injection (W14)                              | —        | ✅     |
 | Centralized API resolver             | `bridge/api-resolver.ts`                                                 | 3-tier chain: ElementRegistry→Core.byId→RecordReplay   | D19      | ✅     |
 | Browser object map                   | `bridge/browser-scripts/object-map.ts`                                   | TTL cleanup, no leaks                                  | D20      | ✅     |
@@ -1068,50 +1249,62 @@ Every decision in this plan was verified against official best practices from th
 | Barrel exports                       | `bridge/index.ts`, `proxy/index.ts`, `src/index.ts`                      | Export validation (attw 6/6)                           | —        | ✅     |
 | INT1/INT2 integration smoke          | Deferred to Phase 7 (requires real browser + SAP demo apps)              | —                                                      | —        | ⏳     |
 
-### Phase 3 — Fixtures + Auth + Navigation (Weeks 10–12)
+### Phase 3 — Fixtures + Auth + Navigation (Weeks 10–12) ✅ COMPLETE
 
-> **Detailed plan**: [`plans/plan3.md`](plan3.md) — 21 batches, 3 sub-phases, ~2,730 LOC, ~123 tests
->
-> **Sub-phases**: 3.1 Foundation → 3.2 Wiring+Auth → 3.3 WorkZone+Assembly
+**Completed**: 2026-02-19 | **Tests**: 1,394 | **Files**: 109 source + 99 test | **E2E**: 6/6 steps passing
+
+> **Detailed plan**: [`plans/plan3.md`](plan3.md) — 21 batches, 3 sub-phases
+> **Tracker**: [`plans/phase3-tracker.md`](phase3-tracker.md) — 19 agents, 6 waves, all COMPLETE
 > **Key decisions**: W1–W14 in plan3.md. D2 (fixture composition), D28 (setup project auth).
+> **Critical simplification**: BridgeAdapter layer REMOVED — proxy calls page.evaluate() directly.
 
-| Task                          | Files                                                                 | Tests                                                  | Status |
-| ----------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------ | ------ |
-| G2: Fix proxy stub methods    | `proxy/dynamic-proxy.ts`                                              | Bridge round-trips for getBindingInfo, getDomRef, etc. | ⏳     |
-| Wire orphaned browser scripts | `bridge/classic-adapter.ts`, `bridge/adapter.ts`                      | Object map lifecycle, selector extraction (R3)         | ⏳     |
-| Core fixtures (worker + test) | `fixtures/core-fixtures.ts`                                           | Config, logger, tracer, compat, selectors, matchers    | ⏳     |
-| Auth strategies (6)           | `auth/strategies/*.ts`, `auth/auth-factory.ts`, `auth/auth-checks.ts` | OnPrem, CloudSAML, Office365, API, Cert, MultiTenant   | ⏳     |
-| Stability fixtures            | `fixtures/stability-fixtures.ts`                                      | WalkMe/analytics interception, auto UI5 stability      | ⏳     |
-| Auth handler + setup project  | `auth/auth-handler.ts`, `auth/auth.setup.ts`, `auth/auth.teardown.ts` | D28 pattern: storageState, retry, session management   | ⏳     |
-| Auth fixtures                 | `fixtures/auth-fixtures.ts`                                           | sapAuth fixture with fixture options                   | ⏳     |
-| Navigation module             | `modules/navigation.ts`                                               | Tile, intent, hash, search, back/forward               | ⏳     |
-| Navigation fixtures           | `fixtures/nav-fixtures.ts`                                            | Step-decorated nav API, WorkZone stub                  | ⏳     |
-| WorkZone module               | `modules/workzone.ts`                                                 | Dual-frame bridge injection, context switching (G6)    | ⏳     |
-| Fixture assembly              | `fixtures/index.ts`                                                   | `mergeTests()` chain → single `test` + `expect` export | ⏳     |
-| Phase 1 infra wiring (R2)     | All fixture + auth + nav files                                        | 8/8 unconsumed modules consumed in fixture lifecycle   | ⏳     |
+| Task                              | Files                                                                 | Tests                                                                       | Status |
+| --------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------ |
+| ~~G2: Fix proxy stub methods~~    | Replaced by `control-proxy.ts` (653 LOC)                              | Full proxy lifecycle tested                                                 | ✅     |
+| ~~Wire orphaned browser scripts~~ | Adapters deleted; `object-map.ts` remains **unwired** (memory leak)   | Scripts tested individually; lifecycle wiring deferred                      | ⚠️     |
+| Core fixtures (worker + test)     | `fixtures/core-fixtures.ts` (232 LOC)                                 | Config, logger, tracer, compat, selectors, 8 matchers via expect.extend()   | ✅     |
+| Auth strategies (6)               | `auth/strategies/*.ts` (5 files), `auth/multi-tenant.ts`              | BTP SAML, Basic, O365, API, Cert, MultiTenant                               | ✅     |
+| Stability fixtures                | `fixtures/stability-fixtures.ts` (219 LOC)                            | WalkMe/analytics interception, auto UI5 stability                           | ✅     |
+| Auth handler + setup project      | `auth/auth-handler.ts` (261 LOC), `auth-setup.ts`, `auth-teardown.ts` | D28 pattern: storageState, retry, session management                        | ✅     |
+| Auth fixtures                     | `fixtures/auth-fixtures.ts` (162 LOC)                                 | sapAuth fixture with configurable strategy                                  | ✅     |
+| Navigation module                 | `modules/navigation.ts` (201 LOC)                                     | Tile, intent, hash, search, back/forward                                    | ✅     |
+| Navigation fixtures               | `fixtures/nav-fixtures.ts` (136 LOC)                                  | ui5Navigation fixture                                                       | ✅     |
+| WorkZone module                   | `modules/workzone.ts` (128 LOC)                                       | Dual-frame bridge injection, context switching (G6)                         | ✅     |
+| UI5Handler                        | `fixtures/ui5-handler.ts` (588 LOC)                                   | 18 methods: control, controls, click, fill, press, etc.                     | ✅     |
+| Shell + Footer handlers           | `fixtures/shell-handler.ts` (102), `footer-handler.ts` (119)          | FLP shell bar + footer operations                                           | ✅     |
+| Fixture assembly                  | `fixtures/index.ts` (68 LOC)                                          | `mergeTests()` → single `test` + `expect` export                            | ✅     |
+| Phase 1 infra wiring (R2)         | All fixture files                                                     | logging ✅, telemetry ✅, retry ✅, wait-helpers ✅, compat ✅, matchers ✅ | ✅     |
+| Phase 3 simplification            | 10 files deleted, `control-proxy.ts` replaces proxy chain             | Old tests deleted, new tests cover unified proxy                            | ✅     |
+| E2E gold standard                 | `tests/e2e/sap-cloud/bom-e2e-gold-standard.spec.ts`                   | 6 steps: navigate, create BOM, materials (2×), BOM usage, create            | ✅     |
 
-### Phase 4 — Modules + Table + FE (Weeks 13–15)
+### Phase 4 — Cleanup + Modules + Table + FE (Weeks 13–15)
 
-> **Prerequisites from Phase 2 Review** (2026-02-17):
->
-> WebComponentAdapter is a stub (Phase 2). Full `@ui5/webcomponents` support needed here
-> for hybrid apps that mix classic UI5 controls with Web Components.
-> `registry` discovery strategy is a no-op placeholder — implement or remove.
-> All modules consume the proxy layer (discoverControl → proxy → adapter).
+> **Updated**: 2026-02-19 — Split into Phase 4a (cleanup) and Phase 4b (modules).
+> **Prerequisites**: Phase 3 COMPLETE. Adapter layer removed. ~950 LOC dead code identified.
+> **Key change**: Web Component support needs different approach (no adapter pattern).
 
-| Task                            | Files                                    | Tests                                         | Notes                                             |
-| ------------------------------- | ---------------------------------------- | --------------------------------------------- | ------------------------------------------------- |
-| WebComponentAdapter full impl   | `bridge/webcomponent-adapter.ts`         | Shadow DOM traversal, `@ui5/webcomponents`    | Upgrade Phase 2 stub to real adapter              |
-| HybridAdapter element detection | `bridge/hybrid-adapter.ts`               | Per-element classic vs WC routing             | Phase 2 delegates all to classic; add real detect |
-| Registry discovery strategy     | `proxy/discovery.ts`                     | `registry` strategy implementation or removal | Currently a no-op (Phase 3+ placeholder)          |
-| Table operations                | `modules/table.ts`                       | Get rows, cells, filter, sort, pagination     | Uses proxy + `getControlAggregation`              |
-| Assertions                      | `modules/assertion.ts`                   | UI5-specific assertions                       | Wraps raw matchers from Phase 1                   |
-| Element operations              | `modules/element.ts`                     | Existence, visibility, properties             | —                                                 |
-| Control operations              | `modules/control.ts`                     | Properties, aggregations, bindings            | —                                                 |
-| Date handling                   | `modules/date.ts`                        | Date picker, time picker                      | —                                                 |
-| Dialog helpers                  | `modules/dialog.ts`                      | Dialog/popover interactions                   | —                                                 |
-| OData handler                   | `modules/odata.ts`                       | CRUD with optional Zod schema                 | —                                                 |
-| Fiori Elements                  | `fe/list-report.ts`, `fe/object-page.ts` | FE test library                               | —                                                 |
+**Phase 4a: Cleanup + Hardening** (all tasks parallelizable)
+
+| Task                       | Files                                                                       | Tests               | Notes                                   |
+| -------------------------- | --------------------------------------------------------------------------- | ------------------- | --------------------------------------- |
+| DELETE dead code (4 files) | `step-decorator.ts`, `api-resolver.ts`, `get-version.ts`, `get-selector.ts` | Remove orphan tests | ~340 LOC removed                        |
+| Wire/DELETE constants      | `control-types.ts`, `object-categories.ts`                                  | —                   | ~277 LOC; wire into discovery or delete |
+| Wire object-map cleanup    | `object-map.ts` → fixture teardown                                          | Lifecycle test      | Fix memory leak risk                    |
+| Matcher type augmentation  | New `matchers/types.d.ts`                                                   | Type tests          | Type-safe `expect().toHaveUI5Text()`    |
+| Create CI/CD               | `.github/workflows/ci.yml`                                                  | —                   | lint + typecheck + test:unit + build    |
+| Wire telemetry spans       | `telemetry/spans.ts` → handler/proxy                                        | —                   | OTel spans for bridge/proxy operations  |
+
+**Phase 4b: Modules + Table + FE**
+
+| Task                    | Files                                    | Tests                                     | Notes                                       |
+| ----------------------- | ---------------------------------------- | ----------------------------------------- | ------------------------------------------- |
+| Table operations        | `modules/table.ts`                       | Get rows, cells, filter, sort, pagination | Uses proxy + `getControlAggregation`        |
+| OData handler           | `modules/odata.ts`                       | CRUD with optional Zod schema             | —                                           |
+| Dialog helpers          | `modules/dialog.ts`                      | Dialog/popover interactions               | —                                           |
+| Date handling           | `modules/date.ts`                        | Date picker, time picker                  | —                                           |
+| Fiori Elements          | `fe/list-report.ts`, `fe/object-page.ts` | FE test library                           | Depends on table module                     |
+| ~~WebComponentAdapter~~ | ~~N/A~~                                  | —                                         | Adapter pattern removed; needs new approach |
+| ~~Registry discovery~~  | ~~N/A~~                                  | —                                         | Evaluate if needed without adapter pattern  |
 
 ### Phase 5 — AI + Intents + Vocabulary (Weeks 16–18)
 
@@ -1174,7 +1367,7 @@ Every decision in this plan was verified against official best practices from th
 
 Full codebase audit against plan.md, plan1.md, plan2.md. Trust source code only.
 
-**Current Metrics** (verified `npm run test:unit -- --coverage`):
+**Phase 2 Metrics** (verified `npm run test:unit -- --coverage`):
 
 | Metric     | Value                                                                        |
 | ---------- | ---------------------------------------------------------------------------- |
@@ -1204,51 +1397,65 @@ Proxy (dynamic-proxy, discovery, cache, ui5-object, converter)
 
 Verified: core never imports bridge/proxy. Bridge never imports proxy.
 
-#### R2. Phase 1 Consumption in Phase 2 — PARTIAL (by design)
+#### R2. Phase 1 Consumption — Post-Phase 3 Status
 
-| Phase 1 Module                  | Consumed by Phase 2?                                   | Deferred To |
-| ------------------------------- | ------------------------------------------------------ | ----------- |
-| `core/errors/*`                 | YES — ControlError, BridgeError used in bridge + proxy | —           |
-| `core/utils/version-compare`    | YES — used in `bridge/api-resolver.ts`                 | —           |
-| `selectors/selector-parser`     | YES — `serializeUI5Selector` used in `proxy/cache.ts`  | —           |
-| `core/config/schema`            | YES — types used across bridge + proxy                 | —           |
-| `core/logging`                  | NO — exported but not used internally                  | Phase 3     |
-| `core/telemetry`                | NO — exported but not used internally                  | Phase 3     |
-| `core/utils/retry`              | NO — exported but not used internally                  | Phase 3     |
-| `core/utils/step-decorator`     | NO — not even in main barrel                           | Phase 3     |
-| `core/utils/wait-helpers`       | NO — exported at top level only                        | Phase 3     |
-| `core/compat/playwright-compat` | NO — exported but not used internally                  | Phase 3     |
-| `selectors/ui5-selector-engine` | NO — exported, awaiting fixture registration           | Phase 3     |
-| `matchers/*`                    | NO — exported, awaiting `expect.extend()`              | Phase 3     |
+| Phase 1 Module                  | Consumed? | Where Consumed                                             | Status      |
+| ------------------------------- | --------- | ---------------------------------------------------------- | ----------- |
+| `core/errors/*`                 | ✅ YES    | bridge, proxy, auth, fixtures                              | Phase 2     |
+| `core/utils/version-compare`    | ✅ YES    | `bridge/api-resolver.ts` (dead), `inject-ui5.ts` (active)  | Phase 2     |
+| `selectors/selector-parser`     | ✅ YES    | `proxy/cache.ts`                                           | Phase 2     |
+| `core/config/schema`            | ✅ YES    | bridge, proxy, fixtures                                    | Phase 2     |
+| `core/logging`                  | ✅ YES    | `core-fixtures.ts` rootLogger, `ui5-handler.ts`            | Phase 3     |
+| `core/telemetry`                | ✅ YES    | `core-fixtures.ts` tracer (NoOp)                           | Phase 3     |
+| `core/utils/retry`              | ✅ YES    | `auth/auth-handler.ts`                                     | Phase 3     |
+| `core/utils/step-decorator`     | ❌ NO     | **DEAD CODE** — not imported anywhere in src/              | ⚠️ Phase 4a |
+| `core/utils/wait-helpers`       | ✅ YES    | `fixtures/ui5-handler.ts`                                  | Phase 3     |
+| `core/compat/playwright-compat` | ✅ YES    | `core-fixtures.ts` playwrightCompat fixture                | Phase 3     |
+| `selectors/ui5-selector-engine` | ✅ YES    | `core-fixtures.ts` selectorRegistration fixture            | Phase 3     |
+| `matchers/*`                    | ✅ YES    | `core-fixtures.ts` matcherRegistration → `expect.extend()` | Phase 3     |
 
-**Action**: Phase 3 must wire all 8 unconsumed modules into fixtures.
+**Result**: 11 of 12 Phase 1 modules consumed. Only `step-decorator.ts` remains unwired (79 LOC dead code).
 
-#### R3. Orphaned Source Files — 2 FOUND
+#### R3. Orphaned Source Files — 7 FOUND (Updated 2026-02-19)
 
-| File                                     | Status                                                        | Resolution                                                 |
-| ---------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------- |
-| `bridge/browser-scripts/object-map.ts`   | Tested but not imported by any src file, not in bridge barrel | Phase 3: wire into classic-adapter or fixture lifecycle    |
-| `bridge/browser-scripts/get-selector.ts` | Tested but not imported by any src file, not in bridge barrel | Phase 3: wire into adapter for reverse selector extraction |
+| File                                     | LOC | Status                                                             | Resolution                                      |
+| ---------------------------------------- | --- | ------------------------------------------------------------------ | ----------------------------------------------- |
+| `bridge/browser-scripts/object-map.ts`   | 104 | ⚠️ Tested but not imported; cleanup never called — **MEMORY LEAK** | Phase 4a: wire cleanup into fixture teardown    |
+| `bridge/browser-scripts/get-selector.ts` | 102 | Tested but not imported by any src file                            | Phase 4a: DELETE (functionality not needed yet) |
+| `bridge/browser-scripts/get-version.ts`  | 47  | Dead — functionality inlined in inject-ui5.ts                      | Phase 4a: DELETE                                |
+| `bridge/api-resolver.ts`                 | 113 | Dead — functionality inlined in inject-ui5.ts                      | Phase 4a: DELETE                                |
+| `core/utils/step-decorator.ts`           | 79  | Dead — not imported anywhere in src/                               | Phase 4a: wire into UI5Handler or DELETE        |
+| `core/constants/control-types.ts`        | 163 | Unwired — no barrel, no imports                                    | Phase 4a: evaluate + wire or DELETE             |
+| `core/constants/object-categories.ts`    | 114 | Unwired — no barrel, no imports                                    | Phase 4a: evaluate + wire or DELETE             |
 
-#### R4. Features Already Implemented for Future Phases
+#### R4. Features Already Implemented for Future Phases (Updated 2026-02-19)
 
-| Feature                           | Planned Phase | Actual Status     | Evidence                                           |
-| --------------------------------- | ------------- | ----------------- | -------------------------------------------------- |
-| D22 auto-gen typed proxies        | Phase 6       | ✅ Phase 1        | `scripts/generate-typed-proxies.ts` (1,266 LOC)    |
-| Capability generator              | Unplanned     | ✅ Done           | `scripts/generate-capabilities.ts` (430 LOC)       |
-| IDE setup wizard                  | Unplanned     | ✅ Done           | `scripts/setup-ide.ts` (150 LOC)                   |
-| Bridge smoke tests (INT1 partial) | Phase 2 INT1  | Partially written | `tests/integration/bridge-smoke.spec.ts` (165 LOC) |
+| Feature                           | Planned Phase | Actual Status     | Evidence                                                              |
+| --------------------------------- | ------------- | ----------------- | --------------------------------------------------------------------- |
+| D22 auto-gen typed proxies        | Phase 6       | ✅ Phase 1        | `scripts/generate-typed-proxies.ts` (1,266 LOC)                       |
+| Capability generator              | Unplanned     | ✅ Done           | `scripts/generate-capabilities.ts` (430 LOC)                          |
+| IDE setup wizard                  | Unplanned     | ✅ Done           | `scripts/setup-ide.ts` (150 LOC)                                      |
+| Bridge smoke tests (INT1 partial) | Phase 2 INT1  | Partially written | `tests/integration/bridge-smoke.spec.ts` (165 LOC)                    |
+| E2E gold standard test            | Phase 7       | ✅ Phase 3        | `tests/e2e/sap-cloud/bom-e2e-gold-standard.spec.ts` — 6 steps passing |
+| Custom matcher registration       | Phase 3       | ✅ Phase 3        | 8 matchers wired via `expect.extend()` in `core-fixtures.ts`          |
+| Auth setup project (D28)          | Phase 3       | ✅ Phase 3        | `auth/auth-setup.ts` + `playwright.config.ts` project dependencies    |
+| Fixture assembly (D2)             | Phase 3       | ✅ Phase 3        | `mergeTests(coreTest, authTest, navTest, stabilityTest)`              |
 
-#### R5. Deferred Items Tracking
+#### R5. Deferred Items Tracking (Updated 2026-02-19)
 
-| Item                             | Original Phase  | Deferred To | GitHub Issue |
-| -------------------------------- | --------------- | ----------- | ------------ |
-| INT1 bridge integration smoke    | Phase 2         | Phase 7     | #7 (parent)  |
-| INT2 proxy + SAP cloud smoke     | Phase 2         | Phase 7     | #7 (parent)  |
-| G2 proxy stub methods            | Phase 2         | Phase 3     | #22          |
-| WebComponentAdapter full support | Phase 2 (stub)  | Phase 4     | —            |
-| `registry` discovery strategy    | Phase 2 (no-op) | Phase 4     | —            |
-| CSP compliance                   | Phase 2         | Phase 7     | —            |
+| Item                             | Original Phase  | Status / Deferred To                                 | GitHub Issue |
+| -------------------------------- | --------------- | ---------------------------------------------------- | ------------ |
+| INT1 bridge integration smoke    | Phase 2         | ⏳ Phase 7                                           | #7 (parent)  |
+| INT2 proxy + SAP cloud smoke     | Phase 2         | ⏳ Phase 7                                           | #7 (parent)  |
+| G2 proxy stub methods            | Phase 2         | ✅ RESOLVED Phase 3 — replaced by `control-proxy.ts` | #22          |
+| WebComponentAdapter full support | Phase 2 (stub)  | ⏳ Phase 4b (new approach, not adapter)              | —            |
+| `registry` discovery strategy    | Phase 2 (no-op) | ⏳ Phase 4b — evaluate if still needed               | —            |
+| CSP compliance                   | Phase 2         | ⏳ Phase 7                                           | —            |
+| Dead code cleanup (~950 LOC)     | N/A             | ⏳ Phase 4a                                          | —            |
+| Object map memory leak           | Phase 2 (D20)   | ⚠️ Phase 4a (HIGH)                                   | —            |
+| CI/CD setup                      | Phase 0         | ⚠️ Phase 4a (HIGH)                                   | —            |
+| Matcher type augmentation        | Phase 3         | ⏳ Phase 4a                                          | —            |
+| `test.step()` wiring             | Phase 1         | ⏳ Phase 4a                                          | —            |
 
 #### R6. Duplicate Scope — NONE CRITICAL
 
@@ -1260,6 +1467,165 @@ Verified: core never imports bridge/proxy. Bridge never imports proxy.
 | Matchers Phase 1 vs Phase 3     | By design — raw functions (P1) wired into fixtures (P3)             |
 | Error classes in later phases   | None planned — all 10 subclasses created in Phase 1                 |
 | Config schema extensions        | By design — Zod schema is extensible, Phase 2 added strategy fields |
+
+### 11.2 Post-Phase 3 Architect Review (2026-02-19)
+
+Full codebase audit of 109 source files and 99 test files. Every statement verified against actual code.
+
+**Current Metrics** (verified from source):
+
+| Metric       | Value                                                                          |
+| ------------ | ------------------------------------------------------------------------------ |
+| Tests        | 1,394 passing (86 unit test files + 1 E2E + 1 integration)                     |
+| Source files | 109 (42 core, 3 sel, 3 mat, 21 bridge, 8 proxy, 8 fixtures, 13 auth, 11 other) |
+| Lint         | 0 errors, 0 warnings                                                           |
+| TypeCheck    | 0 errors                                                                       |
+| Build        | ESM + CJS + DTS (attw 6/6 exports valid)                                       |
+| E2E          | 1 gold standard test, 6/6 steps passing against SAP BTP cloud                  |
+
+#### R7. Phase 3 Simplification — VALIDATED
+
+| Change                     | Evidence                                                                                                              | Impact                                      |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 5 adapter files deleted    | `git status` shows `D src/bridge/adapter*.ts`, `classic-adapter.ts`, `hybrid-adapter.ts`, `webcomponent-adapter.ts`   | -680 LOC, eliminates data-loss bug          |
+| 5 proxy files deleted      | `D src/proxy/dynamic-proxy.ts`, `playwright-api.ts`, `proxy-converter.ts`, `return-handler.ts`, `ui5-object-proxy.ts` | -1,300 LOC, eliminates inter-file data loss |
+| 16 test files deleted      | Corresponding test files for deleted source                                                                           | Clean migration, no orphan references       |
+| `control-proxy.ts` created | 653 LOC unified handler, inline return handling, 7-type system                                                        | Justified 300 LOC exception                 |
+| `ui5-handler.ts` created   | 588 LOC, 18 methods, manages full control lifecycle                                                                   | Justified 300 LOC exception                 |
+
+#### R8. Design Decision Status — Post-Phase 3
+
+| #   | Decision                           | Status                 | Evidence                                                                               |
+| --- | ---------------------------------- | ---------------------- | -------------------------------------------------------------------------------------- |
+| D1  | Single package + sub-path exports  | ✅ ACTIVE              | `package.json` exports, `tsup.config.ts` 6 entries, attw 6/6                           |
+| D2  | Internal fixture composition       | ✅ ACTIVE              | `fixtures/index.ts` `mergeTests()` assembly                                            |
+| D3  | Version-negotiated bridge adapters | ❌ **REMOVED Phase 3** | Adapter files deleted; proxy calls `page.evaluate()` directly                          |
+| D4  | Hybrid typed proxy                 | ✅ ACTIVE (modified)   | 199 auto-gen interfaces (types only); dynamic proxy at runtime via `control-proxy.ts`  |
+| D5  | 4-layer observability              | 🔄 PARTIAL             | L1 test.step() not wired; L2 pino ✅; L3 OTel NoOp ✅; L4 AI telemetry ⏳              |
+| D6  | Boundary validation (Zod)          | ✅ ACTIVE              | Config boundary validated; bridge `as unknown` accepted                                |
+| D7  | Zod-validated config               | ✅ ACTIVE              | `core/config/schema.ts`, `Object.freeze()` in fixture                                  |
+| D8  | Unified error hierarchy            | ✅ ACTIVE              | 10 error subclasses in `core/errors/`, all with `retryable`, `suggestions[]`           |
+| D9  | AI Mode A + C                      | ⏳ Phase 5             | Stub barrels configured; no implementation                                             |
+| D10 | Testing: Vitest + GitHub Actions   | ✅ ACTIVE              | 1,394 Vitest tests; CI not yet configured (no `.github/workflows/ci.yml`)              |
+| D11 | No plugin API                      | ✅ ACTIVE              | No extension points exposed                                                            |
+| D12 | Auto-gen docs                      | ⏳ Phase 6             | Stubs only                                                                             |
+| D13 | Apache 2.0                         | ✅ ACTIVE              | `LICENSE` file                                                                         |
+| D14 | Playwright compat range            | ✅ ACTIVE              | `peerDependencies: ">=1.50.0 <2.0.0"`, `PlaywrightCompat` 8 flags                      |
+| D15 | Security measures                  | 🔄 PARTIAL             | eslint-plugin-security ✅; npm audit ⏳; SBOM ⏳                                       |
+| D16 | Single unified proxy               | ✅ ACTIVE              | `control-proxy.ts` single handler, no double-proxy                                     |
+| D17 | Bidirectional proxy conversion     | ✅ ACTIVE (inlined)    | Return handling in `control-proxy.ts` creates sub-proxies for objects/controls         |
+| D18 | Discovery factory integrated       | ✅ ACTIVE              | `proxy/discovery-factory.ts` + `proxy/discovery.ts`                                    |
+| D19 | Centralized API resolver           | ✅ ACTIVE (inlined)    | `__praman_getById()` registered in `inject-ui5.ts` (not separate `api-resolver.ts`)    |
+| D20 | Browser object map cleanup         | ⚠️ **NOT WIRED**       | `object-map.ts` exists but `objectMapCleanup()` never called — memory leak risk        |
+| D21 | Shared interaction logic           | ✅ ACTIVE (inlined)    | Shared logic in `strategy.ts` base, not separate `shared.ts`                           |
+| D22 | Auto-generated method signatures   | ✅ COMPLETE (Phase 1)  | `scripts/generate-typed-proxies.ts`, 199 interfaces, 4,092 methods                     |
+| D23 | skipStabilityWait config           | ✅ ACTIVE              | In `PramanConfigSchema` + per-selector override                                        |
+| D24 | exec() with new Function()         | ✅ ACTIVE              | Used in `control-proxy.ts` with ESLint disable                                         |
+| D25 | Visibility preference default      | ✅ ACTIVE              | `preferVisibleControls` in config schema                                               |
+| D26 | UI5Object AI introspection         | ⏳ NOT IMPLEMENTED     | UI5Object exists but no `describe()`, `suggestOperations()`, `getAIContext()` methods  |
+| D27 | Module size ≤300 LOC guideline     | ✅ ACTIVE              | 2 documented exceptions (control-proxy.ts, ui5-handler.ts)                             |
+| D28 | Auth via project dependencies      | ✅ ACTIVE              | `auth-setup.ts` produces storageState; `playwright.config.ts` has project dependencies |
+| D29 | Enhanced error model + AI envelope | ✅ ERRORS, ⏳ ENVELOPE | Error model complete; AI response envelope not yet needed (Phase 5)                    |
+
+#### R9. Best Practice Gaps Identified
+
+| #     | Gap                                                                  | Severity  | Best Practice Source                             | Recommendation                                              |
+| ----- | -------------------------------------------------------------------- | --------- | ------------------------------------------------ | ----------------------------------------------------------- |
+| BP-1  | No `test.step()` wrapping in UI5Handler methods                      | 🟡 Medium | Playwright: test.step() for structured reporting | Wire `step-decorator.ts` (currently dead code) into handler |
+| BP-2  | Object map cleanup never called — memory leak                        | 🟡 Medium | Google SRE: resource cleanup in lifecycle        | Wire `objectMapCleanup()` into fixture teardown             |
+| BP-3  | `UI5ObjectCache` exported but not used internally                    | 🟢 Low    | Google: don't export unused code                 | Either wire into UI5Handler or remove from barrel           |
+| BP-4  | No GitHub Actions CI configured                                      | 🔴 High   | Microsoft: CI on every PR                        | Create `.github/workflows/ci.yml`                           |
+| BP-5  | `api-resolver.ts` is dead code (inlined in inject-ui5.ts)            | 🟢 Low    | Clean code: remove dead code                     | DELETE file                                                 |
+| BP-6  | 3 dead browser scripts (get-version, get-selector, object-map)       | 🟢 Low    | Clean code: remove dead code                     | DELETE or wire                                              |
+| BP-7  | No TypeScript declaration augmentation for custom matchers           | 🟡 Medium | Playwright: type-safe expect.extend()            | Add `PlaywrightMatchers` augmentation                       |
+| BP-8  | `step-decorator.ts` is dead code                                     | 🟢 Low    | Clean code: remove dead code                     | Wire or DELETE                                              |
+| BP-9  | Constants files (`control-types.ts`, `object-categories.ts`) unwired | 🟢 Low    | Clean code: remove dead code                     | Wire or DELETE                                              |
+| BP-10 | E2E test has 2 remaining `waitForTimeout()` calls                    | 🟢 Low    | Playwright: no fixed waits                       | Replace with polling-based alternatives                     |
+
+#### R10. Current Implementation vs Original Plan
+
+| Planned Feature              | Plan Section      | Status         | Notes                                                                        |
+| ---------------------------- | ----------------- | -------------- | ---------------------------------------------------------------------------- |
+| **Core Infrastructure**      | Phase 1           | ✅ COMPLETE    | All modules implemented; 3 files unused (step-decorator, constants×2)        |
+| **Bridge Adapters**          | Phase 2/D3        | ❌ **REMOVED** | Adapters caused data-loss bug; replaced by direct `page.evaluate()`          |
+| **Browser Scripts**          | Phase 2           | ✅ IMPLEMENTED | 5 of 8 scripts actively used; 3 dead (get-version, get-selector, object-map) |
+| **Interaction Strategies**   | Phase 2/D21       | ✅ IMPLEMENTED | 3 strategies, shared base in strategy.ts                                     |
+| **Single Unified Proxy**     | Phase 2/D16       | ✅ IMPLEMENTED | `control-proxy.ts` with inline return handling                               |
+| **UI5Object + Cache**        | Phase 2/D17       | ✅ IMPLEMENTED | `ui5-object.ts` + `ui5-object-cache.ts`                                      |
+| **Discovery Factory**        | Phase 2/D18       | ✅ IMPLEMENTED | `discovery-factory.ts` + `discovery.ts`                                      |
+| **Core Fixtures**            | Phase 3           | ✅ IMPLEMENTED | Worker + test scoped, matcher registration wired                             |
+| **Auth (6 strategies)**      | Phase 3/D28       | ✅ IMPLEMENTED | Setup project pattern, 6 strategies, SAPAuthHandler                          |
+| **Navigation**               | Phase 3           | ✅ IMPLEMENTED | Module + fixture, tile/hash/intent navigation                                |
+| **Stability Fixtures**       | Phase 3           | ✅ IMPLEMENTED | WalkMe interception, auto UI5 stability                                      |
+| **WorkZone**                 | Phase 3/G6        | ✅ IMPLEMENTED | Dual-frame bridge injection module                                           |
+| **Fixture Assembly**         | Phase 3/D2        | ✅ IMPLEMENTED | `mergeTests()` pattern in `fixtures/index.ts`                                |
+| **UI5Handler**               | Phase 3           | ✅ IMPLEMENTED | 588 LOC, 18 methods, manages full lifecycle                                  |
+| **E2E Validation**           | Phase 3           | ✅ IMPLEMENTED | Gold standard test: 6 steps, SAP BTP cloud                                   |
+| **Table Fixtures**           | Phase 3 (planned) | ❌ NOT CREATED | Deferred — table matchers exist but no fixture                               |
+| **OData Fixtures**           | Phase 3 (planned) | ❌ NOT CREATED | Deferred to Phase 4                                                          |
+| **Assertion Fixtures**       | Phase 3 (planned) | ❌ NOT CREATED | Matchers wired via expect.extend() instead                                   |
+| **Interaction Fixtures**     | Phase 3 (planned) | ❌ NOT CREATED | UI5Handler provides interaction methods directly                             |
+| **Shell Fixtures**           | Phase 3 (planned) | 🔄 PARTIAL     | `shell-handler.ts` exists but no dedicated fixture                           |
+| **Web Component Adapter**    | Phase 4 (planned) | ⏳ DEFERRED    | Adapter pattern removed; WC support needs different approach                 |
+| **Typed Proxy directory**    | Phase 2/D4        | ❌ NOT CREATED | 199 auto-gen interfaces in `core/types/controls.ts` instead                  |
+| **Proxy Converter**          | Phase 2/D17       | ❌ DELETED     | Functionality inlined in `control-proxy.ts`                                  |
+| **Playwright API allowlist** | Phase 2           | ❌ DELETED     | Interaction strategies handle directly                                       |
+| **AI Layer**                 | Phase 5           | ⏳ STUB        | Barrel configured, no implementation                                         |
+| **Intent API**               | Phase 5           | ⏳ STUB        | Barrel configured, no implementation                                         |
+| **Vocabulary**               | Phase 5           | ⏳ STUB        | Barrel configured, no implementation                                         |
+| **FE (Fiori Elements)**      | Phase 4           | ⏳ STUB        | Barrel configured, no implementation                                         |
+| **Reporters**                | Phase 6           | ⏳ STUB        | Barrel configured, no implementation                                         |
+| **CLI**                      | Phase 6           | ⏳ STUB        | Barrel exists but NOT in tsup/exports                                        |
+| **Docusaurus**               | Phase 6           | ❌ NOT CREATED | No docs/ site directory                                                      |
+| **CI/CD**                    | Phase 0           | ⚠️ MISSING     | No `.github/workflows/ci.yml`                                                |
+| **SBOM**                     | Phase 5/7         | ⏳ DEFERRED    | Not yet created                                                              |
+| **npm provenance**           | Phase 5/7         | ⏳ DEFERRED    | Not yet published                                                            |
+
+#### R11. Recommended Next Phase Plan (Phase 4 — Revised)
+
+Based on the review, Phase 4 should be split into two sub-phases:
+
+**Phase 4a: Cleanup + Hardening** (prerequisite for all subsequent work)
+
+| Task                                                                                  | Priority  | Dependencies               | Parallelizable?          |
+| ------------------------------------------------------------------------------------- | --------- | -------------------------- | ------------------------ |
+| DELETE dead code: step-decorator.ts, api-resolver.ts, get-version.ts, get-selector.ts | 🔴 High   | None                       | ✅ Yes (all independent) |
+| Wire or DELETE: control-types.ts, object-categories.ts                                | 🟡 Medium | None                       | ✅ Yes                   |
+| Wire object-map cleanup into fixture teardown (memory leak fix)                       | 🔴 High   | None                       | ✅ Yes                   |
+| Wire step-decorator into UI5Handler (or DELETE)                                       | 🟡 Medium | Depends on DELETE decision | No                       |
+| Wire UI5ObjectCache into UI5Handler                                                   | 🟢 Low    | None                       | ✅ Yes                   |
+| Add TypeScript matcher type augmentation                                              | 🟡 Medium | None                       | ✅ Yes                   |
+| Create `.github/workflows/ci.yml`                                                     | 🔴 High   | None                       | ✅ Yes                   |
+| Wire telemetry spans into handler/proxy                                               | 🟢 Low    | None                       | ✅ Yes                   |
+
+**Phase 4b: Modules + Table + FE** (original Phase 4 scope)
+
+| Task                                              | Priority  | Dependencies     | Parallelizable?        |
+| ------------------------------------------------- | --------- | ---------------- | ---------------------- |
+| Table module (`modules/table.ts`)                 | 🔴 High   | Phase 4a cleanup | ✅ Yes with OData      |
+| OData module (`modules/odata.ts`)                 | 🔴 High   | Phase 4a cleanup | ✅ Yes with Table      |
+| Dialog helpers (`modules/dialog.ts`)              | 🟡 Medium | Phase 4a cleanup | ✅ Yes                 |
+| Date handling (`modules/date.ts`)                 | 🟡 Medium | Phase 4a cleanup | ✅ Yes                 |
+| FE ListReport (`fe/list-report.ts`)               | 🟡 Medium | Table module     | No                     |
+| FE ObjectPage (`fe/object-page.ts`)               | 🟡 Medium | None             | ✅ Yes with ListReport |
+| Web Component support (new approach, not adapter) | 🟡 Medium | Phase 4a cleanup | No                     |
+
+**Dependency graph for parallel execution:**
+
+```
+Phase 4a (all independent, run in parallel):
+  ├── Agent A: Dead code deletion (4 files)
+  ├── Agent B: Wire object-map cleanup + UI5ObjectCache
+  ├── Agent C: CI/CD setup (.github/workflows/ci.yml)
+  ├── Agent D: Matcher type augmentation
+  └── Agent E: Constants/step-decorator decision + wiring
+
+Phase 4b (after 4a gate passes):
+  ├── Agent F: Table module + Table fixtures (independent)
+  ├── Agent G: OData module (independent)
+  ├── Agent H: Dialog + Date modules (independent)
+  └── Agent I: FE ListReport + ObjectPage (depends on Table from Agent F)
+```
 
 ---
 
@@ -1475,4 +1841,4 @@ These decisions were added in v2.0.0 of this plan, based on deep line-by-line an
 
 ---
 
-_End of Document — Praman v1.0 Architecture & Rebuild Plan v2.0.0 Enhanced — Post-Proxy Deep Analysis_
+_End of Document — Praman v1.0 Architecture & Rebuild Plan v3.0.0 — Post-Phase 3 Architect Review (2026-02-19)_

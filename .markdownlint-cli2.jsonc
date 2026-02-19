@@ -3,16 +3,7 @@
     "extends": ".markdownlint.jsonc"
   },
   "ignores": [
-    "plans/plan.md",
-    "plans/phase1plan.md",
-    "plans/plan2.md",
-    "plans/plan3.md",
-    "plans/phase1-tracker.md",
-    "plans/phase2-tracker.md",
-    "plans/phase3-tracker.md",
-    "plans/dhikraft-flow-analysis.md",
-    "plans/ui5summary.md",
-    "plans/setup.md",
+    "plans/**",
     "skills/playwright-praman-sap-testing/skills-tdd.md",
     "skills/playwright-praman-sap-testing/skills-sap-fiori-consultant.md",
     "skills/playwright-praman-sap-testing/skills-sap-odata-expert.md",

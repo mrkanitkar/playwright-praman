@@ -9,45 +9,47 @@
  * @module auth
  */
 
-import type { BridgePage } from '#bridge/adapter.js';
-
 /**
- * Extended page interface for authentication operations.
+ * Minimal page interface for authentication operations.
  *
  * @remarks
- * Extends `BridgePage` with navigation and DOM interaction methods
- * required by auth strategies (goto, url, waitForSelector, waitForURL,
- * waitForLoadState). These methods are available on Playwright's `Page`
- * but not on the minimal `BridgePage` interface. Auth strategies need
- * navigation capabilities that pure bridge operations do not.
+ * Simplified subset of Playwright's `Page` used by auth strategies.
+ * Playwright's `Page` satisfies this interface, so it can be passed
+ * directly. Simplified method signatures keep auth test mocking simple.
  *
  * @example
  * ```typescript
- * const page: AuthPage = playwrightPage; // Playwright Page satisfies AuthPage
+ * const page: AuthPage = playwrightPage;
  * await page.goto('https://sap.example.com');
  * await page.waitForSelector('#shell-header', { timeout: 30_000 });
  * ```
  */
-export interface AuthPage extends BridgePage {
-  /** Navigate to the given URL. */
-  goto(url: string, options?: { readonly timeout?: number }): Promise<unknown>;
-  /** Return the current page URL. */
+export interface AuthPage {
+  /** Navigate to URL. */
+  goto(url: string, options?: Record<string, unknown>): Promise<unknown>;
+  /** Get current URL. */
   url(): string;
-  /** Wait for a CSS selector to appear in the DOM. */
-  waitForSelector(
-    selector: string,
-    options?: { readonly timeout?: number; readonly state?: string },
-  ): Promise<unknown>;
-  /** Wait for the page URL to match the given pattern. */
+  /** Wait for a selector to appear. */
+  waitForSelector(selector: string, options?: Record<string, unknown>): Promise<unknown>;
+  /** Wait for URL to match. */
   waitForURL(
     url: string | RegExp | ((url: URL) => boolean),
-    options?: { readonly timeout?: number },
+    options?: Record<string, unknown>,
   ): Promise<void>;
-  /** Wait for a specific load state (e.g., 'networkidle', 'domcontentloaded'). */
-  waitForLoadState(
-    state?: 'load' | 'domcontentloaded' | 'networkidle',
-    options?: { readonly timeout?: number },
-  ): Promise<void>;
+  /** Wait for page load state. */
+  waitForLoadState(state?: string, options?: Record<string, unknown>): Promise<void>;
+  /** Wait for a function to return truthy. */
+  waitForFunction(
+    pageFunction: string | (() => unknown),
+    options?: { readonly timeout?: number; readonly polling?: number },
+  ): Promise<unknown>;
+  /** Evaluate script in page context. */
+  evaluate<T = unknown>(
+    pageFunction: string | ((...args: never[]) => T),
+    arg?: unknown,
+  ): Promise<T>;
+  /** Get a locator for a selector. */
+  locator(selector: string, options?: Record<string, unknown>): unknown;
 }
 
 /**
@@ -93,7 +95,7 @@ export interface AuthStrategy {
    * const isAuth = await strategy.isAuthenticated(page);
    * ```
    */
-  isAuthenticated(page: BridgePage): Promise<boolean>;
+  isAuthenticated(page: AuthPage): Promise<boolean>;
 }
 
 /**

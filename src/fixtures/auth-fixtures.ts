@@ -114,10 +114,10 @@ const fixtureLogger = {
  * });
  * ```
  */
-export const authTest = base.extend<AuthFixtures & AuthFixtureOptions & AuthDeps>({
+export const authTest = base.extend<AuthFixtures & AuthFixtureOptions, AuthDeps>({
   // Placeholder — provided by coreTest via mergeTests (PW-MERGE-1)
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true }],
+  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
 
   sapAuthConfig: [{ url: '', username: '', password: '' }, { option: true }],
 

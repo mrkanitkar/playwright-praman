@@ -61,12 +61,65 @@ const BUILD_RESULT_SNIPPET = `
 `;
 
 /**
+ * Enhanced matching helpers for Tier 2 registry scan (GAP-02).
+ *
+ * @remarks
+ * Provides property matching, viewName traversal, bindingPath matching,
+ * and a full matchesSelector function used in the string-form IIFE.
+ */
+const ENHANCED_MATCHING_SNIPPET = `
+  function matchesProperties(ctrl, properties) {
+    var propNames = Object.keys(properties);
+    for (var pi = 0; pi < propNames.length; pi++) {
+      var propName = propNames[pi];
+      var getterName = 'get' + propName.charAt(0).toUpperCase() + propName.slice(1);
+      if (typeof ctrl[getterName] !== 'function') return false;
+      if (ctrl[getterName]() !== properties[propName]) return false;
+    }
+    return true;
+  }
+
+  function isInView(ctrl, viewName) {
+    var current = ctrl;
+    while (current) {
+      if (current.getMetadata && current.getMetadata().getName && current.getMetadata().getName() === viewName) {
+        return true;
+      }
+      current = typeof current.getParent === 'function' ? current.getParent() : null;
+    }
+    return false;
+  }
+
+  function matchesBindingPath(ctrl, bindingPath) {
+    var expectedPath = bindingPath.path;
+    if (!expectedPath) return false;
+    if (typeof ctrl.getBinding !== 'function') return false;
+    var binding = ctrl.getBinding('value') || ctrl.getBinding('text');
+    if (!binding) return false;
+    var actualPath = binding.getPath ? binding.getPath() : '';
+    return actualPath === expectedPath;
+  }
+
+  function matchesFullSelector(ctrl, sel) {
+    if (sel.controlType) {
+      if (!ctrl.getMetadata || ctrl.getMetadata().getName() !== sel.controlType) return false;
+    }
+    if (sel.properties && !matchesProperties(ctrl, sel.properties)) return false;
+    if (sel.viewName && !isInView(ctrl, sel.viewName)) return false;
+    if (sel.bindingPath && !matchesBindingPath(ctrl, sel.bindingPath)) return false;
+    return true;
+  }
+`;
+
+/**
  * Creates a browser script that finds a single UI5 control.
  *
  * @remarks
- * Uses 2-tier discovery (A.3):
- * 1. RecordReplay.findDOMElementByControlSelector (primary)
- * 2. getById fallback (for ID-only selectors)
+ * Uses 3-tier discovery:
+ * 1. getById exact match (for full ID selectors)
+ * 2. Registry scan with enhanced matching: exact/suffix/RegExp ID,
+ *    controlType, properties, viewName, bindingPath. Prefers visible controls.
+ * 3. RecordReplay.findDOMElementByControlSelector (for controlType + properties selectors)
  *
  * The script expects `selector` to be passed as an argument via `page.evaluate()`.
  *
@@ -91,19 +144,68 @@ export function createFindControlScript(): string {
 
       ${METHOD_EXTRACTION_SNIPPET}
       ${BUILD_RESULT_SNIPPET}
+      ${ENHANCED_MATCHING_SNIPPET}
 
       var selector = arguments[0];
       if (!selector) {
         return empty;
       }
 
-      if (typeof selector === 'string') {
-        var ctrl = bridge.getById(selector);
-        if (ctrl) {
-          return buildResult(ctrl);
+      // Tier 1: Direct ID lookup via registry (exact match)
+      var selectorId = typeof selector === 'string' ? selector : selector.id;
+      if (selectorId) {
+        var directCtrl = bridge.getById(selectorId);
+        if (directCtrl) {
+          if (!selector.controlType
+              || (directCtrl.getMetadata && directCtrl.getMetadata().getName() === selector.controlType)) {
+            return buildResult(directCtrl);
+          }
         }
       }
 
+      // Tier 2: Registry scan with enhanced matching (GAP-02)
+      // Supports: exact ID, suffix (--id), RegExp ID (/pattern/),
+      // controlType, properties, viewName, bindingPath.
+      // Prefers visible controls (GAP-21) when selector is an object.
+      if (typeof sap !== 'undefined' && sap.ui && sap.ui.core) {
+        var registry = sap.ui.core.Element && sap.ui.core.Element.registry
+          ? sap.ui.core.Element.registry
+          : (sap.ui.core.ElementRegistry || null);
+        if (registry && registry.all) {
+          var suffix = selectorId ? '--' + selectorId : null;
+          var isRegExp = selectorId && typeof selectorId === 'string'
+            && selectorId.charAt(0) === '/' && selectorId.charAt(selectorId.length - 1) === '/'
+            && selectorId.length > 2;
+          var allMap = registry.all();
+          var ids = Object.keys(allMap);
+          var firstMatch = null;
+          var visibleMatch = null;
+          for (var ri = 0; ri < ids.length; ri++) {
+            var regCtrl = allMap[ids[ri]];
+            if (!regCtrl || !regCtrl.getId) continue;
+            var regId = regCtrl.getId();
+            // ID matching
+            if (selectorId) {
+              if (isRegExp) {
+                var pattern = new RegExp(selectorId.slice(1, -1));
+                if (!pattern.test(regId)) continue;
+              } else if (regId !== selectorId && !(regId.length > suffix.length && regId.indexOf(suffix) === regId.length - suffix.length)) {
+                continue;
+              }
+            }
+            // Full selector matching
+            if (!matchesFullSelector(regCtrl, selector)) continue;
+            if (!firstMatch) firstMatch = regCtrl;
+            if (regCtrl.getVisible && regCtrl.getVisible()) {
+              if (!visibleMatch) visibleMatch = regCtrl;
+            }
+          }
+          var bestMatch = visibleMatch || firstMatch;
+          if (bestMatch) return buildResult(bestMatch);
+        }
+      }
+
+      // Tier 3: RecordReplay (for controlType + properties selectors)
       if (bridge.RecordReplay) {
         try {
           var domElement = await bridge.RecordReplay.findDOMElementByControlSelector({ selector: selector });
@@ -123,13 +225,6 @@ export function createFindControlScript(): string {
           }
         } catch (e) {
           // RecordReplay failed, continue to fallback
-        }
-      }
-
-      if (selector && selector.id) {
-        var fallbackCtrl = bridge.getById(selector.id);
-        if (fallbackCtrl) {
-          return buildResult(fallbackCtrl);
         }
       }
 
