@@ -1010,4 +1010,487 @@ describe('control-proxy', () => {
       await expect(fn()).rejects.toThrow('Bridge not available');
     });
   });
+
+  // ── objectArray return type (GAP-11) ──────────────────────────────
+  describe('objectArray return type', () => {
+    it('objectArray → returns array of UI5Object proxies', async () => {
+      const evaluateMock = vi.fn();
+      // First call: method execution returns objectArray
+      evaluateMock.mockResolvedValueOnce({
+        success: true,
+        returnType: 'objectArray',
+        uuids: ['uuid-1', 'uuid-2'],
+        objectTypes: ['sap.ui.model.json.JSONModel', 'sap.ui.model.odata.v4.ODataModel'],
+        duration: 1,
+      } satisfies MethodExecutionResult);
+      // Second call: UI5Object.create -> loadMethods for uuid-1
+      evaluateMock.mockResolvedValueOnce(['getData', 'setData']);
+      // Third call: UI5Object.create -> loadMethods for uuid-2
+      evaluateMock.mockResolvedValueOnce(['read', 'create']);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['getModels'] as () => Promise<unknown[]>;
+      const result = await fn();
+
+      expect(result).toHaveLength(2);
+      expect((result[0] as Record<string, unknown>)['uuid']).toBe('uuid-1');
+      expect((result[0] as Record<string, unknown>)['type']).toBe('sap.ui.model.json.JSONModel');
+      expect((result[1] as Record<string, unknown>)['uuid']).toBe('uuid-2');
+      expect((result[1] as Record<string, unknown>)['type']).toBe(
+        'sap.ui.model.odata.v4.ODataModel',
+      );
+    });
+
+    it('objectArray with empty uuid → returns null for that item', async () => {
+      const evaluateMock = vi.fn();
+      evaluateMock.mockResolvedValueOnce({
+        success: true,
+        returnType: 'objectArray',
+        uuids: ['uuid-1', ''],
+        objectTypes: ['sap.ui.model.json.JSONModel', 'string'],
+        duration: 1,
+      } satisfies MethodExecutionResult);
+      // Only uuid-1 triggers UI5Object.create -> loadMethods
+      evaluateMock.mockResolvedValueOnce(['getData']);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['getModels'] as () => Promise<unknown[]>;
+      const result = await fn();
+
+      expect(result).toHaveLength(2);
+      expect((result[0] as Record<string, unknown>)['uuid']).toBe('uuid-1');
+      expect(result[1]).toBeNull();
+    });
+
+    it('objectArray with empty arrays → returns empty array', async () => {
+      const evaluateMock = vi.fn();
+      evaluateMock.mockResolvedValueOnce({
+        success: true,
+        returnType: 'objectArray',
+        uuids: [],
+        objectTypes: [],
+        duration: 1,
+      } satisfies MethodExecutionResult);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['getModels'] as () => Promise<unknown[]>;
+      const result = await fn();
+
+      expect(result).toHaveLength(0);
+    });
+
+    it('objectArray with missing uuids/objectTypes → defaults to empty', async () => {
+      const evaluateMock = vi.fn();
+      evaluateMock.mockResolvedValueOnce({
+        success: true,
+        returnType: 'objectArray',
+        duration: 1,
+      } satisfies MethodExecutionResult);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['getModels'] as () => Promise<unknown[]>;
+      const result = await fn();
+
+      expect(result).toHaveLength(0);
+    });
+
+    it('objectArray with missing objectTypes falls back to unknown', async () => {
+      const evaluateMock = vi.fn();
+      evaluateMock.mockResolvedValueOnce({
+        success: true,
+        returnType: 'objectArray',
+        uuids: ['uuid-1'],
+        // objectTypes intentionally omitted
+        duration: 1,
+      } satisfies MethodExecutionResult);
+      evaluateMock.mockResolvedValueOnce([]);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['getModels'] as () => Promise<unknown[]>;
+      const result = await fn();
+
+      expect(result).toHaveLength(1);
+      expect((result[0] as Record<string, unknown>)['type']).toBe('unknown');
+    });
+  });
+
+  // ── Context-destroyed retry logic ──────────────────────────────────
+  describe('context-destroyed retry logic', () => {
+    it('retries on "Execution context was destroyed" and succeeds on retry', async () => {
+      vi.useFakeTimers();
+      try {
+        const evaluateMock = vi.fn();
+        // First call: context destroyed
+        evaluateMock.mockRejectedValueOnce(new Error('Execution context was destroyed'));
+        // Second call: success
+        evaluateMock.mockResolvedValueOnce(resultOk('Retry Success'));
+
+        const page = { evaluate: evaluateMock } as unknown as Page;
+        const state = createTestState({ page });
+        const proxy = createControlProxy(state) as TestProxy;
+
+        const promise = proxy.getText();
+        // Advance past the retry delay (2500ms)
+        await vi.advanceTimersByTimeAsync(3000);
+        const result = await promise;
+
+        expect(result).toBe('Retry Success');
+        expect(evaluateMock).toHaveBeenCalledTimes(2);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('retries up to MAX_CONTEXT_RETRIES (3) times then throws', async () => {
+      vi.useFakeTimers();
+      try {
+        const contextError = new Error('Execution context was destroyed');
+        const evaluateMock = vi.fn().mockRejectedValue(contextError);
+
+        const page = { evaluate: evaluateMock } as unknown as Page;
+        const state = createTestState({ page });
+        const proxy = createControlProxy(state) as TestProxy;
+
+        // eslint-disable-next-line promise/prefer-await-to-then -- must attach handler before timer advance to prevent unhandled rejection
+        const promise = proxy.getText().catch((err: unknown) => err);
+        // Advance past first retry delay
+        await vi.advanceTimersByTimeAsync(3000);
+        // Advance past second retry delay
+        await vi.advanceTimersByTimeAsync(3000);
+        // Advance past potential extra to ensure settlement
+        await vi.advanceTimersByTimeAsync(3000);
+
+        const error = await promise;
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe('Execution context was destroyed');
+        expect(evaluateMock).toHaveBeenCalledTimes(3);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('does not retry for non-context-destroyed errors', async () => {
+      const evaluateMock = vi.fn().mockRejectedValue(new Error('Some other error'));
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const state = createTestState({ page });
+      const proxy = createControlProxy(state) as TestProxy;
+
+      await expect(proxy.getText()).rejects.toThrow('Some other error');
+      expect(evaluateMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not retry for non-Error rejections', async () => {
+      const evaluateMock = vi.fn().mockRejectedValue('string rejection');
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const state = createTestState({ page });
+      const proxy = createControlProxy(state) as TestProxy;
+
+      await expect(proxy.getText()).rejects.toBe('string rejection');
+      expect(evaluateMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('succeeds on the third attempt after two context-destroyed errors', async () => {
+      vi.useFakeTimers();
+      try {
+        const contextError = new Error('Execution context was destroyed');
+        const evaluateMock = vi
+          .fn()
+          .mockRejectedValueOnce(contextError)
+          .mockRejectedValueOnce(contextError)
+          .mockResolvedValueOnce(resultOk('Third Time'));
+
+        const page = { evaluate: evaluateMock } as unknown as Page;
+        const state = createTestState({ page });
+        const proxy = createControlProxy(state) as TestProxy;
+
+        const promise = proxy.getText();
+        // Advance past the first retry delay
+        await vi.advanceTimersByTimeAsync(3000);
+        // Advance past the second retry delay
+        await vi.advanceTimersByTimeAsync(3000);
+        const result = await promise;
+
+        expect(result).toBe('Third Time');
+        expect(evaluateMock).toHaveBeenCalledTimes(3);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+
+  // ── handleReturn edge cases ────────────────────────────────────────
+  describe('handleReturn edge cases', () => {
+    it('object with missing uuid defaults to empty string', async () => {
+      const evaluateMock = vi.fn();
+      evaluateMock.mockResolvedValueOnce({
+        success: true,
+        returnType: 'object',
+        // uuid intentionally omitted
+        objectType: 'sap.ui.model.json.JSONModel',
+        duration: 1,
+      } satisfies MethodExecutionResult);
+      // UI5Object.create -> loadMethods
+      evaluateMock.mockResolvedValueOnce([]);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['getModel'] as () => Promise<unknown>;
+      const result = (await fn()) as Record<string, unknown>;
+
+      expect(result['uuid']).toBe('');
+    });
+
+    it('object with missing objectType defaults to unknown', async () => {
+      const evaluateMock = vi.fn();
+      evaluateMock.mockResolvedValueOnce({
+        success: true,
+        returnType: 'object',
+        uuid: 'model-uuid-1',
+        // objectType intentionally omitted
+        duration: 1,
+      } satisfies MethodExecutionResult);
+      // UI5Object.create -> loadMethods
+      evaluateMock.mockResolvedValueOnce([]);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['getModel'] as () => Promise<unknown>;
+      const result = (await fn()) as Record<string, unknown>;
+
+      expect(result['type']).toBe('unknown');
+    });
+
+    it('aggregation with missing uuids defaults to empty array', async () => {
+      const page = createMockPage({
+        success: true,
+        returnType: 'aggregation',
+        // uuids intentionally omitted
+        duration: 1,
+      });
+      const proxy = createControlProxy(createTestState({ page }));
+      const items = await proxy.getAggregation('items');
+      expect(items).toHaveLength(0);
+    });
+
+    it('aggregation with more uuids than types uses unknown for excess', async () => {
+      const page = createMockPage({
+        success: true,
+        returnType: 'aggregation',
+        uuids: ['item1', 'item2', 'item3'],
+        objectTypes: ['sap.m.StandardListItem'],
+        duration: 1,
+      });
+      const proxy = createControlProxy(createTestState({ page }));
+      const items = (await proxy.getAggregation('items')) as UI5ControlBase[];
+
+      expect(items).toHaveLength(3);
+      expect(items[0]?.controlType).toBe('sap.m.StandardListItem');
+      expect(items[1]?.controlType).toBe('unknown');
+      expect(items[2]?.controlType).toBe('unknown');
+    });
+
+    it('newElement with undefined value returns undefined', async () => {
+      const page = createMockPage({
+        success: true,
+        returnType: 'newElement',
+        value: undefined,
+        duration: 1,
+      });
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['getChild'] as () => Promise<unknown>;
+      expect(await fn()).toBeUndefined();
+    });
+
+    it('failure result includes BridgeError code', async () => {
+      const page = createMockPage({
+        success: false,
+        returnType: 'none',
+        error: 'Some failure',
+        duration: 1,
+      });
+      const proxy = createControlProxy(createTestState({ page })) as TestProxy;
+
+      try {
+        await proxy.getText();
+        expect.fail('Should have thrown');
+      } catch (error: unknown) {
+        expect((error as Record<string, unknown>)['code']).toBe('ERR_BRIDGE_EXECUTION');
+      }
+    });
+  });
+
+  // ── createChainableResult deep coverage ────────────────────────────
+  describe('createChainableResult edge cases', () => {
+    it('symbol access on chainable delegates to the underlying promise', () => {
+      const evaluateMock = vi.fn().mockResolvedValue(resultOk('Hello'));
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = createControlProxy(createTestState({ page }));
+      const rec = toRecord(proxy);
+      const getText = rec['getText'] as (...args: unknown[]) => unknown;
+      const chainable = getText();
+
+      // Symbol.toStringTag on a Promise yields 'Promise'
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Reflect.get returns any for symbol property access
+      const tag = Reflect.get(chainable as object, Symbol.toStringTag);
+      expect(tag).toBe('Promise');
+    });
+
+    it('finally on chainable works like promise finally', async () => {
+      const evaluateMock = vi.fn().mockResolvedValue(resultOk('Done'));
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = createControlProxy(createTestState({ page }));
+      const rec = toRecord(proxy);
+      const getText = rec['getText'] as (...args: unknown[]) => unknown;
+      const chainable = getText();
+
+      let finallyCalled = false;
+      const chainableObj = chainable as { finally: (fn: () => void) => Promise<unknown> };
+      await chainableObj.finally(() => {
+        finallyCalled = true;
+      });
+      expect(finallyCalled).toBe(true);
+    });
+
+    it('catch on chainable works like promise catch', async () => {
+      const evaluateMock = vi.fn().mockRejectedValue(new Error('fail'));
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = createControlProxy(createTestState({ page }));
+      const rec = toRecord(proxy);
+      const getText = rec['getText'] as (...args: unknown[]) => unknown;
+      const chainable = getText();
+
+      let catchCalled = false;
+      const chainableObj = chainable as { catch: (fn: (err: unknown) => void) => Promise<unknown> };
+      await chainableObj.catch(() => {
+        catchCalled = true;
+      });
+      expect(catchCalled).toBe(true);
+    });
+
+    it('chain with null resolved value terminates gracefully', async () => {
+      const evaluateMock = vi.fn().mockResolvedValue(resultOk(null));
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = createControlProxy(createTestState({ page }));
+      const result1 = chainCall(proxy, 'getValue');
+      const result2 = await (chainCall(result1, 'something') as Promise<unknown>);
+
+      expect(result2).toBeUndefined();
+    });
+
+    it('chain with resolved object that has the method calls it', async () => {
+      // First call returns an element (sub-proxy), second call getText on it
+      const evaluateMock = vi.fn();
+      evaluateMock.mockResolvedValueOnce({
+        success: true,
+        returnType: 'element',
+        value: { id: 'innerCtrl' },
+        duration: 1,
+      } satisfies MethodExecutionResult);
+      evaluateMock.mockResolvedValueOnce(resultOk('Inner Text'));
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = createControlProxy(createTestState({ page }));
+      const parent = chainCall(proxy, 'getParent');
+      const text = await (chainCall(parent, 'getText') as Promise<unknown>);
+
+      expect(text).toBe('Inner Text');
+    });
+
+    it('chain with resolved object where member is not a function returns undefined', async () => {
+      // getText returns a plain object { name: 'test' }, then chain accesses 'name' (not a function)
+      const evaluateMock = vi.fn().mockResolvedValue(resultOk({ name: 'test' }));
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = createControlProxy(createTestState({ page }));
+      const getResult = chainCall(proxy, 'getData');
+      const result = await (chainCall(getResult, 'name') as Promise<unknown>);
+
+      // 'name' is 'test' (a string), not a function, so should return undefined
+      expect(result).toBeUndefined();
+    });
+  });
+
+  // ── getAggregation forwarder ──────────────────────────────────────
+  describe('getAggregation forwarding', () => {
+    it('getAggregation returns cached forwarder', () => {
+      const proxy = createControlProxy(createTestState());
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- testing proxy returns same cached forwarder reference
+      const fn1 = proxy.getAggregation;
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- testing proxy returns same cached forwarder reference
+      const fn2 = proxy.getAggregation;
+      expect(fn1).toBe(fn2);
+    });
+
+    it('getAggregation calls page.evaluate with correct method name', async () => {
+      const evaluateMock = vi.fn().mockResolvedValue({
+        success: true,
+        returnType: 'aggregation',
+        uuids: ['item1'],
+        objectTypes: ['sap.m.StandardListItem'],
+        duration: 1,
+      } satisfies MethodExecutionResult);
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = createControlProxy(createTestState({ page }));
+
+      await proxy.getAggregation('items');
+
+      const [, args] = evaluateMock.mock.calls[0] as [unknown, Record<string, unknown>];
+      expect(args['methodName']).toBe('getAggregation');
+      expect(args['args']).toEqual(['items']);
+    });
+  });
+
+  // ── Blacklist enforcement additional ──────────────────────────────
+  describe('blacklist enforcement additional', () => {
+    it('blacklisted error includes correct error code', () => {
+      const proxy = toRecord(createControlProxy(createTestState()));
+      // eslint-disable-next-line @typescript-eslint/dot-notation -- testing blacklisted property access via proxy get trap
+      expect(() => proxy['constructor']).toThrow();
+      try {
+        // eslint-disable-next-line @typescript-eslint/dot-notation, @typescript-eslint/no-unused-expressions -- testing blacklisted property access via proxy get trap
+        proxy['constructor'];
+        expect.fail('Should have thrown');
+      } catch (error: unknown) {
+        expect((error as Record<string, unknown>)['code']).toBe('ERR_CONTROL_METHOD');
+      }
+    });
+
+    it('blacklisted error includes method name in message', () => {
+      const proxy = toRecord(createControlProxy(createTestState()));
+      expect(() => proxy['fireEvent']).toThrow(/fireEvent/);
+    });
+
+    it('blacklisted error includes control type and id', () => {
+      const proxy = toRecord(createControlProxy(createTestState()));
+      expect(() => proxy['init']).toThrow(/sap\.m\.Button#saveBtn/);
+    });
+  });
+
+  // ── resolveKnownProperty default case (unknown property) ──────────
+  describe('resolveKnownProperty default → dynamic forwarder', () => {
+    it('unknown property name returns a function (dynamic forwarder)', () => {
+      const proxy = toRecord(createControlProxy(createTestState()));
+      const fn = proxy['someRandomMethod'];
+      expect(typeof fn).toBe('function');
+    });
+
+    it('dynamic forwarder for unknown property calls page.evaluate', async () => {
+      const evaluateMock = vi.fn().mockResolvedValue(resultOk(42));
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const proxy = toRecord(createControlProxy(createTestState({ page })));
+      const fn = proxy['customMethod'] as () => Promise<unknown>;
+
+      const result = await fn();
+
+      expect(result).toBe(42);
+      const [, args] = evaluateMock.mock.calls[0] as [unknown, Record<string, unknown>];
+      expect(args['methodName']).toBe('customMethod');
+    });
+  });
 });

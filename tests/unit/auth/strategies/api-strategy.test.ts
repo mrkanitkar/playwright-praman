@@ -4,8 +4,12 @@
  * @remarks
  * Verifies the API-based headless authentication flow:
  * POST to login endpoint, cookie extraction, error handling.
+ *
+ * The `evaluate callback coverage` sections exercise the browser-context
+ * code inside `page.evaluate()` calls by making the mock invoke the
+ * callback with a minimal DOM/fetch stub.
  */
-import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import type { AuthStrategy, SAPAuthConfig } from '../../../../src/auth/auth-types.js';
 import { APIAuthStrategy } from '../../../../src/auth/strategies/api-strategy.js';
@@ -126,6 +130,7 @@ describe('APIAuthStrategy', () => {
         const authError = error as AuthError;
         expect(authError.message).toContain('401');
         expect(authError.retryable).toBe(false);
+        expect(authError.suggestions).toContain('Verify username and password are correct');
       }
     });
 
@@ -145,6 +150,47 @@ describe('APIAuthStrategy', () => {
         const authError = error as AuthError;
         expect(authError.message).toContain('500');
         expect(authError.retryable).toBe(true);
+        expect(authError.suggestions).toContain('The SAP server encountered an error');
+      }
+    });
+
+    it('throws AuthError with retryable=false for 403 response', async () => {
+      page.evaluate.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        cookiesBefore: '',
+        cookiesAfter: '',
+      });
+
+      try {
+        await strategy.authenticate(page, config);
+        expect.fail('Should have thrown');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(AuthError);
+        const authError = error as AuthError;
+        expect(authError.message).toContain('403');
+        expect(authError.retryable).toBe(false);
+        expect(authError.suggestions).toContain('The user may not have access to this system');
+      }
+    });
+
+    it('throws AuthError with default suggestions for unexpected status codes', async () => {
+      page.evaluate.mockResolvedValueOnce({
+        ok: false,
+        status: 418,
+        cookiesBefore: '',
+        cookiesAfter: '',
+      });
+
+      try {
+        await strategy.authenticate(page, config);
+        expect.fail('Should have thrown');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(AuthError);
+        const authError = error as AuthError;
+        expect(authError.message).toContain('418');
+        expect(authError.retryable).toBe(false);
+        expect(authError.suggestions).toContain('Unexpected response from login endpoint');
       }
     });
 
@@ -158,6 +204,20 @@ describe('APIAuthStrategy', () => {
         expect(error).toBeInstanceOf(AuthError);
         const authError = error as AuthError;
         expect(authError.message).toContain('API login request failed');
+        expect(authError.retryable).toBe(true);
+      }
+    });
+
+    it('throws AuthError with generic message for non-Error thrown values', async () => {
+      page.evaluate.mockRejectedValueOnce('string error');
+
+      try {
+        await strategy.authenticate(page, config);
+        expect.fail('Should have thrown');
+      } catch (error) {
+        expect(error).toBeInstanceOf(AuthError);
+        const authError = error as AuthError;
+        expect(authError.message).toContain('Unknown error');
         expect(authError.retryable).toBe(true);
       }
     });
@@ -205,6 +265,261 @@ describe('APIAuthStrategy', () => {
       // Should NOT have double slashes
       expect(loginCallArgs.loginUrl).toBe('https://sap.example.com/sap/public/bc/sec/login');
     });
+
+    it('handles login endpoint without leading slash', async () => {
+      const noSlashEndpointConfig: Readonly<SAPAuthConfig> = {
+        ...config,
+        loginEndpoint: 'sap/login',
+      };
+
+      page.evaluate.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        cookiesBefore: '',
+        cookiesAfter: 'MYSAPSSO2=abc;',
+      });
+
+      await strategy.authenticate(page, noSlashEndpointConfig);
+
+      const loginCallArgs = page.evaluate.mock.calls[0]?.[1] as {
+        loginUrl: string;
+      };
+      expect(loginCallArgs.loginUrl).toBe('https://sap.example.com/sap/login');
+    });
+
+    it('uses default timeout when config.timeout is not set', async () => {
+      const noTimeoutConfig: Readonly<SAPAuthConfig> = {
+        url: 'https://sap.example.com',
+        username: 'admin',
+        password: 'secret-test', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+      };
+
+      page.evaluate.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        cookiesBefore: '',
+        cookiesAfter: 'SAP_SESSIONID=abc;',
+      });
+
+      await strategy.authenticate(page, noTimeoutConfig);
+
+      expect(page.goto).toHaveBeenCalledWith('https://sap.example.com', { timeout: 30_000 });
+    });
+
+    it('handles config without client field', async () => {
+      const noClientConfig: Readonly<SAPAuthConfig> = {
+        url: 'https://sap.example.com',
+        username: 'admin',
+        password: 'secret-test', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+      };
+
+      page.evaluate.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        cookiesBefore: '',
+        cookiesAfter: 'SAP_SESSIONID=abc;',
+      });
+
+      await strategy.authenticate(page, noClientConfig);
+
+      const loginCallArgs = page.evaluate.mock.calls[0]?.[1] as {
+        client: string | undefined;
+      };
+      expect(loginCallArgs.client).toBeUndefined();
+    });
+
+    /* eslint-disable n/no-unsupported-features/node-builtins -- fetch stubs for page.evaluate() callback coverage */
+    describe('evaluate callback coverage', () => {
+      let origDocument: typeof globalThis.document;
+      let origFetch: typeof globalThis.fetch;
+
+      beforeEach(() => {
+        origDocument = globalThis.document;
+        origFetch = globalThis.fetch;
+      });
+
+      afterEach(() => {
+        globalThis.document = origDocument;
+        globalThis.fetch = origFetch;
+      });
+
+      it('executes the login POST via evaluate callback with successful response', async () => {
+        let cookieValue = '';
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          get cookie() {
+            return cookieValue;
+          },
+          set cookie(val: string) {
+            cookieValue = val;
+          },
+        } as any;
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal fetch stub
+        globalThis.fetch = vi.fn().mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock returns Promise directly
+          () => {
+            // Simulate cookie being set after fetch
+            cookieValue = 'MYSAPSSO2=fetched;';
+            return Promise.resolve({ ok: true, status: 200 });
+          },
+        ) as any;
+
+        const cbPage = createMockAuthPage();
+        let evaluateCallCount = 0;
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            evaluateCallCount++;
+            // Only invoke the callback for the first evaluate call (performLogin)
+            if (evaluateCallCount === 1) {
+              const result = (fn as (a: unknown) => unknown)(arg);
+              // result is a Promise from the async callback
+              return result as Promise<unknown>;
+            }
+            // Subsequent calls return canned values for isAuthenticated checks
+            return Promise.resolve(undefined);
+          },
+        );
+
+        await strategy.authenticate(cbPage, config);
+
+        expect(cbPage.evaluate).toHaveBeenCalled();
+        expect(globalThis.fetch).toHaveBeenCalled();
+      });
+
+      it('executes the login POST via evaluate callback without client', async () => {
+        let cookieValue = '';
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          get cookie() {
+            return cookieValue;
+          },
+          set cookie(val: string) {
+            cookieValue = val;
+          },
+        } as any;
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal fetch stub
+        globalThis.fetch = vi.fn().mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock returns Promise directly
+          () => {
+            cookieValue = 'SAP_SESSIONID=abc;';
+            return Promise.resolve({ ok: true, status: 200 });
+          },
+        ) as any;
+
+        const cbPage = createMockAuthPage();
+        let evaluateCallCount = 0;
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            evaluateCallCount++;
+            if (evaluateCallCount === 1) {
+              return (fn as (a: unknown) => unknown)(arg) as Promise<unknown>;
+            }
+            return Promise.resolve(undefined);
+          },
+        );
+
+        const noClientConfig: Readonly<SAPAuthConfig> = {
+          url: 'https://sap.example.com',
+          username: 'admin',
+          password: 'secret-test', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+        };
+
+        await strategy.authenticate(cbPage, noClientConfig);
+
+        expect(cbPage.evaluate).toHaveBeenCalled();
+      });
+
+      it('exercises the setTimeout abort callback via fake timers', async () => {
+        vi.useFakeTimers();
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          get cookie() {
+            return '';
+          },
+        } as any;
+
+        // Create a fetch that respects AbortSignal -- rejects when aborted
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal fetch stub
+        globalThis.fetch = vi.fn().mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock returns Promise directly
+          (_url: string, options: { signal?: AbortSignal }) =>
+            new Promise<never>((_resolve, reject) => {
+              if (options.signal !== undefined) {
+                options.signal.addEventListener('abort', () => {
+                  reject(new Error('AbortError: The operation was aborted'));
+                });
+              }
+            }),
+        ) as any;
+
+        const cbPage = createMockAuthPage();
+        let evaluateCallCount = 0;
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            evaluateCallCount++;
+            if (evaluateCallCount === 1) {
+              const promise = (fn as (a: unknown) => unknown)(arg) as Promise<unknown>;
+              // Advance timers to fire the setTimeout abort callback
+              vi.advanceTimersByTime(10_000);
+              return promise;
+            }
+            return Promise.resolve(undefined);
+          },
+        );
+
+        try {
+          await strategy.authenticate(cbPage, config);
+          expect.fail('Should have thrown');
+        } catch (error) {
+          expect(error).toBeInstanceOf(AuthError);
+        }
+
+        vi.useRealTimers();
+      });
+
+      it('handles fetch failure in evaluate callback', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          get cookie() {
+            return '';
+          },
+        } as any;
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal fetch stub
+        globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error')) as any;
+
+        const cbPage = createMockAuthPage();
+        let evaluateCallCount = 0;
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            evaluateCallCount++;
+            if (evaluateCallCount === 1) {
+              return (fn as (a: unknown) => unknown)(arg) as Promise<unknown>;
+            }
+            return Promise.resolve(undefined);
+          },
+        );
+
+        try {
+          await strategy.authenticate(cbPage, config);
+          expect.fail('Should have thrown');
+        } catch (error) {
+          // The error from the callback is caught and re-thrown as AuthError
+          // by performLogin's outer catch
+          expect(error).toBeInstanceOf(AuthError);
+          const authError = error as AuthError;
+          expect(authError.message).toContain('API login request failed');
+        }
+      });
+    });
+    /* eslint-enable n/no-unsupported-features/node-builtins */
   });
 
   describe('isAuthenticated', () => {

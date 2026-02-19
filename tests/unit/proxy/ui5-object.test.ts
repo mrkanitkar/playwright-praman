@@ -609,6 +609,131 @@ describe('UI5Object', () => {
     });
   });
 
+  // ── handleObjectReturn — additional return type coverage ──────────
+
+  describe('handleObjectReturn — returnType branches', () => {
+    it('throws BridgeError with fallback message when error property is undefined', async () => {
+      const { page } = createMockPageWithMethods([], {
+        success: false,
+        returnType: 'none',
+        // error is omitted — triggers `result.error ?? "Method failed on ..."` fallback
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      await expect(obj.executeMethod('badMethod', [])).rejects.toThrow(
+        'Method failed on sap.ui.model.json.JSONModel',
+      );
+    });
+
+    it('returns undefined for unknown returnType', async () => {
+      const { page } = createMockPageWithMethods([], {
+        success: true,
+        returnType: 'unknown',
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const result = await obj.executeMethod('someMethod', []);
+      expect(result).toBeUndefined();
+    });
+
+    it('returns value for empty returnType', async () => {
+      const { page } = createMockPageWithMethods([], {
+        success: true,
+        returnType: 'empty',
+        value: null,
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const result = await obj.executeMethod('emptyMethod', []);
+      expect(result).toBeNull();
+    });
+
+    it('returns value for element returnType', async () => {
+      const { page } = createMockPageWithMethods([], {
+        success: true,
+        returnType: 'element',
+        value: { id: 'ctrl-1', controlType: 'sap.m.Button' },
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const result = await obj.executeMethod('getElement', []);
+      expect(result).toEqual({ id: 'ctrl-1', controlType: 'sap.m.Button' });
+    });
+
+    it('returns value for newElement returnType', async () => {
+      const { page } = createMockPageWithMethods([], {
+        success: true,
+        returnType: 'newElement',
+        value: { id: 'new-ctrl', controlType: 'sap.m.Input' },
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const result = await obj.executeMethod('createElement', []);
+      expect(result).toEqual({ id: 'new-ctrl', controlType: 'sap.m.Input' });
+    });
+
+    it('returns value for aggregation returnType', async () => {
+      const { page } = createMockPageWithMethods([], {
+        success: true,
+        returnType: 'aggregation',
+        value: [{ id: 'item-1' }, { id: 'item-2' }],
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const result = await obj.executeMethod('getAggregation', []);
+      expect(result).toEqual([{ id: 'item-1' }, { id: 'item-2' }]);
+    });
+
+    it('creates sub-proxy with fallback uuid/objectType when missing', async () => {
+      const evaluateFn = vi.fn();
+      // 1st call: loadMethods for parent
+      evaluateFn.mockResolvedValueOnce([]);
+      // 2nd call: executeMethod returns object with no uuid/objectType
+      evaluateFn.mockResolvedValueOnce({
+        success: true,
+        returnType: 'object',
+        // uuid and objectType intentionally omitted — triggers ?? fallbacks
+        duration: 1,
+      });
+      // 3rd call: loadMethods for sub-object
+      evaluateFn.mockResolvedValueOnce([]);
+      const page = { evaluate: evaluateFn, waitForFunction: vi.fn() } as unknown as Page;
+
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const sub = (await obj.executeMethod('getUnknown', [])) as Record<string, unknown>;
+      expect(sub['uuid']).toBe('');
+      expect(sub['type']).toBe('unknown');
+    });
+  });
+
   // ── GAP-11: objectArray return type handling ────────────────────────
 
   describe('handleObjectReturn — objectArray (GAP-11)', () => {
@@ -744,6 +869,388 @@ describe('UI5Object', () => {
       expect(getPath).toBeDefined();
       const pathResult = await getPath?.();
       expect(pathResult).toBe('/CustomerName');
+    });
+
+    it('handles objectArray with missing uuids/objectTypes (fallback to empty arrays)', async () => {
+      const evaluateFn = vi.fn();
+      evaluateFn.mockResolvedValueOnce([]);
+      evaluateFn.mockResolvedValueOnce({
+        success: true,
+        returnType: 'objectArray',
+        // uuids and objectTypes intentionally omitted — triggers ?? [] fallbacks
+        duration: 1,
+      });
+      const page = { evaluate: evaluateFn, waitForFunction: vi.fn() } as unknown as Page;
+
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const result = (await obj.executeMethod('getMissing', [])) as unknown[];
+      expect(result).toEqual([]);
+    });
+
+    it('uses fallback type "unknown" when objectTypes array is shorter than uuids', async () => {
+      const evaluateFn = vi.fn();
+      evaluateFn.mockResolvedValueOnce([]);
+      evaluateFn.mockResolvedValueOnce({
+        success: true,
+        returnType: 'objectArray',
+        uuids: ['a-uuid', 'b-uuid'],
+        objectTypes: ['sap.ui.model.Filter'],
+        // second type is missing — triggers at(idx) ?? 'unknown' fallback
+        isArray: true,
+        duration: 1,
+      });
+      // loadMethods for first sub-object
+      evaluateFn.mockResolvedValueOnce([]);
+      // loadMethods for second sub-object
+      evaluateFn.mockResolvedValueOnce([]);
+      const page = { evaluate: evaluateFn, waitForFunction: vi.fn() } as unknown as Page;
+
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const result = (await obj.executeMethod('getItems', [])) as (Record<
+        string,
+        unknown
+      > | null)[];
+
+      expect(result).toHaveLength(2);
+      expect(result[0]?.['type']).toBe('sap.ui.model.Filter');
+      expect(result[1]?.['type']).toBe('unknown');
+    });
+  });
+
+  // ── Additional proxy get trap coverage ──────────────────────────────
+
+  describe('toProxy() — additional get trap paths', () => {
+    it('valueOf returns string representation', async () => {
+      const page = createMockPage();
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const proxy = obj.toProxy() as Record<string, (() => string) | undefined>;
+      // eslint-disable-next-line @typescript-eslint/dot-notation -- bracket notation avoids unbound-method on Object.prototype.valueOf
+      const valueOfFn = proxy['valueOf'];
+      expect(valueOfFn).toBeDefined();
+      expect(valueOfFn?.()).toBe('[UI5Object sap.ui.model.json.JSONModel uuid-1]');
+    });
+
+    it('routes executeMethod through explicit method via proxy', async () => {
+      const { page } = createMockPageWithMethods([], {
+        success: true,
+        returnType: 'result',
+        value: 'exec-result',
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const proxy = obj.toProxy() as Record<
+        string,
+        ((...args: unknown[]) => Promise<unknown>) | undefined
+      >;
+      const execMethod = proxy['executeMethod'];
+      expect(execMethod).toBeDefined();
+      const result = await execMethod?.('someMethod', []);
+      expect(result).toBe('exec-result');
+    });
+
+    it('returns undefined for prototype access (NON_PROXIED_PROPERTIES)', async () => {
+      const page = createMockPage();
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const proxy = obj.toProxy() as Record<string, unknown>;
+      expect(proxy['prototype']).toBeUndefined();
+    });
+
+    it('returns undefined for getMetadata access (NON_PROXIED not EXPLICIT)', async () => {
+      const page = createMockPage();
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const proxy = obj.toProxy() as Record<string, unknown>;
+      expect(proxy['getMetadata']).toBeUndefined();
+    });
+
+    it('returns undefined for destroy access (NON_PROXIED not EXPLICIT)', async () => {
+      const page = createMockPage();
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const proxy = obj.toProxy() as Record<string, unknown>;
+      expect(proxy['destroy']).toBeUndefined();
+    });
+
+    it('preventExtensions trap returns true', async () => {
+      const page = createMockPage();
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const proxy = obj.toProxy() as object;
+      // Object.preventExtensions calls the preventExtensions trap
+      expect(Object.preventExtensions(proxy)).toBe(proxy);
+    });
+
+    it('forwards arbitrary unknown method names through generic forwarder', async () => {
+      const { page, evaluateFn } = createMockPageWithMethods([], {
+        success: true,
+        returnType: 'result',
+        value: 'dynamic-result',
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      const proxy = obj.toProxy() as Record<
+        string,
+        ((...args: unknown[]) => Promise<unknown>) | undefined
+      >;
+      const dynamicMethod = proxy['someArbitraryMethod'];
+      expect(dynamicMethod).toBeDefined();
+      const result = await dynamicMethod?.('arg1', 'arg2');
+      expect(result).toBe('dynamic-result');
+      // Verify args were forwarded
+      const [, args] = evaluateFn.mock.calls[1] as [unknown, Record<string, unknown>];
+      expect(args).toEqual(
+        expect.objectContaining({
+          methodName: 'someArbitraryMethod',
+          args: ['arg1', 'arg2'],
+        }),
+      );
+    });
+  });
+
+  // ── getBindingContext without modelName ─────────────────────────────
+
+  describe('getBindingContext() — no modelName path', () => {
+    it('passes empty args array when modelName is undefined', async () => {
+      const { page, evaluateFn } = createMockPageWithMethods(['getBindingContext'], {
+        success: true,
+        returnType: 'none',
+        duration: 1,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      await obj.getBindingContext();
+      const [, args] = evaluateFn.mock.calls[1] as [unknown, Record<string, unknown>];
+      expect(args).toEqual(
+        expect.objectContaining({
+          methodName: 'getBindingContext',
+          args: [],
+        }),
+      );
+    });
+  });
+
+  // ── loadMethods browser callback coverage ──────────────────────────
+  //
+  // The loadMethods() browser callback runs inside page.evaluate(). To get
+  // V8 coverage of the callback body, we make the mock actually invoke the
+  // callback function with a synthetic global/window setup.
+
+  describe('loadMethods — browser callback branches', () => {
+    /**
+     * Creates a mock page whose evaluate function invokes the passed
+     * callback against a synthetic `window` object. This lets V8 track
+     * coverage of the callback body.
+     *
+     * The browser callback uses `Reflect.get(window, ...)` — in Node.js
+     * `window` does not exist, so we temporarily alias `globalThis` as
+     * `window` before invoking the callback.
+     */
+    function createCallbackInvokingPage(bridgeSetup: Record<string, unknown> | undefined): {
+      page: Page;
+      evaluateFn: ReturnType<typeof vi.fn>;
+    } {
+      const evaluateFn = vi.fn().mockImplementation(
+        // eslint-disable-next-line @typescript-eslint/promise-function-async -- synchronous mock wrapping; page.evaluate signature expects Promise return
+        (
+          fn: (params: { uuid: string; bridgeNs: string }) => string[],
+          args: { uuid: string; bridgeNs: string },
+        ): Promise<string[]> => {
+          const bridgeNs = args.bridgeNs;
+          // In Node.js, `window` is not defined. The callback references it
+          // via `Reflect.get(window, ...)`, so we temporarily define it.
+          const hadWindow = 'window' in globalThis;
+          if (!hadWindow) {
+            Reflect.set(globalThis, 'window', globalThis);
+          }
+          if (bridgeSetup !== undefined) {
+            Reflect.set(globalThis, bridgeNs, bridgeSetup);
+          }
+          try {
+            return Promise.resolve(fn(args));
+          } finally {
+            Reflect.deleteProperty(globalThis, bridgeNs);
+            if (!hadWindow) {
+              Reflect.deleteProperty(globalThis, 'window');
+            }
+          }
+        },
+      );
+      return {
+        page: { evaluate: evaluateFn, waitForFunction: vi.fn() } as unknown as Page,
+        evaluateFn,
+      };
+    }
+
+    it('returns empty array when bridge namespace is not on window', async () => {
+      const { page } = createCallbackInvokingPage(undefined);
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      expect(obj.methodCache.size).toBe(0);
+    });
+
+    it('returns empty array when getObject function is missing from bridge', async () => {
+      const { page } = createCallbackInvokingPage({
+        // Bridge exists but has no getObject function
+        someOtherUtil: () => null,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      expect(obj.methodCache.size).toBe(0);
+    });
+
+    it('returns empty array when getObject returns null (object not found)', async () => {
+      const { page } = createCallbackInvokingPage({
+        getObject: () => null,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      expect(obj.methodCache.size).toBe(0);
+    });
+
+    it('collects public methods from prototype chain', async () => {
+      // Create a mock UI5-like object with a prototype chain
+      class BaseObj {
+        getData(): string {
+          return 'data';
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- stub for prototype chain testing
+        setData(_d: string): void {
+          /* noop */
+        }
+        /** Private method — should be excluded by the _-prefix filter */
+        // eslint-disable-next-line @typescript-eslint/naming-convention -- intentional _-prefix to test exclusion filter
+        _internalMethod(): void {
+          /* noop */
+        }
+      }
+      class DerivedObj extends BaseObj {
+        getProperty(): string {
+          return 'prop';
+        }
+      }
+
+      const { page } = createCallbackInvokingPage({
+        getObject: () => new DerivedObj(),
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'sap.ui.model.json.JSONModel',
+        page,
+      });
+      // Should include public methods from both DerivedObj and BaseObj prototypes
+      expect(obj.methodCache.has('getProperty')).toBe(true);
+      expect(obj.methodCache.has('getData')).toBe(true);
+      expect(obj.methodCache.has('setData')).toBe(true);
+      // Should exclude _-prefixed internal methods
+      expect(obj.methodCache.has('_internalMethod')).toBe(false);
+      // constructor is a function on the prototype and doesn't start with _,
+      // so the callback DOES include it (filtering is only _-prefixed).
+      expect(obj.methodCache.has('constructor')).toBe(true);
+    });
+
+    it('excludes duplicate method names across prototype levels', async () => {
+      class Base {
+        sharedMethod(): string {
+          return 'base';
+        }
+      }
+      class Child extends Base {
+        // Override — same name should appear only once
+        override sharedMethod(): string {
+          return 'child';
+        }
+        childOnly(): void {
+          /* noop */
+        }
+      }
+
+      const { page } = createCallbackInvokingPage({
+        getObject: () => new Child(),
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'TestType',
+        page,
+      });
+      // sharedMethod appears in both prototypes but should only be in cache once
+      expect(obj.methodCache.has('sharedMethod')).toBe(true);
+      expect(obj.methodCache.has('childOnly')).toBe(true);
+      // Verify it's exactly the methods we expect (constructor is excluded because it starts with lowercase but is still a function)
+      // Actually constructor doesn't start with _ and IS a function, so it would be included.
+      // Let's just check the total - depends on how many methods are on the chain.
+      expect(obj.methodCache.size).toBeGreaterThanOrEqual(2);
+    });
+
+    it('excludes non-function properties from prototype chain', async () => {
+      // Create an object with non-function properties on its prototype
+      const proto = {
+        methodA(): string {
+          return 'a';
+        },
+        stringProp: 'hello',
+        numProp: 42,
+        boolProp: true,
+      };
+      const mockObj = Object.create(proto) as Record<string, unknown>;
+
+      const { page } = createCallbackInvokingPage({
+        getObject: () => mockObj,
+      });
+      const obj = await UI5Object.create({
+        uuid: 'uuid-1',
+        type: 'TestType',
+        page,
+      });
+      expect(obj.methodCache.has('methodA')).toBe(true);
+      // Non-function properties should be excluded
+      expect(obj.methodCache.has('stringProp')).toBe(false);
+      expect(obj.methodCache.has('numProp')).toBe(false);
+      expect(obj.methodCache.has('boolProp')).toBe(false);
     });
   });
 });

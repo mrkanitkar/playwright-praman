@@ -25,6 +25,9 @@ export default defineConfig({
         'src/core/types/validation.ts',
         // Interface-only — no runtime implementation in Phase 1
         'src/bridge/adapter.ts',
+        // Playwright runtime files — run in Playwright test runner, not Vitest
+        'src/auth/auth-setup.ts',
+        'src/auth/auth-teardown.ts',
         // Example/documentation file — not production code
         'src/core/examples/**',
       ],

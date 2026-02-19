@@ -5,8 +5,12 @@
  * Verifies the multi-step Office365/Azure AD authentication flow:
  * email entry, Next click, password entry, submit, KMSI prompt handling,
  * and SAP shell verification.
+ *
+ * The `evaluate callback coverage` sections exercise the browser-context
+ * code inside `page.evaluate()` calls by making the mock invoke the
+ * callback with a minimal DOM stub.
  */
-import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import type { AuthStrategy, SAPAuthConfig } from '../../../../src/auth/auth-types.js';
 import { Office365AuthStrategy } from '../../../../src/auth/strategies/office365-strategy.js';
@@ -185,6 +189,191 @@ describe('Office365AuthStrategy', () => {
       await strategy.authenticate(page, noTimeoutConfig);
 
       expect(page.goto).toHaveBeenCalledWith('https://sap.example.com', { timeout: 30_000 });
+    });
+
+    it('throws AuthError when Next button not found', async () => {
+      let callCount = 0;
+      // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock implementation
+      page.waitForSelector.mockImplementation((selector: string) => {
+        callCount++;
+        // Email field succeeds (1st), Next button fails (2nd)
+        if (callCount === 2 && selector === 'input[type="submit"]') {
+          return Promise.reject(new Error('Timeout'));
+        }
+        // The waitAndClick tries all selectors, all fail
+        if (selector === 'input[type="submit"]' && callCount > 1) {
+          return Promise.reject(new Error('Timeout'));
+        }
+        return Promise.resolve(undefined);
+      });
+
+      // The waitAndClick for Next has only one selector, so it throws AuthError
+      await expect(strategy.authenticate(page, config)).rejects.toThrow(AuthError);
+
+      callCount = 0;
+      try {
+        await strategy.authenticate(page, config);
+      } catch (error) {
+        expect(error).toBeInstanceOf(AuthError);
+        const authError = error as AuthError;
+        expect(authError.code).toBe('ERR_AUTH_FAILED');
+        expect(authError.strategy).toBe('office365');
+        expect(authError.message).toContain('Next');
+      }
+    });
+
+    it('throws AuthError when Sign in button not found', async () => {
+      // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock implementation
+      page.waitForSelector.mockImplementation((selector: string) => {
+        // Steps 1-3 succeed (email, next, password), step 4 (sign in) fails
+        if (selector === 'input[data-report-event="Signin_Submit"]') {
+          return Promise.reject(new Error('Timeout'));
+        }
+        return Promise.resolve(undefined);
+      });
+
+      await expect(strategy.authenticate(page, config)).rejects.toThrow(AuthError);
+
+      try {
+        await strategy.authenticate(page, config);
+      } catch (error) {
+        expect(error).toBeInstanceOf(AuthError);
+        const authError = error as AuthError;
+        expect(authError.code).toBe('ERR_AUTH_FAILED');
+        expect(authError.message).toContain('Sign in');
+      }
+    });
+
+    describe('evaluate callback coverage', () => {
+      let origDocument: typeof globalThis.document;
+
+      beforeEach(() => {
+        origDocument = globalThis.document;
+      });
+
+      afterEach(() => {
+        globalThis.document = origDocument;
+      });
+
+      it('fills email and password fields via evaluate callback', async () => {
+        const mockElement = {
+          value: '',
+          click: vi.fn(),
+          dispatchEvent: vi.fn(),
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(mockElement),
+        } as any;
+
+        const cbPage = createMockAuthPage();
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        await strategy.authenticate(cbPage, config);
+
+        // Verify evaluate was called (filling email, clicking next, filling password, clicking sign in, KMSI)
+        expect(cbPage.evaluate).toHaveBeenCalled();
+        expect(cbPage.evaluate.mock.calls.length).toBeGreaterThanOrEqual(4);
+      });
+
+      it('handles null element in waitAndFill callback gracefully', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(null),
+        } as any;
+
+        const cbPage = createMockAuthPage();
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        await strategy.authenticate(cbPage, config);
+
+        expect(cbPage.evaluate).toHaveBeenCalled();
+      });
+
+      it('handles null element in waitAndClick callback gracefully', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(null),
+        } as any;
+
+        const cbPage = createMockAuthPage();
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        await strategy.authenticate(cbPage, config);
+
+        expect(cbPage.evaluate).toHaveBeenCalled();
+      });
+
+      it('handles KMSI click with element present via evaluate callback', async () => {
+        const mockElement = {
+          value: '',
+          click: vi.fn(),
+          dispatchEvent: vi.fn(),
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(mockElement),
+        } as any;
+
+        const cbPage = createMockAuthPage();
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        const staySignedInConfig: Readonly<SAPAuthConfig> = {
+          ...config,
+          staySignedIn: true,
+        };
+
+        await strategy.authenticate(cbPage, staySignedInConfig);
+
+        // Should have invoked evaluate for KMSI click
+        const evaluateCalls = cbPage.evaluate.mock.calls;
+        const kmsiCall = evaluateCalls.find((call) => call[1] === '#idSIButton9');
+        expect(kmsiCall).toBeDefined();
+      });
+
+      it('handles KMSI click with null element via evaluate callback', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- minimal DOM stub
+        globalThis.document = {
+          querySelector: vi.fn().mockReturnValue(null),
+        } as any;
+
+        const cbPage = createMockAuthPage();
+        cbPage.evaluate.mockImplementation(
+          // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock must return Promise directly
+          (fn: (...args: never[]) => unknown, arg?: unknown) => {
+            const result = (fn as (a: unknown) => unknown)(arg);
+            return Promise.resolve(result);
+          },
+        );
+
+        await strategy.authenticate(cbPage, config);
+
+        expect(cbPage.evaluate).toHaveBeenCalled();
+      });
     });
   });
 

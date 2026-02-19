@@ -210,6 +210,20 @@ describe('createWorkZoneManager', () => {
       expect(frame).toHaveProperty('evaluate');
       expect(frame).toHaveProperty('url');
     });
+
+    it('throws NavigationError when no app iframe is found', () => {
+      // Create page with no application frames (only non-app frames)
+      const nonAppFrame = createMockFrame({ url: 'https://example.com/shell' });
+      const page = createMockPage({
+        isWorkZone: true,
+        frames: [nonAppFrame],
+      });
+      const adapter = createMockAdapter();
+      const manager = createWorkZoneManager(asPage(page), asAdapter(adapter));
+
+      expect(() => manager.getAppFrameForEval()).toThrow(NavigationError);
+      expect(() => manager.getAppFrameForEval()).toThrow('WorkZone app iframe not found');
+    });
   });
 
   describe('navigateToApp', () => {
@@ -258,6 +272,18 @@ describe('createWorkZoneManager', () => {
 
       expect(result).toBeNull();
     });
+
+    it('returns null when evaluate returns a non-string, non-null value', async () => {
+      const page = createMockPage({ isWorkZone: true });
+      // Simulate evaluate returning unexpected type (e.g., number or boolean)
+      page.evaluate.mockResolvedValue(42);
+      const adapter = createMockAdapter();
+      const manager = createWorkZoneManager(asPage(page), asAdapter(adapter));
+
+      const result = await manager.getCurrentApp();
+
+      expect(result).toBeNull();
+    });
   });
 
   describe('isAppReady', () => {
@@ -281,6 +307,45 @@ describe('createWorkZoneManager', () => {
       const result = await manager.isAppReady(1000);
 
       expect(result).toBe(false);
+    });
+
+    it('returns false when no app iframe is found', async () => {
+      // Create page with no application frames
+      const nonAppFrame = createMockFrame({ url: 'https://example.com/shell' });
+      const page = createMockPage({
+        isWorkZone: true,
+        frames: [nonAppFrame],
+      });
+      const adapter = createMockAdapter();
+      const manager = createWorkZoneManager(asPage(page), asAdapter(adapter));
+
+      const result = await manager.isAppReady();
+
+      expect(result).toBe(false);
+      expect(waitForUI5Stable).not.toHaveBeenCalled();
+    });
+
+    it('passes custom timeout to waitForUI5Stable', async () => {
+      const page = createMockPage({ isWorkZone: true });
+      const adapter = createMockAdapter();
+      const manager = createWorkZoneManager(asPage(page), asAdapter(adapter));
+
+      await manager.isAppReady(5000);
+
+      expect(waitForUI5Stable).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ timeout: 5000 }),
+      );
+    });
+
+    it('passes undefined opts when no timeout specified', async () => {
+      const page = createMockPage({ isWorkZone: true });
+      const adapter = createMockAdapter();
+      const manager = createWorkZoneManager(asPage(page), asAdapter(adapter));
+
+      await manager.isAppReady();
+
+      expect(waitForUI5Stable).toHaveBeenCalledWith(expect.anything(), undefined);
     });
   });
 

@@ -75,6 +75,13 @@ vi.mock('#core/logging/index.js', () => ({
   createLogger: mockCreateLogger,
 }));
 
+// ── Mock bridge injection ──────────────────────────────────────────────
+const mockResetPageInjection = vi.fn();
+
+vi.mock('#bridge/injection.js', () => ({
+  resetPageInjection: mockResetPageInjection,
+}));
+
 // ── Mock Playwright ───────────────────────────────────────────────────
 const mockTestExtend = createMockTestExtend();
 const mockExpectExtend = createMockExpectExtend();
@@ -210,6 +217,7 @@ function resetAllMockDefaults(): void {
   mockGetCurrentHash.mockResolvedValue('PurchaseOrder-manage');
   mockCreateWorkZoneManager.mockReturnValue(mockWorkZoneManager);
   mockCreateLogger.mockReturnValue(mockChildLogger);
+  mockResetPageInjection.mockReturnValue(undefined);
 }
 
 // ── Tests ────────────────────────────────────────────────────────────
@@ -335,6 +343,78 @@ describe('nav-fixtures fixture definitions', () => {
         expect.objectContaining({ baseURL: 'https://sap.example.com' }),
       );
     });
+
+    it('navigateToHash delegates correctly', async () => {
+      const fn = extractFixtureFn(fixtures['ui5Navigation']);
+      const nav = await runFixture<UI5NavigationAPI>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await nav.navigateToHash('Shell-home', { timeout: 3000 });
+
+      expect(mockNavigateToHash).toHaveBeenCalledOnce();
+      expect(mockNavigateToHash).toHaveBeenCalledWith(mockPage, 'Shell-home', { timeout: 3000 });
+    });
+
+    it('navigateToHome delegates correctly', async () => {
+      const fn = extractFixtureFn(fixtures['ui5Navigation']);
+      const nav = await runFixture<UI5NavigationAPI>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await nav.navigateToHome({ timeout: 5000 });
+
+      expect(mockNavigateToHome).toHaveBeenCalledOnce();
+      expect(mockNavigateToHome).toHaveBeenCalledWith(mockPage, { timeout: 5000 });
+    });
+
+    it('navigateBack delegates correctly', async () => {
+      const fn = extractFixtureFn(fixtures['ui5Navigation']);
+      const nav = await runFixture<UI5NavigationAPI>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await nav.navigateBack();
+
+      expect(mockNavigateBack).toHaveBeenCalledOnce();
+      expect(mockNavigateBack).toHaveBeenCalledWith(mockPage, undefined);
+    });
+
+    it('navigateForward delegates correctly', async () => {
+      const fn = extractFixtureFn(fixtures['ui5Navigation']);
+      const nav = await runFixture<UI5NavigationAPI>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await nav.navigateForward();
+
+      expect(mockNavigateForward).toHaveBeenCalledOnce();
+      expect(mockNavigateForward).toHaveBeenCalledWith(mockPage, undefined);
+    });
+
+    it('searchAndOpenApp delegates correctly', async () => {
+      const fn = extractFixtureFn(fixtures['ui5Navigation']);
+      const nav = await runFixture<UI5NavigationAPI>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await nav.searchAndOpenApp('Purchase Orders', { timeout: 10_000 });
+
+      expect(mockSearchAndOpenApp).toHaveBeenCalledOnce();
+      expect(mockSearchAndOpenApp).toHaveBeenCalledWith(mockPage, 'Purchase Orders', {
+        timeout: 10_000,
+      });
+    });
   });
 
   describe('btpWorkZone fixture', () => {
@@ -353,6 +433,38 @@ describe('nav-fixtures fixture definitions', () => {
           resetInjectionState: expect.any(Function) as unknown,
         }),
       );
+    });
+
+    it('adapter shim init() is a no-op that resolves', async () => {
+      const fn = extractFixtureFn(fixtures['btpWorkZone']);
+      await runFixture(fn, { page: mockPage });
+
+      // Extract the adapter shim passed to createWorkZoneManager
+      const adapterArg = mockCreateWorkZoneManager.mock.calls[0] as [
+        unknown,
+        { init(): Promise<void>; resetInjectionState(): void },
+      ];
+      const shim = adapterArg[1];
+
+      // init() should resolve without error
+      await expect(shim.init()).resolves.toBeUndefined();
+    });
+
+    it('adapter shim resetInjectionState() calls resetPageInjection with page', async () => {
+      const fn = extractFixtureFn(fixtures['btpWorkZone']);
+      await runFixture(fn, { page: mockPage });
+
+      // Extract the adapter shim passed to createWorkZoneManager
+      const adapterArg = mockCreateWorkZoneManager.mock.calls[0] as [
+        unknown,
+        { init(): Promise<void>; resetInjectionState(): void },
+      ];
+      const shim = adapterArg[1];
+
+      shim.resetInjectionState();
+
+      expect(mockResetPageInjection).toHaveBeenCalledOnce();
+      expect(mockResetPageInjection).toHaveBeenCalledWith(mockPage);
     });
   });
 
