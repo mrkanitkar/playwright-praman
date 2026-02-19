@@ -1085,6 +1085,7 @@ describe('UI5Object', () => {
       page: Page;
       evaluateFn: ReturnType<typeof vi.fn>;
     } {
+      /* eslint-disable @typescript-eslint/promise-function-async -- mock returns Promise without async to avoid require-await conflict */
       const evaluateFn = vi
         .fn()
         .mockImplementation(
@@ -1092,7 +1093,6 @@ describe('UI5Object', () => {
             fn: (params: { uuid: string; bridgeNs: string }) => string[],
             args: { uuid: string; bridgeNs: string },
           ): Promise<string[]> => {
-            // eslint-disable-line @typescript-eslint/promise-function-async -- synchronous mock wrapping; page.evaluate signature expects Promise return
             const bridgeNs = args.bridgeNs;
             // In Node.js, `window` is not defined. The callback references it
             // via `Reflect.get(window, ...)`, so we temporarily define it.
@@ -1113,6 +1113,7 @@ describe('UI5Object', () => {
             }
           },
         );
+      /* eslint-enable @typescript-eslint/promise-function-async */
       return {
         page: { evaluate: evaluateFn, waitForFunction: vi.fn() } as unknown as Page,
         evaluateFn,
