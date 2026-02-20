@@ -129,6 +129,87 @@ describe('sales.createSalesOrder', () => {
 
     expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
   });
+
+  it('returns error when material term not found (customer succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await sales.createSalesOrder(ui5, ui5Nav, vocab, {
+      customer: '1',
+      material: 'M',
+      quantity: 1,
+      salesOrganization: '1',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillCustomer');
+  });
+
+  it('returns error when quantity term not found (customer + material succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await sales.createSalesOrder(ui5, ui5Nav, vocab, {
+      customer: '1',
+      material: 'M',
+      quantity: 1,
+      salesOrganization: '1',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillCustomer');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await sales.createSalesOrder(
+      ui5,
+      ui5Nav,
+      vocab,
+      { customer: '1', material: 'M', quantity: 1, salesOrganization: '1' },
+      { timeout: 30_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(30_000);
+  });
+
+  it('includes stepsExecuted with all fill steps', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await sales.createSalesOrder(ui5, ui5Nav, vocab, {
+      customer: '1',
+      material: 'M',
+      quantity: 1,
+      salesOrganization: '1',
+    });
+
+    expect(result.metadata.stepsExecuted).toContain('navigate');
+    expect(result.metadata.stepsExecuted).toContain('fillCustomer');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+    expect(result.metadata.stepsExecuted).toContain('fillQuantity');
+    expect(result.metadata.stepsExecuted).toContain('clickSave');
+  });
 });
 
 // ── createQuotation ───────────────────────────────────────────────────────────
@@ -149,6 +230,93 @@ describe('sales.createQuotation', () => {
     expect(result.metadata.sapModule).toBe('SD');
     expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('Quotation-create');
   });
+
+  it('returns error when customer term is not found in vocabulary', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockResolvedValue(undefined),
+    };
+
+    const result = await sales.createQuotation(ui5, ui5Nav, vocab, {
+      customer: '200001',
+      material: 'FG-1000',
+      quantity: 10,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.error?.code).toBe('ERR_VOCAB_TERM_NOT_FOUND');
+  });
+
+  it('returns error when material term not found (customer succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await sales.createQuotation(ui5, ui5Nav, vocab, {
+      customer: '200001',
+      material: 'FG-1000',
+      quantity: 10,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillCustomer');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await sales.createQuotation(
+      ui5,
+      ui5Nav,
+      vocab,
+      { customer: '200001', material: 'FG-1000', quantity: 10 },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await sales.createQuotation(
+      ui5,
+      ui5Nav,
+      vocab,
+      { customer: '200001', material: 'FG-1000', quantity: 10 },
+      { timeout: 20_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(20_000);
+  });
+
+  it('includes fillCustomer and fillMaterial in stepsExecuted', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await sales.createQuotation(ui5, ui5Nav, vocab, {
+      customer: '200001',
+      material: 'FG-1000',
+      quantity: 10,
+    });
+
+    expect(result.metadata.stepsExecuted).toContain('fillCustomer');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+    expect(result.metadata.stepsExecuted).toContain('clickSave');
+  });
 });
 
 // ── approveQuotation ──────────────────────────────────────────────────────────
@@ -168,6 +336,45 @@ describe('sales.approveQuotation', () => {
       properties: { text: 'Approve' },
     });
   });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    await sales.approveQuotation(
+      ui5,
+      ui5Nav,
+      { quotationNumber: '20000123' },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await sales.approveQuotation(
+      ui5,
+      ui5Nav,
+      { quotationNumber: '20000123' },
+      { timeout: 10_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(10_000);
+  });
+
+  it('includes clickApprove and waitForSave in stepsExecuted', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await sales.approveQuotation(ui5, ui5Nav, { quotationNumber: '20000123' });
+
+    expect(result.metadata.stepsExecuted).toContain('clickApprove');
+    expect(result.metadata.stepsExecuted).toContain('waitForSave');
+  });
 });
 
 // ── searchSalesOrders ─────────────────────────────────────────────────────────
@@ -184,6 +391,35 @@ describe('sales.searchSalesOrders', () => {
     expect(result.metadata.sapModule).toBe('SD');
     expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('SalesOrder-manage');
   });
+
+  it('returns error when a search criteria term is not found in vocabulary', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockResolvedValue(undefined),
+    };
+
+    const result = await sales.searchSalesOrders(ui5, ui5Nav, vocab, { Customer: '200001' });
+
+    expect(result.status).toBe('error');
+    expect(result.error?.code).toBe('ERR_VOCAB_TERM_NOT_FOUND');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await sales.searchSalesOrders(
+      ui5,
+      ui5Nav,
+      vocab,
+      { Customer: '200001' },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
 });
 
 // ── searchCustomers ────────────────────────────────────────────────────────────
@@ -198,6 +434,24 @@ describe('sales.searchCustomers', () => {
     expect(result.status).toBe('success');
     expect(result.metadata.sapModule).toBe('SD');
     expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('Customer-manage');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    await sales.searchCustomers(ui5, ui5Nav, { skipNavigation: true });
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('includes clickGo in stepsExecuted', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await sales.searchCustomers(ui5, ui5Nav);
+
+    expect(result.metadata.stepsExecuted).toContain('clickGo');
   });
 });
 
@@ -222,5 +476,28 @@ describe('sales.checkDeliveryStatus', () => {
     const result = await sales.checkDeliveryStatus(ui5, ui5Nav, { salesOrderNumber: '10000001' });
 
     expect(result.metadata.stepsExecuted).toContain('getDeliveryStatus');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    await sales.checkDeliveryStatus(
+      ui5,
+      ui5Nav,
+      { salesOrderNumber: '10000001' },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('includes navigate in stepsExecuted when navigation is not skipped', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await sales.checkDeliveryStatus(ui5, ui5Nav, { salesOrderNumber: '10000001' });
+
+    expect(result.metadata.stepsExecuted).toContain('navigate');
   });
 });

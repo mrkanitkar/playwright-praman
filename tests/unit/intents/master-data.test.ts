@@ -138,6 +138,80 @@ describe('masterData.createVendorMaster', () => {
     expect(result.metadata.stepsExecuted).toContain('fillCountry');
     expect(result.metadata.stepsExecuted).toContain('clickSave');
   });
+
+  it('returns error when country term not found (name succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await masterData.createVendorMaster(ui5, ui5Nav, vocab, {
+      name: 'Acme GmbH',
+      country: 'DE',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillName');
+  });
+
+  it('returns error when taxId term not found (name + country succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await masterData.createVendorMaster(ui5, ui5Nav, vocab, {
+      name: 'Acme GmbH',
+      country: 'DE',
+      taxId: 'DE123456789',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillName');
+    expect(result.metadata.stepsExecuted).toContain('fillCountry');
+  });
+
+  it('includes fillTaxId in stepsExecuted on success with taxId', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await masterData.createVendorMaster(ui5, ui5Nav, vocab, {
+      name: 'Acme GmbH',
+      country: 'DE',
+      taxId: 'DE123456789',
+    });
+
+    expect(result.status).toBe('success');
+    expect(result.metadata.stepsExecuted).toContain('fillTaxId');
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await masterData.createVendorMaster(
+      ui5,
+      ui5Nav,
+      vocab,
+      { name: 'Acme GmbH', country: 'DE' },
+      { timeout: 20_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(20_000);
+  });
 });
 
 // ── createCustomerMaster ──────────────────────────────────────────────────────
@@ -190,6 +264,96 @@ describe('masterData.createCustomerMaster', () => {
 
     expect(result.status).toBe('error');
     expect(result.error?.code).toBe('ERR_VOCAB_TERM_NOT_FOUND');
+  });
+
+  it('returns error when country term not found (name succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await masterData.createCustomerMaster(ui5, ui5Nav, vocab, {
+      name: 'Globex Corp',
+      country: 'US',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillName');
+  });
+
+  it('returns error when salesOrganization term not found (name + country succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await masterData.createCustomerMaster(ui5, ui5Nav, vocab, {
+      name: 'Globex Corp',
+      country: 'US',
+      salesOrganization: '1000',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillName');
+    expect(result.metadata.stepsExecuted).toContain('fillCountry');
+  });
+
+  it('includes fillSalesOrganization in stepsExecuted on success', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await masterData.createCustomerMaster(ui5, ui5Nav, vocab, {
+      name: 'Globex Corp',
+      country: 'US',
+      salesOrganization: '1000',
+    });
+
+    expect(result.status).toBe('success');
+    expect(result.metadata.stepsExecuted).toContain('fillSalesOrganization');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await masterData.createCustomerMaster(
+      ui5,
+      ui5Nav,
+      vocab,
+      { name: 'Globex Corp', country: 'US' },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await masterData.createCustomerMaster(
+      ui5,
+      ui5Nav,
+      vocab,
+      { name: 'Globex Corp', country: 'US' },
+      { timeout: 25_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(25_000);
   });
 });
 
@@ -275,5 +439,121 @@ describe('masterData.createMaterialMaster', () => {
     expect(result.metadata.stepsExecuted).toContain('fillMaterialNumber');
     expect(result.metadata.stepsExecuted).toContain('fillDescription');
     expect(result.metadata.stepsExecuted).toContain('clickSave');
+  });
+
+  it('returns error when description term not found (materialNumber succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await masterData.createMaterialMaster(ui5, ui5Nav, vocab, {
+      materialNumber: 'RAW-0001',
+      description: 'Raw material A',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterialNumber');
+  });
+
+  it('returns error when materialType term not found (required fields succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await masterData.createMaterialMaster(ui5, ui5Nav, vocab, {
+      materialNumber: 'RAW-0001',
+      description: 'Raw material A',
+      materialType: 'ROH',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterialNumber');
+    expect(result.metadata.stepsExecuted).toContain('fillDescription');
+  });
+
+  it('returns error when baseUnit term not found (materialType succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        // materialNumber + description + materialType succeed (3), baseUnit fails
+        return callCount <= 3 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await masterData.createMaterialMaster(ui5, ui5Nav, vocab, {
+      materialNumber: 'RAW-0001',
+      description: 'Raw material A',
+      materialType: 'ROH',
+      baseUnit: 'KG',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterialType');
+  });
+
+  it('fills only materialType when baseUnit is not provided', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await masterData.createMaterialMaster(ui5, ui5Nav, vocab, {
+      materialNumber: 'RAW-0001',
+      description: 'Raw material A',
+      materialType: 'ROH',
+    });
+
+    expect(result.status).toBe('success');
+    // materialNumber + description + materialType = 3 fills
+    expect(ui5.fill).toHaveBeenCalledTimes(3);
+    expect(result.metadata.stepsExecuted).toContain('fillMaterialType');
+  });
+
+  it('fills only baseUnit when materialType is not provided', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await masterData.createMaterialMaster(ui5, ui5Nav, vocab, {
+      materialNumber: 'RAW-0001',
+      description: 'Raw material A',
+      baseUnit: 'KG',
+    });
+
+    expect(result.status).toBe('success');
+    // materialNumber + description + baseUnit = 3 fills
+    expect(ui5.fill).toHaveBeenCalledTimes(3);
+    expect(result.metadata.stepsExecuted).toContain('fillBaseUnit');
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await masterData.createMaterialMaster(
+      ui5,
+      ui5Nav,
+      vocab,
+      { materialNumber: 'RAW-0001', description: 'Raw material A' },
+      { timeout: 10_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(10_000);
   });
 });
