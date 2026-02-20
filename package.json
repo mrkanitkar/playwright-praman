@@ -63,6 +63,9 @@
       "require": "./dist/reporters/index.cjs"
     }
   },
+  "bin": {
+    "playwright-praman": "./dist/cli/index.js"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

@@ -23,6 +23,7 @@ import type { AuthPage, AuthStrategy, SAPAuthConfig, SessionInfo } from './auth-
 
 import { AuthError } from '#core/errors/auth-error.js';
 import { retry } from '#core/utils/retry.js';
+import { ui5Step } from '#core/utils/step-decorator.js';
 
 /**
  * Minimal logger interface for auth handler lifecycle events.
@@ -106,6 +107,7 @@ export class SAPAuthHandler {
    * await handler.login(page, config);
    * ```
    */
+  @ui5Step
   async login(page: AuthPage, config: Readonly<SAPAuthConfig>): Promise<void> {
     this.logger.info({ strategy: this.strategy.name, url: config.url }, 'Starting SAP login');
 
@@ -176,6 +178,7 @@ export class SAPAuthHandler {
    * await handler.loginFromEnv(page);
    * ```
    */
+  @ui5Step
   async loginFromEnv(page: AuthPage): Promise<void> {
     const config = this.buildConfigFromEnv();
     await this.login(page, config);
@@ -194,6 +197,7 @@ export class SAPAuthHandler {
    * await handler.logout(page);
    * ```
    */
+  @ui5Step
   async logout(page: AuthPage): Promise<void> {
     this.logger.info({ strategy: this.strategy.name }, 'Logging out of SAP');
 
@@ -217,6 +221,7 @@ export class SAPAuthHandler {
    * const isAuth = await handler.isAuthenticated(page);
    * ```
    */
+  @ui5Step
   async isAuthenticated(page: AuthPage): Promise<boolean> {
     return this.strategy.isAuthenticated(page);
   }

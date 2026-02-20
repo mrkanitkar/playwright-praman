@@ -202,7 +202,7 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
     await use(logger);
   },
 
-  ui5: async ({ page, pramanConfig, rootLogger }, use) => {
+  ui5: async ({ page, pramanConfig, rootLogger, tracer }, use) => {
     const logger = createLogger('bridge', rootLogger);
     const strategy = createInteractionStrategy(pramanConfig.interactionStrategy);
 
@@ -225,6 +225,7 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
         ui5WaitTimeout: pramanConfig.ui5WaitTimeout,
         controlDiscoveryTimeout: pramanConfig.controlDiscoveryTimeout,
       },
+      tracer,
     });
 
     try {

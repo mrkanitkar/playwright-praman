@@ -5,13 +5,15 @@
     "praman", "playwright-praman", "tsup", "vitest", "docusaurus", "pino", "commitlint",
     "fiori", "sapui", "odata", "btp", "saml", "flp", "walkme",
     "combobox", "thenable", "webcomponent", "webcomponents",
-    "smarttable", "smartfilterbar", "smartform", "filterbar", "uxap", "webc", "icontabfilter",
+    "smarttable", "smartfilterbar", "smartform", "smartfield", "filterbar", "uxap", "webc", "icontabfilter",
     "cyclonedx", "sbom", "provenance", "commitizen",
     "redaction", "hermetic", "serializable", "introspectable",
     "wdi5", "opentelemetry", "otel", "otlp", "camelcase",
     "semver", "pageobject", "kebabcase", "nodenext",
     "zestest", "mrkanitkar", "dhikraft",
     "agentic", "attw", "blocklist",
+    "recordreplay", "ushell", "hana", "lifnr", "abap", "sess", "sonarjs",
+    "resumability", "initialised", "optimised", "normalised", "initialisation", "endo",
     "EKKO", "EKPO", "MINBE", "MAXBE", "BSTRF", "PLIFZ"
   ],
   "ignorePaths": [
@@ -28,6 +30,18 @@
     {
       "filename": "docs/documentation-standards.md",
       "words": ["master", "Master"]
+    },
+    {
+      "filename": "src/bridge/method-blacklist.ts",
+      "ignoreWords": ["blacklist", "blacklisted", "BLACKLIST"]
+    },
+    {
+      "filename": "tests/unit/bridge/method-blacklist.test.ts",
+      "ignoreWords": ["blacklist", "blacklisted", "BLACKLIST"]
+    },
+    {
+      "filename": "src/vocabulary/vocabulary-matcher.ts",
+      "words": ["vendro"]
     }
   ]
 }

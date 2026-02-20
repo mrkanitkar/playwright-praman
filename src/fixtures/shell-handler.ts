@@ -28,6 +28,7 @@ import { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS } from '#bridge/bridge-constants.js';
 import { ensureBridgeInjected } from '#bridge/injection.js';
 import { NavigationError } from '#core/errors/navigation-error.js';
 import { createLogger } from '#core/logging/logger.js';
+import { ui5Step } from '#core/utils/step-decorator.js';
 
 /**
  * Options for constructing a ShellHandler.
@@ -75,6 +76,7 @@ export class ShellHandler {
    * await shell.expectShellHeader();
    * ```
    */
+  @ui5Step
   async expectShellHeader(): Promise<void> {
     this.log.debug('Checking shell header visibility');
 
@@ -113,6 +115,7 @@ export class ShellHandler {
    * await shell.clickHome();
    * ```
    */
+  @ui5Step
   async clickHome(): Promise<void> {
     this.log.debug('Clicking shell home button');
 
@@ -164,6 +167,7 @@ export class ShellHandler {
    * await shell.openUserMenu();
    * ```
    */
+  @ui5Step
   async openUserMenu(): Promise<void> {
     this.log.debug('Opening user menu');
 

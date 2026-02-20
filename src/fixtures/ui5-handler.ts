@@ -43,8 +43,11 @@ import type { DiscoveryStrategyName } from '#core/config/schema.js';
 import { ControlError } from '#core/errors/control-error.js';
 import { SelectorError } from '#core/errors/selector-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
+import type { TracerWrapper } from '#core/telemetry/otel.js';
+import { getNoOpTracer } from '#core/telemetry/otel.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
+import { ui5Step } from '#core/utils/step-decorator.js';
 import { ControlProxyCache } from '#proxy/cache.js';
 import { createControlProxy } from '#proxy/control-proxy.js';
 
@@ -77,6 +80,8 @@ export interface UI5HandlerOptions {
     readonly ui5WaitTimeout?: number;
     readonly controlDiscoveryTimeout?: number;
   };
+  /** Optional tracer for OpenTelemetry instrumentation. Defaults to NoOpTracer. */
+  readonly tracer?: TracerWrapper;
 }
 
 /**
@@ -115,6 +120,7 @@ export class UI5Handler {
   private readonly discoveryStrategies: readonly DiscoveryStrategyName[];
   private readonly ui5WaitTimeout: number;
   private readonly discoveryTimeout: number;
+  private readonly tracer: TracerWrapper;
   private cache: ControlProxyCache;
 
   constructor(options: UI5HandlerOptions) {
@@ -123,6 +129,7 @@ export class UI5Handler {
     this.discoveryStrategies = options.discoveryStrategies;
     this.ui5WaitTimeout = options.config?.ui5WaitTimeout ?? DEFAULT_UI5_WAIT_TIMEOUT;
     this.discoveryTimeout = options.config?.controlDiscoveryTimeout ?? DEFAULT_DISCOVERY_TIMEOUT;
+    this.tracer = options.tracer ?? getNoOpTracer();
     this.cache = new ControlProxyCache();
   }
 
@@ -169,11 +176,8 @@ export class UI5Handler {
    */
   private async internalFindControl(selector: UI5Selector): Promise<BridgeControlRef | null> {
     await this.ensureReady();
-    const selectorJson = JSON.stringify(selector);
-    const script = createFindControlScript();
-    const withArgs = script.replace(/\)\(\)$/, `)(${selectorJson})`);
+    const withArgs = createFindControlScript().replace(/\)\(\)$/, `)(${JSON.stringify(selector)})`);
     const result = await this.page.evaluate<ControlDiscoveryResult>(withArgs);
-
     if (result.id === '') return null;
     return { id: result.id, controlType: result.controlType };
   }
@@ -186,11 +190,11 @@ export class UI5Handler {
    */
   private async internalFindControls(selector: UI5Selector): Promise<readonly BridgeControlRef[]> {
     await this.ensureReady();
-    const selectorJson = JSON.stringify(selector);
-    const script = createFindAllControlsScript();
-    const withArgs = script.replace(/\)\(\)$/, `)(${selectorJson})`);
+    const withArgs = createFindAllControlsScript().replace(
+      /\)\(\)$/,
+      `)(${JSON.stringify(selector)})`,
+    );
     const results = await this.page.evaluate<readonly ControlDiscoveryResult[]>(withArgs);
-
     return results.map((r) => ({ id: r.id, controlType: r.controlType }));
   }
 
@@ -208,8 +212,7 @@ export class UI5Handler {
     args: readonly unknown[],
   ): Promise<unknown> {
     await this.ensureReady();
-    const script = createExecuteMethodScript();
-    const withArgs = script.replace(
+    const withArgs = createExecuteMethodScript().replace(
       /\)\(\)$/,
       `)(${JSON.stringify(controlId)}, ${JSON.stringify(methodName)}, ${JSON.stringify(args)})`,
     );
@@ -225,10 +228,9 @@ export class UI5Handler {
    */
   private async internalGetAvailableMethods(controlId: string): Promise<readonly string[]> {
     await this.ensureReady();
-    const ns = BRIDGE_GLOBALS.NAMESPACE;
     const allMethods = await this.page.evaluate<string[]>(
       `(function() {
-        var bridge = window.${ns};
+        var bridge = window.${BRIDGE_GLOBALS.NAMESPACE};
         if (!bridge) return [];
         if (!bridge.utils || typeof bridge.utils.retrieveControlMethods !== 'function') return [];
         return bridge.utils.retrieveControlMethods('${controlId}');
@@ -258,32 +260,35 @@ export class UI5Handler {
    * );
    * ```
    */
+  @ui5Step
   async control(
     selector: UI5Selector,
     options?: { readonly timeout?: number },
   ): Promise<UI5ControlBase> {
-    validateSelector(selector);
+    return this.tracer.withSpan('praman.ui5.findControl', async () => {
+      validateSelector(selector);
 
-    // Always poll for control discovery — use explicit timeout or configured default
-    await this.waitFor(selector, { timeout: options?.timeout ?? this.discoveryTimeout });
+      // Always poll for control discovery — use explicit timeout or configured default
+      await this.waitFor(selector, { timeout: options?.timeout ?? this.discoveryTimeout });
 
-    await this.internalWaitForUI5Stable();
+      await this.internalWaitForUI5Stable();
 
-    const proxy = await this.discoverSingleControl(selector);
+      const proxy = await this.discoverSingleControl(selector);
 
-    if (proxy === null) {
-      throw new ControlError({
-        message: `Control not found: ${JSON.stringify(selector)}`,
-        attempted: `Find control with selector: ${JSON.stringify(selector)}`,
-        suggestions: [
-          'Verify the control ID exists in the UI5 view',
-          'Check if the page has fully loaded (waitForUI5Stable)',
-          'Try using controlType + properties instead of ID',
-        ],
-      });
-    }
+      if (proxy === null) {
+        throw new ControlError({
+          message: `Control not found: ${JSON.stringify(selector)}`,
+          attempted: `Find control with selector: ${JSON.stringify(selector)}`,
+          suggestions: [
+            'Verify the control ID exists in the UI5 view',
+            'Check if the page has fully loaded (waitForUI5Stable)',
+            'Try using controlType + properties instead of ID',
+          ],
+        });
+      }
 
-    return proxy;
+      return proxy;
+    });
   }
 
   /**
@@ -297,29 +302,32 @@ export class UI5Handler {
    * const buttons = await handler.controls({ controlType: 'sap.m.Button' });
    * ```
    */
+  @ui5Step
   async controls(selector: UI5Selector): Promise<readonly UI5ControlBase[]> {
-    validateSelector(selector);
-    await this.internalWaitForUI5Stable();
+    return this.tracer.withSpan('praman.ui5.findControls', async () => {
+      validateSelector(selector);
+      await this.internalWaitForUI5Stable();
 
-    const refs = await this.internalFindControls(selector);
-    if (refs.length === 0) {
-      return [];
-    }
+      const refs = await this.internalFindControls(selector);
+      if (refs.length === 0) {
+        return [];
+      }
 
-    const proxies: UI5ControlBase[] = [];
-    for (const ref of refs) {
-      const methods = await this.internalGetAvailableMethods(ref.id);
-      const proxy = createControlProxy({
-        id: ref.id,
-        controlType: ref.controlType,
-        methods: new Set(methods),
-        page: this.page,
-        interactionStrategy: this.strategy,
-      });
-      proxies.push(proxy);
-    }
+      const proxies: UI5ControlBase[] = [];
+      for (const ref of refs) {
+        const methods = await this.internalGetAvailableMethods(ref.id);
+        const proxy = createControlProxy({
+          id: ref.id,
+          controlType: ref.controlType,
+          methods: new Set(methods),
+          page: this.page,
+          interactionStrategy: this.strategy,
+        });
+        proxies.push(proxy);
+      }
 
-    return proxies;
+      return proxies;
+    });
   }
 
   /**
@@ -332,9 +340,12 @@ export class UI5Handler {
    * await handler.click({ id: 'submitBtn' });
    * ```
    */
+  @ui5Step
   async click(selector: UI5Selector): Promise<void> {
-    const proxy = await this.control(selector);
-    await this.strategy.press(this.page, proxy.id);
+    return this.tracer.withSpan('praman.ui5.click', async () => {
+      const proxy = await this.control(selector);
+      await this.strategy.press(this.page, proxy.id);
+    });
   }
 
   /**
@@ -348,9 +359,12 @@ export class UI5Handler {
    * await handler.fill({ id: 'nameInput' }, 'John');
    * ```
    */
+  @ui5Step
   async fill(selector: UI5Selector, value: string): Promise<void> {
-    const proxy = await this.control(selector);
-    await this.strategy.enterText(this.page, proxy.id, value);
+    return this.tracer.withSpan('praman.ui5.fill', async () => {
+      const proxy = await this.control(selector);
+      await this.strategy.enterText(this.page, proxy.id, value);
+    });
   }
 
   /**
@@ -363,6 +377,7 @@ export class UI5Handler {
    * await handler.press({ id: 'saveBtn' });
    * ```
    */
+  @ui5Step
   async press(selector: UI5Selector): Promise<void> {
     await this.click(selector);
   }
@@ -378,6 +393,7 @@ export class UI5Handler {
    * await handler.select({ id: 'dropdown1' }, 'option2');
    * ```
    */
+  @ui5Step
   async select(selector: UI5Selector, key: string): Promise<void> {
     const proxy = await this.control(selector);
     await this.strategy.select(this.page, proxy.id, key);
@@ -393,6 +409,7 @@ export class UI5Handler {
    * await handler.check({ id: 'agreeCheckbox' });
    * ```
    */
+  @ui5Step
   async check(selector: UI5Selector): Promise<void> {
     const proxy = await this.control(selector);
     await this.internalExecuteControlMethod(proxy.id, 'setSelected', [true]);
@@ -408,6 +425,7 @@ export class UI5Handler {
    * await handler.uncheck({ id: 'agreeCheckbox' });
    * ```
    */
+  @ui5Step
   async uncheck(selector: UI5Selector): Promise<void> {
     const proxy = await this.control(selector);
     await this.internalExecuteControlMethod(proxy.id, 'setSelected', [false]);
@@ -423,6 +441,7 @@ export class UI5Handler {
    * await handler.clear({ id: 'searchInput' });
    * ```
    */
+  @ui5Step
   async clear(selector: UI5Selector): Promise<void> {
     const proxy = await this.control(selector);
     await this.strategy.enterText(this.page, proxy.id, '');
@@ -439,6 +458,7 @@ export class UI5Handler {
    * const text = await handler.getText({ id: 'label1' });
    * ```
    */
+  @ui5Step
   async getText(selector: UI5Selector): Promise<string> {
     const proxy = await this.control(selector);
     const result = await this.internalExecuteControlMethod(proxy.id, 'getText', []);
@@ -456,6 +476,7 @@ export class UI5Handler {
    * const val = await handler.getValue({ id: 'input1' });
    * ```
    */
+  @ui5Step
   async getValue(selector: UI5Selector): Promise<string> {
     const proxy = await this.control(selector);
     const result = await this.internalExecuteControlMethod(proxy.id, 'getValue', []);
@@ -472,8 +493,11 @@ export class UI5Handler {
    * await handler.waitForUI5(10000);
    * ```
    */
+  @ui5Step
   async waitForUI5(timeout?: number): Promise<void> {
-    await this.internalWaitForUI5Stable(timeout ?? this.ui5WaitTimeout);
+    return this.tracer.withSpan('praman.ui5.waitForUI5', async () => {
+      await this.internalWaitForUI5Stable(timeout ?? this.ui5WaitTimeout);
+    });
   }
 
   /**
@@ -488,36 +512,39 @@ export class UI5Handler {
    * await handler.waitFor({ id: 'dialog1' }, { timeout: 5000 });
    * ```
    */
+  @ui5Step
   async waitFor(
     selector: UI5Selector,
     options?: { readonly timeout?: number; readonly interval?: number },
   ): Promise<void> {
-    const timeout = options?.timeout ?? this.discoveryTimeout;
-    const interval = options?.interval ?? DEFAULT_POLL_INTERVAL;
-    const deadline = Date.now() + timeout;
+    return this.tracer.withSpan('praman.ui5.waitFor', async () => {
+      const timeout = options?.timeout ?? this.discoveryTimeout;
+      const interval = options?.interval ?? DEFAULT_POLL_INTERVAL;
+      const deadline = Date.now() + timeout;
 
-    while (Date.now() < deadline) {
-      const proxy = await this.discoverSingleControl(selector);
-      if (proxy !== null) {
-        return;
+      while (Date.now() < deadline) {
+        const proxy = await this.discoverSingleControl(selector);
+        if (proxy !== null) {
+          return;
+        }
+
+        const remaining = deadline - Date.now();
+        if (remaining <= 0) break;
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, Math.min(interval, remaining));
+        });
       }
 
-      const remaining = deadline - Date.now();
-      if (remaining <= 0) break;
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, Math.min(interval, remaining));
+      throw new TimeoutError({
+        message: `Timed out waiting for control: ${JSON.stringify(selector)}`,
+        attempted: `Wait for control with selector: ${JSON.stringify(selector)}`,
+        timeoutMs: timeout,
+        suggestions: [
+          'Increase the timeout value',
+          'Verify the control will eventually appear on the page',
+          'Check if a navigation or data load is required first',
+        ],
       });
-    }
-
-    throw new TimeoutError({
-      message: `Timed out waiting for control: ${JSON.stringify(selector)}`,
-      attempted: `Wait for control with selector: ${JSON.stringify(selector)}`,
-      timeoutMs: timeout,
-      suggestions: [
-        'Increase the timeout value',
-        'Verify the control will eventually appear on the page',
-        'Check if a navigation or data load is required first',
-      ],
     });
   }
 
@@ -541,6 +568,7 @@ export class UI5Handler {
    * await handler.destroy();
    * ```
    */
+  @ui5Step
   // eslint-disable-next-line @typescript-eslint/require-await -- interface consistency: destroy() is async for future cleanup needs
   async destroy(): Promise<void> {
     this.cache = new ControlProxyCache();

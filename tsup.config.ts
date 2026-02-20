@@ -8,6 +8,7 @@ export default defineConfig({
     'vocabulary/index': 'src/vocabulary/index.ts',
     'fe/index': 'src/fe/index.ts',
     'reporters/index': 'src/reporters/index.ts',
+    'cli/index': 'src/cli/index.ts',
   },
   format: ['esm', 'cjs'],
   tsconfig: 'tsconfig.build.json',

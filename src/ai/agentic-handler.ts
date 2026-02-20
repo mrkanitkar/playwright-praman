@@ -23,6 +23,8 @@ import { RecipeRegistry } from './recipe-registry.js';
 import type { ChatMessage } from './schemas/llm-request.schema.js';
 import type { AgenticCheckpoint, AiGeneratedTest, AiResponse, PageContext } from './types.js';
 
+import { ui5Step } from '#core/utils/step-decorator.js';
+
 // ── Zod schema for generateTest LLM response ────────────────────────────────
 
 const AiGeneratedTestSchema = z.object({
@@ -177,6 +179,7 @@ export class AgenticHandler {
    * }
    * ```
    */
+  @ui5Step
   async generateTest(
     scenario: string,
     page: Parameters<typeof buildPageContext>[0],
@@ -289,6 +292,7 @@ export class AgenticHandler {
    * }
    * ```
    */
+  @ui5Step
   async interpretStep(
     step: string,
     page: Parameters<typeof buildPageContext>[0],
@@ -386,6 +390,7 @@ export class AgenticHandler {
    * }
    * ```
    */
+  @ui5Step
   async suggestActions(pageContext: PageContext): Promise<AiResponse<string[]>> {
     const startTime = Date.now();
 
