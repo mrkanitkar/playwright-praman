@@ -22,9 +22,6 @@
  * @module fixtures
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- mergeTests() returns any-typed merged fixture */
-/* eslint-disable @typescript-eslint/no-unsafe-call -- mergeTests() call inferred as any by TypeScript */
-
 import { expect, mergeTests } from '@playwright/test';
 
 import { aiTest } from './ai-fixtures.js';
@@ -88,7 +85,7 @@ export { navTest } from './nav-fixtures.js';
 export type { NavFixtures, NavWorkerDeps, UI5NavigationAPI } from './nav-fixtures.js';
 
 export { aiTest } from './ai-fixtures.js';
-export type { PramanAIFixture } from './ai-fixtures.js';
+export type { AIFixtures, AIWorkerDeps, PramanAIFixture } from './ai-fixtures.js';
 
 export { intentTest } from './intent-fixtures.js';
-export type { IntentFixture } from './intent-fixtures.js';
+export type { IntentFixture, IntentTestFixtures } from './intent-fixtures.js';

@@ -21,6 +21,8 @@
  * @module matchers
  */
 
+export {};
+
 declare module '@playwright/test' {
   // eslint-disable-next-line @typescript-eslint/naming-convention -- R matches @playwright/test Matchers<R> generic parameter
   interface Matchers<R> {
