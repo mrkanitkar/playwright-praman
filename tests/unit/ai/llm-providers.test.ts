@@ -152,7 +152,9 @@ describe('callAzureOpenAI()', () => {
     const config = { ...makeAzureConfig(), maxTokens: 1024 };
     await callAzureOpenAI(SAMPLE_MESSAGES, config);
 
-    const callPayload = openAIMocks.createFn.mock.calls[0][0] as Record<string, unknown>;
+    const firstCall = openAIMocks.createFn.mock.calls[0];
+    if (firstCall === undefined) throw new Error('Expected createFn to have been called');
+    const callPayload = firstCall[0] as Record<string, unknown>;
     expect(callPayload['max_tokens']).toBe(1024);
   });
 
@@ -166,7 +168,9 @@ describe('callAzureOpenAI()', () => {
     const config = { ...makeAzureConfig(), model: 'gpt-4-turbo' };
     await callAzureOpenAI(SAMPLE_MESSAGES, config);
 
-    const callPayload = openAIMocks.createFn.mock.calls[0][0] as Record<string, unknown>;
+    const firstCall = openAIMocks.createFn.mock.calls[0];
+    if (firstCall === undefined) throw new Error('Expected createFn to have been called');
+    const callPayload = firstCall[0] as Record<string, unknown>;
     expect(callPayload['model']).toBe('gpt-4-turbo');
   });
 });
@@ -227,7 +231,9 @@ describe('callOpenAI()', () => {
     const config = { ...makeOpenAIConfig(), maxTokens: 2048 };
     await callOpenAI(SAMPLE_MESSAGES, config);
 
-    const callPayload = openAIMocks.createFn.mock.calls[0][0] as Record<string, unknown>;
+    const firstCall = openAIMocks.createFn.mock.calls[0];
+    if (firstCall === undefined) throw new Error('Expected createFn to have been called');
+    const callPayload = firstCall[0] as Record<string, unknown>;
     expect(callPayload['max_tokens']).toBe(2048);
   });
 
@@ -241,7 +247,9 @@ describe('callOpenAI()', () => {
     const config = { ...makeOpenAIConfig(), model: undefined };
     await callOpenAI(SAMPLE_MESSAGES, config);
 
-    const callPayload = openAIMocks.createFn.mock.calls[0][0] as Record<string, unknown>;
+    const firstCall = openAIMocks.createFn.mock.calls[0];
+    if (firstCall === undefined) throw new Error('Expected createFn to have been called');
+    const callPayload = firstCall[0] as Record<string, unknown>;
     expect(callPayload['model']).toBe('gpt-4o');
   });
 });
@@ -295,7 +303,9 @@ describe('callAnthropic()', () => {
 
     await callAnthropic(messages, makeAnthropicConfig());
 
-    const callPayload = anthropicMocks.createFn.mock.calls[0][0] as Record<string, unknown>;
+    const firstCall = anthropicMocks.createFn.mock.calls[0];
+    if (firstCall === undefined) throw new Error('Expected createFn to have been called');
+    const callPayload = firstCall[0] as Record<string, unknown>;
     // system should be passed at top level, not in messages array
     expect(callPayload['system']).toBe('You are an expert.');
     const sentMessages = callPayload['messages'] as { role: string }[];
@@ -311,7 +321,9 @@ describe('callAnthropic()', () => {
 
     await callAnthropic(SAMPLE_MESSAGES, makeAnthropicConfig());
 
-    const callPayload = anthropicMocks.createFn.mock.calls[0][0] as Record<string, unknown>;
+    const firstCall = anthropicMocks.createFn.mock.calls[0];
+    if (firstCall === undefined) throw new Error('Expected createFn to have been called');
+    const callPayload = firstCall[0] as Record<string, unknown>;
     expect(callPayload['system']).toBeUndefined();
   });
 
@@ -325,7 +337,9 @@ describe('callAnthropic()', () => {
     const config = { ...makeAnthropicConfig(), model: undefined };
     await callAnthropic(SAMPLE_MESSAGES, config);
 
-    const callPayload = anthropicMocks.createFn.mock.calls[0][0] as Record<string, unknown>;
+    const firstCall = anthropicMocks.createFn.mock.calls[0];
+    if (firstCall === undefined) throw new Error('Expected createFn to have been called');
+    const callPayload = firstCall[0] as Record<string, unknown>;
     expect(callPayload['model']).toBe('claude-opus-4-6');
   });
 });

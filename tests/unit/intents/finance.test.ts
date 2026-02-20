@@ -37,12 +37,16 @@ function makeUI5(): UI5Mock {
 }
 
 function makeNav(): {
-  navigateToApp: ReturnType<typeof vi.fn>;
-  navigateToHash: ReturnType<typeof vi.fn>;
+  navigateToApp: ReturnType<typeof vi.fn<(appId: string, options?: unknown) => Promise<void>>>;
+  navigateToHash: ReturnType<typeof vi.fn<(hash: string, options?: unknown) => Promise<void>>>;
 } {
   return {
-    navigateToApp: vi.fn().mockResolvedValue(undefined),
-    navigateToHash: vi.fn().mockResolvedValue(undefined),
+    navigateToApp: vi
+      .fn<(appId: string, options?: unknown) => Promise<void>>()
+      .mockResolvedValue(undefined),
+    navigateToHash: vi
+      .fn<(hash: string, options?: unknown) => Promise<void>>()
+      .mockResolvedValue(undefined),
   };
 }
 

@@ -7,9 +7,6 @@
  * - The guard is called before each table/dialog/date/odata method
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-call -- vi.fn() wrapped results are any-typed */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- vi.fn() mock return is any-typed */
-
 import { describe, expect, it, vi } from 'vitest';
 
 describe('module-fixtures stability guard (withStability)', () => {
@@ -42,11 +39,11 @@ describe('module-fixtures stability guard (withStability)', () => {
     });
 
     const original = {
-      getRows: vi.fn().mockResolvedValue(['row1', 'row2']),
-      getRowCount: vi.fn().mockResolvedValue(2),
+      getRows: vi.fn<() => Promise<string[]>>().mockResolvedValue(['row1', 'row2']),
+      getRowCount: vi.fn<() => Promise<number>>().mockResolvedValue(2),
     };
 
-    const wrapped = withStability(original as never, guard);
+    const wrapped = withStability(original, guard);
 
     await wrapped.getRows();
     await wrapped.getRowCount();
@@ -60,13 +57,15 @@ describe('module-fixtures stability guard (withStability)', () => {
   it('preserves method arguments when calling through guard', async () => {
     const guard = vi.fn().mockResolvedValue(undefined);
     const original = {
-      filterByColumn: vi.fn().mockImplementation(async (col: number, value: string) => {
-        await Promise.resolve();
-        return `${String(col)}:${value}`;
-      }),
+      filterByColumn: vi
+        .fn<(col: number, value: string) => Promise<string>>()
+        .mockImplementation(async (col: number, value: string) => {
+          await Promise.resolve();
+          return `${String(col)}:${value}`;
+        }),
     };
 
-    const wrapped = withStability(original as never, guard);
+    const wrapped = withStability(original, guard);
     const result = await wrapped.filterByColumn(2, 'Active');
 
     expect(guard).toHaveBeenCalledOnce();
@@ -77,12 +76,12 @@ describe('module-fixtures stability guard (withStability)', () => {
   it('wraps all methods in the object', () => {
     const guard = vi.fn().mockResolvedValue(undefined);
     const original = {
-      methodA: vi.fn().mockResolvedValue('a'),
-      methodB: vi.fn().mockResolvedValue('b'),
-      methodC: vi.fn().mockResolvedValue('c'),
+      methodA: vi.fn<() => Promise<string>>().mockResolvedValue('a'),
+      methodB: vi.fn<() => Promise<string>>().mockResolvedValue('b'),
+      methodC: vi.fn<() => Promise<string>>().mockResolvedValue('c'),
     };
 
-    const wrapped = withStability(original as never, guard);
+    const wrapped = withStability(original, guard);
 
     expect(typeof wrapped.methodA).toBe('function');
     expect(typeof wrapped.methodB).toBe('function');
@@ -99,14 +98,14 @@ describe('module-fixtures stability guard (withStability)', () => {
       await Promise.resolve();
     });
     const original = {
-      doSomething: vi.fn().mockImplementation(async () => {
+      doSomething: vi.fn<() => Promise<string>>().mockImplementation(async () => {
         callOrder.push('method');
         await Promise.resolve();
         return 'done';
       }),
     };
 
-    const wrapped = withStability(original as never, guard);
+    const wrapped = withStability(original, guard);
     await wrapped.doSomething();
 
     expect(callOrder).toEqual(['guard', 'method']);
@@ -115,7 +114,7 @@ describe('module-fixtures stability guard (withStability)', () => {
   it('page.off() is called in finally even when use() throws', () => {
     const offCalled = { value: false };
     const mockPage = {
-      off: vi.fn(() => {
+      off: vi.fn<(event: string, listener: (...args: unknown[]) => void) => void>(() => {
         offCalled.value = true;
       }),
     };
@@ -127,7 +126,7 @@ describe('module-fixtures stability guard (withStability)', () => {
     } catch {
       // expected error
     } finally {
-      mockPage.off('framenavigated' as never, mockListener as never);
+      mockPage.off('framenavigated', mockListener);
     }
 
     expect(offCalled.value).toBe(true);

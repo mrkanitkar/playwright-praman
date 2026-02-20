@@ -21,7 +21,7 @@ describe('module-fixtures teardown (B5 fix verification)', () => {
   it('page.off() is called in finally even when use() throws', async () => {
     const offCalled = { value: false };
     const mockPage = {
-      off: vi.fn(() => {
+      off: vi.fn<(event: string, listener: (...args: unknown[]) => void) => void>(() => {
         offCalled.value = true;
       }),
       evaluate: vi.fn<(...args: unknown[]) => Promise<void>>().mockResolvedValue(undefined),
@@ -64,7 +64,7 @@ describe('module-fixtures teardown (B5 fix verification)', () => {
 
   it('handler.destroy() called in finally even when cleanup fails', async () => {
     const mockPage = {
-      off: vi.fn(),
+      off: vi.fn<(event: string, listener: (...args: unknown[]) => void) => void>(),
       evaluate: vi
         .fn<(...args: unknown[]) => Promise<void>>()
         .mockRejectedValue(new Error('Page navigated')),

@@ -10,8 +10,6 @@
  * @module fixtures
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- dynamic import of fixture module returns any-typed */
-
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
