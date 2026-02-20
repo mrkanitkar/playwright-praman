@@ -30,11 +30,6 @@
  * @module fixtures
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- Playwright test.extend() returns any-typed fixtures */
-/* eslint-disable @typescript-eslint/no-unsafe-call -- Playwright fixture callbacks are called with any-typed args */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- Playwright page/use are any-typed in fixture context */
-/* eslint-disable @typescript-eslint/no-unsafe-argument -- Playwright fixture args have any types from test.extend */
-
 import { expect, test as base } from '@playwright/test';
 import type { Frame } from '@playwright/test';
 import type { Logger } from 'pino';

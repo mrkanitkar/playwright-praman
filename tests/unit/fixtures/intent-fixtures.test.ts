@@ -15,8 +15,6 @@
  * @module fixtures
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- dynamic import of fixture module returns any-typed */
-
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -246,6 +244,33 @@ async function runFixture<T>(
   return captured as T;
 }
 
+/**
+ * Safely retrieves a method from a Record type, throwing if undefined.
+ *
+ * @remarks
+ * Replaces non-null assertions (`!`) on Record bracket-access which ESLint
+ * forbids via `@typescript-eslint/no-non-null-assertion`. With
+ * `noUncheckedIndexedAccess`, `Record<string, T>[key]` returns `T | undefined`.
+ * This helper narrows the type at runtime with a clear error message.
+ *
+ * @param obj - The record to look up
+ * @param key - The property name
+ * @returns The value, guaranteed to be defined
+ *
+ * @example
+ * ```typescript
+ * const fn = method(core, 'fillField');
+ * await fn('Vendor', '100001');
+ * ```
+ */
+function method<T>(obj: Record<string, T>, key: string): T {
+  const value = obj[key];
+  if (value === undefined) {
+    throw new Error(`Expected property "${key}" to be defined`);
+  }
+  return value;
+}
+
 // ── Fixture definitions reference ─────────────────────────────────────
 const fixtures = (intentTest as unknown as { _fixtureDefinitions: Record<string, unknown> })
   ._fixtureDefinitions;
@@ -343,7 +368,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await core['fillField']('Vendor', '100001');
+      await method(core, 'fillField')('Vendor', '100001');
 
       expect(mocks.fillField).toHaveBeenCalledOnce();
     });
@@ -353,7 +378,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await core['clickButton']('Save');
+      await method(core, 'clickButton')('Save');
 
       expect(mocks.clickButton).toHaveBeenCalledOnce();
     });
@@ -363,7 +388,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await core['selectOption']('Status', 'Active');
+      await method(core, 'selectOption')('Status', 'Active');
 
       expect(mocks.selectOption).toHaveBeenCalledOnce();
     });
@@ -373,7 +398,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await core['assertField']('Vendor', '100001');
+      await method(core, 'assertField')('Vendor', '100001');
 
       expect(mocks.assertField).toHaveBeenCalledOnce();
     });
@@ -383,7 +408,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await core['confirmAndWait']();
+      await method(core, 'confirmAndWait')();
 
       expect(mocks.confirmAndWait).toHaveBeenCalledOnce();
     });
@@ -393,7 +418,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await core['waitForSave']();
+      await method(core, 'waitForSave')();
 
       expect(mocks.waitForSave).toHaveBeenCalledOnce();
     });
@@ -408,7 +433,10 @@ describe('intent-fixtures fixture definitions', () => {
         string,
         (...args: unknown[]) => Promise<unknown>
       >;
-      await proc['createPurchaseOrder']({
+      await method(
+        proc,
+        'createPurchaseOrder',
+      )({
         vendor: '100001',
         material: 'MAT-001',
         quantity: 10,
@@ -426,7 +454,7 @@ describe('intent-fixtures fixture definitions', () => {
         string,
         (...args: unknown[]) => Promise<unknown>
       >;
-      await proc['approvePurchaseOrder']({ poNumber: '4500000001' });
+      await method(proc, 'approvePurchaseOrder')({ poNumber: '4500000001' });
 
       expect(mocks.approvePurchaseOrder).toHaveBeenCalledOnce();
     });
@@ -439,7 +467,7 @@ describe('intent-fixtures fixture definitions', () => {
         string,
         (...args: unknown[]) => Promise<unknown>
       >;
-      await proc['searchPurchaseOrders']({ Vendor: '100001' });
+      await method(proc, 'searchPurchaseOrders')({ Vendor: '100001' });
 
       expect(mocks.searchPurchaseOrders).toHaveBeenCalledOnce();
     });
@@ -452,7 +480,10 @@ describe('intent-fixtures fixture definitions', () => {
         string,
         (...args: unknown[]) => Promise<unknown>
       >;
-      await proc['createPurchaseRequisition']({ material: 'MAT-001', quantity: 5, plant: '1000' });
+      await method(
+        proc,
+        'createPurchaseRequisition',
+      )({ material: 'MAT-001', quantity: 5, plant: '1000' });
 
       expect(mocks.createPurchaseRequisition).toHaveBeenCalledOnce();
     });
@@ -465,7 +496,7 @@ describe('intent-fixtures fixture definitions', () => {
         string,
         (...args: unknown[]) => Promise<unknown>
       >;
-      await proc['confirmGoodsReceipt']({ poNumber: '4500000001', quantity: 10 });
+      await method(proc, 'confirmGoodsReceipt')({ poNumber: '4500000001', quantity: 10 });
 
       expect(mocks.confirmGoodsReceipt).toHaveBeenCalledOnce();
     });
@@ -478,7 +509,7 @@ describe('intent-fixtures fixture definitions', () => {
         string,
         (...args: unknown[]) => Promise<unknown>
       >;
-      await proc['searchVendors']();
+      await method(proc, 'searchVendors')();
 
       expect(mocks.searchVendors).toHaveBeenCalledOnce();
     });
@@ -490,7 +521,10 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await sales['createSalesOrder']({
+      await method(
+        sales,
+        'createSalesOrder',
+      )({
         customer: '200001',
         material: 'FG-1000',
         quantity: 5,
@@ -505,7 +539,10 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await sales['createQuotation']({ customer: '200001', material: 'FG-1000', quantity: 5 });
+      await method(
+        sales,
+        'createQuotation',
+      )({ customer: '200001', material: 'FG-1000', quantity: 5 });
 
       expect(mocks.createQuotation).toHaveBeenCalledOnce();
     });
@@ -515,7 +552,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await sales['approveQuotation']({ quotationNumber: 'Q-001' });
+      await method(sales, 'approveQuotation')({ quotationNumber: 'Q-001' });
 
       expect(mocks.approveQuotation).toHaveBeenCalledOnce();
     });
@@ -525,7 +562,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await sales['searchSalesOrders']({ Customer: '200001' });
+      await method(sales, 'searchSalesOrders')({ Customer: '200001' });
 
       expect(mocks.searchSalesOrders).toHaveBeenCalledOnce();
     });
@@ -535,7 +572,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      await sales['searchCustomers']();
+      await method(sales, 'searchCustomers')();
 
       expect(mocks.searchCustomers).toHaveBeenCalledOnce();
     });
@@ -545,7 +582,7 @@ describe('intent-fixtures fixture definitions', () => {
       const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
-      const result = await sales['checkDeliveryStatus']({ salesOrderNumber: 'SO-001' });
+      const result = await method(sales, 'checkDeliveryStatus')({ salesOrderNumber: 'SO-001' });
 
       expect(mocks.checkDeliveryStatus).toHaveBeenCalledOnce();
       expect((result as Record<string, unknown>)['data']).toBe('In Transit');

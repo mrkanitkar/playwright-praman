@@ -9,8 +9,6 @@
  * - page.off() is always called (try/finally guarantee)
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-call -- vi.fn() typed as any in Playwright mock context */
-
 import { describe, expect, it, vi } from 'vitest';
 
 import { createObjectCleanupScript } from '../../../src/bridge/browser-scripts/object-map.js';
@@ -26,7 +24,7 @@ describe('core-fixtures teardown', () => {
     // Simulates page.evaluate rejecting (page navigated away mid-cleanup)
     const mockPage = {
       evaluate: vi
-        .fn<[unknown], Promise<void>>()
+        .fn<(arg: unknown) => Promise<void>>()
         .mockRejectedValue(new Error('Navigation occurred')),
     };
 
@@ -48,7 +46,7 @@ describe('core-fixtures teardown', () => {
       }),
     };
     const mockPage = {
-      evaluate: vi.fn<[unknown], Promise<void>>().mockRejectedValue(new Error('Navigation')),
+      evaluate: vi.fn<(arg: unknown) => Promise<void>>().mockRejectedValue(new Error('Navigation')),
     };
 
     const cleanupScript = createObjectCleanupScript();
@@ -67,10 +65,10 @@ describe('core-fixtures teardown', () => {
   it('page.off() is called in finally block', async () => {
     const offCalled = { value: false };
     const mockPage = {
-      off: vi.fn(() => {
+      off: vi.fn<(event: string, listener: (...args: unknown[]) => void) => void>(() => {
         offCalled.value = true;
       }),
-      evaluate: vi.fn<[unknown], Promise<void>>().mockResolvedValue(undefined),
+      evaluate: vi.fn<(arg: unknown) => Promise<void>>().mockResolvedValue(undefined),
     };
     const mockHandler = { destroy: vi.fn().mockResolvedValue(undefined) };
     const mockListener = vi.fn();
