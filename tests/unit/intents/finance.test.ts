@@ -143,6 +143,89 @@ describe('finance.createJournalEntry', () => {
 
     expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
   });
+
+  it('returns error when posting date term is not found (docDate succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        // First call (Document Date) succeeds, second call (Posting Date) fails
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await finance.createJournalEntry(ui5, ui5Nav, vocab, {
+      documentDate: '2026-02-20',
+      postingDate: '2026-02-20',
+      lineItems: [],
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillDocumentDate');
+  });
+
+  it('returns error when G/L Account term not found for a line item', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        // First 2 calls succeed (docDate, postDate), 3rd (G/L Account) fails
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await finance.createJournalEntry(ui5, ui5Nav, vocab, {
+      documentDate: '2026-02-20',
+      postingDate: '2026-02-20',
+      lineItems: [{ glAccount: '400000', debitCredit: 'S', amount: 1000 }],
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillDocumentDate');
+    expect(result.metadata.stepsExecuted).toContain('fillPostingDate');
+  });
+
+  it('returns error when Amount term not found for a line item (G/L succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        // First 3 calls succeed (docDate, postDate, G/L), 4th (Amount) fails
+        return callCount <= 3 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await finance.createJournalEntry(ui5, ui5Nav, vocab, {
+      documentDate: '2026-02-20',
+      postingDate: '2026-02-20',
+      lineItems: [{ glAccount: '400000', debitCredit: 'S', amount: 1000 }],
+    });
+
+    expect(result.status).toBe('error');
+  });
+
+  it('passes timeout option to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await finance.createJournalEntry(
+      ui5,
+      ui5Nav,
+      vocab,
+      { documentDate: '2026-02-20', postingDate: '2026-02-20', lineItems: [] },
+      { timeout: 30_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(30_000);
+  });
 });
 
 // ── postVendorInvoice ─────────────────────────────────────────────────────────
@@ -196,6 +279,65 @@ describe('finance.postVendorInvoice', () => {
     expect(result.status).toBe('error');
     expect(result.error?.code).toBe('ERR_VOCAB_TERM_NOT_FOUND');
   });
+
+  it('returns error when invoice date term not found (vendor succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await finance.postVendorInvoice(ui5, ui5Nav, vocab, {
+      vendor: '100001',
+      invoiceDate: '2026-02-20',
+      amount: 5000,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillVendor');
+  });
+
+  it('returns error when amount term not found (vendor + invDate succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await finance.postVendorInvoice(ui5, ui5Nav, vocab, {
+      vendor: '100001',
+      invoiceDate: '2026-02-20',
+      amount: 5000,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillVendor');
+    expect(result.metadata.stepsExecuted).toContain('fillInvoiceDate');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await finance.postVendorInvoice(
+      ui5,
+      ui5Nav,
+      vocab,
+      { vendor: '100001', invoiceDate: '2026-02-20', amount: 5000 },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
 });
 
 // ── processPayment ────────────────────────────────────────────────────────────
@@ -248,5 +390,81 @@ describe('finance.processPayment', () => {
 
     expect(result.status).toBe('error');
     expect(result.error?.code).toBe('ERR_VOCAB_TERM_NOT_FOUND');
+  });
+
+  it('returns error when amount term not found (vendor succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await finance.processPayment(ui5, ui5Nav, vocab, {
+      vendor: '100001',
+      amount: 5000,
+      paymentDate: '2026-02-28',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillVendor');
+  });
+
+  it('returns error when payment date term not found (vendor + amount succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await finance.processPayment(ui5, ui5Nav, vocab, {
+      vendor: '100001',
+      amount: 5000,
+      paymentDate: '2026-02-28',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillVendor');
+    expect(result.metadata.stepsExecuted).toContain('fillAmount');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await finance.processPayment(
+      ui5,
+      ui5Nav,
+      vocab,
+      { vendor: '100001', amount: 5000, paymentDate: '2026-02-28' },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await finance.processPayment(
+      ui5,
+      ui5Nav,
+      vocab,
+      { vendor: '100001', amount: 5000, paymentDate: '2026-02-28' },
+      { timeout: 20_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(20_000);
   });
 });

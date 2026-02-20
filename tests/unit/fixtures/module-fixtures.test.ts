@@ -316,7 +316,7 @@ const mockConfig: Readonly<PramanConfig> = Object.freeze(
 );
 
 // ── Import after mocks ──────────────────────────────────────────────
-const { moduleTest } = await import('#fixtures/module-fixtures.js');
+const { moduleTest, withStability } = await import('#fixtures/module-fixtures.js');
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
@@ -1357,6 +1357,158 @@ describe('module-fixtures fixture definitions', () => {
       capturedListener(childFrame);
 
       expect(mockResetPageInjection).not.toHaveBeenCalled();
+    });
+
+    it('teardown runs cleanup script and calls handler.destroy()', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+
+      await fn(
+        { page: mockPage, pramanConfig: mockConfig, rootLogger: mockChildLogger },
+        async () => {
+          await Promise.resolve();
+        },
+      );
+
+      // Verify teardown called page.evaluate (cleanup script) and handler.destroy()
+      expect(mockPage.evaluate).toHaveBeenCalled();
+      expect(mockUI5HandlerInstance.destroy).toHaveBeenCalledOnce();
+    });
+
+    it('teardown calls handler.destroy() even when cleanup script throws', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+
+      // Make page.evaluate reject (simulates page navigated away)
+      mockPage.evaluate.mockRejectedValueOnce(new Error('page closed'));
+
+      await fn(
+        { page: mockPage, pramanConfig: mockConfig, rootLogger: mockChildLogger },
+        async () => {
+          await Promise.resolve();
+        },
+      );
+
+      // handler.destroy() must still be called even when cleanup script fails
+      expect(mockUI5HandlerInstance.destroy).toHaveBeenCalledOnce();
+    });
+
+    it('teardown removes listener and destroys handler even when use() throws', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+
+      await expect(
+        fn({ page: mockPage, pramanConfig: mockConfig, rootLogger: mockChildLogger }, async () => {
+          await Promise.reject(new Error('test error during use'));
+        }),
+      ).rejects.toThrow('test error during use');
+
+      // Teardown must still run
+      expect(mockPage.off).toHaveBeenCalledWith('framenavigated', expect.any(Function));
+      expect(mockUI5HandlerInstance.destroy).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('withStability', () => {
+    it('wraps all methods with a stability guard', async () => {
+      const guardCalls: number[] = [];
+      const guard = async (): Promise<void> => {
+        guardCalls.push(1);
+        await Promise.resolve();
+      };
+      const obj = {
+        doSomething: async (x: never): Promise<string> => {
+          await Promise.resolve();
+          return `result-${String(x)}`;
+        },
+      };
+
+      const wrapped = withStability(obj, guard);
+      const result = await wrapped.doSomething('test' as never);
+
+      expect(guardCalls).toHaveLength(1);
+      expect(result).toBe('result-test');
+    });
+
+    it('skips undefined values in the input object (noUncheckedIndexedAccess guard)', async () => {
+      const guardCalls: number[] = [];
+      const guard = async (): Promise<void> => {
+        guardCalls.push(1);
+        await Promise.resolve();
+      };
+
+      // Create an object that has an undefined value via Object.defineProperty
+      // to exercise the `if (fn === undefined) continue;` branch
+      const obj: Record<string, (...args: never[]) => Promise<unknown>> = {
+        realMethod: async (): Promise<string> => {
+          await Promise.resolve();
+          return 'ok';
+        },
+      };
+      // Manually set a key to undefined to trigger the guard
+      Object.defineProperty(obj, 'ghostKey', {
+        value: undefined,
+        enumerable: true,
+        configurable: true,
+      });
+
+      const wrapped = withStability(obj, guard);
+
+      // The ghostKey should NOT exist on the wrapped object
+      // because withStability skips undefined values
+      expect(wrapped['realMethod']).toBeDefined();
+      expect(wrapped['ghostKey']).toBeUndefined();
+
+      // Call the real method to ensure it still works
+      const realFn = wrapped['realMethod'];
+      expect(realFn).toBeDefined();
+      if (realFn === undefined) throw new Error('realMethod should be defined');
+      const result = await realFn();
+      expect(result).toBe('ok');
+      expect(guardCalls).toHaveLength(1);
+    });
+
+    it('preserves method return values through the stability wrapper', async () => {
+      const guard = async (): Promise<void> => {
+        await Promise.resolve();
+      };
+      const obj = {
+        getNumber: async (): Promise<number> => {
+          await Promise.resolve();
+          return 42;
+        },
+        getString: async (): Promise<string> => {
+          await Promise.resolve();
+          return 'hello';
+        },
+      };
+
+      const wrapped = withStability(obj, guard);
+
+      expect(await wrapped.getNumber()).toBe(42);
+      expect(await wrapped.getString()).toBe('hello');
+    });
+
+    it('calls guard before each method invocation', async () => {
+      const callOrder: string[] = [];
+      const guard = async (): Promise<void> => {
+        callOrder.push('guard');
+        await Promise.resolve();
+      };
+      const obj = {
+        alpha: async (): Promise<void> => {
+          callOrder.push('alpha');
+          await Promise.resolve();
+        },
+        beta: async (): Promise<void> => {
+          callOrder.push('beta');
+          await Promise.resolve();
+        },
+      };
+
+      const wrapped = withStability(obj, guard);
+
+      await wrapped.alpha();
+      await wrapped.beta();
+
+      expect(callOrder).toEqual(['guard', 'alpha', 'guard', 'beta']);
     });
   });
 });

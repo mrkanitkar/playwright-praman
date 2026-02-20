@@ -160,6 +160,107 @@ describe('manufacturing.createProductionOrder', () => {
     expect(result.metadata.stepsExecuted).toContain('fillQuantity');
     expect(result.metadata.stepsExecuted).toContain('clickSave');
   });
+
+  it('returns error when plant term not found (material succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await manufacturing.createProductionOrder(ui5, ui5Nav, vocab, {
+      material: 'FG-1000',
+      plant: '1000',
+      quantity: 50,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+  });
+
+  it('returns error when quantity term not found (material + plant succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await manufacturing.createProductionOrder(ui5, ui5Nav, vocab, {
+      material: 'FG-1000',
+      plant: '1000',
+      quantity: 50,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+    expect(result.metadata.stepsExecuted).toContain('fillPlant');
+  });
+
+  it('returns error when scheduledStart term not found (required fields succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        // First 3 succeed (material, plant, qty), 4th (scheduledStart) fails
+        return callCount <= 3 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await manufacturing.createProductionOrder(ui5, ui5Nav, vocab, {
+      material: 'FG-1000',
+      plant: '1000',
+      quantity: 50,
+      scheduledStart: '2026-03-01',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+    expect(result.metadata.stepsExecuted).toContain('fillPlant');
+    expect(result.metadata.stepsExecuted).toContain('fillQuantity');
+  });
+
+  it('includes fillScheduledStart in stepsExecuted on success', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await manufacturing.createProductionOrder(ui5, ui5Nav, vocab, {
+      material: 'FG-1000',
+      plant: '1000',
+      quantity: 50,
+      scheduledStart: '2026-03-01',
+    });
+
+    expect(result.status).toBe('success');
+    expect(result.metadata.stepsExecuted).toContain('fillScheduledStart');
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await manufacturing.createProductionOrder(
+      ui5,
+      ui5Nav,
+      vocab,
+      { material: 'FG-1000', plant: '1000', quantity: 50 },
+      { timeout: 30_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(30_000);
+  });
 });
 
 // ── confirmProductionOrder ────────────────────────────────────────────────────
@@ -222,5 +323,58 @@ describe('manufacturing.confirmProductionOrder', () => {
 
     expect(result.metadata.stepsExecuted).toContain('fillOrderNumber');
     expect(result.metadata.stepsExecuted).toContain('fillQuantity');
+  });
+
+  it('returns error when quantity term not found (order number succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await manufacturing.confirmProductionOrder(ui5, ui5Nav, vocab, {
+      orderNumber: '1000012',
+      quantity: 50,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillOrderNumber');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await manufacturing.confirmProductionOrder(
+      ui5,
+      ui5Nav,
+      vocab,
+      { orderNumber: '1000012', quantity: 50 },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await manufacturing.confirmProductionOrder(
+      ui5,
+      ui5Nav,
+      vocab,
+      { orderNumber: '1000012', quantity: 50 },
+      { timeout: 15_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(15_000);
   });
 });

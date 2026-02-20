@@ -147,6 +147,92 @@ describe('procurement.createPurchaseOrder', () => {
     expect(result.metadata.stepsExecuted).toContain('fillVendor');
     expect(result.metadata.stepsExecuted).toContain('clickSave');
   });
+
+  it('returns error when material term not found (vendor succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await procurement.createPurchaseOrder(ui5, ui5Nav, vocab, {
+      vendor: '1',
+      material: 'M',
+      quantity: 1,
+      plant: '1',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillVendor');
+  });
+
+  it('returns error when quantity term not found (vendor + material succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await procurement.createPurchaseOrder(ui5, ui5Nav, vocab, {
+      vendor: '1',
+      material: 'M',
+      quantity: 1,
+      plant: '1',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillVendor');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+  });
+
+  it('returns error when plant term not found (vendor + material + qty succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 3 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await procurement.createPurchaseOrder(ui5, ui5Nav, vocab, {
+      vendor: '1',
+      material: 'M',
+      quantity: 1,
+      plant: '1',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillVendor');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+    expect(result.metadata.stepsExecuted).toContain('fillQuantity');
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await procurement.createPurchaseOrder(
+      ui5,
+      ui5Nav,
+      vocab,
+      { vendor: '1', material: 'M', quantity: 1, plant: '1' },
+      { timeout: 30_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(30_000);
+  });
 });
 
 // ── approvePurchaseOrder ──────────────────────────────────────────────────────
@@ -165,6 +251,45 @@ describe('procurement.approvePurchaseOrder', () => {
       controlType: 'sap.m.Button',
       properties: { text: 'Approve' },
     });
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    await procurement.approvePurchaseOrder(
+      ui5,
+      ui5Nav,
+      { poNumber: '4500012345' },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await procurement.approvePurchaseOrder(
+      ui5,
+      ui5Nav,
+      { poNumber: '4500012345' },
+      { timeout: 10_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(10_000);
+  });
+
+  it('includes clickApprove and waitForSave in stepsExecuted', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await procurement.approvePurchaseOrder(ui5, ui5Nav, { poNumber: '4500012345' });
+
+    expect(result.metadata.stepsExecuted).toContain('clickApprove');
+    expect(result.metadata.stepsExecuted).toContain('waitForSave');
   });
 });
 
@@ -186,6 +311,37 @@ describe('procurement.searchPurchaseOrders', () => {
       properties: { text: 'Go' },
     });
   });
+
+  it('returns error when a search criteria term is not found in vocabulary', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockResolvedValue(undefined),
+    };
+
+    const result = await procurement.searchPurchaseOrders(ui5, ui5Nav, vocab, {
+      Vendor: '100001',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.error?.code).toBe('ERR_VOCAB_TERM_NOT_FOUND');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await procurement.searchPurchaseOrders(
+      ui5,
+      ui5Nav,
+      vocab,
+      { Vendor: '100001' },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
 });
 
 // ── createPurchaseRequisition ─────────────────────────────────────────────────
@@ -205,6 +361,99 @@ describe('procurement.createPurchaseRequisition', () => {
     expect(result.status).toBe('success');
     expect(result.metadata.sapModule).toBe('MM');
     expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('PurchaseRequisition-create');
+  });
+
+  it('returns error when material term is not found in vocabulary', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockResolvedValue(undefined),
+    };
+
+    const result = await procurement.createPurchaseRequisition(ui5, ui5Nav, vocab, {
+      material: 'MAT-001',
+      quantity: 5,
+      plant: '1000',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.error?.code).toBe('ERR_VOCAB_TERM_NOT_FOUND');
+  });
+
+  it('returns error when quantity term not found (material succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await procurement.createPurchaseRequisition(ui5, ui5Nav, vocab, {
+      material: 'MAT-001',
+      quantity: 5,
+      plant: '1000',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+  });
+
+  it('returns error when plant term not found (material + quantity succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await procurement.createPurchaseRequisition(ui5, ui5Nav, vocab, {
+      material: 'MAT-001',
+      quantity: 5,
+      plant: '1000',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+    expect(result.metadata.stepsExecuted).toContain('fillQuantity');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await procurement.createPurchaseRequisition(
+      ui5,
+      ui5Nav,
+      vocab,
+      { material: 'MAT-001', quantity: 5, plant: '1000' },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    const result = await procurement.createPurchaseRequisition(
+      ui5,
+      ui5Nav,
+      vocab,
+      { material: 'MAT-001', quantity: 5, plant: '1000' },
+      { timeout: 20_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(20_000);
   });
 });
 
@@ -228,6 +477,48 @@ describe('procurement.confirmGoodsReceipt', () => {
       properties: { text: 'Post' },
     });
   });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    await procurement.confirmGoodsReceipt(
+      ui5,
+      ui5Nav,
+      { poNumber: '4500012345', quantity: 10 },
+      { skipNavigation: true },
+    );
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('passes timeout option through to waitForSave', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await procurement.confirmGoodsReceipt(
+      ui5,
+      ui5Nav,
+      { poNumber: '4500012345', quantity: 10 },
+      { timeout: 15_000 },
+    );
+
+    expect(result.status).toBe('success');
+    expect(ui5.waitForUI5).toHaveBeenCalledWith(15_000);
+  });
+
+  it('includes clickPost and waitForSave in stepsExecuted', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await procurement.confirmGoodsReceipt(ui5, ui5Nav, {
+      poNumber: '4500012345',
+      quantity: 10,
+    });
+
+    expect(result.metadata.stepsExecuted).toContain('clickPost');
+    expect(result.metadata.stepsExecuted).toContain('waitForSave');
+  });
 });
 
 // ── searchVendors ─────────────────────────────────────────────────────────────
@@ -242,5 +533,23 @@ describe('procurement.searchVendors', () => {
     expect(result.status).toBe('success');
     expect(result.metadata.sapModule).toBe('MM');
     expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('Supplier-manage');
+  });
+
+  it('skips navigation when skipNavigation is true', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    await procurement.searchVendors(ui5, ui5Nav, { skipNavigation: true });
+
+    expect(ui5Nav.navigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('includes clickGo in stepsExecuted', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+
+    const result = await procurement.searchVendors(ui5, ui5Nav);
+
+    expect(result.metadata.stepsExecuted).toContain('clickGo');
   });
 });

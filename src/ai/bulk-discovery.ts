@@ -195,6 +195,7 @@ function buildErrorResponse(err: unknown, duration: number): AiResponse<PageCont
  * @param args - Serializable filter arguments from Node.js.
  * @returns Array of raw control descriptors found in the UI5 element registry.
  */
+/* v8 ignore start -- browser-context: entire function executes in Chromium via page.evaluate(), not in Node.js */
 // eslint-disable-next-line sonarjs/cognitive-complexity -- inlined helpers required by page.evaluate() serialization inflate complexity
 function browserDiscoverControls(args: BrowserArgs): {
   id: string;
@@ -410,6 +411,7 @@ function browserDiscoverControls(args: BrowserArgs): {
 
   return results;
 }
+/* v8 ignore stop */
 
 // ── Main export ────────────────────────────────────────────────────────────
 

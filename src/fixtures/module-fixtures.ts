@@ -248,7 +248,7 @@ export function createODataFixture(page: never) {
  * Calls `guard()` before each async method in `obj` to ensure UI5 is stable.
  * Type-safe: preserves the original object's method signatures.
  */
-function withStability<T extends Record<string, (...args: never[]) => Promise<unknown>>>(
+export function withStability<T extends Record<string, (...args: never[]) => Promise<unknown>>>(
   obj: T,
   guard: () => Promise<void>,
 ): T {
