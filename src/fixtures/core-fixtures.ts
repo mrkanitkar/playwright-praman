@@ -56,6 +56,7 @@ import {
 
 import { UI5Handler } from './ui5-handler.js';
 
+import { createObjectCleanupScript } from '#bridge/browser-scripts/object-map.js';
 import { resetPageInjection } from '#bridge/injection.js';
 import { createInteractionStrategy } from '#bridge/interaction-strategies/strategy-factory.js';
 import { assertMinVersion, getPlaywrightFeatures } from '#core/compat/index.js';
@@ -231,10 +232,21 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
       },
     });
 
-    await use(handler);
-
-    // Teardown: remove navigation listener
-    page.off('framenavigated', navigationListener);
+    try {
+      await use(handler);
+    } finally {
+      // Teardown: remove navigation listener (always — even if use() throws)
+      page.off('framenavigated', navigationListener);
+      try {
+        // Clean up browser-side object map to prevent memory leaks
+        const cleanupScript = createObjectCleanupScript();
+        await page.evaluate(cleanupScript).catch(() => {
+          // Cleanup failure is non-fatal — page may have navigated away
+        });
+      } finally {
+        await handler.destroy();
+      }
+    }
   },
 });
 
