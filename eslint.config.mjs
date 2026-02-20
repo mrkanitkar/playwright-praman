@@ -96,6 +96,14 @@ export default tseslint.config(
       'n/prefer-promises/dns': 'error',
       'n/prefer-promises/fs': 'error',
       'n/no-process-exit': 'error',
+      'n/hashbang': [
+        'error',
+        {
+          convertPath: {
+            'src/**/*.ts': ['^src/(.+)\\.ts$', 'dist/$1.js'],
+          },
+        },
+      ],
     },
   },
 

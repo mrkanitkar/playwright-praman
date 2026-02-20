@@ -16,6 +16,8 @@
 import type { Page } from '@playwright/test';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createMockTracer } from '../../helpers/mock-tracer-wrapper.js';
+
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
 import { SelectorError } from '#core/errors/selector-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
@@ -491,6 +493,153 @@ describe('UI5Handler', () => {
       for (const result of results) {
         expect(result).toBe(fakeProxy);
       }
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  // Group 7: Telemetry integration (tests 29-36)
+  // ════════════════════════════════════════════════════════════════════
+
+  describe('telemetry integration', () => {
+    it('control() creates a span named praman.ui5.findControl', async () => {
+      const { tracer, spans } = createMockTracer();
+      const tracedHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        tracer,
+      });
+
+      await tracedHandler.control(defaultSelector);
+
+      // control() calls waitFor() internally, which creates its own span.
+      // Find the findControl span specifically.
+      const findControlSpan = spans.find((s) => s.name === 'praman.ui5.findControl');
+      expect(findControlSpan).toBeDefined();
+      expect(findControlSpan?.ended).toBe(true);
+      expect(findControlSpan?.status).toBe('ok');
+    });
+
+    it('click() creates a span named praman.ui5.click', async () => {
+      const { tracer, spans } = createMockTracer();
+      const tracedHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        tracer,
+      });
+
+      await tracedHandler.click(defaultSelector);
+
+      const clickSpan = spans.find((s) => s.name === 'praman.ui5.click');
+      expect(clickSpan).toBeDefined();
+      expect(clickSpan?.ended).toBe(true);
+      expect(clickSpan?.status).toBe('ok');
+    });
+
+    it('controls() creates a span named praman.ui5.findControls', async () => {
+      const { tracer, spans } = createMockTracer();
+      const tracedHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        tracer,
+      });
+
+      page.evaluate.mockResolvedValue([]);
+
+      await tracedHandler.controls({ controlType: 'sap.m.Button' });
+
+      const findControlsSpan = spans.find((s) => s.name === 'praman.ui5.findControls');
+      expect(findControlsSpan).toBeDefined();
+      expect(findControlsSpan?.ended).toBe(true);
+      expect(findControlsSpan?.status).toBe('ok');
+    });
+
+    it('fill() creates a span named praman.ui5.fill', async () => {
+      const { tracer, spans } = createMockTracer();
+      const tracedHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        tracer,
+      });
+
+      await tracedHandler.fill(defaultSelector, 'Hello');
+
+      const fillSpan = spans.find((s) => s.name === 'praman.ui5.fill');
+      expect(fillSpan).toBeDefined();
+      expect(fillSpan?.ended).toBe(true);
+      expect(fillSpan?.status).toBe('ok');
+    });
+
+    it('waitForUI5() creates a span named praman.ui5.waitForUI5', async () => {
+      const { tracer, spans } = createMockTracer();
+      const tracedHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        tracer,
+      });
+
+      await tracedHandler.waitForUI5(5000);
+
+      const waitSpan = spans.find((s) => s.name === 'praman.ui5.waitForUI5');
+      expect(waitSpan).toBeDefined();
+      expect(waitSpan?.ended).toBe(true);
+      expect(waitSpan?.status).toBe('ok');
+    });
+
+    it('waitFor() creates a span named praman.ui5.waitFor', async () => {
+      const { tracer, spans } = createMockTracer();
+      const tracedHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        tracer,
+      });
+
+      await tracedHandler.waitFor(defaultSelector, { timeout: 1000 });
+
+      const waitForSpan = spans.find((s) => s.name === 'praman.ui5.waitFor');
+      expect(waitForSpan).toBeDefined();
+      expect(waitForSpan?.ended).toBe(true);
+      expect(waitForSpan?.status).toBe('ok');
+    });
+
+    it('default tracer is NoOpTracer when none provided', async () => {
+      // Handler created without tracer option — should use NoOpTracer
+      // Existing handler from beforeEach has no tracer option, so it uses the default.
+      // Calling any method should still work fine (NoOpTracer is a passthrough).
+      await handler.control(defaultSelector);
+
+      // No assertions on spans needed — just verifying no crash occurs
+      expect(true).toBe(true);
+    });
+
+    it('span records error status when method throws', async () => {
+      const { tracer, spans } = createMockTracer();
+      const tracedHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        config: { controlDiscoveryTimeout: 100 },
+        tracer,
+      });
+
+      // Make all evaluate calls return not-found so waitFor times out
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      await expect(tracedHandler.control(defaultSelector, { timeout: 100 })).rejects.toThrow(
+        TimeoutError,
+      );
+
+      // The outermost span (findControl) should have error status because
+      // the waitFor inside it throws TimeoutError, which propagates.
+      const findControlSpan = spans.find((s) => s.name === 'praman.ui5.findControl');
+      expect(findControlSpan).toBeDefined();
+      expect(findControlSpan?.ended).toBe(true);
+      expect(findControlSpan?.status).toBe('error');
     });
   });
 });

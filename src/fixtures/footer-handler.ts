@@ -26,6 +26,7 @@ import type { Logger } from 'pino';
 
 import { ControlError } from '#core/errors/control-error.js';
 import { createLogger } from '#core/logging/logger.js';
+import { ui5Step } from '#core/utils/step-decorator.js';
 
 /**
  * Options for constructing a FooterHandler.
@@ -116,6 +117,7 @@ export class FooterHandler {
    * await footer.clickSave();
    * ```
    */
+  @ui5Step
   async clickSave(): Promise<void> {
     await this.clickFooterButton('Save');
   }
@@ -130,6 +132,7 @@ export class FooterHandler {
    * await footer.clickApply();
    * ```
    */
+  @ui5Step
   async clickApply(): Promise<void> {
     await this.clickFooterButton('Apply');
   }
@@ -144,6 +147,7 @@ export class FooterHandler {
    * await footer.clickCancel();
    * ```
    */
+  @ui5Step
   async clickCancel(): Promise<void> {
     await this.clickFooterButton('Cancel');
   }
@@ -158,6 +162,7 @@ export class FooterHandler {
    * await footer.clickEdit();
    * ```
    */
+  @ui5Step
   async clickEdit(): Promise<void> {
     await this.clickFooterButton('Edit');
   }
@@ -172,6 +177,7 @@ export class FooterHandler {
    * await footer.clickDelete();
    * ```
    */
+  @ui5Step
   async clickDelete(): Promise<void> {
     await this.clickFooterButton('Delete');
   }
@@ -186,6 +192,7 @@ export class FooterHandler {
    * await footer.clickCreate();
    * ```
    */
+  @ui5Step
   async clickCreate(): Promise<void> {
     await this.clickFooterButton('Create');
   }
