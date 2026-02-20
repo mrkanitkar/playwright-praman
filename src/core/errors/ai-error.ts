@@ -43,7 +43,12 @@ export interface AIErrorOptions extends Omit<PramanErrorOptions, 'code' | 'retry
     | typeof ErrorCode.ERR_AI_PROVIDER_UNAVAILABLE
     | typeof ErrorCode.ERR_AI_RESPONSE_INVALID
     | typeof ErrorCode.ERR_AI_TOKEN_LIMIT
-    | typeof ErrorCode.ERR_AI_RATE_LIMITED;
+    | typeof ErrorCode.ERR_AI_RATE_LIMITED
+    | typeof ErrorCode.ERR_AI_NOT_CONFIGURED
+    | typeof ErrorCode.ERR_AI_LLM_CALL_FAILED
+    | typeof ErrorCode.ERR_AI_RESPONSE_PARSE_FAILED
+    | typeof ErrorCode.ERR_AI_CONTEXT_BUILD_FAILED
+    | typeof ErrorCode.ERR_AI_STEP_INTERPRET_FAILED;
   readonly retryable?: boolean;
   readonly provider?: string;
   readonly model?: string;

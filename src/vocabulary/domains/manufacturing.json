@@ -1,0 +1,146 @@
+{
+  "$version": "1.2.0",
+  "$description": "Manufacturing domain vocabulary with labelFor-based selectors for Intent API v1.2.0",
+  "domain": "manufacturing",
+  "module": "PP",
+  "ui5Selectors": {
+    "productionOrder": {
+      "header": {
+        "orderType": {
+          "labelFor": { "text": "Order Type" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "type of production order",
+          "sapFieldName": "AUART",
+          "aliases": ["AUART"]
+        },
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "material to be produced",
+          "sapFieldName": "MATNR",
+          "aliases": ["MATNR", "product"]
+        },
+        "plant": {
+          "labelFor": { "text": "Plant" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "production plant",
+          "sapFieldName": "WERKS",
+          "aliases": ["WERKS", "productionPlant"]
+        },
+        "orderQuantity": {
+          "labelFor": { "text": "Total Quantity" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "quantity to produce",
+          "sapFieldName": "GAMNG",
+          "aliases": ["GAMNG", "qty", "quantity"]
+        },
+        "unitOfMeasure": {
+          "labelFor": { "text": "Unit of Measure" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "production unit",
+          "sapFieldName": "GMEIN",
+          "aliases": ["GMEIN", "uom"]
+        },
+        "startDate": {
+          "labelFor": { "text": "Basic Start Date" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "planned production start",
+          "sapFieldName": "GSTRP",
+          "aliases": ["GSTRP"]
+        },
+        "mrpController": {
+          "labelFor": { "text": "MRP Controller" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "material requirements planner",
+          "sapFieldName": "DISPO",
+          "aliases": ["DISPO", "planner"]
+        },
+        "storageLocation": {
+          "labelFor": { "text": "Storage Location" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "goods receipt storage location",
+          "sapFieldName": "LGORT",
+          "aliases": ["LGORT", "sloc"]
+        }
+      },
+      "operations": {
+        "workCenter": {
+          "labelFor": { "text": "Work Center" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "production resource",
+          "sapFieldName": "ARBPL",
+          "aliases": ["ARBPL"]
+        }
+      },
+      "actions": {
+        "release": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Release" },
+          "intentApiMethod": "clickButton"
+        },
+        "confirm": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Confirm" },
+          "intentApiMethod": "clickButton"
+        },
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    },
+    "billOfMaterials": {
+      "header": {
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "MATNR",
+          "aliases": ["MATNR"]
+        },
+        "plant": {
+          "labelFor": { "text": "Plant" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "WERKS",
+          "aliases": ["WERKS"]
+        }
+      },
+      "item": {
+        "component": {
+          "labelFor": { "text": "Component" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "IDNRK",
+          "aliases": ["IDNRK", "material"]
+        },
+        "componentQuantity": {
+          "labelFor": { "text": "Quantity" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "sapFieldName": "MENGE",
+          "aliases": ["MENGE", "qty"]
+        }
+      }
+    }
+  },
+  "businessTermMappings": {
+    "product": "material",
+    "qty": "orderQuantity",
+    "quantity": "orderQuantity",
+    "uom": "unitOfMeasure",
+    "productionPlant": "plant",
+    "planner": "mrpController",
+    "sloc": "storageLocation"
+  }
+}

@@ -9,6 +9,11 @@
  * @module fixtures
  */
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- Playwright test.extend() returns any-typed fixtures */
+/* eslint-disable @typescript-eslint/no-unsafe-call -- Playwright fixture callbacks are called with any-typed args */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- Playwright page/use are any-typed in fixture context */
+/* eslint-disable @typescript-eslint/no-unsafe-argument -- Playwright fixture args have any types from test.extend */
+
 import type { Frame } from '@playwright/test';
 
 import type { DateInput, DateOptions } from '../modules/date.js';
@@ -89,9 +94,11 @@ import {
 import { coreTest } from './core-fixtures.js';
 import { UI5Handler } from './ui5-handler.js';
 
+import { createObjectCleanupScript } from '#bridge/browser-scripts/object-map.js';
 import { resetPageInjection } from '#bridge/injection.js';
 import { createInteractionStrategy } from '#bridge/interaction-strategies/strategy-factory.js';
 import { createLogger } from '#core/logging/index.js';
+import { waitForUI5Stable } from '#core/utils/wait-helpers.js';
 
 /**
  * Creates the table sub-namespace fixture object.
@@ -239,6 +246,32 @@ export function createODataFixture(page: never) {
   } as const;
 }
 
+/**
+ * Wraps all async methods in an object with a stability guard.
+ *
+ * @remarks
+ * Calls `guard()` before each async method in `obj` to ensure UI5 is stable.
+ * Type-safe: preserves the original object's method signatures.
+ */
+function withStability<T extends Record<string, (...args: never[]) => Promise<unknown>>>(
+  obj: T,
+  guard: () => Promise<void>,
+): T {
+  const wrapped: Partial<T> = {};
+  for (const key of Object.keys(obj) as (keyof T)[]) {
+    // eslint-disable-next-line security/detect-object-injection -- key comes from Object.keys(obj), not user input
+    const fn = obj[key]; // noUncheckedIndexedAccess: key is guaranteed by Object.keys
+    if (fn === undefined) continue;
+    const capturedFn = fn;
+    // eslint-disable-next-line security/detect-object-injection -- key comes from Object.keys(obj), not user input
+    wrapped[key] = (async (...args: never[]): Promise<unknown> => {
+      await guard();
+      return capturedFn(...args);
+    }) as T[keyof T];
+  }
+  return wrapped as T;
+}
+
 /** Type of the extended UI5Handler with sub-namespaces. */
 export type ExtendedUI5Handler = UI5Handler & {
   readonly table: ReturnType<typeof createTableFixture>;
@@ -290,15 +323,35 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       },
     });
 
+    // Stability guard: wait for UI5 to be stable before each module method call
+    const guard = async (): Promise<void> => {
+      await waitForUI5Stable(page, {
+        timeout: pramanConfig.ui5WaitTimeout,
+        skipStabilityWait: pramanConfig.skipStabilityWait,
+      });
+    };
+
     const extended = Object.assign(handler, {
-      table: createTableFixture(page as never),
-      dialog: createDialogFixture(page as never),
-      date: createDateFixture(page as never),
-      odata: createODataFixture(page as never),
+      table: withStability(createTableFixture(page as never), guard),
+      dialog: withStability(createDialogFixture(page as never), guard),
+      date: withStability(createDateFixture(page as never), guard),
+      odata: withStability(createODataFixture(page as never), guard),
     }) as ExtendedUI5Handler;
 
-    await use(extended);
-
-    page.off('framenavigated', navigationListener);
+    try {
+      await use(extended);
+    } finally {
+      // Teardown: remove navigation listener (always — even if use() throws)
+      page.off('framenavigated', navigationListener);
+      try {
+        // Clean up browser-side object map to prevent memory leaks
+        const cleanupScript = createObjectCleanupScript();
+        await page.evaluate(cleanupScript).catch(() => {
+          // Cleanup failure is non-fatal — page may have navigated away
+        });
+      } finally {
+        await handler.destroy();
+      }
+    }
   },
 });

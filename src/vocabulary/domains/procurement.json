@@ -1,0 +1,220 @@
+{
+  "$version": "1.2.0",
+  "$description": "Procurement domain vocabulary with labelFor-based selectors for Intent API v1.2.0",
+  "domain": "procurement",
+  "module": "MM",
+  "ui5Selectors": {
+    "purchaseOrder": {
+      "header": {
+        "supplier": {
+          "labelFor": { "text": "Supplier" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "vendor partner providing goods/services",
+          "sapFieldName": "LIFNR",
+          "aliases": ["vendor", "vendorId", "supplierId", "LIFNR"]
+        },
+        "purchasingOrganization": {
+          "labelFor": { "text": "Purchasing Organization" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "organizational unit responsible for procurement",
+          "sapFieldName": "EKORG",
+          "aliases": ["purchOrg", "EKORG", "procurementOrg"]
+        },
+        "purchasingGroup": {
+          "labelFor": { "text": "Purchasing Group" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "buyer group handling the purchase",
+          "sapFieldName": "EKGRP",
+          "aliases": ["buyerGroup", "EKGRP", "purchGroup"]
+        },
+        "companyCode": {
+          "labelFor": { "text": "Company Code" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "legal entity for accounting",
+          "sapFieldName": "BUKRS",
+          "aliases": ["BUKRS", "company"]
+        },
+        "documentDate": {
+          "labelFor": { "text": "Document Date" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "date of PO creation",
+          "sapFieldName": "BEDAT",
+          "aliases": ["poDate", "BEDAT", "orderDate"]
+        },
+        "currency": {
+          "labelFor": { "text": "Currency" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "transaction currency",
+          "sapFieldName": "WAERS",
+          "aliases": ["WAERS", "curr"]
+        },
+        "paymentTerms": {
+          "labelFor": { "text": "Payment Terms" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "payment conditions",
+          "sapFieldName": "ZTERM",
+          "aliases": ["ZTERM", "terms"]
+        },
+        "incoterms": {
+          "labelFor": { "text": "Incoterms" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "international commercial terms",
+          "sapFieldName": "INCO1",
+          "aliases": ["INCO1", "deliveryTerms"]
+        },
+        "poType": {
+          "labelFor": { "text": "Order Type" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "purchase order document type",
+          "sapFieldName": "BSART",
+          "aliases": ["BSART", "orderType", "docType"]
+        }
+      },
+      "item": {
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "material/product being ordered",
+          "sapFieldName": "MATNR",
+          "aliases": ["materialNumber", "MATNR", "product", "item"]
+        },
+        "shortText": {
+          "labelFor": { "text": "Short Text" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "item description",
+          "sapFieldName": "TXZ01",
+          "aliases": ["description", "TXZ01", "itemText"]
+        },
+        "quantity": {
+          "labelFor": { "text": "Order Quantity" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "quantity to order",
+          "sapFieldName": "MENGE",
+          "aliases": ["orderQty", "MENGE", "qty"]
+        },
+        "unitOfMeasure": {
+          "labelFor": { "text": "Order Unit" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "unit of measure for ordering",
+          "sapFieldName": "MEINS",
+          "aliases": ["uom", "MEINS", "unit"]
+        },
+        "netPrice": {
+          "labelFor": { "text": "Net Price" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "price per unit",
+          "sapFieldName": "NETPR",
+          "aliases": ["price", "NETPR", "unitPrice"]
+        },
+        "plant": {
+          "labelFor": { "text": "Plant" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "receiving plant/facility",
+          "sapFieldName": "WERKS",
+          "aliases": ["WERKS", "facility", "site"]
+        },
+        "storageLocation": {
+          "labelFor": { "text": "Storage Location" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "inventory storage location",
+          "sapFieldName": "LGORT",
+          "aliases": ["LGORT", "warehouse", "sloc"]
+        },
+        "deliveryDate": {
+          "labelFor": { "text": "Delivery Date" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "requested delivery date",
+          "sapFieldName": "LFDAT",
+          "aliases": ["LFDAT", "reqDeliveryDate"]
+        },
+        "costCenter": {
+          "labelFor": { "text": "Cost Center" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "cost center for expense",
+          "sapFieldName": "KOSTL",
+          "aliases": ["KOSTL", "costCtr"]
+        }
+      },
+      "actions": {
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        },
+        "post": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Post" },
+          "intentApiMethod": "clickButton"
+        },
+        "submit": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Submit" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    },
+    "purchaseRequisition": {
+      "header": {
+        "requisitionType": {
+          "labelFor": { "text": "Requisition Type" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "BSART",
+          "aliases": ["BSART", "prType"]
+        },
+        "requisitioner": {
+          "labelFor": { "text": "Requisitioner" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "AFNAM",
+          "aliases": ["AFNAM", "requester"]
+        }
+      },
+      "item": {
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "MATNR",
+          "aliases": ["MATNR", "product"]
+        }
+      }
+    }
+  },
+  "businessTermMappings": {
+    "vendor": "supplier",
+    "vendorId": "supplier",
+    "supplierId": "supplier",
+    "purchOrg": "purchasingOrganization",
+    "buyerGroup": "purchasingGroup",
+    "materialNumber": "material",
+    "product": "material",
+    "orderQty": "quantity",
+    "uom": "unitOfMeasure",
+    "price": "netPrice",
+    "warehouse": "storageLocation",
+    "sloc": "storageLocation",
+    "facility": "plant",
+    "site": "plant",
+    "poNumber": "purchaseOrder",
+    "prType": "requisitionType"
+  }
+}

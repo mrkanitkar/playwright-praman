@@ -68,6 +68,51 @@ describe('AIError', () => {
     expect(error.tokenUsage).toEqual(usage);
   });
 
+  it('accepts ERR_AI_NOT_CONFIGURED code', () => {
+    const error = new AIError({
+      code: ErrorCode.ERR_AI_NOT_CONFIGURED,
+      message: 'AI not configured',
+      attempted: 'Initialize LlmService',
+    });
+    expect(error.code).toBe(ErrorCode.ERR_AI_NOT_CONFIGURED);
+  });
+
+  it('accepts ERR_AI_LLM_CALL_FAILED code', () => {
+    const error = new AIError({
+      code: ErrorCode.ERR_AI_LLM_CALL_FAILED,
+      message: 'LLM call failed',
+      attempted: 'Call OpenAI chat completion',
+    });
+    expect(error.code).toBe(ErrorCode.ERR_AI_LLM_CALL_FAILED);
+  });
+
+  it('accepts ERR_AI_RESPONSE_PARSE_FAILED code', () => {
+    const error = new AIError({
+      code: ErrorCode.ERR_AI_RESPONSE_PARSE_FAILED,
+      message: 'Response parse failed',
+      attempted: 'Parse LLM JSON response',
+    });
+    expect(error.code).toBe(ErrorCode.ERR_AI_RESPONSE_PARSE_FAILED);
+  });
+
+  it('accepts ERR_AI_CONTEXT_BUILD_FAILED code', () => {
+    const error = new AIError({
+      code: ErrorCode.ERR_AI_CONTEXT_BUILD_FAILED,
+      message: 'Context build failed',
+      attempted: 'Build page context for AI',
+    });
+    expect(error.code).toBe(ErrorCode.ERR_AI_CONTEXT_BUILD_FAILED);
+  });
+
+  it('accepts ERR_AI_STEP_INTERPRET_FAILED code', () => {
+    const error = new AIError({
+      code: ErrorCode.ERR_AI_STEP_INTERPRET_FAILED,
+      message: 'Step interpret failed',
+      attempted: 'Interpret step: Fill supplier field',
+    });
+    expect(error.code).toBe(ErrorCode.ERR_AI_STEP_INTERPRET_FAILED);
+  });
+
   it('includes subclass fields in toJSON()', () => {
     const error = new AIError({
       message: 'AI failed',

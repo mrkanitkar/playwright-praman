@@ -1,0 +1,130 @@
+{
+  "$version": "1.2.0",
+  "$description": "Quality Management domain vocabulary with labelFor-based selectors for Intent API v1.2.0",
+  "domain": "quality",
+  "module": "QM",
+  "ui5Selectors": {
+    "inspectionLot": {
+      "header": {
+        "inspectionLotNumber": {
+          "labelFor": { "text": "Inspection Lot" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "unique identifier for inspection lot",
+          "sapFieldName": "PRUEFLOS",
+          "aliases": ["PRUEFLOS", "lot"]
+        },
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "material being inspected",
+          "sapFieldName": "MATNR",
+          "aliases": ["MATNR", "product"]
+        },
+        "plant": {
+          "labelFor": { "text": "Plant" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "plant where inspection occurs",
+          "sapFieldName": "WERKS",
+          "aliases": ["WERKS"]
+        },
+        "lotQuantity": {
+          "labelFor": { "text": "Lot Quantity" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "quantity in inspection lot",
+          "sapFieldName": "LOSMENGE",
+          "aliases": ["LOSMENGE", "qty"]
+        }
+      },
+      "actions": {
+        "usageDecision": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Usage Decision" },
+          "intentApiMethod": "clickButton"
+        },
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    },
+    "resultsRecording": {
+      "results": {
+        "measuredValue": {
+          "labelFor": { "text": "Mean Value" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "measured/recorded value",
+          "sapFieldName": "MESSWERT",
+          "aliases": ["MESSWERT", "value"]
+        },
+        "defectiveUnits": {
+          "labelFor": { "text": "Defective Units" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "number of defective units",
+          "sapFieldName": "FEESSION",
+          "aliases": ["FEESSION", "defects"]
+        }
+      }
+    },
+    "qualityNotification": {
+      "header": {
+        "notificationType": {
+          "labelFor": { "text": "Notification Type" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "type of quality notification",
+          "sapFieldName": "QMART",
+          "aliases": ["QMART"]
+        },
+        "shortText": {
+          "labelFor": { "text": "Short Text" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "notification description",
+          "sapFieldName": "QMTXT",
+          "aliases": ["QMTXT", "description"]
+        },
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "MATNR",
+          "aliases": ["MATNR"]
+        },
+        "vendor": {
+          "labelFor": { "text": "Vendor" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "LIFNR",
+          "aliases": ["LIFNR", "supplier"]
+        }
+      },
+      "actions": {
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        },
+        "complete": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Complete" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    }
+  },
+  "businessTermMappings": {
+    "product": "material",
+    "lot": "inspectionLotNumber",
+    "qty": "lotQuantity",
+    "value": "measuredValue",
+    "defects": "defectiveUnits",
+    "supplier": "vendor"
+  }
+}

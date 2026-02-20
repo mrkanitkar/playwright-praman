@@ -66,15 +66,6 @@ export type { FEListPage } from './fe-list-helpers.js';
 export { FETestLibraryInstance, initializeFETestLibrary } from './fe-test-library.js';
 export type { FETestLibraryOptions, FETestLibraryPage } from './fe-test-library.js';
 
-// ── FE Browser Scripts ───────────────────────────────────────────────
-export {
-  FE_ADD_TO_QUEUE_SCRIPT,
-  FE_DETECT_WORKZONE_SCRIPT,
-  FE_EMPTY_QUEUE_SCRIPT,
-  FE_INIT_OPA_SCRIPT,
-  FE_LOAD_LIBRARIES_SCRIPT,
-} from './fe-browser-scripts.js';
-
 // ── FE Types ─────────────────────────────────────────────────────────
 export type {
   FETestLibraryResponse,

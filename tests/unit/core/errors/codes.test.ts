@@ -75,12 +75,31 @@ describe('ErrorCode', () => {
     expect(ErrorCode.ERR_AI_RESPONSE_INVALID).toBe('ERR_AI_RESPONSE_INVALID');
     expect(ErrorCode.ERR_AI_TOKEN_LIMIT).toBe('ERR_AI_TOKEN_LIMIT');
     expect(ErrorCode.ERR_AI_RATE_LIMITED).toBe('ERR_AI_RATE_LIMITED');
+    expect(ErrorCode.ERR_AI_NOT_CONFIGURED).toBe('ERR_AI_NOT_CONFIGURED');
+    expect(ErrorCode.ERR_AI_LLM_CALL_FAILED).toBe('ERR_AI_LLM_CALL_FAILED');
+    expect(ErrorCode.ERR_AI_RESPONSE_PARSE_FAILED).toBe('ERR_AI_RESPONSE_PARSE_FAILED');
+    expect(ErrorCode.ERR_AI_CONTEXT_BUILD_FAILED).toBe('ERR_AI_CONTEXT_BUILD_FAILED');
+    expect(ErrorCode.ERR_AI_STEP_INTERPRET_FAILED).toBe('ERR_AI_STEP_INTERPRET_FAILED');
   });
 
   it('defines plugin error codes', () => {
     expect(ErrorCode.ERR_PLUGIN_LOAD).toBe('ERR_PLUGIN_LOAD');
     expect(ErrorCode.ERR_PLUGIN_INIT).toBe('ERR_PLUGIN_INIT');
     expect(ErrorCode.ERR_PLUGIN_INCOMPATIBLE).toBe('ERR_PLUGIN_INCOMPATIBLE');
+  });
+
+  it('defines vocabulary error codes', () => {
+    expect(ErrorCode.ERR_VOCAB_TERM_NOT_FOUND).toBe('ERR_VOCAB_TERM_NOT_FOUND');
+    expect(ErrorCode.ERR_VOCAB_DOMAIN_LOAD_FAILED).toBe('ERR_VOCAB_DOMAIN_LOAD_FAILED');
+    expect(ErrorCode.ERR_VOCAB_JSON_INVALID).toBe('ERR_VOCAB_JSON_INVALID');
+    expect(ErrorCode.ERR_VOCAB_AMBIGUOUS_MATCH).toBe('ERR_VOCAB_AMBIGUOUS_MATCH');
+  });
+
+  it('defines intent error codes', () => {
+    expect(ErrorCode.ERR_INTENT_FIELD_NOT_FOUND).toBe('ERR_INTENT_FIELD_NOT_FOUND');
+    expect(ErrorCode.ERR_INTENT_ACTION_FAILED).toBe('ERR_INTENT_ACTION_FAILED');
+    expect(ErrorCode.ERR_INTENT_NAVIGATION_FAILED).toBe('ERR_INTENT_NAVIGATION_FAILED');
+    expect(ErrorCode.ERR_INTENT_VALIDATION_FAILED).toBe('ERR_INTENT_VALIDATION_FAILED');
   });
 
   // ── Uniqueness test ──────────────────────────────────────────────────
@@ -91,8 +110,8 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 38 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(38);
+  it('has exactly 51 error codes', () => {
+    expect(Object.keys(ErrorCode)).toHaveLength(51);
   });
 
   // ── Immutability test ────────────────────────────────────────────────
