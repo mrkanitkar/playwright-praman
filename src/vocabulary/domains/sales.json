@@ -1,0 +1,152 @@
+{
+  "$version": "1.2.0",
+  "$description": "Sales & Distribution domain vocabulary with labelFor-based selectors for Intent API v1.2.0",
+  "domain": "sales",
+  "module": "SD",
+  "ui5Selectors": {
+    "salesOrder": {
+      "header": {
+        "customer": {
+          "labelFor": { "text": "Sold-To Party" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "customer placing the order",
+          "sapFieldName": "KUNNR",
+          "aliases": ["soldToParty", "KUNNR", "client", "buyer"]
+        },
+        "shipToParty": {
+          "labelFor": { "text": "Ship-To Party" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "delivery recipient",
+          "sapFieldName": "KUNWE",
+          "aliases": ["KUNWE", "deliveryAddress"]
+        },
+        "salesOrganization": {
+          "labelFor": { "text": "Sales Organization" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "organizational unit for sales",
+          "sapFieldName": "VKORG",
+          "aliases": ["salesOrg", "VKORG"]
+        },
+        "distributionChannel": {
+          "labelFor": { "text": "Distribution Channel" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "channel for product distribution",
+          "sapFieldName": "VTWEG",
+          "aliases": ["VTWEG", "channel"]
+        },
+        "orderType": {
+          "labelFor": { "text": "Order Type" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "sales document type",
+          "sapFieldName": "AUART",
+          "aliases": ["AUART", "salesOrderType"]
+        },
+        "requestedDeliveryDate": {
+          "labelFor": { "text": "Requested Delivery Date" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "customer requested delivery date",
+          "sapFieldName": "VDATU",
+          "aliases": ["VDATU", "deliveryDate"]
+        },
+        "paymentTerms": {
+          "labelFor": { "text": "Payment Terms" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "payment conditions",
+          "sapFieldName": "ZTERM",
+          "aliases": ["ZTERM", "terms"]
+        }
+      },
+      "item": {
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "product being sold",
+          "sapFieldName": "MATNR",
+          "aliases": ["MATNR", "product", "item"]
+        },
+        "orderQuantity": {
+          "labelFor": { "text": "Order Quantity" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "quantity ordered",
+          "sapFieldName": "KWMENG",
+          "aliases": ["KWMENG", "qty", "quantity"]
+        },
+        "netPrice": {
+          "labelFor": { "text": "Net Price" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "price per unit",
+          "sapFieldName": "NETPR",
+          "aliases": ["NETPR", "price"]
+        },
+        "plant": {
+          "labelFor": { "text": "Plant" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "shipping plant",
+          "sapFieldName": "WERKS",
+          "aliases": ["WERKS", "shippingPlant"]
+        }
+      },
+      "actions": {
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        },
+        "submit": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Submit" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    },
+    "delivery": {
+      "header": {
+        "salesOrder": {
+          "labelFor": { "text": "Sales Order" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "VBELN",
+          "aliases": ["VBELN", "soNumber"]
+        },
+        "shippingPoint": {
+          "labelFor": { "text": "Shipping Point" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "VSTEL",
+          "aliases": ["VSTEL"]
+        }
+      },
+      "item": {
+        "deliveryQuantity": {
+          "labelFor": { "text": "Delivery Quantity" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "sapFieldName": "LFIMG",
+          "aliases": ["LFIMG", "qty"]
+        }
+      }
+    }
+  },
+  "businessTermMappings": {
+    "client": "customer",
+    "buyer": "customer",
+    "soldToParty": "customer",
+    "salesOrg": "salesOrganization",
+    "channel": "distributionChannel",
+    "product": "material",
+    "qty": "orderQuantity",
+    "price": "netPrice",
+    "shippingPlant": "plant"
+  }
+}

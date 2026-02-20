@@ -42,3 +42,9 @@ export type { SelectorErrorOptions } from './selector-error.js';
 
 export { TimeoutError } from './timeout-error.js';
 export type { TimeoutErrorOptions } from './timeout-error.js';
+
+export { VocabularyError } from './vocabulary-error.js';
+export type { VocabularyErrorOptions } from './vocabulary-error.js';
+
+export { IntentError } from './intent-error.js';
+export type { IntentErrorOptions } from './intent-error.js';

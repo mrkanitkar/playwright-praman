@@ -1,0 +1,150 @@
+{
+  "$version": "1.2.0",
+  "$description": "Warehouse Management domain vocabulary with labelFor-based selectors for Intent API v1.2.0",
+  "domain": "warehouse",
+  "module": "WM/EWM",
+  "ui5Selectors": {
+    "goodsMovement": {
+      "header": {
+        "movementType": {
+          "labelFor": { "text": "Movement Type" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "type of inventory movement",
+          "sapFieldName": "BWART",
+          "aliases": ["BWART"]
+        },
+        "plant": {
+          "labelFor": { "text": "Plant" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "plant for goods movement",
+          "sapFieldName": "WERKS",
+          "aliases": ["WERKS"]
+        },
+        "storageLocation": {
+          "labelFor": { "text": "Storage Location" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "inventory storage location",
+          "sapFieldName": "LGORT",
+          "aliases": ["LGORT", "sloc"]
+        },
+        "postingDate": {
+          "labelFor": { "text": "Posting Date" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "date of inventory posting",
+          "sapFieldName": "BUDAT",
+          "aliases": ["BUDAT"]
+        }
+      },
+      "item": {
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "material being moved",
+          "sapFieldName": "MATNR",
+          "aliases": ["MATNR", "product"]
+        },
+        "quantity": {
+          "labelFor": { "text": "Quantity" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "movement quantity",
+          "sapFieldName": "ERFMG",
+          "aliases": ["ERFMG", "qty"]
+        },
+        "batch": {
+          "labelFor": { "text": "Batch" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "batch/lot number",
+          "sapFieldName": "CHARG",
+          "aliases": ["CHARG", "lot"]
+        },
+        "receivingStorageLocation": {
+          "labelFor": { "text": "Receiving Stor. Loc." },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "destination storage location",
+          "sapFieldName": "UMLGO",
+          "aliases": ["UMLGO", "toSloc"]
+        },
+        "receivingPlant": {
+          "labelFor": { "text": "Receiving Plant" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "destination plant",
+          "sapFieldName": "UMWRK",
+          "aliases": ["UMWRK", "toPlant"]
+        }
+      },
+      "actions": {
+        "post": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Post" },
+          "intentApiMethod": "clickButton"
+        },
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    },
+    "transferOrder": {
+      "header": {
+        "warehouseNumber": {
+          "labelFor": { "text": "Warehouse Number" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "warehouse complex identifier",
+          "sapFieldName": "LGNUM",
+          "aliases": ["LGNUM"]
+        },
+        "sourceStorageBin": {
+          "labelFor": { "text": "Source Storage Bin" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "source bin",
+          "sapFieldName": "VLPLA",
+          "aliases": ["VLPLA", "fromBin"]
+        },
+        "destStorageBin": {
+          "labelFor": { "text": "Destination Storage Bin" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "destination bin",
+          "sapFieldName": "NLPLA",
+          "aliases": ["NLPLA", "toBin"]
+        }
+      },
+      "item": {
+        "material": {
+          "labelFor": { "text": "Material" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "sapFieldName": "MATNR",
+          "aliases": ["MATNR"]
+        },
+        "quantity": {
+          "labelFor": { "text": "Quantity" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "sapFieldName": "VSOLA",
+          "aliases": ["VSOLA", "qty"]
+        }
+      }
+    }
+  },
+  "businessTermMappings": {
+    "product": "material",
+    "qty": "quantity",
+    "lot": "batch",
+    "sloc": "storageLocation",
+    "toSloc": "receivingStorageLocation",
+    "toPlant": "receivingPlant"
+  }
+}

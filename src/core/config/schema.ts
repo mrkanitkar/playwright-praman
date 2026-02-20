@@ -39,11 +39,17 @@ const authSchema = z.object({
 
 // ── AI sub-schema ────────────────────────────────────────────────────
 const aiSchema = z.object({
-  provider: z.enum(['azure-openai', 'openai']).default('azure-openai'),
+  provider: z.enum(['azure-openai', 'openai', 'anthropic']).default('azure-openai'),
   apiKey: z.string().optional(),
   model: z.string().optional(),
   temperature: z.number().min(0).max(2).default(0.3),
   maxTokens: z.number().int().positive().optional(),
+  // Azure OpenAI-specific fields (W2: azure-openai + openai supported; W14: anthropic added)
+  endpoint: z.url().optional(), // Azure: resource endpoint URL
+  deployment: z.string().optional(), // Azure: deployment name
+  apiVersion: z.string().optional(), // Azure: API version e.g. '2024-02-01'
+  // Anthropic-specific fields (W14: separate key for security clarity)
+  anthropicApiKey: z.string().optional(), // Anthropic: API key (distinct from openai apiKey)
 });
 
 // ── Telemetry sub-schema ─────────────────────────────────────────────

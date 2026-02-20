@@ -22,10 +22,15 @@
  * @module fixtures
  */
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- mergeTests() returns any-typed merged fixture */
+/* eslint-disable @typescript-eslint/no-unsafe-call -- mergeTests() call inferred as any by TypeScript */
+
 import { expect, mergeTests } from '@playwright/test';
 
+import { aiTest } from './ai-fixtures.js';
 import { authTest } from './auth-fixtures.js';
 import { feTest } from './fe-fixtures.js';
+import { intentTest } from './intent-fixtures.js';
 import { moduleTest } from './module-fixtures.js';
 import { navTest } from './nav-fixtures.js';
 import { stabilityTest } from './stability-fixtures.js';
@@ -51,7 +56,15 @@ import { stabilityTest } from './stability-fixtures.js';
  * });
  * ```
  */
-export const test = mergeTests(moduleTest, authTest, navTest, stabilityTest, feTest);
+export const test = mergeTests(
+  moduleTest,
+  authTest,
+  navTest,
+  stabilityTest,
+  feTest,
+  aiTest,
+  intentTest,
+);
 
 export { expect };
 
@@ -73,3 +86,9 @@ export type { AuthDeps, AuthFixtureOptions, AuthFixtures } from './auth-fixtures
 
 export { navTest } from './nav-fixtures.js';
 export type { NavFixtures, NavWorkerDeps, UI5NavigationAPI } from './nav-fixtures.js';
+
+export { aiTest } from './ai-fixtures.js';
+export type { PramanAIFixture } from './ai-fixtures.js';
+
+export { intentTest } from './intent-fixtures.js';
+export type { IntentFixture } from './intent-fixtures.js';

@@ -21,7 +21,7 @@
  * All Praman error codes as a frozen constant object.
  *
  * @remarks
- * Categories (10):
+ * Categories (13):
  * - Config (3): schema validation, file not found, parse failure
  * - Bridge (5): timeout, injection, readiness, version mismatch, execution
  * - Control (7): not found, visibility, enabled, interactable, property, aggregation, method
@@ -30,8 +30,10 @@
  * - OData (3): request failed, parse, CSRF token
  * - Selector (3): invalid, ambiguous, parse
  * - Timeout (3): UI5 stability, control discovery, generic operation
- * - AI (4): provider unavailable, invalid response, token limit, rate limited
+ * - AI (9): provider unavailable, invalid response, token limit, rate limited, not configured, llm call failed, response parse failed, context build failed, step interpret failed
  * - Plugin (3): load failure, init failure, incompatible version
+ * - Vocabulary (4): term not found, domain load failed, JSON invalid, ambiguous match
+ * - Intent (4): field not found, action failed, navigation failed, validation failed
  */
 export const ErrorCode = Object.freeze({
   // ── Config errors ──────────────────────────────────────────────────
@@ -86,11 +88,28 @@ export const ErrorCode = Object.freeze({
   ERR_AI_RESPONSE_INVALID: 'ERR_AI_RESPONSE_INVALID',
   ERR_AI_TOKEN_LIMIT: 'ERR_AI_TOKEN_LIMIT',
   ERR_AI_RATE_LIMITED: 'ERR_AI_RATE_LIMITED',
+  ERR_AI_NOT_CONFIGURED: 'ERR_AI_NOT_CONFIGURED',
+  ERR_AI_LLM_CALL_FAILED: 'ERR_AI_LLM_CALL_FAILED',
+  ERR_AI_RESPONSE_PARSE_FAILED: 'ERR_AI_RESPONSE_PARSE_FAILED',
+  ERR_AI_CONTEXT_BUILD_FAILED: 'ERR_AI_CONTEXT_BUILD_FAILED',
+  ERR_AI_STEP_INTERPRET_FAILED: 'ERR_AI_STEP_INTERPRET_FAILED',
 
   // ── Plugin errors ──────────────────────────────────────────────────
   ERR_PLUGIN_LOAD: 'ERR_PLUGIN_LOAD',
   ERR_PLUGIN_INIT: 'ERR_PLUGIN_INIT',
   ERR_PLUGIN_INCOMPATIBLE: 'ERR_PLUGIN_INCOMPATIBLE',
+
+  // ── Vocabulary errors ──────────────────────────────────────────────
+  ERR_VOCAB_TERM_NOT_FOUND: 'ERR_VOCAB_TERM_NOT_FOUND',
+  ERR_VOCAB_DOMAIN_LOAD_FAILED: 'ERR_VOCAB_DOMAIN_LOAD_FAILED',
+  ERR_VOCAB_JSON_INVALID: 'ERR_VOCAB_JSON_INVALID',
+  ERR_VOCAB_AMBIGUOUS_MATCH: 'ERR_VOCAB_AMBIGUOUS_MATCH',
+
+  // ── Intent errors ──────────────────────────────────────────────────
+  ERR_INTENT_FIELD_NOT_FOUND: 'ERR_INTENT_FIELD_NOT_FOUND',
+  ERR_INTENT_ACTION_FAILED: 'ERR_INTENT_ACTION_FAILED',
+  ERR_INTENT_NAVIGATION_FAILED: 'ERR_INTENT_NAVIGATION_FAILED',
+  ERR_INTENT_VALIDATION_FAILED: 'ERR_INTENT_VALIDATION_FAILED',
 } as const);
 
 /**

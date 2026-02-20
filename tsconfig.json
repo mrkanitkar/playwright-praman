@@ -28,7 +28,10 @@
       "#core/*": ["src/core/*"],
       "#bridge/*": ["src/bridge/*"],
       "#proxy/*": ["src/proxy/*"],
-      "#fixtures/*": ["src/fixtures/*"]
+      "#fixtures/*": ["src/fixtures/*"],
+      "#ai/*": ["src/ai/*"],
+      "#vocabulary/*": ["src/vocabulary/*"],
+      "#intents/*": ["src/intents/*"]
     }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"],

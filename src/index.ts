@@ -33,19 +33,15 @@ export {
   ConfigError,
   ControlError,
   ErrorCode,
+  IntentError,
   NavigationError,
   ODataError,
   PluginError,
   PramanError,
   SelectorError,
   TimeoutError,
+  VocabularyError,
 } from './core/errors/index.js';
-
-// ── Logging ─────────────────────────────────────────────────────────
-export { createLogger, createRootLogger } from './core/logging/index.js';
-
-// ── Telemetry ───────────────────────────────────────────────────────
-export { initTelemetry } from './core/telemetry/index.js';
 
 // ── Utils ───────────────────────────────────────────────────────────
 export {
@@ -55,50 +51,12 @@ export {
   waitForUI5Stable,
 } from './core/utils/index.js';
 
-// ── Compat ──────────────────────────────────────────────────────────
-export { getPlaywrightVersion, hasFeature } from './core/compat/index.js';
-
-// ── Selectors ───────────────────────────────────────────────────────
-export {
-  createUI5SelectorEngineScript,
-  isUI5SelectorString,
-  parseUI5Selector,
-  serializeUI5Selector,
-  validateUI5Selector,
-} from './selectors/index.js';
-
-// ── Matchers ────────────────────────────────────────────────────────
-export {
-  checkUI5Binding,
-  checkUI5CellText,
-  checkUI5ControlType,
-  checkUI5Enabled,
-  checkUI5Property,
-  checkUI5RowCount,
-  checkUI5SelectedRows,
-  checkUI5Text,
-  checkUI5ValueState,
-  checkUI5Visible,
-} from './matchers/index.js';
-export type { MatcherResult } from './matchers/index.js';
-
-// ── Bridge ──────────────────────────────────────────────────────────
-export { ensureBridgeInjected, isBridgeReady, waitForBridgeReady } from './bridge/index.js';
-export type { MethodExecutionResult } from './bridge/index.js';
-
-// ── Proxy ───────────────────────────────────────────────────────────
-export {
-  createControlProxy,
-  ControlProxyCache,
-  discoverControl,
-  UI5Object,
-  UI5ObjectCache,
-} from './proxy/index.js';
-export type { ControlProxyState } from './proxy/index.js';
-
-// ── Auth ────────────────────────────────────────────────────────────
-export { createAuthStrategy, SAPAuthHandler } from './auth/index.js';
+// ── Auth types ───────────────────────────────────────────────────────
 export type { AuthStrategy, SAPAuthConfig, SessionInfo } from './auth/index.js';
+
+// ── Types ────────────────────────────────────────────────────────────
+export type { UI5Selector } from './core/types/selectors.js';
+export type { UI5ControlBase } from './core/types/controls.js';
 
 // ── Navigation ──────────────────────────────────────────────────────
 export {
@@ -112,6 +70,8 @@ export {
   navigateToTile,
   searchAndOpenApp,
 } from './modules/index.js';
+export type { NavigationOptions } from './modules/navigation.js';
+export type { UI5NavigationAPI } from './fixtures/nav-fixtures.js';
 
 // ── Table (core) ────────────────────────────────────────────────────
 export {
@@ -165,7 +125,6 @@ export type {
 // ── Dialog ──────────────────────────────────────────────────────────
 export {
   confirmDialog,
-  DIALOG_CONTROL_TYPES,
   dismissDialog,
   getDialogButtons,
   getOpenDialogs,
@@ -183,7 +142,6 @@ export type {
 
 // ── Date ────────────────────────────────────────────────────────────
 export {
-  DATE_FORMATS,
   formatDateForUI5,
   getDatePickerValue,
   getDateRangeSelection,

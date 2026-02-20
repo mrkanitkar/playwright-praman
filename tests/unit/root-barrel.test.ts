@@ -24,15 +24,14 @@ describe('root barrel (src/index.ts)', () => {
   });
 
   describe('auth re-exports', () => {
-    it('should export SAPAuthHandler class', async () => {
+    it('should export AuthStrategy, SAPAuthConfig, SessionInfo types (type-level)', async () => {
+      // Auth types are exported; implementation symbols (SAPAuthHandler, createAuthStrategy)
+      // are internal and NOT exported from the public barrel (A2 barrel surgery)
       const mod = await import('../../src/index.js');
-      expect(mod.SAPAuthHandler).toBeDefined();
-    });
-
-    it('should export createAuthStrategy factory', async () => {
-      const mod = await import('../../src/index.js');
-      expect(mod.createAuthStrategy).toBeDefined();
-      expect(typeof mod.createAuthStrategy).toBe('function');
+      // Verify implementation symbols are gone
+      const b = mod as Record<string, unknown>;
+      expect(b['SAPAuthHandler']).toBeUndefined();
+      expect(b['createAuthStrategy']).toBeUndefined();
     });
   });
 
