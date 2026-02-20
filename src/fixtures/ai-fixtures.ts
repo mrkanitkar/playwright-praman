@@ -29,11 +29,6 @@
  * @module fixtures
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- Playwright test.extend() returns any-typed fixtures */
-/* eslint-disable @typescript-eslint/no-unsafe-call -- Playwright fixture callbacks are called with any-typed args */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- Playwright page/use are any-typed in fixture context */
-/* eslint-disable @typescript-eslint/no-unsafe-argument -- Playwright fixture args have any types from test.extend */
-
 import { test as base } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
@@ -109,13 +104,13 @@ export interface PramanAIFixture {
 }
 
 /** Worker-level dependencies provided by coreTest via mergeTests. */
-interface AIWorkerDeps {
+export interface AIWorkerDeps {
   /** Readonly Praman configuration (PW-MERGE-1 placeholder). */
   pramanConfig: Readonly<PramanConfig>;
 }
 
 /** Test fixture map for the aiTest extension. */
-interface AIFixtures {
+export interface AIFixtures {
   /** AI stack fixture for AI-powered test operations. */
   pramanAI: PramanAIFixture;
 }

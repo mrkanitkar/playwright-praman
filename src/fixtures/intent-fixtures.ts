@@ -26,8 +26,6 @@
  * @module fixtures
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-argument -- Playwright fixture args have any types from test.extend */
-
 import type { test as base } from '@playwright/test';
 
 import type { IntentOptions, IntentResult } from '../intents/types.js';
@@ -76,7 +74,7 @@ export interface IntentFixture {
       label: string,
       expected: string,
       options?: IntentOptions,
-    ) => Promise<IntentResult<boolean>>;
+    ) => Promise<IntentResult>;
     /** Click the Confirm button and wait for the dialog to close. */
     confirmAndWait: (options?: IntentOptions) => Promise<IntentResult>;
     /** Wait for the page to complete a save operation. */
@@ -178,7 +176,7 @@ export interface IntentFixture {
 }
 
 /** Test fixture map for the intentTest extension. */
-interface IntentTestFixtures {
+export interface IntentTestFixtures {
   /** SAP business intent operations. */
   intent: IntentFixture;
 }
@@ -211,7 +209,7 @@ interface IntentTestFixtures {
  * });
  * ```
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+
 export const intentTest = (aiTest as unknown as typeof base).extend<IntentTestFixtures>({
   intent: async ({ page }, use) => {
     const [intentModule, vocabModule] = await Promise.all([
@@ -233,7 +231,6 @@ export const intentTest = (aiTest as unknown as typeof base).extend<IntentTestFi
     const ui5 = page as never;
     const ui5Navigation = page as never;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Playwright `use` is any-typed in fixture context
     await use({
       core: {
         // fillField, clickButton, selectOption, assertField, confirmAndWait do not
