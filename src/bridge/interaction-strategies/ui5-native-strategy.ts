@@ -40,6 +40,7 @@ export class UI5NativeStrategy implements InteractionStrategy {
         var ctrl = bridge.getById('${controlId}');
         if (!ctrl) return { success: false };
         if (typeof ctrl.firePress === 'function') { ctrl.firePress(); return { success: true }; }
+        if (typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); return { success: true }; }
         if (typeof ctrl.fireTap === 'function') { ctrl.fireTap(); return { success: true }; }
         var dom = ctrl.getDomRef ? ctrl.getDomRef() : null;
         if (dom) { dom.click(); return { success: true }; }

@@ -63,6 +63,7 @@ export class Opa5Strategy implements InteractionStrategy {
         if (!bridge || !bridge.RecordReplay) {
           var ctrl = bridge && bridge.getById('${controlId}');
           if (ctrl && typeof ctrl.firePress === 'function') { ctrl.firePress(); return { success: true }; }
+          if (ctrl && typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); return { success: true }; }
           return { success: false, error: 'RecordReplay not available' };
         }
         try {

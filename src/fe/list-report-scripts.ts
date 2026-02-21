@@ -253,6 +253,7 @@ export const LR_NAVIGATE_TO_ITEM_SCRIPT = `(function(arg) {
     }
     var row = items[arg.rowIndex];
     if (typeof row.firePress === 'function') { row.firePress(); return { success: true }; }
+    if (typeof row.fireSelect === 'function') { row.fireSelect(); return { success: true }; }
     if (typeof row.fireTap === 'function') { row.fireTap(); return { success: true }; }
     var cells = row.getCells ? row.getCells() : [];
     if (cells.length > 0 && typeof cells[0].firePress === 'function') {

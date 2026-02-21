@@ -35,6 +35,18 @@ describe('Opa5Strategy', () => {
     expect(evaluateFn).toHaveBeenCalled();
   });
 
+  it('press fallback includes fireSelect when RecordReplay unavailable', async () => {
+    const strategy = new Opa5Strategy();
+    const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+    const page = { evaluate: evaluateFn } as unknown as Page;
+    await strategy.press(page, 'btn1');
+    const script = evaluateFn.mock.calls[0]?.[0] as string;
+    expect(script).toContain('fireSelect');
+    const pressIdx = script.indexOf('firePress');
+    const selectIdx = script.indexOf('fireSelect');
+    expect(pressIdx).toBeLessThan(selectIdx);
+  });
+
   it('calls page.evaluate for enterText', async () => {
     const strategy = new Opa5Strategy();
     const evaluateFn = vi.fn().mockResolvedValue({ success: true });

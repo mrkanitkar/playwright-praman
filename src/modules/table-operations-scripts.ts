@@ -108,6 +108,7 @@ export function clickRowScript(effectiveId: string, isGrid: boolean, rowIndex: n
   const responsiveBody =
     `var items=c.getItems();var item=items[${ri}];if(!item)return false;` +
     'if(typeof item.firePress==="function"){item.firePress();return true;}' +
+    'if(typeof item.fireSelect==="function"){item.fireSelect();return true;}' +
     'if(item.$){item.$().trigger("tap");return true;}return false;';
   return iife(ctrl(effectiveId, 'false') + br(isGrid, gridBody, responsiveBody), 'false');
 }
