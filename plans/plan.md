@@ -1194,17 +1194,17 @@ Every decision in this plan was verified against official best practices from th
 
 ### Phase Overview
 
-| Phase       | Focus                      | Duration | Src Files | Src LOC    | Funcs   | Tests     | Key Deliverables                                                                                                                                                                                                                                                                                                       |
-| ----------- | -------------------------- | -------- | --------- | ---------- | ------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Phase 0** | Architecture & Design      | 2 weeks  | —         | —          | —       | —         | ✅ plan.md, npm scaffold, 10 ESLint plugins, dual ESM+CJS, skill files                                                                                                                                                                                                                                                 |
-| **Phase 1** | Core Infrastructure        | 3 weeks  | 49        | 11,365     | 52      | 515       | ✅ Config (Zod), errors (10), logging (pino), OTel, types (199 interfaces), matchers, selectors, retry. 98.92%                                                                                                                                                                                                         |
-| **Phase 2** | Bridge + Proxy             | 4 weeks  | 29        | 4,999      | 35      | 492       | ✅ 6 browser scripts, 3 strategies, unified proxy (D16), UI5Object (D17), API resolver (D19), discovery (D18). 99.18%                                                                                                                                                                                                  |
-| **Phase 3** | Fixtures + Auth + Nav      | 3 weeks  | 24        | 5,160      | 21      | 415       | ✅ Adapter removed, proxy consolidated. Fixtures: core+auth+nav+stability. Auth: 6 strategies. UI5Handler: 18 methods. E2E 6/6. 99.13%                                                                                                                                                                                 |
-| **Phase 4** | Modules + Table + FE       | 3 weeks  | 22        | 7,386      | 100     | 477       | ✅ Table (6 variants), dialog, date (5 formats), OData (model+HTTP), FE (ListReport, ObjectPage, test library, helpers), fixtures. 98.91%. Tag: `v1.0.0-phase4`                                                                                                                                                        |
-| **Phase 5** | AI + Intents + Vocabulary  | 3 weeks  | 406 new   | 2,397      | —       | —         | ✅ API hygiene (barrel + types + matchers/types.d.ts + memory leak + dead code), SKILL.md + skills/ domain files, LLM service (3 providers), agentic handler, capability/recipe registries, bulk discovery, vocabulary (6 domains + fuzzy match), 5 intent domain APIs (MM/SD/FI/PP/MD), ai-fixtures + intent-fixtures |
-| **Phase 6** | CLI + Reporters + Docs     | 2 weeks  | —         | —          | —       | —         | CLI, reporters, Docusaurus site, TypeDoc, JSON Schema generation (SKILL.md generation moved to Phase 5)                                                                                                                                                                                                                |
-| **Phase 7** | Cleanup + Hardening + Cert | 2 weeks  | —         | —          | —       | —         | step-decorator.ts (wire or delete), CI/CD, telemetry spans, SBOM, provenance, benchmarks, security audit, migration guide, INT1/INT2 integration tests                                                                                                                                                                 |
-| **Totals**  | Phases 0–4                 | 15 weeks | **129**   | **28,935** | **208** | **1,991** | ~56K total LOC (29K source + 27K test). 98.91% stmts, 95.54% branches, 99.34% funcs                                                                                                                                                                                                                                    |
+| Phase       | Focus                             | Duration | Src Files | Src LOC    | Funcs   | Tests     | Key Deliverables                                                                                                                                                                                                                                                                                                       |
+| ----------- | --------------------------------- | -------- | --------- | ---------- | ------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase 0** | Architecture & Design             | 2 weeks  | —         | —          | —       | —         | ✅ plan.md, npm scaffold, 10 ESLint plugins, dual ESM+CJS, skill files                                                                                                                                                                                                                                                 |
+| **Phase 1** | Core Infrastructure               | 3 weeks  | 49        | 11,365     | 52      | 515       | ✅ Config (Zod), errors (10), logging (pino), OTel, types (199 interfaces), matchers, selectors, retry. 98.92%                                                                                                                                                                                                         |
+| **Phase 2** | Bridge + Proxy                    | 4 weeks  | 29        | 4,999      | 35      | 492       | ✅ 6 browser scripts, 3 strategies, unified proxy (D16), UI5Object (D17), API resolver (D19), discovery (D18). 99.18%                                                                                                                                                                                                  |
+| **Phase 3** | Fixtures + Auth + Nav             | 3 weeks  | 24        | 5,160      | 21      | 415       | ✅ Adapter removed, proxy consolidated. Fixtures: core+auth+nav+stability. Auth: 6 strategies. UI5Handler: 18 methods. E2E 6/6. 99.13%                                                                                                                                                                                 |
+| **Phase 4** | Modules + Table + FE              | 3 weeks  | 22        | 7,386      | 100     | 477       | ✅ Table (6 variants), dialog, date (5 formats), OData (model+HTTP), FE (ListReport, ObjectPage, test library, helpers), fixtures. 98.91%. Tag: `v1.0.0-phase4`                                                                                                                                                        |
+| **Phase 5** | AI + Intents + Vocabulary         | 3 weeks  | 406 new   | 2,397      | —       | —         | ✅ API hygiene (barrel + types + matchers/types.d.ts + memory leak + dead code), SKILL.md + skills/ domain files, LLM service (3 providers), agentic handler, capability/recipe registries, bulk discovery, vocabulary (6 domains + fuzzy match), 5 intent domain APIs (MM/SD/FI/PP/MD), ai-fixtures + intent-fixtures |
+| **Phase 6** | CLI + Reporters + Instrumentation | 3 weeks  | —         | —          | —       | —         | ✅ Step decorator (`@ui5Step` + `withStep()`), CI/CD (4 workflows), telemetry spans, SBOM generation, reporters (compliance + OData trace), CLI (9 modules), JSON Schema generation, cspell/knip fixes                                                                                                                 |
+| **Phase 7** | Parity + Docs + Hardening         | 20 weeks | —         | —          | —       | —         | 91 items from Phase 6.1 plan: P0 bug fix (1), P1 missing features (7), P2 behavioral fixes (3), P3 documentation (35), P4 architecture (18), P5 AI/best-practices (15). Plus: INT1/INT2 integration tests, npm provenance, performance benchmarks, security audit                                                      |
+| **Totals**  | Phases 0–4                        | 15 weeks | **129**   | **28,935** | **208** | **1,991** | ~56K total LOC (29K source + 27K test). 98.91% stmts, 95.54% branches, 99.34% funcs                                                                                                                                                                                                                                    |
 
 **Total estimated duration: 22 weeks (~5.5 months)**
 
@@ -1352,76 +1352,84 @@ Every decision in this plan was verified against official best practices from th
 | D     | Sales domain (SD)            | `intents/domains/sales.ts`                             | createSO, createQuotation, approveQuotation, searchSOs                         |
 | D     | intent fixture               | `fixtures/intent-fixtures.ts`                          | Lazy-loaded (D2); domain APIs + vocabulary                                     |
 
-### Phase 6 — CLI + Reporters + Docs (Weeks 19–20)
+### Phase 6 — Step Instrumentation + Reporters + CLI (Weeks 19–21) ✅ COMPLETE
 
+> **Commit**: `3202b46 feat: implement phase 6 — step instrumentation, reporters, CLI`
+> **Detailed plan**: `plans/phase6.md` (W1–W19 decision log, 5 sub-phases)
+>
 > **Scope reductions from earlier phases** (verified 2026-02-17):
 >
 > - D22 auto-gen (`scripts/generate-typed-proxies.ts`) — **pulled forward to Phase 1, COMPLETE**
 > - `scripts/generate-capabilities.ts` (430 LOC) — **already implemented**, extracts @capability tags
 > - `scripts/setup-ide.ts` (150 LOC) — **already implemented**, interactive IDE config wizard
-> - `scripts/generate-json-schema.ts` — stub only (4 LOC), needs implementation
 >
 > **Scope moved to Phase 5** (verified 2026-02-20 — see plans/phase5plan.md §4):
 >
-> - `scripts/generate-skill-md.ts` — **moved to Phase 5 Batch B** — SKILL.md must ship with AI layer
-> - `SKILL.md` authored file — **moved to Phase 5 Batch B**
-> - `skills/` domain files (7 files) — **moved to Phase 5 Batch B**
+> - `scripts/generate-skill-md.ts` — **Phase 5 Batch B**
+> - `SKILL.md` + `skills/` domain files — **Phase 5 Batch B**
+>
+> **Phase 6 absorbed from Phase 7**: step-decorator wiring, CI/CD, telemetry spans, SBOM generation
 
-| Task                       | Files                                   | Tests                    | Status      |
-| -------------------------- | --------------------------------------- | ------------------------ | ----------- |
-| CLI init                   | `cli/init.ts`                           | Project scaffolding      | —           |
-| CLI doctor                 | `cli/doctor.ts`                         | Health check             | —           |
-| Compliance reporter        | `reporters/compliance-reporter.ts`      | Praman compliance report | —           |
-| OData trace reporter       | `reporters/odata-trace-reporter.ts`     | OData call logging       | —           |
-| Docusaurus site            | `docs/`                                 | All user guide pages     | —           |
-| TypeDoc generation         | Build script                            | API reference            | —           |
-| JSON Schema generation     | `scripts/generate-json-schema.ts`       | Config schema for IDEs   | Stub exists |
-| ~~SKILL.md generation~~    | ~~`scripts/generate-skill-md.ts`~~      | ~~AI agent skill file~~  | ✅ Phase 5  |
-| ~~Auto-gen typed proxies~~ | ~~`scripts/generate-typed-proxies.ts`~~ | ~~199 interfaces~~       | ✅ Phase 1  |
-| ~~Capability registry~~    | ~~`scripts/generate-capabilities.ts`~~  | ~~TSDoc extraction~~     | ✅ Done     |
-| ~~IDE setup wizard~~       | ~~`scripts/setup-ide.ts`~~              | ~~IDE config~~           | ✅ Done     |
+| Task                       | Files                                                                                                                                 | Tests                    | Status     |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ---------- |
+| Step decorator `@ui5Step`  | `core/utils/step-decorator.ts`                                                                                                        | Vitest + Playwright      | ✅ Phase 6 |
+| Wire `@ui5Step` handlers   | `ui5-handler`, `shell-handler`, `footer-handler`, `auth-handler`, `agentic-handler`                                                   | Existing tests green     | ✅ Phase 6 |
+| CI/CD workflows            | `.github/workflows/ci.yml`, `docs.yml`, `release.yml`, `copilot-setup-steps.yml`                                                      | —                        | ✅ Phase 6 |
+| Telemetry spans            | `core/telemetry/spans.ts` → handler/proxy                                                                                             | —                        | ✅ Phase 6 |
+| SBOM generation            | `scripts/generate-sbom.ts`                                                                                                            | CycloneDX output         | ✅ Phase 6 |
+| JSON Schema generation     | `scripts/generate-json-schema.ts`                                                                                                     | Config schema for IDEs   | ✅ Phase 6 |
+| Compliance reporter        | `reporters/compliance-reporter.ts`                                                                                                    | Praman compliance report | ✅ Phase 6 |
+| OData trace reporter       | `reporters/odata-trace-reporter.ts`                                                                                                   | OData call logging       | ✅ Phase 6 |
+| CLI (9 modules)            | `cli/init.ts`, `doctor.ts`, `uninstall.ts`, `logger.ts`, `version.ts`, `ide-detector.ts`, `validator.ts`, `scaffolder.ts`, `index.ts` | CLI tests                | ✅ Phase 6 |
+| cspell + knip fixes        | `.cspell.json`, `knip.config.ts`                                                                                                      | CI green                 | ✅ Phase 6 |
+| ~~Docusaurus site~~        | ~~`docs/`~~                                                                                                                           | ~~User guide pages~~     | ⏳ Phase 7 |
+| ~~TypeDoc generation~~     | ~~Build script~~                                                                                                                      | ~~API reference~~        | ⏳ Phase 7 |
+| ~~SKILL.md generation~~    | ~~`scripts/generate-skill-md.ts`~~                                                                                                    | ~~AI agent skill file~~  | ✅ Phase 5 |
+| ~~Auto-gen typed proxies~~ | ~~`scripts/generate-typed-proxies.ts`~~                                                                                               | ~~199 interfaces~~       | ✅ Phase 1 |
+| ~~Capability registry~~    | ~~`scripts/generate-capabilities.ts`~~                                                                                                | ~~TSDoc extraction~~     | ✅ Done    |
+| ~~IDE setup wizard~~       | ~~`scripts/setup-ide.ts`~~                                                                                                            | ~~IDE config~~           | ✅ Done    |
 
-### Phase 7 — Cleanup + Hardening + Certification (Weeks 21–22)
+### Phase 7 — Parity + Documentation + Hardening (Weeks 22–41)
 
-> **Updated**: 2026-02-19 — Cleanup tasks (formerly Phase 4a) merged here as final phase.
-> **Updated**: 2026-02-20 — Phase 5 absorbed 6 of 7 cleanup items. Only step-decorator.ts remains.
-> **Deferred items absorbed into Phase 7** (verified 2026-02-17):
+> **Updated**: 2026-02-21 — Comprehensive phase incorporating Phase 6.1 remediation plan (91 items).
+> **Phase 6 absorbed**: step-decorator wiring, CI/CD, telemetry spans, SBOM — all COMPLETE.
+> **Detailed plan**: `parity-verify-skill/parity-workspace/parity-site/docs/plans/praman-phase-6-1-plan.md`
+> **Architect review**: 2026-02-21 — 23 items removed/merged/reclassified from original 114-item plan.
+>
+> **Prior deferred items still outstanding**:
 >
 > - INT1/INT2 integration smoke tests (deferred from Phase 2) — need real browser + SAP demo apps
 > - GitHub issue #7 (parent) remains open until INT1/INT2 complete
-> - ~87 LOC dead code remaining for deletion (Phase 5 Batch A removed ~262 LOC; Phase 5 Batch C wired 277 LOC)
 >
-> **Scope moved to Phase 5** (verified 2026-02-20 — see plans/phase5plan.md §4):
+> **Items completed by Phase 6** (no longer in Phase 7):
 >
-> - `api-resolver.ts`, `get-selector.ts`, `get-version.ts` DELETE — **Phase 5 Batch A5** (~262 LOC)
-> - `object-map.ts` cleanup wiring — **Phase 5 Batch A3** (memory leak fix)
-> - `matchers/types.d.ts` augmentation — **Phase 5 Batch A2** (BLOCKING for AI agents)
-> - `control-types.ts`, `object-categories.ts` — **Phase 5 Batch C6** (wired into bulk-discovery.ts)
+> - ~~DELETE dead code (`step-decorator.ts`)~~ — ✅ Phase 6 (wired via `@ui5Step`)
+> - ~~Create CI/CD~~ — ✅ Phase 6 (4 workflows: ci.yml, docs.yml, release.yml, copilot-setup-steps.yml)
+> - ~~Wire telemetry spans~~ — ✅ Phase 6 (`telemetry/spans.ts` → handler/proxy)
+> - ~~SBOM generation~~ — ✅ Phase 6 (`scripts/generate-sbom.ts`)
 
-**Cleanup + Hardening** (all tasks parallelizable)
+**Phase 7 Workstreams** (from Phase 6.1 plan, post-architect review)
 
-| Task                           | Files                                                      | Tests               | Notes                                              |
-| ------------------------------ | ---------------------------------------------------------- | ------------------- | -------------------------------------------------- |
-| DELETE dead code (1 file)      | `step-decorator.ts`                                        | Remove orphan tests | ~87 LOC removed (wire into AI handler first)       |
-| Create CI/CD                   | `.github/workflows/ci.yml`                                 | —                   | lint + typecheck + test:unit + build               |
-| Wire telemetry spans           | `telemetry/spans.ts` → handler/proxy                       | —                   | OTel spans for bridge/proxy operations             |
-| ~~DELETE dead code (3 files)~~ | ~~`api-resolver.ts`, `get-version.ts`, `get-selector.ts`~~ | ~~Remove tests~~    | ✅ Phase 5 Batch A5                                |
-| ~~Wire/DELETE constants~~      | ~~`control-types.ts`, `object-categories.ts`~~             | —                   | ✅ Phase 5 Batch C6 — wired into bulk-discovery.ts |
-| ~~Wire object-map cleanup~~    | ~~`object-map.ts` → fixture teardown~~                     | ~~Lifecycle test~~  | ✅ Phase 5 Batch A3                                |
-| ~~Matcher type augmentation~~  | ~~New `matchers/types.d.ts`~~                              | ~~Type tests~~      | ✅ Phase 5 Batch A2                                |
+| Workstream            | Items  | Effort (days)   | Focus                                                                                     |
+| --------------------- | ------ | --------------- | ----------------------------------------------------------------------------------------- |
+| P0: Critical Bug Fix  | 1      | 0.5             | Wire `ui5=` selector engine registration                                                  |
+| P1: Missing Features  | 7      | 14.5–23.5       | Capabilities/Recipes main export, 6 fixtures, handlers sub-path, global-setup, FLP errors |
+| P2: Behavioral Fixes  | 3      | 1.5             | Server-side logout, vocab normalization, README                                           |
+| P3: Documentation     | 35     | 66              | 33 Docusaurus pages + API reference fix + config example                                  |
+| P4: Architecture      | 18     | 29–43           | Type safety, discriminated unions, API Extractor, branded types, lifecycle hooks, etc.    |
+| P5: AI/Best Practices | 15     | 23–35           | Provider-specific AI, inspect API, Codegen, Cloud ALM, mock server, 3 product decisions   |
+| **Total**             | **79** | **134.5–169.5** | Plus deferred INT1/INT2 + provenance + benchmarks + security                              |
 
-**Integration + Certification**
+**Integration + Certification** (carried from original Phase 7)
 
 | Task                           | Deliverable                                                    | Notes                              |
 | ------------------------------ | -------------------------------------------------------------- | ---------------------------------- |
 | INT1: Bridge integration smoke | `tests/integration/bridge-smoke.spec.ts` against SAP demo apps | Deferred from Phase 2 (batch INT1) |
 | INT2: Proxy integration smoke  | `tests/integration/proxy-smoke.spec.ts` + SAP cloud smoke      | Deferred from Phase 2 (batch INT2) |
-| SBOM generation                | CycloneDX per release                                          | —                                  |
 | npm provenance                 | `--provenance` publish                                         | —                                  |
 | Behavioral equivalence tests   | Golden master tests vs. wdi5                                   | —                                  |
 | Performance benchmarks         | Bridge injection, control discovery, method call latency       | —                                  |
 | Security audit                 | Final Snyk + npm audit review                                  | —                                  |
-| Migration guide                | Docusaurus page: v2.5.0 → v3.0                                 | —                                  |
 | CSP assessment                 | Document CSP dependency; `respectCSP` config placeholder       | —                                  |
 
 ---
@@ -1506,22 +1514,22 @@ Verified: core never imports bridge/proxy. Bridge never imports proxy.
 
 #### R5. Deferred Items Tracking (Updated 2026-02-20)
 
-| Item                             | Original Phase  | Status / Deferred To                                               | GitHub Issue |
-| -------------------------------- | --------------- | ------------------------------------------------------------------ | ------------ |
-| INT1 bridge integration smoke    | Phase 2         | ⏳ Phase 7                                                         | #7 (parent)  |
-| INT2 proxy + SAP cloud smoke     | Phase 2         | ⏳ Phase 7                                                         | #7 (parent)  |
-| G2 proxy stub methods            | Phase 2         | ✅ RESOLVED Phase 3 — replaced by `control-proxy.ts`               | #22          |
-| WebComponentAdapter full support | Phase 2 (stub)  | ⏳ Phase 7 (new approach, not adapter)                             | —            |
-| `registry` discovery strategy    | Phase 2 (no-op) | ⏳ Phase 7 — evaluate if still needed                              | —            |
-| CSP compliance                   | Phase 2         | ⏳ Phase 7                                                         | —            |
-| Dead code cleanup (~87 LOC)      | N/A             | ⏳ Phase 7 (step-decorator.ts only; 6/7 files resolved in Phase 5) | —            |
-| Object map memory leak           | Phase 2 (D20)   | ✅ Phase 5 Batch A3 — wired in fixture teardown                    | —            |
-| CI/CD setup                      | Phase 0         | ⚠️ Phase 7 (HIGH)                                                  | —            |
-| Matcher type augmentation        | Phase 3         | ✅ Phase 5 Batch A2 — matchers/types.d.ts                          | —            |
-| `test.step()` wiring             | Phase 1         | ⏳ Phase 7                                                         | —            |
-| AI layer (LLM, agentic, intents) | Phase 5         | ✅ Phase 5 Batches C+D (see plans/phase5plan.md)                   | —            |
-| Vocabulary service (6 domains)   | Phase 5         | ✅ Phase 5 Batch C (see plans/phase5plan.md)                       | —            |
-| SKILL.md + skills/ domain files  | Phase 6         | ✅ Phase 5 Batch B (moved forward — SKILL.md ships with AI layer)  | —            |
+| Item                             | Original Phase  | Status / Deferred To                                              | GitHub Issue |
+| -------------------------------- | --------------- | ----------------------------------------------------------------- | ------------ |
+| INT1 bridge integration smoke    | Phase 2         | ⏳ Phase 7                                                        | #7 (parent)  |
+| INT2 proxy + SAP cloud smoke     | Phase 2         | ⏳ Phase 7                                                        | #7 (parent)  |
+| G2 proxy stub methods            | Phase 2         | ✅ RESOLVED Phase 3 — replaced by `control-proxy.ts`              | #22          |
+| WebComponentAdapter full support | Phase 2 (stub)  | ⏳ Phase 7 (new approach, not adapter)                            | —            |
+| `registry` discovery strategy    | Phase 2 (no-op) | ⏳ Phase 7 — evaluate if still needed                             | —            |
+| CSP compliance                   | Phase 2         | ⏳ Phase 7                                                        | —            |
+| Dead code cleanup (~87 LOC)      | N/A             | ✅ Phase 6 — step-decorator.ts wired via `@ui5Step`               | —            |
+| Object map memory leak           | Phase 2 (D20)   | ✅ Phase 5 Batch A3 — wired in fixture teardown                   | —            |
+| CI/CD setup                      | Phase 0         | ✅ Phase 6 — 4 workflows (ci, docs, release, copilot-setup-steps) | —            |
+| Matcher type augmentation        | Phase 3         | ✅ Phase 5 Batch A2 — matchers/types.d.ts                         | —            |
+| `test.step()` wiring             | Phase 1         | ✅ Phase 6 — `@ui5Step` decorator + `withStep()` wrapper          | —            |
+| AI layer (LLM, agentic, intents) | Phase 5         | ✅ Phase 5 Batches C+D (see plans/phase5plan.md)                  | —            |
+| Vocabulary service (6 domains)   | Phase 5         | ✅ Phase 5 Batch C (see plans/phase5plan.md)                      | —            |
+| SKILL.md + skills/ domain files  | Phase 6         | ✅ Phase 5 Batch B (moved forward — SKILL.md ships with AI layer) | —            |
 
 #### R6. Duplicate Scope — NONE CRITICAL
 
@@ -1640,12 +1648,15 @@ Full codebase audit of 109 source files and 99 test files. Every statement verif
 | **Intent API**               | Phase 5           | ✅ IMPLEMENTED | 5 domain modules (MM/SD/FI/PP/MD), intent-fixtures, IntentError                                                            |
 | **Vocabulary**               | Phase 5           | ✅ IMPLEMENTED | 6 SAP domain JSON files, fuzzy matcher, vocabulary-loader, VocabularyError                                                 |
 | **FE (Fiori Elements)**      | Phase 4           | ✅ IMPLEMENTED | ListReport, ObjectPage, FE test library, table/list helpers, browser scripts                                               |
-| **Reporters**                | Phase 6           | ⏳ STUB        | Barrel configured, no implementation                                                                                       |
-| **CLI**                      | Phase 6           | ⏳ STUB        | Barrel exists but NOT in tsup/exports                                                                                      |
-| **Docusaurus**               | Phase 6           | ❌ NOT CREATED | No docs/ site directory                                                                                                    |
-| **CI/CD**                    | Phase 0           | ⚠️ MISSING     | No `.github/workflows/ci.yml`                                                                                              |
-| **SBOM**                     | Phase 5/7         | ⏳ DEFERRED    | Not yet created                                                                                                            |
-| **npm provenance**           | Phase 5/7         | ⏳ DEFERRED    | Not yet published                                                                                                          |
+| **Reporters**                | Phase 6           | ✅ IMPLEMENTED | `compliance-reporter.ts` + `odata-trace-reporter.ts`, barrel wired                                                         |
+| **CLI**                      | Phase 6           | ✅ IMPLEMENTED | 9 modules: init, doctor, uninstall, logger, version, ide-detector, validator, scaffolder, index                            |
+| **Step Instrumentation**     | Phase 6           | ✅ IMPLEMENTED | `@ui5Step` decorator + `withStep()` wrapper, wired to 5 handlers (~30 methods)                                             |
+| **Telemetry Spans**          | Phase 6           | ✅ IMPLEMENTED | `telemetry/spans.ts` wired to handler/proxy operations                                                                     |
+| **Docusaurus**               | Phase 7           | ❌ NOT CREATED | No docs/ site directory — 33 pages planned in Phase 7 (P3)                                                                 |
+| **CI/CD**                    | Phase 6           | ✅ IMPLEMENTED | 4 workflows: `ci.yml`, `docs.yml`, `release.yml`, `copilot-setup-steps.yml`                                                |
+| **SBOM**                     | Phase 6           | ✅ IMPLEMENTED | `scripts/generate-sbom.ts` (CycloneDX)                                                                                     |
+| **JSON Schema**              | Phase 6           | ✅ IMPLEMENTED | `scripts/generate-json-schema.ts` (Zod → JSON Schema)                                                                      |
+| **npm provenance**           | Phase 7           | ⏳ DEFERRED    | Not yet published                                                                                                          |
 
 #### R11. Phase 4 Completion Summary
 
@@ -1668,14 +1679,17 @@ Execution used 6 parallel agent waves:
 - `registry` discovery strategy evaluation
 
 ```
-Phase 7 — Cleanup (all independent, run in parallel):
-  ├── Agent A: Dead code deletion (4 files)
-  ├── Agent B: Wire object-map cleanup + UI5ObjectCache
-  ├── Agent C: CI/CD setup (.github/workflows/ci.yml)
-  ├── Agent D: Matcher type augmentation
-  ├── Agent E: Constants/step-decorator decision + wiring
-  ├── Agent F: WebComponent support (new approach)
-  └── Agent G: Registry discovery evaluation
+Phase 6 — COMPLETE (all cleanup items resolved):
+  ├── ✅ Dead code → step-decorator.ts wired via @ui5Step
+  ├── ✅ Object-map cleanup → Phase 5 Batch A3
+  ├── ✅ CI/CD → Phase 6 (4 workflows)
+  ├── ✅ Matcher type augmentation → Phase 5 Batch A2
+  ├── ✅ Step-decorator → Phase 6 (@ui5Step + withStep())
+  ├── ⏳ WebComponent support → Phase 7 (new approach)
+  └── ⏳ Registry discovery evaluation → Phase 7
+
+Phase 7 — Parity + Docs + Hardening (91 items):
+  See plans/praman-phase-6-1-plan.md (revised 2026-02-21)
 ```
 
 ---
