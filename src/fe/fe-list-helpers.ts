@@ -262,6 +262,7 @@ export async function feClickListItem(
     `if(${String(itemIndex)}<0||${String(itemIndex)}>=items.length)return{__oob:true};` +
     `var item=items[${String(itemIndex)}];` +
     `if(typeof item.firePress==="function"){item.firePress();}` +
+    `else if(typeof item.fireSelect==="function"){item.fireSelect();}` +
     `else if(typeof item.fireTap==="function"){item.fireTap();}` +
     `return{__ok:true};}catch(e){return{__error:e.message||String(e)};}})()`;
 

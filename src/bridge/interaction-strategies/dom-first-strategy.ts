@@ -40,6 +40,7 @@ export class DomFirstStrategy implements InteractionStrategy {
         var dom = ctrl.getDomRef ? ctrl.getDomRef() : null;
         if (dom) { dom.click(); return { success: true }; }
         if (typeof ctrl.firePress === 'function') { ctrl.firePress(); return { success: true }; }
+        if (typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); return { success: true }; }
         if (typeof ctrl.fireTap === 'function') { ctrl.fireTap(); return { success: true }; }
         return { success: false };
       })()`,

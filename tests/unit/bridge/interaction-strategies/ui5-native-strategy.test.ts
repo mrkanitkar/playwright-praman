@@ -26,6 +26,20 @@ describe('UI5NativeStrategy', () => {
     expect(evaluateFn).toHaveBeenCalled();
   });
 
+  it('press script includes fireSelect in fallback chain', async () => {
+    const strategy = new UI5NativeStrategy();
+    const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+    const page = { evaluate: evaluateFn } as unknown as Page;
+    await strategy.press(page, 'btn1');
+    const script = evaluateFn.mock.calls[0]?.[0] as string;
+    expect(script).toContain('fireSelect');
+    const pressIdx = script.indexOf('firePress');
+    const selectIdx = script.indexOf('fireSelect');
+    const tapIdx = script.indexOf('fireTap');
+    expect(pressIdx).toBeLessThan(selectIdx);
+    expect(selectIdx).toBeLessThan(tapIdx);
+  });
+
   it('calls page.evaluate for enterText', async () => {
     const strategy = new UI5NativeStrategy();
     const evaluateFn = vi.fn().mockResolvedValue({ success: true });
