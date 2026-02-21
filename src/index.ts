@@ -2,7 +2,9 @@
  * Praman v1.0 — AI-First SAP UI5 Test Automation Platform for Playwright.
  *
  * @remarks
- * Phase 4: Core + Bridge + Proxy + Fixtures + Auth + Navigation + Table + Dialog + Date + OData + FE.
+ * Main entry exports test fixtures, configuration, error hierarchy,
+ * AI discovery (CapabilityRegistry, RecipeRegistry), and SAP UI5 modules.
+ * For advanced AI agent building, use the `playwright-praman/ai` sub-path.
  *
  * @packageDocumentation
  *
@@ -50,6 +52,18 @@ export {
   waitForUI5Bootstrap,
   waitForUI5Stable,
 } from './core/utils/index.js';
+
+// ── AI Discovery ───────────────────────────────────────────────────
+export { CapabilityRegistry } from './ai/capability-registry.js';
+export { capabilities } from './ai/capabilities.js';
+export { RecipeRegistry } from './ai/recipe-registry.js';
+export type {
+  AiResponse,
+  CapabilitiesJSON,
+  CapabilityEntry,
+  CapabilityStats,
+  RecipeEntry,
+} from './ai/types.js';
 
 // ── Auth types ───────────────────────────────────────────────────────
 export type { AuthStrategy, SAPAuthConfig, SessionInfo } from './auth/index.js';

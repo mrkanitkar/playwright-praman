@@ -181,6 +181,75 @@ export interface CapabilityEntry {
   readonly usage_example: string;
   /** Registry schema version for forward compatibility. */
   readonly registryVersion: number;
+  /**
+   * Priority tier for API surface stratification.
+   *
+   * @remarks
+   * - `'fixture'` — Primary Playwright fixture (recommended for consumers)
+   * - `'namespace'` — Secondary utility / handler export
+   * - `'implementation'` — Internal implementation detail
+   */
+  readonly priority?: 'fixture' | 'namespace' | 'implementation';
+}
+
+/**
+ * Statistical summary of the capability registry.
+ *
+ * @intent Provide a quick overview of registered capabilities for dashboards and AI agents.
+ *
+ * @example
+ * ```typescript
+ * const stats = registry.getStatistics();
+ * console.log(`Total: ${stats.totalMethods}, Categories: ${stats.categories.join(', ')}`);
+ * ```
+ */
+export interface CapabilityStats {
+  /** Total number of registered capability entries. */
+  readonly totalMethods: number;
+  /** Deduplicated list of category names across all entries. */
+  readonly categories: readonly string[];
+  /** ISO 8601 timestamp when the statistics were generated. */
+  readonly generatedAt: string;
+  /** Package version string. */
+  readonly version: string;
+  /** Breakdown of entries by priority tier. */
+  readonly byPriority: {
+    readonly fixture: number;
+    readonly namespace: number;
+    readonly implementation: number;
+  };
+}
+
+/**
+ * Full JSON export of the capability registry for AI agent consumption.
+ *
+ * @intent Provide a structured, serialisable snapshot of all capabilities.
+ *
+ * @example
+ * ```typescript
+ * const json = registry.toJSON();
+ * const prompt = JSON.stringify(json);
+ * ```
+ */
+export interface CapabilitiesJSON {
+  /** Package name. */
+  readonly name: string;
+  /** Package version. */
+  readonly version: string;
+  /** ISO 8601 timestamp when the export was generated. */
+  readonly generatedAt: string;
+  /** Total number of registered capability entries. */
+  readonly totalMethods: number;
+  /** Breakdown of entries by priority tier. */
+  readonly byPriority: {
+    readonly fixture: number;
+    readonly namespace: number;
+    readonly implementation: number;
+  };
+  /** Entries with `priority === 'fixture'` (listed first per Playwright best practice). */
+  readonly fixtures: readonly CapabilityEntry[];
+  /** All registered entries. */
+  readonly methods: readonly CapabilityEntry[];
 }
 
 // ── Recipe Registry ────────────────────────────────────────────────────────
