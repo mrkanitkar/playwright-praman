@@ -353,6 +353,85 @@ describe('ODataTraceReporter', () => {
     const report = JSON.parse(writtenContent) as ODataTraceReport;
     expect(report.totalRequests).toBe(1);
   });
+
+  it('skips file-based attachments (body is undefined)', async () => {
+    const { writeFile } = await import('node:fs/promises');
+
+    const reporter = new ODataTraceReporter({ outputDir: './reports/odata' });
+    const testCase = createMockTestCase({ title: 'file attachment test' });
+    const result = createMockTestResult();
+
+    // File-based attachment: has path but no body
+    result.attachments.push({
+      name: 'odata-trace',
+      contentType: 'application/json',
+      path: './test-results/odata-trace.json',
+    });
+
+    reporter.onTestEnd(testCase, result);
+    await reporter.onEnd(createMockFullResult());
+
+    const writtenContent = (writeFile as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as string;
+    const report = JSON.parse(writtenContent) as ODataTraceReport;
+    expect(report.totalRequests).toBe(0);
+  });
+
+  it('defaults optional entry fields when only method and url are present', async () => {
+    const { writeFile } = await import('node:fs/promises');
+
+    const reporter = new ODataTraceReporter({ outputDir: './reports/odata' });
+    const testCase = createMockTestCase({ title: 'minimal entry test' });
+    const result = createMockTestResult();
+
+    result.attachments.push({
+      name: 'odata-trace',
+      contentType: 'application/json',
+      body: toAttachmentBody({
+        method: 'GET',
+        url: '/odata/v4/catalog/Products',
+        // No statusCode, duration, responseSize, or timestamp
+      }),
+    });
+
+    reporter.onTestEnd(testCase, result);
+    await reporter.onEnd(createMockFullResult());
+
+    const writtenContent = (writeFile as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as string;
+    const report = JSON.parse(writtenContent) as ODataTraceReport;
+    expect(report.totalRequests).toBe(1);
+
+    const trace = report.traces[0];
+    expect(trace?.statusCode).toBe(0);
+    expect(trace?.duration).toBe(0);
+    expect(trace?.responseSize).toBe(0);
+    expect(trace?.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it('handles non-object entries in attachment array', async () => {
+    const { writeFile } = await import('node:fs/promises');
+
+    const reporter = new ODataTraceReporter({ outputDir: './reports/odata' });
+    const testCase = createMockTestCase({ title: 'non-object entries test' });
+    const result = createMockTestResult();
+
+    result.attachments.push({
+      name: 'odata-trace',
+      contentType: 'application/json',
+      body: toAttachmentBody([
+        null,
+        42,
+        'a string',
+        { method: 'GET', url: '/odata/v4/catalog/Products', statusCode: 200, duration: 50 },
+      ]),
+    });
+
+    reporter.onTestEnd(testCase, result);
+    await reporter.onEnd(createMockFullResult());
+
+    const writtenContent = (writeFile as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as string;
+    const report = JSON.parse(writtenContent) as ODataTraceReport;
+    expect(report.totalRequests).toBe(1);
+  });
 });
 
 describe('extractEntitySet', () => {
