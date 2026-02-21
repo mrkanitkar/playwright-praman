@@ -471,21 +471,38 @@ describe('core-fixtures worker-scoped fixture definitions', () => {
   });
 
   describe('selectorRegistration fixture', () => {
-    it('completes without error', async () => {
+    it('registers ui5 selector engine with playwright.selectors', async () => {
       const fn = extractFixtureFn(fixtures['selectorRegistration']);
+      const mockRegister = vi.fn().mockResolvedValue(undefined);
+      const mockPlaywright = { selectors: { register: mockRegister } };
 
       // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
-      await expect(runFixture<void>(fn, {})).resolves.toBeUndefined();
+      await runFixture<void>(fn, { playwright: mockPlaywright });
+
+      expect(mockRegister).toHaveBeenCalledOnce();
+      expect(mockRegister).toHaveBeenCalledWith('ui5', expect.any(Function));
     });
 
-    it('is idempotent (calling twice does not throw)', async () => {
+    it('handles "already registered" error gracefully', async () => {
       const fn = extractFixtureFn(fixtures['selectorRegistration']);
+      const mockRegister = vi
+        .fn()
+        .mockRejectedValue(new Error('"ui5" has been already registered'));
+      const mockPlaywright = { selectors: { register: mockRegister } };
 
       // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
-      await runFixture<void>(fn, {});
+      await expect(runFixture<void>(fn, { playwright: mockPlaywright })).resolves.toBeUndefined();
+    });
+
+    it('propagates unexpected registration errors', async () => {
+      const fn = extractFixtureFn(fixtures['selectorRegistration']);
+      const mockRegister = vi.fn().mockRejectedValue(new Error('Network failure'));
+      const mockPlaywright = { selectors: { register: mockRegister } };
 
       // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
-      await expect(runFixture<void>(fn, {})).resolves.toBeUndefined();
+      await expect(runFixture<void>(fn, { playwright: mockPlaywright })).rejects.toThrow(
+        'Network failure',
+      );
     });
   });
 

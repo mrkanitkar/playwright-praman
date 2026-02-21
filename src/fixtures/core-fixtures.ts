@@ -48,6 +48,7 @@ import {
   checkUI5ValueState,
   checkUI5Visible,
 } from '../matchers/ui5-matchers.js';
+import { createUI5SelectorEngineScript } from '../selectors/ui5-selector-engine.js';
 
 import { UI5Handler } from './ui5-handler.js';
 
@@ -164,12 +165,17 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
   ],
 
   selectorRegistration: [
-    // eslint-disable-next-line no-empty-pattern -- Playwright fixture pattern: ({}, use) is required when no deps
-    async ({}, use) => {
-      // Selector registration requires playwright.selectors which is
-      // only available in the Playwright test runtime. The actual registration
-      // (playwright.selectors.register('ui5', script)) will be wired in a
-      // later phase when running under Playwright's test runner.
+    async ({ playwright }, use) => {
+      try {
+        await playwright.selectors.register('ui5', createUI5SelectorEngineScript);
+      } catch (error: unknown) {
+        // Idempotency: another worker may have already registered the engine
+        const isAlreadyRegistered =
+          error instanceof Error && error.message.includes('has been already registered');
+        if (!isAlreadyRegistered) {
+          throw error;
+        }
+      }
       await use();
     },
     { scope: 'worker', auto: true },

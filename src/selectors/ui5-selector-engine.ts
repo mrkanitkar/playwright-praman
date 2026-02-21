@@ -4,11 +4,12 @@
  * @remarks
  * Phase 1 provides a DOM attribute-based fallback that queries elements
  * by `data-sap-ui` (ID) and `data-sap-ui-type` (control type) attributes.
- * This engine script is designed to be registered with Playwright's
- * `selectors.register()` in a later phase.
+ * Registered with Playwright's `selectors.register('ui5', createUI5SelectorEngineScript)`
+ * in the `selectorRegistration` worker-scoped fixture.
  *
- * The engine script is self-contained (no imports, no Node.js APIs)
- * because it runs inside the browser context.
+ * The engine factory is self-contained (no imports, no Node.js APIs, no
+ * module-level closures) because Playwright serializes it via `.toString()`
+ * and evaluates it inside the browser context.
  *
  * @module selectors
  */
@@ -49,86 +50,62 @@ export interface UI5SelectorEngineScript {
 }
 
 /**
- * Builds a CSS attribute selector string from an ID and/or control type.
- *
- * @param id - The SAP UI5 control ID (matches `data-sap-ui` attribute)
- * @param controlType - The SAP UI5 control type (matches `data-sap-ui-type` attribute)
- * @returns A CSS attribute selector string
- */
-function buildAttributeSelector(id: string | undefined, controlType: string | undefined): string {
-  let cssSelector = '';
-
-  if (id !== undefined) {
-    cssSelector += `[data-sap-ui="${id}"]`;
-  }
-
-  if (controlType !== undefined) {
-    cssSelector += `[data-sap-ui-type="${controlType}"]`;
-  }
-
-  return cssSelector;
-}
-
-/**
- * Parses a minimal selector string into ID and controlType components.
- *
- * @remarks
- * This is an inline lightweight parser for the browser context.
- * It does not depend on the full `parseUI5Selector` function.
- *
- * Supports:
- * - `#id` - ID-only selector
- * - `controlType` - Type-only selector
- * - `controlType#id` - Combined selector
- *
- * @param selector - The selector body (without `ui5=` prefix)
- * @returns An object with optional `id` and `controlType` fields
- */
-function parseInlineSelector(selector: string): {
-  id: string | undefined;
-  controlType: string | undefined;
-} {
-  const hashIndex = selector.indexOf('#');
-
-  if (hashIndex === 0) {
-    // ID-only: "#myButton"
-    return { id: selector.slice(1), controlType: undefined };
-  }
-
-  if (hashIndex > 0) {
-    // Combined: "sap.m.Button#myButton"
-    return {
-      controlType: selector.slice(0, hashIndex),
-      id: selector.slice(hashIndex + 1),
-    };
-  }
-
-  // Type-only: "sap.m.Button"
-  return { id: undefined, controlType: selector };
-}
-
-/**
- * Creates a UI5 selector engine script for Playwright registration.
+ * Creates a UI5 selector engine factory for Playwright registration.
  *
  * @remarks
  * Phase 1 implementation uses DOM attribute-based queries:
  * - `data-sap-ui` attribute for control ID matching
  * - `data-sap-ui-type` attribute for control type matching
  *
- * The returned object conforms to the Playwright custom selector engine
- * interface and can be passed to `selectors.register('ui5', engine)`.
+ * All helper functions are **inlined inside this factory** because Playwright
+ * serializes the function via `.toString()` and evaluates it in browser context.
+ * Module-level closures are NOT available after serialization.
  *
- * @returns A selector engine script with `query` and `queryAll` methods
+ * Pass this factory directly to `selectors.register('ui5', createUI5SelectorEngineScript)`.
+ *
+ * @returns A selector engine with `query` and `queryAll` methods
  *
  * @example
  * ```typescript
  * import { createUI5SelectorEngineScript } from './ui5-selector-engine.js';
  *
- * const engine = createUI5SelectorEngineScript();
- * // Later: selectors.register('ui5', engine);
+ * // In a worker-scoped fixture:
+ * await playwright.selectors.register('ui5', createUI5SelectorEngineScript);
  * ```
  */
 export function createUI5SelectorEngineScript(): UI5SelectorEngineScript {
+  // ── Inlined helpers (must live inside factory for browser serialization) ──
+
+  function parseInlineSelector(selector: string): {
+    id: string | undefined;
+    controlType: string | undefined;
+  } {
+    const hashIndex = selector.indexOf('#');
+    if (hashIndex === 0) {
+      return { id: selector.slice(1), controlType: undefined };
+    }
+    if (hashIndex > 0) {
+      return {
+        controlType: selector.slice(0, hashIndex),
+        id: selector.slice(hashIndex + 1),
+      };
+    }
+    return { id: undefined, controlType: selector };
+  }
+
+  function buildAttributeSelector(id: string | undefined, controlType: string | undefined): string {
+    let css = '';
+    if (id !== undefined) {
+      css += `[data-sap-ui="${id}"]`;
+    }
+    if (controlType !== undefined) {
+      css += `[data-sap-ui-type="${controlType}"]`;
+    }
+    return css;
+  }
+
+  // ── Engine methods ────────────────────────────────────────────────────────
+
   return {
     query(root: HTMLElement, selector: string): HTMLElement | null {
       const { id, controlType } = parseInlineSelector(selector);
