@@ -16,6 +16,8 @@ export type {
   AiResponseError,
   AiProviderConfig,
   CapabilityEntry,
+  CapabilityStats,
+  CapabilitiesJSON,
   RecipeEntry,
   AgenticCheckpoint,
   DiscoveredControl,
@@ -25,6 +27,7 @@ export type {
 
 // ── Registries ─────────────────────────────────────────────────────────────
 export { CapabilityRegistry } from './capability-registry.js';
+export { capabilities } from './capabilities.js';
 export { RecipeRegistry } from './recipe-registry.js';
 
 // ── LLM Service ────────────────────────────────────────────────────────────

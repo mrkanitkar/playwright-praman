@@ -3,8 +3,9 @@
  *
  * @remarks
  * Verifies registry construction, static version, list/get/has/find/byCategory
- * queries, register(), and forAI() behaviour. All tests are hermetic — no
- * generated file dependencies are assumed to have data.
+ * queries, register(), listByPriority(), findByName(), getStatistics(),
+ * toJSON(), and forAI() behaviour. All tests are hermetic — no generated file
+ * dependencies are assumed to have data.
  */
 import { describe, expect, it } from 'vitest';
 
@@ -22,6 +23,7 @@ const SAMPLE_ENTRY_A: CapabilityEntry = {
   sapModule: 'sap.m.Button',
   usage_example: "await ui5.click({ id: 'submitBtn' })",
   registryVersion: 1,
+  priority: 'fixture',
 };
 
 const SAMPLE_ENTRY_B: CapabilityEntry = {
@@ -31,6 +33,7 @@ const SAMPLE_ENTRY_B: CapabilityEntry = {
   category: 'navigation',
   usage_example: "await ui5.navigateToTile('Sales Orders')",
   registryVersion: 1,
+  priority: 'fixture',
 };
 
 const SAMPLE_ENTRY_C: CapabilityEntry = {
@@ -41,6 +44,27 @@ const SAMPLE_ENTRY_C: CapabilityEntry = {
   intent: 'fill',
   usage_example: "await ui5.fill({ id: 'nameInput' }, 'John')",
   registryVersion: 1,
+  priority: 'fixture',
+};
+
+const SAMPLE_HANDLER: CapabilityEntry = {
+  id: 'agentic-handler',
+  name: 'AgenticHandler',
+  description: 'Agentic AI handler class for autonomous test generation',
+  category: 'handler',
+  usage_example: 'const handler = new AgenticHandler(llm, buildPageContext, caps)',
+  registryVersion: 1,
+  priority: 'namespace',
+};
+
+const SAMPLE_IMPL: CapabilityEntry = {
+  id: 'internal-retry',
+  name: 'retryWithBackoff',
+  description: 'Internal retry helper with exponential backoff',
+  category: 'infrastructure',
+  usage_example: 'await retryWithBackoff(() => findControl(sel), 3)',
+  registryVersion: 1,
+  priority: 'implementation',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -244,23 +268,241 @@ describe('CapabilityRegistry', () => {
     });
   });
 
+  // ── listByPriority() ──────────────────────────────────────────────────
+
+  describe('listByPriority()', () => {
+    it('returns only fixture-priority entries', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
+      const fixtures = registry.listByPriority('fixture');
+      expect(fixtures).toHaveLength(1);
+      expect(fixtures[0]?.id).toBe('click-button');
+    });
+
+    it('returns only namespace-priority entries', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
+      const namespaces = registry.listByPriority('namespace');
+      expect(namespaces).toHaveLength(1);
+      expect(namespaces[0]?.id).toBe('agentic-handler');
+    });
+
+    it('returns only implementation-priority entries', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
+      const impls = registry.listByPriority('implementation');
+      expect(impls).toHaveLength(1);
+      expect(impls[0]?.id).toBe('internal-retry');
+    });
+
+    it('returns empty array when no entries match the priority', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      expect(registry.listByPriority('implementation')).toEqual([]);
+    });
+
+    it('returns multiple entries for the same priority', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
+      const fixtures = registry.listByPriority('fixture');
+      expect(fixtures).toHaveLength(3);
+    });
+
+    it('excludes entries without a priority field', () => {
+      const noPriority: CapabilityEntry = {
+        id: 'no-priority',
+        name: 'noPriority',
+        description: 'Entry without priority',
+        category: 'misc',
+        usage_example: 'example()',
+        registryVersion: 1,
+      };
+      const registry = makeRegistry(SAMPLE_ENTRY_A, noPriority);
+      const fixtures = registry.listByPriority('fixture');
+      expect(fixtures).toHaveLength(1);
+      expect(fixtures[0]?.id).toBe('click-button');
+    });
+  });
+
+  // ── findByName() ──────────────────────────────────────────────────────
+
+  describe('findByName()', () => {
+    it('returns the entry with the given name', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
+      const result = registry.findByName('clickButton');
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('click-button');
+    });
+
+    it('returns undefined for an unknown name', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      expect(registry.findByName('unknownMethod')).toBeUndefined();
+    });
+
+    it('is case-sensitive', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      expect(registry.findByName('clickbutton')).toBeUndefined();
+      expect(registry.findByName('ClickButton')).toBeUndefined();
+    });
+
+    it('returns the first match when multiple entries share a name', () => {
+      const duplicate: CapabilityEntry = {
+        ...SAMPLE_ENTRY_A,
+        id: 'click-button-v2',
+        description: 'V2 click',
+      };
+      const registry = makeRegistry(SAMPLE_ENTRY_A, duplicate);
+      const result = registry.findByName('clickButton');
+      expect(result).toBeDefined();
+    });
+
+    it('returns undefined on an empty registry', () => {
+      const registry = new CapabilityRegistry();
+      expect(registry.findByName('anything')).toBeUndefined();
+    });
+  });
+
+  // ── getStatistics() ───────────────────────────────────────────────────
+
+  describe('getStatistics()', () => {
+    it('returns correct totalMethods count', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_HANDLER);
+      const stats = registry.getStatistics();
+      expect(stats.totalMethods).toBe(3);
+    });
+
+    it('returns deduplicated categories', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_C, SAMPLE_HANDLER);
+      const stats = registry.getStatistics();
+      // A and C share 'interaction', handler has 'handler'
+      expect(stats.categories).toHaveLength(2);
+      expect(stats.categories).toContain('interaction');
+      expect(stats.categories).toContain('handler');
+    });
+
+    it('returns a valid ISO timestamp', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      const stats = registry.getStatistics();
+      expect(new Date(stats.generatedAt).toISOString()).toBe(stats.generatedAt);
+    });
+
+    it('returns the package version', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      const stats = registry.getStatistics();
+      expect(stats.version).toBe('1.0.1');
+    });
+
+    it('returns correct byPriority breakdown', () => {
+      const registry = makeRegistry(
+        SAMPLE_ENTRY_A,
+        SAMPLE_ENTRY_B,
+        SAMPLE_ENTRY_C,
+        SAMPLE_HANDLER,
+        SAMPLE_IMPL,
+      );
+      const stats = registry.getStatistics();
+      expect(stats.byPriority).toEqual({
+        fixture: 3,
+        namespace: 1,
+        implementation: 1,
+      });
+    });
+
+    it('returns zeros for all priorities on empty registry', () => {
+      const registry = new CapabilityRegistry();
+      const stats = registry.getStatistics();
+      expect(stats.totalMethods).toBe(0);
+      expect(stats.byPriority).toEqual({
+        fixture: 0,
+        namespace: 0,
+        implementation: 0,
+      });
+    });
+  });
+
+  // ── toJSON() ──────────────────────────────────────────────────────────
+
+  describe('toJSON()', () => {
+    it('returns the package name', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      const json = registry.toJSON();
+      expect(json.name).toBe('playwright-praman');
+    });
+
+    it('returns the package version', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      const json = registry.toJSON();
+      expect(json.version).toBe('1.0.1');
+    });
+
+    it('includes a generatedAt timestamp', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      const json = registry.toJSON();
+      expect(json.generatedAt).toBeDefined();
+      expect(new Date(json.generatedAt).toISOString()).toBe(json.generatedAt);
+    });
+
+    it('returns correct totalMethods', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER);
+      const json = registry.toJSON();
+      expect(json.totalMethods).toBe(2);
+    });
+
+    it('includes byPriority breakdown', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
+      const json = registry.toJSON();
+      expect(json.byPriority).toEqual({
+        fixture: 1,
+        namespace: 1,
+        implementation: 1,
+      });
+    });
+
+    it('lists only fixture entries in the fixtures field', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
+      const json = registry.toJSON();
+      expect(json.fixtures).toHaveLength(1);
+      expect(json.fixtures[0]?.priority).toBe('fixture');
+    });
+
+    it('lists all entries in the methods field', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
+      const json = registry.toJSON();
+      expect(json.methods).toHaveLength(3);
+    });
+
+    it('returns empty fixtures and methods on empty registry', () => {
+      const registry = new CapabilityRegistry();
+      const json = registry.toJSON();
+      expect(json.fixtures).toEqual([]);
+      expect(json.methods).toEqual([]);
+      expect(json.totalMethods).toBe(0);
+    });
+  });
+
   // ── forAI() ────────────────────────────────────────────────────────────
 
   describe('forAI()', () => {
-    it('returns an array', () => {
-      const registry = new CapabilityRegistry();
-      expect(Array.isArray(registry.forAI())).toBe(true);
+    it('returns a CapabilitiesJSON object (same shape as toJSON)', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER);
+      const aiResult = registry.forAI();
+      expect(aiResult.name).toBe('playwright-praman');
+      expect(aiResult.methods).toHaveLength(2);
+      expect(aiResult.fixtures).toHaveLength(1);
+      expect(aiResult.byPriority).toBeDefined();
     });
 
-    it('returns all registered entries', () => {
-      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
-      expect(registry.forAI()).toHaveLength(2);
+    it('returns the same data as toJSON()', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_HANDLER);
+      const json = registry.toJSON();
+      const ai = registry.forAI();
+      expect(ai.name).toBe(json.name);
+      expect(ai.version).toBe(json.version);
+      expect(ai.totalMethods).toBe(json.totalMethods);
+      expect(ai.byPriority).toEqual(json.byPriority);
+      expect(ai.fixtures).toEqual(json.fixtures);
+      expect(ai.methods).toEqual(json.methods);
     });
 
     it('every entry has a usage_example', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
-      const entries = registry.forAI();
-      for (const entry of entries) {
+      const result = registry.forAI();
+      for (const entry of result.methods) {
         expect(typeof entry.usage_example).toBe('string');
         expect(entry.usage_example.length).toBeGreaterThan(0);
       }

@@ -21,8 +21,10 @@
  * @module ai
  */
 
+import { PACKAGE_NAME, VERSION } from '../version.js';
+
 import { GENERATED_CAPABILITIES } from './capability-registry.generated.js';
-import type { CapabilityEntry } from './types.js';
+import type { CapabilitiesJSON, CapabilityEntry, CapabilityStats } from './types.js';
 
 /**
  * Queryable registry of Praman API capabilities for AI agents.
@@ -95,6 +97,22 @@ export class CapabilityRegistry {
   }
 
   /**
+   * Returns capabilities matching the given priority tier.
+   *
+   * @param priority - Priority level to filter by.
+   * @returns Entries whose `priority` matches exactly.
+   *
+   * @example
+   * ```typescript
+   * const fixtures = registry.listByPriority('fixture');
+   * const handlers = registry.listByPriority('namespace');
+   * ```
+   */
+  listByPriority(priority: 'fixture' | 'namespace' | 'implementation'): CapabilityEntry[] {
+    return [...this.entries.values()].filter((e) => e.priority === priority);
+  }
+
+  /**
    * Searches capabilities by partial match against `name` or `description`.
    *
    * @remarks
@@ -117,13 +135,91 @@ export class CapabilityRegistry {
   }
 
   /**
-   * Returns a list of capabilities optimised for inclusion in an AI prompt.
+   * Returns the first capability entry matching the given `name`, or `undefined`.
    *
    * @remarks
-   * Currently returns all entries. In future releases this may apply
-   * relevance scoring or truncation to stay within token budgets.
+   * Searches by human-readable `name` (not `id`). For exact ID lookup use `get()`.
    *
-   * @returns All capability entries (ordered by insertion).
+   * @param name - Human-readable capability name to look up (case-sensitive).
+   * @returns The matching entry, or `undefined` if not found.
+   *
+   * @example
+   * ```typescript
+   * const cap = registry.findByName('clickButton');
+   * if (cap !== undefined) {
+   *   console.log(cap.usage_example);
+   * }
+   * ```
+   */
+  findByName(name: string): CapabilityEntry | undefined {
+    for (const entry of this.entries.values()) {
+      if (entry.name === name) return entry;
+    }
+    return undefined;
+  }
+
+  /**
+   * Returns a statistical summary of the capability registry.
+   *
+   * @returns Statistics including total count, categories, and priority breakdown.
+   *
+   * @example
+   * ```typescript
+   * const stats = registry.getStatistics();
+   * console.log(`Total: ${stats.totalMethods}`);
+   * ```
+   */
+  getStatistics(): CapabilityStats {
+    const entries = [...this.entries.values()];
+    const categories = [...new Set(entries.map((e) => e.category).filter(Boolean))];
+    return {
+      totalMethods: entries.length,
+      categories,
+      generatedAt: new Date().toISOString(),
+      version: VERSION,
+      byPriority: {
+        fixture: entries.filter((e) => e.priority === 'fixture').length,
+        namespace: entries.filter((e) => e.priority === 'namespace').length,
+        implementation: entries.filter((e) => e.priority === 'implementation').length,
+      },
+    };
+  }
+
+  /**
+   * Exports the full registry as a structured JSON object.
+   *
+   * @remarks
+   * Fixtures are listed first (Playwright best practice), then all methods.
+   *
+   * @returns Structured JSON snapshot of the entire registry.
+   *
+   * @example
+   * ```typescript
+   * const json = registry.toJSON();
+   * console.log(JSON.stringify(json, null, 2));
+   * ```
+   */
+  toJSON(): CapabilitiesJSON {
+    const stats = this.getStatistics();
+    return {
+      name: PACKAGE_NAME,
+      version: VERSION,
+      generatedAt: stats.generatedAt,
+      totalMethods: stats.totalMethods,
+      byPriority: stats.byPriority,
+      fixtures: this.listByPriority('fixture'),
+      methods: this.list(),
+    };
+  }
+
+  /**
+   * Returns the full registry as structured JSON optimised for AI agent consumption.
+   *
+   * @remarks
+   * Currently an alias for `toJSON()`. Future releases may apply
+   * provider-specific formatting or token-budget-aware truncation.
+   *
+   * @returns Structured JSON snapshot of the entire registry.
    *
    * @example
    * ```typescript
@@ -131,8 +227,8 @@ export class CapabilityRegistry {
    * const prompt = JSON.stringify(aiContext);
    * ```
    */
-  forAI(): CapabilityEntry[] {
-    return this.list();
+  forAI(): CapabilitiesJSON {
+    return this.toJSON();
   }
 
   /**
