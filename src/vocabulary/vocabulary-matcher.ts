@@ -109,7 +109,12 @@ function levenshteinDistance(a: string, b: string): number {
  * ```
  */
 function normalize(text: string): string {
-  return text.toLowerCase().trim();
+  return text
+    .toLowerCase()
+    .trim()
+    .replaceAll(/[/\-_.]/g, ' ')
+    .replaceAll(/ {2,}/g, ' ')
+    .trim();
 }
 
 /**

@@ -29,7 +29,7 @@
  * async function logControl(control: UI5ControlBase): Promise<void> {
  *   const id = await control.getId();
  *   const type = await control.getControlType();
- *   console.log(`${type}#${id}`);
+ *   logger.info(`${type}#${id}`);
  * }
  * ```
  */

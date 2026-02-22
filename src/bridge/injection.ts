@@ -57,10 +57,15 @@ export async function injectBridgeEager(target: Page | BrowserContext): Promise<
 
   const bridgeScript = createBridgeInjectionScript();
 
+  const timeoutMs = BRIDGE_TIMEOUTS.INJECTION;
+
   const eagerScript = `(function waitForUI5AndInject() {
+  var deadline = Date.now() + ${String(timeoutMs)};
   function tryInject() {
     if (typeof sap !== 'undefined' && sap.ui && typeof sap.ui.require === 'function') {
       ${bridgeScript}
+    } else if (Date.now() > deadline) {
+      console.warn('[praman] Eager bridge injection timed out after ${String(timeoutMs)}ms — page may not be a UI5 application');
     } else {
       setTimeout(tryInject, ${String(BRIDGE_TIMEOUTS.POLLING_INTERVAL)});
     }

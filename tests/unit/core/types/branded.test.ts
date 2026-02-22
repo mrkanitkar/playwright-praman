@@ -1,0 +1,148 @@
+/**
+ * Tests for `src/core/types/branded.ts`.
+ *
+ * @remarks
+ * Verifies branded types prevent accidental mixing at the type level
+ * and factory functions produce correctly branded values.
+ */
+import { describe, expect, expectTypeOf, it } from 'vitest';
+
+import type {
+  BindingPath,
+  ControlId,
+  EntitySetName,
+  SemanticObject,
+  ViewName,
+} from '#core/types/branded.js';
+import {
+  bindingPath,
+  controlId,
+  entitySetName,
+  semanticObject,
+  viewName,
+} from '#core/types/branded.js';
+
+describe('Branded types', () => {
+  // ── Factory functions ─────────────────────────────────────────────
+
+  describe('controlId()', () => {
+    it('creates a ControlId from a string', () => {
+      const id = controlId('myButton');
+      expect(id).toBe('myButton');
+    });
+
+    it('returns a value typed as ControlId', () => {
+      const id = controlId('btn1');
+      expectTypeOf(id).toExtend<ControlId>();
+    });
+  });
+
+  describe('viewName()', () => {
+    it('creates a ViewName from a string', () => {
+      const name = viewName('my.app.View1');
+      expect(name).toBe('my.app.View1');
+    });
+
+    it('returns a value typed as ViewName', () => {
+      const name = viewName('my.app.Main');
+      expectTypeOf(name).toExtend<ViewName>();
+    });
+  });
+
+  describe('bindingPath()', () => {
+    it('creates a BindingPath from a string', () => {
+      const path = bindingPath('/Products(1)/Name');
+      expect(path).toBe('/Products(1)/Name');
+    });
+
+    it('returns a value typed as BindingPath', () => {
+      const path = bindingPath('/SalesOrders');
+      expectTypeOf(path).toExtend<BindingPath>();
+    });
+  });
+
+  describe('semanticObject()', () => {
+    it('creates a SemanticObject from a string', () => {
+      const obj = semanticObject('PurchaseOrder');
+      expect(obj).toBe('PurchaseOrder');
+    });
+
+    it('returns a value typed as SemanticObject', () => {
+      const obj = semanticObject('SalesOrder');
+      expectTypeOf(obj).toExtend<SemanticObject>();
+    });
+  });
+
+  describe('entitySetName()', () => {
+    it('creates an EntitySetName from a string', () => {
+      const es = entitySetName('Products');
+      expect(es).toBe('Products');
+    });
+
+    it('returns a value typed as EntitySetName', () => {
+      const es = entitySetName('PurchaseOrders');
+      expectTypeOf(es).toExtend<EntitySetName>();
+    });
+  });
+
+  // ── Type-level discrimination tests ──────────────────────────────
+
+  describe('type discrimination', () => {
+    it('ControlId extends string', () => {
+      expectTypeOf<ControlId>().toExtend<string>();
+    });
+
+    it('ViewName extends string', () => {
+      expectTypeOf<ViewName>().toExtend<string>();
+    });
+
+    it('BindingPath extends string', () => {
+      expectTypeOf<BindingPath>().toExtend<string>();
+    });
+
+    it('SemanticObject extends string', () => {
+      expectTypeOf<SemanticObject>().toExtend<string>();
+    });
+
+    it('EntitySetName extends string', () => {
+      expectTypeOf<EntitySetName>().toExtend<string>();
+    });
+
+    it('ControlId is not assignable to ViewName', () => {
+      expectTypeOf<ControlId>().not.toExtend<ViewName>();
+    });
+
+    it('ViewName is not assignable to BindingPath', () => {
+      expectTypeOf<ViewName>().not.toExtend<BindingPath>();
+    });
+
+    it('BindingPath is not assignable to SemanticObject', () => {
+      expectTypeOf<BindingPath>().not.toExtend<SemanticObject>();
+    });
+
+    it('SemanticObject is not assignable to EntitySetName', () => {
+      expectTypeOf<SemanticObject>().not.toExtend<EntitySetName>();
+    });
+
+    it('plain string is not assignable to ControlId', () => {
+      expectTypeOf<string>().not.toExtend<ControlId>();
+    });
+  });
+
+  // ── Runtime behavior ────────────────────────────────────────────
+
+  describe('runtime behavior', () => {
+    it('branded values work as plain strings at runtime', () => {
+      const id = controlId('myControl');
+      expect(id.startsWith('my')).toBe(true);
+      expect(id).toHaveLength(9);
+      expect(id.toUpperCase()).toBe('MYCONTROL');
+    });
+
+    it('branded values are strictly equal to their source string', () => {
+      const raw = 'testId';
+      const branded = controlId(raw);
+      expect(branded).toBe(raw);
+    });
+  });
+});

@@ -11,7 +11,11 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import { ErrorCode } from '#core/errors/codes.js';
-import type { ErrorCode as ErrorCodeType } from '#core/errors/codes.js';
+import type {
+  ErrorCategory,
+  ErrorCode as ErrorCodeType,
+  ErrorCodePattern,
+} from '#core/errors/codes.js';
 
 describe('ErrorCode', () => {
   // ── Existence tests ──────────────────────────────────────────────────
@@ -110,8 +114,8 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 51 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(51);
+  it('has exactly 56 error codes', () => {
+    expect(Object.keys(ErrorCode)).toHaveLength(56);
   });
 
   // ── Immutability test ────────────────────────────────────────────────
@@ -129,5 +133,44 @@ describe('ErrorCode', () => {
   it('rejects invalid error codes at type level', () => {
     expectTypeOf<'INVALID_CODE'>().not.toExtend<ErrorCodeType>();
     expectTypeOf<'ERR_UNKNOWN'>().not.toExtend<ErrorCodeType>();
+  });
+
+  // ── Template literal type tests ─────────────────────────────────────
+  it('ErrorCategory covers all 13 categories', () => {
+    expectTypeOf<'CONFIG'>().toExtend<ErrorCategory>();
+    expectTypeOf<'BRIDGE'>().toExtend<ErrorCategory>();
+    expectTypeOf<'CONTROL'>().toExtend<ErrorCategory>();
+    expectTypeOf<'AUTH'>().toExtend<ErrorCategory>();
+    expectTypeOf<'NAV'>().toExtend<ErrorCategory>();
+    expectTypeOf<'ODATA'>().toExtend<ErrorCategory>();
+    expectTypeOf<'SELECTOR'>().toExtend<ErrorCategory>();
+    expectTypeOf<'TIMEOUT'>().toExtend<ErrorCategory>();
+    expectTypeOf<'AI'>().toExtend<ErrorCategory>();
+    expectTypeOf<'PLUGIN'>().toExtend<ErrorCategory>();
+    expectTypeOf<'VOCAB'>().toExtend<ErrorCategory>();
+    expectTypeOf<'INTENT'>().toExtend<ErrorCategory>();
+    expectTypeOf<'FLP'>().toExtend<ErrorCategory>();
+  });
+
+  it('rejects invalid categories', () => {
+    expectTypeOf<'UNKNOWN'>().not.toExtend<ErrorCategory>();
+    expectTypeOf<'DATABASE'>().not.toExtend<ErrorCategory>();
+  });
+
+  it('ErrorCodePattern matches valid error code format', () => {
+    expectTypeOf<'ERR_CONFIG_INVALID'>().toExtend<ErrorCodePattern>();
+    expectTypeOf<'ERR_BRIDGE_TIMEOUT'>().toExtend<ErrorCodePattern>();
+    expectTypeOf<'ERR_AI_LLM_CALL_FAILED'>().toExtend<ErrorCodePattern>();
+    expectTypeOf<'ERR_FLP_SHELL_NOT_FOUND'>().toExtend<ErrorCodePattern>();
+  });
+
+  it('ErrorCodePattern rejects invalid formats', () => {
+    expectTypeOf<'INVALID_CODE'>().not.toExtend<ErrorCodePattern>();
+    expectTypeOf<'ERR_UNKNOWN_THING'>().not.toExtend<ErrorCodePattern>();
+    expectTypeOf<'CONFIG_INVALID'>().not.toExtend<ErrorCodePattern>();
+  });
+
+  it('all ErrorCode values match ErrorCodePattern', () => {
+    expectTypeOf<ErrorCodeType>().toExtend<ErrorCodePattern>();
   });
 });

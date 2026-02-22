@@ -2,18 +2,15 @@
 
 > AI-First SAP UI5 Test Automation Platform for Playwright
 
-> [!NOTE]
-> **Coming soon for actual use.** The package scaffold is published; full functionality is under active development.
-
 [![CI](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/playwright-praman)](https://www.npmjs.com/package/playwright-praman)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 
-| | Windows | macOS | Linux |
-|---|---|---|---|
-| Node 20 | ✅ | ✅ | ✅ |
-| Node 22 | ✅ | ✅ | ✅ |
-| Node 24 | ✅ | ✅ | ✅ |
+|         | Windows | macOS | Linux |
+| ------- | ------- | ----- | ----- |
+| Node 20 | ✅      | ✅    | ✅    |
+| Node 22 | ✅      | ✅    | ✅    |
+| Node 24 | ✅      | ✅    | ✅    |
 
 ## Features
 
@@ -47,14 +44,14 @@ test('SAP Fiori app navigation', async ({ page, ui5 }) => {
 
 ## Sub-path Exports
 
-| Export | Description |
-|---|---|
-| `playwright-praman` | Core fixtures, proxy, bridge |
-| `playwright-praman/ai` | AI/LLM service, agentic handler |
-| `playwright-praman/intents` | Intent wrappers, registries |
+| Export                         | Description                      |
+| ------------------------------ | -------------------------------- |
+| `playwright-praman`            | Core fixtures, proxy, bridge     |
+| `playwright-praman/ai`         | AI/LLM service, agentic handler  |
+| `playwright-praman/intents`    | Intent wrappers, registries      |
 | `playwright-praman/vocabulary` | SAP vocabulary, control mappings |
-| `playwright-praman/fe` | SAP Fiori Elements helpers |
-| `playwright-praman/reporters` | Custom Playwright reporters |
+| `playwright-praman/fe`         | SAP Fiori Elements helpers       |
+| `playwright-praman/reporters`  | Custom Playwright reporters      |
 
 ## Build
 
@@ -67,22 +64,22 @@ npm run ci             # lint + typecheck + test + build
 
 ## IDE Support
 
-| IDE / Agent | Config |
-|---|---|
-| VS Code + Copilot | `.github/copilot-instructions.md`, `.vscode/` |
+| IDE / Agent          | Config                                          |
+| -------------------- | ----------------------------------------------- |
+| VS Code + Copilot    | `.github/copilot-instructions.md`, `.vscode/`   |
 | JetBrains / IntelliJ | `.idea/runConfigurations/`, `.idea/codeStyles/` |
-| Cursor | `.cursor/rules/praman.mdc` |
-| Google Antigravity | `.antigravity/rules.md` |
+| Cursor               | `.cursor/rules/praman.mdc`                      |
+| Google Antigravity   | `.antigravity/rules.md`                         |
 
 ## AI Agent Support
 
-| Agent | Config |
-|---|---|
-| GitHub Copilot | `.github/copilot-instructions.md` |
-| Copilot Coding Agents | `.github/agents/` |
-| Claude Code | `CLAUDE.md` |
-| OpenAI Codex / Jules | `AGENTS.md`, `.jules/setup.md` |
-| Cursor | `.cursor/rules/` |
+| Agent                 | Config                            |
+| --------------------- | --------------------------------- |
+| GitHub Copilot        | `.github/copilot-instructions.md` |
+| Copilot Coding Agents | `.github/agents/`                 |
+| Claude Code           | `CLAUDE.md`                       |
+| OpenAI Codex / Jules  | `AGENTS.md`, `.jules/setup.md`    |
+| Cursor                | `.cursor/rules/`                  |
 
 ## Azure Playwright (Optional)
 

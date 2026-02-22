@@ -41,7 +41,12 @@ export interface DiscoveryPage {
  *
  * @example
  * ```typescript
- * const opts: DiscoverPageOptions = { interactiveOnly: true, includeHidden: false };
+ * const opts: DiscoverPageOptions = {
+ *   interactiveOnly: true,
+ *   includeHidden: false,
+ *   limit: 50,
+ *   offset: 0,
+ * };
  * ```
  */
 export interface DiscoverPageOptions {
@@ -51,6 +56,10 @@ export interface DiscoverPageOptions {
   readonly includeHidden?: boolean;
   /** Discovery timeout in milliseconds. Default: `30_000`. */
   readonly timeout?: number;
+  /** Maximum number of controls to return (applied after filtering). */
+  readonly limit?: number;
+  /** Number of controls to skip before returning results (applied after filtering). */
+  readonly offset?: number;
 }
 
 // ── Raw control shape returned from the browser ────────────────────────────
@@ -157,6 +166,17 @@ function castRawControls(value: unknown): RawDiscoveredControl[] {
     (item): item is RawDiscoveredControl =>
       typeof item === 'object' && item !== null && 'id' in item && 'controlType' in item,
   );
+}
+
+/** Applies offset/limit pagination to a controls array. */
+function applyPagination(
+  controls: DiscoveredControl[],
+  offset: number | undefined,
+  limit: number | undefined,
+): DiscoveredControl[] {
+  const start = offset ?? 0;
+  const sliced = start > 0 ? controls.slice(start) : controls;
+  return limit !== undefined ? sliced.slice(0, limit) : sliced;
 }
 
 // ── Error response builder ────────────────────────────────────────────────
@@ -354,6 +374,7 @@ function browserDiscoverControls(args: BrowserArgs): {
     };
   }
 
+  // Type assertion: browser-context — window.sap is a UI5 runtime global with no Node.js type declarations
   const sapWindow = window as unknown as SapWindow;
   let elementsMap: Record<string, unknown> = {};
   try {
@@ -441,10 +462,14 @@ function browserDiscoverControls(args: BrowserArgs): {
  * ```typescript
  * import { discoverPage } from '#ai/bulk-discovery.js';
  *
+ * // Basic usage
  * const response = await discoverPage(page, { interactiveOnly: true });
  * if (response.status === 'success') {
- *   console.log(response.data.controls.length, 'controls found');
+ *   logger.info(`${response.data.controls.length} controls found`);
  * }
+ *
+ * // With pagination
+ * const paged = await discoverPage(page, { limit: 20, offset: 40 });
  * ```
  */
 export async function discoverPage(
@@ -460,13 +485,15 @@ export async function discoverPage(
 
     const rawResult = await page.evaluate(
       /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
+      // Type assertion: page.evaluate() requires (...args: never[]) => unknown signature; the actual browser-side function has typed args
       browserDiscoverControls as unknown as (...args: never[]) => unknown,
       /* v8 ignore stop */
       { interactiveOnly, includeHidden },
     );
 
     const rawControls = castRawControls(rawResult);
-    const controls = rawControls.map(toDiscoveredControl);
+    const allControls = rawControls.map(toDiscoveredControl);
+    const controls = applyPagination(allControls, options.offset, options.limit);
 
     const buttons = controls.filter((c) => BUTTON_TYPES.has(c.controlType));
     const formFields = controls.filter((c) => FORM_FIELD_TYPES.has(c.controlType));

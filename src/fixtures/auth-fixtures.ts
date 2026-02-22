@@ -36,6 +36,9 @@ import type { SAPAuthConfig } from '../auth/auth-types.js';
 /**
  * Auth fixture option types.
  *
+ * @ai
+ * @aiContext Configuration for SAP authentication strategies.
+ *
  * @remarks
  * Configurable per-project via `test.use({ sapAuthConfig: { ... } })`.
  *
@@ -55,6 +58,9 @@ export interface AuthFixtureOptions {
 
 /**
  * Auth fixture types.
+ *
+ * @ai
+ * @aiContext Provides the sapAuth handler for login/logout in tests.
  *
  * @remarks
  * Test-scoped fixtures provided to each test.
@@ -87,6 +93,9 @@ const fixtureLogger = {
   info(): void {
     /* no-op in fixture — lifecycle logging deferred to explicit login() */
   },
+  warn(): void {
+    /* no-op in fixture — warning logging deferred to explicit login() */
+  },
   error(): void {
     /* no-op in fixture — error logging deferred to explicit login() */
   },
@@ -94,6 +103,9 @@ const fixtureLogger = {
 
 /**
  * Auth test object with sapAuth handler and sapAuthConfig option.
+ *
+ * @ai
+ * @aiContext Use to access the SAP auth handler for login/logout operations.
  *
  * @remarks
  * Extends `@playwright/test` base with auth fixtures:

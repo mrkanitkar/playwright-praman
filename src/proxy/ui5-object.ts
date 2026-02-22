@@ -29,6 +29,7 @@ import { BRIDGE_GLOBALS } from '#bridge/bridge-constants.js';
 import type { MethodExecutionResult } from '#bridge/bridge-types.js';
 import { browserExecuteObjectMethod } from '#bridge/browser-scripts/execute-method-fn.js';
 import { BridgeError } from '#core/errors/bridge-error.js';
+import { assertNever } from '#core/utils/assert-never.js';
 
 /** Anti-thenable property names — return `undefined` to prevent auto-await. */
 const ANTI_THENABLE = new Set(['then', 'catch', 'finally']);
@@ -263,6 +264,8 @@ export class UI5Object {
         // Object methods should not produce these, but handle gracefully.
         return result.value;
       }
+      default:
+        return assertNever(result.returnType);
     }
   }
 

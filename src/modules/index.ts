@@ -42,6 +42,8 @@ export {
   waitForTableData,
 } from './table.js';
 export type {
+  SmartTableInfo,
+  StandardTableInfo,
   TableInfo,
   TableOptions,
   TablePage,

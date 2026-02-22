@@ -276,6 +276,67 @@ describe('injectBridgeEager', () => {
     );
   });
 
+  it('includes a Date.now() wall-clock timeout guard', async () => {
+    const addInitScriptFn = vi.fn().mockResolvedValue(undefined);
+    const page = {
+      addInitScript: addInitScriptFn,
+      evaluate: vi.fn(),
+      waitForFunction: vi.fn(),
+    } as unknown as Page;
+
+    await injectBridgeEager(page);
+
+    const scriptArg = addInitScriptFn.mock.calls[0]?.[0] as string;
+    expect(scriptArg).toContain('Date.now()');
+    expect(scriptArg).toContain('deadline');
+  });
+
+  it('uses BRIDGE_TIMEOUTS.INJECTION as the timeout deadline', async () => {
+    const addInitScriptFn = vi.fn().mockResolvedValue(undefined);
+    const page = {
+      addInitScript: addInitScriptFn,
+      evaluate: vi.fn(),
+      waitForFunction: vi.fn(),
+    } as unknown as Page;
+
+    await injectBridgeEager(page);
+
+    const scriptArg = addInitScriptFn.mock.calls[0]?.[0] as string;
+    expect(scriptArg).toContain(`Date.now() + ${String(BRIDGE_TIMEOUTS.INJECTION)}`);
+  });
+
+  it('emits console.warn on timeout', async () => {
+    const addInitScriptFn = vi.fn().mockResolvedValue(undefined);
+    const page = {
+      addInitScript: addInitScriptFn,
+      evaluate: vi.fn(),
+      waitForFunction: vi.fn(),
+    } as unknown as Page;
+
+    await injectBridgeEager(page);
+
+    const scriptArg = addInitScriptFn.mock.calls[0]?.[0] as string;
+    expect(scriptArg).toContain('console.warn');
+    expect(scriptArg).toContain('[praman] Eager bridge injection timed out');
+  });
+
+  it('stops polling after deadline is reached (no further setTimeout)', async () => {
+    const addInitScriptFn = vi.fn().mockResolvedValue(undefined);
+    const page = {
+      addInitScript: addInitScriptFn,
+      evaluate: vi.fn(),
+      waitForFunction: vi.fn(),
+    } as unknown as Page;
+
+    await injectBridgeEager(page);
+
+    const scriptArg = addInitScriptFn.mock.calls[0]?.[0] as string;
+    // The timeout branch should warn and NOT call setTimeout
+    // Verify structure: else if (Date.now() > deadline) { console.warn... } else { setTimeout... }
+    expect(scriptArg).toMatch(/Date\.now\(\)\s*>\s*deadline/);
+    expect(scriptArg).toMatch(/else\s+if\s*\(Date\.now\(\)\s*>\s*deadline\)/);
+  });
+
   it('is idempotent — skips injection on second call for same target', async () => {
     const addInitScriptFn = vi.fn().mockResolvedValue(undefined);
     const page = {

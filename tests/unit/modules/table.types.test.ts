@@ -9,6 +9,8 @@
 import { describe, expectTypeOf, it } from 'vitest';
 
 import type {
+  SmartTableInfo,
+  StandardTableInfo,
   TableInfo,
   TableOptions,
   TablePage,
@@ -39,10 +41,14 @@ describe('TableVariant', () => {
 });
 
 describe('TableInfo', () => {
-  it('has required fields variant, effectiveId, and isSmartTable', () => {
+  it('is a discriminated union of StandardTableInfo and SmartTableInfo', () => {
+    expectTypeOf<TableInfo>().toEqualTypeOf<StandardTableInfo | SmartTableInfo>();
+  });
+
+  it('has required fields variant, effectiveId, and kind', () => {
     expectTypeOf<TableInfo>().toHaveProperty('variant');
     expectTypeOf<TableInfo>().toHaveProperty('effectiveId');
-    expectTypeOf<TableInfo>().toHaveProperty('isSmartTable');
+    expectTypeOf<TableInfo>().toHaveProperty('kind');
   });
 
   it('variant field is typed as TableVariant', () => {
@@ -53,12 +59,52 @@ describe('TableInfo', () => {
     expectTypeOf<TableInfo['effectiveId']>().toEqualTypeOf<string>();
   });
 
-  it('isSmartTable field is typed as boolean', () => {
-    expectTypeOf<TableInfo['isSmartTable']>().toEqualTypeOf<boolean>();
+  it('kind field is a union of standard and smart', () => {
+    expectTypeOf<TableInfo['kind']>().toEqualTypeOf<'standard' | 'smart'>();
+  });
+});
+
+describe('StandardTableInfo', () => {
+  it('has kind discriminant set to standard', () => {
+    expectTypeOf<StandardTableInfo['kind']>().toEqualTypeOf<'standard'>();
   });
 
-  it('smartTableId is an optional string field', () => {
-    expectTypeOf<TableInfo['smartTableId']>().toEqualTypeOf<string | undefined>();
+  it('has variant typed as TableVariant', () => {
+    expectTypeOf<StandardTableInfo['variant']>().toEqualTypeOf<TableVariant>();
+  });
+
+  it('has effectiveId typed as string', () => {
+    expectTypeOf<StandardTableInfo['effectiveId']>().toEqualTypeOf<string>();
+  });
+
+  it('does not have a smartTableId property', () => {
+    expectTypeOf<StandardTableInfo>().not.toHaveProperty('smartTableId');
+  });
+
+  it('extends TableInfo', () => {
+    expectTypeOf<StandardTableInfo>().toExtend<TableInfo>();
+  });
+});
+
+describe('SmartTableInfo', () => {
+  it('has kind discriminant set to smart', () => {
+    expectTypeOf<SmartTableInfo['kind']>().toEqualTypeOf<'smart'>();
+  });
+
+  it('has variant typed as TableVariant', () => {
+    expectTypeOf<SmartTableInfo['variant']>().toEqualTypeOf<TableVariant>();
+  });
+
+  it('has effectiveId typed as string', () => {
+    expectTypeOf<SmartTableInfo['effectiveId']>().toEqualTypeOf<string>();
+  });
+
+  it('has smartTableId typed as string (required)', () => {
+    expectTypeOf<SmartTableInfo['smartTableId']>().toEqualTypeOf<string>();
+  });
+
+  it('extends TableInfo', () => {
+    expectTypeOf<SmartTableInfo>().toExtend<TableInfo>();
   });
 });
 

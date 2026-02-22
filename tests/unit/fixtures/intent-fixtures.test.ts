@@ -62,6 +62,20 @@ const mocks = vi.hoisted(() => {
   const searchCustomers = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
   const checkDeliveryStatus = vi.fn().mockResolvedValue({ status: 'success', data: 'In Transit' });
 
+  // ── Finance domain ─────────────────────────────────────────────────
+  const createJournalEntry = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const postVendorInvoice = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const processPayment = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+
+  // ── Manufacturing domain ───────────────────────────────────────────
+  const createProductionOrder = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const confirmProductionOrder = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+
+  // ── Master Data domain ─────────────────────────────────────────────
+  const createVendorMaster = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const createCustomerMaster = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const createMaterialMaster = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+
   return {
     // vocabulary
     loadDomain,
@@ -88,6 +102,17 @@ const mocks = vi.hoisted(() => {
     searchSalesOrders,
     searchCustomers,
     checkDeliveryStatus,
+    // finance
+    createJournalEntry,
+    postVendorInvoice,
+    processPayment,
+    // manufacturing
+    createProductionOrder,
+    confirmProductionOrder,
+    // masterData
+    createVendorMaster,
+    createCustomerMaster,
+    createMaterialMaster,
   };
 });
 
@@ -114,6 +139,20 @@ vi.mock('#intents/index.js', () => ({
     searchSalesOrders: mocks.searchSalesOrders,
     searchCustomers: mocks.searchCustomers,
     checkDeliveryStatus: mocks.checkDeliveryStatus,
+  },
+  finance: {
+    createJournalEntry: mocks.createJournalEntry,
+    postVendorInvoice: mocks.postVendorInvoice,
+    processPayment: mocks.processPayment,
+  },
+  manufacturing: {
+    createProductionOrder: mocks.createProductionOrder,
+    confirmProductionOrder: mocks.confirmProductionOrder,
+  },
+  masterData: {
+    createVendorMaster: mocks.createVendorMaster,
+    createCustomerMaster: mocks.createCustomerMaster,
+    createMaterialMaster: mocks.createMaterialMaster,
   },
 }));
 
@@ -189,11 +228,20 @@ vi.mock('@playwright/test', () => ({
   },
 }));
 
-// ── Mock Playwright page ──────────────────────────────────────────────
-const mockPage = {
-  evaluate: vi.fn().mockResolvedValue(undefined),
-  waitForFunction: vi.fn().mockResolvedValue(undefined),
-  url: vi.fn().mockReturnValue('https://example.com/fiori'),
+// ── Mock UI5Handler and UI5NavigationAPI (PW-MERGE-1) ──────────────────
+const mockUi5 = {
+  control: vi.fn().mockResolvedValue({}),
+  click: vi.fn().mockResolvedValue(undefined),
+  fill: vi.fn().mockResolvedValue(undefined),
+  select: vi.fn().mockResolvedValue(undefined),
+  getText: vi.fn().mockResolvedValue(''),
+  waitForUI5: vi.fn().mockResolvedValue(undefined),
+};
+const mockUi5Navigation = {
+  navigateToApp: vi.fn().mockResolvedValue(undefined),
+  navigateToHash: vi.fn().mockResolvedValue(undefined),
+  navigateToHome: vi.fn().mockResolvedValue(undefined),
+  navigateBack: vi.fn().mockResolvedValue(undefined),
 };
 
 // ── Import after mocks ────────────────────────────────────────────────
@@ -228,7 +276,7 @@ function extractFixtureFn(definition: unknown): (...args: any[]) => Promise<void
  *
  * @example
  * ```typescript
- * const intent = await runFixture<IntentFixture>(fixtureFn, { page: mockPage });
+ * const intent = await runFixture<IntentFixture>(fixtureFn, { ui5: mockUi5, ui5Navigation: mockUi5Navigation });
  * ```
  */
 async function runFixture<T>(
@@ -307,6 +355,14 @@ function resetAllMockDefaults(): void {
   mocks.searchSalesOrders.mockResolvedValue({ status: 'success', data: undefined });
   mocks.searchCustomers.mockResolvedValue({ status: 'success', data: undefined });
   mocks.checkDeliveryStatus.mockResolvedValue({ status: 'success', data: 'In Transit' });
+  mocks.createJournalEntry.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.postVendorInvoice.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.processPayment.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createProductionOrder.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.confirmProductionOrder.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createVendorMaster.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createCustomerMaster.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createMaterialMaster.mockResolvedValue({ status: 'success', data: undefined });
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────
@@ -320,19 +376,39 @@ describe('intent-fixtures fixture definitions', () => {
     vi.restoreAllMocks();
   });
 
+  describe('PW-MERGE-1 option placeholders', () => {
+    it('declares ui5 as an option placeholder', () => {
+      const def = fixtures['ui5'];
+      expect(Array.isArray(def)).toBe(true);
+      expect((def as unknown[])[1]).toEqual(expect.objectContaining({ option: true }));
+    });
+
+    it('declares ui5Navigation as an option placeholder', () => {
+      const def = fixtures['ui5Navigation'];
+      expect(Array.isArray(def)).toBe(true);
+      expect((def as unknown[])[1]).toEqual(expect.objectContaining({ option: true }));
+    });
+  });
+
   describe('intent fixture', () => {
     it('is registered as a fixture definition', () => {
       expect(fixtures).toHaveProperty('intent');
     });
 
-    it('provides core, procurement, and sales namespaces', async () => {
+    it('provides all 6 domain namespaces', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       expect(intent).toBeDefined();
       expect(intent['core']).toBeDefined();
       expect(intent['procurement']).toBeDefined();
       expect(intent['sales']).toBeDefined();
+      expect(intent['finance']).toBeDefined();
+      expect(intent['manufacturing']).toBeDefined();
+      expect(intent['masterData']).toBeDefined();
     });
 
     it('preloads all 4 vocabulary domains before use()', async () => {
@@ -345,14 +421,17 @@ describe('intent-fixtures fixture definitions', () => {
         await Promise.resolve();
       };
 
-      await fn({ page: mockPage }, captureUse as never);
+      await fn({ ui5: mockUi5, ui5Navigation: mockUi5Navigation }, captureUse as never);
 
       expect(domainsLoadedBeforeUse).toBe(true);
     });
 
     it('calls loadDomain for procurement, sales, finance, manufacturing', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const domainArgs = mocks.loadDomain.mock.calls.map((c) => c[0] as string);
       expect(domainArgs).toContain('procurement');
@@ -365,7 +444,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('core.fillField delegates to fillField intent function', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(core, 'fillField')('Vendor', '100001');
@@ -375,7 +457,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('core.clickButton delegates to clickButton intent function', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(core, 'clickButton')('Save');
@@ -385,7 +470,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('core.selectOption delegates to selectOption intent function', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(core, 'selectOption')('Status', 'Active');
@@ -395,7 +483,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('core.assertField delegates to assertField intent function', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(core, 'assertField')('Vendor', '100001');
@@ -405,7 +496,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('core.confirmAndWait delegates to confirmAndWait intent function', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(core, 'confirmAndWait')();
@@ -415,7 +509,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('core.waitForSave delegates to waitForSave intent function', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const core = intent['core'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(core, 'waitForSave')();
@@ -427,7 +524,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('procurement.createPurchaseOrder delegates to procurement.createPurchaseOrder', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const proc = intent['procurement'] as Record<
         string,
@@ -448,7 +548,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('procurement.approvePurchaseOrder delegates to procurement.approvePurchaseOrder', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const proc = intent['procurement'] as Record<
         string,
@@ -461,7 +564,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('procurement.searchPurchaseOrders delegates to procurement.searchPurchaseOrders', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const proc = intent['procurement'] as Record<
         string,
@@ -474,7 +580,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('procurement.createPurchaseRequisition delegates to procurement.createPurchaseRequisition', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const proc = intent['procurement'] as Record<
         string,
@@ -490,7 +599,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('procurement.confirmGoodsReceipt delegates to procurement.confirmGoodsReceipt', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const proc = intent['procurement'] as Record<
         string,
@@ -503,7 +615,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('procurement.searchVendors delegates to procurement.searchVendors', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const proc = intent['procurement'] as Record<
         string,
@@ -518,7 +633,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('sales.createSalesOrder delegates to sales.createSalesOrder', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(
@@ -536,7 +654,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('sales.createQuotation delegates to sales.createQuotation', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(
@@ -549,7 +670,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('sales.approveQuotation delegates to sales.approveQuotation', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(sales, 'approveQuotation')({ quotationNumber: 'Q-001' });
@@ -559,7 +683,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('sales.searchSalesOrders delegates to sales.searchSalesOrders', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(sales, 'searchSalesOrders')({ Customer: '200001' });
@@ -569,7 +696,10 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('sales.searchCustomers delegates to sales.searchCustomers', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       await method(sales, 'searchCustomers')();
@@ -579,13 +709,151 @@ describe('intent-fixtures fixture definitions', () => {
 
     it('sales.checkDeliveryStatus delegates to sales.checkDeliveryStatus', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
-      const intent = await runFixture<Record<string, unknown>>(fn, { page: mockPage });
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
 
       const sales = intent['sales'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
       const result = await method(sales, 'checkDeliveryStatus')({ salesOrderNumber: 'SO-001' });
 
       expect(mocks.checkDeliveryStatus).toHaveBeenCalledOnce();
       expect((result as Record<string, unknown>)['data']).toBe('In Transit');
+    });
+
+    // ── finance namespace ──────────────────────────────────────────────
+
+    it('finance.createJournalEntry delegates to finance.createJournalEntry', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const finance = intent['finance'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        finance,
+        'createJournalEntry',
+      )({
+        documentDate: '2026-02-20',
+        postingDate: '2026-02-20',
+        lineItems: [{ glAccount: '400000', debitCredit: 'S', amount: 1000 }],
+      });
+
+      expect(mocks.createJournalEntry).toHaveBeenCalledOnce();
+    });
+
+    it('finance.postVendorInvoice delegates to finance.postVendorInvoice', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const finance = intent['finance'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        finance,
+        'postVendorInvoice',
+      )({ vendor: '100001', invoiceDate: '2026-02-20', amount: 5000 });
+
+      expect(mocks.postVendorInvoice).toHaveBeenCalledOnce();
+    });
+
+    it('finance.processPayment delegates to finance.processPayment', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const finance = intent['finance'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        finance,
+        'processPayment',
+      )({ vendor: '100001', amount: 5000, paymentDate: '2026-02-28' });
+
+      expect(mocks.processPayment).toHaveBeenCalledOnce();
+    });
+
+    // ── manufacturing namespace ────────────────────────────────────────
+
+    it('manufacturing.createProductionOrder delegates to manufacturing.createProductionOrder', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const mfg = intent['manufacturing'] as Record<
+        string,
+        (...args: unknown[]) => Promise<unknown>
+      >;
+      await method(
+        mfg,
+        'createProductionOrder',
+      )({ material: 'FG-1000', plant: '1000', quantity: 50 });
+
+      expect(mocks.createProductionOrder).toHaveBeenCalledOnce();
+    });
+
+    it('manufacturing.confirmProductionOrder delegates to manufacturing.confirmProductionOrder', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const mfg = intent['manufacturing'] as Record<
+        string,
+        (...args: unknown[]) => Promise<unknown>
+      >;
+      await method(mfg, 'confirmProductionOrder')({ orderNumber: '1000012', quantity: 50 });
+
+      expect(mocks.confirmProductionOrder).toHaveBeenCalledOnce();
+    });
+
+    // ── masterData namespace ───────────────────────────────────────────
+
+    it('masterData.createVendorMaster delegates to masterData.createVendorMaster', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const md = intent['masterData'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(md, 'createVendorMaster')({ name: 'Acme GmbH', country: 'DE' });
+
+      expect(mocks.createVendorMaster).toHaveBeenCalledOnce();
+    });
+
+    it('masterData.createCustomerMaster delegates to masterData.createCustomerMaster', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const md = intent['masterData'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(md, 'createCustomerMaster')({ name: 'Globex Corp', country: 'US' });
+
+      expect(mocks.createCustomerMaster).toHaveBeenCalledOnce();
+    });
+
+    it('masterData.createMaterialMaster delegates to masterData.createMaterialMaster', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const md = intent['masterData'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        md,
+        'createMaterialMaster',
+      )({ materialNumber: 'RAW-0001', description: 'Raw material A' });
+
+      expect(mocks.createMaterialMaster).toHaveBeenCalledOnce();
     });
   });
 });

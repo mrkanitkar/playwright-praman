@@ -7,7 +7,7 @@
  * @example
  * ```typescript
  * import { VERSION, PACKAGE_NAME } from './version.js';
- * console.log(`${PACKAGE_NAME}@${VERSION}`);
+ * logger.info(`${PACKAGE_NAME}@${VERSION}`);
  * ```
  */
 export const VERSION = '1.0.1' as const;

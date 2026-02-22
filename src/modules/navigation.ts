@@ -86,8 +86,12 @@ async function setHash(page: NavigationPage, hash: string): Promise<void> {
   await page.evaluate(
     /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
     ((h: string) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- browser-evaluated: window.hasher has no Node types
-      (window as any).hasher.setHash(h);
+      // Type assertion: window.hasher is an FLP runtime global (Hasher.js) with no Node.js type declarations
+      interface HasherWindow {
+        hasher?: { setHash(hash: string): void };
+      }
+      const w = window as unknown as HasherWindow;
+      w.hasher?.setHash(h);
     }) as (...args: never[]) => unknown,
     /* v8 ignore stop */
     hash,
@@ -184,6 +188,7 @@ export async function navigateToIntent(
 ): Promise<void> {
   let hash = `${intent.semanticObject}-${intent.action}`;
   if (params !== undefined && Object.keys(params).length > 0) {
+    // Type assertion: URLSearchParams constructor does not accept Readonly<Record<>>, but does not mutate input
     const queryString = new URLSearchParams(params as Record<string, string>).toString();
     hash = `${hash}?${queryString}`;
   }

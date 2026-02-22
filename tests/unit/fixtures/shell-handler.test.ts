@@ -118,7 +118,36 @@ describe('ShellHandler', () => {
   });
 
   // ═══════════════════════════════════════════════════════════════════════
-  // Group 3: openUserMenu (tests 5-6)
+  // Group 3: openNotifications (tests 5-6)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  describe('openNotifications()', () => {
+    it('opens notifications panel by clicking the notifications icon', async () => {
+      page.evaluate.mockResolvedValue(true);
+
+      await handler.openNotifications();
+
+      expect(page.evaluate).toHaveBeenCalledOnce();
+    });
+
+    it('throws NavigationError when notifications icon is not found', async () => {
+      page.evaluate.mockResolvedValue(false);
+
+      await expect(handler.openNotifications()).rejects.toThrow(NavigationError);
+
+      try {
+        await handler.openNotifications();
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(NavigationError);
+        const navError = error as NavigationError;
+        expect(navError.code).toBe('ERR_NAV_ROUTE_FAILED');
+        expect(navError.suggestions.length).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Group 4: openUserMenu (tests 7-8)
   // ═══════════════════════════════════════════════════════════════════════
 
   describe('openUserMenu()', () => {

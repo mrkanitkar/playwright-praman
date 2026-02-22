@@ -30,7 +30,6 @@
  */
 
 import { test as base } from '@playwright/test';
-import type { Page } from '@playwright/test';
 
 import type { AgenticHandler } from '../ai/agentic-handler.js';
 import type { DiscoverPageOptions } from '../ai/bulk-discovery.js';
@@ -94,7 +93,7 @@ export interface PramanAIFixture {
    * @example
    * ```typescript
    * const ctx = await pramanAI.buildContext();
-   * if (ctx.status === 'success') { console.log(ctx.data.ui5Version); }
+   * if (ctx.status === 'success') { logger.info(ctx.data.ui5Version); }
    * ```
    */
   buildContext: () => Promise<AiResponse<PageContext>>;
@@ -166,15 +165,17 @@ export const aiTest = base.extend<AIFixtures, AIWorkerDeps>({
     const recipes = new RecipeRegistry();
     const vocabulary = createVocabularyService();
     const agentic = new AgenticHandler(llm, buildPageContext, capabilities, recipes);
-    const typedPage = page as unknown as Page;
+    // Type assertion: Playwright Page structurally satisfies DiscoveryPage (url() + evaluate())
+    // but the fixture's inferred page type from mergeTests is narrower than the import-time Page
+    const discoveryPage = page as unknown as Parameters<typeof discoverPage>[0];
 
     await use({
-      discoverPage: async (opts?: DiscoverPageOptions) => discoverPage(typedPage as never, opts),
+      discoverPage: async (opts?: DiscoverPageOptions) => discoverPage(discoveryPage, opts),
       capabilities,
       recipes,
       agentic,
       llm,
-      buildContext: async () => buildPageContext(typedPage as never, pramanConfig),
+      buildContext: async () => buildPageContext(discoveryPage, pramanConfig),
       vocabulary,
     });
 

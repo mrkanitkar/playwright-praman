@@ -28,7 +28,7 @@
  * ```typescript
  * import { REDACTION_PATHS } from '#core/logging/redaction.js';
  *
- * console.log(REDACTION_PATHS.length); // >= 10
+ * logger.info(REDACTION_PATHS.length); // >= 10
  * ```
  */
 export const REDACTION_PATHS: readonly string[] = [

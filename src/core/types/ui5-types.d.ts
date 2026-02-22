@@ -31,6 +31,17 @@ declare namespace sap {
       }
     }
   }
+  namespace ushell {
+    const Container: {
+      getUser(): {
+        getLanguage(): string;
+        getDateFormat(): string;
+        getTimeFormat(): string;
+        getTimezone(): string;
+        getNumberFormat(): string;
+      };
+    };
+  }
 }
 
 /** Praman bridge functions injected into the browser context. */

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- UI5Handler is the central fixture-layer class; 15+ cohesive public methods belong in one class */
 /**
  * UI5Handler — internal class for UI5 control discovery, interaction, and lifecycle.
  *
@@ -29,6 +30,7 @@ import { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS } from '#bridge/bridge-constants.js';
 import type {
   BridgeControlRef,
   ControlDiscoveryResult,
+  ControlInspection,
   MethodExecutionResult,
 } from '#bridge/bridge-types.js';
 import { createExecuteMethodScript } from '#bridge/browser-scripts/execute-method.js';
@@ -36,6 +38,7 @@ import {
   createFindAllControlsScript,
   createFindControlScript,
 } from '#bridge/browser-scripts/find-control.js';
+import { createInspectControlScript } from '#bridge/browser-scripts/inspect-control.js';
 import { ensureBridgeInjected } from '#bridge/injection.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
 import { filterMethods } from '#bridge/method-blacklist.js';
@@ -62,6 +65,9 @@ const DEFAULT_POLL_INTERVAL = 250;
 
 /**
  * Configuration options for UI5Handler.
+ *
+ * @ai
+ * @aiContext Configuration for creating a UI5Handler instance.
  *
  * @example
  * ```typescript
@@ -106,6 +112,9 @@ function validateSelector(selector: UI5Selector): void {
 
 /**
  * Internal UI5Handler class with methods for control discovery, interaction, and lifecycle.
+ *
+ * @ai
+ * @aiContext Main entry point for UI5 control interactions in tests.
  *
  * @example
  * ```typescript
@@ -242,6 +251,9 @@ export class UI5Handler {
   /**
    * Discovers a single control matching the selector.
    *
+   * @ai
+   * @aiContext Use to find a UI5 control by ID or properties.
+   *
    * @param selector - The UI5 selector to search for.
    * @param options - Optional discovery options.
    * @returns The discovered control proxy.
@@ -294,6 +306,9 @@ export class UI5Handler {
   /**
    * Discovers multiple controls matching the selector.
    *
+   * @ai
+   * @aiContext Use to find all UI5 controls matching a selector.
+   *
    * @param selector - The UI5 selector to search for.
    * @returns Array of discovered control proxies.
    *
@@ -333,6 +348,9 @@ export class UI5Handler {
   /**
    * Clicks a control via the interaction strategy.
    *
+   * @ai
+   * @aiContext Use to click a UI5 button, link, or clickable control.
+   *
    * @param selector - The UI5 selector to click.
    *
    * @example
@@ -350,6 +368,9 @@ export class UI5Handler {
 
   /**
    * Fills a control with text via the interaction strategy.
+   *
+   * @ai
+   * @aiContext Use to type text into an input, textarea, or search field.
    *
    * @param selector - The UI5 selector.
    * @param value - The text to enter.
@@ -370,6 +391,9 @@ export class UI5Handler {
   /**
    * Presses a control (alias for click).
    *
+   * @ai
+   * @aiContext Use to press a UI5 button; alias for click().
+   *
    * @param selector - The UI5 selector to press.
    *
    * @example
@@ -384,6 +408,9 @@ export class UI5Handler {
 
   /**
    * Selects an item in a selection control.
+   *
+   * @ai
+   * @aiContext Use to pick an option in a dropdown, combo box, or select.
    *
    * @param selector - The UI5 selector.
    * @param key - The key or ID of the item to select.
@@ -402,6 +429,9 @@ export class UI5Handler {
   /**
    * Checks a checkbox control.
    *
+   * @ai
+   * @aiContext Use to check (enable) a UI5 checkbox control.
+   *
    * @param selector - The UI5 selector for the checkbox.
    *
    * @example
@@ -417,6 +447,9 @@ export class UI5Handler {
 
   /**
    * Unchecks a checkbox control.
+   *
+   * @ai
+   * @aiContext Use to uncheck (disable) a UI5 checkbox control.
    *
    * @param selector - The UI5 selector for the checkbox.
    *
@@ -434,6 +467,9 @@ export class UI5Handler {
   /**
    * Clears a control's text content.
    *
+   * @ai
+   * @aiContext Use to clear text from an input or search field.
+   *
    * @param selector - The UI5 selector to clear.
    *
    * @example
@@ -449,6 +485,9 @@ export class UI5Handler {
 
   /**
    * Gets the text of a control.
+   *
+   * @ai
+   * @aiContext Use to read displayed text from a label, title, or text control.
    *
    * @param selector - The UI5 selector.
    * @returns The control's text value.
@@ -468,6 +507,9 @@ export class UI5Handler {
   /**
    * Gets the value of a control.
    *
+   * @ai
+   * @aiContext Use to read the current value from an input or form field.
+   *
    * @param selector - The UI5 selector.
    * @returns The control's value.
    *
@@ -486,6 +528,9 @@ export class UI5Handler {
   /**
    * Waits for UI5 to stabilize.
    *
+   * @ai
+   * @aiContext Use after navigation or data load to wait for UI5 rendering.
+   *
    * @param timeout - Optional timeout in milliseconds.
    *
    * @example
@@ -502,6 +547,9 @@ export class UI5Handler {
 
   /**
    * Waits for a control to appear by polling.
+   *
+   * @ai
+   * @aiContext Use to wait for a control to appear before interacting.
    *
    * @param selector - The UI5 selector to wait for.
    * @param options - Optional timeout and polling interval.
@@ -549,7 +597,82 @@ export class UI5Handler {
   }
 
   /**
+   * Inspects a control and returns full metadata without creating a proxy.
+   *
+   * @remarks
+   * Provides a standalone discovery API at the fixture level for control
+   * introspection. Discovers the control first, then runs the inspect
+   * browser script to retrieve detailed metadata: controlType, id,
+   * visibility, enabled state, all properties with current values,
+   * aggregation names, and binding paths for data-bound properties.
+   *
+   * Unlike `control()`, this does NOT return an interactive proxy.
+   * Use it for debugging, test assertions on metadata, or AI-driven
+   * control analysis.
+   *
+   * @ai
+   * @aiContext Use to get full metadata for a UI5 control (properties, bindings, aggregations).
+   *
+   * @param selector - The UI5 selector to inspect.
+   * @returns Full control metadata including properties, aggregations, and bindings.
+   * @throws ControlError if the control is not found.
+   * @throws SelectorError if the selector is empty.
+   *
+   * @example
+   * ```typescript
+   * const info = await handler.inspect({ id: 'saveBtn' });
+   * logger.info(info.controlType);  // 'sap.m.Button'
+   * logger.info(info.properties);   // { text: 'Save', type: 'Emphasized', ... }
+   * logger.info(info.bindingPaths); // { text: '/ButtonText' }
+   * ```
+   */
+  @ui5Step
+  async inspect(selector: UI5Selector): Promise<ControlInspection> {
+    return this.tracer.withSpan('praman.ui5.inspect', async () => {
+      validateSelector(selector);
+      await this.internalWaitForUI5Stable();
+
+      // Discover the control first to get its ID
+      const ref = await this.internalFindControl(selector);
+      if (ref === null) {
+        throw new ControlError({
+          message: `Control not found for inspection: ${JSON.stringify(selector)}`,
+          attempted: `Inspect control with selector: ${JSON.stringify(selector)}`,
+          suggestions: [
+            'Verify the control ID exists in the UI5 view',
+            'Check if the page has fully loaded (waitForUI5Stable)',
+            'Try using controlType + properties instead of ID',
+          ],
+        });
+      }
+
+      // Run the inspect browser script with the discovered control ID
+      const withArgs = createInspectControlScript().replace(
+        /\)\(\)$/,
+        `)(${JSON.stringify(ref.id)})`,
+      );
+      const result = await this.page.evaluate<ControlInspection | null>(withArgs);
+
+      if (result === null) {
+        throw new ControlError({
+          message: `Failed to inspect control: ${ref.id}`,
+          attempted: `Inspect control metadata for ID: ${ref.id}`,
+          suggestions: [
+            'The control may have been destroyed between discovery and inspection',
+            'Try again after waiting for UI5 stability',
+          ],
+        });
+      }
+
+      return result;
+    });
+  }
+
+  /**
    * Clears the internal proxy cache.
+   *
+   * @ai
+   * @aiContext Use to force re-discovery of controls after page changes.
    *
    * @example
    * ```typescript
@@ -562,6 +685,9 @@ export class UI5Handler {
 
   /**
    * Destroys the handler and cleans up resources.
+   *
+   * @ai
+   * @aiContext Use in teardown to release handler resources.
    *
    * @example
    * ```typescript

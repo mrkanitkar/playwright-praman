@@ -21,7 +21,7 @@
  * All Praman error codes as a frozen constant object.
  *
  * @remarks
- * Categories (13):
+ * Categories (14):
  * - Config (3): schema validation, file not found, parse failure
  * - Bridge (5): timeout, injection, readiness, version mismatch, execution
  * - Control (7): not found, visibility, enabled, interactable, property, aggregation, method
@@ -34,6 +34,7 @@
  * - Plugin (3): load failure, init failure, incompatible version
  * - Vocabulary (4): term not found, domain load failed, JSON invalid, ambiguous match
  * - Intent (4): field not found, action failed, navigation failed, validation failed
+ * - FLP (5): shell not found, permission denied, API unavailable, invalid user, operation timeout
  */
 export const ErrorCode = Object.freeze({
   // ── Config errors ──────────────────────────────────────────────────
@@ -110,6 +111,13 @@ export const ErrorCode = Object.freeze({
   ERR_INTENT_ACTION_FAILED: 'ERR_INTENT_ACTION_FAILED',
   ERR_INTENT_NAVIGATION_FAILED: 'ERR_INTENT_NAVIGATION_FAILED',
   ERR_INTENT_VALIDATION_FAILED: 'ERR_INTENT_VALIDATION_FAILED',
+
+  // ── FLP errors ────────────────────────────────────────────────────
+  ERR_FLP_SHELL_NOT_FOUND: 'ERR_FLP_SHELL_NOT_FOUND',
+  ERR_FLP_PERMISSION_DENIED: 'ERR_FLP_PERMISSION_DENIED',
+  ERR_FLP_API_UNAVAILABLE: 'ERR_FLP_API_UNAVAILABLE',
+  ERR_FLP_INVALID_USER: 'ERR_FLP_INVALID_USER',
+  ERR_FLP_OPERATION_TIMEOUT: 'ERR_FLP_OPERATION_TIMEOUT',
 } as const);
 
 /**
@@ -122,3 +130,46 @@ export const ErrorCode = Object.freeze({
  * ```
  */
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+
+/**
+ * Error code category — the middle segment of `ERR_<CATEGORY>_<REASON>`.
+ *
+ * @example
+ * ```typescript
+ * import type { ErrorCategory } from '#core/errors/codes.js';
+ *
+ * const cat: ErrorCategory = 'CONFIG'; // valid
+ * ```
+ */
+export type ErrorCategory =
+  | 'CONFIG'
+  | 'BRIDGE'
+  | 'CONTROL'
+  | 'AUTH'
+  | 'NAV'
+  | 'ODATA'
+  | 'SELECTOR'
+  | 'TIMEOUT'
+  | 'AI'
+  | 'PLUGIN'
+  | 'VOCAB'
+  | 'INTENT'
+  | 'FLP';
+
+/**
+ * Template literal type enforcing the `ERR_<CATEGORY>_<REASON>` format.
+ *
+ * @remarks
+ * Validates that any string matching this pattern starts with `ERR_`,
+ * followed by a known {@link ErrorCategory}, then an underscore and
+ * an uppercase reason string. Useful for compile-time validation of
+ * new error codes.
+ *
+ * @example
+ * ```typescript
+ * import type { ErrorCodePattern } from '#core/errors/codes.js';
+ *
+ * const valid: ErrorCodePattern = 'ERR_CONFIG_INVALID'; // OK
+ * ```
+ */
+export type ErrorCodePattern = `ERR_${ErrorCategory}_${string}`;

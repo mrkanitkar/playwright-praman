@@ -17,7 +17,7 @@
  *
  * const result = await checkUI5Text(page, 'btn1', 'Save');
  * if (!result.pass) {
- *   console.log(result.message());
+ *   logger.warn(result.message());
  * }
  * ```
  *

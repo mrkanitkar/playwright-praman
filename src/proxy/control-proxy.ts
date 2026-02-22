@@ -53,6 +53,7 @@ import { isBlacklisted } from '#bridge/method-blacklist.js';
 import { BridgeError } from '#core/errors/bridge-error.js';
 import { ControlError } from '#core/errors/control-error.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
+import { assertNever } from '#core/utils/assert-never.js';
 
 /** Anti-thenable property names — return `undefined` to prevent auto-await. */
 const ANTI_THENABLE = new Set(['then', 'catch', 'finally']);
@@ -190,8 +191,8 @@ export interface ControlProxyState {
  * @example
  * ```typescript
  * const meta = await control.getControlMetadata();
- * console.log(meta.className); // 'sap.m.Button'
- * console.log(meta.properties); // ['text', 'enabled', 'type', 'icon']
+ * logger.info(meta.className); // 'sap.m.Button'
+ * logger.info(meta.properties); // ['text', 'enabled', 'type', 'icon']
  * ```
  */
 export interface ControlMetadataResult {
@@ -216,8 +217,8 @@ export interface ControlMetadataResult {
  * @example
  * ```typescript
  * const info = await control.getControlInfoFull();
- * console.log(info.id); // 'saveBtn'
- * console.log(info.methods); // ['getText', 'setText', ...]
+ * logger.info(info.id); // 'saveBtn'
+ * logger.info(info.methods); // ['getText', 'setText', ...]
  * ```
  */
 export interface ControlInfoFull {
@@ -331,6 +332,8 @@ async function handleReturn(
         }),
       );
     }
+    default:
+      return assertNever(result.returnType);
   }
 }
 

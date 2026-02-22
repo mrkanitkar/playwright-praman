@@ -90,8 +90,8 @@ async function readUi5Version(page: DiscoveryPage): Promise<string | undefined> 
  *
  * const response = await buildPageContext(page, config);
  * if (response.status === 'success') {
- *   console.log('UI5 version:', response.data.ui5Version ?? 'unknown');
- *   console.log('Controls found:', response.data.controls.length);
+ *   logger.info('UI5 version:', response.data.ui5Version ?? 'unknown');
+ *   logger.info('Controls found:', response.data.controls.length);
  * }
  * ```
  */

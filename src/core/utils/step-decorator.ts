@@ -184,6 +184,7 @@ export const ACTION_MAP = {
   controls: 'Find controls',
   waitForUI5: 'Wait for UI5',
   waitFor: 'Wait for control',
+  inspect: 'Inspect control',
   destroy: 'Destroy handler',
 
   // ShellHandler
@@ -203,6 +204,14 @@ export const ACTION_MAP = {
   generateTest: 'Generate test',
   interpretStep: 'Interpret step',
   suggestActions: 'Suggest actions',
+
+  // FLPSettingsHandler
+  getLanguage: 'Get language',
+  getDateFormat: 'Get date format',
+  getTimeFormat: 'Get time format',
+  getTimezone: 'Get timezone',
+  getNumberFormat: 'Get number format',
+  getAllSettings: 'Get all settings',
 
   // SAPAuthHandler
   login: 'Login',

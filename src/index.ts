@@ -35,6 +35,7 @@ export {
   ConfigError,
   ControlError,
   ErrorCode,
+  FLPError,
   IntentError,
   NavigationError,
   ODataError,
@@ -63,6 +64,7 @@ export type {
   CapabilityEntry,
   CapabilityStats,
   RecipeEntry,
+  RecipePriority,
 } from './ai/types.js';
 
 // ── Auth types ───────────────────────────────────────────────────────
@@ -71,6 +73,20 @@ export type { AuthStrategy, SAPAuthConfig, SessionInfo } from './auth/index.js';
 // ── Types ────────────────────────────────────────────────────────────
 export type { UI5Selector } from './core/types/selectors.js';
 export type { UI5ControlBase } from './core/types/controls.js';
+export type {
+  BindingPath,
+  ControlId,
+  EntitySetName,
+  SemanticObject,
+  ViewName,
+} from './core/types/branded.js';
+export {
+  bindingPath,
+  controlId,
+  entitySetName,
+  semanticObject,
+  viewName,
+} from './core/types/branded.js';
 
 // ── Navigation ──────────────────────────────────────────────────────
 export {
@@ -101,6 +117,8 @@ export {
   waitForTableData,
 } from './modules/table.js';
 export type {
+  SmartTableInfo,
+  StandardTableInfo,
   TableInfo,
   TableOptions,
   TableVariant,

@@ -17,10 +17,12 @@ import type { UI5HandlerSlice, VocabLookup } from '../core-wrappers.js';
 import { clickButton, fillField, navigateAndSearch, waitForSave } from '../core-wrappers.js';
 import type { IntentOptions, IntentResult } from '../types.js';
 
+import type { IntentString, UI5ControlTypeName } from '#core/types/index.js';
+
 // ── Shared constants ──────────────────────────────────────────────────────
 
 /** SAP Button control type string. */
-const SAP_BUTTON_TYPE = 'sap.m.Button';
+const SAP_BUTTON_TYPE: UI5ControlTypeName = 'sap.m.Button';
 
 // ── Inline navigation API interface ───────────────────────────────────────
 
@@ -32,7 +34,7 @@ const SAP_BUTTON_TYPE = 'sap.m.Button';
  * fixture without creating a circular dependency.
  */
 interface NavAPI {
-  navigateToApp(appId: string, options?: unknown): Promise<void>;
+  navigateToApp(appId: IntentString, options?: unknown): Promise<void>;
   navigateToHash(hash: string, options?: unknown): Promise<void>;
 }
 
@@ -53,6 +55,8 @@ function mmResult<T>(params: {
   retryable?: boolean;
   suggestions?: string[];
 }): IntentResult<T> {
+  // Type assertion: exactOptionalPropertyTypes requires omitting undefined optional fields;
+  // conditional spread produces a union type TypeScript cannot narrow to IntentResult<T>
   return {
     status: params.status,
     ...(params.data !== undefined && { data: params.data }),

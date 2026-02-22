@@ -513,4 +513,196 @@ describe('CapabilityRegistry', () => {
       expect(() => registry.forAI()).not.toThrow();
     });
   });
+
+  // ── forProvider() ──────────────────────────────────────────────────────
+
+  describe('forProvider()', () => {
+    // ── Claude (XML) format ─────────────────────────────────────────────
+
+    describe('claude format', () => {
+      it('returns XML-structured capability elements', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('claude');
+        expect(result).toContain('<capabilities>');
+        expect(result).toContain('</capabilities>');
+        expect(result).toContain('<capability');
+        expect(result).toContain('</capability>');
+      });
+
+      it('includes capability name attribute', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('claude');
+        expect(result).toContain('name="clickButton"');
+      });
+
+      it('includes capability category attribute', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('claude');
+        expect(result).toContain('category="interaction"');
+      });
+
+      it('includes intent attribute when present', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('claude');
+        expect(result).toContain('intent="click"');
+      });
+
+      it('omits intent attribute when not present', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_B);
+        const result = registry.forProvider('claude');
+        expect(result).not.toContain('intent=');
+      });
+
+      it('includes description element', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('claude');
+        expect(result).toContain(
+          '<description>Clicks a UI5 button control by selector</description>',
+        );
+      });
+
+      it('includes example element', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('claude');
+        expect(result).toContain(`<example>await ui5.click({ id: 'submitBtn' })</example>`);
+      });
+
+      it('returns self-closing tag for empty registry', () => {
+        const registry = new CapabilityRegistry();
+        const result = registry.forProvider('claude');
+        expect(result).toBe('<capabilities />');
+      });
+
+      it('includes multiple capabilities', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
+        const result = registry.forProvider('claude');
+        expect(result).toContain('name="clickButton"');
+        expect(result).toContain('name="navigateTile"');
+        expect(result).toContain('name="fillInput"');
+      });
+    });
+
+    // ── OpenAI (JSON function-calling) format ──────────────────────────
+
+    describe('openai format', () => {
+      it('returns valid JSON', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('openai');
+        expect(() => JSON.parse(result) as unknown).not.toThrow();
+      });
+
+      it('returns an array of tool objects', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
+        const parsed = JSON.parse(registry.forProvider('openai')) as unknown[];
+        expect(Array.isArray(parsed)).toBe(true);
+        expect(parsed).toHaveLength(2);
+      });
+
+      it('each tool has type "function"', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const parsed = JSON.parse(registry.forProvider('openai')) as { type: string }[];
+        expect(parsed[0]?.type).toBe('function');
+      });
+
+      it('includes function name matching capability name', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const parsed = JSON.parse(registry.forProvider('openai')) as {
+          function: { name: string };
+        }[];
+        expect(parsed[0]?.function.name).toBe('clickButton');
+      });
+
+      it('includes function description', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const parsed = JSON.parse(registry.forProvider('openai')) as {
+          function: { description: string };
+        }[];
+        expect(parsed[0]?.function.description).toBe('Clicks a UI5 button control by selector');
+      });
+
+      it('includes parameters with example property', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const parsed = JSON.parse(registry.forProvider('openai')) as {
+          function: {
+            parameters: {
+              properties: { example: { description: string } };
+            };
+          };
+        }[];
+        expect(parsed[0]?.function.parameters.properties.example.description).toBe(
+          "await ui5.click({ id: 'submitBtn' })",
+        );
+      });
+
+      it('includes category in function metadata', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const parsed = JSON.parse(registry.forProvider('openai')) as {
+          function: { category: string };
+        }[];
+        expect(parsed[0]?.function.category).toBe('interaction');
+      });
+
+      it('returns empty array JSON for empty registry', () => {
+        const registry = new CapabilityRegistry();
+        const result = registry.forProvider('openai');
+        expect(JSON.parse(result)).toEqual([]);
+      });
+    });
+
+    // ── Gemini (plain text) format ─────────────────────────────────────
+
+    describe('gemini format', () => {
+      it('returns plain text listing', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('gemini');
+        expect(result).toContain('clickButton');
+        expect(result).toContain('[interaction]');
+        expect(result).toContain('Clicks a UI5 button control by selector');
+      });
+
+      it('includes example prefixed with "Example:"', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('gemini');
+        expect(result).toContain("Example: await ui5.click({ id: 'submitBtn' })");
+      });
+
+      it('separates multiple entries with blank lines', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
+        const result = registry.forProvider('gemini');
+        // Two entries should be separated by a double newline
+        const blocks = result.split('\n\n');
+        expect(blocks).toHaveLength(2);
+      });
+
+      it('returns fallback message for empty registry', () => {
+        const registry = new CapabilityRegistry();
+        const result = registry.forProvider('gemini');
+        expect(result).toBe('No capabilities registered.');
+      });
+
+      it('includes all capabilities', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
+        const result = registry.forProvider('gemini');
+        expect(result).toContain('clickButton');
+        expect(result).toContain('navigateTile');
+        expect(result).toContain('fillInput');
+      });
+    });
+
+    // ── General ─────────────────────────────────────────────────────────
+
+    it('returns a string for all provider types', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      expect(typeof registry.forProvider('claude')).toBe('string');
+      expect(typeof registry.forProvider('openai')).toBe('string');
+      expect(typeof registry.forProvider('gemini')).toBe('string');
+    });
+
+    it('returns non-empty strings when capabilities are registered', () => {
+      const registry = makeRegistry(SAMPLE_ENTRY_A);
+      expect(registry.forProvider('claude').length).toBeGreaterThan(0);
+      expect(registry.forProvider('openai').length).toBeGreaterThan(0);
+      expect(registry.forProvider('gemini').length).toBeGreaterThan(0);
+    });
+  });
 });

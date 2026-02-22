@@ -25,8 +25,10 @@
 
 import process from 'node:process';
 
-import { PramanConfigSchema } from './schema.js';
 import type { PramanConfig, PramanConfigInput } from './schema.js';
+import { PramanConfigSchema } from './schema.js';
+
+import { assertNever } from '#core/utils/assert-never.js';
 
 /**
  * Options for loading Praman configuration.
@@ -97,6 +99,8 @@ function readEnvOverrides(): Record<string, unknown> {
         }
         break;
       }
+      default:
+        assertNever(mapping.type);
     }
   }
 

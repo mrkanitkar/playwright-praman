@@ -31,6 +31,9 @@ import { ui5Step } from '#core/utils/step-decorator.js';
 /**
  * Options for constructing a FooterHandler.
  *
+ * @ai
+ * @aiContext Configuration for creating a FooterHandler instance.
+ *
  * @example
  * ```typescript
  * const options: FooterHandlerOptions = { page };
@@ -42,6 +45,9 @@ export interface FooterHandlerOptions {
 
 /**
  * Footer bar button operations for SAP Fiori apps.
+ *
+ * @ai
+ * @aiContext Use to click standard footer bar buttons (Save, Edit, etc.).
  *
  * @remarks
  * Provides convenience methods for common footer bar actions: Save, Apply,
@@ -110,6 +116,9 @@ export class FooterHandler {
   /**
    * Clicks the Save button in the footer bar.
    *
+   * @ai
+   * @aiContext Use to save the current document or form.
+   *
    * @throws ControlError if the Save button is not found.
    *
    * @example
@@ -124,6 +133,9 @@ export class FooterHandler {
 
   /**
    * Clicks the Apply button in the footer bar.
+   *
+   * @ai
+   * @aiContext Use to apply changes without closing the current view.
    *
    * @throws ControlError if the Apply button is not found.
    *
@@ -140,6 +152,9 @@ export class FooterHandler {
   /**
    * Clicks the Cancel button in the footer bar.
    *
+   * @ai
+   * @aiContext Use to cancel and discard changes in the current view.
+   *
    * @throws ControlError if the Cancel button is not found.
    *
    * @example
@@ -154,6 +169,9 @@ export class FooterHandler {
 
   /**
    * Clicks the Edit button in the footer bar.
+   *
+   * @ai
+   * @aiContext Use to switch from display mode to edit mode.
    *
    * @throws ControlError if the Edit button is not found.
    *
@@ -170,6 +188,9 @@ export class FooterHandler {
   /**
    * Clicks the Delete button in the footer bar.
    *
+   * @ai
+   * @aiContext Use to delete the current document or record.
+   *
    * @throws ControlError if the Delete button is not found.
    *
    * @example
@@ -184,6 +205,9 @@ export class FooterHandler {
 
   /**
    * Clicks the Create button in the footer bar.
+   *
+   * @ai
+   * @aiContext Use to create a new document or record.
    *
    * @throws ControlError if the Create button is not found.
    *

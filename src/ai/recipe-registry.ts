@@ -22,7 +22,7 @@
  */
 
 import { GENERATED_RECIPES } from './recipe-registry.generated.js';
-import type { RecipeEntry } from './types.js';
+import type { RecipeEntry, RecipePriority } from './types.js';
 
 /** Filter options accepted by {@link RecipeRegistry.select}. */
 interface RecipeFilter {
@@ -30,6 +30,8 @@ interface RecipeFilter {
   readonly category?: string;
   /** Filter by audience role. */
   readonly role?: RecipeEntry['role'];
+  /** Filter by priority level. */
+  readonly priority?: RecipePriority;
 }
 
 /**
@@ -53,7 +55,7 @@ export class RecipeRegistry {
    * @example
    * ```typescript
    * const registry = new RecipeRegistry();
-   * console.log(registry.select({}).length);
+   * logger.info(registry.select({}).length);
    * ```
    */
   constructor() {
@@ -113,8 +115,56 @@ export class RecipeRegistry {
       if (filter.role !== undefined && recipe.role !== filter.role) {
         return false;
       }
+      if (filter.priority !== undefined && recipe.priority !== filter.priority) {
+        return false;
+      }
       return true;
     });
+  }
+
+  /**
+   * Returns recipes matching the given role.
+   *
+   * @param role - Audience role to filter by.
+   * @returns Matching recipe entries.
+   *
+   * @example
+   * ```typescript
+   * const agentRecipes = registry.selectByRole('ai-agent');
+   * ```
+   */
+  selectByRole(role: RecipeEntry['role']): RecipeEntry[] {
+    return this.select({ role });
+  }
+
+  /**
+   * Returns recipes matching the given category.
+   *
+   * @param category - Category string to filter by.
+   * @returns Matching recipe entries.
+   *
+   * @example
+   * ```typescript
+   * const authRecipes = registry.selectByCategory('auth');
+   * ```
+   */
+  selectByCategory(category: string): RecipeEntry[] {
+    return this.select({ category });
+  }
+
+  /**
+   * Returns recipes matching the given priority level.
+   *
+   * @param priority - Priority level to filter by.
+   * @returns Matching recipe entries.
+   *
+   * @example
+   * ```typescript
+   * const essentialRecipes = registry.selectByPriority('essential');
+   * ```
+   */
+  selectByPriority(priority: RecipePriority): RecipeEntry[] {
+    return this.select({ priority });
   }
 
   /**

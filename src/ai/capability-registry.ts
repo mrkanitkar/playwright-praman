@@ -24,7 +24,12 @@
 import { PACKAGE_NAME, VERSION } from '../version.js';
 
 import { GENERATED_CAPABILITIES } from './capability-registry.generated.js';
-import type { CapabilitiesJSON, CapabilityEntry, CapabilityStats } from './types.js';
+import type {
+  AiProviderName,
+  CapabilitiesJSON,
+  CapabilityEntry,
+  CapabilityStats,
+} from './types.js';
 
 /**
  * Queryable registry of Praman API capabilities for AI agents.
@@ -56,7 +61,7 @@ export class CapabilityRegistry {
    * @example
    * ```typescript
    * const registry = new CapabilityRegistry();
-   * console.log(registry.list().length);
+   * logger.info(registry.list().length);
    * ```
    */
   constructor() {
@@ -74,7 +79,7 @@ export class CapabilityRegistry {
    * @example
    * ```typescript
    * const all = registry.list();
-   * console.log(all.length);
+   * logger.info(all.length);
    * ```
    */
   list(): CapabilityEntry[] {
@@ -147,7 +152,7 @@ export class CapabilityRegistry {
    * ```typescript
    * const cap = registry.findByName('clickButton');
    * if (cap !== undefined) {
-   *   console.log(cap.usage_example);
+   *   logger.info(cap.usage_example);
    * }
    * ```
    */
@@ -166,7 +171,7 @@ export class CapabilityRegistry {
    * @example
    * ```typescript
    * const stats = registry.getStatistics();
-   * console.log(`Total: ${stats.totalMethods}`);
+   * logger.info(`Total: ${stats.totalMethods}`);
    * ```
    */
   getStatistics(): CapabilityStats {
@@ -196,7 +201,7 @@ export class CapabilityRegistry {
    * @example
    * ```typescript
    * const json = registry.toJSON();
-   * console.log(JSON.stringify(json, null, 2));
+   * logger.info(JSON.stringify(json, null, 2));
    * ```
    */
   toJSON(): CapabilitiesJSON {
@@ -232,6 +237,114 @@ export class CapabilityRegistry {
   }
 
   /**
+   * Returns capabilities formatted for a specific AI provider.
+   *
+   * @remarks
+   * Each provider receives a format optimised for its native consumption pattern:
+   * - `'claude'` — XML-structured `{@literal <capability>}` elements with attributes
+   * - `'openai'` — JSON array of function-calling tool schemas
+   * - `'gemini'` — Plain text listing with name, description, and example
+   *
+   * @param provider - Target AI provider name.
+   * @returns Formatted capability descriptions as a string.
+   *
+   * @example
+   * ```typescript
+   * const registry = new CapabilityRegistry();
+   * const claudeContext = registry.forProvider('claude');
+   * const openaiTools = registry.forProvider('openai');
+   * const geminiText = registry.forProvider('gemini');
+   * ```
+   */
+  forProvider(provider: AiProviderName): string {
+    const entries = this.list();
+
+    switch (provider) {
+      case 'claude': {
+        return this.formatForClaude(entries);
+      }
+      case 'openai': {
+        return this.formatForOpenAI(entries);
+      }
+      case 'gemini': {
+        return this.formatForGemini(entries);
+      }
+    }
+  }
+
+  /**
+   * Formats capabilities as XML-structured elements for Claude.
+   *
+   * @param entries - Capability entries to format.
+   * @returns XML-structured string with capability elements.
+   */
+  private formatForClaude(entries: readonly CapabilityEntry[]): string {
+    if (entries.length === 0) {
+      return '<capabilities />';
+    }
+
+    const lines: string[] = ['<capabilities>'];
+    for (const entry of entries) {
+      const attrs = [`name="${entry.name}"`, `category="${entry.category}"`];
+      if (entry.intent !== undefined) {
+        attrs.push(`intent="${entry.intent}"`);
+      }
+      lines.push(`  <capability ${attrs.join(' ')}>`);
+      lines.push(`    <description>${entry.description}</description>`);
+      lines.push(`    <example>${entry.usage_example}</example>`);
+      lines.push('  </capability>');
+    }
+    lines.push('</capabilities>');
+    return lines.join('\n');
+  }
+
+  /**
+   * Formats capabilities as a JSON array of OpenAI function-calling tool schemas.
+   *
+   * @param entries - Capability entries to format.
+   * @returns JSON string of tool function schemas.
+   */
+  private formatForOpenAI(entries: readonly CapabilityEntry[]): string {
+    const tools = entries.map((entry) => ({
+      type: 'function' as const,
+      function: {
+        name: entry.name,
+        description: entry.description,
+        parameters: {
+          type: 'object' as const,
+          properties: {
+            example: {
+              type: 'string' as const,
+              description: entry.usage_example,
+            },
+          },
+        },
+        ...(entry.category !== '' ? { category: entry.category } : {}),
+      },
+    }));
+    return JSON.stringify(tools, undefined, 2);
+  }
+
+  /**
+   * Formats capabilities as a plain text listing for Gemini.
+   *
+   * @param entries - Capability entries to format.
+   * @returns Plain text with one capability per block.
+   */
+  private formatForGemini(entries: readonly CapabilityEntry[]): string {
+    if (entries.length === 0) {
+      return 'No capabilities registered.';
+    }
+
+    return entries
+      .map(
+        (entry) =>
+          `${entry.name} [${entry.category}]: ${entry.description}\n  Example: ${entry.usage_example}`,
+      )
+      .join('\n\n');
+  }
+
+  /**
    * Returns the capability entry with the given `id`, or `undefined`.
    *
    * @param id - Unique kebab-case capability identifier.
@@ -241,7 +354,7 @@ export class CapabilityRegistry {
    * ```typescript
    * const cap = registry.get('click-button');
    * if (cap !== undefined) {
-   *   console.log(cap.usage_example);
+   *   logger.info(cap.usage_example);
    * }
    * ```
    */

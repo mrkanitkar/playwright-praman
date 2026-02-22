@@ -20,6 +20,7 @@
 import { ErrorCode } from '#core/errors/codes.js';
 import { ODataError } from '#core/errors/odata-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
+import type { ODataEntityPath } from '#core/types/index.js';
 import { DEFAULT_TIMEOUTS } from '#core/utils/constants.js';
 
 /**
@@ -50,8 +51,8 @@ export interface ODataOptions {
  * ```
  */
 export interface WaitForODataLoadOptions extends ODataOptions {
-  /** Binding path to check for loaded data. */
-  readonly bindingPath?: string;
+  /** Binding path to check for loaded data (must start with `/`). */
+  readonly bindingPath?: ODataEntityPath;
   /** Polling interval in ms. Defaults to `DEFAULT_TIMEOUTS.POLLING_INTERVAL`. */
   readonly polling?: number;
 }
@@ -438,7 +439,7 @@ export async function getEntityCount(
  * ```typescript
  * const dirty = await hasPendingChanges(page);
  * if (dirty) {
- *   console.log('Model has unsaved changes');
+ *   logger.warn('Model has unsaved changes');
  * }
  * ```
  */

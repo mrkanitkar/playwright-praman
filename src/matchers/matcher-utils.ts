@@ -187,7 +187,7 @@ export async function getControlAggregation(
  * ```typescript
  * const info = await getUI5BindingInfo(page, 'input1', 'value');
  * if (info) {
- *   console.log(info.path); // e.g., '/ProductName'
+ *   logger.info(info.path); // e.g., '/ProductName'
  * }
  * ```
  */

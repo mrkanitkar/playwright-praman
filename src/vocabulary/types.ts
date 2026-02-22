@@ -223,7 +223,7 @@ export interface VocabularyService {
    * @example
    * ```typescript
    * const stats = svc.getStats();
-   * console.log(stats.totalTerms);
+   * logger.info(stats.totalTerms);
    * ```
    */
   getStats(): VocabularyServiceStats;
