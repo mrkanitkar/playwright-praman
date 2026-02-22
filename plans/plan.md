@@ -2,14 +2,14 @@
 
 ## Architecture & Rebuild Plan
 
-| Property         | Value                                                                                         |
-| ---------------- | --------------------------------------------------------------------------------------------- |
-| **Document ID**  | PRAMAN-ARCH-PLAN-001                                                                          |
-| **Version**      | 4.0.0                                                                                         |
-| **Status**       | 🟢 Phase 5 COMPLETE — 2,397 tests, 406 new tests, AI + Intents + Vocabulary layer implemented |
-| **Author**       | Principal Architect                                                                           |
-| **Created**      | 2025-02-14                                                                                    |
-| **Last Updated** | 2026-02-20 (Post-Phase 5 — AI + Intents + Vocabulary complete)                                |
+| Property         | Value                                                                                 |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| **Document ID**  | PRAMAN-ARCH-PLAN-001                                                                  |
+| **Version**      | 4.0.0                                                                                 |
+| **Status**       | 🟢 Phase 6.1 COMPLETE — 31 parity code items done, 48 docs deferred to Phase 7        |
+| **Author**       | Principal Architect                                                                   |
+| **Created**      | 2025-02-14                                                                            |
+| **Last Updated** | 2026-02-22 (Post-Phase 6.1 — All code remediation complete, docs deferred to Phase 7) |
 
 ---
 
@@ -1194,17 +1194,18 @@ Every decision in this plan was verified against official best practices from th
 
 ### Phase Overview
 
-| Phase       | Focus                             | Duration | Src Files | Src LOC    | Funcs   | Tests     | Key Deliverables                                                                                                                                                                                                                                                                                                       |
-| ----------- | --------------------------------- | -------- | --------- | ---------- | ------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Phase 0** | Architecture & Design             | 2 weeks  | —         | —          | —       | —         | ✅ plan.md, npm scaffold, 10 ESLint plugins, dual ESM+CJS, skill files                                                                                                                                                                                                                                                 |
-| **Phase 1** | Core Infrastructure               | 3 weeks  | 49        | 11,365     | 52      | 515       | ✅ Config (Zod), errors (10), logging (pino), OTel, types (199 interfaces), matchers, selectors, retry. 98.92%                                                                                                                                                                                                         |
-| **Phase 2** | Bridge + Proxy                    | 4 weeks  | 29        | 4,999      | 35      | 492       | ✅ 6 browser scripts, 3 strategies, unified proxy (D16), UI5Object (D17), API resolver (D19), discovery (D18). 99.18%                                                                                                                                                                                                  |
-| **Phase 3** | Fixtures + Auth + Nav             | 3 weeks  | 24        | 5,160      | 21      | 415       | ✅ Adapter removed, proxy consolidated. Fixtures: core+auth+nav+stability. Auth: 6 strategies. UI5Handler: 18 methods. E2E 6/6. 99.13%                                                                                                                                                                                 |
-| **Phase 4** | Modules + Table + FE              | 3 weeks  | 22        | 7,386      | 100     | 477       | ✅ Table (6 variants), dialog, date (5 formats), OData (model+HTTP), FE (ListReport, ObjectPage, test library, helpers), fixtures. 98.91%. Tag: `v1.0.0-phase4`                                                                                                                                                        |
-| **Phase 5** | AI + Intents + Vocabulary         | 3 weeks  | 406 new   | 2,397      | —       | —         | ✅ API hygiene (barrel + types + matchers/types.d.ts + memory leak + dead code), SKILL.md + skills/ domain files, LLM service (3 providers), agentic handler, capability/recipe registries, bulk discovery, vocabulary (6 domains + fuzzy match), 5 intent domain APIs (MM/SD/FI/PP/MD), ai-fixtures + intent-fixtures |
-| **Phase 6** | CLI + Reporters + Instrumentation | 3 weeks  | —         | —          | —       | —         | ✅ Step decorator (`@ui5Step` + `withStep()`), CI/CD (4 workflows), telemetry spans, SBOM generation, reporters (compliance + OData trace), CLI (9 modules), JSON Schema generation, cspell/knip fixes                                                                                                                 |
-| **Phase 7** | Parity + Docs + Hardening         | 20 weeks | —         | —          | —       | —         | 91 items from Phase 6.1 plan: P0 bug fix (1), P1 missing features (7), P2 behavioral fixes (3), P3 documentation (35), P4 architecture (18), P5 AI/best-practices (15). Plus: INT1/INT2 integration tests, npm provenance, performance benchmarks, security audit                                                      |
-| **Totals**  | Phases 0–4                        | 15 weeks | **129**   | **28,935** | **208** | **1,991** | ~56K total LOC (29K source + 27K test). 98.91% stmts, 95.54% branches, 99.34% funcs                                                                                                                                                                                                                                    |
+| Phase         | Focus                             | Duration | Src Files | Src LOC    | Funcs   | Tests     | Key Deliverables                                                                                                                                                                                                                                                                                                       |
+| ------------- | --------------------------------- | -------- | --------- | ---------- | ------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase 0**   | Architecture & Design             | 2 weeks  | —         | —          | —       | —         | ✅ plan.md, npm scaffold, 10 ESLint plugins, dual ESM+CJS, skill files                                                                                                                                                                                                                                                 |
+| **Phase 1**   | Core Infrastructure               | 3 weeks  | 49        | 11,365     | 52      | 515       | ✅ Config (Zod), errors (10), logging (pino), OTel, types (199 interfaces), matchers, selectors, retry. 98.92%                                                                                                                                                                                                         |
+| **Phase 2**   | Bridge + Proxy                    | 4 weeks  | 29        | 4,999      | 35      | 492       | ✅ 6 browser scripts, 3 strategies, unified proxy (D16), UI5Object (D17), API resolver (D19), discovery (D18). 99.18%                                                                                                                                                                                                  |
+| **Phase 3**   | Fixtures + Auth + Nav             | 3 weeks  | 24        | 5,160      | 21      | 415       | ✅ Adapter removed, proxy consolidated. Fixtures: core+auth+nav+stability. Auth: 6 strategies. UI5Handler: 18 methods. E2E 6/6. 99.13%                                                                                                                                                                                 |
+| **Phase 4**   | Modules + Table + FE              | 3 weeks  | 22        | 7,386      | 100     | 477       | ✅ Table (6 variants), dialog, date (5 formats), OData (model+HTTP), FE (ListReport, ObjectPage, test library, helpers), fixtures. 98.91%. Tag: `v1.0.0-phase4`                                                                                                                                                        |
+| **Phase 5**   | AI + Intents + Vocabulary         | 3 weeks  | 406 new   | 2,397      | —       | —         | ✅ API hygiene (barrel + types + matchers/types.d.ts + memory leak + dead code), SKILL.md + skills/ domain files, LLM service (3 providers), agentic handler, capability/recipe registries, bulk discovery, vocabulary (6 domains + fuzzy match), 5 intent domain APIs (MM/SD/FI/PP/MD), ai-fixtures + intent-fixtures |
+| **Phase 6**   | CLI + Reporters + Instrumentation | 3 weeks  | —         | —          | —       | —         | ✅ Step decorator (`@ui5Step` + `withStep()`), CI/CD (4 workflows), telemetry spans, SBOM generation, reporters (compliance + OData trace), CLI (9 modules), JSON Schema generation, cspell/knip fixes                                                                                                                 |
+| **Phase 6.1** | Parity Code Remediation           | 2 weeks  | —         | —          | —       | —         | ✅ 31 code items COMPLETED: P0 bug fixes (4), P1 missing features (9), P2 behavioral fixes (3), P4 architecture (12), P5 AI (3). All verified with passing tests.                                                                                                                                                      |
+| **Phase 7**   | Docs + Hardening + Deferred       | 20 weeks | —         | —          | —       | —         | 48 deferred items: P3 documentation (33 Docusaurus pages), P4 deferred arch (3: dry-run, circuit breaker, graceful shutdown), P5 deferred (12: Codegen, Cloud ALM, 7 docs, 3 product decisions). Plus: INT1/INT2 integration tests, npm provenance, performance benchmarks, security audit                             |
+| **Totals**    | Phases 0–4                        | 15 weeks | **129**   | **28,935** | **208** | **1,991** | ~56K total LOC (29K source + 27K test). 98.91% stmts, 95.54% branches, 99.34% funcs                                                                                                                                                                                                                                    |
 
 **Total estimated duration: 22 weeks (~5.5 months)**
 
@@ -1389,36 +1390,44 @@ Every decision in this plan was verified against official best practices from th
 | ~~Capability registry~~    | ~~`scripts/generate-capabilities.ts`~~                                                                                                | ~~TSDoc extraction~~     | ✅ Done    |
 | ~~IDE setup wizard~~       | ~~`scripts/setup-ide.ts`~~                                                                                                            | ~~IDE config~~           | ✅ Done    |
 
-### Phase 7 — Parity + Documentation + Hardening (Weeks 22–41)
+### Phase 6.1 — Parity Code Remediation (Weeks 22–23) ✅ COMPLETE
 
-> **Updated**: 2026-02-21 — Comprehensive phase incorporating Phase 6.1 remediation plan (91 items).
-> **Phase 6 absorbed**: step-decorator wiring, CI/CD, telemetry spans, SBOM — all COMPLETE.
+> **Updated**: 2026-02-22 — All 31 code items COMPLETED with passing tests. 40 docs-only items deferred to Phase 7.
 > **Detailed plan**: `parity-verify-skill/parity-workspace/parity-site/docs/plans/praman-phase-6-1-plan.md`
-> **Architect review**: 2026-02-21 — 23 items removed/merged/reclassified from original 114-item plan.
+
+**Completed Workstreams** (31 items, all verified with test evidence)
+
+| Workstream                    | Items  | Status          | Key Deliverables                                                                                                                                                                   |
+| ----------------------------- | ------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0: Critical Bug Fixes        | 4      | ✅ ALL COMPLETE | `fireSelect` fallback, injection timeout, `ui5=` selector engine, intent fixture fix                                                                                               |
+| P1: Missing Features          | 9      | ✅ ALL COMPLETE | Capabilities/Recipes API, 5 fixtures (flpLocks, flpSettings, testData, ui5Shell, ui5Footer), intent domains, config helpers, FLP errors                                            |
+| P2: Behavioral Fixes          | 3      | ✅ ALL COMPLETE | Server-side logout, vocab normalization, README cleanup                                                                                                                            |
+| P4: Architecture (code items) | 12     | ✅ ALL COMPLETE | Type-safety audit, discriminated unions, API Extractor, recipe metadata, pagination, branded types, template literals, lifecycle docs, exhaustive switch, stack trace verification |
+| P5: AI/Best Practices (code)  | 3      | ✅ ALL COMPLETE | `capabilities.forAI({ provider })`, `ui5.inspect()`, console.log cleanup                                                                                                           |
+| **Total Completed**           | **31** | ✅              | All code work done                                                                                                                                                                 |
+
+### Phase 7 — Documentation + Hardening + Deferred (Weeks 24–41)
+
+> **Updated**: 2026-02-22 — 48 items deferred from Phase 6.1 (all docs-only, product decisions, or complex integration).
+> **Phase 6 absorbed**: step-decorator wiring, CI/CD, telemetry spans, SBOM — all COMPLETE.
+> **Phase 6.1 absorbed**: All code items (P0, P1, P2, P4 code, P5 code) — all COMPLETE.
 >
 > **Prior deferred items still outstanding**:
 >
 > - INT1/INT2 integration smoke tests (deferred from Phase 2) — need real browser + SAP demo apps
 > - GitHub issue #7 (parent) remains open until INT1/INT2 complete
->
-> **Items completed by Phase 6** (no longer in Phase 7):
->
-> - ~~DELETE dead code (`step-decorator.ts`)~~ — ✅ Phase 6 (wired via `@ui5Step`)
-> - ~~Create CI/CD~~ — ✅ Phase 6 (4 workflows: ci.yml, docs.yml, release.yml, copilot-setup-steps.yml)
-> - ~~Wire telemetry spans~~ — ✅ Phase 6 (`telemetry/spans.ts` → handler/proxy)
-> - ~~SBOM generation~~ — ✅ Phase 6 (`scripts/generate-sbom.ts`)
 
-**Phase 7 Workstreams** (from Phase 6.1 plan, post-architect review)
+**Phase 7 Workstreams** (48 deferred items from Phase 6.1 plan)
 
-| Workstream            | Items  | Effort (days)   | Focus                                                                                     |
-| --------------------- | ------ | --------------- | ----------------------------------------------------------------------------------------- |
-| P0: Critical Bug Fix  | 1      | 0.5             | Wire `ui5=` selector engine registration                                                  |
-| P1: Missing Features  | 7      | 14.5–23.5       | Capabilities/Recipes main export, 6 fixtures, handlers sub-path, global-setup, FLP errors |
-| P2: Behavioral Fixes  | 3      | 1.5             | Server-side logout, vocab normalization, README                                           |
-| P3: Documentation     | 35     | 66              | 33 Docusaurus pages + API reference fix + config example                                  |
-| P4: Architecture      | 18     | 29–43           | Type safety, discriminated unions, API Extractor, branded types, lifecycle hooks, etc.    |
-| P5: AI/Best Practices | 15     | 23–35           | Provider-specific AI, inspect API, Codegen, Cloud ALM, mock server, 3 product decisions   |
-| **Total**             | **79** | **134.5–169.5** | Plus deferred INT1/INT2 + provenance + benchmarks + security                              |
+| Workstream                | Items  | Effort (days) | Focus                                                                                                                                                                              |
+| ------------------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P3: Documentation         | 33     | 64            | 33 Docusaurus pages (Tier 0-4): Getting Started, Config, Auth, Errors, Selectors, Fixtures, Migration guides, Architecture, AI, FE, SAP Cookbook, Gold Standard, API Reference     |
+| P3: Deployment fixes      | 2      | 1             | Fix API Reference 404 (P3-034), complete playwright.config.ts example (P3-035)                                                                                                     |
+| P4: Architecture deferred | 3      | 8–10          | Dry-run/preview (P4-013), circuit breaker (P4-016), graceful shutdown (P4-018)                                                                                                     |
+| P5: Docs deferred         | 7      | 8.5–13.5      | Accessibility (P5-005), SAP Activate (P5-006), upgrade testing (P5-007), OData mocking (P5-011), component testing (P5-012), cross-browser (P5-013), Best Practice import (P5-015) |
+| P5: Complex deferred      | 2      | 8+            | Codegen (P5-004), Cloud ALM integration (P5-010)                                                                                                                                   |
+| P5: Product decisions     | 3      | 1.5           | SAP_ACTIVE_SYSTEM default (PD-001), session timeout (PD-002), synonym scoring (PD-003)                                                                                             |
+| **Total**                 | **48** | **91–90**     | Plus deferred INT1/INT2 + provenance + benchmarks + security                                                                                                                       |
 
 **Integration + Certification** (carried from original Phase 7)
 
@@ -1639,7 +1648,7 @@ Full codebase audit of 109 source files and 99 test files. Every statement verif
 | **OData Fixtures**           | Phase 3 (planned) | ✅ Phase 4     | `module-fixtures.ts` ui5.odata sub-namespace (model + HTTP)                                                                |
 | **Assertion Fixtures**       | Phase 3 (planned) | ❌ NOT CREATED | Matchers wired via expect.extend() instead                                                                                 |
 | **Interaction Fixtures**     | Phase 3 (planned) | ❌ NOT CREATED | UI5Handler provides interaction methods directly                                                                           |
-| **Shell Fixtures**           | Phase 3 (planned) | 🔄 PARTIAL     | `shell-handler.ts` exists but no dedicated fixture                                                                         |
+| **Shell Fixtures**           | Phase 3 (planned) | ✅ Phase 6.1   | `shell-footer-fixtures.ts` wires `ui5Shell` + `ui5Footer` fixtures (P1-003e)                                               |
 | **Web Component Adapter**    | Phase 4 (planned) | ⏳ DEFERRED    | Adapter pattern removed; WC support needs different approach                                                               |
 | **Typed Proxy directory**    | Phase 2/D4        | ❌ NOT CREATED | 199 auto-gen interfaces in `core/types/controls.ts` instead                                                                |
 | **Proxy Converter**          | Phase 2/D17       | ❌ DELETED     | Functionality inlined in `control-proxy.ts`                                                                                |
@@ -1657,6 +1666,8 @@ Full codebase audit of 109 source files and 99 test files. Every statement verif
 | **SBOM**                     | Phase 6           | ✅ IMPLEMENTED | `scripts/generate-sbom.ts` (CycloneDX)                                                                                     |
 | **JSON Schema**              | Phase 6           | ✅ IMPLEMENTED | `scripts/generate-json-schema.ts` (Zod → JSON Schema)                                                                      |
 | **npm provenance**           | Phase 7           | ⏳ DEFERRED    | Not yet published                                                                                                          |
+| **Phase 6.1 Parity Code**    | Phase 6.1         | ✅ COMPLETE    | 31 items: P0 bugs (4), P1 features (9), P2 behavioral (3), P4 arch (12), P5 AI (3). All tests passing.                     |
+| **Phase 7 Docs + Deferred**  | Phase 7           | ⏳ NOT STARTED | 48 items: P3 docs (33), P4 deferred (3), P5 deferred (12). All docs-only or complex integration.                           |
 
 #### R11. Phase 4 Completion Summary
 
@@ -1688,8 +1699,15 @@ Phase 6 — COMPLETE (all cleanup items resolved):
   ├── ⏳ WebComponent support → Phase 7 (new approach)
   └── ⏳ Registry discovery evaluation → Phase 7
 
-Phase 7 — Parity + Docs + Hardening (91 items):
-  See plans/praman-phase-6-1-plan.md (revised 2026-02-21)
+Phase 6.1 — COMPLETE (31 code items, all verified with tests):
+  ├── ✅ P0: 4 bug fixes (fireSelect, injection timeout, ui5= engine, intent fixture)
+  ├── ✅ P1: 9 missing features (Capabilities, Recipes, 5 fixtures, intent domains, config, FLP errors)
+  ├── ✅ P2: 3 behavioral fixes (logout, vocab normalization, README)
+  ├── ✅ P4: 12 architecture items (type-safety, branded types, pagination, template literals, etc.)
+  └── ✅ P5: 3 AI items (forAI provider, inspect API, console.log cleanup)
+
+Phase 7 — Docs + Hardening + Deferred (48 items):
+  See plans/praman-phase-6-1-plan.md (revised 2026-02-22)
 ```
 
 ---
