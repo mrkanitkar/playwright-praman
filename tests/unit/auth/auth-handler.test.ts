@@ -235,6 +235,20 @@ describe('SAPAuthHandler', () => {
       });
       expect(retryOpts.shouldRetry(nonRetryableError)).toBe(false);
     });
+
+    it('shouldRetry returns true for plain Error without retryable property', async () => {
+      await handler.login(page, config);
+
+      const retryCall = retryMock.mock.calls[0] as [
+        () => Promise<void>,
+        { readonly shouldRetry: (error: Error) => boolean },
+      ];
+      const retryOpts = retryCall[1];
+
+      // Plain Error has no retryable property — should return true
+      const plainError = new Error('network timeout');
+      expect(retryOpts.shouldRetry(plainError)).toBe(true);
+    });
   });
 
   // ── Test 6: loginFromEnv reads SAP_CLOUD_* vars ─────────────────────
@@ -490,6 +504,36 @@ describe('SAPAuthHandler', () => {
         expect.objectContaining({ strategy: 'onprem' }),
         expect.stringContaining('UI-based logout failed'),
       );
+    });
+
+    it('logs warning when logout button is not found after opening menu', async () => {
+      // Menu opens (evaluate returns true), waitForFunction resolves,
+      // but logout button click returns false
+      page.evaluate
+        .mockResolvedValueOnce(true) // menu button click succeeds
+        .mockResolvedValueOnce(false); // logout button NOT found
+      page.waitForFunction.mockResolvedValue(undefined);
+      page.url.mockReturnValue('https://sap.example.com');
+
+      await handler.login(page, config);
+      await handler.logout(page);
+
+      // Should log warning about logout button not found
+      const warnCalls = mockLogger.warn.mock.calls.map((call: readonly unknown[]) => call[1]);
+      expect(warnCalls).toContain('Logout button not found after opening user menu');
+    });
+
+    it('falls back to ICF when waitForFunction times out', async () => {
+      // Menu opens, but waitForFunction rejects (logout button never appears)
+      page.evaluate.mockResolvedValueOnce(true); // menu button click succeeds
+      page.waitForFunction.mockRejectedValue(new Error('Timeout'));
+      page.url.mockReturnValue('https://sap.example.com');
+
+      await handler.login(page, config);
+      await handler.logout(page);
+
+      // Should attempt ICF logoff as fallback
+      expect(page.goto).toHaveBeenCalledWith('https://sap.example.com/sap/public/bc/icf/logoff');
     });
 
     it('logs info on successful UI logout', async () => {

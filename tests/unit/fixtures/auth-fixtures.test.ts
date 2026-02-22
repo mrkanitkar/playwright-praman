@@ -379,6 +379,26 @@ describe('auth-fixtures sapAuth fixture', () => {
     }).not.toThrow();
   });
 
+  it('fixtureLogger.warn() is a no-op that does not throw', async () => {
+    const fn = extractFixtureFn(fixtures['sapAuth']);
+    // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+    const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
+
+    await runFixture(fn, { sapAuthConfig: config });
+
+    const constructorCall = mockSAPAuthHandler.mock.calls[0] as [
+      {
+        readonly strategy: unknown;
+        readonly logger: { info(): void; warn(): void; error(): void };
+      },
+    ];
+    const logger = constructorCall[0].logger;
+
+    expect(() => {
+      logger.warn();
+    }).not.toThrow();
+  });
+
   it('fixtureLogger.error() is a no-op that does not throw', async () => {
     const fn = extractFixtureFn(fixtures['sapAuth']);
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values

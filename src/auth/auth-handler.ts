@@ -250,6 +250,7 @@ export class SAPAuthHandler {
   private async attemptUiLogout(page: AuthPage): Promise<boolean> {
     try {
       // Click the user menu button to open the menu
+      /* v8 ignore start -- browser-only DOM code inside page.evaluate() */
       const menuClicked = await page.evaluate(() => {
         const menuSelectors = [
           '#meAreaHeaderButton',
@@ -266,6 +267,7 @@ export class SAPAuthHandler {
         }
         return false;
       });
+      /* v8 ignore stop */
 
       if (!menuClicked) {
         this.logger.warn(
@@ -276,6 +278,7 @@ export class SAPAuthHandler {
       }
 
       // Wait briefly for the menu to open, then click logout
+      /* v8 ignore start -- browser-only DOM code inside page.waitForFunction() */
       await page.waitForFunction(
         () => {
           const logoutSelectors = ['#logoutBtn', 'button[id*="logoutBtn"]'];
@@ -300,8 +303,10 @@ export class SAPAuthHandler {
         },
         { timeout: 5000 },
       );
+      /* v8 ignore stop */
 
       // Click the logout button
+      /* v8 ignore start -- browser-only DOM code inside page.evaluate() */
       const logoutClicked = await page.evaluate(() => {
         // Try ID-based selectors first
         const logoutSelectors = ['#logoutBtn', 'button[id*="logoutBtn"]'];
@@ -329,6 +334,7 @@ export class SAPAuthHandler {
 
         return false;
       });
+      /* v8 ignore stop */
 
       if (!logoutClicked) {
         this.logger.warn(
