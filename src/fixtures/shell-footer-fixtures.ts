@@ -1,6 +1,11 @@
 /**
  * Shell & Footer fixtures — Playwright fixtures wrapping ShellHandler and FooterHandler.
  *
+ * @ai
+ * @aiContext Provides `ui5Shell` (ShellHandler: shell header, home nav, user menu, notifications)
+ * and `ui5Footer` (FooterHandler: save, edit, cancel, message popover) fixtures.
+ * Both are stateless — no teardown needed.
+ *
  * @remarks
  * Provides `ui5Shell` and `ui5Footer` fixtures that create handler instances
  * with `page` auto-injected from the Playwright fixture system. Both are

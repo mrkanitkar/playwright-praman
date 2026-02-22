@@ -141,6 +141,7 @@ function createScopeProxy(
   }
 
   // Top-level proxy: captures the page target (e.g., `onTheMainPage`)
+  // Type assertion: Object.create(null) returns object; cast to Record for Proxy handler typing
   return new Proxy(Object.create(null) as Record<string, unknown>, {
     get(_obj: unknown, prop: string | symbol): unknown {
       if (typeof prop === 'symbol') return undefined;

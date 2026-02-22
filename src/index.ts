@@ -58,6 +58,7 @@ export {
 export { CapabilityRegistry } from './ai/capability-registry.js';
 export { capabilities } from './ai/capabilities.js';
 export { RecipeRegistry } from './ai/recipe-registry.js';
+export { recipes } from './ai/recipes.js';
 export type {
   AiResponse,
   CapabilitiesJSON,
@@ -65,6 +66,7 @@ export type {
   CapabilityStats,
   RecipeEntry,
   RecipePriority,
+  RecipeRole,
 } from './ai/types.js';
 
 // ── Auth types ───────────────────────────────────────────────────────

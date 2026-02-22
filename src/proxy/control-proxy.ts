@@ -129,6 +129,7 @@ function createChainableResult(promise: Promise<unknown>): unknown {
           (async () => {
             const resolved = await promise;
             if (resolved !== null && resolved !== undefined && typeof resolved === 'object') {
+              // Type assertions: resolved is confirmed non-null object above; member is checked as function before invocation
               const member = Reflect.get(resolved as Record<string, unknown>, prop);
               if (typeof member === 'function') {
                 return (member as (...fnArgs: unknown[]) => unknown)(...args);

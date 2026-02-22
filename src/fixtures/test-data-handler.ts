@@ -1,6 +1,10 @@
 /**
  * TestDataHandler -- generates, persists, and cleans up test data.
  *
+ * @ai
+ * @aiContext Handler class for test data lifecycle: generate() with uuid/timestamp placeholders,
+ * save()/load() for JSON persistence, cleanup() for automatic file removal on teardown.
+ *
  * @remarks
  * Provides template-based data generation with placeholder substitution,
  * JSON file persistence, and automatic cleanup of persisted files on teardown.

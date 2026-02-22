@@ -455,12 +455,14 @@ export async function queryEntities<TData = unknown>(
   const status = response.status();
   assertSuccessStatus(status, url, operation);
 
+  // Type assertion: response.json() returns unknown; OData responses are always JSON objects
   const raw = (await response.json()) as Record<string, unknown>;
   const headersMap = response.headers();
   const etag = headersMap['etag'];
 
   // Parse OData V2 (d.results) or V4 (value) response format
   let entities: readonly TData[];
+  // Type assertions: OData V2 wraps in d.results, V4 uses value — both are arrays of entity records
   const dProperty = raw['d'] as Record<string, unknown> | undefined;
   if (dProperty !== undefined && Array.isArray(dProperty['results'])) {
     entities = dProperty['results'] as readonly TData[];

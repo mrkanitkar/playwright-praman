@@ -5,6 +5,12 @@
  * Passed to `page.evaluate(fn, args)` using CDP `Runtime.callFunctionOn`.
  * See `find-control.ts` for the string-form variant.
  *
+ * Type assertions (`as string`, `as boolean`, `as Record<...>`) throughout this file
+ * narrow untyped UI5 API return values from `.call()` on dynamically-resolved methods.
+ * UI5's runtime API is inherently untyped in the browser context — `.call()` returns
+ * `unknown`. These casts are safe because the method names are known UI5 API contracts
+ * (getId, getMetadata, getName, getDomRef, getVisible).
+ *
  * @module bridge/browser-scripts
  */
 

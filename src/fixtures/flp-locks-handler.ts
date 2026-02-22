@@ -1,6 +1,10 @@
 /**
  * FLP Locks handler -- manages SAP SM12 lock entries for test isolation.
  *
+ * @ai
+ * @aiContext Manages SAP SM12 lock entries via OData (SM12_SRV). Query, count, delete lock entries
+ * by username. Auto-cleanup tracks and releases locks in reverse order during teardown.
+ *
  * @remarks
  * Uses HTTP OData requests via `page.request` to query and delete lock entries
  * from the SM12_SRV OData service. Provides auto-cleanup teardown that releases

@@ -290,6 +290,21 @@ export interface CapabilitiesJSON {
 export type RecipePriority = 'essential' | 'recommended' | 'advanced' | 'deprecated';
 
 /**
+ * Audience role for a recipe — determines who the recipe is designed for.
+ *
+ * @remarks
+ * - `'ai-agent'` — optimised for autonomous AI test generation
+ * - `'human-tester'` — written for manual test authoring
+ * - `'both'` — useful for both audiences
+ *
+ * @example
+ * ```typescript
+ * const role: RecipeRole = 'ai-agent';
+ * ```
+ */
+export type RecipeRole = 'ai-agent' | 'human-tester' | 'both';
+
+/**
  * A single recipe entry describing a reusable test pattern.
  *
  * @remarks
@@ -324,7 +339,7 @@ export interface RecipeEntry {
   /** Category for grouping and filtering (e.g. `'auth'`, `'navigation'`). */
   readonly category: string;
   /** Who this recipe is intended for. */
-  readonly role: 'ai-agent' | 'human-tester' | 'both';
+  readonly role: RecipeRole;
   /** Priority level for adoption guidance. */
   readonly priority: RecipePriority;
   /** Ready-to-use TypeScript code for the recipe. */

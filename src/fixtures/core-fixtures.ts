@@ -1,6 +1,11 @@
 /**
  * Core fixtures for the Praman Playwright test runner.
  *
+ * @ai
+ * @aiContext Foundation fixture layer. Provides `pramanConfig` (validated config),
+ * `pramanLogger` (structured logger), `ui5` (UI5Handler for control interactions),
+ * and auto-fixtures for selector engine and matcher registration.
+ *
  * @remarks
  * Defines the foundation fixture layer using `test.extend()`.
  *

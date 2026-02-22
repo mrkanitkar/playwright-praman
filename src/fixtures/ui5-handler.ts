@@ -501,6 +501,7 @@ export class UI5Handler {
   async getText(selector: UI5Selector): Promise<string> {
     const proxy = await this.control(selector);
     const result = await this.internalExecuteControlMethod(proxy.id, 'getText', []);
+    // Type assertion: getText() bridge method always returns a string value from the UI5 control
     return result as string;
   }
 
@@ -522,6 +523,7 @@ export class UI5Handler {
   async getValue(selector: UI5Selector): Promise<string> {
     const proxy = await this.control(selector);
     const result = await this.internalExecuteControlMethod(proxy.id, 'getValue', []);
+    // Type assertion: getValue() bridge method always returns a string value from the UI5 control
     return result as string;
   }
 
