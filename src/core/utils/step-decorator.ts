@@ -268,6 +268,7 @@ function formatValue(value: unknown, visited: WeakSet<object>): string {
   }
 
   visited.add(value);
+  // Type assertion: value passed array/primitive checks above — must be a plain object at this point
   const record = value as Record<string, unknown>;
   const entries = Object.entries(record);
   const parts = entries.slice(0, 3).map(([key, val]) => `${key}: ${formatValue(val, visited)}`);
@@ -299,6 +300,7 @@ function extractPriorityParts(record: Record<string, unknown>, visited: WeakSet<
     typeof record['properties'] === 'object' &&
     record['properties'] !== null
   ) {
+    // Type assertion: typeof guard above confirms record['properties'] is a non-null object
     const properties = record['properties'] as Record<string, unknown>;
     if ('text' in properties) {
       parts.push(`text: ${formatValue(properties['text'], visited)}`);
@@ -381,6 +383,7 @@ export function formatSelectorForStep(selector: unknown): string {
   const visited = new WeakSet();
   visited.add(selector);
 
+  // Type assertion: UI5Selector is a branded string | object; non-string case is always a record
   return formatSelectorRecord(selector as Record<string, unknown>, visited);
 }
 

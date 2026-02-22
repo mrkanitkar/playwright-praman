@@ -356,6 +356,7 @@ export class ODataTraceReporter implements Reporter {
   private parseAndAddTraces(testTitle: string, body: Buffer): void {
     let parsed: unknown;
     try {
+      // Type assertion: JSON.parse returns any; cast to unknown for safe narrowing below
       parsed = JSON.parse(body.toString('utf8')) as unknown;
     } catch {
       return; // Silently skip malformed JSON
@@ -392,6 +393,7 @@ function isRawODataEntry(
   if (typeof value !== 'object' || value === null) {
     return false;
   }
+  // Type assertion: non-null object check above guarantees value is indexable
   const record = value as Record<string, unknown>;
   return typeof record['method'] === 'string' && typeof record['url'] === 'string';
 }

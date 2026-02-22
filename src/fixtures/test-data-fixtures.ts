@@ -1,6 +1,10 @@
 /**
  * Test data fixtures -- Playwright fixture wrapping TestDataHandler.
  *
+ * @ai
+ * @aiContext Provides `testData` fixture for template-based data generation (uuid, timestamp placeholders),
+ * JSON persistence, and automatic cleanup on teardown.
+ *
  * @remarks
  * Provides a `testData` fixture that creates a {@link TestDataHandler}
  * scoped to the test's output directory. On teardown, all persisted

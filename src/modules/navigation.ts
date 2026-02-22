@@ -316,5 +316,6 @@ export async function getCurrentHash(page: NavigationPage): Promise<string> {
     (() => window.location.hash.replace('#', '')) as (...args: never[]) => unknown,
     /* v8 ignore stop */
   );
+  // Type assertion: page.evaluate returns unknown; browser lambda always returns a string
   return hash as string;
 }

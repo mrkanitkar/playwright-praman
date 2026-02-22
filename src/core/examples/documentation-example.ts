@@ -135,7 +135,7 @@
  *     deliveryDate: '2026-03-15'
  *   });
  *
- *   console.log(`Created PO: ${poNumber}`);
+ *   expect(poNumber).toBeTruthy();
  * });
  * ```
  *

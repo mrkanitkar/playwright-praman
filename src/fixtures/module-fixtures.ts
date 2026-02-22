@@ -1,6 +1,11 @@
 /**
  * Module fixtures — extends `ui5` with table, dialog, date, and OData sub-namespaces.
  *
+ * @ai
+ * @aiContext Use `ui5.table` for table row/column operations, `ui5.dialog` for dialog
+ * interactions (confirm, dismiss, wait), `ui5.date` for date/time picker controls, and
+ * `ui5.odata` for OData model queries and HTTP CRUD operations.
+ *
  * @remarks
  * Overrides the `ui5` fixture from `coreTest` to attach `.table`, `.dialog`,
  * `.date`, and `.odata` sub-namespace objects. Each method curries the Playwright
@@ -326,6 +331,8 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       });
     };
 
+    // Type assertions: `page as never` prevents fixture factory from depending on concrete Page type;
+    // `as ExtendedUI5Handler` narrows Object.assign result to the branded union type
     const extended = Object.assign(handler, {
       table: withStability(createTableFixture(page as never), guard),
       dialog: withStability(createDialogFixture(page as never), guard),

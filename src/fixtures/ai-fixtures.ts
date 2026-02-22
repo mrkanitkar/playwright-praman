@@ -1,6 +1,11 @@
 /**
  * AI fixtures — provides `pramanAI` fixture for AI-powered test operations.
  *
+ * @ai
+ * @aiContext Provides `pramanAI` fixture with full AI stack: discoverPage(), buildContext(),
+ * capabilities/recipe registries, agentic handler for test generation, LLM service,
+ * and vocabulary service. All AI deps are dynamically imported.
+ *
  * @remarks
  * Extends the Playwright base test with a `pramanAI` fixture that wires up the
  * full AI stack: LLM service, capability registry, recipe registry, vocabulary

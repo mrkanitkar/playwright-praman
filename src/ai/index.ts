@@ -21,6 +21,7 @@ export type {
   CapabilitiesJSON,
   RecipeEntry,
   RecipePriority,
+  RecipeRole,
   AgenticCheckpoint,
   DiscoveredControl,
   PageContext,
@@ -31,6 +32,7 @@ export type {
 export { CapabilityRegistry } from './capability-registry.js';
 export { capabilities } from './capabilities.js';
 export { RecipeRegistry } from './recipe-registry.js';
+export { recipes } from './recipes.js';
 
 // ── LLM Service ────────────────────────────────────────────────────────────
 export type { LlmService } from './llm-service.js';

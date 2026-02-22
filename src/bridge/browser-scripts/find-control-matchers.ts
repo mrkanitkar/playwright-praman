@@ -6,6 +6,11 @@
  * They provide property, viewName, bindingPath, and RegExp ID matching
  * for the Tier 2 registry scan in `find-control-fn.ts`.
  *
+ * Type assertions (`as string`, `as Record<string, unknown>`) throughout this file
+ * narrow untyped values from UI5 selector records and `.call()` on dynamically-resolved
+ * browser-side methods. These casts are safe: selector keys are constrained by the
+ * UI5Selector type, and method names are known UI5 API contracts.
+ *
  * @module bridge/browser-scripts
  */
 

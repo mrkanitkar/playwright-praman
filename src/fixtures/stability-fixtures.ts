@@ -1,6 +1,10 @@
 /**
  * Stability fixtures — request interception and UI5 auto-wait.
  *
+ * @ai
+ * @aiContext Auto-enabled stability fixtures. Blocks WalkMe/analytics requests
+ * and waits for UI5 framework stability after navigation. No manual activation needed.
+ *
  * @remarks
  * Provides two auto test-scoped fixtures:
  * - `requestInterceptor` — blocks WalkMe/analytics via `page.route()`

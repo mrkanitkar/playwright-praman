@@ -2,6 +2,11 @@
  * Fiori Elements fixtures — provides `fe` fixture with list report,
  * object page, table, and list sub-namespaces.
  *
+ * @ai
+ * @aiContext Use the `fe` fixture for Fiori Elements apps. Provides list report operations
+ * (filter, search, navigate), object page operations (edit, save, sections), table helpers
+ * (row click, cell read), and list helpers (item click, count).
+ *
  * @remarks
  * Each method curries the Playwright `page` into the corresponding
  * FE module function. Dependencies are declared as PW-MERGE-1 placeholders.
@@ -117,6 +122,7 @@ export function createFEFixture(page: never): FioriElementsFixture {
  */
 export const feTest = base.extend<FEFixtures>({
   fe: async ({ page }, use) => {
+    // Type assertion: `page as never` prevents factory from depending on concrete Page type
     await use(createFEFixture(page as never));
   },
 });

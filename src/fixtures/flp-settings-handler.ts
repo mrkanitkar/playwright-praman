@@ -1,6 +1,10 @@
 /**
  * FLP Settings handler -- reads SAP Fiori Launchpad user settings.
  *
+ * @ai
+ * @aiContext Reads FLP user settings (language, date/time/number formats, timezone) from the
+ * UShell Container API via page.evaluate(). Use getAllSettings() for bulk retrieval.
+ *
  * @remarks
  * Reads user settings (language, date/time/number formats, timezone) from
  * the UShell Container API via `page.evaluate()`. Throws {@link FLPError}

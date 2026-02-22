@@ -17,6 +17,11 @@
  * `browserExecuteControlMethod` and `browserExecuteObjectMethod`.
  * This is the only correct approach for `page.evaluate()` compatibility.
  *
+ * Type assertions (`as string`, `as BridgeRecord`) throughout this file narrow
+ * untyped UI5 API return values from `.call()`. UI5's browser-side API methods
+ * (getMetadata, getName, getId, etc.) return dynamically-typed values — casts
+ * are safe because the method names are known UI5 API contracts.
+ *
  * File exceeds 300 LOC (self-contained browser scripts with inlined helpers cannot be split).
  *
  * For string-form scripts (legacy, used by `ui5-handler.ts`), see `execute-method.ts`.
