@@ -27,6 +27,7 @@ import { expect, mergeTests } from '@playwright/test';
 import { aiTest } from './ai-fixtures.js';
 import { authTest } from './auth-fixtures.js';
 import { feTest } from './fe-fixtures.js';
+import { flpLocksTest } from './flp-locks-fixtures.js';
 import { flpSettingsTest } from './flp-settings-fixtures.js';
 import { intentTest } from './intent-fixtures.js';
 import { moduleTest } from './module-fixtures.js';
@@ -65,6 +66,7 @@ export const test = mergeTests(
   aiTest,
   intentTest,
   shellFooterTest,
+  flpLocksTest,
   flpSettingsTest,
   testDataTest,
 );
@@ -98,6 +100,9 @@ export type { IntentFixture, IntentFixtureDeps, IntentTestFixtures } from './int
 
 export { shellFooterTest } from './shell-footer-fixtures.js';
 export type { ShellFooterFixtures } from './shell-footer-fixtures.js';
+
+export { flpLocksTest } from './flp-locks-fixtures.js';
+export type { FLPLocksFixtures } from './flp-locks-fixtures.js';
 
 export { flpSettingsTest } from './flp-settings-fixtures.js';
 export type { FLPSettingsFixtures } from './flp-settings-fixtures.js';
