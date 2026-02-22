@@ -131,7 +131,7 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
  * @example
  * ```typescript
  * const version = getPlaywrightVersion();
- * console.log(version.raw); // '1.58.2'
+ * logger.info(version.raw); // '1.58.2'
  * ```
  */
 export function getPlaywrightVersion(): PlaywrightVersion {

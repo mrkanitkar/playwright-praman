@@ -43,6 +43,8 @@ function fiResult<T>(params: {
   retryable?: boolean;
   suggestions?: string[];
 }): IntentResult<T> {
+  // Type assertion: exactOptionalPropertyTypes requires omitting undefined optional fields;
+  // conditional spread produces a union type TypeScript cannot narrow to IntentResult<T>
   return {
     status: params.status,
     ...(params.data !== undefined && { data: params.data }),

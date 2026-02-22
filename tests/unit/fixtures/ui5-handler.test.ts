@@ -18,7 +18,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createMockTracer } from '../../helpers/mock-tracer-wrapper.js';
 
+import type { ControlInspection } from '#bridge/bridge-types.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
+import { ControlError } from '#core/errors/control-error.js';
 import { SelectorError } from '#core/errors/selector-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
@@ -30,6 +32,7 @@ const mockEnsureBridgeInjected = vi.fn().mockResolvedValue(undefined);
 const mockCreateFindControlScript = vi.fn().mockReturnValue('(async function(){})()');
 const mockCreateFindAllControlsScript = vi.fn().mockReturnValue('(async function(){})()');
 const mockCreateExecuteMethodScript = vi.fn().mockReturnValue('(function(){})()');
+const mockCreateInspectControlScript = vi.fn().mockReturnValue('(function(){})()');
 const mockFilterMethods = vi.fn().mockImplementation((methods: readonly string[]) => methods);
 const mockCreateControlProxy = vi.fn();
 
@@ -44,6 +47,10 @@ vi.mock('#bridge/browser-scripts/find-control.js', () => ({
 
 vi.mock('#bridge/browser-scripts/execute-method.js', () => ({
   createExecuteMethodScript: mockCreateExecuteMethodScript,
+}));
+
+vi.mock('#bridge/browser-scripts/inspect-control.js', () => ({
+  createInspectControlScript: mockCreateInspectControlScript,
 }));
 
 vi.mock('#bridge/method-blacklist.js', () => ({
@@ -640,6 +647,128 @@ describe('UI5Handler', () => {
       expect(findControlSpan).toBeDefined();
       expect(findControlSpan?.ended).toBe(true);
       expect(findControlSpan?.status).toBe('error');
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  // Group 8: Inspect (tests 37-44)
+  // ════════════════════════════════════════════════════════════════════
+
+  describe('inspect() — control metadata inspection', () => {
+    const inspectionResult: ControlInspection = {
+      id: 'btn1',
+      controlType: 'sap.m.Button',
+      visible: true,
+      enabled: true,
+      domId: 'btn1',
+      properties: { text: 'Save', type: 'Emphasized', icon: '', enabled: true },
+      aggregationNames: ['tooltip', 'customData', 'layoutData', 'dependents'],
+      bindingPaths: { text: '/ButtonText' },
+    };
+
+    it('returns full metadata for a discovered control', async () => {
+      // First evaluate: find-control (discovery)
+      // Second evaluate: inspect-control script
+      page.evaluate
+        .mockResolvedValueOnce({ id: 'btn1', controlType: 'sap.m.Button' })
+        .mockResolvedValueOnce(inspectionResult);
+
+      const result = await handler.inspect(defaultSelector);
+
+      expect(result.id).toBe('btn1');
+      expect(result.controlType).toBe('sap.m.Button');
+      expect(result.visible).toBe(true);
+      expect(result.enabled).toBe(true);
+      expect(result.properties).toEqual({
+        text: 'Save',
+        type: 'Emphasized',
+        icon: '',
+        enabled: true,
+      });
+      expect(result.aggregationNames).toEqual([
+        'tooltip',
+        'customData',
+        'layoutData',
+        'dependents',
+      ]);
+      expect(result.bindingPaths).toEqual({ text: '/ButtonText' });
+    });
+
+    it('calls ensureBridgeInjected before inspection', async () => {
+      page.evaluate
+        .mockResolvedValueOnce({ id: 'btn1', controlType: 'sap.m.Button' })
+        .mockResolvedValueOnce(inspectionResult);
+
+      await handler.inspect(defaultSelector);
+
+      expect(mockEnsureBridgeInjected).toHaveBeenCalled();
+    });
+
+    it('calls waitForFunction for UI5 stability before inspection', async () => {
+      page.evaluate
+        .mockResolvedValueOnce({ id: 'btn1', controlType: 'sap.m.Button' })
+        .mockResolvedValueOnce(inspectionResult);
+
+      await handler.inspect(defaultSelector);
+
+      expect(page.waitForFunction).toHaveBeenCalled();
+    });
+
+    it('throws ControlError when control is not found', async () => {
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown' });
+
+      await expect(handler.inspect(defaultSelector)).rejects.toThrow(ControlError);
+    });
+
+    it('throws ControlError when inspect script returns null', async () => {
+      // Discovery succeeds but inspect returns null
+      page.evaluate
+        .mockResolvedValueOnce({ id: 'btn1', controlType: 'sap.m.Button' })
+        .mockResolvedValueOnce(null);
+
+      await expect(handler.inspect(defaultSelector)).rejects.toThrow(ControlError);
+    });
+
+    it('throws SelectorError for empty selector', async () => {
+      const emptySelector = {} as UI5Selector;
+
+      await expect(handler.inspect(emptySelector)).rejects.toThrow(SelectorError);
+    });
+
+    it('returns domId as null when control is not rendered', async () => {
+      const unrenderedResult: ControlInspection = {
+        ...inspectionResult,
+        domId: null,
+      };
+
+      page.evaluate
+        .mockResolvedValueOnce({ id: 'btn1', controlType: 'sap.m.Button' })
+        .mockResolvedValueOnce(unrenderedResult);
+
+      const result = await handler.inspect(defaultSelector);
+
+      expect(result.domId).toBeNull();
+    });
+
+    it('creates a span named praman.ui5.inspect when tracer is provided', async () => {
+      const { tracer, spans } = createMockTracer();
+      const tracedHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        tracer,
+      });
+
+      page.evaluate
+        .mockResolvedValueOnce({ id: 'btn1', controlType: 'sap.m.Button' })
+        .mockResolvedValueOnce(inspectionResult);
+
+      await tracedHandler.inspect(defaultSelector);
+
+      const inspectSpan = spans.find((s) => s.name === 'praman.ui5.inspect');
+      expect(inspectSpan).toBeDefined();
+      expect(inspectSpan?.ended).toBe(true);
+      expect(inspectSpan?.status).toBe('ok');
     });
   });
 });

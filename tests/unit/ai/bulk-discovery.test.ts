@@ -752,4 +752,120 @@ describe('discoverPage', () => {
       expect(result.data.navigationElements).toHaveLength(1);
     }
   });
+
+  // ── 22. Pagination — limit ──────────────────────────────────────────────
+
+  it('returns only the first N controls when limit is specified', async () => {
+    page = makeMockPage([buttonRaw, inputRaw, tableRaw, linkRaw]);
+
+    const result = await discoverPage(page as never, { limit: 2 });
+
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      expect(result.data.controls).toHaveLength(2);
+      expect(result.data.controls[0]?.id).toBe('submitBtn');
+      expect(result.data.controls[1]?.id).toBe('nameInput');
+    }
+  });
+
+  // ── 23. Pagination — offset ─────────────────────────────────────────────
+
+  it('skips the first N controls when offset is specified', async () => {
+    page = makeMockPage([buttonRaw, inputRaw, tableRaw, linkRaw]);
+
+    const result = await discoverPage(page as never, { offset: 2 });
+
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      expect(result.data.controls).toHaveLength(2);
+      expect(result.data.controls[0]?.id).toBe('mainTable');
+      expect(result.data.controls[1]?.id).toBe('homeLink');
+    }
+  });
+
+  // ── 24. Pagination — limit + offset combined ────────────────────────────
+
+  it('applies both offset and limit for windowed pagination', async () => {
+    page = makeMockPage([buttonRaw, inputRaw, tableRaw, linkRaw, pageContainerRaw, modelRaw]);
+
+    const result = await discoverPage(page as never, { offset: 1, limit: 3 });
+
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      expect(result.data.controls).toHaveLength(3);
+      expect(result.data.controls[0]?.id).toBe('nameInput');
+      expect(result.data.controls[1]?.id).toBe('mainTable');
+      expect(result.data.controls[2]?.id).toBe('homeLink');
+    }
+  });
+
+  // ── 25. Pagination — partitions reflect paginated controls ──────────────
+
+  it('partitions only the paginated subset of controls', async () => {
+    page = makeMockPage([buttonRaw, inputRaw, tableRaw, linkRaw]);
+
+    const result = await discoverPage(page as never, { offset: 2 });
+
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      // Only tableRaw and linkRaw remain after offset=2
+      expect(result.data.buttons).toHaveLength(0);
+      expect(result.data.formFields).toHaveLength(0);
+      expect(result.data.tables).toHaveLength(1);
+      expect(result.data.navigationElements).toHaveLength(1);
+    }
+  });
+
+  // ── 26. Pagination — offset beyond total returns empty ──────────────────
+
+  it('returns empty controls when offset exceeds total control count', async () => {
+    page = makeMockPage([buttonRaw, inputRaw]);
+
+    const result = await discoverPage(page as never, { offset: 10 });
+
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      expect(result.data.controls).toHaveLength(0);
+      expect(result.data.buttons).toHaveLength(0);
+    }
+  });
+
+  // ── 27. Pagination — limit larger than available returns all ─────────────
+
+  it('returns all controls when limit exceeds total count', async () => {
+    page = makeMockPage([buttonRaw, inputRaw]);
+
+    const result = await discoverPage(page as never, { limit: 100 });
+
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      expect(result.data.controls).toHaveLength(2);
+    }
+  });
+
+  // ── 28. Pagination — offset=0 returns all controls ──────────────────────
+
+  it('returns all controls when offset is 0', async () => {
+    page = makeMockPage([buttonRaw, inputRaw, tableRaw]);
+
+    const result = await discoverPage(page as never, { offset: 0 });
+
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      expect(result.data.controls).toHaveLength(3);
+    }
+  });
+
+  // ── 29. Pagination — no pagination when neither limit nor offset set ────
+
+  it('returns all controls when neither limit nor offset is set', async () => {
+    page = makeMockPage([buttonRaw, inputRaw, tableRaw, linkRaw]);
+
+    const result = await discoverPage(page as never, {});
+
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      expect(result.data.controls).toHaveLength(4);
+    }
+  });
 });

@@ -33,6 +33,9 @@ import { ui5Step } from '#core/utils/step-decorator.js';
 /**
  * Options for constructing a ShellHandler.
  *
+ * @ai
+ * @aiContext Configuration for creating a ShellHandler instance.
+ *
  * @example
  * ```typescript
  * const options: ShellHandlerOptions = { page };
@@ -44,6 +47,9 @@ export interface ShellHandlerOptions {
 
 /**
  * Shell header operations for SAP Fiori Launchpad.
+ *
+ * @ai
+ * @aiContext Use for FLP shell header actions: home, user menu, notifications.
  *
  * @remarks
  * Provides methods to verify the shell header visibility, navigate home,
@@ -68,6 +74,9 @@ export class ShellHandler {
 
   /**
    * Verifies the shell header is visible on the page.
+   *
+   * @ai
+   * @aiContext Use to assert the FLP shell header is rendered.
    *
    * @throws NavigationError if the shell header element is not found.
    *
@@ -105,6 +114,9 @@ export class ShellHandler {
 
   /**
    * Clicks the shell home button to navigate to the FLP home page.
+   *
+   * @ai
+   * @aiContext Use to navigate to the FLP home page via shell logo.
    *
    * @remarks
    * Targets `#shell-header-logo` or `.sapUshellShellHeadItm` (Fiori 2.0/3.0).
@@ -158,7 +170,56 @@ export class ShellHandler {
   }
 
   /**
+   * Opens the notifications panel by clicking the notifications icon.
+   *
+   * @ai
+   * @aiContext Use to open the FLP notifications panel.
+   *
+   * @throws NavigationError if the notifications icon is not found.
+   *
+   * @example
+   * ```typescript
+   * await shell.openNotifications();
+   * ```
+   */
+  @ui5Step
+  async openNotifications(): Promise<void> {
+    this.log.debug('Opening notifications panel');
+
+    const found = await this.page.evaluate(
+      /* v8 ignore start -- browser-context function */
+      () => {
+        const btn =
+          document.querySelector('#NotificationsCountButton') ??
+          document.querySelector('.sapUshellNotificationsCountButton') ??
+          document.querySelector('#shell-header-notifications');
+        if (btn instanceof HTMLElement) {
+          btn.click();
+          return true;
+        }
+        return false;
+      },
+      /* v8 ignore stop */
+    );
+
+    if (!found) {
+      throw new NavigationError({
+        message: 'Notifications icon not found in shell header',
+        attempted: 'Open notifications panel via shell header',
+        suggestions: [
+          'Verify the shell header is visible (use expectShellHeader() first)',
+          'Check if notifications are enabled in the Fiori Launchpad configuration',
+          'Ensure the user has permissions to view notifications',
+        ],
+      });
+    }
+  }
+
+  /**
    * Opens the user menu by clicking the user avatar button.
+   *
+   * @ai
+   * @aiContext Use to open the user menu for profile or settings access.
    *
    * @throws NavigationError if the user avatar button is not found.
    *

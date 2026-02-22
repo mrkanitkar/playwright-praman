@@ -129,7 +129,8 @@ export const stabilityTest = base.extend<StabilityFixtures, StabilityDeps>({
         // Fire-and-forget: waitForUI5Stable failure is non-fatal (PW-STAB-1)
         void (async () => {
           try {
-            await waitForUI5Stable(page as unknown as Parameters<typeof waitForUI5Stable>[0], {
+            // Type assertion: Playwright Page satisfies WaitPage structurally; Parameters<> avoids importing the internal WaitPage type
+            await waitForUI5Stable(page as Parameters<typeof waitForUI5Stable>[0], {
               timeout: DEFAULT_TIMEOUTS.UI5_WAIT,
             });
           } catch {

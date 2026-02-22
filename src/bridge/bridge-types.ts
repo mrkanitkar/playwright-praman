@@ -101,6 +101,49 @@ export interface ControlDiscoveryResult {
 }
 
 /**
+ * Full metadata result from inspecting a UI5 control via the bridge.
+ *
+ * @remarks
+ * Returned by the `inspect-control` browser script. Contains all
+ * introspectable metadata for a discovered control: properties with
+ * current values, aggregation names, binding paths, visibility, and
+ * enabled state. Used by `UI5Handler.inspect()` for fixture-level
+ * control discovery.
+ *
+ * @example
+ * ```typescript
+ * const inspection: ControlInspection = {
+ *   id: 'btn1',
+ *   controlType: 'sap.m.Button',
+ *   visible: true,
+ *   enabled: true,
+ *   domId: 'btn1',
+ *   properties: { text: 'Save', type: 'Emphasized' },
+ *   aggregationNames: ['tooltip', 'customData', 'dependents'],
+ *   bindingPaths: { text: '/ButtonText' },
+ * };
+ * ```
+ */
+export interface ControlInspection {
+  /** UI5 control ID. */
+  readonly id: string;
+  /** Fully qualified control type (e.g., `'sap.m.Button'`). */
+  readonly controlType: string;
+  /** Whether the control is currently visible. */
+  readonly visible: boolean;
+  /** Whether the control is currently enabled. */
+  readonly enabled: boolean;
+  /** DOM element ID, or null if not rendered. */
+  readonly domId: string | null;
+  /** All properties with their current values. */
+  readonly properties: Readonly<Record<string, unknown>>;
+  /** Names of all aggregations defined in the control's metadata. */
+  readonly aggregationNames: readonly string[];
+  /** Binding paths for data-bound properties (property name to OData path). */
+  readonly bindingPaths: Readonly<Record<string, string>>;
+}
+
+/**
  * Result of executing a method on a UI5 control via the bridge.
  *
  * @remarks

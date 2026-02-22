@@ -64,45 +64,45 @@ function asPage(mock: ReturnType<typeof createMockPage>): TablePage {
 
 /** Detection result for sap.m.Table. */
 const RESPONSIVE_DETECT = {
+  kind: 'standard' as const,
   variant: 'sap.m.Table',
   effectiveId: 'myTable',
-  isSmartTable: false,
 };
 
 /** Detection result for sap.ui.table.Table. */
 const GRID_DETECT = {
+  kind: 'standard' as const,
   variant: 'sap.ui.table.Table',
   effectiveId: 'gridTable',
-  isSmartTable: false,
 };
 
 /** Detection result for SmartTable wrapping a grid table. */
 const SMART_DETECT = {
+  kind: 'smart' as const,
   variant: 'sap.ui.table.Table',
   effectiveId: 'innerGrid',
-  isSmartTable: true,
   smartTableId: 'smartTable',
 };
 
 /** Detection result for sap.ui.mdc.Table. */
 const MDC_DETECT = {
+  kind: 'standard' as const,
   variant: 'sap.ui.mdc.Table',
   effectiveId: 'mdcTable',
-  isSmartTable: false,
 };
 
 /** Detection result for sap.ui.table.TreeTable. */
 const TREE_DETECT = {
+  kind: 'standard' as const,
   variant: 'sap.ui.table.TreeTable',
   effectiveId: 'treeTable',
-  isSmartTable: false,
 };
 
 /** Detection result for AnalyticalTable. */
 const ANALYTICAL_DETECT = {
+  kind: 'standard' as const,
   variant: 'sap.ui.table.AnalyticalTable',
   effectiveId: 'analyticalTable',
-  isSmartTable: false,
 };
 
 describe('table module', () => {
@@ -119,8 +119,7 @@ describe('table module', () => {
 
       expect(info.variant).toBe('sap.m.Table');
       expect(info.effectiveId).toBe('myTable');
-      expect(info.isSmartTable).toBe(false);
-      expect(info.smartTableId).toBeUndefined();
+      expect(info.kind).toBe('standard');
     });
 
     it('identifies sap.ui.table.Table', async () => {
@@ -129,7 +128,7 @@ describe('table module', () => {
 
       expect(info.variant).toBe('sap.ui.table.Table');
       expect(info.effectiveId).toBe('gridTable');
-      expect(info.isSmartTable).toBe(false);
+      expect(info.kind).toBe('standard');
     });
 
     it('identifies SmartTable and unwraps inner table', async () => {
@@ -138,8 +137,8 @@ describe('table module', () => {
 
       expect(info.variant).toBe('sap.ui.table.Table');
       expect(info.effectiveId).toBe('innerGrid');
-      expect(info.isSmartTable).toBe(true);
-      expect(info.smartTableId).toBe('smartTable');
+      expect(info.kind).toBe('smart');
+      expect(info.kind === 'smart' && info.smartTableId).toBe('smartTable');
     });
 
     it('identifies sap.ui.mdc.Table', async () => {
@@ -147,7 +146,7 @@ describe('table module', () => {
       const info = await detectTableType(asPage(page), 'mdcTable');
 
       expect(info.variant).toBe('sap.ui.mdc.Table');
-      expect(info.isSmartTable).toBe(false);
+      expect(info.kind).toBe('standard');
     });
 
     it('identifies TreeTable', async () => {
@@ -159,7 +158,11 @@ describe('table module', () => {
     });
 
     it('throws ControlError for non-table control type', async () => {
-      const nonTableResult = { variant: 'sap.m.Button', effectiveId: 'btn1', isSmartTable: false };
+      const nonTableResult = {
+        kind: 'standard' as const,
+        variant: 'sap.m.Button',
+        effectiveId: 'btn1',
+      };
       const page = createMockPage([nonTableResult]);
 
       const error = await detectTableType(asPage(page), 'btn1').catch((e: unknown) => e);
@@ -173,14 +176,14 @@ describe('table module', () => {
 
       expect(info.variant).toBe('sap.ui.table.AnalyticalTable');
       expect(info.effectiveId).toBe('analyticalTable');
-      expect(info.isSmartTable).toBe(false);
+      expect(info.kind).toBe('standard');
     });
 
     it('unwraps SmartTable with no inner table yet', async () => {
       const smartNoInner = {
+        kind: 'smart' as const,
         variant: 'sap.ui.comp.smarttable.SmartTable',
         effectiveId: 'smartTable',
-        isSmartTable: true,
         smartTableId: 'smartTable',
       };
       const page = createMockPage([smartNoInner]);
@@ -188,8 +191,8 @@ describe('table module', () => {
 
       expect(info.variant).toBe('sap.ui.comp.smarttable.SmartTable');
       expect(info.effectiveId).toBe('smartTable');
-      expect(info.isSmartTable).toBe(true);
-      expect(info.smartTableId).toBe('smartTable');
+      expect(info.kind).toBe('smart');
+      expect(info.kind === 'smart' && info.smartTableId).toBe('smartTable');
     });
 
     it('throws ControlError when control is not found', async () => {

@@ -17,6 +17,7 @@
 
 import type { IntentOptions, IntentResult } from './types.js';
 
+import type { UI5ControlTypeName } from '#core/types/index.js';
 import type { UI5Selector } from '#core/types/selectors.js';
 
 // ── Shared constants ───────────────────────────────────────────────────────
@@ -31,7 +32,7 @@ const VOCAB_NOT_FOUND_CODE = 'ERR_VOCAB_TERM_NOT_FOUND';
 const VOCAB_SUGGESTION_SUFFIX = 'Use getBusinessTermSuggestions() to find available terms';
 
 /** SAP Button control type string — used in all button selectors. */
-const SAP_BUTTON_TYPE = 'sap.m.Button';
+const SAP_BUTTON_TYPE: UI5ControlTypeName = 'sap.m.Button';
 
 // ── Structural interfaces ──────────────────────────────────────────────────
 
@@ -126,6 +127,8 @@ function makeIntentResult<T>(params: {
   retryable?: boolean;
   suggestions?: string[];
 }): IntentResult<T> {
+  // Type assertion: exactOptionalPropertyTypes requires omitting undefined optional fields;
+  // conditional spread produces a union type TypeScript cannot narrow to IntentResult<T>
   return {
     status: params.status,
     ...(params.data !== undefined && { data: params.data }),

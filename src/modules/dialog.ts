@@ -168,6 +168,8 @@ function dialogScanScript(titleFilter: string, typeFilter: string, returnAll: bo
   );
 }
 
+// ── Dialog Discovery & Query ────────────────────────────────────────────────
+
 /**
  * Waits for a dialog to appear in the UI5 static UI area.
  *
@@ -252,6 +254,8 @@ export async function isDialogOpen(page: DialogPage, dialogId: string): Promise<
       ');if(!c)return false;return typeof c.isOpen==="function"?c.isOpen():false;}catch(e){return false;}})()',
   );
 }
+
+// ── Dialog Actions ──────────────────────────────────────────────────────────
 
 /**
  * Dismisses (closes) the topmost dialog, or a dialog matching the given title.
@@ -363,6 +367,8 @@ function buildDefaultBtnScript(id: string): string {
     'for(var l=0;l<ls.length;l++){if(t===ls[l]){bs[i].firePress();return true;}}}return false;})()'
   );
 }
+
+// ── Dialog Assertions & Helpers ─────────────────────────────────────────────
 
 /**
  * Waits for a specific dialog to be closed.

@@ -310,6 +310,78 @@ describe('resolveFieldSelector', () => {
   });
 });
 
+// ── Normalization: special character stripping ────────────────────────────────
+
+describe('normalize (via matchTerms)', () => {
+  it('"purchase-order" matches "purchase order" term', () => {
+    const poTerm: VocabularyTerm = {
+      name: 'purchase order',
+      synonyms: ['PO'],
+      domain: 'procurement',
+    };
+    const map = makeTermsMap([poTerm]);
+    const results = matchTerms('purchase-order', map, 'procurement');
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]?.term).toBe('purchase order');
+    expect(results[0]?.confidence).toBe(1.0);
+  });
+
+  it('"GL_Account" matches "gl account" term', () => {
+    const glTerm: VocabularyTerm = {
+      name: 'gl account',
+      synonyms: ['general ledger'],
+      domain: 'finance',
+    };
+    const map = makeTermsMap([glTerm]);
+    const results = matchTerms('GL_Account', map, 'finance');
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]?.term).toBe('gl account');
+    expect(results[0]?.confidence).toBe(1.0);
+  });
+
+  it('"cost.center" matches "cost center" term', () => {
+    const ccTerm: VocabularyTerm = {
+      name: 'cost center',
+      synonyms: [],
+      domain: 'finance',
+    };
+    const map = makeTermsMap([ccTerm]);
+    const results = matchTerms('cost.center', map, 'finance');
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]?.term).toBe('cost center');
+    expect(results[0]?.confidence).toBe(1.0);
+  });
+
+  it('"vendor/supplier" normalizes slashes to spaces', () => {
+    // "vendor/supplier" → "vendor supplier" — does not exactly match "vendor" (different length)
+    // but would match a term named "vendor supplier" if one existed
+    const combinedTerm: VocabularyTerm = {
+      name: 'vendor supplier',
+      synonyms: [],
+      domain: 'procurement',
+    };
+    const map = makeTermsMap([combinedTerm]);
+    const results = matchTerms('vendor/supplier', map, 'procurement');
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]?.term).toBe('vendor supplier');
+    expect(results[0]?.confidence).toBe(1.0);
+  });
+
+  it('collapses multiple spaces after stripping special chars', () => {
+    // "a---b" → "a   b" → "a b" after collapsing
+    const testTerm: VocabularyTerm = {
+      name: 'a b',
+      synonyms: [],
+      domain: 'procurement',
+    };
+    const map = makeTermsMap([testTerm]);
+    const results = matchTerms('a---b', map, 'procurement');
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]?.term).toBe('a b');
+    expect(results[0]?.confidence).toBe(1.0);
+  });
+});
+
 // ── Integration: Levenshtein fuzzy path ──────────────────────────────────────
 
 describe('Levenshtein fuzzy matching (integration)', () => {

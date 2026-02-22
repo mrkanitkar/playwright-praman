@@ -30,7 +30,9 @@ import { feTest } from './fe-fixtures.js';
 import { intentTest } from './intent-fixtures.js';
 import { moduleTest } from './module-fixtures.js';
 import { navTest } from './nav-fixtures.js';
+import { shellFooterTest } from './shell-footer-fixtures.js';
 import { stabilityTest } from './stability-fixtures.js';
+import { testDataTest } from './test-data-fixtures.js';
 
 // ── Merged test fixture ─────────────────────────────────────────────
 
@@ -61,6 +63,8 @@ export const test = mergeTests(
   feTest,
   aiTest,
   intentTest,
+  shellFooterTest,
+  testDataTest,
 );
 
 export { expect };
@@ -88,4 +92,10 @@ export { aiTest } from './ai-fixtures.js';
 export type { AIFixtures, AIWorkerDeps, PramanAIFixture } from './ai-fixtures.js';
 
 export { intentTest } from './intent-fixtures.js';
-export type { IntentFixture, IntentTestFixtures } from './intent-fixtures.js';
+export type { IntentFixture, IntentFixtureDeps, IntentTestFixtures } from './intent-fixtures.js';
+
+export { shellFooterTest } from './shell-footer-fixtures.js';
+export type { ShellFooterFixtures } from './shell-footer-fixtures.js';
+
+export { testDataTest } from './test-data-fixtures.js';
+export type { TestDataFixtures } from './test-data-fixtures.js';

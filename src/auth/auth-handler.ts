@@ -41,6 +41,8 @@ import { ui5Step } from '#core/utils/step-decorator.js';
 export interface AuthLogger {
   /** Log informational messages. */
   info(...args: readonly unknown[]): void;
+  /** Log warning messages (non-fatal issues). */
+  warn(...args: readonly unknown[]): void;
   /** Log error messages. */
   error(...args: readonly unknown[]): void;
 }
@@ -188,7 +190,15 @@ export class SAPAuthHandler {
    * Logout and clear session state.
    *
    * @remarks
-   * Navigates to a blank page and clears internal session tracking.
+   * Performs UI-based logout matching SAP Fiori Launchpad shell behavior:
+   *
+   * 1. **Primary**: Click user menu button, then click logout/sign-out button.
+   * 2. **Fallback**: Navigate to `/sap/public/bc/icf/logoff` if UI logout fails.
+   * 3. **Always**: Clear cookies via `context.clearCookies()`, navigate to `about:blank`,
+   *    and clear internal session state.
+   *
+   * All steps are wrapped in try/catch — logout failures are non-fatal and
+   * will not cause test failures.
    *
    * @param page - Playwright page for browser interactions.
    *
@@ -201,13 +211,162 @@ export class SAPAuthHandler {
   async logout(page: AuthPage): Promise<void> {
     this.logger.info({ strategy: this.strategy.name }, 'Logging out of SAP');
 
-    // Navigate to a blank page to clear browser state
-    await page.goto('about:blank');
+    // Step 1: Attempt UI-based logout (user menu → logout button)
+    const uiLogoutSucceeded = await this.attemptUiLogout(page);
 
+    // Step 2: If UI logout failed, try ICF logoff endpoint as fallback
+    if (!uiLogoutSucceeded) {
+      await this.attemptIcfLogoff(page);
+    }
+
+    // Step 3: Always navigate to about:blank to clear browser state
+    try {
+      await page.goto('about:blank');
+    } catch (error: unknown) {
+      this.logger.warn(
+        { error, strategy: this.strategy.name },
+        'Failed to navigate to about:blank during logout',
+      );
+    }
+
+    // Step 4: Always clear internal session state
     this.sessionInfo = null;
     this.loginTimestamp = null;
 
     this.logger.info({ strategy: this.strategy.name }, 'SAP logout complete');
+  }
+
+  /**
+   * Attempt UI-based logout via SAP Fiori Launchpad shell.
+   *
+   * @remarks
+   * Clicks the user menu header button, then clicks the logout button.
+   * Uses `page.evaluate()` for DOM interactions. Non-fatal — returns
+   * `false` on any failure.
+   *
+   * @param page - Playwright page for browser interactions.
+   * @returns `true` if UI logout completed, `false` if it failed.
+   */
+  private async attemptUiLogout(page: AuthPage): Promise<boolean> {
+    try {
+      // Click the user menu button to open the menu
+      const menuClicked = await page.evaluate(() => {
+        const menuSelectors = [
+          '#meAreaHeaderButton',
+          '.sapUshellMeAreaHeaderButton',
+          '#userActionsMenuHeaderButton',
+        ];
+
+        for (const selector of menuSelectors) {
+          const element = document.querySelector(selector);
+          if (element instanceof HTMLElement) {
+            element.click();
+            return true;
+          }
+        }
+        return false;
+      });
+
+      if (!menuClicked) {
+        this.logger.warn(
+          { strategy: this.strategy.name },
+          'User menu button not found, skipping UI logout',
+        );
+        return false;
+      }
+
+      // Wait briefly for the menu to open, then click logout
+      await page.waitForFunction(
+        () => {
+          const logoutSelectors = ['#logoutBtn', 'button[id*="logoutBtn"]'];
+
+          for (const selector of logoutSelectors) {
+            const element = document.querySelector(selector);
+            if (element instanceof HTMLElement) {
+              return true;
+            }
+          }
+
+          // Also check by text content
+          const allButtons = document.querySelectorAll('button, [role="button"], a, span');
+          for (const element of allButtons) {
+            const text = element.textContent.trim().toLowerCase();
+            if (text === 'sign out' || text === 'log out' || text === 'logout') {
+              return true;
+            }
+          }
+
+          return false;
+        },
+        { timeout: 5000 },
+      );
+
+      // Click the logout button
+      const logoutClicked = await page.evaluate(() => {
+        // Try ID-based selectors first
+        const logoutSelectors = ['#logoutBtn', 'button[id*="logoutBtn"]'];
+
+        for (const selector of logoutSelectors) {
+          const element = document.querySelector(selector);
+          if (element instanceof HTMLElement) {
+            element.click();
+            return true;
+          }
+        }
+
+        // Fallback: find by text content
+        const allButtons = document.querySelectorAll('button, [role="button"], a, span');
+        for (const element of allButtons) {
+          const text = element.textContent.trim().toLowerCase();
+          if (
+            (text === 'sign out' || text === 'log out' || text === 'logout') &&
+            element instanceof HTMLElement
+          ) {
+            element.click();
+            return true;
+          }
+        }
+
+        return false;
+      });
+
+      if (!logoutClicked) {
+        this.logger.warn(
+          { strategy: this.strategy.name },
+          'Logout button not found after opening user menu',
+        );
+        return false;
+      }
+
+      this.logger.info({ strategy: this.strategy.name }, 'UI-based logout completed');
+      return true;
+    } catch (error: unknown) {
+      this.logger.warn(
+        { error, strategy: this.strategy.name },
+        'UI-based logout failed, will try fallback',
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Attempt logout via SAP ICF logoff endpoint.
+   *
+   * @remarks
+   * Navigates to `/sap/public/bc/icf/logoff` to invalidate the server
+   * session. Non-fatal — logs a warning on failure.
+   *
+   * @param page - Playwright page for browser interactions.
+   */
+  private async attemptIcfLogoff(page: AuthPage): Promise<void> {
+    try {
+      const currentUrl = page.url();
+      const baseUrl = new URL(currentUrl).origin;
+      await page.goto(`${baseUrl}/sap/public/bc/icf/logoff`);
+      this.logger.info({ strategy: this.strategy.name }, 'ICF logoff endpoint called');
+    } catch (error: unknown) {
+      this.logger.warn({ error, strategy: this.strategy.name }, 'ICF logoff fallback failed');
+    }
   }
 
   /**
@@ -258,7 +417,7 @@ export class SAPAuthHandler {
    * @example
    * ```typescript
    * const session = handler.getSessionInfo();
-   * if (session) console.log(session.strategyName);
+   * if (session) logger.info(session.strategyName);
    * ```
    */
   getSessionInfo(): Readonly<SessionInfo> | null {

@@ -7,9 +7,10 @@
  * for all 4 supported domains are fully awaited BEFORE `use()` is called, so
  * the fixture is ready to use immediately in the test body.
  *
- * Cross-fixture dependencies (`pramanConfig`, `ui5`, `ui5Navigation`) are
- * declared as `option` placeholders (PW-MERGE-1) and overridden by
- * `mergeTests()` in the fixture assembly.
+ * Cross-fixture dependencies (`ui5`, `ui5Navigation`) are declared as `option`
+ * placeholders (PW-MERGE-1) and overridden by `mergeTests()` in the fixture
+ * assembly. This ensures intent functions receive the properly-initialized
+ * UI5Handler and UI5NavigationAPI, not a raw Playwright Page.
  *
  * @example
  * ```typescript
@@ -26,24 +27,40 @@
  * @module fixtures
  */
 
-import type { test as base } from '@playwright/test';
+import { test as base } from '@playwright/test';
 
-import type { IntentOptions, IntentResult } from '../intents/types.js';
+import type {
+  CustomerMasterData,
+  IntentOptions,
+  IntentResult,
+  JournalEntryData,
+  MaterialMasterData,
+  PaymentData,
+  ProductionConfirmationData,
+  ProductionOrderData,
+  VendorInvoiceData,
+  VendorMasterData,
+} from '../intents/types.js';
 
-import { aiTest } from './ai-fixtures.js';
+import type { UI5NavigationAPI } from './nav-fixtures.js';
+import type { UI5Handler } from './ui5-handler.js';
 
 // ── Public fixture type ─────────────────────────────────────────────────────
 
 /**
  * The `intent` fixture object provided to intent-enabled Playwright tests.
  *
+ * @ai
+ * @aiContext Use to execute SAP business operations (PO, SO, invoices, etc.).
+ *
  * @remarks
- * Groups domain intent functions into `core`, `procurement`, and `sales`
- * namespaces. All functions delegate to the corresponding intent module
- * functions with `ui5`, `ui5Navigation`, and `vocabulary` pre-injected.
+ * Groups domain intent functions into `core`, `procurement`, `sales`,
+ * `finance`, `manufacturing`, and `masterData` namespaces. All functions
+ * delegate to the corresponding intent module functions with `ui5`,
+ * `ui5Navigation`, and `vocabulary` pre-injected.
  *
  * @intent Provide typed SAP business intent operations to Playwright tests.
- * @capability intent-fixture, procurement, sales
+ * @capability intent-fixture, procurement, sales, finance, manufacturing, masterData
  *
  * @example
  * ```typescript
@@ -55,6 +72,9 @@ import { aiTest } from './ai-fixtures.js';
 export interface IntentFixture {
   /**
    * Core intent wrappers for low-level SAP field interactions.
+   *
+   * @ai
+   * @aiContext Use for low-level field fill, button click, and assertions.
    *
    * @example
    * ```typescript
@@ -83,6 +103,9 @@ export interface IntentFixture {
 
   /**
    * SAP Materials Management (MM) procurement intent operations.
+   *
+   * @ai
+   * @aiContext Use for purchase orders, requisitions, and goods receipt.
    *
    * @example
    * ```typescript
@@ -129,6 +152,9 @@ export interface IntentFixture {
   /**
    * SAP Sales & Distribution (SD) intent operations.
    *
+   * @ai
+   * @aiContext Use for sales orders, quotations, and delivery status.
+   *
    * @example
    * ```typescript
    * await intent.sales.createSalesOrder({
@@ -173,6 +199,82 @@ export interface IntentFixture {
       options?: IntentOptions,
     ) => Promise<IntentResult<string>>;
   };
+
+  /**
+   * SAP Financial Accounting (FI) intent operations.
+   *
+   * @ai
+   * @aiContext Use for journal entries, vendor invoices, and payments.
+   *
+   * @example
+   * ```typescript
+   * await intent.finance.createJournalEntry({
+   *   documentDate: '2026-02-20',
+   *   postingDate: '2026-02-20',
+   *   lineItems: [{ glAccount: '400000', debitCredit: 'S', amount: 1000 }],
+   * });
+   * ```
+   */
+  finance: {
+    /** Create a journal entry in FB50. */
+    createJournalEntry: (input: JournalEntryData, options?: IntentOptions) => Promise<IntentResult>;
+    /** Post a vendor invoice in FB60. */
+    postVendorInvoice: (input: VendorInvoiceData, options?: IntentOptions) => Promise<IntentResult>;
+    /** Process a vendor payment in F-53. */
+    processPayment: (input: PaymentData, options?: IntentOptions) => Promise<IntentResult>;
+  };
+
+  /**
+   * SAP Production Planning (PP) manufacturing intent operations.
+   *
+   * @ai
+   * @aiContext Use for production orders and confirmations.
+   *
+   * @example
+   * ```typescript
+   * await intent.manufacturing.createProductionOrder({
+   *   material: 'FG-1000', plant: '1000', quantity: 50,
+   * });
+   * ```
+   */
+  manufacturing: {
+    /** Create a production order in CO01. */
+    createProductionOrder: (
+      input: ProductionOrderData,
+      options?: IntentOptions,
+    ) => Promise<IntentResult>;
+    /** Confirm a production order operation in CO11N. */
+    confirmProductionOrder: (
+      input: ProductionConfirmationData,
+      options?: IntentOptions,
+    ) => Promise<IntentResult>;
+  };
+
+  /**
+   * SAP Master Data (MD) intent operations — cross-module.
+   *
+   * @ai
+   * @aiContext Use to create vendor, customer, or material master records.
+   *
+   * @example
+   * ```typescript
+   * await intent.masterData.createVendorMaster({ name: 'Acme GmbH', country: 'DE' });
+   * ```
+   */
+  masterData: {
+    /** Create a vendor master record in XK01/BP. */
+    createVendorMaster: (input: VendorMasterData, options?: IntentOptions) => Promise<IntentResult>;
+    /** Create a customer master record in XD01/BP. */
+    createCustomerMaster: (
+      input: CustomerMasterData,
+      options?: IntentOptions,
+    ) => Promise<IntentResult>;
+    /** Create a material master record in MM01. */
+    createMaterialMaster: (
+      input: MaterialMasterData,
+      options?: IntentOptions,
+    ) => Promise<IntentResult>;
+  };
 }
 
 /** Test fixture map for the intentTest extension. */
@@ -210,8 +312,22 @@ export interface IntentTestFixtures {
  * ```
  */
 
-export const intentTest = (aiTest as unknown as typeof base).extend<IntentTestFixtures>({
-  intent: async ({ page }, use) => {
+/** Cross-fixture dependencies injected via PW-MERGE-1 option placeholders. */
+export interface IntentFixtureDeps {
+  /** UI5Handler — overridden at runtime by mergeTests(). */
+  ui5: UI5Handler;
+  /** Navigation API — overridden at runtime by mergeTests(). */
+  ui5Navigation: UI5NavigationAPI;
+}
+
+export const intentTest = base.extend<IntentTestFixtures & IntentFixtureDeps>({
+  // ── Cross-fixture option placeholders (PW-MERGE-1) ──────────────────────
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
+  ui5: [undefined!, { option: true }],
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
+  ui5Navigation: [undefined!, { option: true }],
+
+  intent: async ({ ui5, ui5Navigation }, use) => {
     const [intentModule, vocabModule] = await Promise.all([
       import('#intents/index.js'),
       import('#vocabulary/index.js'),
@@ -225,11 +341,8 @@ export const intentTest = (aiTest as unknown as typeof base).extend<IntentTestFi
       vocabulary.loadDomain('sales'),
       vocabulary.loadDomain('finance'),
       vocabulary.loadDomain('manufacturing'),
+      // masterData terms are spread across procurement/sales/finance domains
     ]);
-
-    // Cast page to UI5HandlerSlice-compatible shape and nav to NavAPI-compatible
-    const ui5 = page as never;
-    const ui5Navigation = page as never;
 
     await use({
       core: {
@@ -283,6 +396,40 @@ export const intentTest = (aiTest as unknown as typeof base).extend<IntentTestFi
           intentModule.sales.searchCustomers(ui5, ui5Navigation, opts),
         checkDeliveryStatus: async (input, opts) =>
           intentModule.sales.checkDeliveryStatus(ui5, ui5Navigation, input, opts),
+      },
+      finance: {
+        createJournalEntry: async (input, opts) =>
+          intentModule.finance.createJournalEntry(ui5, ui5Navigation, vocabulary, input, opts),
+        postVendorInvoice: async (input, opts) =>
+          intentModule.finance.postVendorInvoice(ui5, ui5Navigation, vocabulary, input, opts),
+        processPayment: async (input, opts) =>
+          intentModule.finance.processPayment(ui5, ui5Navigation, vocabulary, input, opts),
+      },
+      manufacturing: {
+        createProductionOrder: async (input, opts) =>
+          intentModule.manufacturing.createProductionOrder(
+            ui5,
+            ui5Navigation,
+            vocabulary,
+            input,
+            opts,
+          ),
+        confirmProductionOrder: async (input, opts) =>
+          intentModule.manufacturing.confirmProductionOrder(
+            ui5,
+            ui5Navigation,
+            vocabulary,
+            input,
+            opts,
+          ),
+      },
+      masterData: {
+        createVendorMaster: async (input, opts) =>
+          intentModule.masterData.createVendorMaster(ui5, ui5Navigation, vocabulary, input, opts),
+        createCustomerMaster: async (input, opts) =>
+          intentModule.masterData.createCustomerMaster(ui5, ui5Navigation, vocabulary, input, opts),
+        createMaterialMaster: async (input, opts) =>
+          intentModule.masterData.createMaterialMaster(ui5, ui5Navigation, vocabulary, input, opts),
       },
     });
   },

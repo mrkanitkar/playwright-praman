@@ -427,6 +427,73 @@ describe('OData HTTP module', () => {
       expect(result.data).toEqual([]);
       expect(result.data).toHaveLength(0);
     });
+
+    it('sends $top only when skip is not provided', async () => {
+      const mock = createMockPage();
+      mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
+
+      await queryEntities(asPage(mock), SERVICE_URL, 'Products', { top: 5 });
+
+      const callArgs = mock.request.get.mock.calls[0] as unknown[];
+      const url = callArgs[0] as string;
+      expect(url).toContain('$top=5');
+      expect(url).not.toContain('$skip');
+    });
+
+    it('sends $skip only when top is not provided', async () => {
+      const mock = createMockPage();
+      mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
+
+      await queryEntities(asPage(mock), SERVICE_URL, 'Products', { skip: 20 });
+
+      const callArgs = mock.request.get.mock.calls[0] as unknown[];
+      const url = callArgs[0] as string;
+      expect(url).toContain('$skip=20');
+      expect(url).not.toContain('$top');
+    });
+
+    it('sends both $skip and $top for pagination', async () => {
+      const mock = createMockPage();
+      const entities = [{ Name: 'Widget B', Price: 25 }];
+      mock.request.get.mockResolvedValue(createMockResponse(200, { value: entities }));
+
+      const result = await queryEntities(asPage(mock), SERVICE_URL, 'Products', {
+        skip: 10,
+        top: 5,
+      });
+
+      const callArgs = mock.request.get.mock.calls[0] as unknown[];
+      const url = callArgs[0] as string;
+      expect(url).toContain('$skip=10');
+      expect(url).toContain('$top=5');
+      expect(result.data).toHaveLength(1);
+    });
+
+    it('parses OData V2 response format (d.results) with pagination options', async () => {
+      const mock = createMockPage();
+      const entities = [{ Name: 'V2 Entity', Price: 42 }];
+      mock.request.get.mockResolvedValue(createMockResponse(200, { d: { results: entities } }));
+
+      const result = await queryEntities(asPage(mock), SERVICE_URL, 'Products', {
+        top: 10,
+        skip: 0,
+      });
+
+      expect(result.status).toBe(200);
+      expect(result.data).toEqual(entities);
+    });
+
+    it('generates no query string when no options are provided', async () => {
+      const mock = createMockPage();
+      mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
+
+      await queryEntities(asPage(mock), SERVICE_URL, 'Products');
+
+      const callArgs = mock.request.get.mock.calls[0] as unknown[];
+      const url = callArgs[0] as string;
+      expect(url).toBe(`${SERVICE_URL}/Products`);
+      expect(url).not.toContain('?');
+    });
   });
 
   // ── Cross-cutting: Headers ────────────────────────────────────────────────

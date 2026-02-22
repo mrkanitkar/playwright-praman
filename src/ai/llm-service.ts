@@ -21,7 +21,7 @@
  * if (llm.isConfigured()) {
  *   const result = await llm.complete('Summarize this page', MySchema);
  *   if (result.status === 'success') {
- *     console.log(result.data);
+ *     logger.info(result.data);
  *   }
  * }
  * ```

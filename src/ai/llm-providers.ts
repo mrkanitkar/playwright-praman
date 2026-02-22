@@ -43,12 +43,13 @@ interface AnthropicTextBlock {
   readonly text: string;
 }
 
-interface AnthropicContentBlock {
-  readonly type: string;
+/** Non-text content blocks (e.g., tool_use, tool_result). */
+interface AnthropicOtherBlock {
+  readonly type: 'tool_use' | 'tool_result' | 'image';
 }
 
 interface AnthropicResponse {
-  readonly content: readonly (AnthropicTextBlock | AnthropicContentBlock)[];
+  readonly content: readonly (AnthropicTextBlock | AnthropicOtherBlock)[];
   readonly model: string;
   readonly usage: {
     readonly input_tokens: number;
@@ -198,7 +199,7 @@ export async function callAnthropic(
   })) as AnthropicResponse;
 
   const firstBlock = response.content[0];
-  const content = firstBlock?.type === 'text' ? (firstBlock as AnthropicTextBlock).text : '';
+  const content = firstBlock?.type === 'text' ? firstBlock.text : '';
 
   return {
     content,

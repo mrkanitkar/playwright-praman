@@ -10,6 +10,7 @@
  * @module utils
  */
 
+export { assertNever } from './assert-never.js';
 export { calculateBackoff, retry } from './retry.js';
 export type { RetryOptions } from './retry.js';
 export {

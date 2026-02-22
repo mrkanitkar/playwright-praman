@@ -50,6 +50,9 @@ import { createLogger } from '#core/logging/index.js';
 /**
  * UI5 Navigation API provided by the `ui5Navigation` fixture.
  *
+ * @ai
+ * @aiContext Use to navigate between SAP Fiori Launchpad apps and views.
+ *
  * @remarks
  * Wraps all 9 FLP navigation module functions. The `page` argument is
  * injected automatically from the Playwright fixture system.
@@ -66,6 +69,9 @@ export interface UI5NavigationAPI {
   /**
    * Navigates to a SAP app by semantic object hash.
    *
+   * @ai
+   * @aiContext Use to open a Fiori app by its semantic object hash.
+   *
    * @param appId - Semantic object hash (e.g., 'PurchaseOrder-manage').
    * @param options - Navigation options.
    *
@@ -79,6 +85,9 @@ export interface UI5NavigationAPI {
   /**
    * Navigates to an FLP tile by its title text.
    *
+   * @ai
+   * @aiContext Use to click a Fiori Launchpad tile by its visible title.
+   *
    * @param title - Title text of the FLP tile.
    * @param options - Navigation options.
    *
@@ -91,6 +100,9 @@ export interface UI5NavigationAPI {
 
   /**
    * Navigates to an SAP intent with optional parameters.
+   *
+   * @ai
+   * @aiContext Use to navigate via semantic object + action with params.
    *
    * @param intent - Semantic object and action descriptor.
    * @param params - Optional query parameters for the intent.
@@ -113,6 +125,9 @@ export interface UI5NavigationAPI {
   /**
    * Navigates to a specific hash directly.
    *
+   * @ai
+   * @aiContext Use to navigate directly to a URL hash fragment.
+   *
    * @param hash - The hash to navigate to (without leading '#').
    * @param options - Navigation options.
    *
@@ -126,6 +141,9 @@ export interface UI5NavigationAPI {
   /**
    * Navigates to the FLP home screen.
    *
+   * @ai
+   * @aiContext Use to return to the Fiori Launchpad home page.
+   *
    * @param options - Navigation options.
    *
    * @example
@@ -137,6 +155,9 @@ export interface UI5NavigationAPI {
 
   /**
    * Navigates back in browser history.
+   *
+   * @ai
+   * @aiContext Use to go back to the previous page in history.
    *
    * @param options - Navigation options.
    *
@@ -150,6 +171,9 @@ export interface UI5NavigationAPI {
   /**
    * Navigates forward in browser history.
    *
+   * @ai
+   * @aiContext Use to go forward to the next page in history.
+   *
    * @param options - Navigation options.
    *
    * @example
@@ -161,6 +185,9 @@ export interface UI5NavigationAPI {
 
   /**
    * Searches for an app in the FLP shell search bar and opens it.
+   *
+   * @ai
+   * @aiContext Use to find and launch a Fiori app via shell search.
    *
    * @param title - Title of the app to search for.
    * @param options - Navigation options.
@@ -175,6 +202,9 @@ export interface UI5NavigationAPI {
   /**
    * Returns the current URL hash (without leading '#').
    *
+   * @ai
+   * @aiContext Use to read the current navigation hash for assertions.
+   *
    * @returns The current hash string.
    *
    * @example
@@ -187,6 +217,9 @@ export interface UI5NavigationAPI {
 
 /**
  * Navigation fixture types for Playwright's `test.extend()`.
+ *
+ * @ai
+ * @aiContext Fixture types for FLP navigation and BTP WorkZone.
  *
  * @example
  * ```typescript

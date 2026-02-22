@@ -6,7 +6,7 @@
 
 // ── Error codes ──────────────────────────────────────────────────────
 export { ErrorCode } from './codes.js';
-export type { ErrorCode as ErrorCodeType } from './codes.js';
+export type { ErrorCategory, ErrorCode as ErrorCodeType, ErrorCodePattern } from './codes.js';
 
 // ── Base error class ─────────────────────────────────────────────────
 export { PramanError } from './base.js';
@@ -27,6 +27,9 @@ export type { ConfigErrorOptions } from './config-error.js';
 
 export { ControlError } from './control-error.js';
 export type { ControlErrorOptions } from './control-error.js';
+
+export { FLPError } from './flp-error.js';
+export type { FLPErrorOptions } from './flp-error.js';
 
 export { NavigationError } from './navigation-error.js';
 export type { NavigationErrorOptions } from './navigation-error.js';

@@ -77,16 +77,16 @@ function asFSPage(mock: ReturnType<typeof createMockPage>): TableFilterSortPage 
 
 /** Detection result for sap.m.Table. */
 const RESPONSIVE_DETECT = {
+  kind: 'standard' as const,
   variant: 'sap.m.Table',
   effectiveId: 'myTable',
-  isSmartTable: false,
 };
 
 /** Detection result for sap.ui.table.Table. */
 const GRID_DETECT = {
+  kind: 'standard' as const,
   variant: 'sap.ui.table.Table',
   effectiveId: 'gridTable',
-  isSmartTable: false,
 };
 
 describe('table-operations module', () => {

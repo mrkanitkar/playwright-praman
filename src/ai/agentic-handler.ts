@@ -23,7 +23,18 @@ import { RecipeRegistry } from './recipe-registry.js';
 import type { ChatMessage } from './schemas/llm-request.schema.js';
 import type { AgenticCheckpoint, AiGeneratedTest, AiResponse, PageContext } from './types.js';
 
+import { PramanConfigSchema } from '#core/config/schema.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
+
+/** Default config with overridden discovery timeout for context building. */
+const GENERATE_CONTEXT_CONFIG = Object.freeze(
+  PramanConfigSchema.parse({ controlDiscoveryTimeout: 30_000 }),
+);
+
+/** Default config with short timeout for interpret-step context enrichment. */
+const INTERPRET_CONTEXT_CONFIG = Object.freeze(
+  PramanConfigSchema.parse({ controlDiscoveryTimeout: 10_000 }),
+);
 
 // ── Zod schema for generateTest LLM response ────────────────────────────────
 
@@ -174,8 +185,8 @@ export class AgenticHandler {
    *   page,
    * );
    * if (result.status === 'success') {
-   *   console.log('Steps:', result.data.steps);
-   *   console.log('Code:', result.data.code);
+   *   logger.info('Steps:', result.data.steps);
+   *   logger.info('Code:', result.data.code);
    * }
    * ```
    */
@@ -187,11 +198,7 @@ export class AgenticHandler {
     const startTime = Date.now();
 
     // ── Step 1: Build page context ─────────────────────────────────────────
-    const contextResult = await this.contextBuilder(
-      page,
-      // Pass a minimal config-compatible object — context builder only uses timeout
-      { controlDiscoveryTimeout: 30_000 } as Parameters<typeof buildPageContext>[1],
-    );
+    const contextResult = await this.contextBuilder(page, GENERATE_CONTEXT_CONFIG);
 
     if (contextResult.status !== 'success') {
       const errorMsg =
@@ -357,9 +364,7 @@ export class AgenticHandler {
     }
 
     // Build enriched context using the page for AI confirmation logging
-    await this.contextBuilder(page, { controlDiscoveryTimeout: 10_000 } as Parameters<
-      typeof buildPageContext
-    >[1]);
+    await this.contextBuilder(page, INTERPRET_CONTEXT_CONFIG);
 
     return {
       status: 'success',
@@ -386,7 +391,7 @@ export class AgenticHandler {
    * ```typescript
    * const suggestions = await handler.suggestActions(pageContext);
    * if (suggestions.status === 'success') {
-   *   console.log('Next actions:', suggestions.data);
+   *   logger.info('Next actions:', suggestions.data);
    * }
    * ```
    */
@@ -466,7 +471,7 @@ export class AgenticHandler {
    * ```typescript
    * const checkpoint = handler.resumeFromCheckpoint('sess-001');
    * if (checkpoint) {
-   *   console.log('Resuming from step:', checkpoint.currentStep);
+   *   logger.info('Resuming from step:', checkpoint.currentStep);
    * }
    * ```
    */

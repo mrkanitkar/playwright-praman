@@ -100,6 +100,25 @@ export type AiResponse<T> =
       readonly metadata: AiResponseMetadata;
     };
 
+// ── AI Provider Names ─────────────────────────────────────────────────────
+
+/**
+ * Provider name for AI-specific capability formatting.
+ *
+ * @remarks
+ * Used by {@link CapabilityRegistry.forProvider} to select the output format:
+ * - `'claude'` — XML-structured capability descriptions
+ * - `'openai'` — JSON function-calling tool schemas
+ * - `'gemini'` — Plain text capability listing
+ *
+ * @example
+ * ```typescript
+ * const provider: AiProviderName = 'claude';
+ * const formatted = registry.forProvider(provider);
+ * ```
+ */
+export type AiProviderName = 'claude' | 'openai' | 'gemini';
+
 // ── Provider Configuration ─────────────────────────────────────────────────
 
 /**
@@ -200,7 +219,7 @@ export interface CapabilityEntry {
  * @example
  * ```typescript
  * const stats = registry.getStatistics();
- * console.log(`Total: ${stats.totalMethods}, Categories: ${stats.categories.join(', ')}`);
+ * logger.info(`Total: ${stats.totalMethods}, Categories: ${stats.categories.join(', ')}`);
  * ```
  */
 export interface CapabilityStats {
@@ -255,11 +274,28 @@ export interface CapabilitiesJSON {
 // ── Recipe Registry ────────────────────────────────────────────────────────
 
 /**
+ * Priority level indicating how important a recipe is for adoption.
+ *
+ * @remarks
+ * - `essential` — Must-know patterns for any SAP Fiori test suite.
+ * - `recommended` — Best-practice patterns for common scenarios.
+ * - `advanced` — Specialized patterns for complex edge cases.
+ * - `deprecated` — Superseded patterns kept for backward compatibility.
+ *
+ * @example
+ * ```typescript
+ * const priority: RecipePriority = 'essential';
+ * ```
+ */
+export type RecipePriority = 'essential' | 'recommended' | 'advanced' | 'deprecated';
+
+/**
  * A single recipe entry describing a reusable test pattern.
  *
  * @remarks
  * Recipes are curated test patterns that AI agents can emit verbatim or
  * adapt. `role` indicates who the recipe is primarily designed for.
+ * `priority` indicates how important it is for adoption.
  *
  * @intent Provide reusable SAP Fiori test patterns for AI generation.
  * @capability AI recipe lookup, test scaffolding, human reference.
@@ -272,6 +308,7 @@ export interface CapabilitiesJSON {
  *   description: 'Authenticates against SAP BTP using cloud SAML strategy',
  *   category: 'auth',
  *   role: 'both',
+ *   priority: 'essential',
  *   code: "await auth.loginCloud({ user: process.env.SAP_USER! })",
  *   tags: ['auth', 'saml', 'btp'],
  * };
@@ -288,6 +325,8 @@ export interface RecipeEntry {
   readonly category: string;
   /** Who this recipe is intended for. */
   readonly role: 'ai-agent' | 'human-tester' | 'both';
+  /** Priority level for adoption guidance. */
+  readonly priority: RecipePriority;
   /** Ready-to-use TypeScript code for the recipe. */
   readonly code: string;
   /** Free-form tags for semantic search. */

@@ -92,7 +92,7 @@ export interface AIErrorContext {
  *   attempted: 'Load config',
  *   retryable: false,
  * });
- * console.log(error.toUserMessage());
+ * logger.error(error.toUserMessage());
  * ```
  */
 export class PramanError extends Error {
@@ -134,7 +134,7 @@ export class PramanError extends Error {
    * @example
    * ```typescript
    * const json = error.toJSON();
-   * console.log(JSON.stringify(json, null, 2));
+   * logger.debug(JSON.stringify(json, null, 2));
    * ```
    */
   toJSON(): SerializedPramanError {

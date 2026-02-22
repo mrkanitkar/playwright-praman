@@ -35,12 +35,54 @@ export interface WaitForTableDataOptions extends TableOptions {
   readonly polling?: number;
 }
 
-/** @example `const i: TableInfo = { variant: 'sap.m.Table', effectiveId: 't1', isSmartTable: false };` */
-export interface TableInfo {
+/**
+ * Discriminated union for table detection results.
+ *
+ * @remarks
+ * Use the `kind` discriminant to narrow between standard and SmartTable wrappers.
+ *
+ * @example
+ * ```typescript
+ * const info: TableInfo = await detectTableType(page, 'myTable');
+ * if (info.kind === 'smart') {
+ *   logger.info(info.smartTableId);
+ * }
+ * ```
+ */
+export type TableInfo = StandardTableInfo | SmartTableInfo;
+
+/**
+ * Info for non-SmartTable variants.
+ *
+ * @example
+ * ```typescript
+ * const info: StandardTableInfo = { kind: 'standard', variant: 'sap.m.Table', effectiveId: 't1' };
+ * ```
+ */
+export interface StandardTableInfo {
+  readonly kind: 'standard';
   readonly variant: TableVariant;
   readonly effectiveId: string;
-  readonly isSmartTable: boolean;
-  readonly smartTableId?: string;
+}
+
+/**
+ * Info for SmartTable wrapper with inner table.
+ *
+ * @example
+ * ```typescript
+ * const info: SmartTableInfo = {
+ *   kind: 'smart',
+ *   variant: 'sap.ui.table.Table',
+ *   effectiveId: 'innerGrid',
+ *   smartTableId: 'smartTable',
+ * };
+ * ```
+ */
+export interface SmartTableInfo {
+  readonly kind: 'smart';
+  readonly variant: TableVariant;
+  readonly effectiveId: string;
+  readonly smartTableId: string;
 }
 
 /** @example `const p: TablePage = { evaluate: async (s) => ({}), waitForFunction: async () => ({}) };` */
@@ -106,17 +148,17 @@ async function stabilityWait(page: TablePage, options?: TableOptions): Promise<v
 export async function detectTableType(page: TablePage, tableId: string): Promise<TableInfo> {
   const id = JSON.stringify(tableId);
   const result = await page.evaluate<{
+    kind: 'standard' | 'smart';
     variant: string;
     effectiveId: string;
-    isSmartTable: boolean;
     smartTableId?: string;
   } | null>(
     iife(
       `var c=sap.ui.getCore().byId(${id});if(!c)return null;var t=c.getMetadata().getName();` +
         `if(t==='sap.ui.comp.smarttable.SmartTable'){var inner=c.getTable();` +
-        `if(!inner)return{variant:t,effectiveId:${id},isSmartTable:true,smartTableId:${id}};` +
-        `return{variant:inner.getMetadata().getName(),effectiveId:inner.getId(),isSmartTable:true,smartTableId:${id}};}` +
-        `return{variant:t,effectiveId:${id},isSmartTable:false};`,
+        `if(!inner)return{kind:'smart',variant:t,effectiveId:${id},smartTableId:${id}};` +
+        `return{kind:'smart',variant:inner.getMetadata().getName(),effectiveId:inner.getId(),smartTableId:${id}};}` +
+        `return{kind:'standard',variant:t,effectiveId:${id}};`,
       'null',
     ),
   );
@@ -139,7 +181,19 @@ export async function detectTableType(page: TablePage, tableId: string): Promise
       suggestions: ['Verify the control ID points to a table, not another control type'],
     });
   }
-  return result as TableInfo;
+  if (result.kind === 'smart') {
+    return {
+      kind: 'smart',
+      variant: result.variant as TableVariant,
+      effectiveId: result.effectiveId,
+      smartTableId: result.smartTableId ?? result.effectiveId,
+    };
+  }
+  return {
+    kind: 'standard',
+    variant: result.variant as TableVariant,
+    effectiveId: result.effectiveId,
+  };
 }
 
 /**

@@ -364,11 +364,150 @@ describe('SAPAuthHandler', () => {
       expect(handler.getSessionInfo()).toBeNull();
     });
 
-    it('navigates to logout URL', async () => {
+    it('navigates to about:blank as final step', async () => {
       await handler.login(page, config);
       await handler.logout(page);
 
-      expect(page.goto).toHaveBeenCalled();
+      expect(page.goto).toHaveBeenCalledWith('about:blank');
+    });
+
+    it('attempts UI-based logout via evaluate (user menu click)', async () => {
+      // evaluate returns false (menu not found) → falls back to ICF
+      page.evaluate.mockResolvedValue(false);
+
+      await handler.login(page, config);
+      await handler.logout(page);
+
+      // evaluate is called to attempt clicking the user menu button
+      expect(page.evaluate).toHaveBeenCalled();
+    });
+
+    it('attempts ICF logoff fallback when UI logout fails', async () => {
+      // evaluate returns false → UI logout fails → ICF fallback
+      page.evaluate.mockResolvedValue(false);
+      page.url.mockReturnValue(
+        'https://sap.example.com/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html',
+      );
+
+      await handler.login(page, config);
+      await handler.logout(page);
+
+      // Should attempt ICF logoff endpoint
+      expect(page.goto).toHaveBeenCalledWith('https://sap.example.com/sap/public/bc/icf/logoff');
+      // Should still navigate to about:blank afterward
+      expect(page.goto).toHaveBeenCalledWith('about:blank');
+    });
+
+    it('skips ICF fallback when UI logout succeeds', async () => {
+      // Simulate successful UI logout: menu click returns true, waitForFunction resolves, logout click returns true
+      page.evaluate
+        .mockResolvedValueOnce(true) // menu button click succeeds
+        .mockResolvedValueOnce(true); // logout button click succeeds
+      page.waitForFunction.mockResolvedValue(undefined);
+
+      await handler.login(page, config);
+      await handler.logout(page);
+
+      // Should NOT call ICF logoff endpoint (no goto with logoff path)
+      const gotoCalls = page.goto.mock.calls.map((call: readonly unknown[]) => call[0]);
+      const icfCalls = gotoCalls.filter(
+        (url: unknown) => typeof url === 'string' && url.includes('/sap/public/bc/icf/logoff'),
+      );
+      expect(icfCalls).toHaveLength(0);
+
+      // Should still navigate to about:blank
+      expect(page.goto).toHaveBeenCalledWith('about:blank');
+    });
+
+    it('does not throw when UI logout throws an error', async () => {
+      page.evaluate.mockRejectedValue(new Error('Page crashed'));
+
+      await handler.login(page, config);
+
+      // Should not throw — logout is non-fatal
+      await expect(handler.logout(page)).resolves.toBeUndefined();
+    });
+
+    it('does not throw when ICF logoff throws an error', async () => {
+      // UI logout fails (evaluate returns false)
+      page.evaluate.mockResolvedValue(false);
+      // URL parsing works but goto for ICF fails
+      page.url.mockReturnValue('https://sap.example.com');
+      page.goto
+        .mockRejectedValueOnce(new Error('ICF endpoint unreachable')) // ICF logoff
+        .mockResolvedValueOnce(undefined); // about:blank
+
+      await handler.login(page, config);
+
+      await expect(handler.logout(page)).resolves.toBeUndefined();
+    });
+
+    it('does not throw when about:blank navigation fails', async () => {
+      page.evaluate.mockResolvedValue(false);
+      page.url.mockReturnValue('https://sap.example.com');
+      // ICF logoff succeeds, about:blank fails
+      page.goto
+        .mockResolvedValueOnce(undefined) // ICF logoff
+        .mockRejectedValueOnce(new Error('Navigation failed')); // about:blank
+
+      await handler.login(page, config);
+
+      await expect(handler.logout(page)).resolves.toBeUndefined();
+    });
+
+    it('clears session info even when all logout steps fail', async () => {
+      page.evaluate.mockRejectedValue(new Error('evaluate failed'));
+      page.url.mockReturnValue('invalid-url');
+      page.goto.mockRejectedValue(new Error('goto failed'));
+
+      await handler.login(page, config);
+      expect(handler.getSessionInfo()).not.toBeNull();
+
+      // Should not throw
+      await handler.logout(page);
+
+      // Session state must still be cleared
+      expect(handler.getSessionInfo()).toBeNull();
+    });
+
+    it('logs warning when UI logout menu button is not found', async () => {
+      page.evaluate.mockResolvedValue(false);
+      page.url.mockReturnValue('https://sap.example.com');
+
+      await handler.login(page, config);
+      await handler.logout(page);
+
+      expect(mockLogger.warn).toHaveBeenCalled();
+    });
+
+    it('logs warning when UI logout throws', async () => {
+      page.evaluate.mockRejectedValue(new Error('DOM error'));
+
+      await handler.login(page, config);
+      await handler.logout(page);
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({ strategy: 'onprem' }),
+        expect.stringContaining('UI-based logout failed'),
+      );
+    });
+
+    it('logs info on successful UI logout', async () => {
+      // Successful UI logout
+      page.evaluate
+        .mockResolvedValueOnce(true) // menu click
+        .mockResolvedValueOnce(true); // logout click
+      page.waitForFunction.mockResolvedValue(undefined);
+
+      await handler.login(page, config);
+      mockLogger.info.mockClear();
+
+      await handler.logout(page);
+
+      // Should have logged "UI-based logout completed" and "SAP logout complete"
+      const infoMessages = mockLogger.info.mock.calls.map((call: readonly unknown[]) => call[1]);
+      expect(infoMessages).toContain('UI-based logout completed');
+      expect(infoMessages).toContain('SAP logout complete');
     });
   });
 

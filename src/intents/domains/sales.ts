@@ -37,6 +37,8 @@ function sdResult<T>(params: {
   retryable?: boolean;
   suggestions?: string[];
 }): IntentResult<T> {
+  // Type assertion: exactOptionalPropertyTypes requires omitting undefined optional fields;
+  // conditional spread produces a union type TypeScript cannot narrow to IntentResult<T>
   return {
     status: params.status,
     ...(params.data !== undefined && { data: params.data }),
@@ -380,7 +382,7 @@ export async function searchCustomers(
  * @example
  * ```typescript
  * const result = await sales.checkDeliveryStatus(ui5, ui5Nav, { salesOrderNumber: '10000001' });
- * console.log(result.data); // e.g. 'Completely Delivered'
+ * logger.info(result.data); // e.g. 'Completely Delivered'
  * ```
  */
 export async function checkDeliveryStatus(

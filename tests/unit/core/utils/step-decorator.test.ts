@@ -158,9 +158,9 @@ describe('ACTION_MAP', () => {
     }
   });
 
-  it('covers all 30 public async handler methods', () => {
-    // 14 UI5 + 3 Shell + 6 Footer + 3 Agentic + 4 Auth = 30
-    expect(Object.keys(ACTION_MAP)).toHaveLength(30);
+  it('covers all 37 public async handler methods', () => {
+    // 15 UI5 + 3 Shell + 6 Footer + 3 Agentic + 6 FLPSettings + 4 Auth = 37
+    expect(Object.keys(ACTION_MAP)).toHaveLength(37);
   });
 });
 
