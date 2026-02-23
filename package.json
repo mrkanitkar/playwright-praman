@@ -106,6 +106,7 @@
     "docs:dev": "cd docs && npx docusaurus start",
     "docs:build": "cd docs && npx docusaurus build",
     "docs:api": "typedoc",
+    "docs:api-html": "typedoc --options typedoc-html.json",
     "docs:api-review": "api-extractor run --local --verbose",
     "docs:validate": "npm run docs:api && npm run lint && npm run typecheck",
     "generate:capabilities": "tsx scripts/generate-capabilities.ts",

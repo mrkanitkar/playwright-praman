@@ -33,6 +33,9 @@ jobs:
       # Root install — provides TypeScript source for docusaurus-plugin-typedoc
       - run: npm ci
       - run: npm run build
+      # Generate standalone TypeDoc HTML into docs/static/api-html/
+      - name: Generate TypeDoc HTML
+        run: npm run docs:api-html
       # Docusaurus install + build (docusaurus-plugin-typedoc auto-generates API docs)
       - name: Install Docusaurus deps
         working-directory: docs
