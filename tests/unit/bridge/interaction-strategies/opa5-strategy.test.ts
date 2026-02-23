@@ -108,4 +108,43 @@ describe('Opa5Strategy', () => {
     const page = { evaluate: evaluateFn } as unknown as Page;
     await expect(strategy.select(page, 'combo1', 'item1')).rejects.toThrow(ControlError);
   });
+
+  it('press uses fallback message when error is undefined', async () => {
+    const strategy = new Opa5Strategy();
+    const evaluateFn = vi.fn().mockResolvedValue({ success: false });
+    const page = { evaluate: evaluateFn } as unknown as Page;
+    try {
+      await strategy.press(page, 'btn1');
+      expect.unreachable('Should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ControlError);
+      expect((error as ControlError).message).toContain('Press failed on control: btn1');
+    }
+  });
+
+  it('enterText uses fallback message when error is undefined', async () => {
+    const strategy = new Opa5Strategy();
+    const evaluateFn = vi.fn().mockResolvedValue({ success: false });
+    const page = { evaluate: evaluateFn } as unknown as Page;
+    try {
+      await strategy.enterText(page, 'input1', 'hello');
+      expect.unreachable('Should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ControlError);
+      expect((error as ControlError).message).toContain('Enter text failed on control: input1');
+    }
+  });
+
+  it('select uses fallback message when error is undefined', async () => {
+    const strategy = new Opa5Strategy();
+    const evaluateFn = vi.fn().mockResolvedValue({ success: false });
+    const page = { evaluate: evaluateFn } as unknown as Page;
+    try {
+      await strategy.select(page, 'combo1', 'item1');
+      expect.unreachable('Should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ControlError);
+      expect((error as ControlError).message).toContain('Select failed on control: combo1');
+    }
+  });
 });

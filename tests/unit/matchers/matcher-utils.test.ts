@@ -16,6 +16,7 @@ import {
   getControlProperty,
   getUI5BindingInfo,
   getUI5ControlType,
+  pollUntilPass,
 } from '../../../src/matchers/matcher-utils.js';
 
 vi.mock('#bridge/injection.js', () => ({
@@ -305,5 +306,59 @@ describe('UI5BindingInfo type', () => {
     expectTypeOf<UI5BindingInfo>().toHaveProperty('path');
     expectTypeOf<UI5BindingInfo>().toHaveProperty('model');
     expectTypeOf<UI5BindingInfo>().toHaveProperty('value');
+  });
+});
+
+describe('pollUntilPass', () => {
+  it('returns immediately when check passes on first call', async () => {
+    const checkFn = vi.fn().mockResolvedValue({
+      pass: true,
+      message: () => 'passed',
+    });
+
+    const result = await pollUntilPass(checkFn, 1000);
+
+    expect(result.pass).toBe(true);
+    expect(checkFn).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries until check passes', async () => {
+    let callCount = 0;
+    const checkFn = vi.fn().mockImplementation(async () => {
+      callCount++;
+      return Promise.resolve({
+        pass: callCount >= 3,
+        message: () => (callCount >= 3 ? 'passed' : 'still waiting'),
+      });
+    });
+
+    const result = await pollUntilPass(checkFn, 5000);
+
+    expect(result.pass).toBe(true);
+    expect(checkFn).toHaveBeenCalledTimes(3);
+  });
+
+  it('returns last failing result when timeout expires', async () => {
+    const checkFn = vi.fn().mockResolvedValue({
+      pass: false,
+      message: () => 'never passed',
+    });
+
+    const result = await pollUntilPass(checkFn, 250);
+
+    expect(result.pass).toBe(false);
+    expect(result.message()).toBe('never passed');
+    expect(checkFn.mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('uses default timeout when none is provided', async () => {
+    const checkFn = vi.fn().mockResolvedValue({
+      pass: true,
+      message: () => 'passed',
+    });
+
+    const result = await pollUntilPass(checkFn);
+
+    expect(result.pass).toBe(true);
   });
 });
