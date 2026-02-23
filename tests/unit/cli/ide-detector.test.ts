@@ -8,6 +8,8 @@
  *
  * @module cli
  */
+import { join } from 'node:path';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('node:fs', () => ({
@@ -156,10 +158,11 @@ describe('detectIDEs', () => {
   it('passes the correct joined path to existsSync', () => {
     mockExistsSync.mockReturnValue(false);
 
-    detectIDEs('/my/project');
+    const testProjectDir = join('/my', 'project');
+    detectIDEs(testProjectDir);
 
     const calledPaths = mockExistsSync.mock.calls.map((call) => call[0] as string);
-    expect(calledPaths.some((p) => p.includes('/my/project'))).toBe(true);
+    expect(calledPaths.some((p) => p.includes(testProjectDir))).toBe(true);
   });
 });
 

@@ -424,7 +424,6 @@ export async function confirmGoodsReceipt(
  *
  * @param ui5 - UI5 interaction handler.
  * @param ui5Nav - Navigation API.
- * @param criteria - Key/value map of filter field label → value.
  * @param options - Optional intent options.
  * @returns `IntentResult` describing the outcome.
  *
