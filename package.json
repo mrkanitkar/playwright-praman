@@ -20,7 +20,8 @@
     "CHANGELOG.md",
     "README.md",
     "DISCLAIMER.md",
-    "SECURITY.md"
+    "SECURITY.md",
+    "CONTRIBUTING.md"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
