@@ -100,6 +100,10 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dist
+          path: dist/
       - run: npm install @playwright/test@${{ matrix.playwright-version }}
       - run: npx playwright install --with-deps chromium
       - run: npm run test:integration
@@ -159,6 +163,10 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dist
+          path: dist/
       - run: npx playwright install --with-deps chromium
       - name: Run tests on Azure Playwright Workspaces
         run: npx playwright test --config=playwright.service.config.ts --workers=20
