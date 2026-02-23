@@ -1,0 +1,11 @@
+Praman (playwright-praman)
+Copyright 2024-2026 ZesTest
+
+This product was developed independently and does not contain code from
+the projects listed below. The following projects served as architectural
+references and inspiration during design:
+
+- wdi5 (https://github.com/ui5-community/wdi5)
+  Licensed under Apache License 2.0
+  Architectural patterns for SAP UI5 browser bridge design were studied
+  during Praman's independent implementation.
