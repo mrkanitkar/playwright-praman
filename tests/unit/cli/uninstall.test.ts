@@ -9,6 +9,7 @@
  * @module cli/uninstall
  */
 
+import { join } from 'node:path';
 import process from 'node:process';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -52,7 +53,7 @@ const { parseUninstallArgs, getScaffoldedFiles, runUninstall } =
   await import('../../../src/cli/uninstall.js');
 
 /** Safe non-tmp test path to avoid sonarjs/publicly-writable-directories. */
-const TEST_DIR = '/home/testuser/project';
+const TEST_DIR = join('/home', 'testuser', 'project');
 
 // ── Tests ───────────────────────────────────────────────────────────────────
 
@@ -145,8 +146,8 @@ describe('cli/uninstall', () => {
 
     it('returns entries only for files that exist on disk', () => {
       mockExistsSync.mockImplementation(
-        (path: string) =>
-          path === `${TEST_DIR}/playwright.config.ts` || path === `${TEST_DIR}/AGENTS.md`,
+        (p: string) =>
+          p === join(TEST_DIR, 'playwright.config.ts') || p === join(TEST_DIR, 'AGENTS.md'),
       );
 
       const files = getScaffoldedFiles(TEST_DIR, baseOptions);
@@ -233,8 +234,8 @@ describe('cli/uninstall', () => {
 
     it('displays grouped manifest in dry-run mode', async () => {
       mockExistsSync.mockImplementation(
-        (path: string) =>
-          path === `${TEST_DIR}/playwright.config.ts` || path === `${TEST_DIR}/AGENTS.md`,
+        (p: string) =>
+          p === join(TEST_DIR, 'playwright.config.ts') || p === join(TEST_DIR, 'AGENTS.md'),
       );
 
       await runUninstall({
@@ -279,7 +280,7 @@ describe('cli/uninstall', () => {
 
     it('deletes files when confirm is true', async () => {
       mockExistsSync.mockImplementation(
-        (path: string) => path === `${TEST_DIR}/playwright.config.ts`,
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
 
       await runUninstall({
@@ -290,13 +291,13 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
-      expect(mockUnlink).toHaveBeenCalledWith(`${TEST_DIR}/playwright.config.ts`);
+      expect(mockUnlink).toHaveBeenCalledWith(join(TEST_DIR, 'playwright.config.ts'));
     });
 
     it('logs success with count after confirmed removal', async () => {
       mockExistsSync.mockImplementation(
-        (path: string) =>
-          path === `${TEST_DIR}/playwright.config.ts` || path === `${TEST_DIR}/AGENTS.md`,
+        (p: string) =>
+          p === join(TEST_DIR, 'playwright.config.ts') || p === join(TEST_DIR, 'AGENTS.md'),
       );
 
       await runUninstall({
@@ -312,7 +313,7 @@ describe('cli/uninstall', () => {
 
     it('handles unlink errors gracefully', async () => {
       mockExistsSync.mockImplementation(
-        (path: string) => path === `${TEST_DIR}/playwright.config.ts`,
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
       mockUnlink.mockRejectedValueOnce(new Error('EACCES'));
 
@@ -331,7 +332,7 @@ describe('cli/uninstall', () => {
 
     it('cleans empty directories after file removal', async () => {
       mockExistsSync.mockImplementation(
-        (path: string) => path === `${TEST_DIR}/.vscode/extensions.json`,
+        (p: string) => p === join(TEST_DIR, '.vscode', 'extensions.json'),
       );
       mockReaddir.mockResolvedValue([]);
 
@@ -343,11 +344,11 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
-      expect(mockRmdir).toHaveBeenCalledWith(`${TEST_DIR}/.vscode`);
+      expect(mockRmdir).toHaveBeenCalledWith(join(TEST_DIR, '.vscode'));
     });
 
     it('does not remove targetDir itself even if empty', async () => {
-      mockExistsSync.mockImplementation((path: string) => path === `${TEST_DIR}/AGENTS.md`);
+      mockExistsSync.mockImplementation((p: string) => p === join(TEST_DIR, 'AGENTS.md'));
       mockReaddir.mockResolvedValue([]);
 
       await runUninstall({
@@ -364,7 +365,7 @@ describe('cli/uninstall', () => {
 
     it('calls execSync for browser removal when removeBrowsers is true', async () => {
       mockExistsSync.mockImplementation(
-        (path: string) => path === `${TEST_DIR}/playwright.config.ts`,
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
 
       await runUninstall({
@@ -383,7 +384,7 @@ describe('cli/uninstall', () => {
 
     it('handles browser removal failure gracefully', async () => {
       mockExistsSync.mockImplementation(
-        (path: string) => path === `${TEST_DIR}/playwright.config.ts`,
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
       mockExecSync.mockImplementation(() => {
         throw new Error('Command failed');
@@ -404,7 +405,7 @@ describe('cli/uninstall', () => {
 
     it('does not call execSync when removeBrowsers is false', async () => {
       mockExistsSync.mockImplementation(
-        (path: string) => path === `${TEST_DIR}/playwright.config.ts`,
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
 
       await runUninstall({

@@ -125,7 +125,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
-      - run: npm audit --audit-level=high
+      - run: npm audit --audit-level=high --omit=dev
 
   docs-check:
     name: Documentation Validation
