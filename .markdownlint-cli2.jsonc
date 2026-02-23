@@ -12,6 +12,7 @@
     "docs/mcp-sap-docs-setup.md",
     "docs/docs/**",
     "temp/**",
-    "node_modules/"
+    "node_modules/",
+    "CODE_OF_CONDUCT.md"
   ]
 }
