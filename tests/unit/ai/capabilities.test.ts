@@ -90,4 +90,43 @@ describe('capabilities singleton', () => {
     expect(capabilities.findByName('testSingleton')).toBeDefined();
     expect(capabilities.listFixtures().some((e) => e.id === 'test-singleton-entry')).toBe(true);
   });
+
+  it('exposes forControl() method that searches by control type', () => {
+    expect(typeof capabilities.forControl).toBe('function');
+    const result = capabilities.forControl('sap.m.Button');
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('exposes describe() method that returns description or undefined', () => {
+    expect(typeof capabilities.describe).toBe('function');
+    expect(capabilities.describe('nonExistent')).toBeUndefined();
+    expect(capabilities.describe('testSingleton')).toBe('Test entry for singleton verification');
+  });
+
+  it('exposes getCategories() method returning category names', () => {
+    expect(typeof capabilities.getCategories).toBe('function');
+    const cats = capabilities.getCategories();
+    expect(Array.isArray(cats)).toBe(true);
+    expect(cats.length).toBeGreaterThan(0);
+  });
+
+  it('exposes byCategory() method returning entries for a category', () => {
+    expect(typeof capabilities.byCategory).toBe('function');
+    const result = capabilities.byCategory('test');
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.some((e) => e.id === 'test-singleton-entry')).toBe(true);
+  });
+
+  it('exposes get() method that looks up by id', () => {
+    expect(typeof capabilities.get).toBe('function');
+    expect(capabilities.get('test-singleton-entry')).toBeDefined();
+    expect(capabilities.get('nonexistent-id')).toBeUndefined();
+  });
+
+  it('exposes forProvider() method returning formatted string', () => {
+    expect(typeof capabilities.forProvider).toBe('function');
+    const result = capabilities.forProvider('claude');
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
 });
