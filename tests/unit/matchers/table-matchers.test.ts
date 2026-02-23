@@ -83,7 +83,7 @@ describe('checkUI5RowCount', () => {
       ),
     } as unknown as Page;
 
-    const result = await checkUI5RowCount(page, 'table1', 5);
+    const result = await checkUI5RowCount(page, 'table1', 5, { timeout: 0 });
 
     expect(result.pass).toBe(false);
     const message = result.message();
@@ -157,7 +157,7 @@ describe('checkUI5CellText', () => {
         .mockResolvedValueOnce(textResult),
     } as unknown as Page;
 
-    const result = await checkUI5CellText(page, 'table1', 0, 0, 'Hello');
+    const result = await checkUI5CellText(page, 'table1', 0, 0, 'Hello', { timeout: 0 });
 
     expect(result.pass).toBe(false);
   });
@@ -191,7 +191,7 @@ describe('checkUI5CellText', () => {
       evaluate: vi.fn().mockResolvedValue(rowsResult),
     } as unknown as Page;
 
-    const result = await checkUI5CellText(page, 'table1', 5, 0, 'text');
+    const result = await checkUI5CellText(page, 'table1', 5, 0, 'text', { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('row 5 does not exist');
@@ -209,7 +209,7 @@ describe('checkUI5CellText', () => {
       evaluate: vi.fn().mockResolvedValueOnce(rowsResult).mockResolvedValueOnce(cellsResult),
     } as unknown as Page;
 
-    const result = await checkUI5CellText(page, 'table1', 0, 5, 'text');
+    const result = await checkUI5CellText(page, 'table1', 0, 5, 'text', { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('column 5 does not exist');
@@ -255,7 +255,7 @@ describe('checkUI5SelectedRows', () => {
       evaluate: vi.fn().mockResolvedValue(createPropertyResult(['item1'])),
     } as unknown as Page;
 
-    const result = await checkUI5SelectedRows(page, 'table1', 3);
+    const result = await checkUI5SelectedRows(page, 'table1', 3, { timeout: 0 });
 
     expect(result.pass).toBe(false);
     const message = result.message();
@@ -268,7 +268,7 @@ describe('checkUI5SelectedRows', () => {
       evaluate: vi.fn().mockResolvedValue(createPropertyResult('not-an-array')),
     } as unknown as Page;
 
-    const result = await checkUI5SelectedRows(page, 'table1', 2);
+    const result = await checkUI5SelectedRows(page, 'table1', 2, { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('not an array');

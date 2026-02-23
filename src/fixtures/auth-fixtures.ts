@@ -133,7 +133,7 @@ export const authTest = base.extend<AuthFixtures & AuthFixtureOptions, AuthDeps>
 
   sapAuthConfig: [{ url: '', username: '', password: '' }, { option: true }],
 
-  sapAuth: async ({ sapAuthConfig }, use) => {
+  sapAuth: async ({ sapAuthConfig, page }, use) => {
     const strategy = createAuthStrategy(sapAuthConfig);
     const handler = new SAPAuthHandler({
       strategy,
@@ -142,6 +142,10 @@ export const authTest = base.extend<AuthFixtures & AuthFixtureOptions, AuthDeps>
 
     // NOTE: No auto-login — relies on setup project (D28 pattern)
     await use(handler);
-    // NOTE: No auto-logout — session managed by setup project
+
+    // Teardown: server-side logout to avoid dangling sessions (BF-009)
+    if (handler.getSessionInfo() !== null) {
+      await handler.logout(page);
+    }
   },
 });

@@ -112,7 +112,7 @@ function normalize(text: string): string {
   return text
     .toLowerCase()
     .trim()
-    .replaceAll(/[/\-_.]/g, ' ')
+    .replaceAll(/[/\\\-_.:]/g, '')
     .replaceAll(/ {2,}/g, ' ')
     .trim();
 }

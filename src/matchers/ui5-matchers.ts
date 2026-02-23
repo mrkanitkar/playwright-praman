@@ -26,8 +26,13 @@
 
 import type { Page } from '@playwright/test';
 
-import { getControlProperty, getUI5BindingInfo, getUI5ControlType } from './matcher-utils.js';
-import type { MatcherPage } from './matcher-utils.js';
+import {
+  getControlProperty,
+  getUI5BindingInfo,
+  getUI5ControlType,
+  pollUntilPass,
+} from './matcher-utils.js';
+import type { MatcherPage, PollableMatcherResult } from './matcher-utils.js';
 
 /**
  * Result of a matcher check.
@@ -84,21 +89,25 @@ export async function checkUI5Text(
   page: Page,
   controlId: string,
   expected: string | RegExp,
+  options?: MatcherOptions,
 ): Promise<MatcherResult> {
-  const actual = await getControlProperty(page, controlId, 'text');
-  const actualString = String(actual);
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const actual = await getControlProperty(page, controlId, 'text');
+    const actualString = String(actual);
 
-  const pass = expected instanceof RegExp ? expected.test(actualString) : actualString === expected;
+    const pass =
+      expected instanceof RegExp ? expected.test(actualString) : actualString === expected;
 
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected control '${controlId}' text not to match '${String(expected)}', but got '${actualString}'`
-        : `Expected control '${controlId}' text to match '${String(expected)}', but got '${actualString}'`,
-    actual: actualString,
-    expected,
-  };
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected control '${controlId}' text not to match '${String(expected)}', but got '${actualString}'`
+          : `Expected control '${controlId}' text to match '${String(expected)}', but got '${actualString}'`,
+      actual: actualString,
+      expected,
+    };
+  }, options?.timeout);
 }
 
 /**
@@ -118,19 +127,25 @@ export async function checkUI5Text(
  * expect(result.pass).toBe(true);
  * ```
  */
-export async function checkUI5Visible(page: Page, controlId: string): Promise<MatcherResult> {
-  const actual = await getControlProperty(page, controlId, 'visible');
-  const pass = actual === true;
+export async function checkUI5Visible(
+  page: Page,
+  controlId: string,
+  options?: MatcherOptions,
+): Promise<MatcherResult> {
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const actual = await getControlProperty(page, controlId, 'visible');
+    const pass = actual === true;
 
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected control '${controlId}' not to be visible, but it was`
-        : `Expected control '${controlId}' to be visible, but it was not`,
-    actual,
-    expected: true,
-  };
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected control '${controlId}' not to be visible, but it was`
+          : `Expected control '${controlId}' to be visible, but it was not`,
+      actual,
+      expected: true,
+    };
+  }, options?.timeout);
 }
 
 /**
@@ -150,19 +165,25 @@ export async function checkUI5Visible(page: Page, controlId: string): Promise<Ma
  * expect(result.pass).toBe(true);
  * ```
  */
-export async function checkUI5Enabled(page: Page, controlId: string): Promise<MatcherResult> {
-  const actual = await getControlProperty(page, controlId, 'enabled');
-  const pass = actual === true;
+export async function checkUI5Enabled(
+  page: Page,
+  controlId: string,
+  options?: MatcherOptions,
+): Promise<MatcherResult> {
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const actual = await getControlProperty(page, controlId, 'enabled');
+    const pass = actual === true;
 
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected control '${controlId}' not to be enabled, but it was`
-        : `Expected control '${controlId}' to be enabled, but it was not`,
-    actual,
-    expected: true,
-  };
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected control '${controlId}' not to be enabled, but it was`
+          : `Expected control '${controlId}' to be enabled, but it was not`,
+      actual,
+      expected: true,
+    };
+  }, options?.timeout);
 }
 
 /**
@@ -189,20 +210,23 @@ export async function checkUI5Property(
   controlId: string,
   propertyName: string,
   expected: unknown,
+  options?: MatcherOptions,
 ): Promise<MatcherResult> {
-  const actual = await getControlProperty(page, controlId, propertyName);
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const actual = await getControlProperty(page, controlId, propertyName);
 
-  const pass = isDeepEqual(actual, expected);
+    const pass = isDeepEqual(actual, expected);
 
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected control '${controlId}' property '${propertyName}' not to equal ${JSON.stringify(expected)}, but it did`
-        : `Expected control '${controlId}' property '${propertyName}' to equal ${JSON.stringify(expected)}, but got ${JSON.stringify(actual)}`,
-    actual,
-    expected,
-  };
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected control '${controlId}' property '${propertyName}' not to equal ${JSON.stringify(expected)}, but it did`
+          : `Expected control '${controlId}' property '${propertyName}' to equal ${JSON.stringify(expected)}, but got ${JSON.stringify(actual)}`,
+      actual,
+      expected,
+    };
+  }, options?.timeout);
 }
 
 /**
@@ -226,20 +250,23 @@ export async function checkUI5ValueState(
   page: Page,
   controlId: string,
   expected: string,
+  options?: MatcherOptions,
 ): Promise<MatcherResult> {
-  const actual = await getControlProperty(page, controlId, 'valueState');
-  const actualString = String(actual);
-  const pass = actualString === expected;
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const actual = await getControlProperty(page, controlId, 'valueState');
+    const actualString = String(actual);
+    const pass = actualString === expected;
 
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected control '${controlId}' valueState not to be '${expected}', but it was`
-        : `Expected control '${controlId}' valueState to be '${expected}', but got '${actualString}'`,
-    actual: actualString,
-    expected,
-  };
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected control '${controlId}' valueState not to be '${expected}', but it was`
+          : `Expected control '${controlId}' valueState to be '${expected}', but got '${actualString}'`,
+      actual: actualString,
+      expected,
+    };
+  }, options?.timeout);
 }
 
 /**
@@ -266,38 +293,41 @@ export async function checkUI5Binding(
   controlId: string,
   propertyName: string,
   expectedPath?: string,
+  options?: MatcherOptions,
 ): Promise<MatcherResult> {
-  const info = await getUI5BindingInfo(page as MatcherPage, controlId, propertyName);
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const info = await getUI5BindingInfo(page as MatcherPage, controlId, propertyName);
 
-  if (info === null) {
+    if (info === null) {
+      return {
+        pass: false,
+        message: () =>
+          `Expected control '${controlId}' to have a binding on property '${propertyName}', but no binding found`,
+        actual: null,
+        expected: expectedPath ?? 'any binding',
+      };
+    }
+
+    if (expectedPath !== undefined && info.path !== expectedPath) {
+      return {
+        pass: false,
+        message: () =>
+          `Expected control '${controlId}' binding path to be '${expectedPath}', but got '${info.path}'`,
+        actual: info.path,
+        expected: expectedPath,
+      };
+    }
+
     return {
-      pass: false,
+      pass: true,
       message: () =>
-        `Expected control '${controlId}' to have a binding on property '${propertyName}', but no binding found`,
-      actual: null,
+        expectedPath !== undefined
+          ? `Expected control '${controlId}' binding path not to be '${expectedPath}', but it was`
+          : `Expected control '${controlId}' not to have a binding on property '${propertyName}', but it does`,
+      actual: info.path,
       expected: expectedPath ?? 'any binding',
     };
-  }
-
-  if (expectedPath !== undefined && info.path !== expectedPath) {
-    return {
-      pass: false,
-      message: () =>
-        `Expected control '${controlId}' binding path to be '${expectedPath}', but got '${info.path}'`,
-      actual: info.path,
-      expected: expectedPath,
-    };
-  }
-
-  return {
-    pass: true,
-    message: () =>
-      expectedPath !== undefined
-        ? `Expected control '${controlId}' binding path not to be '${expectedPath}', but it was`
-        : `Expected control '${controlId}' not to have a binding on property '${propertyName}', but it does`,
-    actual: info.path,
-    expected: expectedPath ?? 'any binding',
-  };
+  }, options?.timeout);
 }
 
 /**
@@ -322,30 +352,33 @@ export async function checkUI5ControlType(
   page: Page,
   controlId: string,
   expected: string,
+  options?: MatcherOptions,
 ): Promise<MatcherResult> {
-  const actual = await getUI5ControlType(page as MatcherPage, controlId);
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const actual = await getUI5ControlType(page as MatcherPage, controlId);
 
-  if (actual === null) {
+    if (actual === null) {
+      return {
+        pass: false,
+        message: () =>
+          `Expected control '${controlId}' to be of type '${expected}', but control was not found`,
+        actual: null,
+        expected,
+      };
+    }
+
+    const pass = actual === expected;
+
     return {
-      pass: false,
+      pass,
       message: () =>
-        `Expected control '${controlId}' to be of type '${expected}', but control was not found`,
-      actual: null,
+        pass
+          ? `Expected control '${controlId}' not to be of type '${expected}', but it was`
+          : `Expected control '${controlId}' to be of type '${expected}', but got '${actual}'`,
+      actual,
       expected,
     };
-  }
-
-  const pass = actual === expected;
-
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected control '${controlId}' not to be of type '${expected}', but it was`
-        : `Expected control '${controlId}' to be of type '${expected}', but got '${actual}'`,
-    actual,
-    expected,
-  };
+  }, options?.timeout);
 }
 
 /**

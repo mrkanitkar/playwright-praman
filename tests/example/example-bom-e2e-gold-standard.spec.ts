@@ -62,7 +62,6 @@
  * Playwright Native (ONLY Tab key - user permitted):
  *   - page.keyboard.press('Tab'): Form field navigation
  *   - page.keyboard.press('Space'): Row selection in value help
- *   - page.waitForTimeout(): Timing synchronization
  *   - page.goto(): Initial navigation
  *   - page.waitForLoadState(): Page load verification
  *   - expect(page).toHaveTitle(): FLP verification
@@ -102,7 +101,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Navigate to SAP (already authenticated via global setup)
       await page.goto(process.env.SAP_CLOUD_BASE_URL!);
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(3000);
+      await new Promise<void>((resolve) => setTimeout(resolve, 3000));
 
       // Verify FLP Home loaded
       await expect(page).toHaveTitle(/Home/);
@@ -113,7 +112,7 @@ test.describe('BOM End-to-End Flow', () => {
         properties: { text: 'Bills Of Material' },
       });
       await bomTab.press();
-      await page.waitForTimeout(3000);
+      await ui5.waitForUI5();
 
       // Click Maintain Bill Of Material tile
       const maintainBOMTile = await ui5.control({
@@ -124,7 +123,7 @@ test.describe('BOM End-to-End Flow', () => {
 
       // Wait for app to load - DON'T use networkidle (SAP has continuous polling)
       // Instead, wait for a specific element that indicates app is loaded
-      await page.waitForTimeout(5000); // Initial settle time
+      await new Promise<void>((resolve) => setTimeout(resolve, 5000)); // Initial settle time
 
       // Wait for Create BOM button to appear (proves app loaded)
       const createBtn = await ui5.control(
@@ -137,7 +136,6 @@ test.describe('BOM End-to-End Flow', () => {
 
       const btnText = await createBtn.getProperty('text');
       expect(btnText).toBe('Create BOM');
-      console.log('✅ Step 1: Navigate to BOM Maintenance App - PASSED');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -150,25 +148,32 @@ test.describe('BOM End-to-End Flow', () => {
         properties: { text: 'Create BOM' },
       });
       await createBtn.press();
-      await page.waitForTimeout(2000);
+      await ui5.waitForUI5();
 
       // Verify dialog opened using UI5 - check if Material SmartField is visible
       // This proves the dialog opened since this field is inside the dialog
       const materialField = await ui5.control({ id: 'createBOMFragment--material' });
       const materialType = await materialField.getControlType();
-      console.log(`Material field type: ${materialType}`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: `Material field type: ${materialType}` });
       expect(materialType).toBe('sap.ui.comp.smartfield.SmartField');
 
       // Verify dialog is open via UI5 by checking Cancel button exists and is enabled
       const cancelDialogBtn = await ui5.control({ id: 'createBOMFragment--CancelBtn' });
       const cancelBtnEnabled = await cancelDialogBtn.getProperty('enabled');
-      console.log(`Cancel button enabled (dialog open): ${cancelBtnEnabled}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Cancel button enabled (dialog open): ${cancelBtnEnabled}`,
+      });
       expect(cancelBtnEnabled).toBe(true);
 
       // Verify BOM Usage SmartField exists (variantUsage)
       const bomUsageField = await ui5.control({ id: 'createBOMFragment--variantUsage' });
       const bomUsageType = await bomUsageField.getControlType();
-      console.log(`BOM Usage field type: ${bomUsageType}`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: `BOM Usage field type: ${bomUsageType}` });
       expect(bomUsageType).toBe('sap.ui.comp.smartfield.SmartField');
 
       // Verify Create and Cancel buttons exist
@@ -177,8 +182,6 @@ test.describe('BOM End-to-End Flow', () => {
       const cancelBtnText = await cancelDialogBtn.getProperty('text');
       expect(createBtnText).toBe('Create');
       expect(cancelBtnText).toBe('Cancel');
-
-      console.log('✅ Step 2: Open Create BOM Dialog - PASSED (100% UI5 methods)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -188,7 +191,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Open Material value help using UI5 control
       const materialVHIcon = await ui5.control({ id: 'createBOMFragment--material-input-vhi' });
       await materialVHIcon.press();
-      await page.waitForTimeout(3000);
+      await new Promise<void>((resolve) => setTimeout(resolve, 3000));
 
       // P2D Phase 2: Migrated from page.evaluate - use dhikraft proxy for dialog
       const materialDialog = await ui5.control({
@@ -199,7 +202,7 @@ test.describe('BOM End-to-End Flow', () => {
 
       // P2D Phase 7a: Migrated row count to dhikraft proxy
       // UI5ControlProxy handles 'aggregation' return type automatically - getRows() returns array of proxies
-      await page.waitForTimeout(3000); // Wait for data to load
+      await new Promise<void>((resolve) => setTimeout(resolve, 3000)); // Wait for data to load
       const smartTable = await ui5.control({
         id: 'createBOMFragment--material-input-valueHelpDialog-table',
       });
@@ -217,13 +220,15 @@ test.describe('BOM End-to-End Flow', () => {
         if (ctx) rowCount++;
       }
 
-      console.log(`Found ${rowCount} materials in value help (100% dhikraft proxy)`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Found ${rowCount} materials in value help`,
+      });
       expect(rowCount).toBeGreaterThan(0);
 
       // P2D Phase 2: Migrated from page.evaluate - use dhikraft proxy close()
       await materialDialog.close();
-      await page.waitForTimeout(1000);
-      console.log('✅ Step 3: Test Material Value Help - PASSED (dhikraft proxy for dialog)');
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -233,7 +238,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Open Plant value help using UI5 control
       const plantVHIcon = await ui5.control({ id: 'createBOMFragment--plant-input-vhi' });
       await plantVHIcon.press();
-      await page.waitForTimeout(3000);
+      await new Promise<void>((resolve) => setTimeout(resolve, 3000));
 
       // P2D Phase 3: Migrated from page.evaluate - use dhikraft proxy for dialog
       const plantDialog = await ui5.control({
@@ -244,7 +249,7 @@ test.describe('BOM End-to-End Flow', () => {
 
       // P2D Phase 7b: Migrated row count to dhikraft proxy (same pattern as Phase 7a Material)
       // UI5ControlProxy handles 'aggregation' return type automatically - getRows() returns array of proxies
-      await page.waitForTimeout(3000); // Wait for data to load
+      await new Promise<void>((resolve) => setTimeout(resolve, 3000)); // Wait for data to load
       const plantSmartTable = await ui5.control({
         id: 'createBOMFragment--plant-input-valueHelpDialog-table',
       });
@@ -262,13 +267,14 @@ test.describe('BOM End-to-End Flow', () => {
         if (ctx) rowCount++;
       }
 
-      console.log(`Found ${rowCount} plants in value help (100% dhikraft proxy)`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: `Found ${rowCount} plants in value help` });
       expect(rowCount).toBeGreaterThan(0);
 
       // P2D Phase 3: Migrated from page.evaluate - use dhikraft proxy close()
       await plantDialog.close();
-      await page.waitForTimeout(1000);
-      console.log('✅ Step 4: Test Plant Value Help - PASSED (dhikraft proxy for dialog)');
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -295,31 +301,29 @@ test.describe('BOM End-to-End Flow', () => {
         }
       }
 
-      console.log(`Found ${items.length} BOM usage types via dhikraft proxy getItems():`);
-      items.forEach((item: { key: string; text: string }) =>
-        console.log(`  - ${item.key}: ${item.text}`),
-      );
+      test.info().annotations.push({
+        type: 'info',
+        description: `Found ${items.length} BOM usage types: ${items.map((item: { key: string; text: string }) => `${item.key}: ${item.text}`).join(', ')}`,
+      });
       expect(items.length).toBeGreaterThan(0);
 
       // P2D: Migrated from page.evaluate - use dhikraft proxy open()
       await bomUsageCombo.open();
-      await page.waitForTimeout(1000);
+      await ui5.waitForUI5();
 
       // P2D: Migrated from page.evaluate - use dhikraft proxy isOpen()
       const isOpen = await bomUsageCombo.isOpen();
-      console.log(`Dropdown isOpen (via dhikraft proxy): ${isOpen}`);
+      test.info().annotations.push({ type: 'info', description: `Dropdown isOpen: ${isOpen}` });
       expect(isOpen).toBe(true);
 
       // P2D: Migrated from page.evaluate - use dhikraft proxy close()
       await bomUsageCombo.close();
-      await page.waitForTimeout(500);
+      await ui5.waitForUI5();
 
       // P2D: Migrated from page.evaluate - use dhikraft proxy isOpen() for close check
       const isOpenAfterClose = await bomUsageCombo.isOpen();
       const isClosed = !isOpenAfterClose;
       expect(isClosed).toBe(true);
-
-      console.log('✅ Step 5: Test BOM Usage Dropdown - PASSED (dhikraft proxy)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -330,7 +334,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Open Material value help to select a valid material
       const materialVHIcon = await ui5.control({ id: 'createBOMFragment--material-input-vhi' });
       await materialVHIcon.press();
-      await page.waitForTimeout(4000); // Wait for data to load
+      await new Promise<void>((resolve) => setTimeout(resolve, 4000)); // Wait for data to load
 
       // P2D Phase 4: Migrated from page.evaluate Promise/setTimeout to simple wait + dhikraft check
       // Wait for dialog and verify it's open
@@ -348,9 +352,12 @@ test.describe('BOM End-to-End Flow', () => {
         } catch (e) {
           // Dialog not ready yet
         }
-        await page.waitForTimeout(500);
+        await new Promise<void>((resolve) => setTimeout(resolve, 500));
       }
-      console.log(`Material dialog ready: ${materialDialogReady}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Material dialog ready: ${materialDialogReady}`,
+      });
 
       // P2D Phase 7c: Migrated material value extraction to dhikraft proxy
       // Get first material value using dhikraft proxy (SmartTable -> innerTable -> getContextByIndex)
@@ -372,29 +379,33 @@ test.describe('BOM End-to-End Flow', () => {
           materialValue = { success: true, material: dataObjMat.Material };
         }
       }
-      console.log(
-        `Material value retrieved (100% dhikraft proxy): ${JSON.stringify(materialValue)}`,
-      );
+      test.info().annotations.push({
+        type: 'info',
+        description: `Material value retrieved: ${JSON.stringify(materialValue)}`,
+      });
 
       // P2D Phase 4: Migrated dialog close and setValue to dhikraft proxy
       if (materialValue.success && materialValue.material) {
         // Close dialog using dhikraft proxy
         await materialDialogControl.close();
-        await page.waitForTimeout(500);
+        await ui5.waitForUI5();
 
         // Set material value using dhikraft proxy
         const materialInput = await ui5.control({ id: 'createBOMFragment--material-input' });
         await materialInput.setValue(materialValue.material);
         await materialInput.fireChange({ value: materialValue.material });
-        await page.waitForTimeout(500);
-        console.log(`✅ Material set to: ${materialValue.material}`);
+        await ui5.waitForUI5();
+        test.info().annotations.push({
+          type: 'info',
+          description: `Material set to: ${materialValue.material}`,
+        });
       }
 
       // === FILL PLANT ===
       // Open Plant value help to select a valid plant
       const plantVHIcon = await ui5.control({ id: 'createBOMFragment--plant-input-vhi' });
       await plantVHIcon.press();
-      await page.waitForTimeout(4000); // Wait for data to load
+      await new Promise<void>((resolve) => setTimeout(resolve, 4000)); // Wait for data to load
 
       // P2D Phase 4: Migrated from page.evaluate Promise/setTimeout to simple wait + dhikraft check
       const plantDialogControl = await ui5.control({
@@ -411,9 +422,11 @@ test.describe('BOM End-to-End Flow', () => {
         } catch (e) {
           /* dialog not ready yet */
         }
-        await page.waitForTimeout(500);
+        await new Promise<void>((resolve) => setTimeout(resolve, 500));
       }
-      console.log(`Plant dialog ready: ${plantDialogReady}`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: `Plant dialog ready: ${plantDialogReady}` });
 
       // P2D Phase 7d: Migrated plant value extraction to dhikraft proxy
       // Get first plant value using dhikraft proxy (SmartTable -> innerTable -> getContextByIndex)
@@ -435,20 +448,25 @@ test.describe('BOM End-to-End Flow', () => {
           plantValue = { success: true, plant: dataObjPlant.Plant };
         }
       }
-      console.log(`Plant value retrieved (100% dhikraft proxy): ${JSON.stringify(plantValue)}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Plant value retrieved: ${JSON.stringify(plantValue)}`,
+      });
 
       // Close dialog and set value directly (workaround for selection plugin blocking)
       // P2D Phase 4: Migrated dialog close and setValue to dhikraft proxy
       if (plantValue.success && plantValue.plant) {
         await plantDialogControl.close();
-        await page.waitForTimeout(500);
+        await ui5.waitForUI5();
 
         // Set plant value using dhikraft proxy
         const plantInput = await ui5.control({ id: 'createBOMFragment--plant-input' });
         await plantInput.setValue(plantValue.plant);
         await plantInput.fireChange({ value: plantValue.plant });
-        await page.waitForTimeout(500);
-        console.log(`✅ Plant set to: ${plantValue.plant}`);
+        await ui5.waitForUI5();
+        test
+          .info()
+          .annotations.push({ type: 'info', description: `Plant set to: ${plantValue.plant}` });
       }
 
       // === FILL BOM USAGE ===
@@ -459,7 +477,7 @@ test.describe('BOM End-to-End Flow', () => {
 
       // Open dropdown first to ensure items are loaded
       await bomUsageControl.open();
-      await page.waitForTimeout(500);
+      await ui5.waitForUI5();
 
       // Set selected key using dhikraft proxy
       await bomUsageControl.setSelectedKey('1'); // Select "1 (Production)"
@@ -470,8 +488,10 @@ test.describe('BOM End-to-End Flow', () => {
       // Close dropdown
       await bomUsageControl.close();
 
-      console.log(`BOM Usage set to: 1 (Production)`);
-      await page.waitForTimeout(1000); // Wait for dropdown operations to complete
+      test
+        .info()
+        .annotations.push({ type: 'info', description: 'BOM Usage set to: 1 (Production)' });
+      await ui5.waitForUI5();
 
       // P2D Phase 5: Verify the value was actually set using dhikraft proxy
       const selectedKey = await bomUsageControl.getSelectedKey();
@@ -485,7 +505,10 @@ test.describe('BOM End-to-End Flow', () => {
         smartFieldValue: smartFieldValue || '',
       };
 
-      console.log(`BOM Usage verification: ${JSON.stringify(verifyBomUsage)}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `BOM Usage verification: ${JSON.stringify(verifyBomUsage)}`,
+      });
       expect(verifyBomUsage.comboBoxKey).toBe('1');
 
       // === VERIFY ALL VALUES BEFORE PROCEEDING ===
@@ -505,22 +528,14 @@ test.describe('BOM End-to-End Flow', () => {
         createBtnVisible: (await createBtnCtrl.getVisible()) || false, // Now works - dhikraft blacklist fixed
       };
 
-      console.log('═══════════════════════════════════════════════════════════════');
-      console.log('Form Values Final Verification (UI5):');
-      console.log(
-        `  Material: ${finalVerification.materialValue} (Expected: ${materialValue.material})`,
-      );
-      console.log(`  Plant: ${finalVerification.plantValue} (Expected: ${plantValue.plant})`);
-      console.log(`  BOM Usage: ${finalVerification.bomUsageKey} (Expected: 1)`);
-      console.log(`  Create Button Enabled: ${finalVerification.createBtnEnabled}`);
-      console.log(`  Create Button Visible: ${finalVerification.createBtnVisible}`);
-      console.log('═══════════════════════════════════════════════════════════════');
+      test.info().annotations.push({
+        type: 'info',
+        description: `Form Values Final Verification — Material: ${finalVerification.materialValue} (Expected: ${materialValue.material}), Plant: ${finalVerification.plantValue} (Expected: ${plantValue.plant}), BOM Usage: ${finalVerification.bomUsageKey} (Expected: 1), Create Button Enabled: ${finalVerification.createBtnEnabled}, Create Button Visible: ${finalVerification.createBtnVisible}`,
+      });
 
       expect(finalVerification.materialValue).toBe(materialValue.material);
       expect(finalVerification.plantValue).toBe(plantValue.plant);
       expect(finalVerification.bomUsageKey).toBe('1');
-
-      console.log('✅ Step 6: Fill Form with Valid Data - PASSED (100% UI5 methods)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -532,14 +547,15 @@ test.describe('BOM End-to-End Flow', () => {
       const createBtnText = await createBtn.getProperty('text');
       const createBtnEnabled = await createBtn.getProperty('enabled');
 
-      console.log(`Create Button Status: Text="${createBtnText}", Enabled=${createBtnEnabled}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Create Button Status: Text="${createBtnText}", Enabled=${createBtnEnabled}`,
+      });
       expect(createBtnText).toBe('Create');
       expect(createBtnEnabled).toBe(true);
 
-      console.log('🔥 Clicking Create button...');
       await createBtn.press();
-      await page.waitForTimeout(3000);
-      console.log('✅ Create button clicked');
+      await new Promise<void>((resolve) => setTimeout(resolve, 3000));
 
       // P2D Phase 6: Check for validation using dhikraft proxy where possible
       // Check if dialog is still open by checking if OkBtn still exists
@@ -614,32 +630,33 @@ test.describe('BOM End-to-End Flow', () => {
         }
       } catch (e) {
         // Message checks failed - continue with defaults
-        console.log('Message popover/box check via dhikraft proxy failed (expected if none exist)');
+        // Message popover/box check failed (expected if none exist)
       }
 
       const validationResult = { ...messageChecks, dialogStillOpen, fieldValues };
-      console.log(`Validation result: ${JSON.stringify(validationResult)}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Validation result: ${JSON.stringify(validationResult)}`,
+      });
 
       // If dialog is still open, there ARE validation errors - this is a FAILURE
       if (validationResult.dialogStillOpen) {
-        console.log('❌ ERROR: Dialog still open after Create click - validation failed!');
-        console.log(`Field values: ${JSON.stringify(validationResult.fieldValues)}`);
-        console.log(`Error messages: ${JSON.stringify(validationResult.errorMessages)}`);
+        test.info().annotations.push({
+          type: 'error',
+          description: `Dialog still open after Create click — validation failed! Field values: ${JSON.stringify(validationResult.fieldValues)}, Error messages: ${JSON.stringify(validationResult.errorMessages)}`,
+        });
 
         // Take screenshot for debugging
         await page.screenshot({ path: 'bom-create-validation-error.png', fullPage: true });
-        console.log('Screenshot saved: bom-create-validation-error.png');
 
         // Click Cancel to close dialog cleanly
         const cancelBtn = await ui5.control({ id: 'createBOMFragment--CancelBtn' });
         await cancelBtn.press();
-        await page.waitForTimeout(1000);
+        await ui5.waitForUI5();
 
         // This should fail the test
         expect(validationResult.dialogStillOpen).toBe(false);
       }
-
-      console.log('✅ Step 7: Click Create Button - PASSED (100% UI5 methods)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -657,14 +674,6 @@ test.describe('BOM End-to-End Flow', () => {
       // Additional verification - check button is enabled (proves we're on list view)
       const btnEnabled = await createBtn.getProperty('enabled');
       expect(btnEnabled).toBe(true);
-
-      console.log('✅ Step 8: Verify Return to BOM List - PASSED (100% UI5 methods)');
-      console.log('');
-      console.log('═══════════════════════════════════════════════════════════════');
-      console.log('✅ BOM End-to-End flow completed successfully!');
-      console.log('   All 8 steps passed in ONE browser session');
-      console.log('   100% UI5 methods (no Playwright native DOM except Tab key)');
-      console.log('═══════════════════════════════════════════════════════════════');
     });
   });
 });

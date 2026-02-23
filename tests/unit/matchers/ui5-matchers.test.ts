@@ -65,7 +65,7 @@ describe('checkUI5Text', () => {
   it('fails with string mismatch', async () => {
     const page = createMockPage('Cancel');
 
-    const result = await checkUI5Text(page, 'btn1', 'Save');
+    const result = await checkUI5Text(page, 'btn1', 'Save', { timeout: 0 });
 
     expect(result.pass).toBe(false);
   });
@@ -81,7 +81,7 @@ describe('checkUI5Text', () => {
   it('fails with RegExp mismatch', async () => {
     const page = createMockPage('Cancel');
 
-    const result = await checkUI5Text(page, 'btn1', /Save/);
+    const result = await checkUI5Text(page, 'btn1', /Save/, { timeout: 0 });
 
     expect(result.pass).toBe(false);
   });
@@ -89,7 +89,7 @@ describe('checkUI5Text', () => {
   it('fail message includes actual and expected values', async () => {
     const page = createMockPage('Cancel');
 
-    const result = await checkUI5Text(page, 'btn1', 'Save');
+    const result = await checkUI5Text(page, 'btn1', 'Save', { timeout: 0 });
 
     const message = result.message();
     expect(message).toContain('Cancel');
@@ -119,7 +119,7 @@ describe('checkUI5Visible', () => {
   it('fails when control is not visible', async () => {
     const page = createMockPage(false);
 
-    const result = await checkUI5Visible(page, 'ctrl1');
+    const result = await checkUI5Visible(page, 'ctrl1', { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('visible');
@@ -148,7 +148,7 @@ describe('checkUI5Enabled', () => {
   it('fails when control is disabled', async () => {
     const page = createMockPage(false);
 
-    const result = await checkUI5Enabled(page, 'ctrl1');
+    const result = await checkUI5Enabled(page, 'ctrl1', { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('enabled');
@@ -177,7 +177,7 @@ describe('checkUI5Property', () => {
   it('fails with mismatched numeric property', async () => {
     const page = createMockPage(42);
 
-    const result = await checkUI5Property(page, 'ctrl1', 'value', 99);
+    const result = await checkUI5Property(page, 'ctrl1', 'value', 99, { timeout: 0 });
 
     expect(result.pass).toBe(false);
   });
@@ -185,7 +185,7 @@ describe('checkUI5Property', () => {
   it('fails when property is undefined and includes message', async () => {
     const page = createMockPage();
 
-    const result = await checkUI5Property(page, 'ctrl1', 'text', 'Hello');
+    const result = await checkUI5Property(page, 'ctrl1', 'text', 'Hello', { timeout: 0 });
 
     expect(result.pass).toBe(false);
     const message = result.message();
@@ -208,7 +208,13 @@ describe('checkUI5Property', () => {
   it('fails with deep-unequal object values', async () => {
     const page = createMockPage({ key: 'actual' });
 
-    const result = await checkUI5Property(page, 'ctrl1', 'data', { key: 'expected' });
+    const result = await checkUI5Property(
+      page,
+      'ctrl1',
+      'data',
+      { key: 'expected' },
+      { timeout: 0 },
+    );
 
     expect(result.pass).toBe(false);
   });
@@ -236,7 +242,7 @@ describe('checkUI5ValueState', () => {
   it('fails with mismatched value state', async () => {
     const page = createMockPage('None');
 
-    const result = await checkUI5ValueState(page, 'input1', 'Error');
+    const result = await checkUI5ValueState(page, 'input1', 'Error', { timeout: 0 });
 
     expect(result.pass).toBe(false);
   });
@@ -244,7 +250,7 @@ describe('checkUI5ValueState', () => {
   it('message includes value state names', async () => {
     const page = createMockPage('None');
 
-    const result = await checkUI5ValueState(page, 'input1', 'Error');
+    const result = await checkUI5ValueState(page, 'input1', 'Error', { timeout: 0 });
 
     const message = result.message();
     expect(message).toContain('Error');
@@ -290,7 +296,7 @@ describe('checkUI5Binding', () => {
     vi.mocked(getUI5BindingInfo).mockResolvedValue(null);
     const page = createMockPage();
 
-    const result = await checkUI5Binding(page, 'input1', 'value');
+    const result = await checkUI5Binding(page, 'input1', 'value', undefined, { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('no binding found');
@@ -301,7 +307,7 @@ describe('checkUI5Binding', () => {
     vi.mocked(getUI5BindingInfo).mockResolvedValue(bindingInfo);
     const page = createMockPage();
 
-    const result = await checkUI5Binding(page, 'input1', 'value', '/ProductName');
+    const result = await checkUI5Binding(page, 'input1', 'value', '/ProductName', { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('/ProductName');
@@ -328,7 +334,7 @@ describe('checkUI5ControlType', () => {
     vi.mocked(getUI5ControlType).mockResolvedValue('sap.m.Input');
     const page = createMockPage();
 
-    const result = await checkUI5ControlType(page, 'ctrl1', 'sap.m.Button');
+    const result = await checkUI5ControlType(page, 'ctrl1', 'sap.m.Button', { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('sap.m.Button');
@@ -340,7 +346,7 @@ describe('checkUI5ControlType', () => {
     vi.mocked(getUI5ControlType).mockResolvedValue(null);
     const page = createMockPage();
 
-    const result = await checkUI5ControlType(page, 'missing', 'sap.m.Button');
+    const result = await checkUI5ControlType(page, 'missing', 'sap.m.Button', { timeout: 0 });
 
     expect(result.pass).toBe(false);
     expect(result.message()).toContain('control was not found');

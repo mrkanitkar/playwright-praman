@@ -2,13 +2,13 @@
  * Default constants for network request filtering and timeout configuration.
  *
  * @remarks
- * Source: dhikraft v2.5.0 constants.ts (field-tested in production SAP systems).
+ * Source: mk v2.5.0 constants.ts (field-tested in production SAP systems).
  *
  * WalkMe and analytics URL patterns are used by the request interceptor to block
  * third-party scripts that interfere with UI5 stability detection. These patterns
  * were identified through production testing across 50+ SAP BTP tenants.
  *
- * M3 tracked issue: WalkMe patterns originate from dhikraft v2.5.0 field data.
+ * M3 tracked issue: WalkMe patterns originate from mk v2.5.0 field data.
  * These are regex pattern strings, not full RegExp objects, so consumers must
  * wrap them with `new RegExp(pattern)` before use. The patterns are intentionally
  * kept as strings to allow serialization across the Playwright browser boundary.
@@ -43,7 +43,7 @@
  * stability detection (`waitForUI5Stable`). Blocking these during tests
  * eliminates flaky timeout failures.
  *
- * Source attribution: dhikraft v2.5.0 production field data.
+ * Source attribution: mk v2.5.0 production field data.
  *
  * @example
  * ```typescript

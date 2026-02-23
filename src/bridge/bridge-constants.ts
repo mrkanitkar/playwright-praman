@@ -61,7 +61,7 @@ export const BRIDGE_TIMEOUTS = Object.freeze({
  * These patterns are merged with user-configured `ignoreAutoWaitUrls`
  * at runtime.
  *
- * Source: dhikraft v2.5.0 production field data + common SAP BTP services.
+ * Source: mk v2.5.0 production field data + common SAP BTP services.
  */
 export const XHR_IGNORE_PATTERNS: readonly string[] = Object.freeze([
   'walkme',

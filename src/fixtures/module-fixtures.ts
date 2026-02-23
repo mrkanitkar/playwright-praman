@@ -98,6 +98,7 @@ import { createObjectCleanupScript } from '#bridge/browser-scripts/object-map.js
 import { resetPageInjection } from '#bridge/injection.js';
 import { createInteractionStrategy } from '#bridge/interaction-strategies/strategy-factory.js';
 import { createLogger } from '#core/logging/index.js';
+import { withStep } from '#core/utils/step-decorator.js';
 import { waitForUI5Stable } from '#core/utils/wait-helpers.js';
 
 /**
@@ -247,15 +248,22 @@ export function createODataFixture(page: never) {
 }
 
 /**
- * Wraps all async methods in an object with a stability guard.
+ * Wraps all async methods in an object with a stability guard and `test.step()`.
  *
  * @remarks
- * Calls `guard()` before each async method in `obj` to ensure UI5 is stable.
+ * Calls `guard()` before each async method in `obj` to ensure UI5 is stable,
+ * and wraps the call in `withStep()` so every invocation appears as a named
+ * step in the Playwright trace viewer (BF-014).
  * Type-safe: preserves the original object's method signatures.
+ *
+ * @param obj - Object whose methods to wrap.
+ * @param guard - Async stability guard called before each method.
+ * @param namespace - Namespace prefix for step names (e.g., `'table'`, `'dialog'`).
  */
 export function withStability<T extends Record<string, (...args: never[]) => Promise<unknown>>>(
   obj: T,
   guard: () => Promise<void>,
+  namespace = '',
 ): T {
   const wrapped: Partial<T> = {};
   for (const key of Object.keys(obj) as (keyof T)[]) {
@@ -263,10 +271,11 @@ export function withStability<T extends Record<string, (...args: never[]) => Pro
     const fn = obj[key]; // noUncheckedIndexedAccess: key is guaranteed by Object.keys
     if (fn === undefined) continue;
     const capturedFn = fn;
+    const stepPrefix = namespace !== '' ? `ui5.${namespace}` : 'ui5';
     // eslint-disable-next-line security/detect-object-injection -- key comes from Object.keys(obj), not user input
     wrapped[key] = (async (...args: never[]): Promise<unknown> => {
       await guard();
-      return capturedFn(...args);
+      return withStep(`${stepPrefix}.${String(key)}`, async () => capturedFn(...args));
     }) as T[keyof T];
   }
   return wrapped as T;
@@ -334,10 +343,10 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
     // Type assertions: `page as never` prevents fixture factory from depending on concrete Page type;
     // `as ExtendedUI5Handler` narrows Object.assign result to the branded union type
     const extended = Object.assign(handler, {
-      table: withStability(createTableFixture(page as never), guard),
-      dialog: withStability(createDialogFixture(page as never), guard),
-      date: withStability(createDateFixture(page as never), guard),
-      odata: withStability(createODataFixture(page as never), guard),
+      table: withStability(createTableFixture(page as never), guard, 'table'),
+      dialog: withStability(createDialogFixture(page as never), guard, 'dialog'),
+      date: withStability(createDateFixture(page as never), guard, 'date'),
+      odata: withStability(createODataFixture(page as never), guard, 'odata'),
     }) as ExtendedUI5Handler;
 
     try {

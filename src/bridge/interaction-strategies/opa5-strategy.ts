@@ -15,6 +15,17 @@ import { BRIDGE_GLOBALS } from '../bridge-constants.js';
 
 import type { InteractionStrategy } from './strategy.js';
 
+import { ErrorCode } from '#core/errors/codes.js';
+import { ControlError } from '#core/errors/control-error.js';
+
+/** Shape returned by browser-side interaction scripts. */
+interface BridgeResult {
+  readonly success: boolean;
+  readonly error?: string;
+}
+
+const SUGGESTION_RECORDREPLAY = 'Verify RecordReplay API is available (UI5 >= 1.94)';
+
 /**
  * Configuration options for the OPA5 strategy.
  */
@@ -57,14 +68,17 @@ export class Opa5Strategy implements InteractionStrategy {
   async press(page: Page, controlId: string): Promise<void> {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     const timeout = this.config.interactionTimeout;
-    await page.evaluate(
+    const result: BridgeResult = await page.evaluate(
       `(function() {
         var bridge = window.${ns};
         if (!bridge || !bridge.RecordReplay) {
           var ctrl = bridge && bridge.getById('${controlId}');
-          if (ctrl && typeof ctrl.firePress === 'function') { ctrl.firePress(); return { success: true }; }
-          if (ctrl && typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); return { success: true }; }
-          return { success: false, error: 'RecordReplay not available' };
+          if (!ctrl) return { success: false, error: 'Control not found: ${controlId}' };
+          var fired = false;
+          if (typeof ctrl.firePress === 'function') { ctrl.firePress(); fired = true; }
+          if (typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); fired = true; }
+          if (fired) return { success: true };
+          return { success: false, error: 'RecordReplay not available and no fire* methods on: ${controlId}' };
         }
         try {
           bridge.RecordReplay.interactWithControl({
@@ -78,6 +92,20 @@ export class Opa5Strategy implements InteractionStrategy {
         }
       })()`,
     );
+    if (!result.success) {
+      throw new ControlError({
+        code: ErrorCode.ERR_CONTROL_INTERACTION_FAILED,
+        message: result.error ?? `Press failed on control: ${controlId}`,
+        attempted: `press('${controlId}') via opa5 strategy`,
+        retryable: true,
+        details: { controlId, strategy: this.name },
+        suggestions: [
+          SUGGESTION_RECORDREPLAY,
+          'Check if the control ID exists in the UI5 view',
+          'Try using ui5-native strategy as fallback',
+        ],
+      });
+    }
   }
 
   /** {@inheritDoc InteractionStrategy.enterText} */
@@ -85,7 +113,7 @@ export class Opa5Strategy implements InteractionStrategy {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     const timeout = this.config.interactionTimeout;
     const escaped = text.replaceAll('\\', '\\\\').replaceAll("'", "\\'");
-    await page.evaluate(
+    const result: BridgeResult = await page.evaluate(
       `(function() {
         var bridge = window.${ns};
         if (!bridge || !bridge.RecordReplay) {
@@ -106,13 +134,23 @@ export class Opa5Strategy implements InteractionStrategy {
         }
       })()`,
     );
+    if (!result.success) {
+      throw new ControlError({
+        code: ErrorCode.ERR_CONTROL_INTERACTION_FAILED,
+        message: result.error ?? `Enter text failed on control: ${controlId}`,
+        attempted: `enterText('${controlId}', '${text}') via opa5 strategy`,
+        retryable: true,
+        details: { controlId, text, strategy: this.name },
+        suggestions: [SUGGESTION_RECORDREPLAY, 'Check if the control accepts text input'],
+      });
+    }
   }
 
   /** {@inheritDoc InteractionStrategy.select} */
   async select(page: Page, controlId: string, itemId: string): Promise<void> {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     const timeout = this.config.interactionTimeout;
-    await page.evaluate(
+    const result: BridgeResult = await page.evaluate(
       `(function() {
         var bridge = window.${ns};
         if (!bridge || !bridge.RecordReplay) {
@@ -132,5 +170,15 @@ export class Opa5Strategy implements InteractionStrategy {
         }
       })()`,
     );
+    if (!result.success) {
+      throw new ControlError({
+        code: ErrorCode.ERR_CONTROL_INTERACTION_FAILED,
+        message: result.error ?? `Select failed on control: ${controlId}`,
+        attempted: `select('${controlId}', '${itemId}') via opa5 strategy`,
+        retryable: true,
+        details: { controlId, itemId, strategy: this.name },
+        suggestions: [SUGGESTION_RECORDREPLAY, 'Check if the control supports selection'],
+      });
+    }
   }
 }

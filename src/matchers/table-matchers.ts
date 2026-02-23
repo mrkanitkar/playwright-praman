@@ -19,8 +19,9 @@
 
 import type { Page } from '@playwright/test';
 
-import { getControlAggregation, getControlProperty } from './matcher-utils.js';
-import type { MatcherResult } from './ui5-matchers.js';
+import { getControlAggregation, getControlProperty, pollUntilPass } from './matcher-utils.js';
+import type { PollableMatcherResult } from './matcher-utils.js';
+import type { MatcherOptions, MatcherResult } from './ui5-matchers.js';
 
 /**
  * Checks that a UI5 table has the expected number of rows.
@@ -44,20 +45,23 @@ export async function checkUI5RowCount(
   page: Page,
   controlId: string,
   expected: number,
+  options?: MatcherOptions,
 ): Promise<MatcherResult> {
-  const rows = await getControlAggregation(page, controlId, 'items');
-  const actual = rows.length;
-  const pass = actual === expected;
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const rows = await getControlAggregation(page, controlId, 'items');
+    const actual = rows.length;
+    const pass = actual === expected;
 
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected table '${controlId}' not to have ${String(expected)} rows, but it did`
-        : `Expected table '${controlId}' to have ${String(expected)} rows, but got ${String(actual)}`,
-    actual,
-    expected,
-  };
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected table '${controlId}' not to have ${String(expected)} rows, but it did`
+          : `Expected table '${controlId}' to have ${String(expected)} rows, but got ${String(actual)}`,
+      actual,
+      expected,
+    };
+  }, options?.timeout);
 }
 
 /**
@@ -89,47 +93,51 @@ export async function checkUI5CellText(
   row: number,
   column: number,
   expected: string | RegExp,
+  options?: MatcherOptions,
 ): Promise<MatcherResult> {
-  const rows = await getControlAggregation(page, controlId, 'items');
-  const targetRow = rows.at(row);
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const rows = await getControlAggregation(page, controlId, 'items');
+    const targetRow = rows.at(row);
 
-  if (targetRow === undefined) {
+    if (targetRow === undefined) {
+      return {
+        pass: false,
+        message: () =>
+          `Expected cell text at row ${String(row)}, column ${String(column)}, but row ${String(row)} does not exist (table has ${String(rows.length)} rows)`,
+        actual: undefined,
+        expected,
+      };
+    }
+
+    const cells = await getControlAggregation(page, targetRow.id, 'cells');
+    const targetCell = cells.at(column);
+
+    if (targetCell === undefined) {
+      return {
+        pass: false,
+        message: () =>
+          `Expected cell text at row ${String(row)}, column ${String(column)}, but column ${String(column)} does not exist (row has ${String(cells.length)} cells)`,
+        actual: undefined,
+        expected,
+      };
+    }
+
+    const actual = await getControlProperty(page, targetCell.id, 'text');
+    const actualString = String(actual);
+
+    const pass =
+      expected instanceof RegExp ? expected.test(actualString) : actualString === expected;
+
     return {
-      pass: false,
+      pass,
       message: () =>
-        `Expected cell text at row ${String(row)}, column ${String(column)}, but row ${String(row)} does not exist (table has ${String(rows.length)} rows)`,
-      actual: undefined,
+        pass
+          ? `Expected cell [${String(row)},${String(column)}] text not to match '${String(expected)}', but got '${actualString}'`
+          : `Expected cell [${String(row)},${String(column)}] text to match '${String(expected)}', but got '${actualString}'`,
+      actual: actualString,
       expected,
     };
-  }
-
-  const cells = await getControlAggregation(page, targetRow.id, 'cells');
-  const targetCell = cells.at(column);
-
-  if (targetCell === undefined) {
-    return {
-      pass: false,
-      message: () =>
-        `Expected cell text at row ${String(row)}, column ${String(column)}, but column ${String(column)} does not exist (row has ${String(cells.length)} cells)`,
-      actual: undefined,
-      expected,
-    };
-  }
-
-  const actual = await getControlProperty(page, targetCell.id, 'text');
-  const actualString = String(actual);
-
-  const pass = expected instanceof RegExp ? expected.test(actualString) : actualString === expected;
-
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected cell [${String(row)},${String(column)}] text not to match '${String(expected)}', but got '${actualString}'`
-        : `Expected cell [${String(row)},${String(column)}] text to match '${String(expected)}', but got '${actualString}'`,
-    actual: actualString,
-    expected,
-  };
+  }, options?.timeout);
 }
 
 /**
@@ -155,29 +163,32 @@ export async function checkUI5SelectedRows(
   page: Page,
   controlId: string,
   expected: number,
+  options?: MatcherOptions,
 ): Promise<MatcherResult> {
-  const selectedItems = await getControlProperty(page, controlId, 'selectedItems');
+  return pollUntilPass(async (): Promise<PollableMatcherResult> => {
+    const selectedItems = await getControlProperty(page, controlId, 'selectedItems');
 
-  if (!Array.isArray(selectedItems)) {
+    if (!Array.isArray(selectedItems)) {
+      return {
+        pass: false,
+        message: () =>
+          `Expected table '${controlId}' to have ${String(expected)} selected rows, but selectedItems is not an array`,
+        actual: selectedItems,
+        expected,
+      };
+    }
+
+    const actual = selectedItems.length;
+    const pass = actual === expected;
+
     return {
-      pass: false,
+      pass,
       message: () =>
-        `Expected table '${controlId}' to have ${String(expected)} selected rows, but selectedItems is not an array`,
-      actual: selectedItems,
+        pass
+          ? `Expected table '${controlId}' not to have ${String(expected)} selected rows, but it did`
+          : `Expected table '${controlId}' to have ${String(expected)} selected rows, but got ${String(actual)}`,
+      actual,
       expected,
     };
-  }
-
-  const actual = selectedItems.length;
-  const pass = actual === expected;
-
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `Expected table '${controlId}' not to have ${String(expected)} selected rows, but it did`
-        : `Expected table '${controlId}' to have ${String(expected)} selected rows, but got ${String(actual)}`,
-    actual,
-    expected,
-  };
+  }, options?.timeout);
 }

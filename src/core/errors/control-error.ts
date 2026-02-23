@@ -42,7 +42,8 @@ export interface ControlErrorOptions extends Omit<PramanErrorOptions, 'code' | '
     | typeof ErrorCode.ERR_CONTROL_NOT_INTERACTABLE
     | typeof ErrorCode.ERR_CONTROL_PROPERTY
     | typeof ErrorCode.ERR_CONTROL_AGGREGATION
-    | typeof ErrorCode.ERR_CONTROL_METHOD;
+    | typeof ErrorCode.ERR_CONTROL_METHOD
+    | typeof ErrorCode.ERR_CONTROL_INTERACTION_FAILED;
   readonly retryable?: boolean;
   readonly lastKnownSelector?: UI5Selector;
   readonly availableControls?: readonly string[];

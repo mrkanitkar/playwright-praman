@@ -277,3 +277,57 @@ export async function getUI5ControlType(
     });
   }
 }
+
+/** Default polling interval for auto-retry matchers (ms). */
+const MATCHER_POLL_INTERVAL = 100;
+
+/** Default timeout for auto-retry matchers (ms). */
+const MATCHER_DEFAULT_TIMEOUT = 5000;
+
+/**
+ * Result shape for matcher check functions (avoids circular import).
+ */
+export interface PollableMatcherResult {
+  readonly pass: boolean;
+  readonly message: () => string;
+  readonly actual?: unknown;
+  readonly expected?: unknown;
+}
+
+/**
+ * Retries a matcher check function until it passes or the timeout expires.
+ *
+ * @remarks
+ * Implements web-first auto-retry behavior for custom UI5 matchers.
+ * Polls the check function at {@link MATCHER_POLL_INTERVAL} intervals
+ * until either `pass === true` or the timeout is reached. Returns the
+ * last result (pass or fail).
+ *
+ * @param checkFn - Async function returning a matcher result.
+ * @param timeout - Maximum retry time in ms (default: 5000).
+ * @returns The last matcher result after retrying.
+ *
+ * @example
+ * ```typescript
+ * const result = await pollUntilPass(
+ *   () => checkUI5Text(page, 'btn1', 'Save'),
+ *   10_000,
+ * );
+ * ```
+ */
+export async function pollUntilPass(
+  checkFn: () => Promise<PollableMatcherResult>,
+  timeout?: number,
+): Promise<PollableMatcherResult> {
+  const deadline = Date.now() + (timeout ?? MATCHER_DEFAULT_TIMEOUT);
+  let lastResult = await checkFn();
+
+  while (!lastResult.pass && Date.now() < deadline) {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, MATCHER_POLL_INTERVAL);
+    });
+    lastResult = await checkFn();
+  }
+
+  return lastResult;
+}

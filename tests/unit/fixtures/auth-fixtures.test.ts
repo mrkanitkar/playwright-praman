@@ -44,6 +44,18 @@ const mockSAPAuthHandler = vi.fn().mockImplementation(function mockAuthHandler(
   this['getSessionInfo'] = vi.fn().mockReturnValue(null);
 });
 
+/** Minimal mock page for fixture testing. */
+const mockPage = {
+  goto: vi.fn().mockResolvedValue(undefined),
+  url: vi.fn().mockReturnValue('https://sap.example.com/shell'),
+  evaluate: vi.fn().mockResolvedValue(undefined),
+  waitForSelector: vi.fn().mockResolvedValue(undefined),
+  waitForURL: vi.fn().mockResolvedValue(undefined),
+  waitForLoadState: vi.fn().mockResolvedValue(undefined),
+  waitForFunction: vi.fn().mockResolvedValue(undefined),
+  locator: vi.fn(),
+};
+
 vi.mock('../../../src/auth/auth-factory.js', () => ({
   createAuthStrategy: mockCreateAuthStrategy,
 }));
@@ -207,7 +219,7 @@ describe('auth-fixtures sapAuth fixture', () => {
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
     const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     expect(mockCreateAuthStrategy).toHaveBeenCalledWith(config);
     expect(mockSAPAuthHandler).toHaveBeenCalledWith(
@@ -223,7 +235,7 @@ describe('auth-fixtures sapAuth fixture', () => {
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
     const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
 
-    const handler = await runFixture(fn, { sapAuthConfig: config });
+    const handler = await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     // The handler should be provided but login() should NOT have been called
     expect(handler).toBeDefined();
@@ -231,8 +243,8 @@ describe('auth-fixtures sapAuth fixture', () => {
     expect(handlerInstance.login).not.toHaveBeenCalled();
   });
 
-  // Test 3: sapAuth does NOT auto-logout on cleanup
-  it('does NOT auto-logout on teardown', async () => {
+  // Test 3: sapAuth does NOT logout on teardown when no session exists
+  it('does NOT logout on teardown when no session exists', async () => {
     const fn = extractFixtureFn(fixtures['sapAuth']);
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
     const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
@@ -243,7 +255,7 @@ describe('auth-fixtures sapAuth fixture', () => {
       await Promise.resolve();
     };
 
-    await fn({ sapAuthConfig: config }, useFn);
+    await fn({ sapAuthConfig: config, page: mockPage }, useFn);
 
     // After teardown, logout should NOT have been called
     const handlerInstance = capturedHandler as { logout: ReturnType<typeof vi.fn> };
@@ -261,7 +273,7 @@ describe('auth-fixtures sapAuth fixture', () => {
       strategy: 'onprem',
     };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     expect(mockCreateAuthStrategy).toHaveBeenCalledWith(config);
   });
@@ -278,7 +290,7 @@ describe('auth-fixtures sapAuth fixture', () => {
       password: 'cloud-secret',
     };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     expect(mockCreateAuthStrategy).toHaveBeenCalledWith(config);
     expect(mockSAPAuthHandler).toHaveBeenCalledWith(
@@ -299,7 +311,7 @@ describe('auth-fixtures sapAuth fixture', () => {
       strategy: 'onprem',
     };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     expect(mockCreateAuthStrategy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -313,14 +325,14 @@ describe('auth-fixtures sapAuth fixture', () => {
     const fn = extractFixtureFn(fixtures['sapAuth']);
     const config = { url: '', username: '', password: '' };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     expect(mockCreateAuthStrategy).toHaveBeenCalledWith(config);
     expect(mockSAPAuthHandler).toHaveBeenCalledOnce();
   });
 
-  // Test 9: Fixture teardown does not call logout
-  it('fixture teardown does not invoke handler.logout()', async () => {
+  // Test 9: Fixture teardown does not call logout when no session
+  it('fixture teardown does not invoke handler.logout() when no session', async () => {
     const fn = extractFixtureFn(fixtures['sapAuth']);
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
     const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
@@ -332,10 +344,47 @@ describe('auth-fixtures sapAuth fixture', () => {
     };
 
     // Run fixture including teardown
-    await fn({ sapAuthConfig: config }, useFn);
+    await fn({ sapAuthConfig: config, page: mockPage }, useFn);
 
     const handlerInstance = capturedHandler as { logout: ReturnType<typeof vi.fn> };
     expect(handlerInstance.logout).not.toHaveBeenCalled();
+  });
+
+  // Test: BF-009 — Fixture teardown calls logout when session exists
+  it('calls handler.logout() on teardown when session exists (BF-009)', async () => {
+    // Override getSessionInfo to return a non-null session
+    const mockHandlerWithSession = vi.fn().mockImplementation(function mockAuth(
+      this: Record<string, unknown>,
+      options: { readonly strategy: unknown; readonly logger: unknown },
+    ) {
+      this['strategy'] = options.strategy;
+      this['logger'] = options.logger;
+      this['login'] = vi.fn().mockResolvedValue(undefined);
+      this['logout'] = vi.fn().mockResolvedValue(undefined);
+      this['isAuthenticated'] = vi.fn().mockResolvedValue(true);
+      this['isSessionExpired'] = vi.fn().mockReturnValue(false);
+      this['getSessionInfo'] = vi.fn().mockReturnValue({
+        authenticatedAt: Date.now(),
+        strategyName: 'onprem',
+        isValid: true,
+      });
+    });
+    mockSAPAuthHandler.mockImplementation(mockHandlerWithSession);
+
+    const fn = extractFixtureFn(fixtures['sapAuth']);
+    // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+    const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
+
+    let capturedHandler: unknown;
+    const useFn = async (value: unknown): Promise<void> => {
+      capturedHandler = value;
+      await Promise.resolve();
+    };
+
+    await fn({ sapAuthConfig: config, page: mockPage }, useFn);
+
+    const handlerInstance = capturedHandler as { logout: ReturnType<typeof vi.fn> };
+    expect(handlerInstance.logout).toHaveBeenCalledOnce();
   });
 
   // Test: sapAuth provides a handler with logger
@@ -344,7 +393,7 @@ describe('auth-fixtures sapAuth fixture', () => {
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
     const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     expect(mockSAPAuthHandler).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -365,7 +414,7 @@ describe('auth-fixtures sapAuth fixture', () => {
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
     const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     // Extract the logger passed to SAPAuthHandler constructor
     const constructorCall = mockSAPAuthHandler.mock.calls[0] as [
@@ -384,7 +433,7 @@ describe('auth-fixtures sapAuth fixture', () => {
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
     const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     const constructorCall = mockSAPAuthHandler.mock.calls[0] as [
       {
@@ -404,7 +453,7 @@ describe('auth-fixtures sapAuth fixture', () => {
     // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
     const config = { url: 'https://sap.example.com', username: 'admin', password: 'secret' };
 
-    await runFixture(fn, { sapAuthConfig: config });
+    await runFixture(fn, { sapAuthConfig: config, page: mockPage });
 
     // Extract the logger passed to SAPAuthHandler constructor
     const constructorCall = mockSAPAuthHandler.mock.calls[0] as [

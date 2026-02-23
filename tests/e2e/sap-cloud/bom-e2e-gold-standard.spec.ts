@@ -62,7 +62,6 @@
  * Playwright Native (ONLY Tab key - user permitted):
  *   - page.keyboard.press('Tab'): Form field navigation
  *   - page.keyboard.press('Space'): Row selection in value help
- *   - page.waitForTimeout(): Timing synchronization
  *   - page.goto(): Initial navigation
  *   - page.waitForLoadState(): Page load verification
  *   - expect(page).toHaveTitle(): FLP verification
@@ -133,7 +132,6 @@ test.describe('BOM End-to-End Flow', () => {
 
       const btnText = await createBtn.getProperty('text');
       expect(btnText).toBe('Create BOM');
-      console.log('✅ Step 1: Navigate to BOM Maintenance App - PASSED');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -153,19 +151,26 @@ test.describe('BOM End-to-End Flow', () => {
       // S/4HANA Cloud uses sap.ui.comp.smartfield.SmartField which wraps the inner Input
       const materialField = await ui5.control({ id: 'createBOMFragment--material' });
       const materialType = await materialField.getControlType();
-      console.log(`Material field type: ${materialType}`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: `Material field type: ${materialType}` });
       expect(materialType).toBe('sap.ui.comp.smartfield.SmartField');
 
       // Verify dialog is open via UI5 by checking Cancel button exists and is enabled
       const cancelDialogBtn = await ui5.control({ id: 'createBOMFragment--CancelBtn' });
       const cancelBtnEnabled = await cancelDialogBtn.getProperty('enabled');
-      console.log(`Cancel button enabled (dialog open): ${cancelBtnEnabled}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Cancel button enabled (dialog open): ${cancelBtnEnabled}`,
+      });
       expect(cancelBtnEnabled).toBe(true);
 
       // Verify BOM Usage SmartField exists (variantUsage)
       const bomUsageField = await ui5.control({ id: 'createBOMFragment--variantUsage' });
       const bomUsageType = await bomUsageField.getControlType();
-      console.log(`BOM Usage field type: ${bomUsageType}`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: `BOM Usage field type: ${bomUsageType}` });
       expect(bomUsageType).toBe('sap.ui.comp.smartfield.SmartField');
 
       // Verify Create and Cancel buttons exist
@@ -174,8 +179,6 @@ test.describe('BOM End-to-End Flow', () => {
       const cancelBtnText = await cancelDialogBtn.getProperty('text');
       expect(createBtnText).toBe('Create');
       expect(cancelBtnText).toBe('Cancel');
-
-      console.log('✅ Step 2: Open Create BOM Dialog - PASSED (100% UI5 methods)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -202,7 +205,10 @@ test.describe('BOM End-to-End Flow', () => {
 
       // Call getRows() directly — returns array of UI5ControlProxy instances
       const rows = (await innerTable.getRows()) as unknown[];
-      console.log(`getRows() returned ${rows.length} row proxies`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `getRows() returned ${rows.length} row proxies`,
+      });
       expect(rows.length).toBeGreaterThan(0);
 
       // Poll for rows with binding context (OData data loads asynchronously)
@@ -215,14 +221,16 @@ test.describe('BOM End-to-End Flow', () => {
           ).getBindingContext();
           if (ctx) rowCount++;
         }
-        if (rowCount === 0) await page.waitForTimeout(500);
+        if (rowCount === 0) await new Promise<void>((resolve) => setTimeout(resolve, 500));
       }
-      console.log(`Found ${rowCount} materials in value help (100% Praman proxy)`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Found ${rowCount} materials in value help`,
+      });
       expect(rowCount).toBeGreaterThan(0);
 
       await materialDialog.close();
       await ui5.waitForUI5();
-      console.log('✅ Step 3: Test Material Value Help - PASSED (100% Praman proxy)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -260,15 +268,16 @@ test.describe('BOM End-to-End Flow', () => {
           ).getBindingContext();
           if (ctx) rowCount++;
         }
-        if (rowCount === 0) await page.waitForTimeout(500);
+        if (rowCount === 0) await new Promise<void>((resolve) => setTimeout(resolve, 500));
       }
 
-      console.log(`Found ${rowCount} plants in value help (100% Praman proxy)`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: `Found ${rowCount} plants in value help` });
       expect(rowCount).toBeGreaterThan(0);
 
       await plantDialog.close();
       await ui5.waitForUI5();
-      console.log('✅ Step 4: Test Plant Value Help - PASSED (100% Praman proxy)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -295,10 +304,13 @@ test.describe('BOM End-to-End Flow', () => {
         }
       }
 
-      console.log(`Found ${items.length} BOM usage types via dhikraft proxy getItems():`);
-      items.forEach((item: { key: string; text: string }) =>
-        console.log(`  - ${item.key}: ${item.text}`),
-      );
+      const itemsSummary = items
+        .map((item: { key: string; text: string }) => `${item.key}: ${item.text}`)
+        .join(', ');
+      test.info().annotations.push({
+        type: 'info',
+        description: `Found ${items.length} BOM usage types: ${itemsSummary}`,
+      });
       expect(items.length).toBeGreaterThan(0);
 
       await bomUsageCombo.open();
@@ -306,7 +318,7 @@ test.describe('BOM End-to-End Flow', () => {
 
       // Verify dropdown opened
       const isOpen = await bomUsageCombo.isOpen();
-      console.log(`Dropdown isOpen (via dhikraft proxy): ${isOpen}`);
+      test.info().annotations.push({ type: 'info', description: `Dropdown isOpen: ${isOpen}` });
       expect(isOpen).toBe(true);
 
       await bomUsageCombo.close();
@@ -316,8 +328,6 @@ test.describe('BOM End-to-End Flow', () => {
       const isOpenAfterClose = await bomUsageCombo.isOpen();
       const isClosed = !isOpenAfterClose;
       expect(isClosed).toBe(true);
-
-      console.log('✅ Step 5: Test BOM Usage Dropdown - PASSED (dhikraft proxy)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -344,9 +354,12 @@ test.describe('BOM End-to-End Flow', () => {
         } catch (e) {
           // Dialog not ready yet
         }
-        await page.waitForTimeout(500);
+        await new Promise<void>((resolve) => setTimeout(resolve, 500));
       }
-      console.log(`Material dialog ready: ${materialDialogReady}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Material dialog ready: ${materialDialogReady}`,
+      });
 
       // Get first material value (SmartTable -> innerTable -> getContextByIndex)
       const smartTableMat = await ui5.control({
@@ -368,9 +381,12 @@ test.describe('BOM End-to-End Flow', () => {
             break;
           }
         }
-        await page.waitForTimeout(500);
+        await new Promise<void>((resolve) => setTimeout(resolve, 500));
       }
-      console.log(`Material value retrieved (100% Praman proxy): ${JSON.stringify(materialValue)}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Material value retrieved: ${JSON.stringify(materialValue)}`,
+      });
 
       // Always close dialog before proceeding
       await materialDialogControl.close();
@@ -382,7 +398,10 @@ test.describe('BOM End-to-End Flow', () => {
         await materialInput.setValue(materialValue.material);
         await materialInput.fireChange({ value: materialValue.material });
         await ui5.waitForUI5();
-        console.log(`✅ Material set to: ${materialValue.material}`);
+        test.info().annotations.push({
+          type: 'info',
+          description: `Material set to: ${materialValue.material}`,
+        });
       }
 
       // === FILL PLANT ===
@@ -405,9 +424,11 @@ test.describe('BOM End-to-End Flow', () => {
         } catch (e) {
           /* dialog not ready yet */
         }
-        await page.waitForTimeout(500);
+        await new Promise<void>((resolve) => setTimeout(resolve, 500));
       }
-      console.log(`Plant dialog ready: ${plantDialogReady}`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: `Plant dialog ready: ${plantDialogReady}` });
 
       // Get first plant value (SmartTable -> innerTable -> getContextByIndex)
       const smartTablePlant = await ui5.control({
@@ -429,9 +450,12 @@ test.describe('BOM End-to-End Flow', () => {
             break;
           }
         }
-        await page.waitForTimeout(500);
+        await new Promise<void>((resolve) => setTimeout(resolve, 500));
       }
-      console.log(`Plant value retrieved (100% Praman proxy): ${JSON.stringify(plantValue)}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Plant value retrieved: ${JSON.stringify(plantValue)}`,
+      });
 
       // Always close dialog before proceeding
       await plantDialogControl.close();
@@ -443,7 +467,9 @@ test.describe('BOM End-to-End Flow', () => {
         await plantInput.setValue(plantValue.plant);
         await plantInput.fireChange({ value: plantValue.plant });
         await ui5.waitForUI5();
-        console.log(`✅ Plant set to: ${plantValue.plant}`);
+        test
+          .info()
+          .annotations.push({ type: 'info', description: `Plant set to: ${plantValue.plant}` });
       }
 
       // === FILL BOM USAGE ===
@@ -465,7 +491,9 @@ test.describe('BOM End-to-End Flow', () => {
       // Close dropdown
       await bomUsageControl.close();
 
-      console.log(`BOM Usage set to: 1 (Production)`);
+      test
+        .info()
+        .annotations.push({ type: 'info', description: 'BOM Usage set to: 1 (Production)' });
       await ui5.waitForUI5();
 
       // P2D Phase 5: Verify the value was actually set using dhikraft proxy
@@ -480,7 +508,10 @@ test.describe('BOM End-to-End Flow', () => {
         smartFieldValue: smartFieldValue || '',
       };
 
-      console.log(`BOM Usage verification: ${JSON.stringify(verifyBomUsage)}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `BOM Usage verification: ${JSON.stringify(verifyBomUsage)}`,
+      });
       expect(verifyBomUsage.comboBoxKey).toBe('1');
 
       // === VERIFY ALL VALUES BEFORE PROCEEDING ===
@@ -500,22 +531,21 @@ test.describe('BOM End-to-End Flow', () => {
         createBtnVisible: (await createBtnCtrl.getVisible()) || false, // Now works - dhikraft blacklist fixed
       };
 
-      console.log('═══════════════════════════════════════════════════════════════');
-      console.log('Form Values Final Verification (UI5):');
-      console.log(
-        `  Material: ${finalVerification.materialValue} (Expected: ${materialValue.material})`,
-      );
-      console.log(`  Plant: ${finalVerification.plantValue} (Expected: ${plantValue.plant})`);
-      console.log(`  BOM Usage: ${finalVerification.bomUsageKey} (Expected: 1)`);
-      console.log(`  Create Button Enabled: ${finalVerification.createBtnEnabled}`);
-      console.log(`  Create Button Visible: ${finalVerification.createBtnVisible}`);
-      console.log('═══════════════════════════════════════════════════════════════');
+      test.info().annotations.push({
+        type: 'info',
+        description: [
+          'Form Values Final Verification (UI5):',
+          `  Material: ${finalVerification.materialValue} (Expected: ${materialValue.material})`,
+          `  Plant: ${finalVerification.plantValue} (Expected: ${plantValue.plant})`,
+          `  BOM Usage: ${finalVerification.bomUsageKey} (Expected: 1)`,
+          `  Create Button Enabled: ${finalVerification.createBtnEnabled}`,
+          `  Create Button Visible: ${finalVerification.createBtnVisible}`,
+        ].join('\n'),
+      });
 
       expect(finalVerification.materialValue).toBe(materialValue.material);
       expect(finalVerification.plantValue).toBe(plantValue.plant);
       expect(finalVerification.bomUsageKey).toBe('1');
-
-      console.log('✅ Step 6: Fill Form with Valid Data - PASSED (100% UI5 methods)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -527,14 +557,15 @@ test.describe('BOM End-to-End Flow', () => {
       const createBtnText = await createBtn.getProperty('text');
       const createBtnEnabled = await createBtn.getProperty('enabled');
 
-      console.log(`Create Button Status: Text="${createBtnText}", Enabled=${createBtnEnabled}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Create Button Status: Text="${createBtnText}", Enabled=${createBtnEnabled}`,
+      });
       expect(createBtnText).toBe('Create');
       expect(createBtnEnabled).toBe(true);
 
-      console.log('🔥 Clicking Create button...');
       await createBtn.press();
       await ui5.waitForUI5();
-      console.log('✅ Create button clicked');
 
       // P2D Phase 6: Check for validation using dhikraft proxy where possible
       // Check if dialog is still open by checking if OkBtn still exists
@@ -609,21 +640,28 @@ test.describe('BOM End-to-End Flow', () => {
         }
       } catch (e) {
         // Message checks failed - continue with defaults
-        console.log('Message popover/box check via dhikraft proxy failed (expected if none exist)');
+        // Message popover/box check failed (expected if none exist)
       }
 
       const validationResult = { ...messageChecks, dialogStillOpen, fieldValues };
-      console.log(`Validation result: ${JSON.stringify(validationResult)}`);
+      test.info().annotations.push({
+        type: 'info',
+        description: `Validation result: ${JSON.stringify(validationResult)}`,
+      });
 
       // If dialog is still open, there ARE validation errors - this is a FAILURE
       if (validationResult.dialogStillOpen) {
-        console.log('❌ ERROR: Dialog still open after Create click - validation failed!');
-        console.log(`Field values: ${JSON.stringify(validationResult.fieldValues)}`);
-        console.log(`Error messages: ${JSON.stringify(validationResult.errorMessages)}`);
+        test.info().annotations.push({
+          type: 'error',
+          description: [
+            'Dialog still open after Create click - validation failed',
+            `Field values: ${JSON.stringify(validationResult.fieldValues)}`,
+            `Error messages: ${JSON.stringify(validationResult.errorMessages)}`,
+          ].join('\n'),
+        });
 
         // Take screenshot for debugging
         await page.screenshot({ path: 'bom-create-validation-error.png', fullPage: true });
-        console.log('Screenshot saved: bom-create-validation-error.png');
 
         // Click Cancel to close dialog cleanly
         const cancelBtn = await ui5.control({ id: 'createBOMFragment--CancelBtn' });
@@ -633,8 +671,6 @@ test.describe('BOM End-to-End Flow', () => {
         // This should fail the test
         expect(validationResult.dialogStillOpen).toBe(false);
       }
-
-      console.log('✅ Step 7: Click Create Button - PASSED (100% UI5 methods)');
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -652,14 +688,6 @@ test.describe('BOM End-to-End Flow', () => {
       // Additional verification - check button is enabled (proves we're on list view)
       const btnEnabled = await createBtn.getProperty('enabled');
       expect(btnEnabled).toBe(true);
-
-      console.log('✅ Step 8: Verify Return to BOM List - PASSED (100% UI5 methods)');
-      console.log('');
-      console.log('═══════════════════════════════════════════════════════════════');
-      console.log('✅ BOM End-to-End flow completed successfully!');
-      console.log('   All 8 steps passed in ONE browser session');
-      console.log('   100% UI5 methods (no Playwright native DOM except Tab key)');
-      console.log('═══════════════════════════════════════════════════════════════');
     });
   });
 });

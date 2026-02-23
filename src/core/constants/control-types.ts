@@ -2,7 +2,7 @@
  * Interactive and container UI5 control type constants for bulk discovery filtering.
  *
  * @remarks
- * Source: dhikraft v2.5.0 control classification lists, field-tested across
+ * Source: mk v2.5.0 control classification lists, field-tested across
  * 50+ SAP BTP tenants. These sets are used by the proxy layer to classify
  * discovered controls for AI context and user-facing filtering.
  *

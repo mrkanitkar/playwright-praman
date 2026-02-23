@@ -313,69 +313,93 @@ describe('resolveFieldSelector', () => {
 // ── Normalization: special character stripping ────────────────────────────────
 
 describe('normalize (via matchTerms)', () => {
-  it('"purchase-order" matches "purchase order" term', () => {
+  it('"Purchase-Order" normalizes to "purchaseorder"', () => {
     const poTerm: VocabularyTerm = {
-      name: 'purchase order',
+      name: 'purchaseorder',
       synonyms: ['PO'],
       domain: 'procurement',
     };
     const map = makeTermsMap([poTerm]);
-    const results = matchTerms('purchase-order', map, 'procurement');
+    const results = matchTerms('Purchase-Order', map, 'procurement');
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0]?.term).toBe('purchase order');
+    expect(results[0]?.term).toBe('purchaseorder');
     expect(results[0]?.confidence).toBe(1.0);
   });
 
-  it('"GL_Account" matches "gl account" term', () => {
+  it('"G/L_Account" normalizes to "glaccount"', () => {
     const glTerm: VocabularyTerm = {
-      name: 'gl account',
+      name: 'glaccount',
       synonyms: ['general ledger'],
       domain: 'finance',
     };
     const map = makeTermsMap([glTerm]);
-    const results = matchTerms('GL_Account', map, 'finance');
+    const results = matchTerms('G/L_Account', map, 'finance');
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0]?.term).toBe('gl account');
+    expect(results[0]?.term).toBe('glaccount');
     expect(results[0]?.confidence).toBe(1.0);
   });
 
-  it('"cost.center" matches "cost center" term', () => {
+  it('"sap.m.Button" normalizes to "sapmbutton"', () => {
+    const btnTerm: VocabularyTerm = {
+      name: 'sapmbutton',
+      synonyms: [],
+      domain: 'procurement',
+    };
+    const map = makeTermsMap([btnTerm]);
+    const results = matchTerms('sap.m.Button', map, 'procurement');
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]?.term).toBe('sapmbutton');
+    expect(results[0]?.confidence).toBe(1.0);
+  });
+
+  it('"Cost-Center:1000" normalizes to "costcenter1000"', () => {
     const ccTerm: VocabularyTerm = {
-      name: 'cost center',
+      name: 'costcenter1000',
       synonyms: [],
       domain: 'finance',
     };
     const map = makeTermsMap([ccTerm]);
-    const results = matchTerms('cost.center', map, 'finance');
+    const results = matchTerms('Cost-Center:1000', map, 'finance');
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0]?.term).toBe('cost center');
+    expect(results[0]?.term).toBe('costcenter1000');
     expect(results[0]?.confidence).toBe(1.0);
   });
 
-  it('"vendor/supplier" normalizes slashes to spaces', () => {
-    // "vendor/supplier" → "vendor supplier" — does not exactly match "vendor" (different length)
-    // but would match a term named "vendor supplier" if one existed
-    const combinedTerm: VocabularyTerm = {
-      name: 'vendor supplier',
+  it('"MM-PUR" normalizes to "mmpur"', () => {
+    const mmTerm: VocabularyTerm = {
+      name: 'mmpur',
       synonyms: [],
       domain: 'procurement',
     };
-    const map = makeTermsMap([combinedTerm]);
-    const results = matchTerms('vendor/supplier', map, 'procurement');
+    const map = makeTermsMap([mmTerm]);
+    const results = matchTerms('MM-PUR', map, 'procurement');
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0]?.term).toBe('vendor supplier');
+    expect(results[0]?.term).toBe('mmpur');
+    expect(results[0]?.confidence).toBe(1.0);
+  });
+
+  it('strips backslash characters', () => {
+    const pathTerm: VocabularyTerm = {
+      name: 'sapbw',
+      synonyms: [],
+      domain: 'procurement',
+    };
+    const map = makeTermsMap([pathTerm]);
+    const results = matchTerms('SAP\\BW', map, 'procurement');
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]?.term).toBe('sapbw');
     expect(results[0]?.confidence).toBe(1.0);
   });
 
   it('collapses multiple spaces after stripping special chars', () => {
-    // "a---b" → "a   b" → "a b" after collapsing
+    // "a   b" (with embedded spaces) → "a b" after collapsing
     const testTerm: VocabularyTerm = {
       name: 'a b',
       synonyms: [],
       domain: 'procurement',
     };
     const map = makeTermsMap([testTerm]);
-    const results = matchTerms('a---b', map, 'procurement');
+    const results = matchTerms('a   b', map, 'procurement');
     expect(results.length).toBeGreaterThan(0);
     expect(results[0]?.term).toBe('a b');
     expect(results[0]?.confidence).toBe(1.0);

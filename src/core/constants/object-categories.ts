@@ -2,7 +2,7 @@
  * UI5 object category detection for AI context classification.
  *
  * @remarks
- * Source: dhikraft v2.5.0 object classification logic. Classifies non-control
+ * Source: mk v2.5.0 object classification logic. Classifies non-control
  * UI5 objects into semantic categories so the AI layer can provide contextual
  * assistance. Categories include model, router, controller, binding, context,
  * event, formatter, validator, type, component, manifest, i18n, and unknown.

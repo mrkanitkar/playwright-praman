@@ -218,6 +218,11 @@ export const ACTION_MAP = {
   loginFromEnv: 'Login from env',
   logout: 'Logout',
   isAuthenticated: 'Check authentication',
+
+  // TestDataHandler
+  save: 'Save test data',
+  load: 'Load test data',
+  cleanup: 'Cleanup test data',
 } as const satisfies Record<string, string>;
 
 /**
