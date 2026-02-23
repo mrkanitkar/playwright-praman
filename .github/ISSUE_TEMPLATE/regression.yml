@@ -1,7 +1,7 @@
-name: Bug Report
-description: Create a bug report to help us improve
-title: '[Bug]: '
-labels: ['bug', 'triage']
+name: Report regression
+description: Functionality that used to work and does not any more
+title: '[Regression]: '
+labels: ['bug', 'regression']
 body:
   - type: markdown
     attributes:
@@ -10,29 +10,32 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## Troubleshoot
-        If playwright-praman is not behaving the way you expect, please check the [documentation](https://github.com/mrkanitkar/playwright-praman#readme) and search existing issues first.
-        Please make reasonable efforts to troubleshoot and rule out issues with your code, configuration, or SAP system setup.
-  - type: markdown
-    attributes:
-      value: |
         ## Make a minimal reproduction
-        To file the report, you will need a minimal (but complete) example and clear steps on how to reproduce the bug.
-        The simpler you can make it, the more likely we are to successfully verify and fix the bug.
+        To file the report, you will need a minimal (but complete) example and clear steps on how to reproduce the regression.
+        The simpler you can make it, the more likely we are to successfully verify and fix the regression.
   - type: markdown
     attributes:
       value: |
         > [!IMPORTANT]
-        > Bug reports without a minimal reproduction will be rejected.
+        > Regression reports without a minimal reproduction will be rejected.
 
         ---
   - type: input
-    id: version
+    id: goodVersion
     attributes:
-      label: Version
+      label: Last Good Version
       description: |
-        The version of playwright-praman you are using.
-        Is it the [latest](https://github.com/mrkanitkar/playwright-praman/releases)? Test and see if the bug has already been fixed.
+        Last version of playwright-praman where the feature was working.
+      placeholder: ex. 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: badVersion
+    attributes:
+      label: First Bad Version
+      description: |
+        First version of playwright-praman where the feature was broken.
+        Is it the [latest](https://github.com/mrkanitkar/playwright-praman/releases)? Test and see if the regression has already been fixed.
       placeholder: ex. 1.0.1
     validations:
       required: true
@@ -40,13 +43,7 @@ body:
     id: reproduction
     attributes:
       label: Steps to reproduce
-      description: Please provide a minimal reproduction and describe accurately how we can reproduce/verify the bug.
-      placeholder: |
-        Example steps (replace with your own):
-        1. Clone my repo at https://github.com/<myuser>/example
-        2. npm install
-        3. npx playwright test
-        4. You should see the error come up
+      description: Please provide a minimal reproduction and describe accurately how we can reproduce/verify the regression.
     validations:
       required: true
   - type: textarea
@@ -78,7 +75,6 @@ body:
       label: Environment
       description: |
         Please provide your environment details.
-        Include Node.js version, Playwright version, OS, and SAP UI5 version if applicable.
       placeholder: |
         OS: macOS 15.3
         Node: 22.x
