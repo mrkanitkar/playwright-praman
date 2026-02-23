@@ -45,6 +45,8 @@ skills/playwright-praman-sap-testing/SKILL.md
 src/proxy/typed/*.generated.ts
 *.sbom.json
 license-report.json
+plans/
+mk2/
 
 # Strict TypeScript Project
 # WARNING: JavaScript files (.js, .jsx, .mjs, .cjs) are NOT allowed in src/
