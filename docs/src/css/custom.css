@@ -1,54 +1,71 @@
 /**
- * Praman Docusaurus Theme — Elegant Indigo/Violet
- * Brand-aligned with AI-first SAP testing identity.
+ * Praman Docusaurus Theme — Teal + Amber Dual Accent
+ * Light: Teal #0d9488 primary, Amber #f59e0b secondary, Slate ink
+ * Dark:  Teal #2dd4bf primary, Amber #f59e0b secondary, Navy bg
+ * Font:  DM Sans
  */
+
+/* ── Google Fonts import ──────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
 
 /* ── Light Mode ─────────────────────────────────────────── */
 :root {
-  --ifm-color-primary: #4f46e5;
-  --ifm-color-primary-dark: #4338ca;
-  --ifm-color-primary-darker: #3730a3;
-  --ifm-color-primary-darkest: #312e81;
-  --ifm-color-primary-light: #6366f1;
-  --ifm-color-primary-lighter: #818cf8;
-  --ifm-color-primary-lightest: #a5b4fc;
+  --ifm-color-primary: #0d9488;
+  --ifm-color-primary-dark: #0b7e74;
+  --ifm-color-primary-darker: #0a776d;
+  --ifm-color-primary-darkest: #08625a;
+  --ifm-color-primary-light: #0faa9c;
+  --ifm-color-primary-lighter: #10b1a3;
+  --ifm-color-primary-lightest: #14ccbc;
 
-  --ifm-font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ifm-font-family-base: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --ifm-heading-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ifm-heading-font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --ifm-code-font-size: 90%;
   --ifm-heading-font-weight: 700;
   --ifm-font-weight-bold: 600;
 
-  --ifm-background-color: #fafafa;
-  --ifm-navbar-background-color: rgba(255, 255, 255, 0.85);
-  --ifm-footer-background-color: #1e1b4b;
+  --ifm-background-color: #ffffff;
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.92);
+  --ifm-footer-background-color: #0f172a;
 
-  --docusaurus-highlighted-code-line-bg: rgba(79, 70, 229, 0.1);
+  --praman-accent-secondary: #f59e0b;
+  --praman-ink: #0f172a;
+  --praman-ink-secondary: #475569;
+  --praman-border: #e2e8f0;
+  --praman-surface-alt: #f8fafc;
+
+  --docusaurus-highlighted-code-line-bg: rgba(13, 148, 136, 0.1);
 }
 
 /* ── Dark Mode ──────────────────────────────────────────── */
 [data-theme='dark'] {
-  --ifm-color-primary: #818cf8;
-  --ifm-color-primary-dark: #6366f1;
-  --ifm-color-primary-darker: #4f46e5;
-  --ifm-color-primary-darkest: #4338ca;
-  --ifm-color-primary-light: #a5b4fc;
-  --ifm-color-primary-lighter: #c7d2fe;
-  --ifm-color-primary-lightest: #e0e7ff;
+  --ifm-color-primary: #2dd4bf;
+  --ifm-color-primary-dark: #1ac4af;
+  --ifm-color-primary-darker: #19b9a5;
+  --ifm-color-primary-darkest: #149888;
+  --ifm-color-primary-light: #4fdccb;
+  --ifm-color-primary-lighter: #5adfcf;
+  --ifm-color-primary-lightest: #7ee8db;
 
-  --ifm-background-color: #0f0f23;
-  --ifm-navbar-background-color: rgba(15, 15, 35, 0.9);
-  --ifm-footer-background-color: #0a0a1a;
+  --ifm-background-color: #0c1220;
+  --ifm-navbar-background-color: rgba(12, 18, 32, 0.92);
+  --ifm-footer-background-color: #070c16;
 
-  --docusaurus-highlighted-code-line-bg: rgba(129, 140, 248, 0.15);
+  --praman-accent-secondary: #f59e0b;
+  --praman-ink: #f8fafc;
+  --praman-ink-secondary: #94a3b8;
+  --praman-border: #1e293b;
+  --praman-surface-alt: #0f172a;
+
+  --docusaurus-highlighted-code-line-bg: rgba(45, 212, 191, 0.15);
 }
 
 /* ── Navbar glassmorphism ───────────────────────────────── */
 .navbar {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(79, 70, 229, 0.08);
+  border-bottom: 1px solid var(--praman-border);
   box-shadow: none;
 }
 
@@ -64,43 +81,352 @@
   width: 24px;
   height: 24px;
   display: flex;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%23333'/%3E%3C/svg%3E") no-repeat;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%230f172a'/%3E%3C/svg%3E") no-repeat;
 }
 
 [data-theme='dark'] .header-github-link::before {
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%23fff'/%3E%3C/svg%3E") no-repeat;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%23f8fafc'/%3E%3C/svg%3E") no-repeat;
 }
 
-/* ── Hero section ───────────────────────────────────────── */
+/* ── Announcement bar ───────────────────────────────────── */
+div[class*='announcementBar'] {
+  background: var(--ifm-color-primary) !important;
+  color: #fff !important;
+}
+
+/* ── Hero section (landing page) ────────────────────────── */
 .hero--primary {
-  background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #7c3aed 100%);
-  color: #ffffff;
+  background: var(--ifm-background-color);
+  color: var(--praman-ink);
   padding: 4rem 0;
 }
 
 [data-theme='dark'] .hero--primary {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+  background: var(--ifm-background-color);
 }
 
 .hero__title {
   font-size: 3.5rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
 }
 
 .hero__subtitle {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 400;
-  opacity: 0.9;
-  max-width: 600px;
+  color: var(--praman-ink-secondary);
+  max-width: 540px;
   margin: 0 auto;
 }
 
-/* ── Feature cards ──────────────────────────────────────── */
+/* ── Landing page custom components ─────────────────────── */
+.praman-pills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--praman-ink-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.praman-pills .dot {
+  font-size: 1.4rem;
+  color: var(--praman-accent-secondary);
+  line-height: 1;
+}
+
+.praman-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.praman-section-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.6rem;
+  color: var(--praman-ink);
+}
+
+.praman-pitch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--praman-border);
+  border: 1px solid var(--praman-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.praman-pitch-cell {
+  background: var(--ifm-background-color);
+  padding: 2rem;
+  transition: background 0.15s;
+}
+
+.praman-pitch-cell:hover {
+  background: var(--praman-surface-alt);
+}
+
+.praman-pitch-step {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--praman-accent-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.praman-pitch-cell h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.praman-pitch-cell p {
+  color: var(--praman-ink-secondary);
+  font-size: 0.88rem;
+  margin-bottom: 0;
+}
+
+/* ── Code showcase ──────────────────────────────────────── */
+.praman-code-block {
+  background: #0f172a;
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  text-align: left;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.praman-code-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.praman-code-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.praman-code-dots span:nth-child(1) { background: #ef4444; }
+.praman-code-dots span:nth-child(2) { background: #f59e0b; }
+.praman-code-dots span:nth-child(3) { background: #22c55e; }
+
+.praman-code-block pre {
+  margin: 0;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: #e2e8f0;
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+.praman-code-block .kw { color: #c4b5fd; }
+.praman-code-block .str { color: #86efac; }
+.praman-code-block .cmt { color: #64748b; }
+.praman-code-block .fn { color: #93c5fd; }
+
+/* ── Feature list ───────────────────────────────────────── */
+.praman-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.praman-features-list li {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--praman-border);
+}
+
+.praman-features-list li:last-child {
+  border-bottom: none;
+}
+
+.praman-features-list .icon {
+  font-size: 1.5rem;
+  text-align: center;
+  padding-top: 2px;
+}
+
+.praman-features-list h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.praman-features-list p {
+  color: var(--praman-ink-secondary);
+  font-size: 0.88rem;
+  margin-bottom: 0;
+}
+
+/* ── Philosophy section ─────────────────────────────────── */
+.praman-philosophy {
+  background: var(--praman-surface-alt);
+  border-top: 1px solid var(--praman-border);
+  border-bottom: 1px solid var(--praman-border);
+}
+
+.praman-quote {
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--praman-ink-secondary);
+  max-width: 640px;
+  margin: 0 auto 3rem;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.praman-quote strong {
+  color: var(--praman-ink);
+}
+
+.praman-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.praman-pillar {
+  padding: 1.5rem;
+  border: 1px solid var(--praman-border);
+  border-radius: 8px;
+  background: var(--ifm-background-color);
+  transition: border-color 0.15s;
+  border-left: 3px solid var(--praman-accent-secondary);
+}
+
+.praman-pillar:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+.praman-pillar-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--praman-accent-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.praman-pillar h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.praman-pillar p {
+  color: var(--praman-ink-secondary);
+  font-size: 0.82rem;
+  margin-bottom: 0;
+}
+
+/* ── Assurance bar ──────────────────────────────────────── */
+.praman-assurance {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.praman-assurance-item {
+  font-size: 0.85rem;
+  color: var(--praman-ink-secondary);
+  font-weight: 500;
+}
+
+.praman-assurance-item span {
+  color: var(--ifm-color-primary);
+  margin-right: 0.3rem;
+}
+
+/* ── CTA section ────────────────────────────────────────── */
+.praman-cta h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.praman-cta p {
+  color: var(--praman-ink-secondary);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+.praman-btn {
+  padding: 0.7rem 1.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.15s;
+  display: inline-block;
+}
+
+.praman-btn-dark {
+  background: var(--praman-ink);
+  color: #fff;
+}
+
+[data-theme='dark'] .praman-btn-dark {
+  background: var(--praman-accent-secondary);
+  color: #0c1220;
+}
+
+.praman-btn-dark:hover {
+  opacity: 0.9;
+  color: #fff;
+  text-decoration: none;
+}
+
+[data-theme='dark'] .praman-btn-dark:hover {
+  color: #0c1220;
+}
+
+.praman-btn-light {
+  background: var(--praman-surface-alt);
+  color: var(--praman-ink);
+  border: 1px solid var(--praman-border);
+}
+
+[data-theme='dark'] .praman-btn-light {
+  background: transparent;
+  color: var(--praman-ink);
+  border-color: #334155;
+}
+
+.praman-btn-light:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--praman-ink);
+  text-decoration: none;
+}
+
+/* ── Feature cards (docs pages) ─────────────────────────── */
 .feature-card {
-  background: #ffffff;
-  border: 1px solid rgba(79, 70, 229, 0.08);
+  background: var(--ifm-background-color);
+  border: 1px solid var(--praman-border);
   border-radius: 12px;
   padding: 2rem;
   transition: all 0.2s ease;
@@ -109,18 +435,18 @@
 
 .feature-card:hover {
   border-color: var(--ifm-color-primary-lighter);
-  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.12);
   transform: translateY(-2px);
 }
 
 [data-theme='dark'] .feature-card {
-  background: #1a1a2e;
-  border-color: rgba(129, 140, 248, 0.1);
+  background: #0f172a;
+  border-color: #1e293b;
 }
 
 [data-theme='dark'] .feature-card:hover {
-  border-color: rgba(129, 140, 248, 0.3);
-  box-shadow: 0 8px 24px rgba(129, 140, 248, 0.08);
+  border-color: rgba(45, 212, 191, 0.3);
+  box-shadow: 0 8px 24px rgba(45, 212, 191, 0.08);
 }
 
 .feature-icon {
@@ -131,7 +457,7 @@
 /* ── Code blocks ────────────────────────────────────────── */
 .prism-code {
   border-radius: 8px;
-  border: 1px solid rgba(79, 70, 229, 0.08);
+  border: 1px solid var(--praman-border);
 }
 
 /* ── Sidebar ────────────────────────────────────────────── */
@@ -146,7 +472,7 @@
 
 /* ── Footer ─────────────────────────────────────────────── */
 .footer--dark {
-  background: linear-gradient(180deg, #1e1b4b 0%, #0f0d2e 100%);
+  background: linear-gradient(180deg, #0f172a 0%, #070c16 100%);
 }
 
 .footer__logo {
@@ -156,10 +482,24 @@
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 768px) {
   .hero__title {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
   }
 
   .hero__subtitle {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+
+  .praman-pitch-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .praman-pillars-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .praman-pillars-grid {
+    grid-template-columns: 1fr;
   }
 }

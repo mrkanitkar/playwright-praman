@@ -1,0 +1,67 @@
+/**
+ * Praman TypeDoc Theme Override — Teal + Amber Dual Accent
+ * Overrides TypeDoc default theme CSS variables for brand consistency.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* ── Light Mode ── */
+:root {
+  --light-color-background: #ffffff;
+  --light-color-background-secondary: #f8fafc;
+  --light-color-background-active: #e2e8f0;
+  --light-color-accent: #cbd5e1;
+  --light-color-text: #0f172a;
+  --light-color-contrast-text: #0f172a;
+  --light-color-text-aside: #475569;
+  --light-color-link: #0d9488;
+  --light-color-focus-outline: #0d9488;
+
+  --light-color-ts-keyword: #0d9488;
+  --light-color-ts-function: #0b7e74;
+  --light-color-ts-class: #0d9488;
+  --light-color-ts-interface: #0f766e;
+  --light-color-ts-property: #92400e;
+  --light-color-ts-method: #0d9488;
+  --light-color-ts-variable: #0b7e74;
+  --light-color-ts-type-alias: #b45309;
+  --light-color-ts-enum: #92400e;
+}
+
+/* ── Dark Mode ── */
+:root {
+  --dark-color-background: #0c1220;
+  --dark-color-background-secondary: #0f172a;
+  --dark-color-background-active: #1e293b;
+  --dark-color-accent: #334155;
+  --dark-color-text: #f8fafc;
+  --dark-color-contrast-text: #ffffff;
+  --dark-color-text-aside: #94a3b8;
+  --dark-color-link: #2dd4bf;
+  --dark-color-focus-outline: #2dd4bf;
+
+  --dark-color-ts-keyword: #2dd4bf;
+  --dark-color-ts-function: #5eead4;
+  --dark-color-ts-class: #2dd4bf;
+  --dark-color-ts-interface: #14b8a6;
+  --dark-color-ts-property: #fbbf24;
+  --dark-color-ts-method: #2dd4bf;
+  --dark-color-ts-variable: #5eead4;
+  --dark-color-ts-type-alias: #f59e0b;
+  --dark-color-ts-enum: #fbbf24;
+}
+
+/* ── Font override ── */
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* ── Navigation links brand color ── */
+.tsd-navigation a {
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ── Toolbar brand feel ── */
+.tsd-page-toolbar {
+  font-family: 'DM Sans', system-ui, sans-serif;
+}

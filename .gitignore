@@ -38,7 +38,10 @@ docs/.docusaurus/
 docs/build/
 docs/api/
 docs/docs/api/
-docs/static/api-html/
+docs/static/api-html/*
+!docs/static/api-html/assets/
+docs/static/api-html/assets/*
+!docs/static/api-html/assets/praman-theme.css
 
 # Generated
 skills/playwright-praman-sap-testing/SKILL.md
