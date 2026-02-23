@@ -118,7 +118,7 @@ const config: Config = {
         },
         // ── Menu 3: TypeDoc API (standalone HTML) ──
         {
-          href: '/playwright-praman/api-html/',
+          href: '/playwright-praman/api-html/index.html',
           position: 'left',
           label: 'TypeDoc API',
         },
@@ -144,7 +144,7 @@ const config: Config = {
           items: [
             { label: 'Introduction', to: '/docs' },
             { label: 'API Reference', to: '/docs/api' },
-            { label: 'TypeDoc API', href: '/playwright-praman/api-html/' },
+            { label: 'TypeDoc API', href: '/playwright-praman/api-html/index.html' },
           ],
         },
         {
