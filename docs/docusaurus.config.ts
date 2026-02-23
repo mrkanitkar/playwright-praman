@@ -118,9 +118,10 @@ const config: Config = {
         },
         // ── Menu 3: TypeDoc API (standalone HTML) ──
         {
-          href: '/playwright-praman/api-html/index.html',
+          href: 'https://mrkanitkar.github.io/playwright-praman/api-html/index.html',
           position: 'left',
           label: 'TypeDoc API',
+          target: '_self',
         },
         // ── Menu 3: Blog (enable when posts are added) ──\n        // { to: '/blog', label: 'Blog', position: 'left' },
         // ── Right side ──
@@ -144,7 +145,10 @@ const config: Config = {
           items: [
             { label: 'Introduction', to: '/docs' },
             { label: 'API Reference', to: '/docs/api' },
-            { label: 'TypeDoc API', href: '/playwright-praman/api-html/index.html' },
+            {
+              label: 'TypeDoc API',
+              href: 'https://mrkanitkar.github.io/playwright-praman/api-html/index.html',
+            },
           ],
         },
         {
