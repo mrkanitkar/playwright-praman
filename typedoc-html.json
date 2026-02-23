@@ -106,7 +106,7 @@
     "SetSignature"
   ],
 
-  "customCss": "docs/static/api-html/assets/praman-theme.css",
+  "customCss": "docs/src/typedoc/praman-theme.css",
   "hideGenerator": false,
   "theme": "default",
   "gitRevision": "main",
