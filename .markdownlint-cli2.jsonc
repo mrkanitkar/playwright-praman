@@ -10,6 +10,7 @@
     "skills/playwright-praman-sap-testing/skills-sap-ui5-webcomponents-expert.md",
     "skills/playwright-praman-sap-testing/skills-team-overview.md",
     "docs/mcp-sap-docs-setup.md",
+    "docs/docs/**",
     "temp/**",
     "node_modules/"
   ]

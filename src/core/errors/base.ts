@@ -107,6 +107,12 @@ export class PramanError extends Error {
   constructor(options: PramanErrorOptions) {
     super(options.message, options.cause !== undefined ? { cause: options.cause } : undefined);
 
+    // Strip internal framework frames so stack traces start at the user's call site.
+    // captureStackTrace is a V8 extension (Node.js, Chromium) — guard for cross-platform safety.
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, this.constructor);
+    }
+
     this.name = 'PramanError';
     this.code = options.code;
     this.attempted = options.attempted;

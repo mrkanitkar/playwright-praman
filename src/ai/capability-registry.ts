@@ -31,6 +31,8 @@ import type {
   CapabilityStats,
 } from './types.js';
 
+import { assertNever } from '#core/utils/assert-never.js';
+
 /**
  * Queryable registry of Praman API capabilities for AI agents.
  *
@@ -269,6 +271,8 @@ export class CapabilityRegistry {
       case 'gemini': {
         return this.formatForGemini(entries);
       }
+      default:
+        return assertNever(provider);
     }
   }
 

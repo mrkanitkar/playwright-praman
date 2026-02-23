@@ -8,18 +8,26 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import type {
+  AppId,
   BindingPath,
   ControlId,
+  CSSSelector,
   EntitySetName,
+  ODataUrl,
   SemanticObject,
   ViewName,
+  XPathSelector,
 } from '#core/types/branded.js';
 import {
+  appId,
   bindingPath,
   controlId,
+  cssSelector,
   entitySetName,
+  odataUrl,
   semanticObject,
   viewName,
+  xpathSelector,
 } from '#core/types/branded.js';
 
 describe('Branded types', () => {
@@ -85,6 +93,54 @@ describe('Branded types', () => {
     });
   });
 
+  describe('cssSelector()', () => {
+    it('creates a CSSSelector from a string', () => {
+      const sel = cssSelector('.sapMBtn');
+      expect(sel).toBe('.sapMBtn');
+    });
+
+    it('returns a value typed as CSSSelector', () => {
+      const sel = cssSelector('#myControl');
+      expectTypeOf(sel).toExtend<CSSSelector>();
+    });
+  });
+
+  describe('xpathSelector()', () => {
+    it('creates an XPathSelector from a string', () => {
+      const xpath = xpathSelector('//button[@id="submit"]');
+      expect(xpath).toBe('//button[@id="submit"]');
+    });
+
+    it('returns a value typed as XPathSelector', () => {
+      const xpath = xpathSelector('//div[@class="content"]');
+      expectTypeOf(xpath).toExtend<XPathSelector>();
+    });
+  });
+
+  describe('odataUrl()', () => {
+    it('creates an ODataUrl from a string', () => {
+      const url = odataUrl('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');
+      expect(url).toBe('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');
+    });
+
+    it('returns a value typed as ODataUrl', () => {
+      const url = odataUrl('/sap/opu/odata/sap/API_SALESORDER_SRV');
+      expectTypeOf(url).toExtend<ODataUrl>();
+    });
+  });
+
+  describe('appId()', () => {
+    it('creates an AppId from a string', () => {
+      const app = appId('PurchaseOrder-manage');
+      expect(app).toBe('PurchaseOrder-manage');
+    });
+
+    it('returns a value typed as AppId', () => {
+      const app = appId('SalesOrder-display');
+      expectTypeOf(app).toExtend<AppId>();
+    });
+  });
+
   // ── Type-level discrimination tests ──────────────────────────────
 
   describe('type discrimination', () => {
@@ -122,6 +178,42 @@ describe('Branded types', () => {
 
     it('SemanticObject is not assignable to EntitySetName', () => {
       expectTypeOf<SemanticObject>().not.toExtend<EntitySetName>();
+    });
+
+    it('CSSSelector extends string', () => {
+      expectTypeOf<CSSSelector>().toExtend<string>();
+    });
+
+    it('XPathSelector extends string', () => {
+      expectTypeOf<XPathSelector>().toExtend<string>();
+    });
+
+    it('ODataUrl extends string', () => {
+      expectTypeOf<ODataUrl>().toExtend<string>();
+    });
+
+    it('AppId extends string', () => {
+      expectTypeOf<AppId>().toExtend<string>();
+    });
+
+    it('CSSSelector is not assignable to XPathSelector', () => {
+      expectTypeOf<CSSSelector>().not.toExtend<XPathSelector>();
+    });
+
+    it('XPathSelector is not assignable to ODataUrl', () => {
+      expectTypeOf<XPathSelector>().not.toExtend<ODataUrl>();
+    });
+
+    it('ODataUrl is not assignable to AppId', () => {
+      expectTypeOf<ODataUrl>().not.toExtend<AppId>();
+    });
+
+    it('AppId is not assignable to CSSSelector', () => {
+      expectTypeOf<AppId>().not.toExtend<CSSSelector>();
+    });
+
+    it('CSSSelector is not assignable to ControlId', () => {
+      expectTypeOf<CSSSelector>().not.toExtend<ControlId>();
     });
 
     it('plain string is not assignable to ControlId', () => {
