@@ -143,7 +143,7 @@ The vocabulary matcher uses a tiered scoring system:
 | Exact   | 1.0        | Query exactly matches term name or synonym (case-insensitive) |
 | Prefix  | 0.9        | Term name starts with the query string                        |
 | Partial | 0.7        | Term name contains the query string                           |
-| Fuzzy   | 0.5        | Levenshtein distance <= 3 characters                          |
+| Fuzzy   | 0.5        | Levenshtein distance &lt;= 3 characters                       |
 
 ### Normalization
 

@@ -89,7 +89,8 @@ export class FooterHandler {
       (text: string) => {
         const buttons = document.querySelectorAll('.sapMBarChild .sapMBtn');
         for (const btn of buttons) {
-          if (btn.textContent.trim() === text && btn instanceof HTMLElement) {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- textContent is string | null per DOM spec; TypeDoc strict mode requires null guard
+          if ((btn.textContent ?? '').trim() === text && btn instanceof HTMLElement) {
             btn.click();
             return true;
           }

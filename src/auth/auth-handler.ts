@@ -293,7 +293,8 @@ export class SAPAuthHandler {
           // Also check by text content
           const allButtons = document.querySelectorAll('button, [role="button"], a, span');
           for (const element of allButtons) {
-            const text = element.textContent.trim().toLowerCase();
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- textContent is string | null per DOM spec; TypeDoc strict mode requires null guard
+            const text = (element.textContent ?? '').trim().toLowerCase();
             if (text === 'sign out' || text === 'log out' || text === 'logout') {
               return true;
             }
@@ -322,7 +323,8 @@ export class SAPAuthHandler {
         // Fallback: find by text content
         const allButtons = document.querySelectorAll('button, [role="button"], a, span');
         for (const element of allButtons) {
-          const text = element.textContent.trim().toLowerCase();
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- textContent is string | null per DOM spec; TypeDoc strict mode requires null guard
+          const text = (element.textContent ?? '').trim().toLowerCase();
           if (
             (text === 'sign out' || text === 'log out' || text === 'logout') &&
             element instanceof HTMLElement

@@ -103,37 +103,37 @@ All exports are validated by `@arethetypeswrong/cli` (attw) in CI.
 
 The architecture is guided by 29 documented design decisions:
 
-| #   | Decision                                                         | Category      |
-| --- | ---------------------------------------------------------------- | ------------- |
-| D1  | Single package with sub-path exports (not monorepo)              | Packaging     |
-| D2  | Internal fixture composition via `extend()` chain                | Fixtures      |
-| D3  | ~~Version-negotiated bridge adapters~~ (REMOVED Phase 3)         | Bridge        |
-| D4  | Hybrid typed proxy: 199 typed interfaces + dynamic fallback      | Proxy         |
-| D5  | 4-layer observability: Reporter + pino + OTel + AI telemetry     | Observability |
-| D6  | Zod validation at external boundaries only                       | Validation    |
-| D7  | Zod-validated `praman.config.ts` with env overrides              | Config        |
-| D8  | Unified `PramanError` hierarchy with 13 subclasses               | Errors        |
-| D9  | AI Mode A (SKILL.md) + Mode C (agentic fixture)                  | AI            |
-| D10 | Vitest unit tests + Playwright integration tests                 | Testing       |
-| D11 | No plugin API in v1.0                                            | Extension     |
-| D12 | Auto-generated SKILL.md + Docusaurus + TypeDoc                   | Docs          |
-| D13 | Apache 2.0 license                                               | Legal         |
-| D14 | Playwright `>=1.50.0 <2.0.0` with CI matrix                      | Compat        |
-| D15 | Security: dep scanning, secret redaction, SBOM, provenance       | Security      |
-| D16 | Single unified proxy (no double-proxy)                           | Proxy         |
-| D17 | Bidirectional proxy conversion (UI5Object <-> UI5ControlProxy)   | Proxy         |
-| D18 | Integrated discovery factory (removed dead code)                 | Discovery     |
-| D19 | Centralized `__praman_getById()` (3-tier API resolution)         | Bridge        |
-| D20 | Browser objectMap with TTL + cleanup                             | Memory        |
-| D21 | Shared interaction logic across strategies                       | Interactions  |
-| D22 | Auto-generated method signatures (199 interfaces, 4,092 methods) | Types         |
-| D23 | `skipStabilityWait` as global config + per-selector override     | Stability     |
-| D24 | `exec()` with `new Function()` + security documentation          | Security      |
-| D25 | Visibility preference default (prefer visible controls)          | Discovery     |
-| D26 | UI5Object AI introspection as first-class capability             | AI            |
-| D27 | Module size <= 300 LOC guideline (with documented exceptions)    | Quality       |
-| D28 | Auth via Playwright project dependencies (not globalSetup)       | Auth          |
-| D29 | Enhanced error model + AI response envelope                      | AI/Errors     |
+| #   | Decision                                                                 | Category      |
+| --- | ------------------------------------------------------------------------ | ------------- |
+| D1  | Single package with sub-path exports (not monorepo)                      | Packaging     |
+| D2  | Internal fixture composition via `extend()` chain                        | Fixtures      |
+| D3  | ~~Version-negotiated bridge adapters~~ (REMOVED Phase 3)                 | Bridge        |
+| D4  | Hybrid typed proxy: 199 typed interfaces + dynamic fallback              | Proxy         |
+| D5  | 4-layer observability: Reporter + pino + OTel + AI telemetry             | Observability |
+| D6  | Zod validation at external boundaries only                               | Validation    |
+| D7  | Zod-validated `praman.config.ts` with env overrides                      | Config        |
+| D8  | Unified `PramanError` hierarchy with 13 subclasses                       | Errors        |
+| D9  | AI Mode A (SKILL.md) + Mode C (agentic fixture)                          | AI            |
+| D10 | Vitest unit tests + Playwright integration tests                         | Testing       |
+| D11 | No plugin API in v1.0                                                    | Extension     |
+| D12 | Auto-generated SKILL.md + Docusaurus + TypeDoc                           | Docs          |
+| D13 | Apache 2.0 license                                                       | Legal         |
+| D14 | Playwright `>=1.50.0 <2.0.0` with CI matrix                              | Compat        |
+| D15 | Security: dep scanning, secret redaction, SBOM, provenance               | Security      |
+| D16 | Single unified proxy (no double-proxy)                                   | Proxy         |
+| D17 | Bidirectional proxy conversion (`UI5Object` &lt;-&gt; `UI5ControlProxy`) | Proxy         |
+| D18 | Integrated discovery factory (removed dead code)                         | Discovery     |
+| D19 | Centralized `__praman_getById()` (3-tier API resolution)                 | Bridge        |
+| D20 | Browser objectMap with TTL + cleanup                                     | Memory        |
+| D21 | Shared interaction logic across strategies                               | Interactions  |
+| D22 | Auto-generated method signatures (199 interfaces, 4,092 methods)         | Types         |
+| D23 | `skipStabilityWait` as global config + per-selector override             | Stability     |
+| D24 | `exec()` with `new Function()` + security documentation                  | Security      |
+| D25 | Visibility preference default (prefer visible controls)                  | Discovery     |
+| D26 | UI5Object AI introspection as first-class capability                     | AI            |
+| D27 | Module size &lt;= 300 LOC guideline (with documented exceptions)         | Quality       |
+| D28 | Auth via Playwright project dependencies (not globalSetup)               | Auth          |
+| D29 | Enhanced error model + AI response envelope                              | AI/Errors     |
 
 ## Module Decomposition Rationale
 
@@ -171,7 +171,7 @@ Praman v1.0 decomposes these into focused modules following SRP (Single Responsi
 - `discovery.ts` (111 LOC) -- 3-tier control discovery
 - `cache.ts` (104 LOC) -- Proxy cache with RegExp keys
 
-Every module targets <= 300 LOC. Exceptions are documented with justification comments.
+Every module targets &lt;= 300 LOC. Exceptions are documented with justification comments.
 
 ## Codebase Metrics
 
