@@ -62,6 +62,21 @@ describe('PramanError', () => {
       expect(error.stack).toContain('PramanError');
     });
 
+    it('still creates error when captureStackTrace is unavailable', () => {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      const original = Error.captureStackTrace;
+      // Temporarily remove captureStackTrace to exercise the guard branch
+      Object.defineProperty(Error, 'captureStackTrace', { value: undefined, configurable: true });
+      try {
+        const error = new PramanError(SAMPLE_OPTIONS);
+        expect(error).toBeInstanceOf(PramanError);
+        expect(error.code).toBe(SAMPLE_OPTIONS.code);
+        expect(error.stack).toBeDefined();
+      } finally {
+        Object.defineProperty(Error, 'captureStackTrace', { value: original, configurable: true });
+      }
+    });
+
     it('sets timestamp as ISO 8601 string', () => {
       const before = new Date().toISOString();
       const error = new PramanError(SAMPLE_OPTIONS);
