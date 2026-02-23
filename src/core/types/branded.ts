@@ -11,11 +11,13 @@
  *
  * @example
  * ```typescript
- * import { controlId, viewName, bindingPath } from '#core/types/branded.js';
+ * import { controlId, viewName, bindingPath, cssSelector, appId } from '#core/types/branded.js';
  *
  * const id = controlId('myButton');
  * const view = viewName('my.app.View1');
  * const path = bindingPath('/Products(1)/Name');
+ * const css = cssSelector('.sapMBtn');
+ * const app = appId('PurchaseOrder-manage');
  * ```
  *
  * @module types
@@ -91,6 +93,94 @@ export type SemanticObject = Brand<string, 'SemanticObject'>;
  * ```
  */
 export type EntitySetName = Brand<string, 'EntitySetName'>;
+
+/**
+ * A CSS selector string (e.g., `'.sapMBtn'`, `'#myControl'`).
+ *
+ * @example
+ * ```typescript
+ * import type { CSSSelector } from '#core/types/branded.js';
+ *
+ * function findElement(selector: CSSSelector): void { }
+ * ```
+ */
+export type CSSSelector = Brand<string, 'CSSSelector'>;
+
+/**
+ * An XPath expression string (e.g., `'//button[@id="submit"]'`).
+ *
+ * @example
+ * ```typescript
+ * import type { XPathSelector } from '#core/types/branded.js';
+ *
+ * function findByXPath(xpath: XPathSelector): void { }
+ * ```
+ */
+export type XPathSelector = Brand<string, 'XPathSelector'>;
+
+/**
+ * An OData service URL (e.g., `'/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV'`).
+ *
+ * @example
+ * ```typescript
+ * import type { ODataUrl } from '#core/types/branded.js';
+ *
+ * function connectToService(url: ODataUrl): void { }
+ * ```
+ */
+export type ODataUrl = Brand<string, 'ODataUrl'>;
+
+/**
+ * A Fiori Launchpad application ID (e.g., `'PurchaseOrder-manage'`).
+ *
+ * @example
+ * ```typescript
+ * import type { AppId } from '#core/types/branded.js';
+ *
+ * function launchApp(id: AppId): void { }
+ * ```
+ */
+export type AppId = Brand<string, 'AppId'>;
+
+// ── Template literal types ───────────────────────────────────────────────────
+
+/**
+ * An OData resource path that must start with a forward slash.
+ *
+ * @remarks
+ * Used for OData service paths like `'/Products'`, `'/PurchaseOrders(123)'`,
+ * or `'/SalesOrderSet?$filter=Status eq "Open"'`.
+ * The leading slash distinguishes absolute OData paths from relative property paths.
+ *
+ * @example
+ * ```typescript
+ * import type { ODataPath } from '#core/types/branded.js';
+ *
+ * const products: ODataPath = '/Products';
+ * const order: ODataPath = '/PurchaseOrders(123)';
+ * const filtered: ODataPath = '/SalesOrderSet?$filter=Status eq "Open"';
+ * ```
+ */
+export type ODataPath = `/${string}`;
+
+/**
+ * A semantic object-action pair for SAP Fiori intent-based navigation.
+ *
+ * @remarks
+ * Format: `'SemanticObject-action'` (e.g., `'PurchaseOrder-manage'`).
+ * The hyphen separates the semantic object from the action.
+ * Used by SAP Fiori Launchpad (FLP) for cross-app navigation.
+ *
+ * @example
+ * ```typescript
+ * import type { SemanticObjectAction } from '#core/types/branded.js';
+ *
+ * const manage: SemanticObjectAction = 'PurchaseOrder-manage';
+ * const display: SemanticObjectAction = 'SalesOrder-display';
+ * const create: SemanticObjectAction = 'Material-create';
+ * ```
+ */
+export type SemanticObjectAction = `${string}-${string}`;
 
 // ── Factory functions ─────────────────────────────────────────────────────────
 
@@ -177,4 +267,60 @@ export function semanticObject(obj: string): SemanticObject {
  */
 export function entitySetName(name: string): EntitySetName {
   return name as EntitySetName;
+}
+
+/**
+ * Create a branded {@link CSSSelector} from a raw string.
+ *
+ * @param selector - Raw CSS selector string.
+ * @returns Branded CSS selector.
+ * @example
+ * ```typescript
+ * const btn = cssSelector('.sapMBtn');
+ * ```
+ */
+export function cssSelector(selector: string): CSSSelector {
+  return selector as CSSSelector;
+}
+
+/**
+ * Create a branded {@link XPathSelector} from a raw string.
+ *
+ * @param xpath - Raw XPath expression string.
+ * @returns Branded XPath selector.
+ * @example
+ * ```typescript
+ * const btn = xpathSelector('//button[@id="submit"]');
+ * ```
+ */
+export function xpathSelector(xpath: string): XPathSelector {
+  return xpath as XPathSelector;
+}
+
+/**
+ * Create a branded {@link ODataUrl} from a raw string.
+ *
+ * @param url - Raw OData service URL string.
+ * @returns Branded OData URL.
+ * @example
+ * ```typescript
+ * const svc = odataUrl('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');
+ * ```
+ */
+export function odataUrl(url: string): ODataUrl {
+  return url as ODataUrl;
+}
+
+/**
+ * Create a branded {@link AppId} from a raw string.
+ *
+ * @param id - Raw FLP application ID string.
+ * @returns Branded FLP app ID.
+ * @example
+ * ```typescript
+ * const app = appId('PurchaseOrder-manage');
+ * ```
+ */
+export function appId(id: string): AppId {
+  return id as AppId;
 }

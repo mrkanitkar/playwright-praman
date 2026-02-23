@@ -38,6 +38,7 @@ yarn.lock
 # Generated files
 *.d.ts.map
 playwright-praman.sbom.json
+src/core/types/controls.ts
 
 # IDE
 .vscode/

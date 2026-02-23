@@ -42,6 +42,106 @@ test('SAP Fiori app navigation', async ({ page, ui5 }) => {
 });
 ```
 
+## Usage Examples
+
+### Table Operations with Auto-Retry Matchers
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('verify purchase order table', async ({ ui5, ui5Navigation }) => {
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+
+  await test.step('Check table data', async () => {
+    const rows = await ui5.table.getRows('poTable');
+    expect(rows.length).toBeGreaterThan(0);
+    await expect(page).toHaveUI5RowCount('poTable', 5);
+    await expect(page).toHaveUI5CellText('poTable', 0, 1, 'Active');
+  });
+
+  await test.step('Filter and sort', async () => {
+    await ui5.table.filterByColumn('poTable', 0, 'Active');
+    await ui5.table.sortByColumn('poTable', 1);
+  });
+});
+```
+
+### OData CRUD Operations
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('OData model and HTTP access', async ({ ui5 }) => {
+  await test.step('Read model data', async () => {
+    const vendor = await ui5.odata.getModelProperty('/PurchaseOrders(0)/Vendor');
+    expect(vendor).toBe('100001');
+    const dirty = await ui5.odata.hasPendingChanges();
+    expect(dirty).toBe(false);
+  });
+
+  await test.step('HTTP query', async () => {
+    const orders = await ui5.odata.queryEntities(
+      '/sap/opu/odata/sap/API_PO_SRV',
+      'PurchaseOrders',
+      { filter: "Status eq 'A'", top: 10 },
+    );
+    expect(orders.length).toBeGreaterThan(0);
+  });
+});
+```
+
+### Auth + Navigation Flow
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('authenticated navigation', async ({ ui5Navigation, ui5Shell }) => {
+  // storageState from setup project handles authentication
+
+  await test.step('Navigate via FLP', async () => {
+    await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+    await ui5Shell.expectShellHeader();
+  });
+
+  await test.step('Intent-based navigation', async () => {
+    await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', {
+      plant: '1000',
+    });
+    const hash = await ui5Navigation.getCurrentHash();
+    expect(hash).toContain('PurchaseOrder');
+  });
+
+  await test.step('Return home', async () => {
+    await ui5Navigation.navigateToHome();
+  });
+});
+```
+
+### AI-Powered Test Generation
+
+```typescript
+import { test } from 'playwright-praman';
+
+test('AI-assisted test discovery', async ({ pramanAI, page }) => {
+  await test.step('Discover page controls', async () => {
+    const context = await pramanAI.discoverPage({ interactiveOnly: true });
+    if (context.status === 'success') {
+      console.log(`Found ${context.data.controls.length} interactive controls`);
+    }
+  });
+
+  await test.step('Generate test from description', async () => {
+    const result = await pramanAI.agentic.generateTest(
+      'Create a purchase order for vendor 100001 with material MAT-001',
+      page,
+    );
+    if (result.status === 'success') {
+      console.log(result.data.code); // Generated TypeScript test
+    }
+  });
+});
+```
+
 ## Sub-path Exports
 
 | Export                         | Description                      |
