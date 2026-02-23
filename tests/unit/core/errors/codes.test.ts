@@ -114,8 +114,8 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 56 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(56);
+  it('has exactly 57 error codes', () => {
+    expect(Object.keys(ErrorCode)).toHaveLength(57);
   });
 
   // ── Immutability test ────────────────────────────────────────────────

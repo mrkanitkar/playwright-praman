@@ -46,6 +46,7 @@ import { createWorkZoneManager } from '../modules/workzone.js';
 import { resetPageInjection } from '#bridge/injection.js';
 import type { PramanConfig } from '#core/config/index.js';
 import { createLogger } from '#core/logging/index.js';
+import { withStep } from '#core/utils/step-decorator.js';
 
 /**
  * UI5 Navigation API provided by the `ui5Navigation` fixture.
@@ -286,20 +287,42 @@ export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
 
     const nav: UI5NavigationAPI = {
       navigateToApp: async (appId, options?) =>
-        navigateToApp(
-          page as never,
-          appId,
-          baseURL !== undefined ? { baseURL, ...options } : options,
+        withStep(`ui5Navigation.navigateToApp: ${appId}`, async () =>
+          navigateToApp(
+            page as never,
+            appId,
+            baseURL !== undefined ? { baseURL, ...options } : options,
+          ),
         ),
-      navigateToTile: async (title, options?) => navigateToTile(page as never, title, options),
+      navigateToTile: async (title, options?) =>
+        withStep(`ui5Navigation.navigateToTile: ${title}`, async () =>
+          navigateToTile(page as never, title, options),
+        ),
       navigateToIntent: async (intent, params?, options?) =>
-        navigateToIntent(page as never, intent, params, options),
-      navigateToHash: async (hash, options?) => navigateToHash(page as never, hash, options),
-      navigateToHome: async (options?) => navigateToHome(page as never, options),
-      navigateBack: async (options?) => navigateBack(page as never, options),
-      navigateForward: async (options?) => navigateForward(page as never, options),
-      searchAndOpenApp: async (title, options?) => searchAndOpenApp(page as never, title, options),
-      getCurrentHash: async () => getCurrentHash(page as never),
+        withStep(
+          `ui5Navigation.navigateToIntent: ${intent.semanticObject}-${intent.action}`,
+          async () => navigateToIntent(page as never, intent, params, options),
+        ),
+      navigateToHash: async (hash, options?) =>
+        withStep(`ui5Navigation.navigateToHash: ${hash}`, async () =>
+          navigateToHash(page as never, hash, options),
+        ),
+      navigateToHome: async (options?) =>
+        withStep('ui5Navigation.navigateToHome', async () =>
+          navigateToHome(page as never, options),
+        ),
+      navigateBack: async (options?) =>
+        withStep('ui5Navigation.navigateBack', async () => navigateBack(page as never, options)),
+      navigateForward: async (options?) =>
+        withStep('ui5Navigation.navigateForward', async () =>
+          navigateForward(page as never, options),
+        ),
+      searchAndOpenApp: async (title, options?) =>
+        withStep(`ui5Navigation.searchAndOpenApp: ${title}`, async () =>
+          searchAndOpenApp(page as never, title, options),
+        ),
+      getCurrentHash: async () =>
+        withStep('ui5Navigation.getCurrentHash', async () => getCurrentHash(page as never)),
     };
 
     await use(nav);

@@ -3,7 +3,7 @@
  * Unified control proxy — single Proxy handler with direct page.evaluate().
  *
  * @remarks
- * dhikraft-inspired: one Proxy, one get trap, direct `page.evaluate()` calls.
+ * mk-inspired: one Proxy, one get trap, direct `page.evaluate()` calls.
  * Method forwarder functions are cached per method name (wdi5 insight).
  * Inline 7-type return handler creates sub-proxies without a separate file.
  * Fluent chaining via thenable proxies enables `await control.getParent().getText()`.
@@ -147,7 +147,7 @@ function createChainableResult(promise: Promise<unknown>): unknown {
  *
  * @remarks
  * All fields are required — no optional adapter or page. The proxy calls
- * `page.evaluate()` directly (dhikraft pattern), eliminating the adapter layer.
+ * `page.evaluate()` directly (mk pattern), eliminating the adapter layer.
  *
  * @example
  * ```typescript
@@ -623,7 +623,7 @@ function throwIfBlacklisted(prop: string, state: ControlProxyState): void {
  * Creates a single unified Proxy for a UI5 control.
  *
  * @remarks
- * dhikraft-style: constructor-free, single `new Proxy()` with one get trap.
+ * mk-style: constructor-free, single `new Proxy()` with one get trap.
  * Method forwarders are cached in a `Map` to avoid re-creation on repeated
  * access (wdi5 insight). All method calls go through `page.evaluate()` directly —
  * no adapter layer, no data loss.

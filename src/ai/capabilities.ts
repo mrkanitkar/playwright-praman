@@ -2,7 +2,7 @@
  * Pre-built `capabilities` singleton for consumer-facing capability introspection.
  *
  * @remarks
- * Provides a ready-to-use module-level object matching the dhikraft parity API.
+ * Provides a ready-to-use module-level object matching the mk parity API.
  * Delegates all operations to a shared {@link CapabilityRegistry} instance.
  *
  * @example
@@ -25,7 +25,7 @@ const registry = new CapabilityRegistry();
 /**
  * Consumer-facing capabilities introspection API.
  *
- * @intent Provide drop-in parity with dhikraft's `capabilities` object.
+ * @intent Provide drop-in parity with mk's `capabilities` object.
  * @capability Capability discovery, AI context building.
  *
  * @example
@@ -65,6 +65,24 @@ export const capabilities = {
 
   /** Returns structured JSON optimised for AI agent consumption. */
   forAI: (): CapabilitiesJSON => registry.forAI(),
+
+  /** Returns capabilities relevant to a specific UI5 control type. */
+  forControl: (controlType: string): CapabilityEntry[] => registry.find(controlType),
+
+  /** Returns a human-readable description of a named capability. */
+  describe: (name: string): string | undefined => registry.findByName(name)?.description,
+
+  /** Returns unique category names across all registered capabilities. */
+  getCategories: (): readonly string[] => registry.getStatistics().categories,
+
+  /** Returns capabilities matching the given category. */
+  byCategory: (category: string): CapabilityEntry[] => registry.byCategory(category),
+
+  /** Looks up a capability by its kebab-case ID. */
+  get: (id: string): CapabilityEntry | undefined => registry.get(id),
+
+  /** Returns capabilities formatted for a specific AI provider. */
+  forProvider: (provider: 'claude' | 'openai' | 'gemini'): string => registry.forProvider(provider),
 
   /** The underlying registry instance (for advanced usage like `register()`). */
   registry,

@@ -4,7 +4,7 @@
  * @remarks
  * Hybrid approach combining:
  * - wdi5 dynamic rules: `_` prefix, `Render` suffix, event methods
- * - dhikraft static set: field-tested production blacklist
+ * - mk static set: field-tested production blacklist
  * - Praman additions: aggregation, association, delegate, and state methods
  *
  * The blacklist prevents the proxy from forwarding internal UI5 methods
@@ -32,7 +32,7 @@
  * Static set of blacklisted method names.
  *
  * @remarks
- * Merged from dhikraft v2.5.0 production blacklist and wdi5 bridge conventions.
+ * Merged from mk v2.5.0 production blacklist and wdi5 bridge conventions.
  * Categories:
  * - Bridge-reserved: `$`, `getAggregation`, `constructor`, `fireEvent`, `init`
  * - Lifecycle: `clone`, `exit`, `onInit`, `onExit`, show/hide hooks, `applySettings`
@@ -103,7 +103,7 @@ export const METHOD_BLACKLIST: ReadonlySet<string> = new Set([
   'getFieldGroupIds',
   'setFieldGroupIds',
 
-  // ── Aggregation manipulation (dhikraft) ───────────────────────────
+  // ── Aggregation manipulation (mk) ───────────────────────────
   'setAggregation',
   'addAggregation',
   'removeAggregation',
@@ -115,25 +115,25 @@ export const METHOD_BLACKLIST: ReadonlySet<string> = new Set([
   'propagateProperties',
   'findAggregatedObjects',
 
-  // ── Association methods (dhikraft) ────────────────────────────────
+  // ── Association methods (mk) ────────────────────────────────
   'getAssociation',
   'setAssociation',
   'addAssociation',
   'removeAssociation',
   'removeAllAssociation',
 
-  // ── Property validation (dhikraft) ────────────────────────────────
+  // ── Property validation (mk) ────────────────────────────────
   'validateProperty',
 
-  // ── Delegate management (dhikraft) ────────────────────────────────
+  // ── Delegate management (mk) ────────────────────────────────
   'removeDelegate',
   'addDelegate',
 
-  // ── State methods (dhikraft) ──────────────────────────────────────
+  // ── State methods (mk) ──────────────────────────────────────
   'isActive',
   'isDestroyStarted',
 
-  // ── Debug/inspection (dhikraft) ───────────────────────────────────
+  // ── Debug/inspection (mk) ───────────────────────────────────
   'inspect',
   'data',
 

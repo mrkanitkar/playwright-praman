@@ -35,6 +35,7 @@ import { join } from 'node:path';
 import type { Logger } from 'pino';
 
 import { createLogger } from '#core/logging/logger.js';
+import { ui5Step, withStep } from '#core/utils/step-decorator.js';
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -120,6 +121,7 @@ export class TestDataHandler {
    * await handler.save('order.json', { id: '123', total: 99.99 });
    * ```
    */
+  @ui5Step
   async save(filename: string, data: unknown): Promise<void> {
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from trusted baseDir option
     await mkdir(this.baseDir, { recursive: true });
@@ -143,17 +145,19 @@ export class TestDataHandler {
    * ```
    */
   async load<T>(filename: string): Promise<T> {
-    const filePath = join(this.baseDir, filename);
-    try {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from trusted baseDir + caller filename
-      const content = await readFile(filePath, 'utf8');
-      return JSON.parse(content) as T;
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new Error(
-        `Failed to load test data file "${filename}" from ${this.baseDir}: ${message}`,
-      );
-    }
+    return withStep(`Load test data "${filename}"`, async () => {
+      const filePath = join(this.baseDir, filename);
+      try {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from trusted baseDir + caller filename
+        const content = await readFile(filePath, 'utf8');
+        return JSON.parse(content) as T;
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(
+          `Failed to load test data file "${filename}" from ${this.baseDir}: ${message}`,
+        );
+      }
+    });
   }
 
   /**
@@ -169,6 +173,7 @@ export class TestDataHandler {
    * await handler.cleanup();
    * ```
    */
+  @ui5Step
   async cleanup(): Promise<void> {
     const reversed = [...this.trackedFiles].reverse();
     for (const filePath of reversed) {

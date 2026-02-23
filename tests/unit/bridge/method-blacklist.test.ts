@@ -46,7 +46,7 @@ describe('METHOD_BLACKLIST', () => {
     expect(METHOD_BLACKLIST.has('getEventingParent')).toBe(true);
   });
 
-  it('blocks aggregation manipulation methods (dhikraft)', () => {
+  it('blocks aggregation manipulation methods (mk)', () => {
     const aggregationMethods = [
       'setAggregation',
       'addAggregation',
@@ -65,7 +65,7 @@ describe('METHOD_BLACKLIST', () => {
     }
   });
 
-  it('blocks association methods (dhikraft)', () => {
+  it('blocks association methods (mk)', () => {
     const associationMethods = [
       'getAssociation',
       'setAssociation',
@@ -79,21 +79,21 @@ describe('METHOD_BLACKLIST', () => {
     }
   });
 
-  it('blocks property validation (dhikraft)', () => {
+  it('blocks property validation (mk)', () => {
     expect(METHOD_BLACKLIST.has('validateProperty')).toBe(true);
   });
 
-  it('blocks delegate management methods (dhikraft)', () => {
+  it('blocks delegate management methods (mk)', () => {
     expect(METHOD_BLACKLIST.has('addDelegate')).toBe(true);
     expect(METHOD_BLACKLIST.has('removeDelegate')).toBe(true);
   });
 
-  it('blocks state methods (dhikraft)', () => {
+  it('blocks state methods (mk)', () => {
     expect(METHOD_BLACKLIST.has('isActive')).toBe(true);
     expect(METHOD_BLACKLIST.has('isDestroyStarted')).toBe(true);
   });
 
-  it('blocks debug/inspection methods (dhikraft)', () => {
+  it('blocks debug/inspection methods (mk)', () => {
     expect(METHOD_BLACKLIST.has('inspect')).toBe(true);
     expect(METHOD_BLACKLIST.has('data')).toBe(true);
   });
@@ -164,18 +164,18 @@ describe('isBlacklisted', () => {
     expect(isBlacklisted('fireEvent')).toBe(true);
   });
 
-  it('returns true for dhikraft aggregation methods', () => {
+  it('returns true for mk aggregation methods', () => {
     expect(isBlacklisted('setAggregation')).toBe(true);
     expect(isBlacklisted('destroyAggregation')).toBe(true);
     expect(isBlacklisted('findAggregatedObjects')).toBe(true);
   });
 
-  it('returns true for dhikraft association methods', () => {
+  it('returns true for mk association methods', () => {
     expect(isBlacklisted('getAssociation')).toBe(true);
     expect(isBlacklisted('removeAllAssociation')).toBe(true);
   });
 
-  it('returns true for dhikraft state and delegate methods', () => {
+  it('returns true for mk state and delegate methods', () => {
     expect(isBlacklisted('isActive')).toBe(true);
     expect(isBlacklisted('isDestroyStarted')).toBe(true);
     expect(isBlacklisted('addDelegate')).toBe(true);
@@ -222,7 +222,7 @@ describe('filterMethods', () => {
     expect(result).toEqual(['getText', 'setValue', 'destroy']);
   });
 
-  it('removes dhikraft-sourced blacklisted methods', () => {
+  it('removes mk-sourced blacklisted methods', () => {
     const input = ['getText', 'setAggregation', 'getAssociation', 'isActive', 'setValue'];
     const result = filterMethods(input);
     expect(result).toEqual(['getText', 'setValue']);
