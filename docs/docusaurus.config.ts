@@ -116,6 +116,12 @@ const config: Config = {
           position: 'left',
           label: 'API Reference',
         },
+        // ── Menu 3: TypeDoc API (standalone HTML) ──
+        {
+          href: '/playwright-praman/api-html/',
+          position: 'left',
+          label: 'TypeDoc API',
+        },
         // ── Menu 3: Blog (enable when posts are added) ──\n        // { to: '/blog', label: 'Blog', position: 'left' },
         // ── Right side ──
         {
@@ -138,6 +144,7 @@ const config: Config = {
           items: [
             { label: 'Introduction', to: '/docs' },
             { label: 'API Reference', to: '/docs/api' },
+            { label: 'TypeDoc API', href: '/playwright-praman/api-html/' },
           ],
         },
         {
