@@ -2,7 +2,11 @@
   "name": "playwright-praman",
   "version": "1.0.1",
   "description": "AI-First SAP UI5 Test Automation Platform for Playwright",
-  "author": "support@zestest.in",
+  "author": {
+    "name": "Maheshwar Kanitkar",
+    "email": "support@zestest.in",
+    "url": "https://mrkanitkar.github.io/playwright-praman/"
+  },
   "license": "Apache-2.0",
   "type": "module",
   "engines": {
@@ -10,7 +14,13 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "LICENSE",
+    "NOTICE",
+    "CHANGELOG.md",
+    "README.md",
+    "DISCLAIMER.md",
+    "SECURITY.md"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
