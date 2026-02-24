@@ -44,7 +44,7 @@ mcp__playwright-test__planner_setup_page({
 **Troubleshooting:**
 
 - If `ENOENT: .auth/sap-session.json` → create empty file: `{"cookies":[],"origins":[]}`
-- If seed fails → check `tests/integration/sap-planner-seed.spec.ts` as fallback
+- If seed fails → check `tests/seeds/sap-seed.spec.ts` as fallback
 - If context destroyed → IDP redirect in progress, wait and retry
 
 ### Step 3: Detect UI5 Version

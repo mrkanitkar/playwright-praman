@@ -181,3 +181,42 @@ throw new ControlError({
 - **Node.js**: ESM-first with CJS fallback, `node:` prefix, engines field, files field, dual package exports
 - **Claude/Anthropic**: `retryable` + `suggestions[]` on errors, AI response envelope, checkpoint serialization
 - **npm**: Dual ESM+CJS via conditional exports, validated with attw
+
+## Praman SAP Testing Agents
+
+### Available Agents (`.claude/agents/`)
+
+| Agent                  | Purpose                                                  |
+| ---------------------- | -------------------------------------------------------- |
+| `praman-sap-planner`   | Explore SAP app + produce test plan + gold-standard spec |
+| `praman-sap-generator` | Generate compliant tests from plan                       |
+| `praman-sap-healer`    | Fix failing tests, enforce compliance                    |
+
+### Prompts (`.claude/prompts/`)
+
+| Prompt                | Purpose                               |
+| --------------------- | ------------------------------------- |
+| `praman-sap-plan`     | Run planner on SAP app                |
+| `praman-sap-generate` | Generate tests from plan              |
+| `praman-sap-heal`     | Fix failing tests                     |
+| `praman-sap-coverage` | Full pipeline: plan + generate + heal |
+
+### Seed & Config
+
+- Seed: `tests/seeds/sap-seed.spec.ts` — inline `sapAuth.login()` + `page.pause()`
+- Playwright project: `agent-seed-test` in `playwright.config.ts`
+- MCP server: `playwright-test` in `.mcp.json`
+
+### 7 Mandatory Rules (SAP Test Generation)
+
+1. `import { test, expect } from 'playwright-praman'` ONLY
+2. Praman fixtures for ALL UI5 elements — NEVER `page.click('#__...')`
+3. Playwright native ONLY for verified non-UI5 elements
+4. Auth in seed — NEVER `sapAuth.login()` in test body
+5. `setValue()` + `fireChange()` + `waitForUI5()` for every input
+6. `searchOpenDialogs: true` for dialog controls
+7. TSDoc compliance header in every generated test
+
+### Skill Reference
+
+All agents read: `skills/playwright-praman-sap-testing/SKILL.md`

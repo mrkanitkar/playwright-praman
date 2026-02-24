@@ -136,3 +136,46 @@ Load the appropriate skill file based on the task:
 - **Node.js**: ESM-first with CJS fallback, `node:` prefix, engines field, dual package exports
 - **npm**: Dual ESM+CJS via conditional exports, validated with attw
 - **Claude/Anthropic**: retryable + suggestions[] on errors, AI envelope
+
+---
+
+## Praman SAP Testing Agents
+
+### Available Agents
+
+| Agent                  | File                                           | Purpose                                                  |
+| ---------------------- | ---------------------------------------------- | -------------------------------------------------------- |
+| `praman-sap-planner`   | `.github/agents/praman-sap-planner.agent.md`   | Explore SAP app + produce test plan + gold-standard spec |
+| `praman-sap-generator` | `.github/agents/praman-sap-generator.agent.md` | Generate compliant tests from plan                       |
+| `praman-sap-healer`    | `.github/agents/praman-sap-healer.agent.md`    | Fix failing tests, enforce compliance                    |
+
+### Seed File
+
+Seed: `tests/seeds/sap-seed.spec.ts` — authenticates inline via `sapAuth.login()`, then `page.pause()` for MCP handoff.
+
+Playwright project: `agent-seed-test` (configured in `playwright.config.ts`).
+
+### The 7 Mandatory Rules
+
+1. Import ONLY from `playwright-praman`: `import { test, expect } from 'playwright-praman'`
+2. Use Praman fixtures for ALL UI5 elements — NEVER `page.click('#__...')`
+3. Use Playwright native ONLY for verified non-UI5 elements
+4. Keep auth in seed file — NEVER `sapAuth.login()` in test body
+5. Use `setValue()` + `fireChange()` + `waitForUI5()` for every input
+6. Use `searchOpenDialogs: true` for dialog controls
+7. Include TSDoc compliance header in every generated test
+
+### Forbidden Patterns
+
+```text
+page.click('#__...')           → ui5.control().press()
+page.fill('#__...')            → ui5.control().setValue()
+page.locator('[data-sap-ui]') → ui5.control()
+page.locator('.sapM...')       → ui5.control({ controlType })
+from '@playwright/test'        → 'playwright-praman'
+page.waitForTimeout(...)       → ui5.waitForUI5() or polling
+```
+
+### Skill Reference
+
+All agents read: `skills/playwright-praman-sap-testing/SKILL.md`
