@@ -134,7 +134,7 @@ Save the plan using `planner_save_plan` to `specs/{app-name}.plan.md` with:
 
 ### 1. {Scenario Group}
 
-**Seed:** `tests/integration/sap-planner-seed.spec.ts`
+**Seed:** `tests/seeds/sap-seed.spec.ts`
 
 #### 1.1. {Scenario Name}
 
@@ -142,14 +142,10 @@ Save the plan using `planner_save_plan` to `specs/{app-name}.plan.md` with:
 **Steps:**
 
 1. {Action description}
-
-
-    - expect: {Expected outcome}
+   - expect: {Expected outcome}
 
 2. {Next action}
-
-
-    - expect: {Expected outcome}
+   - expect: {Expected outcome}
 ```
 
 ### Step 9: Generate Gold-Standard Spec Files
@@ -461,7 +457,7 @@ system/client information, MDC vs Smart controls}
 
 ### 1. {Scenario Group Name}
 
-**Seed:** `tests/integration/sap-planner-seed.spec.ts`
+**Seed:** `tests/seeds/sap-seed.spec.ts`
 
 #### 1.1. {Scenario Title}
 
@@ -470,14 +466,10 @@ system/client information, MDC vs Smart controls}
 **Steps:**
 
 1. {Action description with specific control types and IDs}
-
-
-    - expect: {Expected outcome with specific values}
+   - expect: {Expected outcome with specific values}
 
 2. {Next action}
-
-
-    - expect: {Expected outcome}
+   - expect: {Expected outcome}
 ```
 
 ### Gold-Standard Spec: `tests/e2e/{app-name}/{scenario-slug}.spec.ts`
