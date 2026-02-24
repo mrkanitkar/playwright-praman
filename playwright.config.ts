@@ -25,6 +25,21 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
+    // ── Agent seed project (MCP agent discovery — inline auth) ─────
+    {
+      name: 'agent-seed-test',
+      testDir: './tests/seeds',
+      testMatch: /sap-seed\.spec\.ts/,
+      timeout: 120_000,
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: false,
+        baseURL: process.env['SAP_CLOUD_BASE_URL'],
+        actionTimeout: 30_000,
+        navigationTimeout: 120_000,
+      },
+    },
+
     // ── Integration test projects ──────────────────────────────────
     {
       name: 'setup',

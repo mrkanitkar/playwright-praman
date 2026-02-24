@@ -15,6 +15,10 @@
   "files": [
     "dist",
     "src",
+    "skills/",
+    "agents/",
+    "docs/user-integration/",
+    "seeds/",
     "LICENSE",
     "NOTICE",
     "CHANGELOG.md",
