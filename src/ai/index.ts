@@ -28,6 +28,15 @@ export type {
   AiGeneratedTest,
 } from './types.js';
 
+// ── Agent Orchestration Types ───────────────────────────────────────────
+export type {
+  AgentPlan,
+  AgentPlanControlRef,
+  AgentPlanScenario,
+  AgentPlanStep,
+  ComplianceReport,
+} from './agent-types.js';
+
 // ── Registries ─────────────────────────────────────────────────────────────
 export { CapabilityRegistry } from './capability-registry.js';
 export { capabilities } from './capabilities.js';

@@ -1,0 +1,31 @@
+---
+description: Praman SAP UI5 Test Automation Rules
+globs:
+  - "tests/**/*.spec.ts"
+  - "tests/**/*.test.ts"
+alwaysApply: false
+---
+
+# Praman SAP Test Automation
+
+**Primary skill reference**: `node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.md`
+
+Read this file before generating any SAP UI5 test.
+
+## Mandatory Import
+
+```typescript
+import { test, expect } from 'playwright-praman';
+```
+
+## Core Rules
+
+1. ALL UI5 element interaction via `ui5.control()` + proxy methods
+2. NEVER `page.click('#__...')`, `page.locator('[data-sap-ui]')`, `page.locator('.sapM...')`
+3. Input pattern: `setValue()` + `fireChange()` + `waitForUI5()` always together
+4. Auth in seed file ONLY — never in test body
+5. Include TSDoc compliance header in every generated test
+
+## Quick Reference
+
+`node_modules/playwright-praman/skills/playwright-praman-sap-testing/ai-quick-reference.md`
