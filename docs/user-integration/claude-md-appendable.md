@@ -47,7 +47,7 @@ After setup, you have 6 agents in `.claude/agents/`:
 2. NEVER use Playwright native selectors for UI5 elements
 3. Non-UI5 elements → Playwright native permitted (verify first)
 4. `import { test, expect } from 'playwright-praman'` ONLY
-5. Auth via seed — `sapAuth.login()` in seed, never in test body
+5. Auth via seed — raw Playwright auth in seed, never `sapAuth.login()` in test body
 6. Post-generation: scan 16+ forbidden patterns
 7. TSDoc compliance header in every generated test
 

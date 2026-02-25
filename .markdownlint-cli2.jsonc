@@ -4,6 +4,8 @@
   },
   "ignores": [
     "plans/**",
+    "specs/**",
+    ".github/agents/**",
     "skills/playwright-praman-sap-testing/skills-tdd.md",
     "skills/playwright-praman-sap-testing/skills-sap-fiori-consultant.md",
     "skills/playwright-praman-sap-testing/skills-sap-odata-expert.md",

@@ -46,6 +46,10 @@
     "**/playwright-report": true
   },
 
+  "terminal.integrated.env.osx": {
+    "NODE_OPTIONS": "--tls-max-v1.2"
+  },
+
   "cSpell.words": [
     "praman", "playwright", "dhikraft", "tsup", "vitest", "docusaurus", "pino",
     "commitlint", "fiori", "sapui", "odata", "flp",

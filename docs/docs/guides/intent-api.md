@@ -18,7 +18,7 @@ import {
   navigateAndSearch,
 } from 'playwright-praman/intents';
 
-import * as procurement from 'playwright-praman/intents';
+import { procurement } from 'playwright-praman/intents';
 ```
 
 The intent layer is built on two foundations:

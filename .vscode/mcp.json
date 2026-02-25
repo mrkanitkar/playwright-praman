@@ -27,6 +27,14 @@
       "env": {
         "UI5_MCP_WORKSPACE": "/Users/maheshwar/Documents/projects/mk1"
       }
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
     }
   },
   "inputs": []

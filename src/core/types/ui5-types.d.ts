@@ -14,8 +14,16 @@
 /** SAP UI5 global namespace (minimal subset used by Praman). */
 declare namespace sap {
   namespace ui {
+    /** UI5 framework version string (e.g. `'1.142.4'`). */
+    const version: string;
     function getCore(): {
       byId(id: string): any;
+      /** Internal element map — may be `undefined` in UI5 1.142+. */
+      mElements?: Record<string, any>;
+      /** Returns all controls matching a field-group ID; pass `''` for all. */
+      byFieldGroupId(groupId: string): any[];
+      /** Global OData models keyed by name. */
+      oModels?: Record<string, any>;
     };
     function require(module: string): any;
     namespace core {

@@ -51,6 +51,10 @@ framework overhead.
 Vitest includes a built-in `bench()` function for microbenchmarks. Use it for operations that
 do not require a browser (proxy creation, serialization, config parsing).
 
+:::info[Contributor Only]
+The benchmarks below use internal path aliases (`#proxy/*`, `#bridge/*`) that are only available when developing Praman itself. They are not accessible to end users of the `playwright-praman` package.
+:::
+
 ```typescript
 // tests/benchmarks/proxy-creation.bench.ts
 import { bench, describe } from 'vitest';
@@ -108,38 +112,38 @@ Output:
    create proxy with method blacklist   38,100    0.021ms   0.061ms  0.026ms  0.028ms  0.055ms
 ```
 
-### Benchmark Patterns for Serialization
+### Benchmark Patterns for JSON Operations
 
 ```typescript
-// tests/benchmarks/serialization.bench.ts
+// tests/benchmarks/json-operations.bench.ts
 import { bench, describe } from 'vitest';
-import { serializeBridgeArgs } from '#bridge/serialization.js';
-import { deserializeBridgeResult } from '#bridge/serialization.js';
 
-describe('bridge serialization', () => {
+describe('JSON serialization', () => {
   const complexSelector = {
     controlType: 'sap.m.Input',
     viewName: 'myApp.view.Detail',
     properties: { placeholder: 'Enter vendor name' },
-    ancestor: { controlType: 'sap.m.VBox', id: /container/ },
+    ancestor: { controlType: 'sap.m.VBox' },
   };
 
   bench('serialize complex selector', () => {
-    serializeBridgeArgs(complexSelector);
+    JSON.stringify(complexSelector);
   });
 
-  bench('deserialize bridge result with nested objects', () => {
-    deserializeBridgeResult({
-      controlId: '__xmlview0--input1',
-      controlType: 'sap.m.Input',
-      properties: {
-        value: 'Vendor 1000',
-        placeholder: 'Enter vendor name',
-        valueState: 'None',
-        enabled: true,
-        editable: true,
-      },
-    });
+  bench('parse bridge result with nested objects', () => {
+    JSON.parse(
+      JSON.stringify({
+        controlId: '__xmlview0--input1',
+        controlType: 'sap.m.Input',
+        properties: {
+          value: 'Vendor 1000',
+          placeholder: 'Enter vendor name',
+          valueState: 'None',
+          enabled: true,
+          editable: true,
+        },
+      }),
+    );
   });
 });
 ```
@@ -207,12 +211,10 @@ test('stability convergence within 2000ms on idle page', async ({ ui5 }) => {
   expect(timing).toBeLessThan(2000);
 
   // Track the actual timing for trend analysis
-  test
-    .info()
-    .annotations.push({
-      type: 'perfMetric',
-      description: `stability_convergence_ms:${Math.round(timing)}`,
-    });
+  test.info().annotations.push({
+    type: 'perfMetric',
+    description: `stability_convergence_ms:${Math.round(timing)}`,
+  });
 });
 ```
 

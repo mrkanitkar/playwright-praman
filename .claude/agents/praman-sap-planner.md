@@ -207,10 +207,10 @@ mcp__playwright-test__planner_save_plan({
 
 ## Agent-Fixture Boundary (Critical)
 
-| Phase           | Fixtures Available        | Discovery Method                      |
-| --------------- | ------------------------- | ------------------------------------- |
-| Seed execution  | ✅ `ui5`, `sapAuth`, `fe` | `sapAuth.login()`, `ui5.waitForUI5()` |
-| Agent discovery | ❌ Fixtures gone          | `browser_evaluate` with raw UI5 API   |
+| Phase           | Fixtures Available     | Discovery Method                                  |
+| --------------- | ---------------------- | ------------------------------------------------- |
+| Seed execution  | ❌ Raw Playwright only | Inline auth via `page.$()` + `fill()` + `click()` |
+| Agent discovery | ❌ Fixtures gone       | `browser_evaluate` with raw UI5 API               |
 
 **During agent phase**: NEVER call fixture methods. Use:
 

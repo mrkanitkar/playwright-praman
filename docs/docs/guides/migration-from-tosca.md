@@ -294,10 +294,10 @@ functions or custom fixtures.
 
 ```typescript
 // helpers/po-helpers.ts
-import type { UI5Fixture } from 'playwright-praman';
+import type { ExtendedUI5Handler } from 'playwright-praman';
 
 export async function fillPOHeader(
-  ui5: UI5Fixture,
+  ui5: ExtendedUI5Handler,
   data: { vendor: string; purchaseOrg: string; companyCode: string },
 ): Promise<void> {
   await ui5.fill({ id: 'vendorInput' }, data.vendor);
