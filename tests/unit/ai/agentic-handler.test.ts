@@ -404,6 +404,98 @@ describe('AgenticHandler', () => {
       }
     });
 
+    it('system prompt includes recipe examples when recipeRegistry has entries', async () => {
+      const llmChat = vi.fn().mockResolvedValue(
+        makeSuccessResponse({
+          steps: ['step 1'],
+          code: "test('x', async () => { await intent.fillField('Vendor', '100001'); });",
+        }),
+      );
+      const contextBuilder = vi.fn().mockResolvedValue(makeSuccessResponse(makePageContext()));
+      const registry = makeCapabilityRegistry(SAMPLE_CAPABILITY);
+
+      // Populate recipe registry with a test recipe
+      const recipeRegistry = new RecipeRegistry();
+      const testRecipes = [
+        {
+          id: 'recipe-test-login',
+          name: 'Login Recipe',
+          description: 'A recipe for logging into the SAP application.',
+          domain: 'auth',
+          priority: 'essential' as const,
+          capabilities: ['UI5-AUTH-001'],
+          pattern: 'await sapAuth.login();',
+        },
+      ];
+      Object.defineProperty(recipeRegistry, 'recipes', {
+        value: testRecipes,
+        writable: false,
+        enumerable: false,
+        configurable: true,
+      });
+
+      const handler = new AgenticHandler(
+        {
+          chat: llmChat,
+          complete: vi.fn(),
+          isConfigured: vi.fn().mockReturnValue(true),
+          close: vi.fn().mockResolvedValue(undefined),
+        },
+        contextBuilder as never,
+        registry,
+        recipeRegistry,
+      );
+
+      await handler.generateTest('create PO', makeMockPage() as never);
+
+      const callArgs = llmChat.mock.calls[0] as [unknown[], unknown];
+      const messages = callArgs[0] as { role: string; content: string }[];
+      const systemContent = messages[0]?.content ?? '';
+      expect(systemContent).toContain('await sapAuth.login()');
+    });
+
+    it('system prompt groups capabilities by namespace including single-segment names', async () => {
+      const llmChat = vi.fn().mockResolvedValue(
+        makeSuccessResponse({
+          steps: ['step 1'],
+          code: "test('x', async () => { await intent.fillField('Vendor', '100001'); });",
+        }),
+      );
+      const contextBuilder = vi.fn().mockResolvedValue(makeSuccessResponse(makePageContext()));
+
+      // Create a capability with a single-segment qualifiedName to hit the `parts[0] ?? 'other'` branch
+      const singleSegmentCapability: CapabilityEntry = {
+        id: 'UI5-UI5-099',
+        qualifiedName: 'standalone',
+        name: 'standalone',
+        description: 'A standalone capability with no namespace dots',
+        category: 'ui5',
+        usageExample: 'await standalone();',
+        registryVersion: 1,
+        priority: 'fixture',
+      };
+
+      const registry = makeCapabilityRegistry(SAMPLE_CAPABILITY, singleSegmentCapability);
+      const handler = new AgenticHandler(
+        {
+          chat: llmChat,
+          complete: vi.fn(),
+          isConfigured: vi.fn().mockReturnValue(true),
+          close: vi.fn().mockResolvedValue(undefined),
+        },
+        contextBuilder as never,
+        registry,
+      );
+
+      await handler.generateTest('test something', makeMockPage() as never);
+
+      const callArgs = llmChat.mock.calls[0] as [unknown[], unknown];
+      const messages = callArgs[0] as { role: string; content: string }[];
+      const systemContent = messages[0]?.content ?? '';
+      // The single-segment qualifiedName should appear under its own namespace heading
+      expect(systemContent).toContain('standalone');
+    });
+
     it('handles missing model in LLM metadata gracefully (defaults to "unknown")', async () => {
       const rawData = {
         steps: ['Navigate'],
