@@ -14,7 +14,7 @@ Install these extensions for the best Praman development experience:
 
 | Extension                | ID                         | Purpose                                        |
 | ------------------------ | -------------------------- | ---------------------------------------------- |
-| ESLint                   | `dbaeumer.vscode-eslint`   | Lint TypeScript with Praman's 10-plugin config |
+| ESLint                   | `dbaeumer.vscode-eslint`   | Lint TypeScript with Praman's 11-plugin config |
 | Playwright Test          | `ms-playwright.playwright` | Run/debug tests, view traces                   |
 | TypeScript               | Built-in                   | TypeScript language support                    |
 | Vitest                   | `vitest.explorer`          | Run unit tests from sidebar                    |

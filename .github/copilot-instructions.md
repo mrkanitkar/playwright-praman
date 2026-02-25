@@ -50,7 +50,7 @@ Load the appropriate skill file based on the task:
 - Reference: `docs/documentation-standards.md`
 - Every public function: `@param`, `@returns`, `@throws`, `@example`
 
-## ESLint Configuration (9 Plugins)
+## ESLint Configuration (11 Plugins)
 
 - `typescript-eslint` — strict type-checked rules
 - `eslint-plugin-tsdoc` — TSDoc syntax enforcement
@@ -61,6 +61,7 @@ Load the appropriate skill file based on the task:
 - `eslint-plugin-n` — Node.js best practices
 - `eslint-plugin-promise` — async/Promise patterns
 - `eslint-plugin-import-x` + `eslint-plugin-unicorn` — import hygiene & modernization
+- `eslint-plugin-headers` — Apache-2.0 `@license` header enforcement on every source file
 
 ## Testing Standards
 

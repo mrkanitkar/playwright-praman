@@ -51,7 +51,7 @@ This produces 9 test runs (3 OS x 3 Node versions) to catch platform-specific is
 ### Quality Job
 
 ```yaml
-- run: npm run lint # ESLint with 10 plugins, 0 errors/warnings
+- run: npm run lint # ESLint with 11 plugins, 0 errors/warnings
 - run: npm run typecheck # tsc --noEmit (strict mode)
 - run: npx cspell "src/**/*.ts" "docs/**/*.md" --no-progress # Spell check
 - run: npx knip # Dead code detection
@@ -116,7 +116,7 @@ npm run ci
 
 | Step       | Command                               | Purpose                                      |
 | ---------- | ------------------------------------- | -------------------------------------------- |
-| Lint       | `eslint src/ tests/ --max-warnings=0` | 10 ESLint plugins, zero tolerance            |
+| Lint       | `eslint src/ tests/ --max-warnings=0` | 11 ESLint plugins, zero tolerance            |
 | Typecheck  | `tsc --noEmit`                        | TypeScript strict mode validation            |
 | Unit tests | `vitest run`                          | Hermetic unit tests with Vitest              |
 | Build      | `tsup`                                | Dual ESM + CJS output with type declarations |
