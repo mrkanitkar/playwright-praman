@@ -1,4 +1,13 @@
 /**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
+/**
  * Tests for `src/matchers/ui5-matchers.ts` — custom matcher functions for UI5 control assertions.
  *
  * @remarks

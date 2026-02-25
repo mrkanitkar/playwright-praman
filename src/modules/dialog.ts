@@ -1,3 +1,12 @@
+/**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
 /* eslint-disable max-lines -- 7 public functions with TSDoc + browser scripts exceed 300 LOC */
 /**
  * Dialog discovery, waiting, and interaction for UI5 dialogs in the static UI area.

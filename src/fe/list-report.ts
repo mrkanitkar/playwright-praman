@@ -1,4 +1,13 @@
 /**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
+/**
  * Fiori Elements List Report page operations.
  * Pure-function module. Browser scripts in `list-report-scripts.ts`.
  * @remarks 9 public functions exceed 300 LOC due to mandatory TSDoc per function.

@@ -15,6 +15,7 @@ import promisePlugin from 'eslint-plugin-promise';
 import sonarjs from 'eslint-plugin-sonarjs';
 import microsoftSdl from '@microsoft/eslint-plugin-sdl';
 import prettier from 'eslint-config-prettier';
+import headers from 'eslint-plugin-headers';
 import pramanPlugin from './eslint-rules/index.js';
 
 export default tseslint.config(
@@ -374,6 +375,26 @@ export default tseslint.config(
     rules: {
       'praman/no-deprecated-ui5-globals': 'warn',
       'praman/no-deprecated-ui5-api': 'warn',
+    },
+  },
+
+  // ── License header enforcement (Angular @license pattern) ───────────────
+  {
+    plugins: { headers },
+    rules: {
+      'headers/header-format': [
+        'error',
+        {
+          source: 'string',
+          content:
+            '@license\n' +
+            'Copyright (c) ZesTest 2025-2030. All Rights Reserved.\n' +
+            'SPDX-License-Identifier: Apache-2.0\n' +
+            '\n' +
+            'This file may contain AI-assisted code.\n' +
+            'See LICENSE and NOTICE files for details.',
+        },
+      ],
     },
   },
 

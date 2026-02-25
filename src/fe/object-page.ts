@@ -1,4 +1,13 @@
 /**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
+/**
  * Fiori Elements Object Page operations for sap.uxap.ObjectPageLayout.
  * Pure-function module using string scripts via `page.evaluate()`.
  *
