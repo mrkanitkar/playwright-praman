@@ -5,7 +5,12 @@
  * Verifies that the pre-built `capabilities` object delegates correctly
  * to the underlying `CapabilityRegistry` and exposes all parity methods.
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Mock the generated capabilities to keep tests hermetic (empty seed).
+vi.mock('#ai/capability-registry.generated.js', () => ({
+  GENERATED_CAPABILITIES: [],
+}));
 
 import { capabilities } from '#ai/capabilities.js';
 
@@ -77,18 +82,19 @@ describe('capabilities singleton', () => {
   it('delegates register via the exposed registry', () => {
     // Register a test entry via the exposed registry
     capabilities.registry.register({
-      id: 'test-singleton-entry',
+      id: 'UI5-UI5-900',
+      qualifiedName: 'ui5.testSingleton',
       name: 'testSingleton',
       description: 'Test entry for singleton verification',
-      category: 'test',
-      usage_example: 'test()',
+      category: 'ui5',
+      usageExample: 'test()',
       registryVersion: 1,
       priority: 'fixture',
     });
 
     expect(capabilities.has('testSingleton')).toBe(true);
     expect(capabilities.findByName('testSingleton')).toBeDefined();
-    expect(capabilities.listFixtures().some((e) => e.id === 'test-singleton-entry')).toBe(true);
+    expect(capabilities.listFixtures().some((e) => e.id === 'UI5-UI5-900')).toBe(true);
   });
 
   it('exposes forControl() method that searches by control type', () => {
@@ -112,14 +118,14 @@ describe('capabilities singleton', () => {
 
   it('exposes byCategory() method returning entries for a category', () => {
     expect(typeof capabilities.byCategory).toBe('function');
-    const result = capabilities.byCategory('test');
+    const result = capabilities.byCategory('ui5');
     expect(Array.isArray(result)).toBe(true);
-    expect(result.some((e) => e.id === 'test-singleton-entry')).toBe(true);
+    expect(result.some((e) => e.id === 'UI5-UI5-900')).toBe(true);
   });
 
   it('exposes get() method that looks up by id', () => {
     expect(typeof capabilities.get).toBe('function');
-    expect(capabilities.get('test-singleton-entry')).toBeDefined();
+    expect(capabilities.get('UI5-UI5-900')).toBeDefined();
     expect(capabilities.get('nonexistent-id')).toBeUndefined();
   });
 

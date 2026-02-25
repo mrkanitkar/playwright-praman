@@ -1,0 +1,2346 @@
+# capabilities.yaml — Single source of truth for all Praman API capabilities
+#
+# This file is read by the generator to produce:
+#   - src/ai/capability-registry.generated.ts
+#   - docs/capabilities.md
+#   - skills/playwright-praman-sap-testing/capabilities-reference.md
+#
+# Run: npm run generate:capabilities
+#
+# Rules:
+#   - Use FIXTURE ALIAS names (what test authors call), not module-level function names
+#   - IDs follow format: UI5-{PREFIX}-{NNN}
+#   - qualifiedName is namespace.name (e.g., ui5.table.getRows)
+#   - Every entry must have: id, qualifiedName, name, description, category, priority, usageExample, registryVersion
+#   - usageExample should be clean code — what a test author would actually write
+#   - For OData methods, omit controlTypes. For UI controls, include controlTypes.
+#
+# Category enum:
+#   ui5, auth, navigate, table, dialog, date, odata, fe, intent, flp, shell, footer, ai, discovery, config, data, interact, assert, other
+#
+# ID Prefix mapping:
+#   ui5 → UI5, table → TABLE, dialog → DLG, date → DATE, odata → ODATA, navigate → NAV,
+#   auth → AUTH, fe → FE, intent → INTENT, shell → SHELL, footer → FOOTER, flp → FLP,
+#   ai → AI, data → DATA, other → OTHER
+
+registryVersion: 1
+generatedAt: '2026-02-25'
+
+categories:
+  ui5: { prefix: UI5, description: 'Core UI5 control interactions' }
+  table: { prefix: TABLE, description: 'Table discovery, reading, and manipulation' }
+  dialog: { prefix: DLG, description: 'Dialog lifecycle management' }
+  date: { prefix: DATE, description: 'Date and time picker operations' }
+  odata: { prefix: ODATA, description: 'OData model and HTTP operations' }
+  navigate: { prefix: NAV, description: 'FLP and in-app navigation' }
+  auth: { prefix: AUTH, description: 'SAP authentication and session management' }
+  fe: { prefix: FE, description: 'Fiori Elements page abstractions' }
+  intent: { prefix: INTENT, description: 'Business intent operations (SAP domain)' }
+  shell: { prefix: SHELL, description: 'SAP Shell header interactions' }
+  footer: { prefix: FOOTER, description: 'Footer toolbar actions' }
+  flp: { prefix: FLP, description: 'Fiori Launchpad services (locks, settings)' }
+  ai: { prefix: AI, description: 'AI-powered discovery and context building' }
+  data: { prefix: DATA, description: 'Test data generation, persistence, and cleanup' }
+
+capabilities:
+  # ════════════════════════════════════════════════════════════════════════════
+  # ui5 — Core UI5 control interactions (16 methods)
+  # Namespace: ui5
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-UI5-001
+    qualifiedName: ui5.control
+    name: control
+    description: 'Discovers a single control matching the selector.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+      - sap.m.Input
+      - sap.m.Text
+      - sap.m.Label
+      - sap.m.Select
+      - sap.m.ComboBox
+      - sap.m.CheckBox
+    usageExample: |
+      const btn = await ui5.control({ id: 'submitBtn' });
+    registryVersion: 1
+
+  - id: UI5-UI5-002
+    qualifiedName: ui5.controls
+    name: controls
+    description: 'Discovers multiple controls matching the selector.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+      - sap.m.Input
+      - sap.m.Text
+      - sap.m.Label
+    usageExample: |
+      const buttons = await ui5.controls({ controlType: 'sap.m.Button' });
+    registryVersion: 1
+
+  - id: UI5-UI5-003
+    qualifiedName: ui5.click
+    name: click
+    description: 'Clicks a control.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+      - sap.m.Link
+      - sap.ui.unified.MenuItem
+    usageExample: |
+      await ui5.click({ id: 'submitBtn' });
+    registryVersion: 1
+
+  - id: UI5-UI5-004
+    qualifiedName: ui5.fill
+    name: fill
+    description: 'Fills a control with text.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Input
+      - sap.m.TextArea
+      - sap.m.SearchField
+      - sap.m.ComboBox
+    usageExample: |
+      await ui5.fill({ id: 'vendorInput' }, '100001');
+    registryVersion: 1
+
+  - id: UI5-UI5-005
+    qualifiedName: ui5.press
+    name: press
+    description: 'Presses a control (alias for click).'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await ui5.press({ id: 'saveBtn' });
+    registryVersion: 1
+
+  - id: UI5-UI5-006
+    qualifiedName: ui5.select
+    name: select
+    description: 'Selects an item in a selection control.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Select
+      - sap.m.ComboBox
+      - sap.m.MultiComboBox
+    usageExample: |
+      await ui5.select({ id: 'purchOrgSelect' }, '1000');
+    registryVersion: 1
+
+  - id: UI5-UI5-007
+    qualifiedName: ui5.check
+    name: check
+    description: 'Checks a checkbox.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.CheckBox
+    usageExample: |
+      await ui5.check({ id: 'agreeCheckbox' });
+    registryVersion: 1
+
+  - id: UI5-UI5-008
+    qualifiedName: ui5.uncheck
+    name: uncheck
+    description: 'Unchecks a checkbox.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.CheckBox
+    usageExample: |
+      await ui5.uncheck({ id: 'agreeCheckbox' });
+    registryVersion: 1
+
+  - id: UI5-UI5-009
+    qualifiedName: ui5.clear
+    name: clear
+    description: "Clears a control's text."
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Input
+      - sap.m.TextArea
+      - sap.m.SearchField
+    usageExample: |
+      await ui5.clear({ id: 'searchField' });
+    registryVersion: 1
+
+  - id: UI5-UI5-010
+    qualifiedName: ui5.getText
+    name: getText
+    description: 'Gets the text of a control.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Label
+      - sap.m.Text
+      - sap.m.Title
+      - sap.m.Button
+    usageExample: |
+      const label = await ui5.getText({ id: 'statusLabel' });
+    registryVersion: 1
+
+  - id: UI5-UI5-011
+    qualifiedName: ui5.getValue
+    name: getValue
+    description: 'Gets the value of a control.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Input
+      - sap.m.DatePicker
+      - sap.m.TimePicker
+      - sap.ui.comp.smartfield.SmartField
+    usageExample: |
+      const val = await ui5.getValue({ id: 'quantityInput' });
+    registryVersion: 1
+
+  - id: UI5-UI5-012
+    qualifiedName: ui5.waitForUI5
+    name: waitForUI5
+    description: 'Waits for UI5 to stabilize.'
+    category: ui5
+    priority: fixture
+    usageExample: |
+      await ui5.waitForUI5();
+    registryVersion: 1
+
+  - id: UI5-UI5-013
+    qualifiedName: ui5.waitFor
+    name: waitFor
+    description: 'Waits for a control to appear.'
+    category: ui5
+    priority: fixture
+    usageExample: |
+      await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });
+    registryVersion: 1
+
+  - id: UI5-UI5-014
+    qualifiedName: ui5.inspect
+    name: inspect
+    description: 'Inspects a control and returns full metadata.'
+    category: ui5
+    priority: fixture
+    usageExample: |
+      const info = await ui5.inspect({ id: 'vendorInput' });
+    registryVersion: 1
+
+  - id: UI5-UI5-015
+    qualifiedName: ui5.clearCache
+    name: clearCache
+    description: 'Clears the internal proxy cache.'
+    category: ui5
+    priority: fixture
+    async: false
+    usageExample: |
+      ui5.clearCache();
+    registryVersion: 1
+
+  - id: UI5-UI5-016
+    qualifiedName: ui5.destroy
+    name: destroy
+    description: 'Destroys the handler and cleans up resources.'
+    category: ui5
+    priority: fixture
+    usageExample: |
+      await ui5.destroy();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # table — Table discovery, reading, and manipulation (24 methods)
+  # Namespace: ui5.table
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-TABLE-001
+    qualifiedName: ui5.table.detectType
+    name: detectType
+    description: 'Detects the table type and returns metadata.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const info = await ui5.table.detectType('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-002
+    qualifiedName: ui5.table.getRows
+    name: getRows
+    description: 'Returns all visible row data as string arrays.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const rows = await ui5.table.getRows('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-003
+    qualifiedName: ui5.table.getRowCount
+    name: getRowCount
+    description: 'Returns the number of rows in the table.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const count = await ui5.table.getRowCount('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-004
+    qualifiedName: ui5.table.getCellValue
+    name: getCellValue
+    description: 'Returns the value of a specific cell by row and column index.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const value = await ui5.table.getCellValue('orderTable', 0, 2);
+    registryVersion: 1
+
+  - id: UI5-TABLE-005
+    qualifiedName: ui5.table.getData
+    name: getData
+    description: 'Returns all table data as an array of record objects.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const data = await ui5.table.getData('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-006
+    qualifiedName: ui5.table.selectRow
+    name: selectRow
+    description: 'Selects a specific row by index.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.selectRow('orderTable', 0);
+    registryVersion: 1
+
+  - id: UI5-TABLE-007
+    qualifiedName: ui5.table.selectAll
+    name: selectAll
+    description: 'Selects all rows in the table.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.selectAll('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-008
+    qualifiedName: ui5.table.deselectAll
+    name: deselectAll
+    description: 'Deselects all rows in the table.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.deselectAll('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-009
+    qualifiedName: ui5.table.waitForData
+    name: waitForData
+    description: 'Waits for table data to load.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.waitForData('orderTable', { timeout: 15000 });
+    registryVersion: 1
+
+  - id: UI5-TABLE-010
+    qualifiedName: ui5.table.getSelectedRows
+    name: getSelectedRows
+    description: 'Returns indices of currently selected rows.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const selected = await ui5.table.getSelectedRows('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-011
+    qualifiedName: ui5.table.getColumnNames
+    name: getColumnNames
+    description: 'Returns the column header names of the table.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const columns = await ui5.table.getColumnNames('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-012
+    qualifiedName: ui5.table.findRowByValues
+    name: findRowByValues
+    description: 'Finds the first row matching the given column-value criteria.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const rowIdx = await ui5.table.findRowByValues('orderTable', { 'Order ID': '4500001234' });
+    registryVersion: 1
+
+  - id: UI5-TABLE-013
+    qualifiedName: ui5.table.getCellByColumnName
+    name: getCellByColumnName
+    description: 'Returns the cell value at the given row and column name.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const status = await ui5.table.getCellByColumnName('orderTable', 0, 'Status');
+    registryVersion: 1
+
+  - id: UI5-TABLE-014
+    qualifiedName: ui5.table.clickRow
+    name: clickRow
+    description: 'Clicks a specific row to trigger navigation or selection.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.clickRow('orderTable', 0);
+    registryVersion: 1
+
+  - id: UI5-TABLE-015
+    qualifiedName: ui5.table.selectRowByValues
+    name: selectRowByValues
+    description: 'Finds and selects a row matching the given column-value criteria.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.selectRowByValues('orderTable', { 'Vendor': '100001' });
+    registryVersion: 1
+
+  - id: UI5-TABLE-016
+    qualifiedName: ui5.table.ensureRowVisible
+    name: ensureRowVisible
+    description: 'Scrolls the table to ensure the given row is visible.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.ensureRowVisible('orderTable', 25);
+    registryVersion: 1
+
+  - id: UI5-TABLE-017
+    qualifiedName: ui5.table.setTableCellValue
+    name: setTableCellValue
+    description: 'Sets the value of a specific cell by row and column index.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.setTableCellValue('orderTable', 0, 2, '500');
+    registryVersion: 1
+
+  - id: UI5-TABLE-018
+    qualifiedName: ui5.table.getRowCountAlt
+    name: getRowCountAlt
+    description: 'Returns the row count using an alternative detection method.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const count = await ui5.table.getRowCountAlt('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-019
+    qualifiedName: ui5.table.filterByColumn
+    name: filterByColumn
+    description: 'Applies a filter to a specific column.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.filterByColumn('orderTable', 1, 'Open');
+    registryVersion: 1
+
+  - id: UI5-TABLE-020
+    qualifiedName: ui5.table.sortByColumn
+    name: sortByColumn
+    description: 'Sorts the table by a specific column.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.sortByColumn('orderTable', 0, { direction: 'ascending' });
+    registryVersion: 1
+
+  - id: UI5-TABLE-021
+    qualifiedName: ui5.table.getSortOrder
+    name: getSortOrder
+    description: 'Returns the current sort order for a specific column.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const sort = await ui5.table.getSortOrder('orderTable', 0);
+    registryVersion: 1
+
+  - id: UI5-TABLE-022
+    qualifiedName: ui5.table.getFilterValue
+    name: getFilterValue
+    description: 'Returns the current filter value for a specific column.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const filter = await ui5.table.getFilterValue('orderTable', 1);
+    registryVersion: 1
+
+  - id: UI5-TABLE-023
+    qualifiedName: ui5.table.exportData
+    name: exportData
+    description: 'Exports all table data as an array of record objects with string values.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const exported = await ui5.table.exportData('orderTable');
+    registryVersion: 1
+
+  - id: UI5-TABLE-024
+    qualifiedName: ui5.table.clickSettings
+    name: clickSettings
+    description: 'Opens the table settings/personalization dialog.'
+    category: table
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await ui5.table.clickSettings('orderTable');
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # dialog — Dialog lifecycle management (7 methods)
+  # Namespace: ui5.dialog
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-DLG-001
+    qualifiedName: ui5.dialog.waitFor
+    name: waitFor
+    description: 'Waits for a dialog to appear and returns its metadata.'
+    category: dialog
+    priority: fixture
+    controlTypes:
+      - sap.m.Dialog
+      - sap.m.Popover
+      - sap.m.ResponsivePopover
+      - sap.m.MessageBox
+      - sap.m.BusyDialog
+      - sap.m.SelectDialog
+      - sap.m.TableSelectDialog
+      - sap.m.ViewSettingsDialog
+    usageExample: |
+      const dlg = await ui5.dialog.waitFor({ title: 'Confirm' });
+    registryVersion: 1
+
+  - id: UI5-DLG-002
+    qualifiedName: ui5.dialog.getOpen
+    name: getOpen
+    description: 'Returns all currently open dialogs.'
+    category: dialog
+    priority: fixture
+    controlTypes:
+      - sap.m.Dialog
+      - sap.m.Popover
+      - sap.m.ResponsivePopover
+      - sap.m.MessageBox
+      - sap.m.BusyDialog
+      - sap.m.SelectDialog
+      - sap.m.TableSelectDialog
+      - sap.m.ViewSettingsDialog
+    usageExample: |
+      const dialogs = await ui5.dialog.getOpen();
+    registryVersion: 1
+
+  - id: UI5-DLG-003
+    qualifiedName: ui5.dialog.isOpen
+    name: isOpen
+    description: 'Checks whether a specific dialog is currently open.'
+    category: dialog
+    priority: fixture
+    controlTypes:
+      - sap.m.Dialog
+      - sap.m.Popover
+      - sap.m.ResponsivePopover
+      - sap.m.MessageBox
+      - sap.m.BusyDialog
+      - sap.m.SelectDialog
+      - sap.m.TableSelectDialog
+      - sap.m.ViewSettingsDialog
+    usageExample: |
+      const open = await ui5.dialog.isOpen('confirmDialog');
+    registryVersion: 1
+
+  - id: UI5-DLG-004
+    qualifiedName: ui5.dialog.dismiss
+    name: dismiss
+    description: 'Dismisses (closes) a dialog.'
+    category: dialog
+    priority: fixture
+    controlTypes:
+      - sap.m.Dialog
+      - sap.m.Popover
+      - sap.m.ResponsivePopover
+      - sap.m.MessageBox
+      - sap.m.BusyDialog
+      - sap.m.SelectDialog
+      - sap.m.TableSelectDialog
+      - sap.m.ViewSettingsDialog
+    usageExample: |
+      await ui5.dialog.dismiss({ title: 'Warning' });
+    registryVersion: 1
+
+  - id: UI5-DLG-005
+    qualifiedName: ui5.dialog.confirm
+    name: confirm
+    description: 'Confirms a dialog by clicking its confirmation button.'
+    category: dialog
+    priority: fixture
+    controlTypes:
+      - sap.m.Dialog
+      - sap.m.Popover
+      - sap.m.ResponsivePopover
+      - sap.m.MessageBox
+      - sap.m.BusyDialog
+      - sap.m.SelectDialog
+      - sap.m.TableSelectDialog
+      - sap.m.ViewSettingsDialog
+    usageExample: |
+      await ui5.dialog.confirm({ title: 'Save Changes', buttonText: 'OK' });
+    registryVersion: 1
+
+  - id: UI5-DLG-006
+    qualifiedName: ui5.dialog.waitForClosed
+    name: waitForClosed
+    description: 'Waits for a specific dialog to close.'
+    category: dialog
+    priority: fixture
+    controlTypes:
+      - sap.m.Dialog
+      - sap.m.Popover
+      - sap.m.ResponsivePopover
+      - sap.m.MessageBox
+      - sap.m.BusyDialog
+      - sap.m.SelectDialog
+      - sap.m.TableSelectDialog
+      - sap.m.ViewSettingsDialog
+    usageExample: |
+      await ui5.dialog.waitForClosed('confirmDialog', { timeout: 5000 });
+    registryVersion: 1
+
+  - id: UI5-DLG-007
+    qualifiedName: ui5.dialog.getButtons
+    name: getButtons
+    description: 'Returns the buttons available in a specific dialog.'
+    category: dialog
+    priority: fixture
+    controlTypes:
+      - sap.m.Dialog
+      - sap.m.Popover
+      - sap.m.ResponsivePopover
+      - sap.m.MessageBox
+      - sap.m.BusyDialog
+      - sap.m.SelectDialog
+      - sap.m.TableSelectDialog
+      - sap.m.ViewSettingsDialog
+    usageExample: |
+      const buttons = await ui5.dialog.getButtons('confirmDialog');
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # date — Date and time picker operations (7 methods)
+  # Namespace: ui5.date
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-DATE-001
+    qualifiedName: ui5.date.setDatePicker
+    name: setDatePicker
+    description: 'Sets a date value on a DatePicker control.'
+    category: date
+    priority: fixture
+    controlTypes:
+      - sap.m.DatePicker
+    usageExample: |
+      await ui5.date.setDatePicker('deliveryDate', '2026-03-15');
+    registryVersion: 1
+
+  - id: UI5-DATE-002
+    qualifiedName: ui5.date.getDatePicker
+    name: getDatePicker
+    description: 'Gets the current date value from a DatePicker control.'
+    category: date
+    priority: fixture
+    controlTypes:
+      - sap.m.DatePicker
+    usageExample: |
+      const date = await ui5.date.getDatePicker('deliveryDate');
+    registryVersion: 1
+
+  - id: UI5-DATE-003
+    qualifiedName: ui5.date.setDateRange
+    name: setDateRange
+    description: 'Sets start and end dates on a DateRangeSelection control.'
+    category: date
+    priority: fixture
+    controlTypes:
+      - sap.m.DateRangeSelection
+    usageExample: |
+      await ui5.date.setDateRange('reportRange', '2026-01-01', '2026-03-31');
+    registryVersion: 1
+
+  - id: UI5-DATE-004
+    qualifiedName: ui5.date.getDateRange
+    name: getDateRange
+    description: 'Gets the current start and end dates from a DateRangeSelection control.'
+    category: date
+    priority: fixture
+    controlTypes:
+      - sap.m.DateRangeSelection
+    usageExample: |
+      const range = await ui5.date.getDateRange('reportRange');
+    registryVersion: 1
+
+  - id: UI5-DATE-005
+    qualifiedName: ui5.date.setTimePicker
+    name: setTimePicker
+    description: 'Sets a time value on a TimePicker control.'
+    category: date
+    priority: fixture
+    controlTypes:
+      - sap.m.TimePicker
+    usageExample: |
+      await ui5.date.setTimePicker('startTime', '14:30:00');
+    registryVersion: 1
+
+  - id: UI5-DATE-006
+    qualifiedName: ui5.date.getTimePicker
+    name: getTimePicker
+    description: 'Gets the current time value from a TimePicker control.'
+    category: date
+    priority: fixture
+    controlTypes:
+      - sap.m.TimePicker
+    usageExample: |
+      const time = await ui5.date.getTimePicker('startTime');
+    registryVersion: 1
+
+  - id: UI5-DATE-007
+    qualifiedName: ui5.date.setAndValidate
+    name: setAndValidate
+    description: "Sets a date and validates the input against the control's constraints."
+    category: date
+    priority: fixture
+    controlTypes:
+      - sap.m.DatePicker
+    usageExample: |
+      await ui5.date.setAndValidate('deliveryDate', '2026-03-15');
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # odata — OData model and HTTP operations (11 methods)
+  # Namespace: ui5.odata
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-ODATA-001
+    qualifiedName: ui5.odata.getModelData
+    name: getModelData
+    description: 'Reads data from the OData model at the given path.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const data = await ui5.odata.getModelData('/PurchaseOrders');
+    registryVersion: 1
+
+  - id: UI5-ODATA-002
+    qualifiedName: ui5.odata.getModelProperty
+    name: getModelProperty
+    description: 'Reads a single property value from the OData model.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const vendor = await ui5.odata.getModelProperty('/PurchaseOrders(\'4500001234\')/Vendor');
+    registryVersion: 1
+
+  - id: UI5-ODATA-003
+    qualifiedName: ui5.odata.waitForLoad
+    name: waitForLoad
+    description: 'Waits for all pending OData requests to complete.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      await ui5.odata.waitForLoad({ timeout: 30000 });
+    registryVersion: 1
+
+  - id: UI5-ODATA-004
+    qualifiedName: ui5.odata.fetchCSRFToken
+    name: fetchCSRFToken
+    description: 'Fetches a CSRF token from the OData service.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const token = await ui5.odata.fetchCSRFToken('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');
+    registryVersion: 1
+
+  - id: UI5-ODATA-005
+    qualifiedName: ui5.odata.getEntityCount
+    name: getEntityCount
+    description: 'Returns the $count for an entity set.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const count = await ui5.odata.getEntityCount('/PurchaseOrders/$count');
+    registryVersion: 1
+
+  - id: UI5-ODATA-006
+    qualifiedName: ui5.odata.hasPendingChanges
+    name: hasPendingChanges
+    description: 'Checks whether the OData model has unsaved changes.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const pending = await ui5.odata.hasPendingChanges();
+    registryVersion: 1
+
+  - id: UI5-ODATA-007
+    qualifiedName: ui5.odata.createEntity
+    name: createEntity
+    description: 'Creates a new entity via OData HTTP POST.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const result = await ui5.odata.createEntity(
+        '/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV',
+        'A_PurchaseOrder',
+        { CompanyCode: '1000', PurchasingOrganization: '1000' }
+      );
+    registryVersion: 1
+
+  - id: UI5-ODATA-008
+    qualifiedName: ui5.odata.updateEntity
+    name: updateEntity
+    description: 'Updates an existing entity via OData HTTP PATCH/PUT.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const result = await ui5.odata.updateEntity(
+        '/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV',
+        'A_PurchaseOrder',
+        '4500001234',
+        { PurchasingGroup: 'A01' }
+      );
+    registryVersion: 1
+
+  - id: UI5-ODATA-009
+    qualifiedName: ui5.odata.deleteEntity
+    name: deleteEntity
+    description: 'Deletes an entity via OData HTTP DELETE.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      await ui5.odata.deleteEntity(
+        '/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV',
+        'A_PurchaseOrder',
+        '4500001234'
+      );
+    registryVersion: 1
+
+  - id: UI5-ODATA-010
+    qualifiedName: ui5.odata.queryEntities
+    name: queryEntities
+    description: 'Queries an entity set with optional OData query parameters.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const result = await ui5.odata.queryEntities(
+        '/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV',
+        'A_PurchaseOrder',
+        { $filter: "CompanyCode eq '1000'", $top: 10 }
+      );
+    registryVersion: 1
+
+  - id: UI5-ODATA-011
+    qualifiedName: ui5.odata.callFunctionImport
+    name: callFunctionImport
+    description: 'Calls an OData function import.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      const result = await ui5.odata.callFunctionImport(
+        '/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV',
+        'ReleasePurchaseOrder',
+        { PurchaseOrder: '4500001234' },
+        'POST'
+      );
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # navigate — FLP and in-app navigation (9 methods)
+  # Namespace: ui5Navigation
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-NAV-001
+    qualifiedName: ui5Navigation.navigateToApp
+    name: navigateToApp
+    description: 'Navigates to a Fiori Launchpad app by its semantic object and action.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+    registryVersion: 1
+
+  - id: UI5-NAV-002
+    qualifiedName: ui5Navigation.navigateToTile
+    name: navigateToTile
+    description: 'Navigates to a Fiori Launchpad tile by its title.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      await ui5Navigation.navigateToTile('Manage Purchase Orders');
+    registryVersion: 1
+
+  - id: UI5-NAV-003
+    qualifiedName: ui5Navigation.navigateToIntent
+    name: navigateToIntent
+    description: 'Navigates to a semantic object intent with optional parameters.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      await ui5Navigation.navigateToIntent(
+        { semanticObject: 'PurchaseOrder', action: 'display' },
+        { PurchaseOrder: '4500001234' }
+      );
+    registryVersion: 1
+
+  - id: UI5-NAV-004
+    qualifiedName: ui5Navigation.navigateToHash
+    name: navigateToHash
+    description: 'Navigates to a specific URL hash fragment.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      await ui5Navigation.navigateToHash('#PurchaseOrder-manage&/PurchaseOrders/4500001234');
+    registryVersion: 1
+
+  - id: UI5-NAV-005
+    qualifiedName: ui5Navigation.navigateToHome
+    name: navigateToHome
+    description: 'Navigates back to the Fiori Launchpad home page.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      await ui5Navigation.navigateToHome();
+    registryVersion: 1
+
+  - id: UI5-NAV-006
+    qualifiedName: ui5Navigation.navigateBack
+    name: navigateBack
+    description: 'Navigates back one step in the browser history.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      await ui5Navigation.navigateBack();
+    registryVersion: 1
+
+  - id: UI5-NAV-007
+    qualifiedName: ui5Navigation.navigateForward
+    name: navigateForward
+    description: 'Navigates forward one step in the browser history.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      await ui5Navigation.navigateForward();
+    registryVersion: 1
+
+  - id: UI5-NAV-008
+    qualifiedName: ui5Navigation.searchAndOpenApp
+    name: searchAndOpenApp
+    description: 'Searches for an app in the Fiori Launchpad and opens it.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      await ui5Navigation.searchAndOpenApp('Manage Purchase Orders');
+    registryVersion: 1
+
+  - id: UI5-NAV-009
+    qualifiedName: ui5Navigation.getCurrentHash
+    name: getCurrentHash
+    description: 'Returns the current URL hash fragment.'
+    category: navigate
+    priority: fixture
+    usageExample: |
+      const hash = await ui5Navigation.getCurrentHash();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # auth — SAP authentication and session management (6 methods)
+  # Namespace: sapAuth
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-AUTH-001
+    qualifiedName: sapAuth.login
+    name: login
+    description: 'Authenticates against the SAP system using the provided config.'
+    category: auth
+    priority: fixture
+    usageExample: |
+      await sapAuth.login(page, {
+        baseUrl: 'https://my-sap.example.com',
+        username: 'TESTUSER',
+        password: 'secret',
+        authStrategy: 'fiori-form',
+      });
+    registryVersion: 1
+
+  - id: UI5-AUTH-002
+    qualifiedName: sapAuth.loginFromEnv
+    name: loginFromEnv
+    description: 'Authenticates using credentials from environment variables.'
+    category: auth
+    priority: fixture
+    usageExample: |
+      await sapAuth.loginFromEnv(page);
+    registryVersion: 1
+
+  - id: UI5-AUTH-003
+    qualifiedName: sapAuth.logout
+    name: logout
+    description: 'Logs out of the SAP system.'
+    category: auth
+    priority: fixture
+    usageExample: |
+      await sapAuth.logout(page);
+    registryVersion: 1
+
+  - id: UI5-AUTH-004
+    qualifiedName: sapAuth.isAuthenticated
+    name: isAuthenticated
+    description: 'Checks whether the current session is authenticated.'
+    category: auth
+    priority: fixture
+    usageExample: |
+      const loggedIn = await sapAuth.isAuthenticated(page);
+    registryVersion: 1
+
+  - id: UI5-AUTH-005
+    qualifiedName: sapAuth.isSessionExpired
+    name: isSessionExpired
+    description: 'Checks whether the current session has expired.'
+    category: auth
+    priority: fixture
+    async: false
+    usageExample: |
+      const expired = sapAuth.isSessionExpired(300000);
+    registryVersion: 1
+
+  - id: UI5-AUTH-006
+    qualifiedName: sapAuth.getSessionInfo
+    name: getSessionInfo
+    description: 'Returns the current session metadata, or null if not authenticated.'
+    category: auth
+    priority: fixture
+    async: false
+    usageExample: |
+      const session = sapAuth.getSessionInfo();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # fe — Fiori Elements: List Report (9 methods)
+  # Namespace: fe.listReport
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-FE-001
+    qualifiedName: fe.listReport.getTable
+    name: getTable
+    description: 'Returns the main table ID of the List Report page.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      const tableId = await fe.listReport.getTable();
+    registryVersion: 1
+
+  - id: UI5-FE-002
+    qualifiedName: fe.listReport.getFilterBar
+    name: getFilterBar
+    description: 'Returns the filter bar ID of the List Report page.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.ui.comp.smartfilterbar.SmartFilterBar
+      - sap.ui.mdc.FilterBar
+    usageExample: |
+      const filterBarId = await fe.listReport.getFilterBar();
+    registryVersion: 1
+
+  - id: UI5-FE-003
+    qualifiedName: fe.listReport.setFilter
+    name: setFilter
+    description: 'Sets a filter field value on the List Report filter bar.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.ui.comp.smartfilterbar.SmartFilterBar
+      - sap.ui.mdc.FilterBar
+    usageExample: |
+      await fe.listReport.setFilter('CompanyCode', '1000');
+    registryVersion: 1
+
+  - id: UI5-FE-004
+    qualifiedName: fe.listReport.search
+    name: search
+    description: 'Triggers the Go/Search action on the List Report filter bar.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.ui.comp.smartfilterbar.SmartFilterBar
+      - sap.ui.mdc.FilterBar
+    usageExample: |
+      await fe.listReport.search();
+    registryVersion: 1
+
+  - id: UI5-FE-005
+    qualifiedName: fe.listReport.clearFilters
+    name: clearFilters
+    description: 'Clears all filter values on the List Report filter bar.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.ui.comp.smartfilterbar.SmartFilterBar
+      - sap.ui.mdc.FilterBar
+    usageExample: |
+      await fe.listReport.clearFilters();
+    registryVersion: 1
+
+  - id: UI5-FE-006
+    qualifiedName: fe.listReport.navigateToItem
+    name: navigateToItem
+    description: 'Navigates to a specific item by clicking its row in the List Report.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.ui.comp.smarttable.SmartTable
+      - sap.ui.mdc.Table
+    usageExample: |
+      await fe.listReport.navigateToItem(0);
+    registryVersion: 1
+
+  - id: UI5-FE-007
+    qualifiedName: fe.listReport.getVariants
+    name: getVariants
+    description: 'Returns the list of available variant names.'
+    category: fe
+    priority: fixture
+    usageExample: |
+      const variants = await fe.listReport.getVariants();
+    registryVersion: 1
+
+  - id: UI5-FE-008
+    qualifiedName: fe.listReport.selectVariant
+    name: selectVariant
+    description: 'Selects a variant by name.'
+    category: fe
+    priority: fixture
+    usageExample: |
+      await fe.listReport.selectVariant('My Open Orders');
+    registryVersion: 1
+
+  - id: UI5-FE-009
+    qualifiedName: fe.listReport.getFilterValue
+    name: getFilterValue
+    description: 'Returns the current value of a filter field.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.ui.comp.smartfilterbar.SmartFilterBar
+      - sap.ui.mdc.FilterBar
+    usageExample: |
+      const value = await fe.listReport.getFilterValue('CompanyCode');
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # fe — Fiori Elements: Object Page (8 methods)
+  # Namespace: fe.objectPage
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-FE-010
+    qualifiedName: fe.objectPage.navigateToSection
+    name: navigateToSection
+    description: 'Navigates to a specific section on the Object Page.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.uxap.ObjectPageLayout
+      - sap.uxap.ObjectPageSection
+    usageExample: |
+      await fe.objectPage.navigateToSection('Items');
+    registryVersion: 1
+
+  - id: UI5-FE-011
+    qualifiedName: fe.objectPage.getSectionData
+    name: getSectionData
+    description: 'Returns the data from a specific section.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.uxap.ObjectPageLayout
+      - sap.uxap.ObjectPageSection
+    usageExample: |
+      const data = await fe.objectPage.getSectionData('General Information');
+    registryVersion: 1
+
+  - id: UI5-FE-012
+    qualifiedName: fe.objectPage.clickButton
+    name: clickButton
+    description: 'Clicks a button on the Object Page by its label.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await fe.objectPage.clickButton('Edit');
+    registryVersion: 1
+
+  - id: UI5-FE-013
+    qualifiedName: fe.objectPage.clickEdit
+    name: clickEdit
+    description: 'Clicks the Edit button on the Object Page.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await fe.objectPage.clickEdit();
+    registryVersion: 1
+
+  - id: UI5-FE-014
+    qualifiedName: fe.objectPage.clickSave
+    name: clickSave
+    description: 'Clicks the Save button on the Object Page.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await fe.objectPage.clickSave();
+    registryVersion: 1
+
+  - id: UI5-FE-015
+    qualifiedName: fe.objectPage.getSections
+    name: getSections
+    description: 'Returns all sections on the Object Page.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.uxap.ObjectPageLayout
+      - sap.uxap.ObjectPageSection
+    usageExample: |
+      const sections = await fe.objectPage.getSections();
+    registryVersion: 1
+
+  - id: UI5-FE-016
+    qualifiedName: fe.objectPage.getHeaderTitle
+    name: getHeaderTitle
+    description: 'Returns the Object Page header title text.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.uxap.ObjectPageLayout
+    usageExample: |
+      const title = await fe.objectPage.getHeaderTitle();
+    registryVersion: 1
+
+  - id: UI5-FE-017
+    qualifiedName: fe.objectPage.isInEditMode
+    name: isInEditMode
+    description: 'Checks whether the Object Page is currently in edit mode.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.uxap.ObjectPageLayout
+    usageExample: |
+      const editing = await fe.objectPage.isInEditMode();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # fe — Fiori Elements: Table (5 methods)
+  # Namespace: fe.table
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-FE-018
+    qualifiedName: fe.table.getRowCount
+    name: getRowCount
+    description: 'Returns the row count for a Fiori Elements table.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+    usageExample: |
+      const count = await fe.table.getRowCount('itemsTable');
+    registryVersion: 1
+
+  - id: UI5-FE-019
+    qualifiedName: fe.table.getCellValue
+    name: getCellValue
+    description: 'Returns the cell value at a given row index and column name.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+    usageExample: |
+      const val = await fe.table.getCellValue('itemsTable', 0, 'Material');
+    registryVersion: 1
+
+  - id: UI5-FE-020
+    qualifiedName: fe.table.findRow
+    name: findRow
+    description: 'Finds the first row matching the given column-value criteria.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+    usageExample: |
+      const idx = await fe.table.findRow('itemsTable', { Material: 'MAT-001' });
+    registryVersion: 1
+
+  - id: UI5-FE-021
+    qualifiedName: fe.table.clickRow
+    name: clickRow
+    description: 'Clicks a row in a Fiori Elements table.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+    usageExample: |
+      await fe.table.clickRow('itemsTable', 0);
+    registryVersion: 1
+
+  - id: UI5-FE-022
+    qualifiedName: fe.table.getColumnNames
+    name: getColumnNames
+    description: 'Returns the column header names for a Fiori Elements table.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.Table
+      - sap.ui.table.Table
+      - sap.ui.table.TreeTable
+      - sap.ui.table.AnalyticalTable
+    usageExample: |
+      const cols = await fe.table.getColumnNames('itemsTable');
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # fe — Fiori Elements: List (5 methods)
+  # Namespace: fe.list
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-FE-023
+    qualifiedName: fe.list.getItemCount
+    name: getItemCount
+    description: 'Returns the number of items in a Fiori Elements list.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.List
+      - sap.m.StandardListItem
+      - sap.m.ListItemBase
+    usageExample: |
+      const count = await fe.list.getItemCount('notificationList');
+    registryVersion: 1
+
+  - id: UI5-FE-024
+    qualifiedName: fe.list.getItemTitle
+    name: getItemTitle
+    description: 'Returns the title of a list item at the given index.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.List
+      - sap.m.StandardListItem
+      - sap.m.ListItemBase
+    usageExample: |
+      const title = await fe.list.getItemTitle('notificationList', 0);
+    registryVersion: 1
+
+  - id: UI5-FE-025
+    qualifiedName: fe.list.findItemByTitle
+    name: findItemByTitle
+    description: 'Finds the index of a list item by its title.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.List
+      - sap.m.StandardListItem
+      - sap.m.ListItemBase
+    usageExample: |
+      const idx = await fe.list.findItemByTitle('notificationList', 'PO 4500001234 approved');
+    registryVersion: 1
+
+  - id: UI5-FE-026
+    qualifiedName: fe.list.clickItem
+    name: clickItem
+    description: 'Clicks a list item at the given index.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.List
+      - sap.m.StandardListItem
+      - sap.m.ListItemBase
+    usageExample: |
+      await fe.list.clickItem('notificationList', 0);
+    registryVersion: 1
+
+  - id: UI5-FE-027
+    qualifiedName: fe.list.selectItem
+    name: selectItem
+    description: 'Selects or deselects a list item at the given index.'
+    category: fe
+    priority: fixture
+    controlTypes:
+      - sap.m.List
+      - sap.m.StandardListItem
+      - sap.m.ListItemBase
+    usageExample: |
+      await fe.list.selectItem('notificationList', 0, true);
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # intent — Core intent operations (7 methods)
+  # Namespace: intent.core
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-INTENT-001
+    qualifiedName: intent.core.fillField
+    name: fillField
+    description: 'Resolves a field label via vocabulary and fills the matching UI5 control.'
+    category: intent
+    priority: fixture
+    sapModule: All
+    intent: 'Fill a form field by business-readable label.'
+    usageExample: |
+      await intent.core.fillField('Vendor', '100001');
+    registryVersion: 1
+
+  - id: UI5-INTENT-002
+    qualifiedName: intent.core.clickButton
+    name: clickButton
+    description: 'Clicks a sap.m.Button control matching the given button text.'
+    category: intent
+    priority: fixture
+    sapModule: All
+    intent: 'Click a button by its visible label.'
+    usageExample: |
+      await intent.core.clickButton('Save');
+    registryVersion: 1
+
+  - id: UI5-INTENT-003
+    qualifiedName: intent.core.selectOption
+    name: selectOption
+    description: 'Resolves a field label via vocabulary and selects an item in the matching control.'
+    category: intent
+    priority: fixture
+    sapModule: All
+    intent: 'Select a dropdown option by business field label.'
+    usageExample: |
+      await intent.core.selectOption('Purchasing Org', '1000');
+    registryVersion: 1
+
+  - id: UI5-INTENT-004
+    qualifiedName: intent.core.assertField
+    name: assertField
+    description: "Resolves a field label via vocabulary, reads the control's text, and compares it."
+    category: intent
+    priority: fixture
+    sapModule: All
+    intent: 'Assert a field value by business label.'
+    usageExample: |
+      await intent.core.assertField('Status', 'In Process');
+    registryVersion: 1
+
+  - id: UI5-INTENT-005
+    qualifiedName: intent.core.confirmAndWait
+    name: confirmAndWait
+    description: 'Confirms a dialog and waits for UI5 to stabilize.'
+    category: intent
+    priority: fixture
+    sapModule: All
+    intent: 'Confirm a dialog and wait for UI to settle.'
+    usageExample: |
+      await intent.core.confirmAndWait();
+    registryVersion: 1
+
+  - id: UI5-INTENT-006
+    qualifiedName: intent.core.waitForSave
+    name: waitForSave
+    description: 'Waits for all pending UI5 rendering and OData requests to complete.'
+    category: intent
+    priority: fixture
+    sapModule: All
+    intent: 'Wait for all pending UI5 rendering to complete.'
+    usageExample: |
+      await intent.core.waitForSave();
+    registryVersion: 1
+
+  - id: UI5-INTENT-007
+    qualifiedName: intent.core.navigateAndSearch
+    name: navigateAndSearch
+    description: 'Navigates to a list app and runs a search with the given criteria.'
+    category: intent
+    priority: fixture
+    sapModule: All
+    intent: 'Navigate to a list app and run a search.'
+    usageExample: |
+      await intent.core.navigateAndSearch('PurchaseOrder-manage', { Vendor: '100001' });
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # intent — Procurement domain (6 methods)
+  # Namespace: intent.procurement
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-INTENT-008
+    qualifiedName: intent.procurement.createPurchaseOrder
+    name: createPurchaseOrder
+    description: 'Creates a purchase order through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: MM
+    intent: 'Create a new purchase order end-to-end.'
+    usageExample: |
+      await intent.procurement.createPurchaseOrder({
+        Vendor: '100001',
+        PurchasingOrg: '1000',
+        Material: 'MAT-001',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-009
+    qualifiedName: intent.procurement.approvePurchaseOrder
+    name: approvePurchaseOrder
+    description: 'Approves a purchase order through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: MM
+    intent: 'Approve an existing purchase order.'
+    usageExample: |
+      await intent.procurement.approvePurchaseOrder({ PurchaseOrder: '4500001234' });
+    registryVersion: 1
+
+  - id: UI5-INTENT-010
+    qualifiedName: intent.procurement.searchPurchaseOrders
+    name: searchPurchaseOrders
+    description: 'Searches for purchase orders using filter criteria.'
+    category: intent
+    priority: fixture
+    sapModule: MM
+    intent: 'Search purchase orders by criteria.'
+    usageExample: |
+      await intent.procurement.searchPurchaseOrders({ Vendor: '100001', CompanyCode: '1000' });
+    registryVersion: 1
+
+  - id: UI5-INTENT-011
+    qualifiedName: intent.procurement.createPurchaseRequisition
+    name: createPurchaseRequisition
+    description: 'Creates a purchase requisition through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: MM
+    intent: 'Create a new purchase requisition end-to-end.'
+    usageExample: |
+      await intent.procurement.createPurchaseRequisition({
+        Material: 'MAT-001',
+        Quantity: '100',
+        Plant: '1000',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-012
+    qualifiedName: intent.procurement.confirmGoodsReceipt
+    name: confirmGoodsReceipt
+    description: 'Confirms a goods receipt for a purchase order.'
+    category: intent
+    priority: fixture
+    sapModule: MM
+    intent: 'Confirm goods receipt against a purchase order.'
+    usageExample: |
+      await intent.procurement.confirmGoodsReceipt({ PurchaseOrder: '4500001234' });
+    registryVersion: 1
+
+  - id: UI5-INTENT-013
+    qualifiedName: intent.procurement.searchVendors
+    name: searchVendors
+    description: 'Searches for vendors using filter criteria.'
+    category: intent
+    priority: fixture
+    sapModule: MM
+    intent: 'Search vendors by criteria.'
+    usageExample: |
+      await intent.procurement.searchVendors({ Name: 'Acme Corp' });
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # intent — Sales domain (6 methods)
+  # Namespace: intent.sales
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-INTENT-014
+    qualifiedName: intent.sales.createSalesOrder
+    name: createSalesOrder
+    description: 'Creates a sales order through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: SD
+    intent: 'Create a new sales order end-to-end.'
+    usageExample: |
+      await intent.sales.createSalesOrder({
+        Customer: '200001',
+        Material: 'MAT-001',
+        Quantity: '50',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-015
+    qualifiedName: intent.sales.createQuotation
+    name: createQuotation
+    description: 'Creates a sales quotation through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: SD
+    intent: 'Create a new sales quotation end-to-end.'
+    usageExample: |
+      await intent.sales.createQuotation({
+        Customer: '200001',
+        Material: 'MAT-001',
+        Quantity: '100',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-016
+    qualifiedName: intent.sales.approveQuotation
+    name: approveQuotation
+    description: 'Approves a sales quotation through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: SD
+    intent: 'Approve an existing sales quotation.'
+    usageExample: |
+      await intent.sales.approveQuotation({ Quotation: '5000001234' });
+    registryVersion: 1
+
+  - id: UI5-INTENT-017
+    qualifiedName: intent.sales.searchSalesOrders
+    name: searchSalesOrders
+    description: 'Searches for sales orders using filter criteria.'
+    category: intent
+    priority: fixture
+    sapModule: SD
+    intent: 'Search sales orders by criteria.'
+    usageExample: |
+      await intent.sales.searchSalesOrders({ Customer: '200001' });
+    registryVersion: 1
+
+  - id: UI5-INTENT-018
+    qualifiedName: intent.sales.searchCustomers
+    name: searchCustomers
+    description: 'Searches for customers using filter criteria.'
+    category: intent
+    priority: fixture
+    sapModule: SD
+    intent: 'Search customers by criteria.'
+    usageExample: |
+      await intent.sales.searchCustomers({ Name: 'Global Industries' });
+    registryVersion: 1
+
+  - id: UI5-INTENT-019
+    qualifiedName: intent.sales.checkDeliveryStatus
+    name: checkDeliveryStatus
+    description: 'Checks the delivery status for a sales order.'
+    category: intent
+    priority: fixture
+    sapModule: SD
+    intent: 'Check delivery status for a sales order.'
+    usageExample: |
+      await intent.sales.checkDeliveryStatus({ SalesOrder: '6000001234' });
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # intent — Finance domain (3 methods)
+  # Namespace: intent.finance
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-INTENT-020
+    qualifiedName: intent.finance.createJournalEntry
+    name: createJournalEntry
+    description: 'Creates a journal entry through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: FI
+    intent: 'Create a new journal entry end-to-end.'
+    usageExample: |
+      await intent.finance.createJournalEntry({
+        CompanyCode: '1000',
+        GLAccount: '400000',
+        Amount: '5000.00',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-021
+    qualifiedName: intent.finance.postVendorInvoice
+    name: postVendorInvoice
+    description: 'Posts a vendor invoice through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: FI
+    intent: 'Post a vendor invoice end-to-end.'
+    usageExample: |
+      await intent.finance.postVendorInvoice({
+        Vendor: '100001',
+        InvoiceAmount: '10000.00',
+        Currency: 'USD',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-022
+    qualifiedName: intent.finance.processPayment
+    name: processPayment
+    description: 'Processes a payment through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: FI
+    intent: 'Process a payment end-to-end.'
+    usageExample: |
+      await intent.finance.processPayment({
+        Vendor: '100001',
+        Amount: '10000.00',
+        PaymentMethod: 'T',
+      });
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # intent — Manufacturing domain (2 methods)
+  # Namespace: intent.manufacturing
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-INTENT-023
+    qualifiedName: intent.manufacturing.createProductionOrder
+    name: createProductionOrder
+    description: 'Creates a production order through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: PP
+    intent: 'Create a new production order end-to-end.'
+    usageExample: |
+      await intent.manufacturing.createProductionOrder({
+        Material: 'FERT-001',
+        Plant: '1000',
+        Quantity: '500',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-024
+    qualifiedName: intent.manufacturing.confirmProductionOrder
+    name: confirmProductionOrder
+    description: 'Confirms a production order through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: PP
+    intent: 'Confirm an existing production order.'
+    usageExample: |
+      await intent.manufacturing.confirmProductionOrder({
+        ProductionOrder: '1000001234',
+        YieldQuantity: '500',
+      });
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # intent — Master Data domain (3 methods)
+  # Namespace: intent.masterData
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-INTENT-025
+    qualifiedName: intent.masterData.createVendorMaster
+    name: createVendorMaster
+    description: 'Creates a vendor master record through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: MD
+    intent: 'Create a new vendor master record.'
+    usageExample: |
+      await intent.masterData.createVendorMaster({
+        Name: 'Acme Corp',
+        Country: 'US',
+        PurchasingOrg: '1000',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-026
+    qualifiedName: intent.masterData.createCustomerMaster
+    name: createCustomerMaster
+    description: 'Creates a customer master record through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: MD
+    intent: 'Create a new customer master record.'
+    usageExample: |
+      await intent.masterData.createCustomerMaster({
+        Name: 'Global Industries',
+        Country: 'DE',
+        SalesOrg: '1000',
+      });
+    registryVersion: 1
+
+  - id: UI5-INTENT-027
+    qualifiedName: intent.masterData.createMaterialMaster
+    name: createMaterialMaster
+    description: 'Creates a material master record through the Fiori UI.'
+    category: intent
+    priority: fixture
+    sapModule: MD
+    intent: 'Create a new material master record.'
+    usageExample: |
+      await intent.masterData.createMaterialMaster({
+        MaterialNumber: 'MAT-999',
+        Description: 'Test Material',
+        MaterialType: 'FERT',
+        Plant: '1000',
+      });
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # ai — AI-powered discovery and context building (7 entries)
+  # Namespace: pramanAI
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-AI-001
+    qualifiedName: pramanAI.discoverPage
+    name: discoverPage
+    description: 'Discovers the current page context using AI-powered analysis.'
+    category: ai
+    priority: fixture
+    usageExample: |
+      const context = await pramanAI.discoverPage();
+    registryVersion: 1
+
+  - id: UI5-AI-002
+    qualifiedName: pramanAI.buildContext
+    name: buildContext
+    description: 'Builds a complete AI page context from the current Playwright page state.'
+    category: ai
+    priority: fixture
+    usageExample: |
+      const context = await pramanAI.buildContext();
+    registryVersion: 1
+
+  - id: UI5-AI-003
+    qualifiedName: pramanAI.capabilities
+    name: capabilities
+    description: 'The CapabilityRegistry instance for querying available capabilities.'
+    category: ai
+    priority: fixture
+    async: false
+    usageExample: |
+      const allCaps = pramanAI.capabilities.getAll();
+    registryVersion: 1
+
+  - id: UI5-AI-004
+    qualifiedName: pramanAI.recipes
+    name: recipes
+    description: 'The RecipeRegistry instance for querying available test recipes.'
+    category: ai
+    priority: fixture
+    async: false
+    usageExample: |
+      const recipe = pramanAI.recipes.get('create-purchase-order');
+    registryVersion: 1
+
+  - id: UI5-AI-005
+    qualifiedName: pramanAI.agentic
+    name: agentic
+    description: 'The AgenticHandler instance for autonomous test operations with checkpoint-based resumability.'
+    category: ai
+    priority: fixture
+    async: false
+    usageExample: |
+      const result = await pramanAI.agentic.execute('create PO', page);
+    registryVersion: 1
+
+  - id: UI5-AI-006
+    qualifiedName: pramanAI.llm
+    name: llm
+    description: 'The LlmService instance for direct LLM interactions.'
+    category: ai
+    priority: fixture
+    async: false
+    usageExample: |
+      const response = await pramanAI.llm.complete('Suggest a test for PO creation');
+    registryVersion: 1
+
+  - id: UI5-AI-007
+    qualifiedName: pramanAI.vocabulary
+    name: vocabulary
+    description: 'The VocabularyService instance for field label resolution.'
+    category: ai
+    priority: fixture
+    async: false
+    usageExample: |
+      const controlId = await pramanAI.vocabulary.resolve('Vendor');
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # shell — SAP Shell header interactions (4 methods)
+  # Namespace: ui5Shell
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-SHELL-001
+    qualifiedName: ui5Shell.expectShellHeader
+    name: expectShellHeader
+    description: 'Asserts that the SAP Shell header is visible.'
+    category: shell
+    priority: fixture
+    controlTypes:
+      - sap.ushell.ui.shell.ShellHeader
+    usageExample: |
+      await ui5Shell.expectShellHeader();
+    registryVersion: 1
+
+  - id: UI5-SHELL-002
+    qualifiedName: ui5Shell.clickHome
+    name: clickHome
+    description: 'Clicks the home button in the SAP Shell header.'
+    category: shell
+    priority: fixture
+    controlTypes:
+      - sap.ushell.ui.shell.ShellHeader
+    usageExample: |
+      await ui5Shell.clickHome();
+    registryVersion: 1
+
+  - id: UI5-SHELL-003
+    qualifiedName: ui5Shell.openNotifications
+    name: openNotifications
+    description: 'Opens the notifications panel from the SAP Shell header.'
+    category: shell
+    priority: fixture
+    controlTypes:
+      - sap.ushell.ui.shell.ShellHeader
+    usageExample: |
+      await ui5Shell.openNotifications();
+    registryVersion: 1
+
+  - id: UI5-SHELL-004
+    qualifiedName: ui5Shell.openUserMenu
+    name: openUserMenu
+    description: 'Opens the user menu from the SAP Shell header.'
+    category: shell
+    priority: fixture
+    controlTypes:
+      - sap.ushell.ui.shell.ShellHeader
+    usageExample: |
+      await ui5Shell.openUserMenu();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # footer — Footer toolbar actions (6 methods)
+  # Namespace: ui5Footer
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-FOOTER-001
+    qualifiedName: ui5Footer.clickSave
+    name: clickSave
+    description: 'Clicks the Save button in the footer toolbar.'
+    category: footer
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await ui5Footer.clickSave();
+    registryVersion: 1
+
+  - id: UI5-FOOTER-002
+    qualifiedName: ui5Footer.clickApply
+    name: clickApply
+    description: 'Clicks the Apply button in the footer toolbar.'
+    category: footer
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await ui5Footer.clickApply();
+    registryVersion: 1
+
+  - id: UI5-FOOTER-003
+    qualifiedName: ui5Footer.clickCancel
+    name: clickCancel
+    description: 'Clicks the Cancel button in the footer toolbar.'
+    category: footer
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await ui5Footer.clickCancel();
+    registryVersion: 1
+
+  - id: UI5-FOOTER-004
+    qualifiedName: ui5Footer.clickEdit
+    name: clickEdit
+    description: 'Clicks the Edit button in the footer toolbar.'
+    category: footer
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await ui5Footer.clickEdit();
+    registryVersion: 1
+
+  - id: UI5-FOOTER-005
+    qualifiedName: ui5Footer.clickDelete
+    name: clickDelete
+    description: 'Clicks the Delete button in the footer toolbar.'
+    category: footer
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await ui5Footer.clickDelete();
+    registryVersion: 1
+
+  - id: UI5-FOOTER-006
+    qualifiedName: ui5Footer.clickCreate
+    name: clickCreate
+    description: 'Clicks the Create button in the footer toolbar.'
+    category: footer
+    priority: fixture
+    controlTypes:
+      - sap.m.Button
+    usageExample: |
+      await ui5Footer.clickCreate();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # flp — Fiori Launchpad services: Locks (4 methods)
+  # Namespace: flpLocks
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-FLP-001
+    qualifiedName: flpLocks.getLockEntries
+    name: getLockEntries
+    description: 'Returns all lock entries for the current or specified user.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const locks = await flpLocks.getLockEntries('TESTUSER');
+    registryVersion: 1
+
+  - id: UI5-FLP-002
+    qualifiedName: flpLocks.getNumberOfLockEntries
+    name: getNumberOfLockEntries
+    description: 'Returns the number of lock entries for the current or specified user.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const count = await flpLocks.getNumberOfLockEntries();
+    registryVersion: 1
+
+  - id: UI5-FLP-003
+    qualifiedName: flpLocks.deleteAllLockEntries
+    name: deleteAllLockEntries
+    description: 'Deletes all lock entries for the current or specified user.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const deleted = await flpLocks.deleteAllLockEntries('TESTUSER');
+    registryVersion: 1
+
+  - id: UI5-FLP-004
+    qualifiedName: flpLocks.cleanup
+    name: cleanup
+    description: 'Cleans up all lock entries created during the test session.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      await flpLocks.cleanup();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # flp — Fiori Launchpad services: Settings (6 methods)
+  # Namespace: flpSettings
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-FLP-005
+    qualifiedName: flpSettings.getLanguage
+    name: getLanguage
+    description: 'Returns the current FLP user language setting.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const lang = await flpSettings.getLanguage();
+    registryVersion: 1
+
+  - id: UI5-FLP-006
+    qualifiedName: flpSettings.getDateFormat
+    name: getDateFormat
+    description: 'Returns the current FLP user date format setting.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const fmt = await flpSettings.getDateFormat();
+    registryVersion: 1
+
+  - id: UI5-FLP-007
+    qualifiedName: flpSettings.getTimeFormat
+    name: getTimeFormat
+    description: 'Returns the current FLP user time format setting.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const fmt = await flpSettings.getTimeFormat();
+    registryVersion: 1
+
+  - id: UI5-FLP-008
+    qualifiedName: flpSettings.getTimezone
+    name: getTimezone
+    description: 'Returns the current FLP user timezone setting.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const tz = await flpSettings.getTimezone();
+    registryVersion: 1
+
+  - id: UI5-FLP-009
+    qualifiedName: flpSettings.getNumberFormat
+    name: getNumberFormat
+    description: 'Returns the current FLP user number format setting.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const fmt = await flpSettings.getNumberFormat();
+    registryVersion: 1
+
+  - id: UI5-FLP-010
+    qualifiedName: flpSettings.getAllSettings
+    name: getAllSettings
+    description: 'Returns all FLP user settings as a single object.'
+    category: flp
+    priority: fixture
+    usageExample: |
+      const settings = await flpSettings.getAllSettings();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # data — Test data generation, persistence, and cleanup (4 methods)
+  # Namespace: testData
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-DATA-001
+    qualifiedName: testData.generate
+    name: generate
+    description: 'Generates test data from a template with randomized values.'
+    category: data
+    priority: fixture
+    async: false
+    usageExample: |
+      const po = testData.generate({ Vendor: '', Material: '', Quantity: '' });
+    registryVersion: 1
+
+  - id: UI5-DATA-002
+    qualifiedName: testData.save
+    name: save
+    description: 'Saves test data to a JSON file for later reuse.'
+    category: data
+    priority: fixture
+    usageExample: |
+      await testData.save('po-data.json', { Vendor: '100001', Material: 'MAT-001' });
+    registryVersion: 1
+
+  - id: UI5-DATA-003
+    qualifiedName: testData.load
+    name: load
+    description: 'Loads previously saved test data from a JSON file.'
+    category: data
+    priority: fixture
+    usageExample: |
+      const data = await testData.load('po-data.json');
+    registryVersion: 1
+
+  - id: UI5-DATA-004
+    qualifiedName: testData.cleanup
+    name: cleanup
+    description: 'Cleans up all test data files created during the test session.'
+    category: data
+    priority: fixture
+    usageExample: |
+      await testData.cleanup();
+    registryVersion: 1

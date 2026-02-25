@@ -18,6 +18,7 @@
  */
 
 import { CapabilityRegistry } from './capability-registry.js';
+import type { CapabilityCategory } from './schemas/capability.schema.js';
 import type { CapabilitiesJSON, CapabilityEntry, CapabilityStats } from './types.js';
 
 const registry = new CapabilityRegistry();
@@ -67,16 +68,20 @@ export const capabilities = {
   forAI: (): CapabilitiesJSON => registry.forAI(),
 
   /** Returns capabilities relevant to a specific UI5 control type. */
-  forControl: (controlType: string): CapabilityEntry[] => registry.find(controlType),
+  forControl: (controlType: string): CapabilityEntry[] =>
+    registry.list().filter((e) => e.controlTypes?.includes(controlType) ?? false),
 
   /** Returns a human-readable description of a named capability. */
   describe: (name: string): string | undefined => registry.findByName(name)?.description,
 
   /** Returns unique category names across all registered capabilities. */
-  getCategories: (): readonly string[] => registry.getStatistics().categories,
+  getCategories: (): readonly CapabilityCategory[] => registry.getStatistics().categories,
 
   /** Returns capabilities matching the given category. */
-  byCategory: (category: string): CapabilityEntry[] => registry.byCategory(category),
+  byCategory: (category: CapabilityCategory): CapabilityEntry[] => registry.byCategory(category),
+
+  /** Returns capabilities matching the given namespace prefix. */
+  byNamespace: (namespace: string): CapabilityEntry[] => registry.byNamespace(namespace),
 
   /** Looks up a capability by its kebab-case ID. */
   get: (id: string): CapabilityEntry | undefined => registry.get(id),

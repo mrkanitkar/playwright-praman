@@ -1,44 +1,48 @@
 #!/usr/bin/env tsx
 /**
  * Generate capabilities-reference.md, api-reference.md, and recipes-reference.md
- * from TSDoc @capability, @intent, @recipe, @sapModule tags in source files.
+ * from capabilities.yaml and recipes.yaml (validated via Zod schemas).
  *
  * @remarks
  * Output files are written to `skills/playwright-praman-sap-testing/`.
  * Run with: `npm run generate:skill-md`
  *
  * Algorithm:
- * 1. Parse all `src/**\/\*.ts` with TypeScript compiler API
- * 2. Extract functions/methods with @capability, @intent, @recipe, @sapModule tags
+ * 1. Read `capabilities.yaml` and `recipes.yaml` from project root
+ * 2. Validate via Zod schemas (CapabilitiesYamlSchema, RecipesYamlSchema)
  * 3. Generate capabilities-reference.md (table per category)
  * 4. Generate api-reference.md (alphabetical function list)
- * 5. Generate recipes-reference.md (top @example blocks)
- * 6. Validate outputs: frontmatter valid, body ≤500 lines per file
+ * 5. Generate recipes-reference.md (curated test patterns)
+ * 6. Validate outputs: frontmatter valid, body reasonable size
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, relative } from 'node:path';
-import { globSync } from 'glob';
-import * as ts from 'typescript';
+import { parse as parseYaml } from 'yaml';
+import { CapabilitiesYamlSchema } from '../src/ai/schemas/capability.schema.js';
+import { RecipesYamlSchema } from '../src/ai/schemas/recipe.schema.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
 interface ExtractedCapability {
+  id: string;
+  qualifiedName: string;
   name: string;
   description: string;
-  capability: string;
+  category: string;
+  usageExample: string;
   intent?: string;
   sapModule?: string;
-  businessContext?: string;
-  examples: string[];
-  fileName: string;
+  controlTypes?: string[];
 }
 
 interface ExtractedRecipe {
+  id: string;
   name: string;
   description: string;
-  code: string;
-  fileName: string;
+  domain: string;
+  priority: string;
+  pattern: string;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────
@@ -46,184 +50,32 @@ interface ExtractedRecipe {
 const OUTPUT_DIR = resolve(process.cwd(), 'skills/playwright-praman-sap-testing');
 
 const CATEGORY_ORDER = [
-  'ui5-control',
-  'navigation',
-  'authentication',
-  'fiori-elements',
+  'ui5',
   'table',
   'dialog',
   'date',
   'odata',
-  'ai',
+  'navigate',
+  'auth',
+  'fe',
   'intent',
-  'vocabulary',
+  'shell',
+  'footer',
+  'flp',
+  'ai',
+  'data',
 ];
-
-// ── TSDoc extraction ──────────────────────────────────────────────────────
-
-/**
- * Get the leading JSDoc/TSDoc comment for a node.
- */
-function getLeadingComment(node: ts.Node, sourceText: string): string | null {
-  const nodeStart = node.getFullStart();
-  const nodeText = sourceText.slice(nodeStart, node.getStart());
-  const ranges = ts.getLeadingCommentRanges(nodeText, 0);
-  if (!ranges || ranges.length === 0) return null;
-  const last = ranges[ranges.length - 1];
-  if (!last) return null;
-  return nodeText.slice(last.pos, last.end);
-}
-
-/**
- * Extract a single TSDoc tag value (first occurrence).
- */
-function getTag(comment: string, tag: string): string | undefined {
-  // Matches @tag value (stops at next @ or end)
-  const re = new RegExp(`@${tag}\\s+([^@\\n][^\\n]*)`, '');
-  const m = re.exec(comment);
-  return m?.[1]?.trim();
-}
-
-/**
- * Extract description (text before first @ tag).
- */
-function getDescription(comment: string): string {
-  const lines = comment
-    .split('\n')
-    .map((l) => l.replace(/^\s*\*\s?/, '').trim())
-    .filter((l) => !l.startsWith('/**') && !l.startsWith('*/') && !l.startsWith('@'));
-
-  const descLines: string[] = [];
-  for (const line of lines) {
-    if (line === '') {
-      if (descLines.length > 0) break;
-    } else {
-      descLines.push(line);
-    }
-  }
-  return descLines.join(' ').trim();
-}
-
-/**
- * Extract all @example blocks from a TSDoc comment.
- */
-function getExamples(comment: string): string[] {
-  const examples: string[] = [];
-  // Match @example followed by a fenced code block
-  const re = /@example\s*\n\s*\*\s*```(?:typescript|ts)?\n([\s\S]*?)```/g;
-  let m;
-  while ((m = re.exec(comment)) !== null) {
-    const code = m[1]
-      ?.split('\n')
-      .map((l) => l.replace(/^\s*\*\s?/, ''))
-      .join('\n')
-      .trim();
-    if (code) examples.push(code);
-  }
-  return examples;
-}
-
-/**
- * Get a node's name (function, method, variable with function value).
- */
-function getNodeName(node: ts.Node): string | null {
-  if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
-    return node.name?.getText() ?? null;
-  }
-  if (ts.isVariableStatement(node)) {
-    const decl = node.declarationList.declarations[0];
-    if (decl) return decl.name.getText();
-  }
-  return null;
-}
-
-// ── Extraction ─────────────────────────────────────────────────────────────
-
-/**
- * Walk all top-level nodes in a source file and extract capabilities.
- */
-function extractFromFile(
-  filePath: string,
-  sourceText: string,
-  capabilities: ExtractedCapability[],
-  recipes: ExtractedRecipe[],
-): void {
-  const sourceFile = ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
-
-  const visit = (node: ts.Node): void => {
-    const comment = getLeadingComment(node, sourceText);
-    if (comment) {
-      const capTag = getTag(comment, 'capability');
-      if (capTag) {
-        const name = getNodeName(node) ?? 'unknown';
-        capabilities.push({
-          name,
-          description: getDescription(comment),
-          capability: capTag,
-          intent: getTag(comment, 'intent'),
-          sapModule: getTag(comment, 'sapModule'),
-          businessContext: getTag(comment, 'businessContext'),
-          examples: getExamples(comment),
-          fileName: relative(process.cwd(), filePath),
-        });
-      }
-
-      const examples = getExamples(comment);
-      if (examples.length > 0) {
-        const name = getNodeName(node);
-        if (name) {
-          for (const ex of examples) {
-            recipes.push({
-              name,
-              description: getDescription(comment),
-              code: ex,
-              fileName: relative(process.cwd(), filePath),
-            });
-          }
-        }
-      }
-    }
-
-    ts.forEachChild(node, visit);
-  };
-
-  ts.forEachChild(sourceFile, visit);
-}
-
-/**
- * Scan all source files and return extracted data.
- */
-function extractAll(): {
-  capabilities: ExtractedCapability[];
-  recipes: ExtractedRecipe[];
-} {
-  const capabilities: ExtractedCapability[] = [];
-  const recipes: ExtractedRecipe[] = [];
-
-  const files = globSync('src/**/*.ts', {
-    cwd: process.cwd(),
-    ignore: ['**/*.test.ts', '**/*.spec.ts', '**/*.d.ts'],
-    absolute: true,
-  });
-
-  for (const filePath of files) {
-    const sourceText = readFileSync(filePath, 'utf-8');
-    extractFromFile(filePath, sourceText, capabilities, recipes);
-  }
-
-  return { capabilities, recipes };
-}
 
 // ── Rendering ──────────────────────────────────────────────────────────────
 
 /**
- * Group capabilities by the first segment of their @capability tag.
+ * Group capabilities by their category field.
  */
 function groupByCategory(caps: ExtractedCapability[]): Map<string, ExtractedCapability[]> {
   const map = new Map<string, ExtractedCapability[]>();
 
   for (const cap of caps) {
-    const category = cap.capability.split('-')[0] ?? 'other';
+    const category = cap.category;
     const existing = map.get(category);
     if (existing) {
       existing.push(cap);
@@ -235,8 +87,9 @@ function groupByCategory(caps: ExtractedCapability[]): Map<string, ExtractedCapa
   // Sort by CATEGORY_ORDER, then alphabetical for unknown categories
   const sorted = new Map<string, ExtractedCapability[]>();
   for (const key of CATEGORY_ORDER) {
-    if (map.has(key)) {
-      sorted.set(key, map.get(key)!);
+    const group = map.get(key);
+    if (group) {
+      sorted.set(key, group);
     }
   }
   for (const [key, val] of map) {
@@ -253,11 +106,10 @@ function renderCapabilities(caps: ExtractedCapability[]): string {
   if (caps.length === 0) {
     return `# Praman Capabilities Reference
 
-> **Note**: No @capability TSDoc tags found in source yet.
-> Run \`npm run generate:skill-md\` after adding @capability tags to public functions.
+> **Note**: No capabilities found in capabilities.yaml.
+> Run \`npm run generate:skill-md\` after populating capabilities.yaml.
 
-Capabilities will be auto-generated from TSDoc @capability tags added to public functions.
-See \`docs/documentation-standards.md\` for the tagging format.
+Capabilities will be auto-generated from capabilities.yaml entries.
 `;
   }
 
@@ -280,16 +132,16 @@ See \`docs/documentation-standards.md\` for the tagging format.
     md += `|---|---|---|---|\n`;
     for (const cap of group) {
       const sapMod = cap.sapModule ?? 'All';
-      md += `| \`${cap.capability}\` | \`${cap.name}()\` | ${cap.description} | ${sapMod} |\n`;
+      md += `| \`${cap.qualifiedName}\` | \`${cap.name}()\` | ${cap.description} | ${sapMod} |\n`;
     }
     md += '\n';
 
     // Examples inline for first 3 per category
-    const withExamples = group.filter((c) => c.examples.length > 0).slice(0, 3);
+    const withExamples = group.filter((c) => c.usageExample.length > 0).slice(0, 3);
     for (const cap of withExamples) {
       md += `### ${cap.name}\n\n`;
       if (cap.intent) md += `**Intent**: ${cap.intent}\n\n`;
-      md += `\`\`\`typescript\n${cap.examples[0]}\n\`\`\`\n\n`;
+      md += `\`\`\`typescript\n${cap.usageExample}\n\`\`\`\n\n`;
     }
   }
 
@@ -305,9 +157,9 @@ function renderApiReference(caps: ExtractedCapability[]): string {
   if (caps.length === 0) {
     return `# Praman API Reference
 
-> **Generated**: ${date} — run \`npm run generate:skill-md\` after adding @capability tags
+> **Generated**: ${date} — run \`npm run generate:skill-md\` after populating capabilities.yaml
 
-No tagged functions found yet.
+No capabilities found yet.
 `;
   }
 
@@ -316,19 +168,19 @@ No tagged functions found yet.
 
 > **Generated**: ${date} — do not edit manually, run \`npm run generate:skill-md\`
 
-| Function | Capability | Description | File |
-|---|---|---|---|
+| Function | Capability | Description |
+|---|---|---|
 `;
 
   for (const cap of sorted) {
-    md += `| \`${cap.name}()\` | \`${cap.capability}\` | ${cap.description} | \`${cap.fileName}\` |\n`;
+    md += `| \`${cap.name}()\` | \`${cap.qualifiedName}\` | ${cap.description} |\n`;
   }
 
   return md;
 }
 
 /**
- * Generate recipes-reference.md content (top @example blocks).
+ * Generate recipes-reference.md content (curated test patterns from recipes.yaml).
  */
 function renderRecipes(recipes: ExtractedRecipe[]): string {
   const date = new Date().toISOString().split('T')[0];
@@ -336,33 +188,32 @@ function renderRecipes(recipes: ExtractedRecipe[]): string {
   if (recipes.length === 0) {
     return `# Praman Recipes Reference
 
-> **Generated**: ${date} — run \`npm run generate:skill-md\` after adding @example blocks
+> **Generated**: ${date} — run \`npm run generate:skill-md\` after populating recipes.yaml
 
 No recipes found yet.
 `;
   }
 
-  // Deduplicate by function name, keep first example per function
+  // Deduplicate by recipe id
   const seen = new Set<string>();
   const unique = recipes.filter((r) => {
-    if (seen.has(r.name)) return false;
-    seen.add(r.name);
+    if (seen.has(r.id)) return false;
+    seen.add(r.id);
     return true;
   });
-
-  const top = unique.slice(0, 20);
 
   let md = `# Praman Recipes Reference
 
 > **Generated**: ${date} — do not edit manually, run \`npm run generate:skill-md\`
-> Top ${top.length} recipes extracted from @example TSDoc blocks
+> ${unique.length} recipes extracted from recipes.yaml
 
 `;
 
-  for (const recipe of top) {
+  for (const recipe of unique) {
     md += `## ${recipe.name}\n\n`;
+    md += `**Domain**: ${recipe.domain} | **Priority**: ${recipe.priority}\n\n`;
     if (recipe.description) md += `${recipe.description}\n\n`;
-    md += `\`\`\`typescript\n${recipe.code}\n\`\`\`\n\n---\n\n`;
+    md += `\`\`\`typescript\n${recipe.pattern}\n\`\`\`\n\n---\n\n`;
   }
 
   return md;
@@ -371,19 +222,37 @@ No recipes found yet.
 // ── Main ──────────────────────────────────────────────────────────────────
 
 function main(): void {
-  console.log('🔍 Scanning src/ for @capability and @recipe TSDoc tags...');
+  console.log('Reading capabilities.yaml and recipes.yaml...');
 
-  const { capabilities, recipes } = extractAll();
+  const capsRaw = readFileSync(resolve(process.cwd(), 'capabilities.yaml'), 'utf-8');
+  const recipesRaw = readFileSync(resolve(process.cwd(), 'recipes.yaml'), 'utf-8');
 
-  console.log(`   Found ${capabilities.length} @capability tags`);
-  console.log(`   Found ${recipes.length} @example blocks`);
+  const capsYaml = CapabilitiesYamlSchema.parse(parseYaml(capsRaw));
+  const recipesYaml = RecipesYamlSchema.parse(parseYaml(recipesRaw));
 
-  if (capabilities.length === 0) {
-    console.warn(
-      '⚠️  No @capability tags found. Generated files will contain placeholder content.',
-    );
-    console.warn('   Add @capability TSDoc tags to public functions in src/ to populate them.');
-  }
+  const capabilities: ExtractedCapability[] = capsYaml.capabilities.map((c) => ({
+    id: c.id,
+    qualifiedName: c.qualifiedName,
+    name: c.name,
+    description: c.description,
+    category: c.category,
+    usageExample: c.usageExample.trim(),
+    intent: c.intent,
+    sapModule: c.sapModule,
+    controlTypes: c.controlTypes,
+  }));
+
+  const recipes: ExtractedRecipe[] = recipesYaml.recipes.map((r) => ({
+    id: r.id,
+    name: r.name,
+    description: r.description.trim(),
+    domain: r.domain,
+    priority: r.priority,
+    pattern: r.pattern.trim(),
+  }));
+
+  console.log(`   Found ${capabilities.length} capabilities`);
+  console.log(`   Found ${recipes.length} recipes`);
 
   // Ensure output directory exists
   if (!existsSync(OUTPUT_DIR)) {
@@ -393,19 +262,19 @@ function main(): void {
   // Write capabilities-reference.md
   const capsPath = resolve(OUTPUT_DIR, 'capabilities-reference.md');
   writeFileSync(capsPath, renderCapabilities(capabilities), 'utf-8');
-  console.log(`✅ Written: ${relative(process.cwd(), capsPath)}`);
+  console.log(`Written: ${relative(process.cwd(), capsPath)}`);
 
   // Write api-reference.md
   const apiPath = resolve(OUTPUT_DIR, 'api-reference.md');
   writeFileSync(apiPath, renderApiReference(capabilities), 'utf-8');
-  console.log(`✅ Written: ${relative(process.cwd(), apiPath)}`);
+  console.log(`Written: ${relative(process.cwd(), apiPath)}`);
 
   // Write recipes-reference.md
   const recipesPath = resolve(OUTPUT_DIR, 'recipes-reference.md');
   writeFileSync(recipesPath, renderRecipes(recipes), 'utf-8');
-  console.log(`✅ Written: ${relative(process.cwd(), recipesPath)}`);
+  console.log(`Written: ${relative(process.cwd(), recipesPath)}`);
 
-  console.log('\n✨ generate-skill-md complete.');
+  console.log('\ngenerate-skill-md complete.');
 }
 
 main();

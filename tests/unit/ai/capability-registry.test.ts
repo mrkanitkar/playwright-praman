@@ -7,7 +7,12 @@
  * toJSON(), and forAI() behaviour. All tests are hermetic — no generated file
  * dependencies are assumed to have data.
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Mock the generated capabilities to keep tests hermetic (empty seed).
+vi.mock('#ai/capability-registry.generated.js', () => ({
+  GENERATED_CAPABILITIES: [],
+}));
 
 import { CapabilityRegistry } from '#ai/capability-registry.js';
 import type { CapabilityEntry } from '#ai/types.js';
@@ -15,54 +20,59 @@ import type { CapabilityEntry } from '#ai/types.js';
 // ── Test fixtures ──────────────────────────────────────────────────────────
 
 const SAMPLE_ENTRY_A: CapabilityEntry = {
-  id: 'click-button',
+  id: 'UI5-UI5-001',
+  qualifiedName: 'ui5.clickButton',
   name: 'clickButton',
   description: 'Clicks a UI5 button control by selector',
-  category: 'interaction',
+  category: 'ui5',
   intent: 'click',
   sapModule: 'sap.m.Button',
-  usage_example: "await ui5.click({ id: 'submitBtn' })",
+  usageExample: "await ui5.click({ id: 'submitBtn' })",
   registryVersion: 1,
   priority: 'fixture',
 };
 
 const SAMPLE_ENTRY_B: CapabilityEntry = {
-  id: 'navigate-tile',
+  id: 'UI5-NAV-001',
+  qualifiedName: 'ui5.navigateTile',
   name: 'navigateTile',
   description: 'Navigates to a Fiori launchpad tile by title',
-  category: 'navigation',
-  usage_example: "await ui5.navigateToTile('Sales Orders')",
+  category: 'navigate',
+  usageExample: "await ui5.navigateToTile('Sales Orders')",
   registryVersion: 1,
   priority: 'fixture',
 };
 
 const SAMPLE_ENTRY_C: CapabilityEntry = {
-  id: 'fill-input',
+  id: 'UI5-UI5-002',
+  qualifiedName: 'ui5.fillInput',
   name: 'fillInput',
   description: 'Fills a text input control with the given value',
-  category: 'interaction',
+  category: 'ui5',
   intent: 'fill',
-  usage_example: "await ui5.fill({ id: 'nameInput' }, 'John')",
+  usageExample: "await ui5.fill({ id: 'nameInput' }, 'John')",
   registryVersion: 1,
   priority: 'fixture',
 };
 
 const SAMPLE_HANDLER: CapabilityEntry = {
-  id: 'agentic-handler',
+  id: 'UI5-AI0-001',
+  qualifiedName: 'ai.agenticHandler',
   name: 'AgenticHandler',
   description: 'Agentic AI handler class for autonomous test generation',
-  category: 'handler',
-  usage_example: 'const handler = new AgenticHandler(llm, buildPageContext, caps)',
+  category: 'ai',
+  usageExample: 'const handler = new AgenticHandler(llm, buildPageContext, caps)',
   registryVersion: 1,
   priority: 'namespace',
 };
 
 const SAMPLE_IMPL: CapabilityEntry = {
-  id: 'internal-retry',
+  id: 'UI5-DAT-001',
+  qualifiedName: 'data.retryWithBackoff',
   name: 'retryWithBackoff',
   description: 'Internal retry helper with exponential backoff',
-  category: 'infrastructure',
-  usage_example: 'await retryWithBackoff(() => findControl(sel), 3)',
+  category: 'data',
+  usageExample: 'await retryWithBackoff(() => findControl(sel), 3)',
   registryVersion: 1,
   priority: 'implementation',
 };
@@ -141,11 +151,13 @@ describe('CapabilityRegistry', () => {
       registry.register(SAMPLE_ENTRY_A);
       const updated: CapabilityEntry = {
         ...SAMPLE_ENTRY_A,
-        description: 'Updated description',
+        description: 'Updated description for button click',
       };
       registry.register(updated);
       expect(registry.list()).toHaveLength(1);
-      expect(registry.get(SAMPLE_ENTRY_A.id)?.description).toBe('Updated description');
+      expect(registry.get(SAMPLE_ENTRY_A.id)?.description).toBe(
+        'Updated description for button click',
+      );
     });
 
     it('can register multiple distinct entries', () => {
@@ -159,9 +171,9 @@ describe('CapabilityRegistry', () => {
   describe('get()', () => {
     it('returns the entry with the given id', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
-      const result = registry.get('click-button');
+      const result = registry.get('UI5-UI5-001');
       expect(result).toBeDefined();
-      expect(result?.id).toBe('click-button');
+      expect(result?.id).toBe('UI5-UI5-001');
       expect(result?.name).toBe('clickButton');
     });
 
@@ -172,7 +184,7 @@ describe('CapabilityRegistry', () => {
 
     it('returns the full entry object', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A);
-      const entry = registry.get('click-button');
+      const entry = registry.get('UI5-UI5-001');
       expect(entry).toEqual(SAMPLE_ENTRY_A);
     });
   });
@@ -209,13 +221,13 @@ describe('CapabilityRegistry', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
       const results = registry.find('click');
       expect(results.length).toBeGreaterThanOrEqual(1);
-      expect(results.some((e) => e.id === 'click-button')).toBe(true);
+      expect(results.some((e) => e.id === 'UI5-UI5-001')).toBe(true);
     });
 
     it('finds entries by partial description match (case-insensitive)', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
       const results = registry.find('launchpad');
-      expect(results.some((e) => e.id === 'navigate-tile')).toBe(true);
+      expect(results.some((e) => e.id === 'UI5-NAV-001')).toBe(true);
     });
 
     it('returns an empty array when no entries match', () => {
@@ -225,10 +237,10 @@ describe('CapabilityRegistry', () => {
 
     it('returns multiple matches when applicable', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
-      // Both SAMPLE_ENTRY_A and SAMPLE_ENTRY_C have 'interaction' category
+      // Both SAMPLE_ENTRY_A and SAMPLE_ENTRY_C have 'ui5' category
       // but searching 'input' matches only SAMPLE_ENTRY_C by name
       const results = registry.find('input');
-      expect(results.some((e) => e.id === 'fill-input')).toBe(true);
+      expect(results.some((e) => e.id === 'UI5-UI5-002')).toBe(true);
     });
 
     it('returns all that match when query is broad', () => {
@@ -244,27 +256,27 @@ describe('CapabilityRegistry', () => {
   describe('byCategory()', () => {
     it('returns only entries matching the given category', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
-      const interaction = registry.byCategory('interaction');
-      expect(interaction).toHaveLength(2);
-      expect(interaction.every((e) => e.category === 'interaction')).toBe(true);
+      const ui5Entries = registry.byCategory('ui5');
+      expect(ui5Entries).toHaveLength(2);
+      expect(ui5Entries.every((e) => e.category === 'ui5')).toBe(true);
     });
 
-    it('returns navigation entries correctly', () => {
+    it('returns navigate entries correctly', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
-      const nav = registry.byCategory('navigation');
+      const nav = registry.byCategory('navigate');
       expect(nav).toHaveLength(1);
-      expect(nav[0]?.id).toBe('navigate-tile');
+      expect(nav[0]?.id).toBe('UI5-NAV-001');
     });
 
-    it('returns empty array for unknown category', () => {
+    it('returns empty array for a valid category with no entries', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A);
-      expect(registry.byCategory('non-existent-category')).toEqual([]);
+      expect(registry.byCategory('odata')).toEqual([]);
     });
 
-    it('category match is case-sensitive', () => {
+    it('returns empty for unused valid category', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A);
-      expect(registry.byCategory('Interaction')).toEqual([]);
-      expect(registry.byCategory('INTERACTION')).toEqual([]);
+      expect(registry.byCategory('table')).toEqual([]);
+      expect(registry.byCategory('dialog')).toEqual([]);
     });
   });
 
@@ -275,21 +287,21 @@ describe('CapabilityRegistry', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
       const fixtures = registry.listByPriority('fixture');
       expect(fixtures).toHaveLength(1);
-      expect(fixtures[0]?.id).toBe('click-button');
+      expect(fixtures[0]?.id).toBe('UI5-UI5-001');
     });
 
     it('returns only namespace-priority entries', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
       const namespaces = registry.listByPriority('namespace');
       expect(namespaces).toHaveLength(1);
-      expect(namespaces[0]?.id).toBe('agentic-handler');
+      expect(namespaces[0]?.id).toBe('UI5-AI0-001');
     });
 
     it('returns only implementation-priority entries', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER, SAMPLE_IMPL);
       const impls = registry.listByPriority('implementation');
       expect(impls).toHaveLength(1);
-      expect(impls[0]?.id).toBe('internal-retry');
+      expect(impls[0]?.id).toBe('UI5-DAT-001');
     });
 
     it('returns empty array when no entries match the priority', () => {
@@ -303,19 +315,21 @@ describe('CapabilityRegistry', () => {
       expect(fixtures).toHaveLength(3);
     });
 
-    it('excludes entries without a priority field', () => {
-      const noPriority: CapabilityEntry = {
-        id: 'no-priority',
-        name: 'noPriority',
-        description: 'Entry without priority',
-        category: 'misc',
-        usage_example: 'example()',
+    it('excludes entries with a different priority value', () => {
+      const implEntry: CapabilityEntry = {
+        id: 'UI5-UI5-099',
+        qualifiedName: 'ui5.implHelper',
+        name: 'implHelper',
+        description: 'An implementation-level helper entry',
+        category: 'ui5',
+        usageExample: 'example()',
         registryVersion: 1,
+        priority: 'implementation',
       };
-      const registry = makeRegistry(SAMPLE_ENTRY_A, noPriority);
+      const registry = makeRegistry(SAMPLE_ENTRY_A, implEntry);
       const fixtures = registry.listByPriority('fixture');
       expect(fixtures).toHaveLength(1);
-      expect(fixtures[0]?.id).toBe('click-button');
+      expect(fixtures[0]?.id).toBe('UI5-UI5-001');
     });
   });
 
@@ -326,7 +340,7 @@ describe('CapabilityRegistry', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
       const result = registry.findByName('clickButton');
       expect(result).toBeDefined();
-      expect(result?.id).toBe('click-button');
+      expect(result?.id).toBe('UI5-UI5-001');
     });
 
     it('returns undefined for an unknown name', () => {
@@ -343,8 +357,8 @@ describe('CapabilityRegistry', () => {
     it('returns the first match when multiple entries share a name', () => {
       const duplicate: CapabilityEntry = {
         ...SAMPLE_ENTRY_A,
-        id: 'click-button-v2',
-        description: 'V2 click',
+        id: 'UI5-UI5-003',
+        description: 'V2 click button variant',
       };
       const registry = makeRegistry(SAMPLE_ENTRY_A, duplicate);
       const result = registry.findByName('clickButton');
@@ -369,10 +383,10 @@ describe('CapabilityRegistry', () => {
     it('returns deduplicated categories', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_C, SAMPLE_HANDLER);
       const stats = registry.getStatistics();
-      // A and C share 'interaction', handler has 'handler'
+      // A and C share 'ui5', handler has 'ai'
       expect(stats.categories).toHaveLength(2);
-      expect(stats.categories).toContain('interaction');
-      expect(stats.categories).toContain('handler');
+      expect(stats.categories).toContain('ui5');
+      expect(stats.categories).toContain('ai');
     });
 
     it('returns a valid ISO timestamp', () => {
@@ -499,12 +513,12 @@ describe('CapabilityRegistry', () => {
       expect(ai.methods).toEqual(json.methods);
     });
 
-    it('every entry has a usage_example', () => {
+    it('every entry has a usageExample', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
       const result = registry.forAI();
       for (const entry of result.methods) {
-        expect(typeof entry.usage_example).toBe('string');
-        expect(entry.usage_example.length).toBeGreaterThan(0);
+        expect(typeof entry.usageExample).toBe('string');
+        expect(entry.usageExample.length).toBeGreaterThan(0);
       }
     });
 
@@ -538,7 +552,7 @@ describe('CapabilityRegistry', () => {
       it('includes capability category attribute', () => {
         const registry = makeRegistry(SAMPLE_ENTRY_A);
         const result = registry.forProvider('claude');
-        expect(result).toContain('category="interaction"');
+        expect(result).toContain('category="ui5"');
       });
 
       it('includes intent attribute when present', () => {
@@ -564,7 +578,10 @@ describe('CapabilityRegistry', () => {
       it('includes example element', () => {
         const registry = makeRegistry(SAMPLE_ENTRY_A);
         const result = registry.forProvider('claude');
-        expect(result).toContain(`<example>await ui5.click({ id: 'submitBtn' })</example>`);
+        // Single quotes are escaped to &apos; in XML
+        expect(result).toContain(
+          `<example>await ui5.click({ id: &apos;submitBtn&apos; })</example>`,
+        );
       });
 
       it('returns self-closing tag for empty registry', () => {
@@ -591,96 +608,98 @@ describe('CapabilityRegistry', () => {
         expect(() => JSON.parse(result) as unknown).not.toThrow();
       });
 
-      it('returns an array of tool objects', () => {
+      it('returns a CapabilitiesJSON object with methods array', () => {
         const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
-        const parsed = JSON.parse(registry.forProvider('openai')) as unknown[];
-        expect(Array.isArray(parsed)).toBe(true);
-        expect(parsed).toHaveLength(2);
+        const parsed = JSON.parse(registry.forProvider('openai')) as {
+          methods: unknown[];
+          totalMethods: number;
+        };
+        expect(parsed.totalMethods).toBe(2);
+        expect(parsed.methods).toHaveLength(2);
       });
 
-      it('each tool has type "function"', () => {
+      it('includes package name', () => {
         const registry = makeRegistry(SAMPLE_ENTRY_A);
-        const parsed = JSON.parse(registry.forProvider('openai')) as { type: string }[];
-        expect(parsed[0]?.type).toBe('function');
+        const parsed = JSON.parse(registry.forProvider('openai')) as { name: string };
+        expect(parsed.name).toBe('playwright-praman');
       });
 
-      it('includes function name matching capability name', () => {
+      it('includes capability entries in methods array', () => {
         const registry = makeRegistry(SAMPLE_ENTRY_A);
         const parsed = JSON.parse(registry.forProvider('openai')) as {
-          function: { name: string };
-        }[];
-        expect(parsed[0]?.function.name).toBe('clickButton');
+          methods: { name: string; description: string; category: string }[];
+        };
+        expect(parsed.methods[0]?.name).toBe('clickButton');
+        expect(parsed.methods[0]?.description).toBe('Clicks a UI5 button control by selector');
+        expect(parsed.methods[0]?.category).toBe('ui5');
       });
 
-      it('includes function description', () => {
-        const registry = makeRegistry(SAMPLE_ENTRY_A);
+      it('includes fixtures array for fixture-priority entries', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER);
         const parsed = JSON.parse(registry.forProvider('openai')) as {
-          function: { description: string };
-        }[];
-        expect(parsed[0]?.function.description).toBe('Clicks a UI5 button control by selector');
+          fixtures: { name: string }[];
+        };
+        expect(parsed.fixtures).toHaveLength(1);
+        expect(parsed.fixtures[0]?.name).toBe('clickButton');
       });
 
-      it('includes parameters with example property', () => {
-        const registry = makeRegistry(SAMPLE_ENTRY_A);
+      it('includes byPriority breakdown', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_HANDLER);
         const parsed = JSON.parse(registry.forProvider('openai')) as {
-          function: {
-            parameters: {
-              properties: { example: { description: string } };
-            };
-          };
-        }[];
-        expect(parsed[0]?.function.parameters.properties.example.description).toBe(
-          "await ui5.click({ id: 'submitBtn' })",
-        );
+          byPriority: { fixture: number; namespace: number; implementation: number };
+        };
+        expect(parsed.byPriority).toEqual({
+          fixture: 1,
+          namespace: 1,
+          implementation: 0,
+        });
       });
 
-      it('includes category in function metadata', () => {
-        const registry = makeRegistry(SAMPLE_ENTRY_A);
-        const parsed = JSON.parse(registry.forProvider('openai')) as {
-          function: { category: string };
-        }[];
-        expect(parsed[0]?.function.category).toBe('interaction');
-      });
-
-      it('returns empty array JSON for empty registry', () => {
+      it('returns empty methods for empty registry', () => {
         const registry = new CapabilityRegistry();
-        const result = registry.forProvider('openai');
-        expect(JSON.parse(result)).toEqual([]);
+        const parsed = JSON.parse(registry.forProvider('openai')) as {
+          methods: unknown[];
+          totalMethods: number;
+        };
+        expect(parsed.methods).toEqual([]);
+        expect(parsed.totalMethods).toBe(0);
       });
     });
 
     // ── Gemini (plain text) format ─────────────────────────────────────
 
     describe('gemini format', () => {
-      it('returns plain text listing', () => {
+      it('returns valid JSON containing capability data', () => {
         const registry = makeRegistry(SAMPLE_ENTRY_A);
         const result = registry.forProvider('gemini');
-        expect(result).toContain('clickButton');
-        expect(result).toContain('[interaction]');
+        const parsed = JSON.parse(result) as { methods: { name: string; category: string }[] };
+        expect(parsed.methods[0]?.name).toBe('clickButton');
+        expect(parsed.methods[0]?.category).toBe('ui5');
+      });
+
+      it('includes capability descriptions', () => {
+        const registry = makeRegistry(SAMPLE_ENTRY_A);
+        const result = registry.forProvider('gemini');
         expect(result).toContain('Clicks a UI5 button control by selector');
       });
 
-      it('includes example prefixed with "Example:"', () => {
-        const registry = makeRegistry(SAMPLE_ENTRY_A);
-        const result = registry.forProvider('gemini');
-        expect(result).toContain("Example: await ui5.click({ id: 'submitBtn' })");
-      });
-
-      it('separates multiple entries with blank lines', () => {
+      it('includes all methods', () => {
         const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B);
-        const result = registry.forProvider('gemini');
-        // Two entries should be separated by a double newline
-        const blocks = result.split('\n\n');
-        expect(blocks).toHaveLength(2);
+        const parsed = JSON.parse(registry.forProvider('gemini')) as { methods: unknown[] };
+        expect(parsed.methods).toHaveLength(2);
       });
 
-      it('returns fallback message for empty registry', () => {
+      it('returns empty methods for empty registry', () => {
         const registry = new CapabilityRegistry();
-        const result = registry.forProvider('gemini');
-        expect(result).toBe('No capabilities registered.');
+        const parsed = JSON.parse(registry.forProvider('gemini')) as {
+          methods: unknown[];
+          totalMethods: number;
+        };
+        expect(parsed.methods).toEqual([]);
+        expect(parsed.totalMethods).toBe(0);
       });
 
-      it('includes all capabilities', () => {
+      it('includes all capabilities in methods', () => {
         const registry = makeRegistry(SAMPLE_ENTRY_A, SAMPLE_ENTRY_B, SAMPLE_ENTRY_C);
         const result = registry.forProvider('gemini');
         expect(result).toContain('clickButton');

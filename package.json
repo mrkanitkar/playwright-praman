@@ -96,6 +96,7 @@
     "spellcheck": "cspell \"src/**/*.ts\" \"docs/**/*.md\" --no-progress",
     "deadcode": "knip",
     "mdlint": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#docs/build\"",
+    "validate:capabilities": "tsx scripts/validate-capabilities.ts",
     "validate:no-js": "tsx scripts/check-no-js-in-src.ts",
     "test:ai-integration": "vitest run --config vitest.integration.config.ts",
     "test:unit": "vitest run",

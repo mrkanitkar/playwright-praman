@@ -2,13 +2,13 @@
 
 ## Praman v1.0 — AI-First SAP UI5 Test Automation Platform
 
-| Property | Value |
-|----------|-------|
-| **Role** | Senior TypeScript Implementer |
-| **Skill ID** | PRAMAN-SKILL-IMPLEMENTER-001 |
-| **Version** | 1.0.0 |
+| Property            | Value                                                                |
+| ------------------- | -------------------------------------------------------------------- |
+| **Role**            | Senior TypeScript Implementer                                        |
+| **Skill ID**        | PRAMAN-SKILL-IMPLEMENTER-001                                         |
+| **Version**         | 1.0.0                                                                |
 | **Authority Level** | Implementation — writes all production code per Architect interfaces |
-| **Parent Docs** | plan.md (D1–D29), setup.md, skills-architect.md |
+| **Parent Docs**     | plan.md (D1–D29), setup.md, skills-architect.md                      |
 
 ---
 
@@ -50,8 +50,8 @@ You implement interfaces defined by the Architect. You do NOT:
     "isolatedModules": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noPropertyAccessFromIndexSignature": true
-  }
+    "noPropertyAccessFromIndexSignature": true,
+  },
 }
 ```
 
@@ -59,16 +59,18 @@ You implement interfaces defined by the Architect. You do NOT:
 
 ```typescript
 // ❌ FORBIDDEN
-const x: any = getData();                    // No 'any'
-const y = data as unknown as MyType;         // No double-cast
-const z = data!;                             // No non-null assertion (use narrowing)
+const x: any = getData(); // No 'any'
+const y = data as unknown as MyType; // No double-cast
+const z = data!; // No non-null assertion (use narrowing)
 // @ts-ignore                                // Never suppress errors
 // @ts-expect-error                          // Only in tests, with justification
 
 // ✅ REQUIRED
-const x: unknown = getData();               // Use 'unknown'
-if (isMyType(x)) { /* use x */ }            // Type guard
-const y = schema.parse(data);               // Zod validation at boundary
+const x: unknown = getData(); // Use 'unknown'
+if (isMyType(x)) {
+  /* use x */
+} // Type guard
+const y = schema.parse(data); // Zod validation at boundary
 
 // Type guards — write them properly
 function isUI5Control(value: unknown): value is UI5Control {
@@ -186,8 +188,8 @@ const dir = getModuleDirname(import.meta.url);
 const configPath = resolveFromPackageRoot(import.meta.url, 'config', 'defaults.json');
 
 // ❌ FORBIDDEN: Hardcoded separators
-const bad = root + '/' + file;        // Breaks on Windows
-const worse = root + '\\' + file;     // Breaks on Unix
+const bad = root + '/' + file; // Breaks on Windows
+const worse = root + '\\' + file; // Breaks on Unix
 ```
 
 ### File Operations
@@ -197,7 +199,7 @@ const worse = root + '\\' + file;     // Breaks on Unix
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 
 // ❌ FORBIDDEN: Sync in production code
-import { readFileSync } from 'node:fs';  // Only in tests or CLI bootstrap
+import { readFileSync } from 'node:fs'; // Only in tests or CLI bootstrap
 ```
 
 ### Build Output Awareness
@@ -307,26 +309,34 @@ const LogLevel = z.enum(['error', 'warn', 'info', 'debug', 'verbose']);
 const InteractionStrategyKind = z.enum(['playwright', 'dom-first', 'opa5', 'hybrid']);
 const AuthStrategyKind = z.enum(['btp-saml', 'basic', 'office365', 'custom']);
 
-export const PramanConfigSchema = z.object({
-  logLevel: LogLevel.default('info'),
-  ui5WaitTimeout: z.number().int().positive().default(30_000),
-  controlDiscoveryTimeout: z.number().int().positive().default(10_000),
-  interactionStrategy: InteractionStrategyKind.default('hybrid'),
-  skipStabilityWait: z.boolean().default(false),
-  preferVisibleControls: z.boolean().default(true),
-  auth: z.object({
-    strategy: AuthStrategyKind,
-    baseUrl: z.string().url(),
-  }).optional(),
-  ai: z.object({
-    provider: z.enum(['azure-openai', 'openai']),
-    temperature: z.number().min(0).max(2).default(0.3),
-  }).optional(),
-  telemetry: z.object({
-    openTelemetry: z.boolean().default(false),
-    exporter: z.enum(['otlp', 'azure-monitor', 'jaeger']).default('otlp'),
-  }).optional(),
-}).strict();
+export const PramanConfigSchema = z
+  .object({
+    logLevel: LogLevel.default('info'),
+    ui5WaitTimeout: z.number().int().positive().default(30_000),
+    controlDiscoveryTimeout: z.number().int().positive().default(10_000),
+    interactionStrategy: InteractionStrategyKind.default('hybrid'),
+    skipStabilityWait: z.boolean().default(false),
+    preferVisibleControls: z.boolean().default(true),
+    auth: z
+      .object({
+        strategy: AuthStrategyKind,
+        baseUrl: z.string().url(),
+      })
+      .optional(),
+    ai: z
+      .object({
+        provider: z.enum(['azure-openai', 'openai']),
+        temperature: z.number().min(0).max(2).default(0.3),
+      })
+      .optional(),
+    telemetry: z
+      .object({
+        openTelemetry: z.boolean().default(false),
+        exporter: z.enum(['otlp', 'azure-monitor', 'jaeger']).default('otlp'),
+      })
+      .optional(),
+  })
+  .strict();
 
 export type PramanConfig = Readonly<z.infer<typeof PramanConfigSchema>>;
 ```
@@ -440,7 +450,7 @@ export async function withRetry<T>(
       );
 
       log.warn({ attempt, backoff, error }, 'Retrying after failure');
-      await new Promise(resolve => setTimeout(resolve, backoff));
+      await new Promise((resolve) => setTimeout(resolve, backoff));
     }
   }
 
@@ -473,27 +483,30 @@ export class ClassicUI5Adapter implements BridgeAdapter {
         try {
           const Reg = sap.ui.require('sap/ui/core/ElementRegistry');
           if (Reg) return Reg.get(id);
-        } catch { /* fall through */ }
+        } catch {
+          /* fall through */
+        }
 
         // Tier 2: Core.byId
         try {
           return sap.ui.getCore().byId(id);
-        } catch { /* fall through */ }
+        } catch {
+          /* fall through */
+        }
 
         // Tier 3: Element.getElementById (deprecated)
         try {
           return sap.ui.core.Element.getElementById(id);
-        } catch { /* fall through */ }
+        } catch {
+          /* fall through */
+        }
 
         return undefined;
       };
     });
   }
 
-  async findControl(
-    page: Page,
-    selector: UI5Selector,
-  ): Promise<ControlHandle> {
+  async findControl(page: Page, selector: UI5Selector): Promise<ControlHandle> {
     // Implementation using page.evaluate() to run browser-side discovery
     // Uses __praman_getById for ID-based, RecordReplay for property-based
     // ...
@@ -507,8 +520,8 @@ Browser scripts run inside `page.evaluate()`. Special rules:
 
 ```typescript
 // ❌ FORBIDDEN in browser scripts
-import { logger } from '#core/logging';     // Node-side imports DO NOT work
-const pino = require('pino');               // No require in browser
+import { logger } from '#core/logging'; // Node-side imports DO NOT work
+const pino = require('pino'); // No require in browser
 
 // ✅ CORRECT: Self-contained browser function
 export function createFindControlScript() {
@@ -554,10 +567,7 @@ export async function fireEvent(
   );
 }
 
-export async function getBridgeAccessor(
-  page: Page,
-  controlId: string,
-): Promise<unknown> {
+export async function getBridgeAccessor(page: Page, controlId: string): Promise<unknown> {
   return page.evaluate(
     ({ id }) => {
       const control = window.__praman_getById(id);
@@ -597,8 +607,7 @@ export function createControlProxy(
 
       // 2. Known typed methods (press, setValue, getText, etc.)
       if (typeof prop === 'string' && isKnownMethod(prop)) {
-        return (...args: unknown[]) =>
-          adapter.executeMethod(handle, prop, args);
+        return (...args: unknown[]) => adapter.executeMethod(handle, prop, args);
       }
 
       // 3. Blacklisted methods — throw descriptive error
@@ -618,8 +627,7 @@ export function createControlProxy(
 
       // 4. Unknown methods — forward to bridge (dynamic method call)
       if (typeof prop === 'string') {
-        return (...args: unknown[]) =>
-          adapter.executeMethod(handle, prop, args);
+        return (...args: unknown[]) => adapter.executeMethod(handle, prop, args);
       }
 
       return undefined;
@@ -654,7 +662,7 @@ function handleMethodReturn(
       return createControlProxy(returnValue.handle, page, adapter); // new control
 
     case 'aggregation':
-      return returnValue.handles.map(h => createControlProxy(h, page, adapter));
+      return returnValue.handles.map((h) => createControlProxy(h, page, adapter));
 
     case 'object':
       return createUI5ObjectProxy(returnValue.uuid, returnValue.type, page);
@@ -706,46 +714,69 @@ export const test = base.extend<{
 ### 6.1 AI Response Envelope (D29, BP-CLAUDE)
 
 ```typescript
-// src/ai/types.ts
-export interface AIResponseEnvelope<T> {
-  readonly status: 'success' | 'partial' | 'error';
-  readonly data: T;
-  readonly metadata: {
-    readonly duration: number;
-    readonly retryable: boolean;
-    readonly suggestions: readonly string[];
-    readonly registryVersion: string;
-  };
+// src/ai/types.ts — AiResponse<T> discriminated union
+export type AiResponse<T> =
+  | { readonly status: 'success'; readonly data: T; readonly metadata: AiResponseMetadata }
+  | {
+      readonly status: 'error';
+      readonly data: undefined;
+      readonly error: AiResponseError;
+      readonly metadata: AiResponseMetadata;
+    }
+  | {
+      readonly status: 'partial';
+      readonly data: Partial<T>;
+      readonly error?: AiResponseError;
+      readonly metadata: AiResponseMetadata;
+    };
+
+export interface AiResponseMetadata {
+  readonly duration: number;
+  readonly retryable: boolean;
+  readonly suggestions: string[];
+  readonly model?: string;
+  readonly tokens?: number;
 }
 ```
 
 ### 6.2 Capability Registry (D9, BP-CLAUDE)
 
 ```typescript
-// src/ai/capabilities/registry.ts
-export interface Capability {
-  readonly name: string;
-  readonly description: string;
-  readonly parameters: readonly ParameterDef[];
-  readonly returnType: string;
-  readonly usage_example: string;
-  readonly since: string;
+// src/ai/schemas/capability.schema.ts — Zod schema is single source of truth
+// TypeScript type derived via z.infer<typeof CapabilityEntrySchema>
+export interface CapabilityEntry {
+  readonly id: string; // 'UI5-TABLE-001' (UI5-PREFIX-NNN format)
+  readonly qualifiedName: string; // 'ui5.table.detectType'
+  readonly name: string; // 'detectType'
+  readonly description: string; // min 10 chars
+  readonly category: CapabilityCategory; // enum: 'ui5' | 'auth' | 'navigate' | 'table' | ...
+  readonly priority: CapabilityPriority; // 'fixture' | 'namespace' | 'implementation'
+  readonly usageExample: string; // ready-to-run code string
+  readonly registryVersion: 1; // literal 1
+  readonly intent?: string;
+  readonly sapModule?: string;
+  readonly controlTypes?: string[];
+  readonly async?: boolean;
 }
 
 export class CapabilityRegistry {
-  private readonly capabilities = new Map<string, Capability>();
-  readonly registryVersion: string;
-
-  register(capability: Capability): void {
-    this.capabilities.set(capability.name, Object.freeze(capability));
+  register(entry: CapabilityEntry): void {
+    /* ... */
   }
-
-  list(): readonly Capability[] {
-    return [...this.capabilities.values()];
+  list(): CapabilityEntry[] {
+    /* ... */
   }
-
-  find(name: string): Capability | undefined {
-    return this.capabilities.get(name);
+  get(id: string): CapabilityEntry | undefined {
+    /* ... */
+  }
+  byCategory(category: CapabilityCategory): CapabilityEntry[] {
+    /* ... */
+  }
+  forProvider(provider: AiProviderName): string {
+    /* ... */
+  }
+  forAI(): CapabilitiesJSON {
+    /* ... */
   }
 }
 ```
@@ -789,34 +820,34 @@ Before submitting ANY code, verify:
 // ❌ NEVER DO THESE
 
 // 1. console.log
-console.log('debug info');                    // Use logger.debug()
+console.log('debug info'); // Use logger.debug()
 
 // 2. any type
-function process(data: any): any { }          // Use unknown + type guard
+function process(data: any): any {} // Use unknown + type guard
 
 // 3. Mutable config
-config.logLevel = 'debug';                    // Config is Readonly
+config.logLevel = 'debug'; // Config is Readonly
 
 // 4. Raw Error
-throw new Error('something failed');          // Use PramanError subclass
+throw new Error('something failed'); // Use PramanError subclass
 
 // 5. waitForTimeout
-await page.waitForTimeout(2000);              // Use waitForUI5Stable()
+await page.waitForTimeout(2000); // Use waitForUI5Stable()
 
 // 6. Missing .js extension
-import { foo } from './bar';                  // Must be './bar.js'
+import { foo } from './bar'; // Must be './bar.js'
 
 // 7. require()
-const pino = require('pino');                 // ESM only: import
+const pino = require('pino'); // ESM only: import
 
 // 8. Non-null assertion
-const el = document.getElementById('x')!;     // Use null check
+const el = document.getElementById('x')!; // Use null check
 
 // 9. Copy-paste from v2.5.0
 // v2.5.0 code is reference only. Every line in v3.0 is new.
 
 // 10. Duplicated API resolution
-sap.ui.getCore().byId(id);                    // Use __praman_getById()
+sap.ui.getCore().byId(id); // Use __praman_getById()
 ```
 
 ---

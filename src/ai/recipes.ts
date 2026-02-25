@@ -9,8 +9,8 @@
  * ```typescript
  * import { recipes } from 'playwright-praman';
  *
- * const authRecipes = recipes.selectByCategory('auth');
- * const agentRecipes = recipes.selectByRole('ai-agent');
+ * const authRecipes = recipes.selectByDomain('auth');
+ * const essential = recipes.selectByPriority('essential');
  * const topFive = recipes.getTopRecipes(5);
  * ```
  *
@@ -18,7 +18,7 @@
  */
 
 import { RecipeRegistry } from './recipe-registry.js';
-import type { RecipeEntry, RecipePriority, RecipeRole } from './types.js';
+import type { RecipeEntry, RecipePriority } from './schemas/recipe.schema.js';
 
 const registry = new RecipeRegistry();
 
@@ -39,22 +39,18 @@ const registry = new RecipeRegistry();
 export const recipes = {
   /** Returns recipes matching the given filter criteria. */
   select: (filter: {
-    readonly category?: string;
-    readonly role?: RecipeEntry['role'];
+    readonly domain?: string;
     readonly priority?: RecipePriority;
   }): RecipeEntry[] => registry.select(filter),
 
-  /** Returns recipes matching the given role. */
-  selectByRole: (role: RecipeEntry['role']): RecipeEntry[] => registry.selectByRole(role),
-
-  /** Returns recipes matching the given category. */
-  selectByCategory: (category: string): RecipeEntry[] => registry.selectByCategory(category),
+  /** Returns recipes matching the given domain. */
+  selectByDomain: (domain: string): RecipeEntry[] => registry.selectByDomain(domain),
 
   /** Returns recipes matching the given priority level. */
   selectByPriority: (priority: RecipePriority): RecipeEntry[] =>
     registry.selectByPriority(priority),
 
-  /** Searches recipes by substring match on title, description, or tags. */
+  /** Searches recipes by substring match on name or description. */
   search: (query: string): RecipeEntry[] => registry.search(query),
 
   /** Returns all recipes in an AI-agent-friendly format. */
@@ -66,33 +62,33 @@ export const recipes = {
   /** Returns all registered recipe entries. */
   list: (): RecipeEntry[] => registry.forAI(),
 
-  /** Searches recipes by substring match on title, description, or tags. */
+  /** Searches recipes by substring match on name or description. */
   find: (query: string): RecipeEntry[] => registry.search(query),
 
-  /** Returns `true` if a recipe with the given title exists. */
-  has: (title: string): boolean =>
-    registry.search(title).some((r) => r.title.toLowerCase() === title.toLowerCase()),
+  /** Returns `true` if a recipe with the given name exists. */
+  has: (name: string): boolean =>
+    registry.search(name).some((r) => r.name.toLowerCase() === name.toLowerCase()),
 
-  /** Returns the code steps for a named recipe, or `undefined`. */
-  getSteps: (title: string): string | undefined => {
-    const match = registry.search(title).find((r) => r.title.toLowerCase() === title.toLowerCase());
-    return match?.code;
+  /** Returns the pattern code for a named recipe, or `undefined`. */
+  getSteps: (name: string): string | undefined => {
+    const match = registry.search(name).find((r) => r.name.toLowerCase() === name.toLowerCase());
+    return match?.pattern;
   },
 
   /** Returns a human-readable description of a named recipe. */
-  describe: (title: string): string | undefined => {
-    const match = registry.search(title).find((r) => r.title.toLowerCase() === title.toLowerCase());
+  describe: (name: string): string | undefined => {
+    const match = registry.search(name).find((r) => r.name.toLowerCase() === name.toLowerCase());
     return match?.description;
   },
 
-  /** Returns unique category names across all registered recipes. */
-  getCategories: (): string[] => {
+  /** Returns unique domain names across all registered recipes. */
+  getDomains: (): string[] => {
     const all = registry.forAI();
-    return [...new Set(all.map((r) => r.category).filter(Boolean))];
+    return [...new Set(all.map((r) => r.domain).filter(Boolean))];
   },
 
   /** Returns recipes relevant to a specific SAP domain. */
-  forDomain: (domain: string): RecipeEntry[] => registry.search(domain),
+  forDomain: (domain: string): RecipeEntry[] => registry.selectByDomain(domain),
 
   /** Returns recipes associated with a specific capability. */
   forCapability: (capability: string): RecipeEntry[] => registry.search(capability),
@@ -103,13 +99,13 @@ export const recipes = {
   /** Exports all recipes as a JSON-serializable array. */
   toJSON: (): readonly RecipeEntry[] => registry.forAI(),
 
-  /** Validates that a recipe title exists and returns basic info. */
-  validate: (title: string): { readonly valid: boolean; readonly role?: RecipeRole } => {
-    const match = registry.search(title).find((r) => r.title.toLowerCase() === title.toLowerCase());
+  /** Validates that a recipe name exists. */
+  validate: (name: string): { readonly valid: boolean } => {
+    const match = registry.search(name).find((r) => r.name.toLowerCase() === name.toLowerCase());
     if (match === undefined) {
       return { valid: false };
     }
-    return { valid: true, role: match.role };
+    return { valid: true };
   },
 
   /** The underlying registry instance (for advanced usage like `fromEntries()`). */

@@ -14,7 +14,7 @@
  * import { CapabilityRegistry } from '#ai/capability-registry.js';
  *
  * const registry = new CapabilityRegistry();
- * const interactionCaps = registry.byCategory('interaction');
+ * const tableCaps = registry.byCategory('table');
  * const aiContext = registry.forAI();
  * ```
  *
@@ -27,6 +27,7 @@ import { GENERATED_CAPABILITIES } from './capability-registry.generated.js';
 import type {
   AiProviderName,
   CapabilitiesJSON,
+  CapabilityCategory,
   CapabilityEntry,
   CapabilityStats,
 } from './types.js';
@@ -42,7 +43,8 @@ import { assertNever } from '#core/utils/assert-never.js';
  * @example
  * ```typescript
  * const registry = new CapabilityRegistry();
- * const caps = registry.byCategory('navigation');
+ * const tableCaps = registry.byCategory('table');
+ * const aiContext = registry.forAI();
  * ```
  */
 export class CapabilityRegistry {
@@ -91,16 +93,31 @@ export class CapabilityRegistry {
   /**
    * Returns capabilities matching the given category.
    *
-   * @param category - Category string to filter by (case-sensitive).
+   * @param category - Category to filter by.
    * @returns Entries whose `category` matches exactly.
    *
    * @example
    * ```typescript
-   * const navCaps = registry.byCategory('navigation');
+   * const navCaps = registry.byCategory('navigate');
    * ```
    */
-  byCategory(category: string): CapabilityEntry[] {
+  byCategory(category: CapabilityCategory): CapabilityEntry[] {
     return [...this.entries.values()].filter((e) => e.category === category);
+  }
+
+  /**
+   * Returns capabilities matching the given namespace prefix.
+   *
+   * @param namespace - Dot-separated namespace prefix, e.g. 'ui5.table'.
+   * @returns Entries whose `qualifiedName` starts with the namespace.
+   *
+   * @example
+   * ```typescript
+   * const tableCaps = registry.byNamespace('ui5.table');
+   * ```
+   */
+  byNamespace(namespace: string): CapabilityEntry[] {
+    return [...this.entries.values()].filter((e) => e.qualifiedName.startsWith(namespace));
   }
 
   /**
@@ -154,7 +171,7 @@ export class CapabilityRegistry {
    * ```typescript
    * const cap = registry.findByName('clickButton');
    * if (cap !== undefined) {
-   *   logger.info(cap.usage_example);
+   *   logger.info(cap.usageExample);
    * }
    * ```
    */
@@ -259,21 +276,34 @@ export class CapabilityRegistry {
    * ```
    */
   forProvider(provider: AiProviderName): string {
-    const entries = this.list();
-
     switch (provider) {
       case 'claude': {
-        return this.formatForClaude(entries);
+        return this.formatForClaude(this.list());
       }
       case 'openai': {
-        return this.formatForOpenAI(entries);
+        return this.formatForOpenAI();
       }
       case 'gemini': {
-        return this.formatForGemini(entries);
+        return this.formatForGemini();
       }
       default:
         return assertNever(provider);
     }
+  }
+
+  /**
+   * Escapes special XML characters in text content and attribute values.
+   *
+   * @param text - Raw text to escape.
+   * @returns XML-safe string.
+   */
+  private escapeXml(text: string): string {
+    return text
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&apos;');
   }
 
   /**
@@ -289,13 +319,16 @@ export class CapabilityRegistry {
 
     const lines: string[] = ['<capabilities>'];
     for (const entry of entries) {
-      const attrs = [`name="${entry.name}"`, `category="${entry.category}"`];
+      const attrs = [
+        `name="${this.escapeXml(entry.name)}"`,
+        `category="${this.escapeXml(entry.category)}"`,
+      ];
       if (entry.intent !== undefined) {
-        attrs.push(`intent="${entry.intent}"`);
+        attrs.push(`intent="${this.escapeXml(entry.intent)}"`);
       }
       lines.push(`  <capability ${attrs.join(' ')}>`);
-      lines.push(`    <description>${entry.description}</description>`);
-      lines.push(`    <example>${entry.usage_example}</example>`);
+      lines.push(`    <description>${this.escapeXml(entry.description)}</description>`);
+      lines.push(`    <example>${this.escapeXml(entry.usageExample)}</example>`);
       lines.push('  </capability>');
     }
     lines.push('</capabilities>');
@@ -303,49 +336,21 @@ export class CapabilityRegistry {
   }
 
   /**
-   * Formats capabilities as a JSON array of OpenAI function-calling tool schemas.
+   * Formats capabilities as a JSON object for OpenAI.
    *
-   * @param entries - Capability entries to format.
-   * @returns JSON string of tool function schemas.
+   * @returns JSON string of the full registry snapshot.
    */
-  private formatForOpenAI(entries: readonly CapabilityEntry[]): string {
-    const tools = entries.map((entry) => ({
-      type: 'function' as const,
-      function: {
-        name: entry.name,
-        description: entry.description,
-        parameters: {
-          type: 'object' as const,
-          properties: {
-            example: {
-              type: 'string' as const,
-              description: entry.usage_example,
-            },
-          },
-        },
-        ...(entry.category !== '' ? { category: entry.category } : {}),
-      },
-    }));
-    return JSON.stringify(tools, undefined, 2);
+  private formatForOpenAI(): string {
+    return JSON.stringify(this.toJSON(), undefined, 2);
   }
 
   /**
-   * Formats capabilities as a plain text listing for Gemini.
+   * Formats capabilities as a JSON object for Gemini.
    *
-   * @param entries - Capability entries to format.
-   * @returns Plain text with one capability per block.
+   * @returns JSON string of the full registry snapshot.
    */
-  private formatForGemini(entries: readonly CapabilityEntry[]): string {
-    if (entries.length === 0) {
-      return 'No capabilities registered.';
-    }
-
-    return entries
-      .map(
-        (entry) =>
-          `${entry.name} [${entry.category}]: ${entry.description}\n  Example: ${entry.usage_example}`,
-      )
-      .join('\n\n');
+  private formatForGemini(): string {
+    return JSON.stringify(this.toJSON(), undefined, 2);
   }
 
   /**
@@ -358,7 +363,7 @@ export class CapabilityRegistry {
    * ```typescript
    * const cap = registry.get('click-button');
    * if (cap !== undefined) {
-   *   logger.info(cap.usage_example);
+   *   logger.info(cap.usageExample);
    * }
    * ```
    */
@@ -402,11 +407,13 @@ export class CapabilityRegistry {
    * @example
    * ```typescript
    * registry.register({
-   *   id: 'my-capability',
+   *   id: 'UI5-UI5-020',
+   *   qualifiedName: 'ui5.myCapability',
    *   name: 'myCapability',
-   *   description: 'Does something useful',
-   *   category: 'custom',
-   *   usage_example: 'await custom.doSomething()',
+   *   description: 'Does something useful for testing.',
+   *   category: 'ui5',
+   *   priority: 'fixture',
+   *   usageExample: 'await ui5.myCapability()',
    *   registryVersion: 1,
    * });
    * ```

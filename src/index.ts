@@ -41,6 +41,10 @@
 // ── Fixtures (merged test + expect) ─────────────────────────────────
 export { expect, test } from './fixtures/index.js';
 
+// ── Standalone fixture modules (for tree-shaking / selective merge) ──
+export { authTest, coreTest } from './fixtures/index.js';
+export type { ExtendedUI5Handler } from './fixtures/index.js';
+
 // ── Config ──────────────────────────────────────────────────────────
 export { defineConfig, loadConfig } from './core/config/index.js';
 export type { PramanConfig, PramanConfigInput, LoadConfigOptions } from './core/config/index.js';
@@ -84,7 +88,6 @@ export type {
   CapabilityStats,
   RecipeEntry,
   RecipePriority,
-  RecipeRole,
 } from './ai/types.js';
 
 // ── Auth types ───────────────────────────────────────────────────────
