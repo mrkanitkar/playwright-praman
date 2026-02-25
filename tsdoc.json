@@ -5,6 +5,11 @@
   ],
   "tagDefinitions": [
     {
+      "tagName": "@license",
+      "syntaxKind": "block",
+      "allowMultiple": false
+    },
+    {
       "tagName": "@module",
       "syntaxKind": "block",
       "allowMultiple": false
@@ -106,6 +111,7 @@
     }
   ],
   "supportForTags": {
+    "@license": true,
     "@module": true,
     "@remarks": true,
     "@example": true,

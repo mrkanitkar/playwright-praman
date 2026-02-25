@@ -1,4 +1,13 @@
 /**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
+/**
  * Fiori Elements table helper functions for `sap.m.Table` and `sap.ui.table.Table`-based FE views.
  *
  * @remarks

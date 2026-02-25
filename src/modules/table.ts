@@ -1,3 +1,12 @@
+/**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
 /* eslint-disable max-lines -- 10 public functions with TSDoc + 6 variant scripts exceed 300 LOC */
 /**
  * Table abstraction module for 6 SAP UI5 table variants.

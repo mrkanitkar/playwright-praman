@@ -1,3 +1,12 @@
+/**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
 /* eslint-disable max-lines -- UI5Handler is the central fixture-layer class; 15+ cohesive public methods belong in one class */
 /**
  * UI5Handler — internal class for UI5 control discovery, interaction, and lifecycle.
