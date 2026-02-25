@@ -147,4 +147,131 @@ describe('Opa5Strategy', () => {
       expect((error as ControlError).message).toContain('Select failed on control: combo1');
     }
   });
+
+  describe('autoWait=false branch', () => {
+    it('press omits autoWaiter code when autoWait is false', async () => {
+      const strategy = new Opa5Strategy({ autoWait: false });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.press(page, 'btn1');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).not.toContain('autoWaiter');
+      expect(script).not.toContain('hasToWait');
+    });
+
+    it('enterText omits autoWaiter code when autoWait is false', async () => {
+      const strategy = new Opa5Strategy({ autoWait: false });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.enterText(page, 'input1', 'hello');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).not.toContain('autoWaiter');
+      expect(script).not.toContain('hasToWait');
+    });
+
+    it('select omits autoWaiter code when autoWait is false', async () => {
+      const strategy = new Opa5Strategy({ autoWait: false });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.select(page, 'combo1', 'item1');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).not.toContain('autoWaiter');
+      expect(script).not.toContain('hasToWait');
+    });
+  });
+
+  describe('debug=true branch', () => {
+    it('press includes console.log when debug is true', async () => {
+      const strategy = new Opa5Strategy({ debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.press(page, 'btn1');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).toContain("console.log('[praman:opa5]'");
+      expect(script).toContain("'press'");
+    });
+
+    it('enterText includes console.log when debug is true', async () => {
+      const strategy = new Opa5Strategy({ debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.enterText(page, 'input1', 'hello');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).toContain("console.log('[praman:opa5]'");
+      expect(script).toContain("'enterText'");
+    });
+
+    it('select includes console.log when debug is true', async () => {
+      const strategy = new Opa5Strategy({ debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.select(page, 'combo1', 'item1');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).toContain("console.log('[praman:opa5]'");
+      expect(script).toContain("'select'");
+    });
+
+    it('press failure path includes debug console.log', async () => {
+      const strategy = new Opa5Strategy({ debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: false, error: 'test error' });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await expect(strategy.press(page, 'btn1')).rejects.toThrow(ControlError);
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      // Debug logging appears in both success and catch blocks
+      const debugLogCount = (script.match(/console\.log/g) ?? []).length;
+      expect(debugLogCount).toBe(2);
+    });
+
+    it('enterText failure path includes debug console.log', async () => {
+      const strategy = new Opa5Strategy({ debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: false, error: 'test error' });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await expect(strategy.enterText(page, 'input1', 'hello')).rejects.toThrow(ControlError);
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      const debugLogCount = (script.match(/console\.log/g) ?? []).length;
+      expect(debugLogCount).toBe(2);
+    });
+
+    it('select failure path includes debug console.log', async () => {
+      const strategy = new Opa5Strategy({ debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: false, error: 'test error' });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await expect(strategy.select(page, 'combo1', 'item1')).rejects.toThrow(ControlError);
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      const debugLogCount = (script.match(/console\.log/g) ?? []).length;
+      expect(debugLogCount).toBe(2);
+    });
+  });
+
+  describe('combined autoWait=false and debug=true', () => {
+    it('press with autoWait=false and debug=true covers both branches', async () => {
+      const strategy = new Opa5Strategy({ autoWait: false, debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.press(page, 'btn1');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).not.toContain('autoWaiter');
+      expect(script).toContain("console.log('[praman:opa5]'");
+    });
+
+    it('enterText with autoWait=false and debug=true covers both branches', async () => {
+      const strategy = new Opa5Strategy({ autoWait: false, debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.enterText(page, 'input1', 'hello');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).not.toContain('autoWaiter');
+      expect(script).toContain("console.log('[praman:opa5]'");
+    });
+
+    it('select with autoWait=false and debug=true covers both branches', async () => {
+      const strategy = new Opa5Strategy({ autoWait: false, debug: true });
+      const evaluateFn = vi.fn().mockResolvedValue({ success: true });
+      const page = { evaluate: evaluateFn } as unknown as Page;
+      await strategy.select(page, 'combo1', 'item1');
+      const script = evaluateFn.mock.calls[0]?.[0] as string;
+      expect(script).not.toContain('autoWaiter');
+      expect(script).toContain("console.log('[praman:opa5]'");
+    });
+  });
 });

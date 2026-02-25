@@ -16,8 +16,10 @@ vi.mock('#ai/llm-providers.js', () => ({
   callAnthropic: vi.fn(),
 }));
 
+import type { CompletionResult } from '#ai/llm-providers.js';
 import { callAnthropic, callAzureOpenAI, callOpenAI } from '#ai/llm-providers.js';
 import { createLlmService } from '#ai/llm-service.js';
+import type { ChatMessage } from '#ai/schemas/llm-request.schema.js';
 import type { PramanConfig } from '#core/config/schema.js';
 import { AIError } from '#core/errors/ai-error.js';
 
@@ -358,6 +360,177 @@ describe('LlmService.chat()', () => {
     if (result.status === 'error') {
       expect(result.metadata.model).toBe('gpt-4o');
       expect(result.metadata.tokens).toBe(50);
+    }
+  });
+});
+
+describe('LlmService.chat() — edge cases for uncovered branches', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('throws ERR_AI_NOT_CONFIGURED when config.ai is removed after construction', async () => {
+    // Line 157: guard clause inside chat() when config.ai becomes undefined
+    const config = { ...makeConfigAzure() };
+    const service = createLlmService(config);
+    // Mutate the config to remove ai after service creation
+    delete (config as Record<string, unknown>)['ai'];
+    await expect(service.chat([{ role: 'user', content: 'hi' }], StringSchema)).rejects.toThrow(
+      AIError,
+    );
+    try {
+      await service.chat([{ role: 'user', content: 'hi' }], StringSchema);
+    } catch (err) {
+      expect(err).toBeInstanceOf(AIError);
+      expect((err as AIError).code).toBe('ERR_AI_NOT_CONFIGURED');
+    }
+  });
+
+  it('throws ERR_AI_INVALID_REQUEST when messages have empty content', async () => {
+    // Line 169: ChatMessageSchema validation fails (content must be min(1))
+    const service = createLlmService(makeConfigAzure());
+    await expect(service.chat([{ role: 'user', content: '' }], StringSchema)).rejects.toThrow(
+      AIError,
+    );
+    try {
+      await service.chat([{ role: 'user', content: '' }], StringSchema);
+    } catch (err) {
+      expect(err).toBeInstanceOf(AIError);
+      expect((err as AIError).code).toBe('ERR_AI_INVALID_REQUEST');
+      expect((err as AIError).retryable).toBe(false);
+      expect((err as AIError).suggestions.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('throws ERR_AI_INVALID_REQUEST when messages have invalid role', async () => {
+    // Line 169: ChatMessageSchema validation fails (invalid role)
+    const service = createLlmService(makeConfigAzure());
+    const invalidMessages: unknown[] = [{ role: 'invalid-role', content: 'hello' }];
+    await expect(service.chat(invalidMessages as ChatMessage[], StringSchema)).rejects.toThrow(
+      AIError,
+    );
+  });
+
+  it('returns malformed-completion error when provider returns non-string content', async () => {
+    // Line 247: LlmCompletionSchema pre-validation fails
+    vi.mocked(callAzureOpenAI).mockResolvedValueOnce({
+      content: 42,
+      model: 'gpt-4o',
+      tokens: 10,
+    } as unknown as CompletionResult);
+    const service = createLlmService(makeConfigAzure());
+    const result = await service.chat([{ role: 'user', content: 'hi' }], StringSchema);
+    expect(result.status).toBe('error');
+    if (result.status === 'error') {
+      expect(result.error.code).toBe('ERR_AI_RESPONSE_PARSE_FAILED');
+      expect(result.error.message).toContain('Malformed completion');
+      expect(result.metadata.retryable).toBe(true);
+      expect(result.metadata.model).toBe('gpt-4o');
+      expect(result.metadata.tokens).toBe(10);
+    }
+  });
+
+  it('returns malformed-completion error without model/tokens when absent', async () => {
+    // Line 247: LlmCompletionSchema pre-validation fails, no model/tokens in metadata
+    vi.mocked(callAzureOpenAI).mockResolvedValueOnce({
+      content: null,
+    } as unknown as CompletionResult);
+    const service = createLlmService(makeConfigAzure());
+    const result = await service.chat([{ role: 'user', content: 'hi' }], StringSchema);
+    expect(result.status).toBe('error');
+    if (result.status === 'error') {
+      expect(result.error.code).toBe('ERR_AI_RESPONSE_PARSE_FAILED');
+      expect(result.metadata.model).toBeUndefined();
+      expect(result.metadata.tokens).toBeUndefined();
+    }
+  });
+
+  it('returns JSON-parse error without model/tokens when absent', async () => {
+    // Lines 288-289: model/tokens spreads in JSON parse error — false branch (absent)
+    vi.mocked(callAzureOpenAI).mockResolvedValueOnce({
+      content: 'not-valid-json',
+    });
+    const service = createLlmService(makeConfigAzure());
+    const result = await service.chat([{ role: 'user', content: 'hi' }], StringSchema);
+    expect(result.status).toBe('error');
+    if (result.status === 'error') {
+      expect(result.error.code).toBe('ERR_AI_RESPONSE_PARSE_FAILED');
+      expect(result.error.message).toContain('not valid JSON');
+      expect(result.metadata.model).toBeUndefined();
+      expect(result.metadata.tokens).toBeUndefined();
+    }
+  });
+
+  it('returns schema-validation error with model/tokens when present', async () => {
+    // Lines 309-310: model/tokens spreads in schema validation error — true branch
+    vi.mocked(callAzureOpenAI).mockResolvedValueOnce({
+      content: JSON.stringify({ wrongField: 'data' }),
+      model: 'gpt-4o-mini',
+      tokens: 25,
+    });
+    const service = createLlmService(makeConfigAzure());
+    const result = await service.chat([{ role: 'user', content: 'hi' }], StringSchema);
+    expect(result.status).toBe('error');
+    if (result.status === 'error') {
+      expect(result.error.code).toBe('ERR_AI_RESPONSE_PARSE_FAILED');
+      expect(result.error.message).toContain('validation failed');
+      expect(result.metadata.model).toBe('gpt-4o-mini');
+      expect(result.metadata.tokens).toBe(25);
+    }
+  });
+
+  it('returns schema-validation error without model/tokens when absent', async () => {
+    // Lines 309-310: model/tokens spreads in schema validation error — false branch
+    vi.mocked(callAzureOpenAI).mockResolvedValueOnce({
+      content: JSON.stringify({ wrongField: 'data' }),
+    });
+    const service = createLlmService(makeConfigAzure());
+    const result = await service.chat([{ role: 'user', content: 'hi' }], StringSchema);
+    expect(result.status).toBe('error');
+    if (result.status === 'error') {
+      expect(result.error.code).toBe('ERR_AI_RESPONSE_PARSE_FAILED');
+      expect(result.metadata.model).toBeUndefined();
+      expect(result.metadata.tokens).toBeUndefined();
+    }
+  });
+
+  it('throws ERR_AI_NOT_CONFIGURED for unknown provider (default switch branch)', async () => {
+    // Lines 201-202: exhaustive default branch with unknown provider value
+    const config = {
+      ...makeConfigNoAi(),
+      ai: {
+        provider: 'unknown-provider',
+        apiKey: 'test-key',
+        temperature: 0.3,
+      },
+    } as unknown as Readonly<PramanConfig>;
+    const service = createLlmService(config);
+    await expect(service.chat([{ role: 'user', content: 'hi' }], StringSchema)).rejects.toThrow(
+      AIError,
+    );
+    try {
+      await service.chat([{ role: 'user', content: 'hi' }], StringSchema);
+    } catch (err) {
+      expect(err).toBeInstanceOf(AIError);
+      expect((err as AIError).code).toBe('ERR_AI_NOT_CONFIGURED');
+      expect((err as AIError).message).toContain('Unknown AI provider');
+    }
+  });
+
+  it('success response omits model and tokens when both are absent', async () => {
+    // Lines 323-324: model/tokens spreads in success path — false branch (both absent)
+    vi.mocked(callAzureOpenAI).mockResolvedValueOnce({
+      content: JSON.stringify({ value: 'result' }),
+    });
+    const service = createLlmService(makeConfigAzure());
+    const result = await service.chat([{ role: 'user', content: 'hi' }], StringSchema);
+    expect(result.status).toBe('success');
+    if (result.status === 'success') {
+      expect(result.data).toEqual({ value: 'result' });
+      expect(result.metadata.model).toBeUndefined();
+      expect(result.metadata.tokens).toBeUndefined();
+      expect(result.metadata.retryable).toBe(false);
+      expect(result.metadata.suggestions).toEqual([]);
     }
   });
 });
