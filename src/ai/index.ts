@@ -21,7 +21,6 @@ export type {
   CapabilitiesJSON,
   RecipeEntry,
   RecipePriority,
-  RecipeRole,
   AgenticCheckpoint,
   DiscoveredControl,
   PageContext,

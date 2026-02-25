@@ -14,7 +14,7 @@
  * import { RecipeRegistry } from '#ai/recipe-registry.js';
  *
  * const registry = new RecipeRegistry();
- * const authRecipes = registry.select({ category: 'auth' });
+ * const authRecipes = registry.select({ domain: 'auth' });
  * const topFive = registry.getTopRecipes(5);
  * ```
  *
@@ -22,14 +22,12 @@
  */
 
 import { GENERATED_RECIPES } from './recipe-registry.generated.js';
-import type { RecipeEntry, RecipePriority } from './types.js';
+import type { RecipeEntry, RecipePriority } from './schemas/recipe.schema.js';
 
 /** Filter options accepted by {@link RecipeRegistry.select}. */
 interface RecipeFilter {
-  /** Filter by category string (case-sensitive). */
-  readonly category?: string;
-  /** Filter by audience role. */
-  readonly role?: RecipeEntry['role'];
+  /** Filter by domain string (case-sensitive). */
+  readonly domain?: string;
   /** Filter by priority level. */
   readonly priority?: RecipePriority;
 }
@@ -103,16 +101,13 @@ export class RecipeRegistry {
    *
    * @example
    * ```typescript
-   * const agentRecipes = registry.select({ role: 'ai-agent' });
-   * const authNav = registry.select({ category: 'auth', role: 'both' });
+   * const uiRecipes = registry.select({ domain: 'ui5' });
+   * const essential = registry.select({ domain: 'auth', priority: 'essential' });
    * ```
    */
   select(filter: RecipeFilter): RecipeEntry[] {
     return this.recipes.filter((recipe) => {
-      if (filter.category !== undefined && recipe.category !== filter.category) {
-        return false;
-      }
-      if (filter.role !== undefined && recipe.role !== filter.role) {
+      if (filter.domain !== undefined && recipe.domain !== filter.domain) {
         return false;
       }
       if (filter.priority !== undefined && recipe.priority !== filter.priority) {
@@ -123,33 +118,18 @@ export class RecipeRegistry {
   }
 
   /**
-   * Returns recipes matching the given role.
+   * Returns recipes matching the given domain.
    *
-   * @param role - Audience role to filter by.
+   * @param domain - Domain string to filter by (e.g. 'ui5', 'table', 'auth').
    * @returns Matching recipe entries.
    *
    * @example
    * ```typescript
-   * const agentRecipes = registry.selectByRole('ai-agent');
+   * const authRecipes = registry.selectByDomain('auth');
    * ```
    */
-  selectByRole(role: RecipeEntry['role']): RecipeEntry[] {
-    return this.select({ role });
-  }
-
-  /**
-   * Returns recipes matching the given category.
-   *
-   * @param category - Category string to filter by.
-   * @returns Matching recipe entries.
-   *
-   * @example
-   * ```typescript
-   * const authRecipes = registry.selectByCategory('auth');
-   * ```
-   */
-  selectByCategory(category: string): RecipeEntry[] {
-    return this.select({ category });
+  selectByDomain(domain: string): RecipeEntry[] {
+    return this.select({ domain });
   }
 
   /**
@@ -168,10 +148,10 @@ export class RecipeRegistry {
   }
 
   /**
-   * Searches recipes by substring match against `title` or `description`.
+   * Searches recipes by substring match against `name` or `description`.
    *
    * @remarks
-   * Case-insensitive substring match. Also checks `tags` for matches.
+   * Case-insensitive substring match.
    * For semantic search, pass `forAI()` output directly to an LLM.
    *
    * @param query - Substring to search for.
@@ -180,16 +160,15 @@ export class RecipeRegistry {
    * @example
    * ```typescript
    * const loginRecipes = registry.search('login');
-   * const samlRecipes = registry.search('saml');
+   * const tableRecipes = registry.search('table');
    * ```
    */
   search(query: string): RecipeEntry[] {
     const lower = query.toLowerCase();
     return this.recipes.filter(
       (recipe) =>
-        recipe.title.toLowerCase().includes(lower) ||
-        recipe.description.toLowerCase().includes(lower) ||
-        recipe.tags.some((tag) => tag.toLowerCase().includes(lower)),
+        recipe.name.toLowerCase().includes(lower) ||
+        recipe.description.toLowerCase().includes(lower),
     );
   }
 

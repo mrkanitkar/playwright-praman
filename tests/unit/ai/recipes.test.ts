@@ -15,14 +15,13 @@ import type { RecipeEntry } from '#ai/types.js';
 
 /** Test recipe seeded into the singleton registry for branch coverage. */
 const TEST_RECIPE: RecipeEntry = {
-  id: 'test-recipe-seed',
-  title: 'Test Login Recipe',
+  id: 'recipe-test-login-seed',
+  name: 'Test Login Recipe',
   description: 'A test recipe for unit test branch coverage',
-  category: 'auth',
-  role: 'ai-agent',
+  domain: 'auth',
   priority: 'essential',
-  code: 'await page.goto("/login");',
-  tags: ['login', 'auth', 'test'],
+  capabilities: ['UI5-AUTH-001'],
+  pattern: 'await page.goto("/login");',
 };
 
 describe('recipes singleton', () => {
@@ -45,13 +44,8 @@ describe('recipes singleton', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
-  it('selectByRole returns matching entries', () => {
-    const result = recipes.selectByRole('ai-agent');
-    expect(result.length).toBeGreaterThan(0);
-  });
-
-  it('selectByCategory returns matching entries', () => {
-    const result = recipes.selectByCategory('auth');
+  it('selectByDomain returns matching entries', () => {
+    const result = recipes.selectByDomain('auth');
     expect(result.length).toBeGreaterThan(0);
   });
 
@@ -91,26 +85,26 @@ describe('recipes singleton', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
-  it('has() returns false for non-existent title', () => {
-    expect(recipes.has('nonExistentRecipeTitle12345')).toBe(false);
+  it('has() returns false for non-existent name', () => {
+    expect(recipes.has('nonExistentRecipeName12345')).toBe(false);
   });
 
-  it('has() returns true for existing recipe title (case-insensitive)', () => {
+  it('has() returns true for existing recipe name (case-insensitive)', () => {
     expect(recipes.has('Test Login Recipe')).toBe(true);
     expect(recipes.has('test login recipe')).toBe(true);
   });
 
-  it('getSteps() returns undefined for non-existent title', () => {
-    expect(recipes.getSteps('nonExistentRecipeTitle12345')).toBeUndefined();
+  it('getSteps() returns undefined for non-existent name', () => {
+    expect(recipes.getSteps('nonExistentRecipeName12345')).toBeUndefined();
   });
 
-  it('getSteps() returns code string for existing recipe', () => {
+  it('getSteps() returns pattern string for existing recipe', () => {
     const steps = recipes.getSteps('Test Login Recipe');
     expect(steps).toBe('await page.goto("/login");');
   });
 
-  it('describe() returns undefined for non-existent title', () => {
-    expect(recipes.describe('nonExistentRecipeTitle12345')).toBeUndefined();
+  it('describe() returns undefined for non-existent name', () => {
+    expect(recipes.describe('nonExistentRecipeName12345')).toBeUndefined();
   });
 
   it('describe() returns description string for existing recipe', () => {
@@ -118,14 +112,14 @@ describe('recipes singleton', () => {
     expect(desc).toBe('A test recipe for unit test branch coverage');
   });
 
-  it('getCategories() returns unique category names', () => {
-    const cats = recipes.getCategories();
-    expect(Array.isArray(cats)).toBe(true);
-    expect(cats).toContain('auth');
-    expect(new Set(cats).size).toBe(cats.length);
+  it('getDomains() returns unique domain names', () => {
+    const domains = recipes.getDomains();
+    expect(Array.isArray(domains)).toBe(true);
+    expect(domains).toContain('auth');
+    expect(new Set(domains).size).toBe(domains.length);
   });
 
-  it('forDomain() delegates to search', () => {
+  it('forDomain() delegates to selectByDomain', () => {
     const result = recipes.forDomain('auth');
     expect(result.length).toBeGreaterThan(0);
   });
@@ -136,7 +130,7 @@ describe('recipes singleton', () => {
   });
 
   it('forProcess() delegates to search', () => {
-    const result = recipes.forProcess('auth');
+    const result = recipes.forProcess('login');
     expect(result.length).toBeGreaterThan(0);
   });
 
@@ -146,15 +140,14 @@ describe('recipes singleton', () => {
     expect(json.length).toBeGreaterThan(0);
   });
 
-  it('validate() returns { valid: false } for non-existent title', () => {
-    const result = recipes.validate('nonExistentRecipeTitle12345');
+  it('validate() returns { valid: false } for non-existent name', () => {
+    const result = recipes.validate('nonExistentRecipeName12345');
     expect(result).toEqual({ valid: false });
   });
 
-  it('validate() returns { valid: true, role } for existing recipe', () => {
+  it('validate() returns { valid: true } for existing recipe', () => {
     const result = recipes.validate('Test Login Recipe');
     expect(result.valid).toBe(true);
-    expect(result.role).toBe('ai-agent');
   });
 });
 
@@ -163,7 +156,7 @@ describe('recipes singleton main entry export', () => {
     const mod = await import('../../../src/index.js');
     expect(mod).toHaveProperty('recipes');
     expect(typeof mod.recipes.select).toBe('function');
-    expect(typeof mod.recipes.selectByRole).toBe('function');
+    expect(typeof mod.recipes.selectByDomain).toBe('function');
     expect(typeof mod.recipes.forAI).toBe('function');
   });
 });

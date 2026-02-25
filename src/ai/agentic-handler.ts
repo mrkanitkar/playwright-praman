@@ -62,14 +62,42 @@ function buildSystemPrompt(
   capabilityRegistry: CapabilityRegistry,
   recipeRegistry: RecipeRegistry,
 ): string {
-  const capList = capabilityRegistry
+  // Only include fixture and namespace priority entries (exclude implementation details)
+  const entries = capabilityRegistry
     .list()
-    .map((c) => `- ${c.name}: ${c.description}`)
-    .join('\n');
+    .filter((c) => c.priority === 'fixture' || c.priority === 'namespace');
+
+  // Group by namespace (derived from qualifiedName: "ui5.table.getRows" -> "ui5.table")
+  const grouped = new Map<string, { qualifiedName: string; name: string; description: string }[]>();
+  for (const entry of entries) {
+    const parts = entry.qualifiedName.split('.');
+    const namespace = parts.length > 1 ? parts.slice(0, -1).join('.') : (parts[0] ?? 'other');
+    const existing = grouped.get(namespace);
+    const item = {
+      qualifiedName: entry.qualifiedName,
+      name: entry.name,
+      description: entry.description,
+    };
+    if (existing !== undefined) {
+      existing.push(item);
+    } else {
+      grouped.set(namespace, [item]);
+    }
+  }
+
+  // Format as namespace-grouped listing
+  const capSections: string[] = [];
+  for (const [namespace, items] of grouped) {
+    capSections.push(`## ${namespace}`);
+    for (const item of items) {
+      capSections.push(`- ${item.qualifiedName}: ${item.description}`);
+    }
+    capSections.push('');
+  }
 
   const recipeExamples = recipeRegistry
     .getTopRecipes(5)
-    .map((r) => r.code)
+    .map((r) => r.pattern)
     .join('\n\n');
 
   return [
@@ -78,9 +106,9 @@ function buildSystemPrompt(
     '1. A numbered list of test steps (natural language)',
     '2. Complete TypeScript test code using Praman fixtures',
     '',
-    'Available capabilities:',
-    capList,
+    'Available capabilities (grouped by namespace):',
     '',
+    ...capSections,
     'Example recipes:',
     recipeExamples,
     '',
@@ -306,10 +334,11 @@ export class AgenticHandler {
   ): Promise<AiResponse<void>> {
     const startTime = Date.now();
 
-    const capList = this.capabilityRegistry
+    const entries = this.capabilityRegistry
       .list()
-      .map((c) => `- ${c.name}: ${c.description}`)
-      .join('\n');
+      .filter((c) => c.priority === 'fixture' || c.priority === 'namespace');
+
+    const capList = entries.map((c) => `- ${c.qualifiedName}: ${c.description}`).join('\n');
 
     const prompt = [
       `Map this test step to a capability name from the list below.`,

@@ -55,13 +55,13 @@ import { capabilities } from 'playwright-praman';
 // Search by substring in name or description
 const tableOps = capabilities.find('table');
 for (const cap of tableOps) {
-  console.log(`${cap.name}: ${cap.usage_example}`);
+  console.log(`${cap.name}: ${cap.usageExample}`);
 }
 
 // Look up a specific capability by name
 const clickCap = capabilities.findByName('clickButton');
 if (clickCap) {
-  console.log(clickCap.usage_example);
+  console.log(clickCap.usageExample);
   // => await ui5.click({ id: 'submitBtn' })
 }
 ```
@@ -74,10 +74,10 @@ import { capabilities } from 'playwright-praman';
 // List all categories
 const categories = capabilities.getCategories();
 console.log(categories);
-// => ['interaction', 'navigation', 'discovery', 'assertion', 'auth', ...]
+// => ['ui5', 'auth', 'navigate', 'table', 'dialog', 'date', ...]
 
-// Get capabilities in a specific category
-const navCaps = capabilities.byCategory('navigation');
+// Get capabilities in a specific category (CapabilityCategory enum value)
+const navCaps = capabilities.byCategory('navigate');
 for (const cap of navCaps) {
   console.log(`${cap.name}: ${cap.description}`);
 }
@@ -94,9 +94,10 @@ const cap = capabilities.get('click-button');
 if (cap) {
   console.log(cap.name); // 'clickButton'
   console.log(cap.description); // 'Clicks a UI5 button by selector'
-  console.log(cap.usage_example); // "await ui5.click({ id: 'submitBtn' })"
-  console.log(cap.category); // 'interaction'
+  console.log(cap.usageExample); // "await ui5.click({ id: 'submitBtn' })"
+  console.log(cap.category); // 'ui5' (CapabilityCategory enum value)
   console.log(cap.priority); // 'fixture'
+  console.log(cap.qualifiedName); // 'ui5.clickButton'
 }
 ```
 
@@ -116,39 +117,20 @@ console.log(`Implementation: ${stats.byPriority.implementation}`);
 ## Recipes
 
 A **recipe** is a reusable test pattern -- a curated code snippet that demonstrates how to
-accomplish a specific testing task. Recipes have a title, description, category, role, priority,
-code, and tags.
+accomplish a specific testing task. Recipes have a name, description, domain, priority,
+capabilities, and a ready-to-use pattern.
 
 ### Recipe Metadata
 
-| Field         | Type             | Description                                                     |
-| ------------- | ---------------- | --------------------------------------------------------------- |
-| `id`          | `string`         | Unique kebab-case identifier                                    |
-| `title`       | `string`         | Short descriptive title                                         |
-| `description` | `string`         | What this recipe demonstrates                                   |
-| `category`    | `string`         | Grouping (`'auth'`, `'navigation'`, `'interaction'`, etc.)      |
-| `role`        | `RecipeRole`     | `'ai-agent'`, `'human-tester'`, or `'both'`                     |
-| `priority`    | `RecipePriority` | `'essential'`, `'recommended'`, `'advanced'`, or `'deprecated'` |
-| `code`        | `string`         | Ready-to-use TypeScript code                                    |
-| `tags`        | `string[]`       | Free-form tags for search                                       |
-
-### Selecting Recipes by Role
-
-Recipes are tagged with a `role` that indicates who they are designed for.
-
-```typescript
-import { recipes } from 'playwright-praman';
-
-// Recipes optimized for AI agents
-const agentRecipes = recipes.selectByRole('ai-agent');
-console.log(`AI agent recipes: ${agentRecipes.length}`);
-
-// Recipes written for human testers
-const humanRecipes = recipes.selectByRole('human-tester');
-
-// Recipes useful for both
-const universalRecipes = recipes.selectByRole('both');
-```
+| Field          | Type             | Description                                                                |
+| -------------- | ---------------- | -------------------------------------------------------------------------- |
+| `id`           | `string`         | Unique kebab-case identifier (e.g. `'recipe-ui5-button-click'`)            |
+| `name`         | `string`         | Short descriptive title                                                    |
+| `description`  | `string`         | What this recipe demonstrates                                              |
+| `domain`       | `string`         | Domain grouping (`'ui5'`, `'auth'`, `'navigation'`, etc.)                  |
+| `priority`     | `RecipePriority` | `'essential'`, `'recommended'`, `'optional'`, `'advanced'`, `'deprecated'` |
+| `capabilities` | `string[]`       | Capability IDs this recipe uses (e.g. `['UI5-UI5-003']`)                   |
+| `pattern`      | `string`         | Ready-to-use TypeScript code pattern                                       |
 
 ### Selecting by Priority
 
@@ -165,20 +147,20 @@ const recommended = recipes.selectByPriority('recommended');
 const advanced = recipes.selectByPriority('advanced');
 ```
 
-### Selecting by Category
+### Selecting by Domain
 
 ```typescript
 import { recipes } from 'playwright-praman';
 
 // All authentication recipes
-const authRecipes = recipes.selectByCategory('auth');
+const authRecipes = recipes.selectByDomain('auth');
 
 // All navigation recipes
-const navRecipes = recipes.selectByCategory('navigation');
+const navRecipes = recipes.selectByDomain('navigation');
 
-// List all available categories
-const categories = recipes.getCategories();
-console.log(categories);
+// List all available domains
+const domains = recipes.getDomains();
+console.log(domains);
 ```
 
 ### Combined Filtering
@@ -188,10 +170,9 @@ Use `recipes.select()` with multiple criteria.
 ```typescript
 import { recipes } from 'playwright-praman';
 
-// Essential recipes for AI agents in the auth category
+// Essential recipes in the auth domain
 const filtered = recipes.select({
-  category: 'auth',
-  role: 'ai-agent',
+  domain: 'auth',
   priority: 'essential',
 });
 ```
@@ -201,11 +182,11 @@ const filtered = recipes.select({
 ```typescript
 import { recipes } from 'playwright-praman';
 
-// Free-text search across title, description, and tags
+// Free-text search across name, description, and capabilities
 const poRecipes = recipes.search('purchase order');
 for (const r of poRecipes) {
-  console.log(`${r.title}: ${r.description}`);
-  console.log(r.code);
+  console.log(`${r.name}: ${r.description}`);
+  console.log(r.pattern);
 }
 
 // Check if a recipe exists
@@ -223,7 +204,7 @@ import { recipes } from 'playwright-praman';
 // Find recipes that use a specific capability
 const clickRecipes = recipes.forCapability('click');
 for (const r of clickRecipes) {
-  console.log(`${r.title} [${r.priority}]`);
+  console.log(`${r.name} [${r.priority}]`);
 }
 ```
 
@@ -247,7 +228,7 @@ import { recipes } from 'playwright-praman';
 // Get the top 5 recipes (by insertion order)
 const topFive = recipes.getTopRecipes(5);
 for (const r of topFive) {
-  console.log(`[${r.priority}] ${r.title}`);
+  console.log(`[${r.priority}] ${r.name}`);
 }
 ```
 
@@ -277,7 +258,7 @@ const aiContext = capabilities.forAI();
 
 ### Provider-Specific Formatting
 
-Each AI provider has a preferred format for consuming capability descriptions.
+Each AI provider has an output format optimized for its consumption model.
 
 ```typescript
 import { capabilities } from 'playwright-praman';
@@ -285,10 +266,10 @@ import { capabilities } from 'playwright-praman';
 // XML-structured for Claude
 const claudeContext = capabilities.forProvider('claude');
 
-// JSON function-calling schema for OpenAI
+// JSON registry snapshot for OpenAI
 const openaiContext = capabilities.forProvider('openai');
 
-// Plain text listing for Gemini
+// JSON registry snapshot for Gemini
 const geminiContext = capabilities.forProvider('gemini');
 ```
 
@@ -300,7 +281,7 @@ Returns all recipes in a flat array suitable for injection into an AI prompt.
 import { recipes } from 'playwright-praman';
 
 const allRecipes = recipes.forAI();
-// Returns RecipeEntry[] with full code, tags, and metadata
+// Returns RecipeEntry[] with full pattern, capabilities, and metadata
 ```
 
 ### Building an AI Prompt with Capabilities and Recipes
@@ -310,7 +291,7 @@ import { capabilities, recipes } from 'playwright-praman';
 
 // Build a context string for an AI agent
 const capabilityContext = JSON.stringify(capabilities.forAI(), null, 2);
-const relevantRecipes = recipes.select({ category: 'navigation', role: 'ai-agent' });
+const relevantRecipes = recipes.select({ domain: 'navigation' });
 
 const prompt = `
 You are a test automation agent for SAP Fiori applications.
@@ -358,13 +339,14 @@ If your project extends Praman with custom helpers, register them so AI agents c
 import { capabilities } from 'playwright-praman';
 
 capabilities.registry.register({
-  id: 'approve-workflow',
+  id: 'UI5-CUSTOM-001',
+  qualifiedName: 'custom.approveWorkflow',
   name: 'approveWorkflow',
   description: 'Approves a workflow item in the SAP Fiori inbox',
-  category: 'workflow',
+  category: 'ui5',
   intent: 'approve',
   sapModule: 'cross.fnd.fiori.inbox',
-  usage_example: "await customHelpers.approveWorkflow({ workitemId: '000123' })",
+  usageExample: "await customHelpers.approveWorkflow({ workitemId: '000123' })",
   registryVersion: 1,
   priority: 'fixture',
 });
@@ -382,7 +364,7 @@ import { recipes } from 'playwright-praman';
 
 const result = recipes.validate('Login to SAP BTP via SAML');
 if (result.valid) {
-  console.log(`Role: ${result.role}`); // 'both'
+  console.log('Recipe found');
 } else {
   console.log('Recipe not found');
 }

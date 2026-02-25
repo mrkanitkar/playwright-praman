@@ -8,6 +8,14 @@
 
 import { describe, expect, it, vi } from 'vitest';
 
+// Mock the generated capabilities/recipes to keep tests hermetic (empty seed).
+vi.mock('#ai/capability-registry.generated.js', () => ({
+  GENERATED_CAPABILITIES: [],
+}));
+vi.mock('#ai/recipe-registry.generated.js', () => ({
+  GENERATED_RECIPES: [],
+}));
+
 import { AgenticHandler } from '#ai/agentic-handler.js';
 import { CapabilityRegistry } from '#ai/capability-registry.js';
 import { RecipeRegistry } from '#ai/recipe-registry.js';
@@ -84,21 +92,25 @@ function makeCapabilityRegistry(...entries: CapabilityEntry[]): CapabilityRegist
 }
 
 const SAMPLE_CAPABILITY: CapabilityEntry = {
-  id: 'fill-field',
+  id: 'UI5-UI5-010',
+  qualifiedName: 'ui5.fillField',
   name: 'fillField',
   description: 'Fill a labeled form field',
-  category: 'interaction',
-  usage_example: "await intent.fillField('Vendor', '100001')",
+  category: 'ui5',
+  usageExample: "await intent.fillField('Vendor', '100001')",
   registryVersion: 1,
+  priority: 'fixture',
 };
 
 const SAMPLE_CAPABILITY_B: CapabilityEntry = {
-  id: 'click-button',
+  id: 'UI5-UI5-011',
+  qualifiedName: 'ui5.clickButton',
   name: 'clickButton',
   description: 'Click a button by text',
-  category: 'interaction',
-  usage_example: "await intent.clickButton('Save')",
+  category: 'ui5',
+  usageExample: "await intent.clickButton('Save')",
   registryVersion: 1,
+  priority: 'fixture',
 };
 
 // ── Tests ────────────────────────────────────────────────────────────────────

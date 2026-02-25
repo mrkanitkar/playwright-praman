@@ -9,6 +9,8 @@
  * @module ai
  */
 
+import type { CapabilityCategory, CapabilityEntry } from './schemas/capability.schema.js';
+
 // ── AI Response Envelope ───────────────────────────────────────────────────
 
 /**
@@ -108,8 +110,8 @@ export type AiResponse<T> =
  * @remarks
  * Used by {@link CapabilityRegistry.forProvider} to select the output format:
  * - `'claude'` — XML-structured capability descriptions
- * - `'openai'` — JSON function-calling tool schemas
- * - `'gemini'` — Plain text capability listing
+ * - `'openai'` — JSON registry snapshot
+ * - `'gemini'` — JSON registry snapshot
  *
  * @example
  * ```typescript
@@ -155,61 +157,36 @@ export interface AiProviderConfig {
   readonly maxTokens?: number;
 }
 
-// ── Capability Registry ────────────────────────────────────────────────────
+// ── Capability Entry (derived from Zod schema) ──────────────────────────
 
 /**
- * A single entry in the capability registry exposed to AI agents.
+ * Re-exported from the Zod schema — this is the single source of truth.
  *
  * @remarks
- * Generated entries are produced by `npm run generate:capabilities` and
- * written to `capability-registry.generated.ts`. Manual entries can be
- * registered via `CapabilityRegistry.register()`.
+ * The `CapabilityEntry` type is derived from `CapabilityEntrySchema` via
+ * `z.infer<>`. All validation and shape definition lives in the schema.
  *
- * @intent Describe a Praman API capability for AI-driven test generation.
- * @capability AI agent context, test scaffolding.
- * @sapModule Any Praman module that exposes a test helper.
+ * @see {@link CapabilityEntrySchema} in `./schemas/capability.schema.js`
  *
  * @example
  * ```typescript
  * const entry: CapabilityEntry = {
- *   id: 'click-button',
- *   name: 'clickButton',
- *   description: 'Clicks a UI5 button by selector',
- *   category: 'interaction',
- *   intent: 'click',
- *   sapModule: 'sap.m.Button',
- *   usage_example: "await ui5.click({ id: 'submitBtn' })",
+ *   id: 'UI5-TABLE-001',
+ *   qualifiedName: 'ui5.table.detectType',
+ *   name: 'detectType',
+ *   description: 'Detects the table type and returns metadata.',
+ *   category: 'table',
+ *   priority: 'fixture',
+ *   usageExample: "const info = await ui5.table.detectType('orderTable');",
  *   registryVersion: 1,
  * };
  * ```
  */
-export interface CapabilityEntry {
-  /** Unique kebab-case identifier for this capability. */
-  readonly id: string;
-  /** Human-readable function or method name. */
-  readonly name: string;
-  /** One-sentence description of what this capability does. */
-  readonly description: string;
-  /** Logical grouping for filtering (e.g. `'interaction'`, `'navigation'`). */
-  readonly category: string;
-  /** Optional intent tag from TSDoc `@intent`. */
-  readonly intent?: string;
-  /** Optional SAP UI5 module tag from TSDoc `@sapModule`. */
-  readonly sapModule?: string;
-  /** Ready-to-run usage example string. */
-  readonly usage_example: string;
-  /** Registry schema version for forward compatibility. */
-  readonly registryVersion: number;
-  /**
-   * Priority tier for API surface stratification.
-   *
-   * @remarks
-   * - `'fixture'` — Primary Playwright fixture (recommended for consumers)
-   * - `'namespace'` — Secondary utility / handler export
-   * - `'implementation'` — Internal implementation detail
-   */
-  readonly priority?: 'fixture' | 'namespace' | 'implementation';
-}
+export type {
+  CapabilityEntry,
+  CapabilityCategory,
+  CapabilityPriority,
+} from './schemas/capability.schema.js';
 
 /**
  * Statistical summary of the capability registry.
@@ -226,7 +203,7 @@ export interface CapabilityStats {
   /** Total number of registered capability entries. */
   readonly totalMethods: number;
   /** Deduplicated list of category names across all entries. */
-  readonly categories: readonly string[];
+  readonly categories: readonly CapabilityCategory[];
   /** ISO 8601 timestamp when the statistics were generated. */
   readonly generatedAt: string;
   /** Package version string. */
@@ -271,82 +248,27 @@ export interface CapabilitiesJSON {
   readonly methods: readonly CapabilityEntry[];
 }
 
-// ── Recipe Registry ────────────────────────────────────────────────────────
+// ── Recipe Entry (derived from Zod schema) ──────────────────────────────
 
 /**
- * Priority level indicating how important a recipe is for adoption.
+ * Re-exported from the Zod schema — this is the single source of truth.
  *
- * @remarks
- * - `essential` — Must-know patterns for any SAP Fiori test suite.
- * - `recommended` — Best-practice patterns for common scenarios.
- * - `advanced` — Specialized patterns for complex edge cases.
- * - `deprecated` — Superseded patterns kept for backward compatibility.
- *
- * @example
- * ```typescript
- * const priority: RecipePriority = 'essential';
- * ```
- */
-export type RecipePriority = 'essential' | 'recommended' | 'advanced' | 'deprecated';
-
-/**
- * Audience role for a recipe — determines who the recipe is designed for.
- *
- * @remarks
- * - `'ai-agent'` — optimised for autonomous AI test generation
- * - `'human-tester'` — written for manual test authoring
- * - `'both'` — useful for both audiences
- *
- * @example
- * ```typescript
- * const role: RecipeRole = 'ai-agent';
- * ```
- */
-export type RecipeRole = 'ai-agent' | 'human-tester' | 'both';
-
-/**
- * A single recipe entry describing a reusable test pattern.
- *
- * @remarks
- * Recipes are curated test patterns that AI agents can emit verbatim or
- * adapt. `role` indicates who the recipe is primarily designed for.
- * `priority` indicates how important it is for adoption.
- *
- * @intent Provide reusable SAP Fiori test patterns for AI generation.
- * @capability AI recipe lookup, test scaffolding, human reference.
+ * @see {@link RecipeEntrySchema} in `./schemas/recipe.schema.js`
  *
  * @example
  * ```typescript
  * const entry: RecipeEntry = {
- *   id: 'login-sap-cloud',
- *   title: 'Login to SAP BTP via SAML',
- *   description: 'Authenticates against SAP BTP using cloud SAML strategy',
- *   category: 'auth',
- *   role: 'both',
+ *   id: 'recipe-ui5-button-click',
+ *   name: 'Button Click',
+ *   description: 'Press a UI5 button by matching its text property.',
+ *   domain: 'ui5',
  *   priority: 'essential',
- *   code: "await auth.loginCloud({ user: process.env.SAP_USER! })",
- *   tags: ['auth', 'saml', 'btp'],
+ *   capabilities: ['UI5-UI5-003'],
+ *   pattern: "await ui5.click({ controlType: 'sap.m.Button', properties: { text: 'Save' } });",
  * };
  * ```
  */
-export interface RecipeEntry {
-  /** Unique kebab-case identifier for this recipe. */
-  readonly id: string;
-  /** Short descriptive title shown in documentation and AI context. */
-  readonly title: string;
-  /** One or two sentence explanation of what this recipe demonstrates. */
-  readonly description: string;
-  /** Category for grouping and filtering (e.g. `'auth'`, `'navigation'`). */
-  readonly category: string;
-  /** Who this recipe is intended for. */
-  readonly role: RecipeRole;
-  /** Priority level for adoption guidance. */
-  readonly priority: RecipePriority;
-  /** Ready-to-use TypeScript code for the recipe. */
-  readonly code: string;
-  /** Free-form tags for semantic search. */
-  readonly tags: string[];
-}
+export type { RecipeEntry, RecipePriority } from './schemas/recipe.schema.js';
 
 // ── Agentic Checkpoint ─────────────────────────────────────────────────────
 

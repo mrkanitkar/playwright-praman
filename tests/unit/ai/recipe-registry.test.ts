@@ -2,11 +2,17 @@
  * Unit tests for `src/ai/recipe-registry.ts`.
  *
  * @remarks
- * Verifies registry construction, select(), search(), forAI(), and
- * getTopRecipes(). All tests are hermetic — recipes are injected through
- * a registry subclass that overrides the internal store.
+ * Verifies registry construction, select(), search(), forAI(),
+ * getTopRecipes(), selectByDomain(), and selectByPriority().
+ * All tests are hermetic — recipes are injected through
+ * RecipeRegistry.fromEntries().
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Mock the generated recipes to keep tests hermetic (empty seed).
+vi.mock('#ai/recipe-registry.generated.js', () => ({
+  GENERATED_RECIPES: [],
+}));
 
 import { RecipeRegistry } from '#ai/recipe-registry.js';
 import type { RecipeEntry } from '#ai/types.js';
@@ -14,47 +20,43 @@ import type { RecipeEntry } from '#ai/types.js';
 // ── Test fixtures ──────────────────────────────────────────────────────────
 
 const RECIPE_AUTH: RecipeEntry = {
-  id: 'login-cloud-saml',
-  title: 'Login via Cloud SAML',
+  id: 'recipe-login-cloud-saml',
+  name: 'Login via Cloud SAML',
   description: 'Authenticates against SAP BTP using cloud SAML strategy',
-  category: 'auth',
-  role: 'both',
+  domain: 'auth',
   priority: 'essential',
-  code: 'await auth.loginCloud({ user: process.env.SAP_USER! });',
-  tags: ['auth', 'saml', 'btp', 'cloud'],
+  pattern: 'await auth.loginCloud({ user: process.env.SAP_USER! });',
+  capabilities: ['UI5-AUTH-001', 'UI5-AUTH-002'],
 };
 
 const RECIPE_NAV: RecipeEntry = {
-  id: 'navigate-fiori-tile',
-  title: 'Navigate to a Fiori Tile',
+  id: 'recipe-navigate-fiori-tile',
+  name: 'Navigate to a Fiori Tile',
   description: 'Opens an SAP Fiori launchpad tile by its display title',
-  category: 'navigation',
-  role: 'ai-agent',
+  domain: 'navigate',
   priority: 'recommended',
-  code: "await ui5.navigateToTile('Sales Orders');",
-  tags: ['navigation', 'tile', 'launchpad'],
+  pattern: "await ui5.navigateToTile('Sales Orders');",
+  capabilities: ['UI5-NAV-001'],
 };
 
 const RECIPE_FORM: RecipeEntry = {
-  id: 'fill-smart-form',
-  title: 'Fill SmartForm Fields',
+  id: 'recipe-fill-smart-form',
+  name: 'Fill SmartForm Fields',
   description: 'Populates a SAP SmartForm with structured field data',
-  category: 'interaction',
-  role: 'human-tester',
+  domain: 'ui5',
   priority: 'advanced',
-  code: "await ui5.fillForm({ Name: 'Alice', Country: 'DE' });",
-  tags: ['form', 'smartform', 'fill'],
+  pattern: "await ui5.fillForm({ Name: 'Alice', Country: 'DE' });",
+  capabilities: ['UI5-UI5-010', 'UI5-UI5-011'],
 };
 
 const RECIPE_TABLE: RecipeEntry = {
-  id: 'filter-table-rows',
-  title: 'Filter Table Rows',
+  id: 'recipe-filter-table-rows',
+  name: 'Filter Table Rows',
   description: 'Applies a filter bar query and verifies matching row count',
-  category: 'interaction',
-  role: 'ai-agent',
+  domain: 'ui5',
   priority: 'essential',
-  code: "await ui5.filterTable({ field: 'Status', value: 'Open' });",
-  tags: ['table', 'filter', 'interaction'],
+  pattern: "await ui5.filterTable({ field: 'Status', value: 'Open' });",
+  capabilities: ['UI5-TBL-001', 'UI5-TBL-002'],
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -87,40 +89,11 @@ describe('RecipeRegistry', () => {
       expect(registry.select({})).toHaveLength(3);
     });
 
-    it('filters by category', () => {
+    it('filters by domain', () => {
       const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM, RECIPE_TABLE);
-      const interaction = registry.select({ category: 'interaction' });
-      expect(interaction).toHaveLength(2);
-      expect(interaction.every((r) => r.category === 'interaction')).toBe(true);
-    });
-
-    it('filters by role', () => {
-      const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM, RECIPE_TABLE);
-      const agentRecipes = registry.select({ role: 'ai-agent' });
-      expect(agentRecipes.every((r) => r.role === 'ai-agent')).toBe(true);
-    });
-
-    it('combines category and role filters (AND semantics)', () => {
-      const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM, RECIPE_TABLE);
-      // interaction + ai-agent = RECIPE_TABLE only
-      const results = registry.select({
-        category: 'interaction',
-        role: 'ai-agent',
-      });
-      expect(results).toHaveLength(1);
-      expect(results[0]?.id).toBe('filter-table-rows');
-    });
-
-    it('returns empty array when no entries match the filter', () => {
-      const registry = makeRegistry(RECIPE_AUTH);
-      expect(registry.select({ category: 'non-existent' })).toEqual([]);
-    });
-
-    it('returns all entries for role both', () => {
-      const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM);
-      const bothRecipes = registry.select({ role: 'both' });
-      expect(bothRecipes).toHaveLength(1);
-      expect(bothRecipes[0]?.id).toBe('login-cloud-saml');
+      const ui5Recipes = registry.select({ domain: 'ui5' });
+      expect(ui5Recipes).toHaveLength(2);
+      expect(ui5Recipes.every((r) => r.domain === 'ui5')).toBe(true);
     });
 
     it('filters by priority', () => {
@@ -130,37 +103,49 @@ describe('RecipeRegistry', () => {
       expect(essential.every((r) => r.priority === 'essential')).toBe(true);
     });
 
-    it('combines category, role, and priority filters (AND semantics)', () => {
+    it('combines domain and priority filters (AND semantics)', () => {
       const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM, RECIPE_TABLE);
+      // ui5 + essential = RECIPE_TABLE only
       const results = registry.select({
-        category: 'interaction',
-        role: 'ai-agent',
+        domain: 'ui5',
         priority: 'essential',
       });
       expect(results).toHaveLength(1);
-      expect(results[0]?.id).toBe('filter-table-rows');
+      expect(results[0]?.id).toBe('recipe-filter-table-rows');
+    });
+
+    it('returns empty array when no entries match the filter', () => {
+      const registry = makeRegistry(RECIPE_AUTH);
+      expect(registry.select({ domain: 'non-existent' })).toEqual([]);
+    });
+
+    it('returns single entry for advanced priority', () => {
+      const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM, RECIPE_TABLE);
+      const advanced = registry.select({ priority: 'advanced' });
+      expect(advanced).toHaveLength(1);
+      expect(advanced[0]?.id).toBe('recipe-fill-smart-form');
     });
   });
 
   // ── search() ───────────────────────────────────────────────────────────
 
   describe('search()', () => {
-    it('finds entries by partial title match (case-insensitive)', () => {
+    it('finds entries by partial name match (case-insensitive)', () => {
       const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM);
       const results = registry.search('login');
-      expect(results.some((r) => r.id === 'login-cloud-saml')).toBe(true);
+      expect(results.some((r) => r.id === 'recipe-login-cloud-saml')).toBe(true);
     });
 
     it('finds entries by partial description match (case-insensitive)', () => {
       const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM);
       const results = registry.search('launchpad');
-      expect(results.some((r) => r.id === 'navigate-fiori-tile')).toBe(true);
+      expect(results.some((r) => r.id === 'recipe-navigate-fiori-tile')).toBe(true);
     });
 
-    it('finds entries by tag match (case-insensitive)', () => {
+    it('searches name field for matches', () => {
       const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM);
-      const results = registry.search('saml');
-      expect(results.some((r) => r.id === 'login-cloud-saml')).toBe(true);
+      const results = registry.search('SAML');
+      expect(results.some((r) => r.id === 'recipe-login-cloud-saml')).toBe(true);
     });
 
     it('returns empty array when query has no matches', () => {
@@ -206,11 +191,11 @@ describe('RecipeRegistry', () => {
       const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV);
       for (const recipe of registry.forAI()) {
         expect(typeof recipe.id).toBe('string');
-        expect(typeof recipe.title).toBe('string');
+        expect(typeof recipe.name).toBe('string');
         expect(typeof recipe.description).toBe('string');
-        expect(typeof recipe.category).toBe('string');
-        expect(typeof recipe.code).toBe('string');
-        expect(Array.isArray(recipe.tags)).toBe(true);
+        expect(typeof recipe.domain).toBe('string');
+        expect(typeof recipe.pattern).toBe('string');
+        expect(Array.isArray(recipe.capabilities)).toBe(true);
       }
     });
   });
@@ -248,35 +233,19 @@ describe('RecipeRegistry', () => {
     });
   });
 
-  // ── selectByRole() ──────────────────────────────────────────────────
+  // ── selectByDomain() ──────────────────────────────────────────────────
 
-  describe('selectByRole()', () => {
-    it('returns entries matching the given role', () => {
+  describe('selectByDomain()', () => {
+    it('returns entries matching the given domain', () => {
       const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM, RECIPE_TABLE);
-      const agentRecipes = registry.selectByRole('ai-agent');
-      expect(agentRecipes).toHaveLength(2);
-      expect(agentRecipes.every((r) => r.role === 'ai-agent')).toBe(true);
-    });
-
-    it('returns empty array when no entries match', () => {
-      const registry = makeRegistry(RECIPE_NAV);
-      expect(registry.selectByRole('human-tester')).toEqual([]);
-    });
-  });
-
-  // ── selectByCategory() ─────────────────────────────────────────────
-
-  describe('selectByCategory()', () => {
-    it('returns entries matching the given category', () => {
-      const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM, RECIPE_TABLE);
-      const interaction = registry.selectByCategory('interaction');
-      expect(interaction).toHaveLength(2);
-      expect(interaction.every((r) => r.category === 'interaction')).toBe(true);
+      const ui5Recipes = registry.selectByDomain('ui5');
+      expect(ui5Recipes).toHaveLength(2);
+      expect(ui5Recipes.every((r) => r.domain === 'ui5')).toBe(true);
     });
 
     it('returns empty array when no entries match', () => {
       const registry = makeRegistry(RECIPE_AUTH);
-      expect(registry.selectByCategory('non-existent')).toEqual([]);
+      expect(registry.selectByDomain('non-existent')).toEqual([]);
     });
   });
 
@@ -299,7 +268,7 @@ describe('RecipeRegistry', () => {
       const registry = makeRegistry(RECIPE_AUTH, RECIPE_NAV, RECIPE_FORM, RECIPE_TABLE);
       const advanced = registry.selectByPriority('advanced');
       expect(advanced).toHaveLength(1);
-      expect(advanced[0]?.id).toBe('fill-smart-form');
+      expect(advanced[0]?.id).toBe('recipe-fill-smart-form');
     });
   });
 });

@@ -1,429 +1,369 @@
 #!/usr/bin/env tsx
 /**
- * Generate capabilities.md from TSDoc comments in source code.
+ * Generate capability and recipe registries from YAML master data.
  *
- * This script:
- * 1. Parses all TypeScript files in src/
- * 2. Extracts JSDoc comments with @capability tag
- * 3. Generates capabilities.md in wdi5 format
- * 4. Validates required tags exist
+ * @remarks
+ * Reads `capabilities.yaml` and `recipes.yaml`, validates via Zod schemas,
+ * and writes 4 output files:
  *
- * @see docs/documentation-standards.md
+ * 1. `src/ai/capability-registry.generated.ts`
+ * 2. `src/ai/recipe-registry.generated.ts`
+ * 3. `docs/capabilities.md`
+ * 4. `skills/playwright-praman-sap-testing/capabilities-reference.md`
+ *
+ * @see capabilities.yaml
+ * @see recipes.yaml
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
-import { resolve, relative } from 'node:path';
-import { globSync } from 'glob';
-import * as ts from 'typescript';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { resolve, dirname } from 'node:path';
+import { parse as parseYaml } from 'yaml';
 
-interface Capability {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  guarantees: string[];
-  apis: string[];
-  failures: string[];
-  examples: string[];
-  intent?: string;
-  prerequisites?: string[];
-  postconditions?: string[];
-  alternatives?: string[];
-  sapModule?: string;
-  ui5Version?: string;
-  fioriElement?: string;
-  source: string;
-  fileName: string;
-}
+import { CapabilitiesYamlSchema } from '../src/ai/schemas/capability.schema.js';
+import { RecipesYamlSchema } from '../src/ai/schemas/recipe.schema.js';
+import type { CapabilityEntry } from '../src/ai/schemas/capability.schema.js';
+import type { CapabilitiesYaml } from '../src/ai/schemas/capability.schema.js';
+import type { RecipeEntry } from '../src/ai/schemas/recipe.schema.js';
+import type { RecipesYaml } from '../src/ai/schemas/recipe.schema.js';
 
-interface CategoryCount {
-  [category: string]: number;
-}
+const ROOT = resolve(import.meta.dirname ?? '.', '..');
 
-const categoryPrefixes: Record<string, string> = {
-  location: 'LOC',
-  interaction: 'INT',
-  navigation: 'NAV',
-  'fiori-elements': 'FE',
-  authentication: 'AUTH',
-  configuration: 'CFG',
-  aggregations: 'AGG',
-  properties: 'PROP',
-  bridge: 'BRIDGE',
-  ai: 'AI',
-  intent: 'INTENT',
-  vocabulary: 'VOCAB',
-  matcher: 'MATCH',
-  selector: 'SEL',
-  reporter: 'REPORT',
-};
+/* ── Paths ────────────────────────────────────────────────────────────────── */
 
-const categoryCounts: CategoryCount = {};
+const CAPABILITIES_YAML = resolve(ROOT, 'capabilities.yaml');
+const RECIPES_YAML = resolve(ROOT, 'recipes.yaml');
+const CAPABILITY_REGISTRY_TS = resolve(ROOT, 'src/ai/capability-registry.generated.ts');
+const RECIPE_REGISTRY_TS = resolve(ROOT, 'src/ai/recipe-registry.generated.ts');
+const CAPABILITIES_MD = resolve(ROOT, 'docs/capabilities.md');
+const CAPABILITIES_SKILL_MD = resolve(
+  ROOT,
+  'skills/playwright-praman-sap-testing/capabilities-reference.md',
+);
+
+/* ── Helpers ──────────────────────────────────────────────────────────────── */
+
+const today = new Date().toISOString().split('T')[0];
 
 /**
- * Extract capabilities from TypeScript source files.
+ * Trim trailing whitespace from `usageExample` values.
+ *
+ * @remarks
+ * YAML block scalars (`|` or `>`) append a trailing newline that must be
+ * removed before embedding in TypeScript source.
  */
-function extractCapabilities(): Capability[] {
-  const capabilities: Capability[] = [];
-  const sourceFiles = globSync('src/**/*.ts', { ignore: ['**/*.test.ts', '**/*.spec.ts'] });
-
-  for (const filePath of sourceFiles) {
-    const sourceText = readFileSync(filePath, 'utf-8');
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      sourceText,
-      ts.ScriptTarget.Latest,
-      true
-    );
-
-    ts.forEachChild(sourceFile, (node) => {
-      const capability = extractCapabilityFromNode(node, filePath, sourceText);
-      if (capability) {
-        capabilities.push(capability);
-      }
-    });
-  }
-
-  return capabilities;
+function trimExamples(entries: readonly CapabilityEntry[]): CapabilityEntry[] {
+  return entries.map((entry) => ({
+    ...entry,
+    usageExample: entry.usageExample.trim(),
+  }));
 }
 
 /**
- * Extract capability from a TypeScript node.
+ * Trim trailing whitespace from recipe `pattern` values.
  */
-function extractCapabilityFromNode(
-  node: ts.Node,
-  filePath: string,
-  sourceText: string
-): Capability | null {
-  // Only process functions, methods, and classes
-  if (
-    !ts.isFunctionDeclaration(node) &&
-    !ts.isMethodDeclaration(node) &&
-    !ts.isClassDeclaration(node)
-  ) {
-    return null;
-  }
+function trimPatterns(entries: readonly RecipeEntry[]): RecipeEntry[] {
+  return entries.map((entry) => ({
+    ...entry,
+    description: entry.description.trim(),
+    pattern: entry.pattern.trim(),
+  }));
+}
 
-  const jsDoc = getJSDocComment(node, sourceText);
-  if (!jsDoc || !jsDoc.includes('@capability')) {
-    return null;
-  }
-
-  const capability: Partial<Capability> = {
-    fileName: relative(process.cwd(), filePath),
-    source: filePath,
-    guarantees: [],
-    apis: [],
-    failures: [],
-    examples: [],
-    prerequisites: [],
-    postconditions: [],
-    alternatives: [],
+/**
+ * Serialize a capability entry to JSON, omitting undefined optional fields.
+ */
+function serializeEntry(entry: CapabilityEntry): string {
+  const ordered: Record<string, unknown> = {
+    id: entry.id,
+    qualifiedName: entry.qualifiedName,
+    name: entry.name,
+    description: entry.description,
+    category: entry.category,
+    priority: entry.priority,
+    usageExample: entry.usageExample,
+    registryVersion: entry.registryVersion,
   };
-
-  // Parse JSDoc tags
-  const tags = parseJSDocTags(jsDoc);
-
-  // Required fields
-  capability.category = tags.category || 'other';
-  capability.name = tags.name || (node.name ? node.name.getText() : 'Unnamed');
-  capability.description = extractDescription(jsDoc);
-
-  // Generate capability ID
-  const prefix = categoryPrefixes[capability.category] || 'OTHER';
-  if (!categoryCounts[prefix]) {
-    categoryCounts[prefix] = 0;
-  }
-  categoryCounts[prefix]++;
-  capability.id = `UI5-${prefix}-${String(categoryCounts[prefix]).padStart(3, '0')}`;
-
-  // Multi-value tags
-  capability.guarantees = extractMultipleValues(jsDoc, '@guarantee');
-  capability.failures = extractMultipleValues(jsDoc, '@failureMode');
-  capability.examples = extractExamples(jsDoc);
-  capability.apis = extractAPIs(node, jsDoc);
-  capability.prerequisites = extractMultipleValues(jsDoc, '@prerequisite');
-  capability.postconditions = extractMultipleValues(jsDoc, '@postcondition');
-  capability.alternatives = extractMultipleValues(jsDoc, '@alternative');
-
-  // Single-value tags
-  capability.intent = tags.intent;
-  capability.sapModule = tags.sapModule;
-  capability.ui5Version = tags.ui5Version;
-  capability.fioriElement = tags.fioriElement;
-
-  return capability as Capability;
+  if (entry.intent !== undefined) ordered['intent'] = entry.intent;
+  if (entry.sapModule !== undefined) ordered['sapModule'] = entry.sapModule;
+  if (entry.controlTypes !== undefined) ordered['controlTypes'] = entry.controlTypes;
+  if (entry.async !== undefined) ordered['async'] = entry.async;
+  return JSON.stringify(ordered, null, 2);
 }
 
 /**
- * Get JSDoc comment for a node.
+ * Ensure the parent directory of a file path exists.
  */
-function getJSDocComment(node: ts.Node, sourceText: string): string | null {
-  const fullText = node.getFullText();
-  const commentRanges = ts.getLeadingCommentRanges(fullText, 0);
-
-  if (!commentRanges || commentRanges.length === 0) {
-    return null;
-  }
-
-  const lastComment = commentRanges[commentRanges.length - 1];
-  if (!lastComment) {
-    return null;
-  }
-
-  return fullText.slice(lastComment.pos, lastComment.end);
+async function ensureDir(filePath: string): Promise<void> {
+  await mkdir(dirname(filePath), { recursive: true });
 }
 
-/**
- * Parse JSDoc tags into key-value pairs.
- */
-function parseJSDocTags(jsDoc: string): Record<string, string> {
-  const tags: Record<string, string> = {};
-  const tagRegex = /@(\w+)\s+([^\n@]*)/g;
-  let match;
-
-  while ((match = tagRegex.exec(jsDoc)) !== null) {
-    const [, tagName, tagValue] = match;
-    if (tagName && tagValue) {
-      tags[tagName] = tagValue.trim();
-    }
-  }
-
-  return tags;
-}
+/* ── Generators ───────────────────────────────────────────────────────────── */
 
 /**
- * Extract description from JSDoc.
+ * Generate `capability-registry.generated.ts`.
  */
-function extractDescription(jsDoc: string): string {
-  const lines = jsDoc.split('\n');
-  const descriptionLines: string[] = [];
-  let inDescription = false;
+function generateCapabilityRegistryTs(entries: readonly CapabilityEntry[]): string {
+  const serialized = entries.map((entry) => serializeEntry(entry));
+  const arrayBody = serialized.map((json) => {
+    // Indent each line of JSON by 2 spaces
+    const indented = json
+      .split('\n')
+      .map((line) => `  ${line}`)
+      .join('\n');
+    return indented;
+  });
 
-  for (const line of lines) {
-    const trimmed = line.replace(/^\s*\*\s?/, '').trim();
+  return `/* eslint-disable max-lines, sonarjs/no-duplicate-string */
+/**
+ * AUTO-GENERATED — do not edit manually.
+ *
+ * @remarks
+ * This file is overwritten by \`npm run generate:capabilities\`.
+ * Edit \`capabilities.yaml\` to add or modify capabilities, then re-run the generator.
+ *
+ * @module ai
+ */
 
-    if (trimmed.startsWith('@')) {
-      break;
-    }
-
-    if (trimmed && !trimmed.startsWith('/**') && !trimmed.startsWith('*/')) {
-      inDescription = true;
-      descriptionLines.push(trimmed);
-    } else if (inDescription && !trimmed) {
-      break;
-    }
-  }
-
-  return descriptionLines.join(' ');
-}
+import type { CapabilityEntry } from './schemas/capability.schema.js';
 
 /**
- * Extract multiple values for a tag.
+ * Static list of generated capability entries.
+ *
+ * @remarks
+ * Generated on ${today} with ${String(entries.length)} entries.
  */
-function extractMultipleValues(jsDoc: string, tag: string): string[] {
-  const values: string[] = [];
-  const regex = new RegExp(`${tag}\\s+([^\\n@]*)`, 'g');
-  let match;
-
-  while ((match = regex.exec(jsDoc)) !== null) {
-    const value = match[1]?.trim();
-    if (value) {
-      values.push(value);
-    }
-  }
-
-  return values;
-}
-
-/**
- * Extract examples from JSDoc.
- */
-function extractExamples(jsDoc: string): string[] {
-  const examples: string[] = [];
-  const exampleRegex = /@example\s+([\s\S]*?)(?=@\w+|\*\/)/g;
-  let match;
-
-  while ((match = exampleRegex.exec(jsDoc)) !== null) {
-    const example = match[1]?.trim();
-    if (example) {
-      examples.push(example);
-    }
-  }
-
-  return examples;
-}
-
-/**
- * Extract API signatures from node.
- */
-function extractAPIs(node: ts.Node, jsDoc: string): string[] {
-  const apis: string[] = [];
-
-  if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
-    const name = node.name?.getText() || 'unnamed';
-    const params = node.parameters.map(p => p.getText()).join(', ');
-    apis.push(`${name}(${params})`);
-  }
-
-  return apis;
-}
-
-/**
- * Generate capabilities.md content.
- */
-function generateMarkdown(capabilities: Capability[]): string {
-  const grouped = groupByCategory(capabilities);
-
-  let markdown = `# Praman Capabilities Reference
-
-> **Document Version**: 1.0
-> **Last Updated**: ${new Date().toISOString().split('T')[0]}
-> **Framework**: Praman (Playwright + SAP UI5)
-> **Purpose**: User-visible behaviors for test authors
-
----
-
-## Overview
-
-This document catalogs all observable behaviors of the Praman test automation framework. Each capability represents a distinct user action or feature available to test authors.
-
-### Category Prefixes
-
-| Prefix | Category | Count |
-|--------|----------|-------|
+export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
+${arrayBody.join(',\n')},
+] as const;
 `;
-
-  for (const [prefix, count] of Object.entries(categoryCounts).sort()) {
-    const category = Object.entries(categoryPrefixes).find(([, p]) => p === prefix)?.[0] || prefix;
-    markdown += `| \`UI5-${prefix}\` | ${category} | ${count} |\n`;
-  }
-
-  markdown += '\n---\n\n';
-
-  for (const [category, caps] of Object.entries(grouped)) {
-    markdown += `## ${capitalize(category)}\n\n`;
-
-    for (const cap of caps) {
-      markdown += generateCapabilitySection(cap);
-    }
-  }
-
-  return markdown;
 }
 
 /**
- * Generate a capability section.
+ * Generate `recipe-registry.generated.ts`.
  */
-function generateCapabilitySection(cap: Capability): string {
-  let section = `### ${cap.id}\n`;
-  section += `**Name**: ${cap.name}\n\n`;
-  section += `**Description**:  \n${cap.description}\n\n`;
+function generateRecipeRegistryTs(entries: readonly RecipeEntry[]): string {
+  const serialized = entries.map((entry) => {
+    const json = JSON.stringify(entry, null, 2);
+    return json
+      .split('\n')
+      .map((line) => `  ${line}`)
+      .join('\n');
+  });
 
-  if (cap.intent) {
-    section += `**Intent**:  \n${cap.intent}\n\n`;
-  }
+  return `/* eslint-disable sonarjs/no-duplicate-string */
+/**
+ * AUTO-GENERATED — do not edit manually.
+ *
+ * @remarks
+ * This file is overwritten by \`npm run generate:capabilities\`.
+ * Edit \`recipes.yaml\` to add or modify recipes, then re-run the generator.
+ *
+ * @module ai
+ */
 
-  if (cap.guarantees.length > 0) {
-    section += `**Guarantees**:\n`;
-    for (const guarantee of cap.guarantees) {
-      section += `- ${guarantee}\n`;
-    }
-    section += '\n';
-  }
+import type { RecipeEntry } from './schemas/recipe.schema.js';
 
-  if (cap.prerequisites && cap.prerequisites.length > 0) {
-    section += `**Prerequisites**:\n`;
-    for (const prereq of cap.prerequisites) {
-      section += `- ${prereq}\n`;
-    }
-    section += '\n';
-  }
-
-  if (cap.apis.length > 0) {
-    section += `**APIs**:\n`;
-    for (const api of cap.apis) {
-      section += `- \`${api}\`\n`;
-    }
-    section += '\n';
-  }
-
-  if (cap.examples.length > 0) {
-    section += `**Examples**:\n`;
-    for (const example of cap.examples) {
-      section += `\`\`\`typescript\n${example}\n\`\`\`\n\n`;
-    }
-  }
-
-  if (cap.failures.length > 0) {
-    section += `**Failures**:\n`;
-    for (const failure of cap.failures) {
-      section += `- **${failure.split('—')[0]?.trim()}**: ${failure.split('—')[1]?.trim()}\n`;
-    }
-    section += '\n';
-  }
-
-  if (cap.alternatives && cap.alternatives.length > 0) {
-    section += `**Alternatives**:\n`;
-    for (const alt of cap.alternatives) {
-      section += `- ${alt}\n`;
-    }
-    section += '\n';
-  }
-
-  section += `---\n\n`;
-
-  return section;
+/**
+ * Static list of generated recipe entries.
+ *
+ * @remarks
+ * Generated on ${today} with ${String(entries.length)} entries.
+ */
+export const GENERATED_RECIPES: readonly RecipeEntry[] = [
+${serialized.join(',\n')},
+] as const;
+`;
 }
 
 /**
- * Group capabilities by category.
+ * Generate `docs/capabilities.md`.
  */
-function groupByCategory(capabilities: Capability[]): Record<string, Capability[]> {
-  const grouped: Record<string, Capability[]> = {};
+function generateCapabilitiesMd(
+  entries: readonly CapabilityEntry[],
+  yamlData: CapabilitiesYaml,
+): string {
+  const lines: string[] = [];
 
-  for (const cap of capabilities) {
-    if (!grouped[cap.category]) {
-      grouped[cap.category] = [];
+  lines.push('# Praman Capabilities Reference');
+  lines.push('');
+  lines.push(
+    `> **Generated**: ${today} — do not edit manually, run \`npm run generate:capabilities\``,
+  );
+  lines.push(
+    `> **Total**: ${String(entries.length)} capabilities across ${String(Object.keys(yamlData.categories).length)} categories`,
+  );
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+
+  // Category summary table
+  lines.push('## Categories');
+  lines.push('');
+  lines.push('| Category | Prefix | Description | Count |');
+  lines.push('|----------|--------|-------------|-------|');
+
+  const categoryCounts = new Map<string, number>();
+  for (const entry of entries) {
+    categoryCounts.set(entry.category, (categoryCounts.get(entry.category) ?? 0) + 1);
+  }
+
+  for (const [catKey, catInfo] of Object.entries(yamlData.categories)) {
+    const count = categoryCounts.get(catKey) ?? 0;
+    lines.push(
+      `| ${catKey} | \`UI5-${catInfo.prefix}\` | ${catInfo.description} | ${String(count)} |`,
+    );
+  }
+
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+
+  // Per-category sections
+  const grouped = new Map<string, CapabilityEntry[]>();
+  for (const entry of entries) {
+    const list = grouped.get(entry.category) ?? [];
+    list.push(entry);
+    grouped.set(entry.category, list);
+  }
+
+  for (const [catKey, catInfo] of Object.entries(yamlData.categories)) {
+    const catEntries = grouped.get(catKey);
+    if (!catEntries || catEntries.length === 0) continue;
+
+    lines.push(`## ${catKey} — ${catInfo.description}`);
+    lines.push('');
+    lines.push('| ID | Name | Description | Usage Example |');
+    lines.push('|-----|------|-------------|---------------|');
+
+    for (const entry of catEntries) {
+      const example = entry.usageExample.split('\n')[0] ?? '';
+      lines.push(`| \`${entry.id}\` | ${entry.name} | ${entry.description} | \`${example}\` |`);
     }
-    grouped[cap.category].push(cap);
+
+    lines.push('');
   }
 
-  return grouped;
+  return lines.join('\n');
 }
 
 /**
- * Capitalize first letter.
+ * Generate `skills/playwright-praman-sap-testing/capabilities-reference.md`.
  */
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+function generateSkillCapabilitiesMd(
+  entries: readonly CapabilityEntry[],
+  yamlData: CapabilitiesYaml,
+): string {
+  const lines: string[] = [];
 
-/**
- * Main execution.
- */
-function main(): void {
-  console.log('🔍 Scanning TypeScript files for @capability tags...');
+  lines.push('# Praman Capabilities Reference (Agent)');
+  lines.push('');
+  lines.push(`> Generated: ${today} — do not edit manually, run \`npm run generate:capabilities\``);
+  lines.push(`> Total: ${String(entries.length)} capabilities`);
+  lines.push('');
+  lines.push('---');
+  lines.push('');
 
-  const capabilities = extractCapabilities();
-
-  console.log(`✅ Found ${capabilities.length} capabilities`);
-
-  if (capabilities.length === 0) {
-    console.warn('⚠️  No capabilities found. Add @capability tag to JSDoc comments.');
-    process.exit(0);
+  // Per-category sections
+  const grouped = new Map<string, CapabilityEntry[]>();
+  for (const entry of entries) {
+    const list = grouped.get(entry.category) ?? [];
+    list.push(entry);
+    grouped.set(entry.category, list);
   }
 
-  const markdown = generateMarkdown(capabilities);
-  const outputPath = resolve(process.cwd(), 'docs/capabilities.md');
+  for (const [catKey, catInfo] of Object.entries(yamlData.categories)) {
+    const catEntries = grouped.get(catKey);
+    if (!catEntries || catEntries.length === 0) continue;
 
-  writeFileSync(outputPath, markdown, 'utf-8');
+    lines.push(`## ${catKey} — ${catInfo.description}`);
+    lines.push('');
 
-  console.log(`📝 Generated: ${outputPath}`);
-  console.log('\n📊 Statistics:');
-  for (const [prefix, count] of Object.entries(categoryCounts).sort()) {
-    console.log(`   ${prefix}: ${count}`);
+    for (const entry of catEntries) {
+      lines.push(`- **${entry.qualifiedName}** — ${entry.description}`);
+    }
+
+    lines.push('');
   }
+
+  return lines.join('\n');
 }
 
-main();
+/* ── Main ─────────────────────────────────────────────────────────────────── */
+
+async function main(): Promise<void> {
+  console.log('Scanning YAML master data...');
+
+  // 1. Read YAML files
+  console.log(`  Reading ${CAPABILITIES_YAML}`);
+  const capabilitiesRaw = await readFile(CAPABILITIES_YAML, 'utf-8');
+  console.log(`  Reading ${RECIPES_YAML}`);
+  const recipesRaw = await readFile(RECIPES_YAML, 'utf-8');
+
+  // 2. Parse YAML
+  const capabilitiesParsed: unknown = parseYaml(capabilitiesRaw);
+  const recipesParsed: unknown = parseYaml(recipesRaw);
+
+  // 3. Validate with Zod schemas
+  console.log('Validating capabilities.yaml...');
+  let capabilitiesYaml: CapabilitiesYaml;
+  try {
+    capabilitiesYaml = CapabilitiesYamlSchema.parse(capabilitiesParsed);
+  } catch (error: unknown) {
+    console.error('Validation failed for capabilities.yaml:');
+    console.error(error);
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log('Validating recipes.yaml...');
+  let recipesYaml: RecipesYaml;
+  try {
+    recipesYaml = RecipesYamlSchema.parse(recipesParsed);
+  } catch (error: unknown) {
+    console.error('Validation failed for recipes.yaml:');
+    console.error(error);
+    process.exitCode = 1;
+    return;
+  }
+
+  // 4. Trim trailing whitespace from usage examples and patterns
+  const capabilities = trimExamples(capabilitiesYaml.capabilities);
+  const recipes = trimPatterns(recipesYaml.recipes);
+
+  console.log(`  Found ${String(capabilities.length)} capabilities`);
+  console.log(`  Found ${String(recipes.length)} recipes`);
+
+  // 5. Generate and write output files
+  console.log('Writing output files...');
+
+  // Output 1: capability-registry.generated.ts
+  await ensureDir(CAPABILITY_REGISTRY_TS);
+  const capRegistryContent = generateCapabilityRegistryTs(capabilities);
+  await writeFile(CAPABILITY_REGISTRY_TS, capRegistryContent, 'utf-8');
+  console.log(`  Written: ${CAPABILITY_REGISTRY_TS} (${String(capabilities.length)} entries)`);
+
+  // Output 2: recipe-registry.generated.ts
+  await ensureDir(RECIPE_REGISTRY_TS);
+  const recipeRegistryContent = generateRecipeRegistryTs(recipes);
+  await writeFile(RECIPE_REGISTRY_TS, recipeRegistryContent, 'utf-8');
+  console.log(`  Written: ${RECIPE_REGISTRY_TS} (${String(recipes.length)} entries)`);
+
+  // Output 3: docs/capabilities.md
+  await ensureDir(CAPABILITIES_MD);
+  const capsMdContent = generateCapabilitiesMd(capabilities, capabilitiesYaml);
+  await writeFile(CAPABILITIES_MD, capsMdContent, 'utf-8');
+  console.log(`  Written: ${CAPABILITIES_MD}`);
+
+  // Output 4: skills capabilities-reference.md
+  await ensureDir(CAPABILITIES_SKILL_MD);
+  const skillMdContent = generateSkillCapabilitiesMd(capabilities, capabilitiesYaml);
+  await writeFile(CAPABILITIES_SKILL_MD, skillMdContent, 'utf-8');
+  console.log(`  Written: ${CAPABILITIES_SKILL_MD}`);
+
+  console.log('Done.');
+}
+
+main().catch((err: unknown) => {
+  console.error('generate-capabilities failed:', err);
+  process.exitCode = 1;
+});

@@ -8,6 +8,7 @@
  */
 import { describe, expectTypeOf, it } from 'vitest';
 
+import type { RecipePriority } from '#ai/schemas/recipe.schema.js';
 import type {
   AgenticCheckpoint,
   AiGeneratedTest,
@@ -15,7 +16,9 @@ import type {
   AiResponse,
   AiResponseError,
   AiResponseMetadata,
+  CapabilityCategory,
   CapabilityEntry,
+  CapabilityPriority,
   DiscoveredControl,
   PageContext,
   RecipeEntry,
@@ -154,14 +157,22 @@ describe('AiProviderConfig', () => {
 describe('CapabilityEntry', () => {
   it('has required string fields', () => {
     expectTypeOf<CapabilityEntry['id']>().toEqualTypeOf<string>();
+    expectTypeOf<CapabilityEntry['qualifiedName']>().toEqualTypeOf<string>();
     expectTypeOf<CapabilityEntry['name']>().toEqualTypeOf<string>();
     expectTypeOf<CapabilityEntry['description']>().toEqualTypeOf<string>();
-    expectTypeOf<CapabilityEntry['category']>().toEqualTypeOf<string>();
-    expectTypeOf<CapabilityEntry['usage_example']>().toEqualTypeOf<string>();
+    expectTypeOf<CapabilityEntry['usageExample']>().toEqualTypeOf<string>();
   });
 
-  it('registryVersion is a number', () => {
-    expectTypeOf<CapabilityEntry['registryVersion']>().toEqualTypeOf<number>();
+  it('category is a CapabilityCategory union', () => {
+    expectTypeOf<CapabilityEntry['category']>().toEqualTypeOf<CapabilityCategory>();
+  });
+
+  it('priority is a CapabilityPriority union', () => {
+    expectTypeOf<CapabilityEntry['priority']>().toEqualTypeOf<CapabilityPriority>();
+  });
+
+  it('registryVersion is the literal 1', () => {
+    expectTypeOf<CapabilityEntry['registryVersion']>().toEqualTypeOf<1>();
   });
 
   it('intent is optional string', () => {
@@ -176,20 +187,20 @@ describe('CapabilityEntry', () => {
 // ── RecipeEntry ────────────────────────────────────────────────────────────
 
 describe('RecipeEntry', () => {
-  it('role is a union of known literals', () => {
-    expectTypeOf<RecipeEntry['role']>().toEqualTypeOf<'ai-agent' | 'human-tester' | 'both'>();
-  });
-
-  it('tags is a string array', () => {
-    expectTypeOf<RecipeEntry['tags']>().toEqualTypeOf<string[]>();
-  });
-
   it('has required string fields', () => {
     expectTypeOf<RecipeEntry['id']>().toEqualTypeOf<string>();
-    expectTypeOf<RecipeEntry['title']>().toEqualTypeOf<string>();
+    expectTypeOf<RecipeEntry['name']>().toEqualTypeOf<string>();
     expectTypeOf<RecipeEntry['description']>().toEqualTypeOf<string>();
-    expectTypeOf<RecipeEntry['category']>().toEqualTypeOf<string>();
-    expectTypeOf<RecipeEntry['code']>().toEqualTypeOf<string>();
+    expectTypeOf<RecipeEntry['domain']>().toEqualTypeOf<string>();
+    expectTypeOf<RecipeEntry['pattern']>().toEqualTypeOf<string>();
+  });
+
+  it('capabilities is a string array', () => {
+    expectTypeOf<RecipeEntry['capabilities']>().toEqualTypeOf<string[]>();
+  });
+
+  it('priority is a RecipePriority union', () => {
+    expectTypeOf<RecipeEntry['priority']>().toEqualTypeOf<RecipePriority>();
   });
 });
 
