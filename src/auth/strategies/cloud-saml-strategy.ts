@@ -34,14 +34,25 @@ const CLOUD_URL_PATTERNS: readonly RegExp[] = [
   /\.cfapps\..*\.hana\.ondemand\.com/i,
 ];
 
-/** IAS email/username field selector chain. */
-const IAS_USERNAME_SELECTORS = ['input[name="j_username"]', '#j_username'] as const;
+/** IAS email/username field selector chain (classic + modern IAS forms). */
+const IAS_USERNAME_SELECTORS = [
+  'input[name="j_username"]',
+  '#j_username',
+  'input[name="email"]',
+  'input[type="email"]',
+  'input[name="loginfmt"]',
+] as const;
 
-/** IAS password field selector chain. */
-const IAS_PASSWORD_SELECTORS = ['input[name="j_password"]', '#j_password'] as const;
+/** IAS password field selector chain (classic + modern IAS forms). */
+const IAS_PASSWORD_SELECTORS = [
+  'input[name="j_password"]',
+  '#j_password',
+  'input[name="password"]',
+  'input[type="password"]',
+] as const;
 
-/** IAS submit button selector chain. */
-const IAS_SUBMIT_SELECTORS = ['#logOnFormSubmit', 'button[type="submit"]'] as const;
+/** IAS submit button selector chain (classic + modern IAS forms). */
+const IAS_SUBMIT_SELECTORS = ['#logOnFormSubmit', 'button[type="submit"]', 'form button'] as const;
 
 /** Shell header selector indicating successful login. */
 const SHELL_HEADER_SELECTOR = '#shell-header';

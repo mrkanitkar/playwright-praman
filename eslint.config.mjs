@@ -31,6 +31,7 @@ export default tseslint.config(
       'tests/e2e/**',
       'tests/example/**',
       'seeds/**',
+      'tests/seeds/**',
       'skills/**',
       'temp/**',
     ],

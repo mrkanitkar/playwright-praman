@@ -5,6 +5,10 @@ title: 'Bridge Internals'
 
 # Bridge Internals
 
+:::info[Contributor Only]
+This page documents Praman's internal bridge architecture. The APIs shown here use internal path aliases (`#bridge/*`) and are not accessible to end users of the `playwright-praman` package. This content is intended for contributors and plugin developers.
+:::
+
 The bridge is the communication layer between Praman's Node.js test code and the SAP UI5 framework running in the browser. Understanding its internals is essential for debugging and extending Praman.
 
 ## Bridge Injection via page.evaluate()

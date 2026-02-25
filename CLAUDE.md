@@ -203,7 +203,7 @@ throw new ControlError({
 
 ### Seed & Config
 
-- Seed: `tests/seeds/sap-seed.spec.ts` — inline `sapAuth.login()` + `page.pause()`
+- Seed: `tests/seeds/sap-seed.spec.ts` — raw Playwright auth (no Praman fixtures), MCP `pauseAtEnd` keeps browser open
 - Playwright project: `agent-seed-test` in `playwright.config.ts`
 - MCP server: `playwright-test` in `.mcp.json`
 

@@ -151,9 +151,10 @@ Load the appropriate skill file based on the task:
 
 ### Seed File
 
-Seed: `tests/seeds/sap-seed.spec.ts` — authenticates inline via `sapAuth.login()`, then `page.pause()` for MCP handoff.
+Seed: `tests/seeds/sap-seed.spec.ts` — authenticates inline via raw Playwright methods. MCP server's `pauseAtEnd` keeps browser open for agent handoff.
 
 Playwright project: `agent-seed-test` (configured in `playwright.config.ts`).
+To invoke the planner: run the `praman-sap-planner` agent which calls `planner_setup_page` with project `agent-seed-test`.
 
 ### The 7 Mandatory Rules
 

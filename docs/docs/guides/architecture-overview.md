@@ -13,7 +13,7 @@ Praman v1.0 is a ground-up rebuild of the SAP UI5 test automation platform for P
 +---------------------------------------------------------------------+
 |                     Test Author / AI Agent                           |
 |  import { test, expect } from 'playwright-praman';                  |
-|  import { procurementAPI } from 'playwright-praman/intents';        |
+|  import { procurement } from 'playwright-praman/intents';           |
 +-----------------------------------+---------------------------------+
                                     |
 +-----------------------------------v---------------------------------+
@@ -57,6 +57,10 @@ The architecture enforces a strict **downward-only dependency rule**:
 - Layer 5 (AI/Intents) imports from Layers 1-4.
 
 This is enforced at compile time via TypeScript path aliases (`#core/*`, `#bridge/*`, `#proxy/*`, `#fixtures/*`) and ESLint import rules.
+
+:::info[Internal Source Code]
+The path aliases below (`#core/*`, `#bridge/*`, `#proxy/*`) are internal to Praman's source code and are not available to end users. They enforce layer boundaries during development.
+:::
 
 ```typescript
 // Allowed: Layer 3 imports from Layer 1

@@ -39,6 +39,10 @@ PRAMAN_LOG_LEVEL=debug npx playwright test
 
 ### Creating Module Loggers
 
+:::info[Contributor Only]
+The `createLogger` and `REDACTION_PATHS` APIs use internal path aliases (`#core/*`) and are only available when developing Praman itself. End users control logging via the `PRAMAN_LOG_LEVEL` environment variable.
+:::
+
 ```typescript
 import { createLogger } from '#core/logging/index.js';
 
@@ -110,7 +114,11 @@ Set `PRAMAN_LOG_LEVEL=debug` to get detailed bridge communication logs alongside
 
 ## OpenTelemetry Integration
 
-Praman includes an OpenTelemetry (OTel) tracing layer for distributed observability:
+Praman includes an OpenTelemetry (OTel) tracing layer for distributed observability.
+
+:::info[Contributor Only]
+The telemetry APIs below use internal path aliases (`#core/*`) and are only available when developing Praman itself. End users enable OTel via configuration (see below).
+:::
 
 ```typescript
 import { initTelemetry, getNoOpTracer } from '#core/telemetry/index.js';

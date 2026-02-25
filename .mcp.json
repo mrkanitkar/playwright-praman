@@ -1,5 +1,12 @@
 {
   "mcpServers": {
+    "playwright-test": {
+      "command": "npx",
+      "args": [
+        "playwright",
+        "run-test-mcp-server"
+      ]
+    },
     "sap-docs": {
       "command": "node",
       "args": ["/Users/maheshwar/Documents/projects/mcp-sap-docs/dist/src/server.js"],
@@ -14,6 +21,10 @@
       "env": {
         "UI5_MCP_WORKSPACE": "/Users/maheshwar/Documents/projects/mk1"
       }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     }
   }
 }

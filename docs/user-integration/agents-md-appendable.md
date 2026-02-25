@@ -30,7 +30,7 @@ import { test, expect } from 'playwright-praman';
 
 1. **Fixture-only**: No class imports. All UI5 interaction via fixtures.
 2. **No native selectors for UI5**: Never `page.click('#__...')` for UI5 controls.
-3. **Auth in seed**: `sapAuth.login()` only in `tests/seeds/sap-seed.spec.ts`.
+3. **Auth in seed**: Raw Playwright auth in `tests/seeds/sap-seed.spec.ts` (no Praman fixtures).
 4. **Gold pattern**: `setValue()` + `fireChange()` + `waitForUI5()` for inputs.
 5. **Compliance header**: Every generated test needs a TSDoc compliance report.
 
