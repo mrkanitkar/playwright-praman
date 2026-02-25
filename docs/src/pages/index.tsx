@@ -7,13 +7,13 @@ function Hero(): ReactNode {
     <section style={{ padding: '8rem 2rem 4rem', textAlign: 'center', maxWidth: 800, margin: '0 auto' }}>
       <span style={{
         display: 'inline-block', padding: '0.3rem 0.8rem', borderRadius: 99,
-        border: '1px solid var(--praman-border)', fontSize: '0.78rem', fontWeight: 500,
-        color: 'var(--praman-ink-secondary)', marginBottom: '2rem',
+        border: '1px solid var(--praman-border)', fontSize: '0.78rem',
+        color: 'teal', fontWeight: 700, marginBottom: '2rem',
       }}>
         Open Source &middot; Agentic-First
       </span>
       <h1 className="hero__title">
-        Transform your SAP to S/4 HANA with evidence, not hope.
+        Transform your SAP to S/4 HANA with Quality, not hope.
       </h1>
       <p className="hero__subtitle" style={{ marginBottom: '1.5rem' }}>
         Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA.

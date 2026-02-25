@@ -10,8 +10,6 @@ Instead, email <security@zestest.in> with:
 - Steps to reproduce
 - Impact assessment
 
-You should receive a response within 72 hours.
-
 ## Supported Versions
 
 | Version | Supported |

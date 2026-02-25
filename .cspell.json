@@ -70,7 +70,9 @@
 
     "microbenchmarks", "Microbenchmarks",
 
-    "TESTUSER", "testuser"
+    "TESTUSER", "testuser",
+
+    "apos"
   ],
   "ignorePaths": [
     "node_modules", "dist", "coverage", "*.lock",
