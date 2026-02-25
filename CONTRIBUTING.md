@@ -99,13 +99,14 @@ All errors must extend `PramanError` and include: `code`, `attempted`,
 
 ### Linting (Zero Tolerance)
 
-10 ESLint plugins enforced with `--max-warnings=0`:
+11 ESLint plugins enforced with `--max-warnings=0`:
 
 - typescript-eslint (strict type-checked)
 - eslint-plugin-tsdoc, eslint-plugin-playwright
 - eslint-plugin-security, @microsoft/eslint-plugin-sdl
 - eslint-plugin-sonarjs, eslint-plugin-n
 - eslint-plugin-promise, eslint-plugin-import-x, eslint-plugin-unicorn
+- eslint-plugin-headers (Apache-2.0 `@license` header enforcement)
 
 Target: **0 errors, 0 warnings** in CI.
 

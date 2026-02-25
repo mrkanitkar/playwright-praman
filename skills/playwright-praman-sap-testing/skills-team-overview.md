@@ -276,6 +276,7 @@ throw new ControlError({
 | **eslint-plugin-promise**        | Promise/async best practices     | Included in lint       | Blocking                   |
 | **eslint-plugin-import-x**       | Import hygiene                   | Included in lint       | Blocking                   |
 | **eslint-plugin-unicorn**        | Modernization rules              | Included in lint       | Blocking                   |
+| **eslint-plugin-headers**        | Apache-2.0 `@license` header     | Included in lint       | Blocking                   |
 | **TypeScript 5.9**               | Type checking (strict)           | `npm run typecheck`    | 0 errors                   |
 | **Vitest**                       | Unit tests (hermetic)            | `npm run test:unit`    | Tiered: 100%/95%/90%       |
 | **tsup**                         | ESM bundle build                 | `npm run build`        | Clean build                |

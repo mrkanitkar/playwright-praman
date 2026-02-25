@@ -83,11 +83,12 @@ For multi-skill tasks, load primary + supporting skill(s). Example:
 - Custom tags: `@intent`, `@guarantee`, `@capability`, `@recipe`, `@ai`, `@aiContext`, `@sapModule`, `@businessContext`
 - Reference: `docs/documentation-standards.md`
 
-## ESLint (10 Plugins — Zero Tolerance)
+## ESLint (11 Plugins — Zero Tolerance)
 
 - typescript-eslint (strict type-checked), eslint-plugin-tsdoc, eslint-plugin-playwright
 - eslint-plugin-security, @microsoft/eslint-plugin-sdl, eslint-plugin-sonarjs
 - eslint-plugin-n, eslint-plugin-promise, eslint-plugin-import-x, eslint-plugin-unicorn
+- eslint-plugin-headers — Apache-2.0 `@license` header enforcement on every source file
 - Target: 0 errors, 0 warnings
 
 ## When Writing Tests
