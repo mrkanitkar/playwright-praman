@@ -17,7 +17,7 @@ SAP Fiori Elements (FE) apps are generated from OData service metadata + annotat
 They follow predictable patterns — Praman's FE fixture captures these patterns.
 
 ```typescript
-import { moduleTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
 // FE apps use SmartTable, SmartFilterBar, ObjectPage
 test('list report test', async ({ ui5, ui5Navigation }) => {
@@ -40,7 +40,7 @@ A Fiori Elements ListReport page has:
 - **Toolbar** — actions above the table (Create, Delete, etc.)
 
 ```typescript
-import { moduleTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
 test('filter and select purchase orders', async ({ ui5, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
@@ -209,15 +209,15 @@ await ui5.click({
 Praman includes a FE-specific library for common Fiori Elements patterns:
 
 ```typescript
-import { FETestLibrary } from 'playwright-praman/fe';
+import { initializeFETestLibrary, type FETestLibraryInstance } from 'playwright-praman/fe';
 
 test('FE list report', async ({ page }) => {
-  const fe = new FETestLibrary(page);
-
-  // Initialize FE test library (detects app type)
-  await fe.init();
+  const fe = await initializeFETestLibrary(page);
 
   // List Report operations
+  // NOTE: The fluent API methods below (fe.filterBar.setField, fe.table.getCount, etc.)
+  // are illustrative. Verify the actual API surface against src/fe/fe-test-library.ts
+  // as method names and signatures may differ from this documented pattern.
   await fe.filterBar.setField('Supplier', 'SUP-001');
   await fe.filterBar.search();
   const rowCount = await fe.table.getCount();

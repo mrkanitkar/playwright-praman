@@ -42,9 +42,11 @@ UI5 control structure, and produce comprehensive test plans with gold-standard `
 
 ## MANDATORY PREFLIGHT
 
-Before ANY work, read the Praman skill file to understand the plugin API:
+Before ANY work, read the Praman skill file to understand the plugin API.
+Try the first path, fall back to the second:
 
 ```text
+.github/skills/sap-test-automation/SKILL.md
 skills/playwright-praman-sap-testing/SKILL.md
 ```
 
@@ -768,42 +770,42 @@ browser_run_code({
 
 When generating `.spec.ts` files, use ONLY these Praman fixture APIs:
 
-| Fixture           | Method                                      | Purpose                     |
-| ----------------- | ------------------------------------------- | --------------------------- |
-| `ui5`             | `.control({ id, controlType, properties })` | Find UI5 control            |
-| `ui5`             | `.click(selector)`                          | Click (shorthand)           |
-| `ui5`             | `.fill(selector, value)`                    | Fill input (shorthand)      |
-| `ui5`             | `.waitForUI5()`                             | Wait for UI5 stability      |
-| `ui5.table`       | `.getRows(tableId)`                         | Get table rows              |
-| `ui5.table`       | `.getRowCount(tableId)`                     | Get row count               |
-| `ui5.table`       | `.getData(tableId)`                         | Get all table data          |
-| `ui5.table`       | `.clickRow(tableId, index)`                 | Click row by index          |
-| `ui5.table`       | `.findRowByValues(tableId, vals)`           | Find row matching values    |
-| `ui5.dialog`      | `.waitFor()`                                | Wait for dialog open        |
-| `ui5.dialog`      | `.isOpen(dialogId)`                         | Check if dialog open        |
-| `ui5.dialog`      | `.confirm()`                                | Click OK/Confirm            |
-| `ui5.dialog`      | `.dismiss()`                                | Click Cancel/Close          |
-| `ui5.dialog`      | `.getButtons(dialogId)`                     | Get dialog buttons          |
-| `ui5.dialog`      | `.waitForClosed(dialogId)`                  | Wait for dialog close       |
-| `ui5.date`        | `.setDatePicker(id, date)`                  | Set date value              |
-| `ui5.date`        | `.getDatePicker(id)`                        | Get date value              |
-| `ui5.date`        | `.setDateRange(id, from, to)`               | Set date range              |
-| `ui5.odata`       | `.queryEntities(url, entity, opts)`         | Query OData entity          |
-| `ui5.odata`       | `.waitForLoad()`                            | Wait for OData load         |
-| `ui5Navigation`   | `.navigateToTile(title)`                    | Click FLP tile by title     |
-| `ui5Navigation`   | `.navigateToApp(hash)`                      | Navigate by semantic object |
-| `ui5Navigation`   | `.navigateToIntent(obj, opts)`              | Navigate by intent          |
-| `ui5Navigation`   | `.navigateBack()`                           | Navigate back               |
-| `ui5Navigation`   | `.navigateToHome()`                         | Go to FLP home              |
-| **Control proxy** | `.press()`                                  | Click/press button          |
-| **Control proxy** | `.setValue(val)`                            | Set input value             |
-| **Control proxy** | `.getValue()`                               | Get input value             |
-| **Control proxy** | `.getProperty(name)`                        | Get any property            |
-| **Control proxy** | `.fireChange({ value })`                    | Fire change event           |
-| **Control proxy** | `.setSelectedKey(key)`                      | Set dropdown key            |
-| **Control proxy** | `.open()` / `.close()`                      | Open/close dropdown         |
-| **Control proxy** | `.getItems()`                               | Get dropdown items          |
-| **Control proxy** | `.isOpen()`                                 | Check if open               |
+| Fixture           | Method                                                                     | Purpose                     |
+| ----------------- | -------------------------------------------------------------------------- | --------------------------- |
+| `ui5`             | `.control({ id, controlType, properties })`                                | Find UI5 control            |
+| `ui5`             | `.click(selector)`                                                         | Click (shorthand)           |
+| `ui5`             | `.fill(selector, value)`                                                   | Fill input (shorthand)      |
+| `ui5`             | `.waitForUI5()`                                                            | Wait for UI5 stability      |
+| `ui5.table`       | `.getRows(tableId)`                                                        | Get table rows              |
+| `ui5.table`       | `.getRowCount(tableId)`                                                    | Get row count               |
+| `ui5.table`       | `.getData(tableId)`                                                        | Get all table data          |
+| `ui5.table`       | `.clickRow(tableId, index)`                                                | Click row by index          |
+| `ui5.table`       | `.findRowByValues(tableId, vals)`                                          | Find row matching values    |
+| `ui5.dialog`      | `.waitFor()`                                                               | Wait for dialog open        |
+| `ui5.dialog`      | `.isOpen(dialogId)`                                                        | Check if dialog open        |
+| `ui5.dialog`      | `.confirm()`                                                               | Click OK/Confirm            |
+| `ui5.dialog`      | `.dismiss()`                                                               | Click Cancel/Close          |
+| `ui5.dialog`      | `.getButtons(dialogId)`                                                    | Get dialog buttons          |
+| `ui5.dialog`      | `.waitForClosed(dialogId)`                                                 | Wait for dialog close       |
+| `ui5.date`        | `.setDatePicker(id, date)`                                                 | Set date value              |
+| `ui5.date`        | `.getDatePicker(id)`                                                       | Get date value              |
+| `ui5.date`        | `.setDateRange(id, from, to)`                                              | Set date range              |
+| `ui5.odata`       | `.queryEntities(url, entity, opts)`                                        | Query OData entity          |
+| `ui5.odata`       | `.waitForLoad()`                                                           | Wait for OData load         |
+| `ui5Navigation`   | `.navigateToTile(title)`                                                   | Click FLP tile by title     |
+| `ui5Navigation`   | `.navigateToApp(hash)`                                                     | Navigate by semantic object |
+| `ui5Navigation`   | `.navigateToIntent(intent: { semanticObject, action }, params?, options?)` | Navigate by intent          |
+| `ui5Navigation`   | `.navigateBack()`                                                          | Navigate back               |
+| `ui5Navigation`   | `.navigateToHome()`                                                        | Go to FLP home              |
+| **Control proxy** | `.press()`                                                                 | Click/press button          |
+| **Control proxy** | `.setValue(val)`                                                           | Set input value             |
+| **Control proxy** | `.getValue()`                                                              | Get input value             |
+| **Control proxy** | `.getProperty(name)`                                                       | Get any property            |
+| **Control proxy** | `.fireChange({ value })`                                                   | Fire change event           |
+| **Control proxy** | `.setSelectedKey(key)`                                                     | Set dropdown key            |
+| **Control proxy** | `.open()` / `.close()`                                                     | Open/close dropdown         |
+| **Control proxy** | `.getItems()`                                                              | Get dropdown items          |
+| **Control proxy** | `.isOpen()`                                                                | Check if open               |
 
 ---
 

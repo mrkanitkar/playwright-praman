@@ -100,11 +100,11 @@ import { z } from 'zod';
 
 // 3. Internal (path aliases via tsconfig paths)
 import { PramanError } from '#core/errors';
-import { logger } from '#core/logging';
+import { createLogger } from '#core/logging';
 import type { UI5Selector } from '#core/types';
 
 // 4. Parent directory
-import { BridgeAdapter } from '../adapter.js';
+import { someHelper } from '../helpers.js';
 
 // 5. Sibling
 import { parseSelector } from './selector-parser.js';
@@ -139,7 +139,7 @@ export async function findControl(
   selector: UI5Selector,
   config: Readonly<PramanConfig>,
 ): Promise<ControlHandle> {
-  const log = logger.child({ module: 'bridge', selector });
+  const log = createLogger('bridge');
 
   try {
     const handle = await page.evaluate(
@@ -306,7 +306,7 @@ export class ControlError extends PramanError {
 import { z } from 'zod';
 
 const LogLevel = z.enum(['error', 'warn', 'info', 'debug', 'verbose']);
-const InteractionStrategyKind = z.enum(['playwright', 'dom-first', 'opa5', 'hybrid']);
+const InteractionStrategyKind = z.enum(['ui5-native', 'dom-first', 'opa5']);
 const AuthStrategyKind = z.enum(['btp-saml', 'basic', 'office365', 'custom']);
 
 export const PramanConfigSchema = z
@@ -314,7 +314,7 @@ export const PramanConfigSchema = z
     logLevel: LogLevel.default('info'),
     ui5WaitTimeout: z.number().int().positive().default(30_000),
     controlDiscoveryTimeout: z.number().int().positive().default(10_000),
-    interactionStrategy: InteractionStrategyKind.default('hybrid'),
+    interactionStrategy: InteractionStrategyKind.default('ui5-native'),
     skipStabilityWait: z.boolean().default(false),
     preferVisibleControls: z.boolean().default(true),
     auth: z
@@ -346,8 +346,13 @@ export type PramanConfig = Readonly<z.infer<typeof PramanConfigSchema>>;
 import { PramanConfigSchema, type PramanConfig } from './schema.js';
 import { ConfigError } from '#core/errors';
 
-export function loadConfig(raw: unknown): PramanConfig {
-  const result = PramanConfigSchema.safeParse(raw);
+export async function loadConfig(options?: {
+  overrides?: Partial<PramanConfig>;
+}): Promise<Readonly<PramanConfig>> {
+  // Discovers praman.config.ts via cosmiconfig, merges overrides, validates via Zod
+  const raw = await discoverConfig(); // internal cosmiconfig lookup
+  const merged = options?.overrides ? { ...raw, ...options.overrides } : raw;
+  const result = PramanConfigSchema.safeParse(merged);
 
   if (!result.success) {
     throw new ConfigError({
@@ -388,30 +393,23 @@ const REDACTION_PATHS = [
   '*.token',
 ];
 
-export function createLogger(config: Readonly<PramanConfig>): pino.Logger {
-  return pino({
-    name: 'praman',
-    level: config.logLevel,
-    redact: {
-      paths: REDACTION_PATHS,
-      censor: '[REDACTED]',
-    },
-    serializers: {
-      err: pino.stdSerializers.err,
-    },
-  });
+export function createLogger(module: string, parentLogger?: Logger): Logger {
+  // If parentLogger provided, creates a child. Otherwise uses default root.
+  const parent = parentLogger ?? getDefaultRootLogger();
+  return parent.child({ module });
 }
 
-// Module-level child logger pattern:
-// const log = logger.child({ module: 'bridge' });
-// log.info({ selector }, 'Finding control');
+// Module-level logger pattern:
+// import { createLogger } from '#core/logging';
+// const logger = createLogger('bridge');
+// logger.info({ selector }, 'Finding control');
 ```
 
 ### 3.4 Retry with Backoff + Jitter (Layer 1, BP-GOOGLE/SRE)
 
 ```typescript
 // src/core/utils/retry.ts
-import { logger } from '#core/logging';
+import { createLogger } from '#core/logging';
 
 export interface RetryOptions {
   readonly maxRetries: number;
@@ -426,18 +424,18 @@ const DEFAULT_RETRY: RetryOptions = {
   maxMs: 5000,
 };
 
-export async function withRetry<T>(
-  operation: () => Promise<T>,
+export async function retry<T>(
+  fn: () => Promise<T>,
   options: Partial<RetryOptions> = {},
 ): Promise<T> {
   const opts = { ...DEFAULT_RETRY, ...options };
-  const log = logger.child({ module: 'retry' });
+  const log = createLogger('retry');
 
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= opts.maxRetries; attempt++) {
     try {
-      return await operation();
+      return await fn();
     } catch (error: unknown) {
       lastError = error;
 
@@ -462,55 +460,46 @@ export async function withRetry<T>(
 
 ## 4. Bridge Implementation Patterns (Layer 2)
 
-### 4.1 Bridge Adapter
+### 4.1 Bridge Pattern (evaluateInBrowser)
+
+Praman uses a single `page.evaluate()`-based bridge pattern. There is no adapter
+abstraction or `BridgeAdapter` interface. All browser-side calls go through
+`page.evaluate()` with self-contained functions that access `sap.*` APIs directly.
 
 ```typescript
-// src/bridge/classic-adapter.ts
-import type { Page } from '@playwright/test';
-import type { BridgeAdapter, ControlHandle, MethodResult } from './adapter.js';
-import type { UI5Selector } from '#core/types';
-import { BridgeError } from '#core/errors';
-import { logger } from '#core/logging';
+// src/bridge/scripts/ — browser-evaluated scripts
+// Each script is a self-contained function passed to page.evaluate()
 
-export class ClassicUI5Adapter implements BridgeAdapter {
-  private readonly log = logger.child({ module: 'bridge-classic' });
+// Example: inject __praman_getById helper into the page
+async function injectBridgeHelpers(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    // Register __praman_getById (D19)
+    window.__praman_getById = (id: string) => {
+      // Tier 1: ElementRegistry (UI5 1.108+)
+      try {
+        const Reg = sap.ui.require('sap/ui/core/ElementRegistry');
+        if (Reg) return Reg.get(id);
+      } catch {
+        /* fall through */
+      }
 
-  async inject(page: Page): Promise<void> {
-    await page.evaluate(() => {
-      // Register __praman_getById (D19)
-      window.__praman_getById = (id: string) => {
-        // Tier 1: ElementRegistry (UI5 1.108+)
-        try {
-          const Reg = sap.ui.require('sap/ui/core/ElementRegistry');
-          if (Reg) return Reg.get(id);
-        } catch {
-          /* fall through */
-        }
+      // Tier 2: Core.byId
+      try {
+        return sap.ui.getCore().byId(id);
+      } catch {
+        /* fall through */
+      }
 
-        // Tier 2: Core.byId
-        try {
-          return sap.ui.getCore().byId(id);
-        } catch {
-          /* fall through */
-        }
+      // Tier 3: Element.getElementById (deprecated)
+      try {
+        return sap.ui.core.Element.getElementById(id);
+      } catch {
+        /* fall through */
+      }
 
-        // Tier 3: Element.getElementById (deprecated)
-        try {
-          return sap.ui.core.Element.getElementById(id);
-        } catch {
-          /* fall through */
-        }
-
-        return undefined;
-      };
-    });
-  }
-
-  async findControl(page: Page, selector: UI5Selector): Promise<ControlHandle> {
-    // Implementation using page.evaluate() to run browser-side discovery
-    // Uses __praman_getById for ID-based, RecordReplay for property-based
-    // ...
-  }
+      return undefined;
+    };
+  });
 }
 ```
 
@@ -548,10 +537,21 @@ export function createFindControlScript() {
 ### 4.3 Interaction Strategy Pattern (D21)
 
 ```typescript
-// src/bridge/interaction-strategies/shared.ts — extracted shared logic
+// src/bridge/interaction-strategies/strategy.ts — InteractionStrategy interface
 import type { Page } from '@playwright/test';
 
-export async function fireEvent(
+/**
+ * Each strategy implements press/enterText/select for UI5 controls.
+ * Strategies: 'ui5-native' (default), 'dom-first', 'opa5'.
+ */
+export interface InteractionStrategy {
+  press(page: Page, controlId: string): Promise<void>;
+  enterText(page: Page, controlId: string, text: string): Promise<void>;
+  select(page: Page, controlId: string, itemId: string): Promise<void>;
+}
+
+// Helper: fire a UI5 event on a control via page.evaluate()
+async function fireEvent(
   page: Page,
   controlId: string,
   eventName: string,
@@ -566,17 +566,6 @@ export async function fireEvent(
     { id: controlId, event: eventName, eventParams: params },
   );
 }
-
-export async function getBridgeAccessor(page: Page, controlId: string): Promise<unknown> {
-  return page.evaluate(
-    ({ id }) => {
-      const control = window.__praman_getById(id);
-      if (!control) throw new Error(`Control not found: ${id}`);
-      return control;
-    },
-    { id: controlId },
-  );
-}
 ```
 
 ---
@@ -586,19 +575,23 @@ export async function getBridgeAccessor(page: Page, controlId: string): Promise<
 ### 5.1 Single Unified Proxy Handler (D16)
 
 ```typescript
-// src/proxy/dynamic-proxy.ts — SINGLE handler (no double-proxy!)
+// src/proxy/control-proxy.ts — SINGLE handler (no double-proxy!)
 import type { Page } from '@playwright/test';
-import type { BridgeAdapter } from '#bridge/adapter';
-import type { ControlHandle } from '#bridge/adapter';
+import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
 
-export function createControlProxy(
-  handle: ControlHandle,
-  page: Page,
-  adapter: BridgeAdapter,
-): UI5ControlProxy {
+export interface ControlProxyState {
+  readonly id: string;
+  readonly controlType: string;
+  readonly methods: ReadonlySet<string>;
+  readonly page: Page;
+  readonly interactionStrategy: InteractionStrategy;
+  readonly skipStabilityWait?: boolean | undefined;
+}
+
+export function createControlProxy(state: ControlProxyState): UI5ControlBase {
   const methodBlacklist = new Set(METHOD_BLACKLIST);
 
-  return new Proxy({} as UI5ControlProxy, {
+  return new Proxy({} as UI5ControlBase, {
     get(target, prop: string | symbol) {
       // 1. Promise interop — prevent auto-thenable
       if (prop === 'then' || prop === 'catch' || prop === 'finally') {
@@ -606,8 +599,9 @@ export function createControlProxy(
       }
 
       // 2. Known typed methods (press, setValue, getText, etc.)
+      // Routes through interactionStrategy or page.evaluate() as appropriate
       if (typeof prop === 'string' && isKnownMethod(prop)) {
-        return (...args: unknown[]) => adapter.executeMethod(handle, prop, args);
+        return (...args: unknown[]) => executeMethod(state.page, state.id, prop, args);
       }
 
       // 3. Blacklisted methods — throw descriptive error
@@ -616,18 +610,18 @@ export function createControlProxy(
           throw new ControlError({
             code: 'ERR_METHOD_BLACKLISTED',
             message: `Method '${prop}' is blacklisted and cannot be called on UI5 controls`,
-            attempted: `Call ${prop}() on ${handle.controlType}`,
+            attempted: `Call ${prop}() on ${state.controlType}`,
             retryable: false,
             severity: 'warning',
-            details: { method: prop, controlType: handle.controlType },
+            details: { method: prop, controlType: state.controlType },
             suggestions: [`Use a specific praman method instead of '${prop}'`],
           });
         };
       }
 
-      // 4. Unknown methods — forward to bridge (dynamic method call)
+      // 4. Unknown methods — forward to bridge via page.evaluate()
       if (typeof prop === 'string') {
-        return (...args: unknown[]) => adapter.executeMethod(handle, prop, args);
+        return (...args: unknown[]) => executeMethod(state.page, state.id, prop, args);
       }
 
       return undefined;
@@ -639,15 +633,11 @@ export function createControlProxy(
 ### 5.2 Seven-Type Return Handler (CF2)
 
 ```typescript
-// Part of dynamic-proxy.ts — handle method return values
+// Part of control-proxy.ts — handle method return values
 
 type ReturnType = 'empty' | 'result' | 'element' | 'newElement' | 'aggregation' | 'object' | 'none';
 
-function handleMethodReturn(
-  returnValue: BrowserMethodResult,
-  page: Page,
-  adapter: BridgeAdapter,
-): unknown {
+function handleMethodReturn(returnValue: BrowserMethodResult, state: ControlProxyState): unknown {
   switch (returnValue.returnType) {
     case 'empty':
       return undefined;
@@ -656,20 +646,20 @@ function handleMethodReturn(
       return returnValue.value; // primitive
 
     case 'element':
-      return createControlProxy(returnValue.handle, page, adapter); // same control
+      return createControlProxy({ ...state, ...returnValue.handle }); // same control
 
     case 'newElement':
-      return createControlProxy(returnValue.handle, page, adapter); // new control
+      return createControlProxy({ ...state, ...returnValue.handle }); // new control
 
     case 'aggregation':
-      return returnValue.handles.map((h) => createControlProxy(h, page, adapter));
+      return returnValue.handles.map((h) => createControlProxy({ ...state, ...h }));
 
     case 'object':
-      return createUI5ObjectProxy(returnValue.uuid, returnValue.type, page);
+      return createUI5ObjectProxy(returnValue.uuid, returnValue.type, state.page);
 
     case 'none':
     default:
-      logger.warn({ returnValue }, 'Unclassified method return');
+      createLogger('proxy').warn({ returnValue }, 'Unclassified method return');
       return undefined;
   }
 }
@@ -683,26 +673,21 @@ import { test as base } from '@playwright/test';
 import type { PramanConfig } from '#core/types';
 import { loadConfig } from '#core/config';
 
-// Lazy loading (D2, BP-CLAUDE)
-type UI5Fixture = import('#proxy/dynamic-proxy').UI5Fixture;
+// Fixtures are defined incrementally via test.extend()
+// There is no single "UI5Fixture" aggregate type — each fixture has its own type
 
-export const test = base.extend<{
-  config: Readonly<PramanConfig>;
-  ui5: UI5Fixture;
-}>({
+export const test = base.extend<PramanTestFixtures>({
   config: async ({}, use) => {
-    const raw = await import(/* dynamic config load */);
-    const config = loadConfig(raw);
+    const config = await loadConfig(); // async — discovers & validates config
     await use(config);
   },
 
   ui5: async ({ page, config }, use) => {
-    // Lazy import — only loaded when ui5 fixture is requested
-    const { createUI5Fixture } = await import('#proxy/dynamic-proxy');
-    const fixture = await createUI5Fixture(page, config);
-    await use(fixture);
+    // Setup: inject bridge, create handler
+    const handler = await createUI5Handler(page, config);
+    await use(handler);
     // Cleanup after test
-    await fixture.dispose();
+    await handler.dispose();
   },
 });
 ```
@@ -810,7 +795,7 @@ Before submitting ANY code, verify:
 - [ ] No `page.waitForTimeout()` — use `waitForUI5Stable()` or auto-retry assertions
 - [ ] File ≤ 300 LOC (or exception documented in comment at top of file)
 - [ ] No circular imports (check with IDE or `madge`)
-- [ ] Conventional Commit message: `feat(bridge): add ClassicUI5Adapter`
+- [ ] Conventional Commit message: `feat(bridge): add interaction strategy`
 
 ---
 

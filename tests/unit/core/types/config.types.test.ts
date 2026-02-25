@@ -98,8 +98,11 @@ describe('AIProvider', () => {
     expectTypeOf<'openai'>().toExtend<AIProvider>();
   });
 
+  it('accepts anthropic provider', () => {
+    expectTypeOf<'anthropic'>().toExtend<AIProvider>();
+  });
+
   it('rejects invalid AI providers', () => {
-    expectTypeOf<'anthropic'>().not.toExtend<AIProvider>();
     expectTypeOf<'google'>().not.toExtend<AIProvider>();
   });
 });

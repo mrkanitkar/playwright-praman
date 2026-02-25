@@ -178,6 +178,7 @@ function validateRawSelector(selectorString: string): void {
       code: ErrorCode.ERR_SELECTOR_PARSE,
       message: 'Selector string must not be empty',
       attempted: PARSE_ATTEMPTED,
+      retryable: false,
       selectorString,
       suggestions: [
         'Provide a non-empty selector string',
@@ -191,6 +192,7 @@ function validateRawSelector(selectorString: string): void {
       code: ErrorCode.ERR_SELECTOR_PARSE,
       message: `Selector string exceeds maximum length of ${String(MAX_SELECTOR_LENGTH)} characters`,
       attempted: PARSE_ATTEMPTED,
+      retryable: false,
       selectorString: selectorString.slice(0, 100) + '...',
       suggestions: [
         'Reduce the selector length',
@@ -204,6 +206,7 @@ function validateRawSelector(selectorString: string): void {
       code: ErrorCode.ERR_SELECTOR_PARSE,
       message: `Selector string must start with "${UI5_PREFIX}" prefix`,
       attempted: PARSE_ATTEMPTED,
+      retryable: false,
       selectorString,
       suggestions: [`Prefix your selector with "${UI5_PREFIX}"`, 'Example: ui5=sap.m.Button#myId'],
     });
@@ -245,6 +248,7 @@ export function parseUI5Selector(selectorString: string): UI5Selector {
       code: ErrorCode.ERR_SELECTOR_INVALID,
       message: 'Selector content after "ui5=" prefix must not be empty',
       attempted: PARSE_ATTEMPTED,
+      retryable: false,
       selectorString,
       suggestions: [
         'Provide a controlType, ID, or properties after the prefix',

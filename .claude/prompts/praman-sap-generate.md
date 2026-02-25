@@ -6,11 +6,11 @@ description: Generate 100% Praman-compliant SAP UI5 test scripts from a test pla
 Generate Praman-compliant tests from the test plan provided.
 
 **Seed file**: `tests/seeds/sap-seed.spec.ts`
-**Skill reference**: `skills/playwright-praman-sap-testing/SKILL.md`
+**Skill reference**: `.github/skills/sap-test-automation/SKILL.md` (or `skills/playwright-praman-sap-testing/SKILL.md`)
 
 Before starting, read:
 
-- `skills/playwright-praman-sap-testing/SKILL.md` (mandatory rules)
+- `.github/skills/sap-test-automation/SKILL.md` (mandatory rules)
 - `skills/playwright-praman-sap-testing/ai-quick-reference.md` (patterns)
 - `skills/playwright-praman-sap-testing/test-template.ts` (examples)
 - The test plan file provided

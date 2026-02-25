@@ -289,6 +289,7 @@ export class FLPLocksHandler {
           code: ErrorCode.ERR_FLP_PERMISSION_DENIED,
           message: `Permission denied when accessing ${url}`,
           attempted: `GET ${url}`,
+          retryable: false,
           flpService: 'SM12_SRV',
           suggestions: [
             'Verify the user has authorization for SM12 lock management',
@@ -302,6 +303,7 @@ export class FLPLocksHandler {
           code: ErrorCode.ERR_FLP_API_UNAVAILABLE,
           message: `SM12_SRV service unavailable (HTTP ${String(status)})`,
           attempted: `GET ${url}`,
+          retryable: true,
           flpService: 'SM12_SRV',
           suggestions: [
             'Verify the SM12_SRV OData service is activated in the SAP system',
@@ -323,6 +325,7 @@ export class FLPLocksHandler {
           code: ErrorCode.ERR_FLP_OPERATION_TIMEOUT,
           message: `Request timed out after ${String(this.timeout)}ms: ${url}`,
           attempted: `GET ${url}`,
+          retryable: true,
           flpService: 'SM12_SRV',
           suggestions: [
             'Increase the timeout value in FLPLocksHandlerOptions',
@@ -335,6 +338,7 @@ export class FLPLocksHandler {
         code: ErrorCode.ERR_FLP_API_UNAVAILABLE,
         message: `Failed to connect to SM12_SRV: ${message}`,
         attempted: `GET ${url}`,
+        retryable: true,
         flpService: 'SM12_SRV',
         suggestions: ['Verify the SAP system is reachable', 'Check the service URL configuration'],
       });
@@ -381,6 +385,7 @@ export class FLPLocksHandler {
         code: ErrorCode.ERR_FLP_PERMISSION_DENIED,
         message: `Permission denied when deleting lock entry: ${url}`,
         attempted: `DELETE ${url}`,
+        retryable: false,
         flpService: 'SM12_SRV',
         suggestions: [
           'Verify the user has authorization to delete SM12 lock entries',
@@ -394,6 +399,7 @@ export class FLPLocksHandler {
         code: ErrorCode.ERR_FLP_API_UNAVAILABLE,
         message: `Failed to delete lock entry (HTTP ${String(status)}): ${url}`,
         attempted: `DELETE ${url}`,
+        retryable: true,
         flpService: 'SM12_SRV',
         suggestions: [
           'The lock entry may have already been released',

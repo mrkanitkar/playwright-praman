@@ -528,7 +528,7 @@ async function detectUI5Mode(page: Page): Promise<'classic' | 'webcomponent' | '
 │            ┌──────────▼───────────────┐                                  │
 │            │   PRAMAN ADAPTER LAYER   │                                  │
 │            │                          │                                  │
-│            │  WebComponentAdapter:    │                                  │
+│            │  WC Interaction Strategy:│                                  │
 │            │  - Detects component type│                                  │
 │            │  - Routes to correct     │                                  │
 │            │    interaction strategy  │                                  │
@@ -959,91 +959,43 @@ test.describe('Behavioral equivalence: Button press', () => {
 
 ## 9. Praman Integration Patterns
 
-### 9.1 WebComponentAdapter Design
+### 9.1 Web Component Interaction Strategy
 
-````typescript
-// The WebComponentAdapter in Praman handles Web Component specifics
-// in the bridge layer (Layer 2)
+Praman does **not** use a separate `WebComponentAdapter` class. Instead, it relies on
+**Playwright's built-in Shadow DOM support**, which automatically pierces open shadow roots
+when using `locator()`. For classic UI5 controls, Praman's bridge/RecordReplay path is used.
+For standalone Web Components (e.g., `<ui5-button>`, `<ui5-input>`), Playwright locators
+interact with them directly.
 
-/**
- * Adapter for SAP UI5 Web Components.
- *
- * @remarks
- * Handles Shadow DOM piercing, custom event listening,
- * and property access on custom elements.
- *
- * @example
- * ```typescript
- * const adapter = new WebComponentAdapter(page);
- * await adapter.setProperty('ui5-input#name', 'value', 'Test');
- * const val = await adapter.getProperty('ui5-input#name', 'value');
- * ```
- */
-interface WebComponentAdapter {
-  /**
-   * Gets a property value from a Web Component host element.
-   *
-   * @param selector - CSS selector for the Web Component
-   * @param property - Property name (JavaScript property, not HTML attribute)
-   * @returns The property value
-   */
-  getProperty(selector: string, property: string): Promise<unknown>;
+```typescript
+// Web Components use Shadow DOM — Praman uses Playwright's native support
 
-  /**
-   * Sets a property on a Web Component host element.
-   *
-   * @param selector - CSS selector for the Web Component
-   * @param property - Property name
-   * @param value - Value to set
-   */
-  setProperty(selector: string, property: string, value: unknown): Promise<void>;
+// Direct Web Component element interaction
+await page.locator('ui5-button').click();
 
-  /**
-   * Dispatches a custom event on a Web Component.
-   *
-   * @param selector - CSS selector for the Web Component
-   * @param eventName - Custom event name (e.g., 'selection-change')
-   * @param detail - Event detail payload
-   */
-  dispatchEvent(selector: string, eventName: string, detail?: unknown): Promise<void>;
+// Shadow DOM piercing to reach inner elements
+await page.locator('ui5-input').locator('input').fill('value');
 
-  /**
-   * Waits for a Web Component to complete its rendering cycle.
-   *
-   * @param selector - CSS selector for the Web Component
-   * @param timeout - Maximum wait time in milliseconds
-   */
-  waitForRendered(selector: string, timeout?: number): Promise<void>;
+// Getting/setting properties via evaluate()
+const value = await page.locator('ui5-input#name').evaluate((el) => (el as HTMLInputElement).value);
 
-  /**
-   * Checks if an element is a UI5 Web Component (has Shadow DOM and UI5 metadata).
-   *
-   * @param selector - CSS selector to check
-   * @returns True if the element is a UI5 Web Component
-   */
-  isWebComponent(selector: string): Promise<boolean>;
+await page.locator('ui5-input#name').evaluate((el, val) => {
+  (el as HTMLInputElement).value = val;
+}, 'Test');
 
-  /**
-   * Gets the tag name of a Web Component (e.g., 'ui5-button', 'ui5-input').
-   *
-   * @param selector - CSS selector for the element
-   * @returns The custom element tag name
-   */
-  getTagName(selector: string): Promise<string>;
+// Dispatching custom events (kebab-case names)
+await page.locator('ui5-select').evaluate((el) => {
+  el.dispatchEvent(new CustomEvent('selection-change', { bubbles: true }));
+});
 
-  /**
-   * Gets all slotted children of a Web Component.
-   *
-   * @param selector - CSS selector for the Web Component
-   * @param slotName - Named slot (omit for default slot)
-   * @returns Array of slotted element info
-   */
-  getSlottedChildren(
-    selector: string,
-    slotName?: string,
-  ): Promise<Array<{ tagName: string; textContent: string }>>;
-}
-````
+// Checking if an element is a Web Component
+const isWC = await page
+  .locator('#myElement')
+  .evaluate((el) => el.shadowRoot !== null && el.tagName.startsWith('UI5-'));
+
+// For UI5 Web Components, standard ui5.waitForUI5() handles stability
+await ui5.waitForUI5();
+```
 
 ### 9.2 Praman Control Resolution for Web Components
 
@@ -1080,60 +1032,33 @@ interface WebComponentAdapter {
  */
 ````
 
-### 9.3 waitForUI5Stable() with Web Components
+### 9.3 waitForUI5() Covers Web Components
 
-````typescript
-// Extended stability check that includes Web Component rendering
+Praman does **not** require a separate `waitForUI5StableWithWebComponents()` function.
+The standard `ui5.waitForUI5()` already handles Web Component rendering state in addition
+to classic UI5 busy indicators and pending OData requests.
 
-/**
- * Wait for both classic UI5 and Web Components to be stable.
- *
- * @remarks
- * Checks:
- * 1. Classic UI5 busy indicators (if UI5 core loaded)
- * 2. Pending OData requests (model pending changes)
- * 3. Web Component rendering queue (UI5Element._invalidated flag)
- * 4. Open popovers/dialogs completing animation
- *
- * @example
- * ```typescript
- * await ui5.waitForUI5Stable();
- * // Now safe to assert on both classic and WC elements
- * ```
- */
-async function waitForUI5StableWithWebComponents(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    return new Promise<void>((resolve) => {
-      const check = (): void => {
-        // Classic UI5 busy check
-        let classicBusy = false;
-        if (typeof sap !== 'undefined' && sap.ui?.getCore) {
-          classicBusy = sap.ui.getCore().getUIDirty?.() === true;
-        }
+```typescript
+// Standard stability wait — works for both classic UI5 and Web Components
+await ui5.waitForUI5();
+// Now safe to assert on both classic and WC elements
 
-        // Web Component rendering queue check
-        const pendingRenders = document.querySelectorAll('[ui5-rendering]').length > 0;
+// If you need to wait specifically for a Web Component to be defined:
+await page.waitForFunction(() => customElements.get('ui5-button') !== undefined);
 
-        // OData pending requests check
-        let odataPending = false;
-        if (typeof sap !== 'undefined' && sap.ui?.getCore) {
-          const models = sap.ui.getCore().getModel?.();
-          if (models && typeof models.hasPendingChanges === 'function') {
-            odataPending = models.hasPendingChanges();
-          }
-        }
+// For Playwright-only assertions, auto-retry handles timing naturally:
+await expect(page.locator('ui5-table-row')).toHaveCount(5);
+```
 
-        if (!classicBusy && !pendingRenders && !odataPending) {
-          resolve();
-        } else {
-          requestAnimationFrame(check);
-        }
-      };
-      check();
-    });
-  });
-}
-````
+**Why no separate function?** Praman's `waitForUI5()` internally checks:
+
+1. Classic UI5 busy indicators (if UI5 core is loaded)
+2. Pending OData requests (model pending changes)
+3. Web Component rendering queue
+4. Open popovers/dialogs completing animation
+
+This unified approach avoids the confusion of choosing between two stability functions
+in hybrid apps.
 
 ---
 
@@ -1349,7 +1274,7 @@ test('should test CAP + React + Web Components app', async ({ page }) => {
 | **SAP OData Expert**  | OData protocol details for data binding validation          |
 | **Fiori Consultant**  | Business process context, Fiori floorplan patterns          |
 | **TDD Agent**         | RED-GREEN-REFACTOR workflow for test-first development      |
-| **Implementer**       | TypeScript patterns for WebComponentAdapter implementation  |
+| **Implementer**       | Playwright shadow DOM selectors for Web Components          |
 
 ### 14.2 Skills That Depend On Me
 

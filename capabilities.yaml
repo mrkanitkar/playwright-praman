@@ -40,6 +40,7 @@ categories:
   footer: { prefix: FOOTER, description: 'Footer toolbar actions' }
   flp: { prefix: FLP, description: 'Fiori Launchpad services (locks, settings)' }
   ai: { prefix: AI, description: 'AI-powered discovery and context building' }
+  assert: { prefix: ASSERT, description: 'UI5-aware custom matchers for assertions' }
   data: { prefix: DATA, description: 'Test data generation, persistence, and cleanup' }
 
 capabilities:
@@ -253,6 +254,85 @@ capabilities:
     priority: fixture
     usageExample: |
       await ui5.destroy();
+    registryVersion: 1
+
+  - id: UI5-UI5-017
+    qualifiedName: control.setValue
+    name: setValue
+    description: 'Set value on a control via proxy method forwarding.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Input
+      - sap.m.TextArea
+      - sap.m.SearchField
+      - sap.m.ComboBox
+      - sap.ui.comp.smartfield.SmartField
+    usageExample: |
+      const input = await ui5.control({ id: 'materialInput' });
+      await input.setValue('MAT-001');
+    registryVersion: 1
+
+  - id: UI5-UI5-018
+    qualifiedName: control.fireChange
+    name: fireChange
+    description: 'Fire change event on a control via proxy method forwarding.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.Input
+      - sap.m.TextArea
+      - sap.m.SearchField
+      - sap.m.ComboBox
+      - sap.ui.comp.smartfield.SmartField
+    usageExample: |
+      const input = await ui5.control({ id: 'materialInput' });
+      await input.fireChange({ value: 'MAT-001' });
+    registryVersion: 1
+
+  - id: UI5-UI5-019
+    qualifiedName: control.open
+    name: open
+    description: 'Open a control (e.g., ComboBox dropdown) via proxy.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.ComboBox
+      - sap.m.MultiComboBox
+      - sap.m.Select
+    usageExample: |
+      const combo = await ui5.control({ id: 'variantCombo' });
+      await combo.open();
+    registryVersion: 1
+
+  - id: UI5-UI5-020
+    qualifiedName: control.close
+    name: close
+    description: 'Close a control via proxy.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.ComboBox
+      - sap.m.MultiComboBox
+      - sap.m.Select
+    usageExample: |
+      const combo = await ui5.control({ id: 'variantCombo' });
+      await combo.close();
+    registryVersion: 1
+
+  - id: UI5-UI5-021
+    qualifiedName: control.setSelectedKey
+    name: setSelectedKey
+    description: 'Set selected key on selection control via proxy.'
+    category: ui5
+    priority: fixture
+    controlTypes:
+      - sap.m.ComboBox
+      - sap.m.MultiComboBox
+      - sap.m.Select
+    usageExample: |
+      const combo = await ui5.control({ id: 'variantCombo' });
+      await combo.setSelectedKey('1');
     registryVersion: 1
 
   # ════════════════════════════════════════════════════════════════════════════
@@ -2059,6 +2139,28 @@ capabilities:
       const controlId = await pramanAI.vocabulary.resolve('Vendor');
     registryVersion: 1
 
+  - id: UI5-AI-008
+    qualifiedName: capability-registry.forAI
+    name: forAI
+    description: 'Get all capabilities formatted for AI consumption.'
+    category: ai
+    priority: implementation
+    async: false
+    usageExample: |
+      const caps = pramanAI.capabilities.forAI();
+    registryVersion: 1
+
+  - id: UI5-AI-009
+    qualifiedName: capability-registry.byCategory
+    name: byCategory
+    description: 'Get capabilities filtered by category.'
+    category: ai
+    priority: implementation
+    async: false
+    usageExample: |
+      const tableCaps = pramanAI.capabilities.byCategory('table');
+    registryVersion: 1
+
   # ════════════════════════════════════════════════════════════════════════════
   # shell — SAP Shell header interactions (4 methods)
   # Namespace: ui5Shell
@@ -2343,4 +2445,79 @@ capabilities:
     priority: fixture
     usageExample: |
       await testData.cleanup();
+    registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # assert — UI5-aware custom matchers (7 methods)
+  # Namespace: matchers
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-ASSERT-001
+    qualifiedName: matchers.toHaveUI5Text
+    name: toHaveUI5Text
+    description: 'Assert control has expected text.'
+    category: assert
+    priority: fixture
+    usageExample: |
+      await expect(locator).toHaveUI5Text('Expected text');
+    registryVersion: 1
+
+  - id: UI5-ASSERT-002
+    qualifiedName: matchers.toBeUI5Visible
+    name: toBeUI5Visible
+    description: 'Assert UI5 control is visible.'
+    category: assert
+    priority: fixture
+    usageExample: |
+      await expect(locator).toBeUI5Visible();
+    registryVersion: 1
+
+  - id: UI5-ASSERT-003
+    qualifiedName: matchers.toBeUI5Enabled
+    name: toBeUI5Enabled
+    description: 'Assert UI5 control is enabled.'
+    category: assert
+    priority: fixture
+    usageExample: |
+      await expect(locator).toBeUI5Enabled();
+    registryVersion: 1
+
+  - id: UI5-ASSERT-004
+    qualifiedName: matchers.toHaveUI5Property
+    name: toHaveUI5Property
+    description: 'Assert control has specific property value.'
+    category: assert
+    priority: fixture
+    usageExample: |
+      await expect(locator).toHaveUI5Property('enabled', true);
+    registryVersion: 1
+
+  - id: UI5-ASSERT-005
+    qualifiedName: matchers.toHaveUI5ValueState
+    name: toHaveUI5ValueState
+    description: 'Assert control value state (Error, Warning, etc.).'
+    category: assert
+    priority: fixture
+    usageExample: |
+      await expect(locator).toHaveUI5ValueState('Success');
+    registryVersion: 1
+
+  - id: UI5-ASSERT-006
+    qualifiedName: matchers.toHaveUI5RowCount
+    name: toHaveUI5RowCount
+    description: 'Assert table has expected row count.'
+    category: assert
+    priority: fixture
+    usageExample: |
+      await expect(table).toHaveUI5RowCount(5);
+    registryVersion: 1
+
+  - id: UI5-ASSERT-007
+    qualifiedName: matchers.toHaveUI5CellText
+    name: toHaveUI5CellText
+    description: 'Assert table cell contains expected text.'
+    category: assert
+    priority: fixture
+    usageExample: |
+      await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');
     registryVersion: 1

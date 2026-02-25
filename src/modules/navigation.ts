@@ -121,6 +121,7 @@ export async function navigateToApp(
       code: ErrorCode.ERR_NAV_ROUTE_FAILED,
       message: 'Application ID must not be empty',
       attempted: 'Navigate to SAP application by semantic object hash',
+      retryable: false,
       suggestions: [
         'Provide a valid semantic object hash (e.g., "PurchaseOrder-manage")',
         'Check the FLP tile configuration for the correct app ID',
@@ -156,6 +157,7 @@ export async function navigateToTile(
       code: ErrorCode.ERR_NAV_TILE_NOT_FOUND,
       message: `FLP tile not found: "${tileTitle}"`,
       attempted: `Navigate to FLP tile with title: "${tileTitle}"`,
+      retryable: true,
       suggestions: [
         'Verify the tile title matches exactly (case-sensitive)',
         'Check if the FLP page has fully loaded (waitForUI5Stable)',

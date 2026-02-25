@@ -30,8 +30,8 @@ export type { BridgeMethodDescriptor, BridgeResult, BridgeReturnType } from './b
 export type { ValidationIssue } from './validation.js';
 
 // ── Branded types (branded.ts) ────────────────────────────────────
-export type { BindingPath, ControlId, EntitySetName, SemanticObject, ViewName } from './branded.js';
-export { bindingPath, controlId, entitySetName, semanticObject, viewName } from './branded.js';
+export type { BindingPath, ControlId, ViewName } from './branded.js';
+export { bindingPath, controlId, viewName } from './branded.js';
 
 // ── Template literal types ──────────────────────────────────────────
 

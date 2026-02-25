@@ -17,7 +17,7 @@
 
 export { ComplianceReporter, isPramanStep } from './compliance-reporter.js';
 export type {
-  ComplianceReport,
+  TestComplianceReport,
   ComplianceReporterOptions,
   TestComplianceEntry,
   TestComplianceStatus,

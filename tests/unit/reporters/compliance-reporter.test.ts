@@ -11,7 +11,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ComplianceReporter, isPramanStep } from '../../../src/reporters/compliance-reporter.js';
-import type { ComplianceReport } from '../../../src/reporters/compliance-reporter.js';
+import type { TestComplianceReport } from '../../../src/reporters/compliance-reporter.js';
 import {
   createMockFullConfig,
   createMockFullResult,
@@ -141,7 +141,7 @@ describe('ComplianceReporter', () => {
     await reporter.onEnd(createMockFullResult());
 
     const written = mockWriteFile.mock.calls[0]?.[1] as string;
-    const report: ComplianceReport = JSON.parse(written) as ComplianceReport;
+    const report: TestComplianceReport = JSON.parse(written) as TestComplianceReport;
 
     expect(report.totalTests).toBe(4);
     expect(report.compliantTests).toBe(2);
@@ -171,7 +171,7 @@ describe('ComplianceReporter', () => {
     expect(filePath).toContain('compliance-report.json');
     expect(encoding).toBe('utf8');
 
-    const report: ComplianceReport = JSON.parse(content) as ComplianceReport;
+    const report: TestComplianceReport = JSON.parse(content) as TestComplianceReport;
     expect(report.totalTests).toBe(1);
     expect(report.tests[0]?.testTitle).toBe('my test');
   });
@@ -188,7 +188,7 @@ describe('ComplianceReporter', () => {
     await reporter.onEnd(createMockFullResult());
 
     const written = mockWriteFile.mock.calls[0]?.[1] as string;
-    const report: ComplianceReport = JSON.parse(written) as ComplianceReport;
+    const report: TestComplianceReport = JSON.parse(written) as TestComplianceReport;
 
     expect(report.tests[0]?.status).toBe('compliant');
     expect(report.tests[0]?.totalSteps).toBe(0);
@@ -215,7 +215,7 @@ describe('ComplianceReporter', () => {
     await reporter.onEnd(createMockFullResult());
 
     const written = mockWriteFile.mock.calls[0]?.[1] as string;
-    const report: ComplianceReport = JSON.parse(written) as ComplianceReport;
+    const report: TestComplianceReport = JSON.parse(written) as TestComplianceReport;
 
     const entry = report.tests[0];
     expect(entry?.status).toBe('mixed');
@@ -257,7 +257,7 @@ describe('ComplianceReporter', () => {
     await reporter.onEnd(createMockFullResult());
 
     const written = mockWriteFile.mock.calls[0]?.[1] as string;
-    const report: ComplianceReport = JSON.parse(written) as ComplianceReport;
+    const report: TestComplianceReport = JSON.parse(written) as TestComplianceReport;
 
     // ISO date string should have 'T' separator and end with 'Z'
     expect(report.timestamp).toContain('T');

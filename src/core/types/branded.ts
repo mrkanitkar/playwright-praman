@@ -71,30 +71,6 @@ export type ViewName = Brand<string, 'ViewName'>;
 export type BindingPath = Brand<string, 'BindingPath'>;
 
 /**
- * A semantic object for intent-based navigation (e.g., `'PurchaseOrder'`).
- *
- * @example
- * ```typescript
- * import type { SemanticObject } from '#core/types/branded.js';
- *
- * function navigate(obj: SemanticObject, action: string): void { }
- * ```
- */
-export type SemanticObject = Brand<string, 'SemanticObject'>;
-
-/**
- * An OData entity set name (e.g., `'Products'`, `'PurchaseOrders'`).
- *
- * @example
- * ```typescript
- * import type { EntitySetName } from '#core/types/branded.js';
- *
- * function queryEntity(entitySet: EntitySetName): void { }
- * ```
- */
-export type EntitySetName = Brand<string, 'EntitySetName'>;
-
-/**
  * A CSS selector string (e.g., `'.sapMBtn'`, `'#myControl'`).
  *
  * @example
@@ -105,30 +81,6 @@ export type EntitySetName = Brand<string, 'EntitySetName'>;
  * ```
  */
 export type CSSSelector = Brand<string, 'CSSSelector'>;
-
-/**
- * An XPath expression string (e.g., `'//button[@id="submit"]'`).
- *
- * @example
- * ```typescript
- * import type { XPathSelector } from '#core/types/branded.js';
- *
- * function findByXPath(xpath: XPathSelector): void { }
- * ```
- */
-export type XPathSelector = Brand<string, 'XPathSelector'>;
-
-/**
- * An OData service URL (e.g., `'/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV'`).
- *
- * @example
- * ```typescript
- * import type { ODataUrl } from '#core/types/branded.js';
- *
- * function connectToService(url: ODataUrl): void { }
- * ```
- */
-export type ODataUrl = Brand<string, 'ODataUrl'>;
 
 /**
  * A Fiori Launchpad application ID (e.g., `'PurchaseOrder-manage'`).
@@ -236,40 +188,6 @@ export function bindingPath(path: string): BindingPath {
 }
 
 /**
- * Create a branded {@link SemanticObject} from a raw string.
- *
- * @param obj - Raw semantic object string.
- * @returns Branded semantic object.
- *
- * @example
- * ```typescript
- * import { semanticObject } from '#core/types/branded.js';
- *
- * const so = semanticObject('PurchaseOrder');
- * ```
- */
-export function semanticObject(obj: string): SemanticObject {
-  return obj as SemanticObject;
-}
-
-/**
- * Create a branded {@link EntitySetName} from a raw string.
- *
- * @param name - Raw entity set name string.
- * @returns Branded entity set name.
- *
- * @example
- * ```typescript
- * import { entitySetName } from '#core/types/branded.js';
- *
- * const es = entitySetName('Products');
- * ```
- */
-export function entitySetName(name: string): EntitySetName {
-  return name as EntitySetName;
-}
-
-/**
  * Create a branded {@link CSSSelector} from a raw string.
  *
  * @param selector - Raw CSS selector string.
@@ -281,34 +199,6 @@ export function entitySetName(name: string): EntitySetName {
  */
 export function cssSelector(selector: string): CSSSelector {
   return selector as CSSSelector;
-}
-
-/**
- * Create a branded {@link XPathSelector} from a raw string.
- *
- * @param xpath - Raw XPath expression string.
- * @returns Branded XPath selector.
- * @example
- * ```typescript
- * const btn = xpathSelector('//button[@id="submit"]');
- * ```
- */
-export function xpathSelector(xpath: string): XPathSelector {
-  return xpath as XPathSelector;
-}
-
-/**
- * Create a branded {@link ODataUrl} from a raw string.
- *
- * @param url - Raw OData service URL string.
- * @returns Branded OData URL.
- * @example
- * ```typescript
- * const svc = odataUrl('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');
- * ```
- */
-export function odataUrl(url: string): ODataUrl {
-  return url as ODataUrl;
 }
 
 /**

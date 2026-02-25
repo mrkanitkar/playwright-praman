@@ -1,7 +1,7 @@
 # Praman Capabilities Reference
 
 > **Generated**: 2026-02-25 — do not edit manually, run `npm run generate:capabilities`
-> **Total**: 165 capabilities across 14 categories
+> **Total**: 179 capabilities across 15 categories
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Category | Prefix       | Description                                    | Count |
 | -------- | ------------ | ---------------------------------------------- | ----- |
-| ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 16    |
+| ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 21    |
 | table    | `UI5-TABLE`  | Table discovery, reading, and manipulation     | 24    |
 | dialog   | `UI5-DLG`    | Dialog lifecycle management                    | 7     |
 | date     | `UI5-DATE`   | Date and time picker operations                | 7     |
@@ -21,31 +21,37 @@
 | shell    | `UI5-SHELL`  | SAP Shell header interactions                  | 4     |
 | footer   | `UI5-FOOTER` | Footer toolbar actions                         | 6     |
 | flp      | `UI5-FLP`    | Fiori Launchpad services (locks, settings)     | 10    |
-| ai       | `UI5-AI`     | AI-powered discovery and context building      | 7     |
+| ai       | `UI5-AI`     | AI-powered discovery and context building      | 9     |
+| assert   | `UI5-ASSERT` | UI5-aware custom matchers for assertions       | 7     |
 | data     | `UI5-DATA`   | Test data generation, persistence, and cleanup | 4     |
 
 ---
 
 ## ui5 — Core UI5 control interactions
 
-| ID            | Name       | Description                                        | Usage Example                                                          |
-| ------------- | ---------- | -------------------------------------------------- | ---------------------------------------------------------------------- |
-| `UI5-UI5-001` | control    | Discovers a single control matching the selector.  | `const btn = await ui5.control({ id: 'submitBtn' });`                  |
-| `UI5-UI5-002` | controls   | Discovers multiple controls matching the selector. | `const buttons = await ui5.controls({ controlType: 'sap.m.Button' });` |
-| `UI5-UI5-003` | click      | Clicks a control.                                  | `await ui5.click({ id: 'submitBtn' });`                                |
-| `UI5-UI5-004` | fill       | Fills a control with text.                         | `await ui5.fill({ id: 'vendorInput' }, '100001');`                     |
-| `UI5-UI5-005` | press      | Presses a control (alias for click).               | `await ui5.press({ id: 'saveBtn' });`                                  |
-| `UI5-UI5-006` | select     | Selects an item in a selection control.            | `await ui5.select({ id: 'purchOrgSelect' }, '1000');`                  |
-| `UI5-UI5-007` | check      | Checks a checkbox.                                 | `await ui5.check({ id: 'agreeCheckbox' });`                            |
-| `UI5-UI5-008` | uncheck    | Unchecks a checkbox.                               | `await ui5.uncheck({ id: 'agreeCheckbox' });`                          |
-| `UI5-UI5-009` | clear      | Clears a control's text.                           | `await ui5.clear({ id: 'searchField' });`                              |
-| `UI5-UI5-010` | getText    | Gets the text of a control.                        | `const label = await ui5.getText({ id: 'statusLabel' });`              |
-| `UI5-UI5-011` | getValue   | Gets the value of a control.                       | `const val = await ui5.getValue({ id: 'quantityInput' });`             |
-| `UI5-UI5-012` | waitForUI5 | Waits for UI5 to stabilize.                        | `await ui5.waitForUI5();`                                              |
-| `UI5-UI5-013` | waitFor    | Waits for a control to appear.                     | `await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });`        |
-| `UI5-UI5-014` | inspect    | Inspects a control and returns full metadata.      | `const info = await ui5.inspect({ id: 'vendorInput' });`               |
-| `UI5-UI5-015` | clearCache | Clears the internal proxy cache.                   | `ui5.clearCache();`                                                    |
-| `UI5-UI5-016` | destroy    | Destroys the handler and cleans up resources.      | `await ui5.destroy();`                                                 |
+| ID            | Name           | Description                                                 | Usage Example                                                          |
+| ------------- | -------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `UI5-UI5-001` | control        | Discovers a single control matching the selector.           | `const btn = await ui5.control({ id: 'submitBtn' });`                  |
+| `UI5-UI5-002` | controls       | Discovers multiple controls matching the selector.          | `const buttons = await ui5.controls({ controlType: 'sap.m.Button' });` |
+| `UI5-UI5-003` | click          | Clicks a control.                                           | `await ui5.click({ id: 'submitBtn' });`                                |
+| `UI5-UI5-004` | fill           | Fills a control with text.                                  | `await ui5.fill({ id: 'vendorInput' }, '100001');`                     |
+| `UI5-UI5-005` | press          | Presses a control (alias for click).                        | `await ui5.press({ id: 'saveBtn' });`                                  |
+| `UI5-UI5-006` | select         | Selects an item in a selection control.                     | `await ui5.select({ id: 'purchOrgSelect' }, '1000');`                  |
+| `UI5-UI5-007` | check          | Checks a checkbox.                                          | `await ui5.check({ id: 'agreeCheckbox' });`                            |
+| `UI5-UI5-008` | uncheck        | Unchecks a checkbox.                                        | `await ui5.uncheck({ id: 'agreeCheckbox' });`                          |
+| `UI5-UI5-009` | clear          | Clears a control's text.                                    | `await ui5.clear({ id: 'searchField' });`                              |
+| `UI5-UI5-010` | getText        | Gets the text of a control.                                 | `const label = await ui5.getText({ id: 'statusLabel' });`              |
+| `UI5-UI5-011` | getValue       | Gets the value of a control.                                | `const val = await ui5.getValue({ id: 'quantityInput' });`             |
+| `UI5-UI5-012` | waitForUI5     | Waits for UI5 to stabilize.                                 | `await ui5.waitForUI5();`                                              |
+| `UI5-UI5-013` | waitFor        | Waits for a control to appear.                              | `await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });`        |
+| `UI5-UI5-014` | inspect        | Inspects a control and returns full metadata.               | `const info = await ui5.inspect({ id: 'vendorInput' });`               |
+| `UI5-UI5-015` | clearCache     | Clears the internal proxy cache.                            | `ui5.clearCache();`                                                    |
+| `UI5-UI5-016` | destroy        | Destroys the handler and cleans up resources.               | `await ui5.destroy();`                                                 |
+| `UI5-UI5-017` | setValue       | Set value on a control via proxy method forwarding.         | `const input = await ui5.control({ id: 'materialInput' });`            |
+| `UI5-UI5-018` | fireChange     | Fire change event on a control via proxy method forwarding. | `const input = await ui5.control({ id: 'materialInput' });`            |
+| `UI5-UI5-019` | open           | Open a control (e.g., ComboBox dropdown) via proxy.         | `const combo = await ui5.control({ id: 'variantCombo' });`             |
+| `UI5-UI5-020` | close          | Close a control via proxy.                                  | `const combo = await ui5.control({ id: 'variantCombo' });`             |
+| `UI5-UI5-021` | setSelectedKey | Set selected key on selection control via proxy.            | `const combo = await ui5.control({ id: 'variantCombo' });`             |
 
 ## table — Table discovery, reading, and manipulation
 
@@ -251,6 +257,20 @@
 | `UI5-AI-005` | agentic      | The AgenticHandler instance for autonomous test operations with checkpoint-based resumability. | `const result = await pramanAI.agentic.execute('create PO', page);`               |
 | `UI5-AI-006` | llm          | The LlmService instance for direct LLM interactions.                                           | `const response = await pramanAI.llm.complete('Suggest a test for PO creation');` |
 | `UI5-AI-007` | vocabulary   | The VocabularyService instance for field label resolution.                                     | `const controlId = await pramanAI.vocabulary.resolve('Vendor');`                  |
+| `UI5-AI-008` | forAI        | Get all capabilities formatted for AI consumption.                                             | `const caps = pramanAI.capabilities.forAI();`                                     |
+| `UI5-AI-009` | byCategory   | Get capabilities filtered by category.                                                         | `const tableCaps = pramanAI.capabilities.byCategory('table');`                    |
+
+## assert — UI5-aware custom matchers for assertions
+
+| ID               | Name                | Description                                        | Usage Example                                               |
+| ---------------- | ------------------- | -------------------------------------------------- | ----------------------------------------------------------- |
+| `UI5-ASSERT-001` | toHaveUI5Text       | Assert control has expected text.                  | `await expect(locator).toHaveUI5Text('Expected text');`     |
+| `UI5-ASSERT-002` | toBeUI5Visible      | Assert UI5 control is visible.                     | `await expect(locator).toBeUI5Visible();`                   |
+| `UI5-ASSERT-003` | toBeUI5Enabled      | Assert UI5 control is enabled.                     | `await expect(locator).toBeUI5Enabled();`                   |
+| `UI5-ASSERT-004` | toHaveUI5Property   | Assert control has specific property value.        | `await expect(locator).toHaveUI5Property('enabled', true);` |
+| `UI5-ASSERT-005` | toHaveUI5ValueState | Assert control value state (Error, Warning, etc.). | `await expect(locator).toHaveUI5ValueState('Success');`     |
+| `UI5-ASSERT-006` | toHaveUI5RowCount   | Assert table has expected row count.               | `await expect(table).toHaveUI5RowCount(5);`                 |
+| `UI5-ASSERT-007` | toHaveUI5CellText   | Assert table cell contains expected text.          | `await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');`   |
 
 ## data — Test data generation, persistence, and cleanup
 

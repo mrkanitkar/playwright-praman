@@ -30,7 +30,7 @@
  * - OData (3): request failed, parse, CSRF token
  * - Selector (3): invalid, ambiguous, parse
  * - Timeout (3): UI5 stability, control discovery, generic operation
- * - AI (9): provider unavailable, invalid response, token limit, rate limited, not configured, llm call failed, response parse failed, context build failed, step interpret failed
+ * - AI (11): provider unavailable, invalid response, token limit, rate limited, not configured, llm call failed, response parse failed, context build failed, step interpret failed, invalid request, capability not found
  * - Plugin (3): load failure, init failure, incompatible version
  * - Vocabulary (4): term not found, domain load failed, JSON invalid, ambiguous match
  * - Intent (4): field not found, action failed, navigation failed, validation failed
@@ -95,6 +95,8 @@ export const ErrorCode = Object.freeze({
   ERR_AI_RESPONSE_PARSE_FAILED: 'ERR_AI_RESPONSE_PARSE_FAILED',
   ERR_AI_CONTEXT_BUILD_FAILED: 'ERR_AI_CONTEXT_BUILD_FAILED',
   ERR_AI_STEP_INTERPRET_FAILED: 'ERR_AI_STEP_INTERPRET_FAILED',
+  ERR_AI_INVALID_REQUEST: 'ERR_AI_INVALID_REQUEST',
+  ERR_AI_CAPABILITY_NOT_FOUND: 'ERR_AI_CAPABILITY_NOT_FOUND',
 
   // ── Plugin errors ──────────────────────────────────────────────────
   ERR_PLUGIN_LOAD: 'ERR_PLUGIN_LOAD',

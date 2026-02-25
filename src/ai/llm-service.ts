@@ -29,11 +29,13 @@
  * @module ai
  */
 
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import type { CompletionResult } from '#ai/llm-providers.js';
 import { callAnthropic, callAzureOpenAI, callOpenAI } from '#ai/llm-providers.js';
+import { ChatMessageSchema } from '#ai/schemas/llm-request.schema.js';
 import type { ChatMessage } from '#ai/schemas/llm-request.schema.js';
+import { LlmCompletionSchema } from '#ai/schemas/llm-response.schema.js';
 import type { AiResponse } from '#ai/types.js';
 import type { PramanConfig } from '#core/config/schema.js';
 import { AIError } from '#core/errors/ai-error.js';
@@ -161,6 +163,21 @@ class LlmServiceImpl implements LlmService {
       });
     }
 
+    // ── Input validation: validate chat messages against schema ──────────
+    const messagesValidation = z.array(ChatMessageSchema).safeParse(messages);
+    if (!messagesValidation.success) {
+      throw new AIError({
+        code: 'ERR_AI_INVALID_REQUEST',
+        message: `Invalid chat messages: ${messagesValidation.error.message}`,
+        attempted: 'Validate chat messages before sending to LLM provider',
+        retryable: false,
+        suggestions: [
+          'Each message must have a role (system, user, or assistant) and non-empty content',
+          'Verify the messages array is not empty',
+        ],
+      });
+    }
+
     const startTime = Date.now();
     const aiConfig = this.config.ai;
 
@@ -224,6 +241,30 @@ function parseAndValidate(
   schema: z.ZodType,
   duration: number,
 ): AiResponse<unknown> {
+  // ── Pre-validation: verify raw completion structure from provider ────
+  const completionValidation = LlmCompletionSchema.safeParse(completion);
+  if (!completionValidation.success) {
+    return {
+      status: 'error',
+      data: undefined,
+      error: {
+        code: 'ERR_AI_RESPONSE_PARSE_FAILED',
+        message: `Malformed completion from LLM provider: ${completionValidation.error.message}`,
+      },
+      metadata: {
+        duration,
+        retryable: true,
+        suggestions: [
+          'The LLM provider returned an unexpected response structure',
+          'Check provider SDK version compatibility',
+          'Verify the API endpoint is returning valid completions',
+        ],
+        ...(completion.model !== undefined && { model: completion.model }),
+        ...(completion.tokens !== undefined && { tokens: completion.tokens }),
+      },
+    };
+  }
+
   let parsed: unknown;
   try {
     parsed = JSON.parse(completion.content);

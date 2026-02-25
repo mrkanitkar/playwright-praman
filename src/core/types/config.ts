@@ -50,7 +50,7 @@ export type AuthStrategy = 'btp-saml' | 'basic' | 'office365' | 'custom';
  * const provider: AIProvider = 'azure-openai';
  * ```
  */
-export type AIProvider = 'azure-openai' | 'openai';
+export type AIProvider = 'azure-openai' | 'openai' | 'anthropic';
 
 /**
  * Telemetry exporter backends for OpenTelemetry.

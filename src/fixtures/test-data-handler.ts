@@ -34,6 +34,8 @@ import { join } from 'node:path';
 
 import type { Logger } from 'pino';
 
+import { PramanError } from '#core/errors/base.js';
+import { ErrorCode } from '#core/errors/codes.js';
 import { createLogger } from '#core/logging/logger.js';
 import { ui5Step, withStep } from '#core/utils/step-decorator.js';
 
@@ -153,9 +155,16 @@ export class TestDataHandler {
         return JSON.parse(content) as T;
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
-        throw new Error(
-          `Failed to load test data file "${filename}" from ${this.baseDir}: ${message}`,
-        );
+        throw new PramanError({
+          code: ErrorCode.ERR_CONFIG_PARSE,
+          message: `Failed to load test data file "${filename}" from ${this.baseDir}: ${message}`,
+          attempted: `Load and parse JSON test data file: ${filename}`,
+          retryable: false,
+          suggestions: [
+            `Verify the file "${filename}" exists in ${this.baseDir}`,
+            'Check that the file contains valid JSON',
+          ],
+        });
       }
     });
   }

@@ -35,7 +35,7 @@ import { test as base } from '@playwright/test';
 import type { Frame, Page } from '@playwright/test';
 
 import type { PramanConfig } from '#core/config/index.js';
-import { DEFAULT_IGNORE_PATTERNS, DEFAULT_TIMEOUTS } from '#core/utils/constants.js';
+import { DEFAULT_IGNORE_PATTERNS } from '#core/utils/constants.js';
 import { waitForUI5Stable } from '#core/utils/wait-helpers.js';
 
 /**
@@ -135,7 +135,7 @@ export const stabilityTest = base.extend<StabilityFixtures, StabilityDeps>({
           try {
             // Type assertion: Playwright Page satisfies WaitPage structurally; Parameters<> avoids importing the internal WaitPage type
             await waitForUI5Stable(page as Parameters<typeof waitForUI5Stable>[0], {
-              timeout: DEFAULT_TIMEOUTS.UI5_WAIT,
+              timeout: pramanConfig.ui5WaitTimeout,
             });
           } catch {
             // Silently catch — stability wait failure should not break the test

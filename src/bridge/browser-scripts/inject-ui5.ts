@@ -189,7 +189,9 @@ export function createBridgeInjectionScript(): string {
         markReady();
       }
     } catch (e) {
-      // Fatal injection error — bridge remains uninitialized
+      // Fatal injection error — surface to browser console for diagnostics
+      console.error('[praman] Fatal bridge injection error:', e);
+      return { success: false, error: String(e) };
     }
   })()`;
 }

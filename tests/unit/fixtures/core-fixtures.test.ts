@@ -573,7 +573,10 @@ describe('core-fixtures test-scoped fixture definitions', () => {
         rootLogger: mockRootLoggerInstance,
       });
 
-      expect(mockCreateInteractionStrategy).toHaveBeenCalledWith(mockConfig.interactionStrategy);
+      expect(mockCreateInteractionStrategy).toHaveBeenCalledWith(
+        mockConfig.interactionStrategy,
+        mockConfig.opa5,
+      );
       expect(lastUI5HandlerOptions).toEqual(
         expect.objectContaining({
           page: mockPage,
@@ -582,6 +585,8 @@ describe('core-fixtures test-scoped fixture definitions', () => {
           config: {
             ui5WaitTimeout: mockConfig.ui5WaitTimeout,
             controlDiscoveryTimeout: mockConfig.controlDiscoveryTimeout,
+            preferVisibleControls: mockConfig.preferVisibleControls,
+            skipStabilityWait: mockConfig.skipStabilityWait,
           },
         }),
       );

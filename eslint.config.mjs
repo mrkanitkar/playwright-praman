@@ -33,6 +33,7 @@ export default tseslint.config(
       'seeds/**',
       'tests/seeds/**',
       'skills/**',
+      '.github/skills/**',
       'temp/**',
     ],
   },

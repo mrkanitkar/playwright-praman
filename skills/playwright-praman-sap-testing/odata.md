@@ -15,10 +15,10 @@
 
 SAP UI5 apps use OData in two distinct ways. Praman provides separate APIs for each:
 
-| Layer           | What it is                                           | When to use                                            | API                                                        |
-| --------------- | ---------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------- |
-| **Model-level** | Reads/writes via sap.ui.model.odata.v2/v4.ODataModel | Access bound data without HTTP calls; read model state | `ui5.odata.readEntity()`, `ui5.odata.getModelData()`       |
-| **HTTP-level**  | Direct REST calls to OData service endpoints         | Seed test data, verify persistence, bypass UI          | `ui5.odata.get()`, `ui5.odata.post()`, `ui5.odata.patch()` |
+| Layer           | What it is                                           | When to use                                            | API                                                                                |
+| --------------- | ---------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| **Model-level** | Reads/writes via sap.ui.model.odata.v2/v4.ODataModel | Access bound data without HTTP calls; read model state | `ui5.odata.getModelData()`, `ui5.odata.getModelProperty()`                         |
+| **HTTP-level**  | Direct REST calls to OData service endpoints         | Seed test data, verify persistence, bypass UI          | `ui5.odata.createEntity()`, `ui5.odata.updateEntity()`, `ui5.odata.deleteEntity()` |
 
 **Key distinction**: Model-level operations are synchronous reads of the UI5 model cache.
 HTTP-level operations make actual network requests to the OData service.
@@ -31,24 +31,25 @@ Model-level operations access the UI5 OData model bound in the current page cont
 No network requests — reads from the model cache.
 
 ```typescript
-import { moduleTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
 test('read bound model data', async ({ ui5 }) => {
-  // Read a single entity from the model
-  const vendor = await ui5.odata.readEntity('/Suppliers', 'SUP-001');
+  // Read model data at a specific path
+  const vendor = await ui5.odata.getModelData("/Suppliers('SUP-001')");
   // Returns: { Supplier: 'SUP-001', Name1: 'Acme Corp', ... }
 
-  // Read all entities from a collection
-  const orders = await ui5.odata.readCollection('/PurchaseOrders');
-
-  // Get the bound context path of a specific control
-  const control = await ui5.control({ id: 'vendorForm' });
-  const context = await ui5.odata.getBindingContext(control);
-  // e.g. '/Suppliers(\'SUP-001\')'
-
-  // Get data from the model at a specific path
-  const data = await ui5.odata.getModelData("/Suppliers('SUP-001')/Name1");
+  // Read a single property from the model
+  const name = await ui5.odata.getModelProperty("/Suppliers('SUP-001')/Name1");
   // e.g. 'Acme Corp'
+
+  // Wait for OData model to finish loading
+  await ui5.odata.waitForLoad();
+
+  // Check if the model has unsaved changes
+  const dirty = await ui5.odata.hasPendingChanges();
+
+  // Count entities at a path
+  const count = await ui5.odata.getEntityCount('/PurchaseOrders');
 });
 ```
 
@@ -75,36 +76,39 @@ HTTP-level operations make direct REST calls. Use for test setup/teardown and
 verifying persistence independent of the UI.
 
 ```typescript
-import { moduleTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
-test('seed data and verify via HTTP', async ({ ui5 }) => {
-  const baseUrl = 'https://your-sap-system.com';
+test('CRUD operations via OData', async ({ ui5 }) => {
+  const serviceUrl = '/sap/opu/odata/sap/MM_PUR_PO_MAINT_V2_SRV/';
 
-  // GET — read entity
-  const response = await ui5.odata.get(
-    `${baseUrl}/sap/opu/odata/sap/MM_PUR_PO_MAINT_V2_SRV/PurchaseOrder('4500001234')`,
-  );
+  // Fetch CSRF token (required for write operations)
+  const token = await ui5.odata.fetchCSRFToken(serviceUrl);
 
-  // POST — create entity
-  const created = await ui5.odata.post(
-    `${baseUrl}/sap/opu/odata/sap/MM_PUR_PO_MAINT_V2_SRV/PurchaseOrderSet`,
-    {
-      Supplier: 'SUP-001',
-      CompanyCode: '1000',
-      PurchasingOrganization: '1000',
-    },
-  );
+  // Query entities with filters
+  const results = await ui5.odata.queryEntities(serviceUrl, 'PurchaseOrderSet', {
+    $filter: "Supplier eq 'SUP-001'",
+    $top: 10,
+  });
 
-  // PATCH — update entity (OData V4)
-  await ui5.odata.patch(
-    `${baseUrl}/sap/opu/odata4/sap/api_purchaseorder/srvd_a2x/sap/PurchaseOrder/0001/PurchaseOrder('4500001234')`,
-    { DocumentCurrency: 'USD' },
-  );
+  // Create entity
+  const created = await ui5.odata.createEntity(serviceUrl, 'PurchaseOrderSet', {
+    Supplier: 'SUP-001',
+    CompanyCode: '1000',
+    PurchasingOrganization: '1000',
+  });
 
-  // DELETE — remove entity
-  await ui5.odata.delete(
-    `${baseUrl}/sap/opu/odata/sap/MM_PUR_PO_MAINT_V2_SRV/PurchaseOrder('4500001234')`,
-  );
+  // Update entity
+  await ui5.odata.updateEntity(serviceUrl, 'PurchaseOrderSet', '4500001234', {
+    DocumentCurrency: 'USD',
+  });
+
+  // Delete entity
+  await ui5.odata.deleteEntity(serviceUrl, 'PurchaseOrderSet', '4500001234');
+
+  // Call function import
+  await ui5.odata.callFunctionImport(serviceUrl, 'ReleasePurchaseOrder', {
+    PurchaseOrder: '4500001234',
+  });
 });
 ```
 
@@ -115,29 +119,46 @@ No manual token management needed.
 
 ```typescript
 // CSRF tokens are fetched automatically before write operations
-await ui5.odata.post(serviceUrl, payload); // Praman fetches X-CSRF-Token first
+await ui5.odata.createEntity(serviceUrl, 'EntitySet', payload); // Praman fetches X-CSRF-Token first
+
+// Or fetch manually
+const token = await ui5.odata.fetchCSRFToken(serviceUrl);
 ```
 
 ---
 
 ## ui5.odata Fixture API
 
-Full API available on `ui5.odata` from `moduleTest`:
+Full API available on `ui5.odata`:
 
 ```typescript
 interface ODataFixture {
   // Model-level
-  readEntity(entitySet: string, key: string): Promise<Record<string, unknown>>;
-  readCollection(entitySet: string): Promise<readonly Record<string, unknown>[]>;
-  getModelData(path: string): Promise<unknown>;
-  getBindingContext(control: UI5ControlBase): Promise<string>;
+  getModelData(path: string, opts?): Promise<unknown>;
+  getModelProperty(path: string, opts?): Promise<unknown>;
+  waitForLoad(opts?): Promise<void>;
+  hasPendingChanges(opts?): Promise<boolean>;
+  getEntityCount(path: string, opts?): Promise<number>;
 
   // HTTP-level
-  get(url: string, params?: Record<string, string>): Promise<unknown>;
-  post(url: string, body: unknown): Promise<unknown>;
-  patch(url: string, body: unknown): Promise<void>;
-  delete(url: string): Promise<void>;
-  batch(operations: ODataBatchOperation[]): Promise<unknown[]>;
+  fetchCSRFToken(serviceUrl: string): Promise<string>;
+  createEntity(serviceUrl: string, entitySet: string, data: unknown, opts?): Promise<unknown>;
+  updateEntity(
+    serviceUrl: string,
+    entitySet: string,
+    key: string,
+    data: unknown,
+    opts?,
+  ): Promise<void>;
+  deleteEntity(serviceUrl: string, entitySet: string, key: string, opts?): Promise<void>;
+  queryEntities(serviceUrl: string, entitySet: string, opts?): Promise<unknown[]>;
+  callFunctionImport(
+    serviceUrl: string,
+    fn: string,
+    params?: unknown,
+    method?: string,
+    opts?,
+  ): Promise<unknown>;
 }
 ```
 
@@ -163,7 +184,7 @@ interface ODataFixture {
 Use Playwright's `page.route()` to intercept and mock OData calls in tests:
 
 ```typescript
-import { coreTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
 test('mock OData response', async ({ page, ui5Navigation }) => {
   // Mock a GET request

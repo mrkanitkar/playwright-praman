@@ -10,9 +10,9 @@ recipes:
     domain: ui5
     priority: essential
     capabilities:
-      - cap-control-locate
-      - cap-control-press
-      - cap-control-click
+      - UI5-UI5-001
+      - UI5-UI5-005
+      - UI5-UI5-003
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -32,10 +32,10 @@ recipes:
     domain: ui5
     priority: essential
     capabilities:
-      - cap-control-locate
-      - cap-control-set-value
-      - cap-control-fire-change
-      - cap-wait-for-ui5
+      - UI5-UI5-001
+      - UI5-UI5-017
+      - UI5-UI5-018
+      - UI5-UI5-012
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -57,12 +57,12 @@ recipes:
     domain: ui5
     priority: essential
     capabilities:
-      - cap-control-locate
-      - cap-control-open
-      - cap-control-set-selected-key
-      - cap-control-fire-change
-      - cap-control-close
-      - cap-wait-for-ui5
+      - UI5-UI5-001
+      - UI5-UI5-019
+      - UI5-UI5-021
+      - UI5-UI5-018
+      - UI5-UI5-020
+      - UI5-UI5-012
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -82,9 +82,9 @@ recipes:
     domain: table
     priority: essential
     capabilities:
-      - cap-table-get-rows
-      - cap-table-get-row-count
-      - cap-table-get-data
+      - UI5-TABLE-002
+      - UI5-TABLE-003
+      - UI5-TABLE-005
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -100,7 +100,7 @@ recipes:
     domain: table
     priority: essential
     capabilities:
-      - cap-table-click-row
+      - UI5-TABLE-014
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -114,7 +114,7 @@ recipes:
     domain: table
     priority: essential
     capabilities:
-      - cap-table-find-row-by-values
+      - UI5-TABLE-012
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -131,10 +131,10 @@ recipes:
     domain: dialog
     priority: essential
     capabilities:
-      - cap-dialog-wait-for
-      - cap-dialog-confirm
-      - cap-dialog-dismiss
-      - cap-control-locate
+      - UI5-DLG-001
+      - UI5-DLG-005
+      - UI5-DLG-004
+      - UI5-UI5-001
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -153,8 +153,8 @@ recipes:
     domain: navigate
     priority: essential
     capabilities:
-      - cap-navigate-to-tile
-      - cap-wait-for-ui5
+      - UI5-NAV-002
+      - UI5-UI5-012
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -169,9 +169,9 @@ recipes:
     domain: navigate
     priority: essential
     capabilities:
-      - cap-navigate-to-app
-      - cap-navigate-to-intent
-      - cap-navigate-search-open-app
+      - UI5-NAV-001
+      - UI5-NAV-003
+      - UI5-NAV-008
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -187,9 +187,9 @@ recipes:
     domain: date
     priority: recommended
     capabilities:
-      - cap-date-set-picker
-      - cap-date-get-picker
-      - cap-date-set-range
+      - UI5-DATE-001
+      - UI5-DATE-002
+      - UI5-DATE-003
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -206,9 +206,9 @@ recipes:
     domain: odata
     priority: recommended
     capabilities:
-      - cap-odata-query-entities
-      - cap-odata-wait-for-load
-      - cap-odata-has-pending-changes
+      - UI5-ODATA-010
+      - UI5-ODATA-003
+      - UI5-ODATA-006
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -228,13 +228,13 @@ recipes:
     domain: assert
     priority: recommended
     capabilities:
-      - cap-assert-ui5-text
-      - cap-assert-ui5-visible
-      - cap-assert-ui5-enabled
-      - cap-assert-ui5-property
-      - cap-assert-ui5-value-state
-      - cap-assert-ui5-row-count
-      - cap-assert-ui5-cell-text
+      - UI5-ASSERT-001
+      - UI5-ASSERT-002
+      - UI5-ASSERT-003
+      - UI5-ASSERT-004
+      - UI5-ASSERT-005
+      - UI5-ASSERT-006
+      - UI5-ASSERT-007
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -255,10 +255,10 @@ recipes:
     domain: intent
     priority: recommended
     capabilities:
-      - cap-intent-fill-field
-      - cap-intent-click-button
-      - cap-intent-assert-field
-      - cap-intent-procurement-create-po
+      - UI5-INTENT-001
+      - UI5-INTENT-002
+      - UI5-INTENT-004
+      - UI5-INTENT-008
     pattern: |
       import { test, expect } from 'playwright-praman';
 
@@ -281,9 +281,9 @@ recipes:
     domain: ai
     priority: optional
     capabilities:
-      - cap-ai-discover-page
-      - cap-ai-capabilities-for-ai
-      - cap-ai-capabilities-by-category
+      - UI5-AI-001
+      - UI5-AI-008
+      - UI5-AI-009
     pattern: |
       import { test, expect } from 'playwright-praman';
 

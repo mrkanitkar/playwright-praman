@@ -26,6 +26,7 @@ import type { Logger } from 'pino';
 
 import { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS } from '#bridge/bridge-constants.js';
 import { ensureBridgeInjected } from '#bridge/injection.js';
+import { ErrorCode } from '#core/errors/codes.js';
 import { NavigationError } from '#core/errors/navigation-error.js';
 import { createLogger } from '#core/logging/logger.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
@@ -101,8 +102,10 @@ export class ShellHandler {
 
     if (!visible) {
       throw new NavigationError({
+        code: ErrorCode.ERR_NAV_ROUTE_FAILED,
         message: 'Shell header is not visible on the page',
         attempted: 'Verify Fiori Launchpad shell header is present',
+        retryable: true,
         suggestions: [
           'Ensure the page is a Fiori Launchpad application',
           'Wait for the page to fully load before checking the shell',
@@ -204,8 +207,10 @@ export class ShellHandler {
 
     if (!found) {
       throw new NavigationError({
+        code: ErrorCode.ERR_NAV_ROUTE_FAILED,
         message: 'Notifications icon not found in shell header',
         attempted: 'Open notifications panel via shell header',
+        retryable: true,
         suggestions: [
           'Verify the shell header is visible (use expectShellHeader() first)',
           'Check if notifications are enabled in the Fiori Launchpad configuration',
@@ -249,8 +254,10 @@ export class ShellHandler {
 
     if (!found) {
       throw new NavigationError({
+        code: ErrorCode.ERR_NAV_ROUTE_FAILED,
         message: 'User avatar button not found in shell header',
         attempted: 'Open user menu via shell header avatar',
+        retryable: true,
         suggestions: [
           'Verify the shell header is visible (use expectShellHeader() first)',
           'Check if the Fiori Launchpad uses a custom shell configuration',

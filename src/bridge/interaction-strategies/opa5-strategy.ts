@@ -18,7 +18,12 @@ import type { InteractionStrategy } from './strategy.js';
 import { ErrorCode } from '#core/errors/codes.js';
 import { ControlError } from '#core/errors/control-error.js';
 
-/** Shape returned by browser-side interaction scripts. */
+/**
+ * Shape returned by browser-side interaction scripts.
+ *
+ * @see `BridgeResult` in `#core/types/bridge.js` for the canonical 4-field envelope.
+ * This is intentionally narrower (2 fields) because browser IIFEs don't return `duration` or `data`.
+ */
 interface BridgeResult {
   readonly success: boolean;
   readonly error?: string;
@@ -68,8 +73,10 @@ export class Opa5Strategy implements InteractionStrategy {
   async press(page: Page, controlId: string): Promise<void> {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     const timeout = this.config.interactionTimeout;
+    const autoWait = this.config.autoWait;
+    const debug = this.config.debug;
     const result: BridgeResult = await page.evaluate(
-      `(function() {
+      `(async function() {
         var bridge = window.${ns};
         if (!bridge || !bridge.RecordReplay) {
           var ctrl = bridge && bridge.getById('${controlId}');
@@ -81,13 +88,27 @@ export class Opa5Strategy implements InteractionStrategy {
           return { success: false, error: 'RecordReplay not available and no fire* methods on: ${controlId}' };
         }
         try {
+          ${
+            autoWait
+              ? `var autoWaiter = bridge.RecordReplay.getAutoWaiter ? bridge.RecordReplay.getAutoWaiter() : null;
+          if (autoWaiter && autoWaiter.hasToWait()) {
+            await new Promise(function(resolve) {
+              var interval = setInterval(function() {
+                if (!autoWaiter.hasToWait()) { clearInterval(interval); resolve(); }
+              }, 100);
+            });
+          }`
+              : ''
+          }
           bridge.RecordReplay.interactWithControl({
             selector: { id: '${controlId}' },
             interactionType: 'PRESS',
             interactionTimeout: ${String(timeout)}
           });
+          ${debug ? `console.log('[praman:opa5]', 'press', '${controlId}', JSON.stringify({ success: true }));` : ''}
           return { success: true };
         } catch (e) {
+          ${debug ? `console.log('[praman:opa5]', 'press', '${controlId}', JSON.stringify({ success: false, error: e.message }));` : ''}
           return { success: false, error: e.message };
         }
       })()`,
@@ -112,9 +133,11 @@ export class Opa5Strategy implements InteractionStrategy {
   async enterText(page: Page, controlId: string, text: string): Promise<void> {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     const timeout = this.config.interactionTimeout;
+    const autoWait = this.config.autoWait;
+    const debug = this.config.debug;
     const escaped = text.replaceAll('\\', '\\\\').replaceAll("'", "\\'");
     const result: BridgeResult = await page.evaluate(
-      `(function() {
+      `(async function() {
         var bridge = window.${ns};
         if (!bridge || !bridge.RecordReplay) {
           var ctrl = bridge && bridge.getById('${controlId}');
@@ -122,14 +145,28 @@ export class Opa5Strategy implements InteractionStrategy {
           return { success: false, error: 'RecordReplay not available' };
         }
         try {
+          ${
+            autoWait
+              ? `var autoWaiter = bridge.RecordReplay.getAutoWaiter ? bridge.RecordReplay.getAutoWaiter() : null;
+          if (autoWaiter && autoWaiter.hasToWait()) {
+            await new Promise(function(resolve) {
+              var interval = setInterval(function() {
+                if (!autoWaiter.hasToWait()) { clearInterval(interval); resolve(); }
+              }, 100);
+            });
+          }`
+              : ''
+          }
           bridge.RecordReplay.interactWithControl({
             selector: { id: '${controlId}' },
             interactionType: 'ENTER_TEXT',
             enterText: '${escaped}',
             interactionTimeout: ${String(timeout)}
           });
+          ${debug ? `console.log('[praman:opa5]', 'enterText', '${controlId}', JSON.stringify({ success: true, text: '${escaped}' }));` : ''}
           return { success: true };
         } catch (e) {
+          ${debug ? `console.log('[praman:opa5]', 'enterText', '${controlId}', JSON.stringify({ success: false, error: e.message }));` : ''}
           return { success: false, error: e.message };
         }
       })()`,
@@ -150,8 +187,10 @@ export class Opa5Strategy implements InteractionStrategy {
   async select(page: Page, controlId: string, itemId: string): Promise<void> {
     const ns = BRIDGE_GLOBALS.NAMESPACE;
     const timeout = this.config.interactionTimeout;
+    const autoWait = this.config.autoWait;
+    const debug = this.config.debug;
     const result: BridgeResult = await page.evaluate(
-      `(function() {
+      `(async function() {
         var bridge = window.${ns};
         if (!bridge || !bridge.RecordReplay) {
           var ctrl = bridge && bridge.getById('${controlId}');
@@ -159,13 +198,27 @@ export class Opa5Strategy implements InteractionStrategy {
           return { success: false, error: 'RecordReplay not available' };
         }
         try {
+          ${
+            autoWait
+              ? `var autoWaiter = bridge.RecordReplay.getAutoWaiter ? bridge.RecordReplay.getAutoWaiter() : null;
+          if (autoWaiter && autoWaiter.hasToWait()) {
+            await new Promise(function(resolve) {
+              var interval = setInterval(function() {
+                if (!autoWaiter.hasToWait()) { clearInterval(interval); resolve(); }
+              }, 100);
+            });
+          }`
+              : ''
+          }
           bridge.RecordReplay.interactWithControl({
             selector: { id: '${controlId}' },
             interactionType: 'PRESS',
             interactionTimeout: ${String(timeout)}
           });
+          ${debug ? `console.log('[praman:opa5]', 'select', '${controlId}', JSON.stringify({ success: true, itemId: '${itemId}' }));` : ''}
           return { success: true };
         } catch (e) {
+          ${debug ? `console.log('[praman:opa5]', 'select', '${controlId}', JSON.stringify({ success: false, error: e.message }));` : ''}
           return { success: false, error: e.message };
         }
       })()`,
