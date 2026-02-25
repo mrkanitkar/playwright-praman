@@ -154,7 +154,7 @@ export interface AgentPlan {
  *
  * @example
  * ```typescript
- * const report: ComplianceReport = {
+ * const report: AgentComplianceReport = {
  *   version: '1.0.0',
  *   ui5ElementsInteracted: 12,
  *   usingPramanFixtures: 12,
@@ -167,7 +167,7 @@ export interface AgentPlan {
  * };
  * ```
  */
-export interface ComplianceReport {
+export interface AgentComplianceReport {
   /** Version of the compliance report format. */
   readonly version: string;
   /** Total number of UI5 element interactions in the test. */

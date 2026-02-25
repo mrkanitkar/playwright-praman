@@ -18,7 +18,12 @@ import type { InteractionStrategy } from './strategy.js';
 import { ErrorCode } from '#core/errors/codes.js';
 import { ControlError } from '#core/errors/control-error.js';
 
-/** Shape returned by browser-side interaction scripts. */
+/**
+ * Shape returned by browser-side interaction scripts.
+ *
+ * @see `BridgeResult` in `#core/types/bridge.js` for the canonical 4-field envelope.
+ * This is intentionally narrower (2 fields) because browser IIFEs don't return `duration` or `data`.
+ */
 interface BridgeResult {
   readonly success: boolean;
   readonly error?: string;

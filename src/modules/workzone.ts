@@ -21,6 +21,7 @@
  */
 
 import { ensureBridgeInjected } from '#bridge/injection.js';
+import { ErrorCode } from '#core/errors/codes.js';
 import { NavigationError } from '#core/errors/navigation-error.js';
 import { waitForUI5Stable } from '#core/utils/wait-helpers.js';
 
@@ -189,8 +190,10 @@ export function createWorkZoneManager(
       const frame = findAppFrame(page);
       if (frame === undefined) {
         throw new NavigationError({
+          code: ErrorCode.ERR_NAV_ROUTE_FAILED,
           message: 'WorkZone app iframe not found',
           attempted: 'Get app frame for script evaluation',
+          retryable: true,
           suggestions: [
             'Verify the WorkZone environment has loaded',
             'Check that an application is open in the WorkZone shell',
@@ -203,8 +206,10 @@ export function createWorkZoneManager(
     async navigateToApp(appId: string): Promise<void> {
       if (appId === '') {
         throw new NavigationError({
+          code: ErrorCode.ERR_NAV_ROUTE_FAILED,
           message: 'App ID must not be empty',
           attempted: `Navigate to app in WorkZone: "${appId}"`,
+          retryable: false,
           suggestions: ['Provide a valid semantic object hash (e.g., "PurchaseOrder-manage")'],
         });
       }

@@ -25,6 +25,8 @@
  */
 import { test } from '@playwright/test';
 
+import { hasFeature } from '#core/compat/playwright-compat.js';
+
 /**
  * Detects whether code is running inside a Playwright test context.
  *
@@ -95,7 +97,9 @@ export function ui5Step<
 
     const stepName = generateStepName(className, methodName, args);
 
-    return test.step(stepName, async () => target.call(this, ...args), { box: true }) as TReturn;
+    const stepOptions = hasFeature('hasBoxedStep') ? { box: true } : {};
+
+    return test.step(stepName, async () => target.call(this, ...args), stepOptions) as TReturn;
   }
 
   return replacementMethod;
@@ -123,7 +127,8 @@ export async function withStep<T>(stepName: string, fn: () => Promise<T>): Promi
   if (!isInsideTestContext()) {
     return fn();
   }
-  return test.step(stepName, fn, { box: true });
+  const stepOptions = hasFeature('hasBoxedStep') ? { box: true } : {};
+  return test.step(stepName, fn, stepOptions);
 }
 
 /**

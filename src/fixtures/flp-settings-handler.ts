@@ -225,6 +225,7 @@ export class FLPSettingsHandler {
         code: ErrorCode.ERR_FLP_API_UNAVAILABLE,
         message: `Failed to read FLP user settings: ${error instanceof Error ? error.message : String(error)}`,
         attempted: 'Read all user settings from sap.ushell.Container',
+        retryable: true,
         flpService: FLP_SERVICE,
         suggestions: [...FLP_CONTAINER_SUGGESTIONS],
       } as const;
@@ -236,6 +237,7 @@ export class FLPSettingsHandler {
         code: ErrorCode.ERR_FLP_SHELL_NOT_FOUND,
         message: 'UShell Container not available — cannot read user settings',
         attempted: 'Read all user settings from sap.ushell.Container',
+        retryable: true,
         flpService: FLP_SERVICE,
         suggestions: [...FLP_CONTAINER_SUGGESTIONS],
       });
@@ -279,6 +281,7 @@ export class FLPSettingsHandler {
         code: ErrorCode.ERR_FLP_API_UNAVAILABLE,
         message: `Failed to read user ${settingName}: ${error instanceof Error ? error.message : String(error)}`,
         attempted: `Read user ${settingName} from sap.ushell.Container`,
+        retryable: true,
         flpService: FLP_SERVICE,
         suggestions: [...FLP_CONTAINER_SUGGESTIONS],
       } as const;
@@ -290,6 +293,7 @@ export class FLPSettingsHandler {
         code: ErrorCode.ERR_FLP_SHELL_NOT_FOUND,
         message: `UShell Container not available — cannot read user ${settingName}`,
         attempted: `Read user ${settingName} from sap.ushell.Container`,
+        retryable: true,
         flpService: FLP_SERVICE,
         suggestions: [...FLP_CONTAINER_SUGGESTIONS],
       });

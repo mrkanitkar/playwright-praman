@@ -57,19 +57,21 @@ await ui5Navigation.navigateToTile('Manage Purchase Orders');
 await ui5Navigation.navigateToTile('Create Sales Order');
 ```
 
-### navigateToIntent(semanticObject, action, params?, options?)
+### navigateToIntent(intent, params?, options?)
 
-Navigate with explicit semantic object, action, and parameters.
+Navigate with explicit semantic object, action, and parameters. The first argument
+is a `NavigationIntent` object with `semanticObject` and `action` fields.
 
 ```typescript
-await ui5Navigation.navigateToIntent('PurchaseOrder', 'manage');
-await ui5Navigation.navigateToIntent('SalesOrder', 'display', {
-  SalesOrder: '1000001',
-});
-await ui5Navigation.navigateToIntent('Material', 'change', {
-  Material: 'MAT001',
-  Plant: '1000',
-});
+await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
+await ui5Navigation.navigateToIntent(
+  { semanticObject: 'SalesOrder', action: 'display' },
+  { SalesOrder: '1000001' },
+);
+await ui5Navigation.navigateToIntent(
+  { semanticObject: 'Material', action: 'change' },
+  { Material: 'MAT001', Plant: '1000' },
+);
 ```
 
 ### navigateToHash(hash, options?)
@@ -131,7 +133,9 @@ For SAP Build WorkZone (formerly SAP Launchpad Service), navigation works throug
 the `btpWorkZone` fixture that handles the WorkZone frame-based shell.
 
 ```typescript
-import { navTest as test } from 'playwright-praman';
+// Note: navTest is exported from src/fixtures/index.ts, not from the main entry.
+// The merged `test` from 'playwright-praman' already includes navigation fixtures.
+import { test } from 'playwright-praman';
 
 test('navigate in WorkZone', async ({ btpWorkZone, ui5Navigation }) => {
   // Initialize WorkZone navigation (waits for shell to load)
@@ -149,10 +153,15 @@ switching when navigating between WorkZone shell and embedded app frames.
 
 ## navTest Fixture
 
-```typescript
-import { navTest as test } from 'playwright-praman';
+`navTest` is a standalone fixture test object exported from `src/fixtures/nav-fixtures.ts`
+that bundles `ui5Navigation` and `btpWorkZone` fixtures. The merged `test` from
+`'playwright-praman'` already includes these fixtures, so most users can import
+`test` directly.
 
-// Fixture provides both ui5 (control interaction) and ui5Navigation
+```typescript
+import { test } from 'playwright-praman';
+
+// The merged test already provides ui5 + ui5Navigation fixtures
 test('full navigation test', async ({ ui5, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
   await ui5.waitForUI5();
@@ -168,8 +177,12 @@ test('full navigation test', async ({ ui5, ui5Navigation }) => {
 **Composing test objects** — navTest extends coreTest:
 
 ```typescript
-// navTest = coreTest + navTest fixtures
-import { navTest as test, expect } from 'playwright-praman';
+// navTest = coreTest + navigation fixtures (ui5Navigation, btpWorkZone)
+// For standalone use (not re-exported from main entry):
+import { navTest } from '#fixtures/nav-fixtures.js'; // internal path alias
+
+// For most tests, use the merged test which includes all fixtures:
+import { test, expect } from 'playwright-praman';
 ```
 
 ---

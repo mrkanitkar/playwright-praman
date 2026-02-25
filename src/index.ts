@@ -101,25 +101,11 @@ export type {
   BindingPath,
   ControlId,
   CSSSelector,
-  EntitySetName,
   ODataPath,
-  ODataUrl,
-  SemanticObject,
   SemanticObjectAction,
   ViewName,
-  XPathSelector,
 } from './core/types/branded.js';
-export {
-  appId,
-  bindingPath,
-  controlId,
-  cssSelector,
-  entitySetName,
-  odataUrl,
-  semanticObject,
-  viewName,
-  xpathSelector,
-} from './core/types/branded.js';
+export { appId, bindingPath, controlId, cssSelector, viewName } from './core/types/branded.js';
 
 // ── Navigation ──────────────────────────────────────────────────────
 export {

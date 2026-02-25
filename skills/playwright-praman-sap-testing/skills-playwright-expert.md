@@ -2,13 +2,13 @@
 
 ## Praman v1.0 — AI-First SAP UI5 Test Automation Platform
 
-| Property | Value |
-|----------|-------|
-| **Role** | Playwright Framework Expert |
-| **Skill ID** | PRAMAN-SKILL-PLAYWRIGHT-EXPERT-001 |
-| **Version** | 1.0.0 |
+| Property            | Value                                                    |
+| ------------------- | -------------------------------------------------------- |
+| **Role**            | Playwright Framework Expert                              |
+| **Skill ID**        | PRAMAN-SKILL-PLAYWRIGHT-EXPERT-001                       |
+| **Version**         | 1.0.0                                                    |
 | **Authority Level** | Domain — final authority on Playwright APIs and patterns |
-| **Parent Docs** | plan.md (D14, D28, Principles 7-8), setup.md |
+| **Parent Docs**     | plan.md (D14, D28, Principles 7-8), setup.md             |
 
 ---
 
@@ -40,48 +40,33 @@ Praman v1.0 builds its entire API on Playwright's fixture system (`test.extend()
 import { test as base, expect as baseExpect } from '@playwright/test';
 import type { PramanConfig } from '#core/types';
 
-// Type declarations for all fixtures
-type PramanFixtures = {
-  config: Readonly<PramanConfig>;
-  ui5: UI5Fixture;
-  navigation: NavigationFixture;
-  ui5Table: TableFixture;
-  sapAuth: AuthFixture;
-  odata: ODataFixture;
-  ui5Assertion: AssertionFixture;
-  ui5Interact: InteractionFixture;
-  ui5Shell: ShellFixture;
-  // ... more fixtures
-};
+// Fixtures are extended incrementally via test.extend() — there is no single
+// aggregated PramanFixtures type. Each fixture module defines its own types.
 
 // Build fixture chain via extend()
-const test = base.extend<PramanFixtures>({
+const test = base.extend<PramanTestFixtures>({
   // Config fixture — loaded once, frozen
   config: async ({}, use) => {
-    const config = await loadAndValidateConfig();
+    const config = await loadConfig(); // async — discovers & validates config
     await use(config);
   },
 
   // UI5 fixture — depends on page + config (auto-dependency)
   ui5: async ({ page, config }, use) => {
-    // Lazy load (D2, BP-CLAUDE)
-    const { createUI5Fixture } = await import('./core-fixtures.js');
-    const fixture = await createUI5Fixture(page, config);
-    await use(fixture);
-    await fixture.dispose();  // Cleanup on test end
+    const handler = await createUI5Handler(page, config);
+    await use(handler);
+    await handler.dispose(); // Cleanup on test end
   },
 
-  // Navigation — depends on page + config + ui5
-  navigation: async ({ page, config, ui5 }, use) => {
-    const { createNavigationFixture } = await import('./navigation-fixtures.js');
-    const nav = await createNavigationFixture(page, config, ui5);
-    await use(nav);
+  // Navigation — depends on page + config
+  ui5Navigation: async ({ page }, use) => {
+    // Navigation fixture provides navigateToApp, navigateToIntent, etc.
+    // ... setup and use
   },
 
-  // Table — depends on page + ui5
-  ui5Table: async ({ page, ui5 }, use) => {
-    const { createTableFixture } = await import('./table-fixtures.js');
-    await use(createTableFixture(page, ui5));
+  // Table — depends on page
+  table: async ({ page }, use) => {
+    await use(createTableFixture(page));
   },
 });
 
@@ -94,19 +79,19 @@ export { test, expect };
 // ✅ CORRECT: Fixture with setup + teardown
 ui5: async ({ page, config }, use) => {
   // SETUP: runs before test
-  const fixture = await createUI5Fixture(page, config);
+  const handler = await createUI5Handler(page, config);
 
   // USE: test runs here
-  await use(fixture);
+  await use(handler);
 
   // TEARDOWN: runs after test (always, even on failure)
-  await fixture.dispose();
+  await handler.dispose();
 },
 
 // ✅ CORRECT: Worker-scoped fixture (shared across tests in a worker)
 config: [
   async ({}, use) => {
-    const config = await loadAndValidateConfig();
+    const config = await loadConfig(); // async discovery + Zod validation
     await use(config);
   },
   { scope: 'worker' },  // Loaded once per worker, not per test
@@ -146,45 +131,22 @@ vocabulary: async ({ config }, use) => {
 
 ### 3.1 Registration
 
+Praman registers `ui5=` selectors internally during fixture setup via
+`selectors.register()`. There is no public `registerUI5SelectorEngine()`
+factory -- registration happens automatically when the `ui5` fixture initializes.
+
 ```typescript
-// src/selectors/ui5-selector-engine.ts
-import { selectors } from '@playwright/test';
+// Internal: called during fixture setup, not exported as a public API
+// Uses Playwright's selectors.register() to enable ui5= prefix in locators
 
-/**
- * Register the ui5= selector engine with Playwright.
- *
- * Usage in tests:
- *   page.locator('ui5={"controlType":"sap.m.Button","properties":{"text":"Save"}}')
- *
- * @example
- * ```typescript
- * await registerUI5SelectorEngine();
- * const saveBtn = page.locator('ui5={"controlType":"sap.m.Button","properties":{"text":"Save"}}');
- * await saveBtn.click();
- * ```
- */
-export async function registerUI5SelectorEngine(): Promise<void> {
-  await selectors.register('ui5', {
-    // This script runs in the browser context
-    script: `
-      ({
-        // Query: find first matching element
-        query(root, selector) {
-          const parsed = JSON.parse(selector);
-          const result = window.__praman_findControl(parsed);
-          return result?.domRef ?? null;
-        },
+// Usage in tests (after fixture setup):
+const saveBtn = page.locator('ui5={"controlType":"sap.m.Button","properties":{"text":"Save"}}');
+await saveBtn.click();
 
-        // QueryAll: find all matching elements
-        queryAll(root, selector) {
-          const parsed = JSON.parse(selector);
-          const results = window.__praman_findAllControls(parsed);
-          return results.map(r => r.domRef).filter(Boolean);
-        },
-      })
-    `,
-  });
-}
+// The selector engine script runs in the browser context:
+// - query(): finds first matching element via __praman_findControl
+// - queryAll(): finds all matching elements via __praman_findAllControls
+// - Returns DOM elements, not UI5 control objects
 ```
 
 ### 3.2 Selector Engine Rules
@@ -200,7 +162,7 @@ export async function registerUI5SelectorEngine(): Promise<void> {
 
 ### 4.1 Implementation Pattern
 
-```typescript
+````typescript
 // src/matchers/ui5-matchers.ts
 import { expect as baseExpect } from '@playwright/test';
 
@@ -290,7 +252,7 @@ export const expect = baseExpect.extend({
     };
   },
 });
-```
+````
 
 ### 4.2 Matcher Rules
 
@@ -321,28 +283,28 @@ export default defineConfig({
     // 2. Test project — runs AFTER setup, consumes storageState
     {
       name: 'sap-tests',
-      dependencies: ['setup'],    // ← BP-PLAYWRIGHT: project dependency
+      dependencies: ['setup'], // ← BP-PLAYWRIGHT: project dependency
       use: {
         ...devices['Desktop Chrome'],
         storageState: '.auth/sap-session.json',
-        trace: 'retain-on-failure',    // ← BP-PLAYWRIGHT: trace on failure
+        trace: 'retain-on-failure', // ← BP-PLAYWRIGHT: trace on failure
       },
     },
   ],
-  workers: 1,            // SAP tests must be sequential
-  fullyParallel: false,  // SAP tests must be sequential
+  workers: 1, // SAP tests must be sequential
+  fullyParallel: false, // SAP tests must be sequential
 });
 ```
 
 ### 5.2 Why NOT globalSetup
 
-| globalSetup (OLD) | project dependencies (CORRECT) |
-|---|---|
-| Runs outside test runner | Runs as a test (full reporting) |
-| No retry on failure | Retries like any test |
-| No trace/screenshot | Full trace + screenshot support |
-| No parallel support | Parallelizable with other setup projects |
-| No test.step() | Can use test.step() for debugging |
+| globalSetup (OLD)        | project dependencies (CORRECT)           |
+| ------------------------ | ---------------------------------------- |
+| Runs outside test runner | Runs as a test (full reporting)          |
+| No retry on failure      | Retries like any test                    |
+| No trace/screenshot      | Full trace + screenshot support          |
+| No parallel support      | Parallelizable with other setup projects |
+| No test.step()           | Can use test.step() for debugging        |
 
 ---
 
@@ -389,44 +351,38 @@ test('Create Purchase Order', async ({ page, ui5, navigation }) => {
 
 ### 7.1 Purpose
 
-Abstract Playwright API differences across versions (D14: `>=1.50.0 <2.0.0`):
+Abstract Playwright API differences across versions (D14: `>=1.50.0 <2.0.0`).
+The compat layer is a module with pure functions -- not a class.
 
 ```typescript
 // src/core/compat/playwright-compat.ts
-import type { Page } from '@playwright/test';
+import {
+  getPlaywrightVersion,
+  getPlaywrightFeatures,
+  hasFeature,
+  assertMinVersion,
+} from '#core/compat/playwright-compat.js';
 
-export class PlaywrightCompat {
-  private readonly version: string;
+// Check minimum version requirement
+assertMinVersion('1.50.0');
 
-  constructor(version: string) {
-    this.version = version;
-  }
-
-  /**
-   * Register selector engine — API changed between 1.x versions.
-   */
-  async registerSelector(name: string, script: string): Promise<void> {
-    // Handle API differences between Playwright versions
-    const { selectors } = await import('@playwright/test');
-    await selectors.register(name, { script });
-  }
-
-  /**
-   * Get trace configuration — normalize across versions.
-   */
-  getTraceConfig(mode: 'off' | 'on' | 'retain-on-failure'): Record<string, unknown> {
-    return { trace: mode };
-  }
+// Feature detection for conditional capabilities
+if (hasFeature('hasClockAPI')) {
+  // use clock API
 }
+
+// Get parsed version info
+const version = getPlaywrightVersion(); // { major, minor, patch }
+const features = getPlaywrightFeatures(); // { hasClockAPI, hasAriaSnapshot, ... }
 ```
 
 ### 7.2 Version Detection
 
 ```typescript
-import { version } from '@playwright/test';
+import { getPlaywrightVersion, assertMinVersion } from '#core/compat/playwright-compat.js';
 
-const playwrightVersion = version; // e.g., '1.58.2'
-const compat = new PlaywrightCompat(playwrightVersion);
+const version = getPlaywrightVersion(); // e.g., { major: 1, minor: 58, patch: 2 }
+assertMinVersion('1.50.0'); // throws if installed version is too old
 ```
 
 ---
@@ -438,17 +394,17 @@ const compat = new PlaywrightCompat(playwrightVersion);
 ```typescript
 // src/reporters/compliance-reporter.ts
 import type { Reporter, TestCase, TestResult, FullResult } from '@playwright/test/reporter';
-import { logger } from '#core/logging';
+import { createLogger } from '#core/logging';
 
 export class ComplianceReporter implements Reporter {
-  private readonly log = logger.child({ module: 'reporter-compliance' });
+  private readonly log = createLogger('reporter-compliance');
   private results: Array<{ test: string; pramanUsage: number; playwrightNative: number }> = [];
 
   onTestEnd(test: TestCase, result: TestResult): void {
     // Analyze test steps for praman vs Playwright native usage
     const steps = result.steps ?? [];
-    const pramanSteps = steps.filter(s => s.title.startsWith('[praman]'));
-    const nativeSteps = steps.filter(s => !s.title.startsWith('[praman]'));
+    const pramanSteps = steps.filter((s) => s.title.startsWith('[praman]'));
+    const nativeSteps = steps.filter((s) => !s.title.startsWith('[praman]'));
 
     this.results.push({
       test: test.title,
@@ -508,15 +464,15 @@ page.addInitScript({
 
 ## 10. Forbidden Playwright Patterns
 
-| Pattern | Why It's Forbidden | Correct Alternative |
-|---------|-------------------|---------------------|
-| `page.waitForTimeout(n)` | Fixed waits cause flakiness (Principle 8) | `waitForUI5Stable()` or auto-retry assertion |
-| `page.$(selector)` | Returns `ElementHandle` (deprecated API) | `page.locator(selector)` |
-| `page.evaluate(() => document.querySelector(...))` | Bypasses Playwright's auto-wait | `page.locator(...)` |
-| `globalSetup` for auth | No reporting, no retry, no trace (D28) | Project dependencies pattern |
-| `test.beforeAll` for auth | Shared state across tests | Fixture with `scope: 'worker'` |
-| `expect(value).toBe(expected)` for UI5 text | Not web-first (race condition) | `expect(proxy).toHaveUI5Text(expected)` |
-| `page.click('#__button0')` for UI5 controls | Generated IDs are unstable | Use RecordReplay selector |
+| Pattern                                            | Why It's Forbidden                        | Correct Alternative                          |
+| -------------------------------------------------- | ----------------------------------------- | -------------------------------------------- |
+| `page.waitForTimeout(n)`                           | Fixed waits cause flakiness (Principle 8) | `waitForUI5Stable()` or auto-retry assertion |
+| `page.$(selector)`                                 | Returns `ElementHandle` (deprecated API)  | `page.locator(selector)`                     |
+| `page.evaluate(() => document.querySelector(...))` | Bypasses Playwright's auto-wait           | `page.locator(...)`                          |
+| `globalSetup` for auth                             | No reporting, no retry, no trace (D28)    | Project dependencies pattern                 |
+| `test.beforeAll` for auth                          | Shared state across tests                 | Fixture with `scope: 'worker'`               |
+| `expect(value).toBe(expected)` for UI5 text        | Not web-first (race condition)            | `expect(proxy).toHaveUI5Text(expected)`      |
+| `page.click('#__button0')` for UI5 controls        | Generated IDs are unstable                | Use RecordReplay selector                    |
 
 ---
 

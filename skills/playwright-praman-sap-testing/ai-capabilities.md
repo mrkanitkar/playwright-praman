@@ -19,8 +19,7 @@ These features are available from the `aiTest` and `intentTest` fixtures.
 > **Status**: Phase 5 — available in Praman v1.0.0+
 
 ```typescript
-import { aiTest as test } from 'playwright-praman';
-import { intentTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 ```
 
 ### Fixture Hierarchy
@@ -41,26 +40,20 @@ The `pramanAI` fixture provides AI-powered test generation using LLM providers
 (Azure OpenAI, OpenAI, or Anthropic Claude).
 
 ```typescript
-import { aiTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
-test('AI-generated test steps', async ({ ui5Navigation, pramanAI }) => {
+test('AI-generated test steps', async ({ page, ui5Navigation, pramanAI }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
 
   // Generate test steps from a natural language description
-  const result = await pramanAI.generateTest(
+  const result = await pramanAI.agentic.generateTest(
     'Create a purchase order for supplier SUP-001 with 3 line items for material MAT001',
+    page,
   );
 
   // result.steps: string[] — human-readable steps
   // result.code: string — TypeScript test code
   // result.metadata: { model, tokens, duration }
-
-  console.log(result.steps);
-  // ['Navigate to PurchaseOrder-manage', 'Fill Supplier field with SUP-001', ...]
-  console.log(result.code);
-  // await ui5Navigation.navigateToApp('PurchaseOrder-manage');
-  // await ui5.fill({ bindingPath: { propertyPath: 'Supplier' } }, 'SUP-001');
-  // ...
 });
 ```
 
@@ -71,24 +64,23 @@ test('discover all UI5 controls', async ({ pramanAI, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
 
   // Get inventory of all interactive controls
-  const inventory = await pramanAI.discoverControls();
-  // Returns: [{ id, controlType, properties, isInteractive, category }]
+  const inventory = await pramanAI.discoverPage({ interactiveOnly: true });
+  // Returns: { controls: [{ id, controlType, properties, isInteractive, category }], url, ... }
 
-  const buttons = inventory.filter((c) => c.controlType === 'sap.m.Button');
-  const inputs = inventory.filter((c) => c.category === 'input');
+  const buttons = inventory.controls.filter((c) => c.controlType === 'sap.m.Button');
+  const inputs = inventory.controls.filter((c) => c.category === 'input');
 });
 ```
 
 ### Querying Capabilities
 
 ```typescript
-// Find what Praman can do for a given intent
-const caps = await pramanAI.queryCapabilities('fill a form field');
-// Returns: [{ name, description, example }]
+// Query capabilities via the registry
+const caps = await pramanAI.capabilities.forAI();
+// Returns structured capability data for AI consumption
 
-// Find recipes for a use case
-const recipes = await pramanAI.findRecipes('select table rows');
-// Returns: [{ name, code, description }]
+// Query by category
+const tableCaps = await pramanAI.capabilities.byCategory('table');
 ```
 
 ---
@@ -98,85 +90,84 @@ const recipes = await pramanAI.findRecipes('select table rows');
 Intent APIs provide high-level business operations for SAP module workflows.
 They use vocabulary mapping to find the right controls without knowing exact IDs.
 
-### Procurement (MM)
+### Procurement
 
 ```typescript
-import { intentTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
 test('create purchase order', async ({ intent, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
 
-  await intent.mm.fillSupplier('SUP-001');
-  await intent.mm.fillCompanyCode('1000');
-  await intent.mm.fillPurchasingOrg('1000');
-  await intent.mm.addLineItem({
+  await intent.procurement.createPurchaseOrder({
+    vendor: 'SUP-001',
     material: 'MAT001',
     quantity: 10,
     plant: '1000',
+    companyCode: '1000',
+    purchasingOrg: '1000',
   });
-  await intent.mm.save();
 });
 ```
 
-### Sales (SD)
+### Sales
 
 ```typescript
 test('create sales order', async ({ intent, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('SalesOrder-create');
 
-  await intent.sd.fillSoldToParty('CUST-001');
-  await intent.sd.fillSalesOrg('1000');
-  await intent.sd.addLineItem({
+  await intent.sales.createSalesOrder({
+    soldToParty: 'CUST-001',
+    salesOrg: '1000',
     material: 'MAT001',
     quantity: 5,
     price: 99.99,
   });
-  await intent.sd.save();
 });
 ```
 
-### Finance (FI)
+### Finance
 
 ```typescript
 test('post journal entry', async ({ intent, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('GLAccountLineItems-manage');
 
-  await intent.fi.setDocumentDate('2024-03-15');
-  await intent.fi.setPostingDate('2024-03-15');
-  await intent.fi.addLineItem({
+  await intent.finance.createJournalEntry({
+    documentDate: '2024-03-15',
+    postingDate: '2024-03-15',
     glAccount: '400000',
     debitCredit: 'S', // S = Debit, H = Credit
     amount: 1000,
     costCenter: '1000',
   });
-  await intent.fi.post();
 });
 ```
 
-### Manufacturing (PP)
+### Manufacturing
 
 ```typescript
 test('create production order', async ({ intent, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('ManufacturingOrder-manage');
 
-  await intent.pp.setMaterial('FG-001');
-  await intent.pp.setPlant('1000');
-  await intent.pp.setQuantity(100);
-  await intent.pp.setScheduledStart('2024-04-01');
-  await intent.pp.release();
+  await intent.manufacturing.createProductionOrder({
+    material: 'FG-001',
+    plant: '1000',
+    quantity: 100,
+    scheduledStart: '2024-04-01',
+  });
 });
 ```
 
-### Master Data (MM/SD/FI shared)
+### Master Data
 
 ```typescript
 test('maintain business partner', async ({ intent, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('BusinessPartner-manage');
 
-  await intent.masterData.setName('New Supplier GmbH');
-  await intent.masterData.setCountry('DE');
-  await intent.masterData.setTaxId('DE123456789');
-  await intent.masterData.save();
+  await intent.masterData.createVendorMaster({
+    name: 'New Supplier GmbH',
+    country: 'DE',
+    taxId: 'DE123456789',
+  });
 });
 ```
 
@@ -189,7 +180,7 @@ It enables intent APIs to find the right controls by business name rather than
 technical ID.
 
 ```typescript
-import { intentTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
 test('use vocabulary for field resolution', async ({ intent }) => {
   // Vocabulary maps 'Vendor' → various SAP field names
@@ -197,7 +188,7 @@ test('use vocabulary for field resolution', async ({ intent }) => {
   // all resolve to the same SAP field
 
   // Fill by business term (vocabulary-resolved)
-  await intent.mm.fillField('Vendor', 'SUP-001');
+  await intent.core.fillField('Vendor', 'SUP-001');
 
   // Get business term suggestions for a field
   const suggestions = await intent.vocabulary.getSuggestions('supplier');
@@ -224,18 +215,20 @@ Bulk discovery scans the entire page and returns a structured inventory
 of all UI5 controls, categorized by type and interactivity.
 
 ```typescript
-import { aiTest as test } from 'playwright-praman';
+import { test, expect } from 'playwright-praman';
 
 test('discover page structure', async ({ pramanAI, ui5Navigation }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
 
-  const inventory = await pramanAI.discoverControls({
-    includeNonInteractive: false, // Only interactive controls
-    categories: ['input', 'button'], // Filter by category
+  const inventory = await pramanAI.discoverPage({
+    interactiveOnly: true, // Only interactive controls
   });
 
-  for (const control of inventory) {
-    console.log(`${control.controlType} id=${control.id} category=${control.category}`);
+  for (const control of inventory.controls) {
+    test.info().annotations.push({
+      type: 'info',
+      description: `${control.controlType} id=${control.id} category=${control.category}`,
+    });
   }
 });
 ```

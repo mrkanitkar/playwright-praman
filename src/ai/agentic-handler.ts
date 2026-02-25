@@ -24,6 +24,7 @@ import type { ChatMessage } from './schemas/llm-request.schema.js';
 import type { AgenticCheckpoint, AiGeneratedTest, AiResponse, PageContext } from './types.js';
 
 import { PramanConfigSchema } from '#core/config/schema.js';
+import { ErrorCode } from '#core/errors/codes.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
 
 /** Default config with overridden discovery timeout for context building. */
@@ -375,7 +376,7 @@ export class AgenticHandler {
         status: 'error',
         data: undefined,
         error: {
-          code: 'ERR_AI_CAPABILITY_NOT_FOUND',
+          code: ErrorCode.ERR_AI_CAPABILITY_NOT_FOUND,
           message: `Capability '${raw.capability}' is not registered`,
         },
         metadata: {

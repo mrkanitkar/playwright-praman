@@ -22,6 +22,7 @@ import process from 'node:process';
 import type { AuthPage, AuthStrategy, SAPAuthConfig, SessionInfo } from './auth-types.js';
 
 import { AuthError } from '#core/errors/auth-error.js';
+import { ErrorCode } from '#core/errors/codes.js';
 import { retry } from '#core/utils/retry.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
 
@@ -121,6 +122,7 @@ export class SAPAuthHandler {
           const isAuth = await this.strategy.isAuthenticated(page);
           if (!isAuth) {
             throw new AuthError({
+              code: ErrorCode.ERR_AUTH_FAILED,
               message: 'Post-login verification failed: not authenticated',
               attempted: `Verify authentication after login to ${config.url}`,
               retryable: true,
@@ -461,6 +463,7 @@ export class SAPAuthHandler {
 
     if (missing.length > 0) {
       throw new AuthError({
+        code: ErrorCode.ERR_AUTH_FAILED,
         message: `Missing required environment variables: ${missing.join(', ')}`,
         attempted: `Build auth config from environment for ${activeSystem} system`,
         retryable: false,

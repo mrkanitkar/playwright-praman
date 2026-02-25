@@ -5,11 +5,11 @@ description: Debug and fix a failing SAP Praman test
 
 Debug and fix the failing SAP Praman test.
 
-**Skill reference**: `skills/playwright-praman-sap-testing/SKILL.md`
+**Skill reference**: `.github/skills/sap-test-automation/SKILL.md` (or `skills/playwright-praman-sap-testing/SKILL.md`)
 
 Before starting, read:
 
-- `skills/playwright-praman-sap-testing/SKILL.md` (forbidden patterns, transformation rules)
+- `.github/skills/sap-test-automation/SKILL.md` (forbidden patterns, transformation rules)
 - The failing test file
 
 Healing steps:

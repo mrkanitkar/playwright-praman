@@ -3,7 +3,7 @@
  *
  * @remarks
  * Verifies AgentPlanControlRef, AgentPlanStep, AgentPlanScenario, AgentPlan,
- * and ComplianceReport interface shapes and field types. Also verifies that
+ * and AgentComplianceReport interface shapes and field types. Also verifies that
  * all types are exported from the `playwright-praman/ai` sub-path.
  */
 import { describe, expectTypeOf, it } from 'vitest';
@@ -13,7 +13,7 @@ import type {
   AgentPlanControlRef,
   AgentPlanScenario,
   AgentPlanStep,
-  ComplianceReport,
+  AgentComplianceReport,
 } from '#ai/agent-types.js';
 import type { DiscoveredControl } from '#ai/types.js';
 
@@ -190,47 +190,51 @@ describe('AgentPlan', () => {
   });
 });
 
-// ── ComplianceReport ─────────────────────────────────────────────────────────
+// ── AgentComplianceReport ─────────────────────────────────────────────────────────
 
-describe('ComplianceReport', () => {
+describe('AgentComplianceReport', () => {
   it('has version as readonly string', () => {
-    expectTypeOf<ComplianceReport['version']>().toEqualTypeOf<string>();
+    expectTypeOf<AgentComplianceReport['version']>().toEqualTypeOf<string>();
   });
 
   it('has ui5ElementsInteracted as readonly number', () => {
-    expectTypeOf<ComplianceReport['ui5ElementsInteracted']>().toEqualTypeOf<number>();
+    expectTypeOf<AgentComplianceReport['ui5ElementsInteracted']>().toEqualTypeOf<number>();
   });
 
   it('has usingPramanFixtures as readonly number', () => {
-    expectTypeOf<ComplianceReport['usingPramanFixtures']>().toEqualTypeOf<number>();
+    expectTypeOf<AgentComplianceReport['usingPramanFixtures']>().toEqualTypeOf<number>();
   });
 
   it('has usingPlaywrightNative as readonly number', () => {
-    expectTypeOf<ComplianceReport['usingPlaywrightNative']>().toEqualTypeOf<number>();
+    expectTypeOf<AgentComplianceReport['usingPlaywrightNative']>().toEqualTypeOf<number>();
   });
 
   it('has fixturesUsed as readonly Record<string, number>', () => {
-    expectTypeOf<ComplianceReport['fixturesUsed']>().toEqualTypeOf<Record<string, number>>();
+    expectTypeOf<AgentComplianceReport['fixturesUsed']>().toEqualTypeOf<Record<string, number>>();
   });
 
   it('authMethod is seed-inline or setup-project union', () => {
-    expectTypeOf<ComplianceReport['authMethod']>().toEqualTypeOf<'seed-inline' | 'setup-project'>();
+    expectTypeOf<AgentComplianceReport['authMethod']>().toEqualTypeOf<
+      'seed-inline' | 'setup-project'
+    >();
   });
 
   it('forbiddenPatternScan is PASSED or FAILED union', () => {
-    expectTypeOf<ComplianceReport['forbiddenPatternScan']>().toEqualTypeOf<'PASSED' | 'FAILED'>();
+    expectTypeOf<AgentComplianceReport['forbiddenPatternScan']>().toEqualTypeOf<
+      'PASSED' | 'FAILED'
+    >();
   });
 
   it('violations is readonly string array', () => {
-    expectTypeOf<ComplianceReport['violations']>().toEqualTypeOf<readonly string[]>();
+    expectTypeOf<AgentComplianceReport['violations']>().toEqualTypeOf<readonly string[]>();
   });
 
   it('complianceStatus is PASSED or FAILED union', () => {
-    expectTypeOf<ComplianceReport['complianceStatus']>().toEqualTypeOf<'PASSED' | 'FAILED'>();
+    expectTypeOf<AgentComplianceReport['complianceStatus']>().toEqualTypeOf<'PASSED' | 'FAILED'>();
   });
 
   it('accepts fully compliant report', () => {
-    const report: ComplianceReport = {
+    const report: AgentComplianceReport = {
       version: '1.0.0',
       ui5ElementsInteracted: 12,
       usingPramanFixtures: 12,
@@ -246,11 +250,11 @@ describe('ComplianceReport', () => {
       violations: [],
       complianceStatus: 'PASSED',
     };
-    expectTypeOf(report).toExtend<ComplianceReport>();
+    expectTypeOf(report).toExtend<AgentComplianceReport>();
   });
 
   it('accepts failed report with violations', () => {
-    const report: ComplianceReport = {
+    const report: AgentComplianceReport = {
       version: '1.0.0',
       ui5ElementsInteracted: 5,
       usingPramanFixtures: 3,
@@ -264,7 +268,7 @@ describe('ComplianceReport', () => {
       ],
       complianceStatus: 'FAILED',
     };
-    expectTypeOf(report).toExtend<ComplianceReport>();
+    expectTypeOf(report).toExtend<AgentComplianceReport>();
   });
 });
 
@@ -278,8 +282,8 @@ describe('compile-time export checks', () => {
     expectTypeOf<Check>().toEqualTypeOf<true>();
   });
 
-  it('ComplianceReport complianceStatus narrows correctly', () => {
-    const report = {} as ComplianceReport;
+  it('AgentComplianceReport complianceStatus narrows correctly', () => {
+    const report = {} as AgentComplianceReport;
     if (report.complianceStatus === 'PASSED') {
       expectTypeOf(report.complianceStatus).toEqualTypeOf<'PASSED'>();
     }

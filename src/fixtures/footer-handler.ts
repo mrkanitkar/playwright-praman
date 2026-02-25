@@ -24,6 +24,7 @@
 import type { Page } from '@playwright/test';
 import type { Logger } from 'pino';
 
+import { ErrorCode } from '#core/errors/codes.js';
 import { ControlError } from '#core/errors/control-error.js';
 import { createLogger } from '#core/logging/logger.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
@@ -103,8 +104,10 @@ export class FooterHandler {
 
     if (!found) {
       throw new ControlError({
+        code: ErrorCode.ERR_CONTROL_NOT_FOUND,
         message: `Footer button "${buttonText}" not found`,
         attempted: `Click footer bar button with text: ${buttonText}`,
+        retryable: true,
         suggestions: [
           `Verify the "${buttonText}" button exists in the footer bar`,
           'Check if the page has fully loaded (waitForUI5Stable)',

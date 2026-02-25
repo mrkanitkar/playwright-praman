@@ -68,9 +68,9 @@ export default defineConfig({
 import { test as setup } from 'playwright-praman';
 
 setup('authenticate', async ({ page, pramanConfig }) => {
-  const { SAPAuthHandler } = await import('playwright-praman');
-  const handler = new SAPAuthHandler(page, pramanConfig.auth!, { logger: console });
-  await handler.authenticate();
+  const { SAPAuthHandler } = await import('playwright-praman/auth');
+  const handler = new SAPAuthHandler(page, pramanConfig.auth!);
+  await handler.login();
   await page.context().storageState({ path: '.auth/session.json' });
 });
 ```
@@ -131,7 +131,7 @@ auth: {
 For technical users, CI pipelines, or systems with API-based auth (Basic auth header, JWT).
 
 ```typescript
-import { APIAuthStrategy } from 'playwright-praman';
+import { APIAuthStrategy } from 'playwright-praman/auth';
 
 // In auth-setup.ts:
 const strategy = new APIAuthStrategy(page, {
@@ -140,7 +140,7 @@ const strategy = new APIAuthStrategy(page, {
   headerName: 'Authorization',
   headerValue: `Bearer ${process.env['API_TOKEN']}`,
 });
-await strategy.authenticate();
+await strategy.login();
 ```
 
 ### Custom: MultiTenantAuthStrategy
@@ -159,7 +159,7 @@ const strategy = new MultiTenantAuthStrategy(page, { baseUrl: tenantUrl, ... });
 For mTLS / client certificate authentication.
 
 ```typescript
-import { CertificateAuthStrategy } from 'playwright-praman';
+import { CertificateAuthStrategy } from 'playwright-praman/auth';
 
 // Playwright context must be configured with clientCertificates:
 const strategy = new CertificateAuthStrategy(page, {

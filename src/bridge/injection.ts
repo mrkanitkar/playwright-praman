@@ -40,6 +40,12 @@ const eagerInjectedTargets = new WeakSet<Page | BrowserContext>();
  *
  * Idempotent --- calling multiple times on the same target is a no-op.
  *
+ * Currently not wired into the default fixture lifecycle (lazy injection
+ * via `ensureBridgeInjected()` is used instead). Kept as a public extension
+ * point for advanced users who need bridge availability before the first
+ * UI5 operation — e.g., auth flows or pre-navigation setup scripts.
+ * Wire into fixture lifecycle when eager injection is needed by default.
+ *
  * @param target - Playwright Page or BrowserContext to inject into.
  *
  * @example

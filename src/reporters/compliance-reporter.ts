@@ -50,7 +50,7 @@ export interface TestComplianceEntry {
 }
 
 /** Full compliance report written to disk. */
-export interface ComplianceReport {
+export interface TestComplianceReport {
   readonly timestamp: string;
   readonly totalTests: number;
   readonly compliantTests: number;
@@ -239,7 +239,7 @@ function categoriseStatus(pramanCount: number, rawCount: number): TestCompliance
  *
  * @internal
  */
-function buildReport(entries: readonly TestComplianceEntry[]): ComplianceReport {
+function buildReport(entries: readonly TestComplianceEntry[]): TestComplianceReport {
   const compliantTests = entries.filter((e) => e.status === 'compliant').length;
   const rawPlaywrightTests = entries.filter((e) => e.status === 'raw-playwright').length;
   const mixedTests = entries.filter((e) => e.status === 'mixed').length;

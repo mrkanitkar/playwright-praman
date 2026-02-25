@@ -37,6 +37,7 @@ export const CapabilityCategorySchema = z.enum([
   'footer',
   'ai',
   'data',
+  'assert',
 ]);
 export type CapabilityCategory = z.infer<typeof CapabilityCategorySchema>;
 

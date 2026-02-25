@@ -63,9 +63,9 @@ Write one minimal test showing what should happen.
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { retryWithBackoff } from '#core/utils/retry.js';
+import { retry } from '#core/utils/retry.js';
 
-describe('retryWithBackoff', () => {
+describe('retry', () => {
   it('retries failed operations 3 times with exponential backoff', async () => {
     let attempts = 0;
     const operation = async () => {
@@ -74,7 +74,7 @@ describe('retryWithBackoff', () => {
       return 'success';
     };
 
-    const result = await retryWithBackoff(operation, { maxRetries: 3 });
+    const result = await retry(operation, { maxRetries: 3 });
 
     expect(result).toBe('success');
     expect(attempts).toBe(3);
@@ -180,10 +180,7 @@ export interface RetryOptions {
   readonly maxDelay?: number;
 }
 
-export async function retryWithBackoff<T>(
-  operation: () => Promise<T>,
-  options: RetryOptions,
-): Promise<T> {
+export async function retry<T>(operation: () => Promise<T>, options: RetryOptions): Promise<T> {
   const { maxRetries, initialDelay = 100, maxDelay = 5000 } = options;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -205,7 +202,7 @@ export async function retryWithBackoff<T>(
 **❌ BAD — Over-Engineered**
 
 ```typescript
-export async function retryWithBackoff<T>(
+export async function retry<T>(
   operation: () => Promise<T>,
   options?: {
     maxRetries?: number;
@@ -931,6 +928,9 @@ npm run test:unit -- --coverage
 **Requirement:** Add retry logic to bridge adapter with exponential backoff
 
 ### Step 1: RED — Write Failing Test
+
+> **Note:** This `RetryStrategy` class is a teaching example for demonstrating the TDD cycle.
+> Praman implements retry logic as the `retry()` function exported from `#core/utils/retry`.
 
 ```typescript
 // tests/unit/bridge/retry-strategy.test.ts

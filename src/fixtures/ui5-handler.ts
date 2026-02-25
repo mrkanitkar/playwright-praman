@@ -43,11 +43,13 @@ import { ensureBridgeInjected } from '#bridge/injection.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
 import { filterMethods } from '#bridge/method-blacklist.js';
 import type { DiscoveryStrategyName } from '#core/config/schema.js';
+import { ErrorCode } from '#core/errors/codes.js';
 import { ControlError } from '#core/errors/control-error.js';
 import { SelectorError } from '#core/errors/selector-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
 import type { TracerWrapper } from '#core/telemetry/otel.js';
 import { getNoOpTracer } from '#core/telemetry/otel.js';
+import { createSpanName } from '#core/telemetry/spans.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
@@ -85,6 +87,8 @@ export interface UI5HandlerOptions {
   readonly config?: {
     readonly ui5WaitTimeout?: number;
     readonly controlDiscoveryTimeout?: number;
+    readonly preferVisibleControls?: boolean;
+    readonly skipStabilityWait?: boolean;
   };
   /** Optional tracer for OpenTelemetry instrumentation. Defaults to NoOpTracer. */
   readonly tracer?: TracerWrapper;
@@ -100,8 +104,10 @@ function validateSelector(selector: UI5Selector): void {
   const hasProperty = Object.keys(selector).length > 0;
   if (!hasProperty) {
     throw new SelectorError({
+      code: ErrorCode.ERR_SELECTOR_INVALID,
       message: 'Selector must have at least one property (id, controlType, properties, etc.)',
       attempted: 'Validate UI5 selector before discovery',
+      retryable: false,
       suggestions: [
         'Provide at least an id, controlType, or properties matcher',
         'Example: { id: "btn1" } or { controlType: "sap.m.Button" }',
@@ -129,6 +135,8 @@ export class UI5Handler {
   private readonly discoveryStrategies: readonly DiscoveryStrategyName[];
   private readonly ui5WaitTimeout: number;
   private readonly discoveryTimeout: number;
+  private readonly preferVisibleControls: boolean;
+  private readonly skipStabilityWait: boolean;
   private readonly tracer: TracerWrapper;
   private cache: ControlProxyCache;
 
@@ -138,6 +146,8 @@ export class UI5Handler {
     this.discoveryStrategies = options.discoveryStrategies;
     this.ui5WaitTimeout = options.config?.ui5WaitTimeout ?? DEFAULT_UI5_WAIT_TIMEOUT;
     this.discoveryTimeout = options.config?.controlDiscoveryTimeout ?? DEFAULT_DISCOVERY_TIMEOUT;
+    this.preferVisibleControls = options.config?.preferVisibleControls ?? true;
+    this.skipStabilityWait = options.config?.skipStabilityWait ?? false;
     this.tracer = options.tracer ?? getNoOpTracer();
     this.cache = new ControlProxyCache();
   }
@@ -181,11 +191,22 @@ export class UI5Handler {
    * Finds a single control via page.evaluate() with the find-control browser script.
    *
    * @param selector - The UI5 selector to search for.
+   * @param options - Optional discovery options.
    * @returns The control ref, or null if not found.
    */
-  private async internalFindControl(selector: UI5Selector): Promise<BridgeControlRef | null> {
+  private async internalFindControl(
+    selector: UI5Selector,
+    options?: { readonly forceRegistryScan?: boolean },
+  ): Promise<BridgeControlRef | null> {
     await this.ensureReady();
-    const withArgs = createFindControlScript().replace(/\)\(\)$/, `)(${JSON.stringify(selector)})`);
+    const findOptions = {
+      preferVisibleControls: this.preferVisibleControls,
+      forceRegistryScan: options?.forceRegistryScan ?? false,
+    };
+    const withArgs = createFindControlScript().replace(
+      /\)\(\)$/,
+      `)(${JSON.stringify(selector)}, ${JSON.stringify(findOptions)})`,
+    );
     const result = await this.page.evaluate<ControlDiscoveryResult>(withArgs);
     if (result.id === '') return null;
     return { id: result.id, controlType: result.controlType };
@@ -275,15 +296,18 @@ export class UI5Handler {
   @ui5Step
   async control(
     selector: UI5Selector,
-    options?: { readonly timeout?: number },
+    options?: { readonly timeout?: number; readonly skipStabilityWait?: boolean },
   ): Promise<UI5ControlBase> {
-    return this.tracer.withSpan('praman.ui5.findControl', async () => {
+    return this.tracer.withSpan(createSpanName('ui5', 'findControl'), async () => {
       validateSelector(selector);
 
       // Always poll for control discovery — use explicit timeout or configured default
       await this.waitFor(selector, { timeout: options?.timeout ?? this.discoveryTimeout });
 
-      await this.internalWaitForUI5Stable();
+      const skip = options?.skipStabilityWait ?? this.skipStabilityWait;
+      if (!skip) {
+        await this.internalWaitForUI5Stable(this.ui5WaitTimeout);
+      }
 
       const proxy = await this.discoverSingleControl(selector);
 
@@ -319,9 +343,9 @@ export class UI5Handler {
    */
   @ui5Step
   async controls(selector: UI5Selector): Promise<readonly UI5ControlBase[]> {
-    return this.tracer.withSpan('praman.ui5.findControls', async () => {
+    return this.tracer.withSpan(createSpanName('ui5', 'findControls'), async () => {
       validateSelector(selector);
-      await this.internalWaitForUI5Stable();
+      await this.internalWaitForUI5Stable(this.ui5WaitTimeout);
 
       const refs = await this.internalFindControls(selector);
       if (refs.length === 0) {
@@ -360,7 +384,7 @@ export class UI5Handler {
    */
   @ui5Step
   async click(selector: UI5Selector): Promise<void> {
-    return this.tracer.withSpan('praman.ui5.click', async () => {
+    return this.tracer.withSpan(createSpanName('ui5', 'click'), async () => {
       const proxy = await this.control(selector);
       await this.strategy.press(this.page, proxy.id);
     });
@@ -382,7 +406,7 @@ export class UI5Handler {
    */
   @ui5Step
   async fill(selector: UI5Selector, value: string): Promise<void> {
-    return this.tracer.withSpan('praman.ui5.fill', async () => {
+    return this.tracer.withSpan(createSpanName('ui5', 'fill'), async () => {
       const proxy = await this.control(selector);
       await this.strategy.enterText(this.page, proxy.id, value);
     });
@@ -542,7 +566,7 @@ export class UI5Handler {
    */
   @ui5Step
   async waitForUI5(timeout?: number): Promise<void> {
-    return this.tracer.withSpan('praman.ui5.waitForUI5', async () => {
+    return this.tracer.withSpan(createSpanName('ui5', 'waitForUI5'), async () => {
       await this.internalWaitForUI5Stable(timeout ?? this.ui5WaitTimeout);
     });
   }
@@ -567,7 +591,7 @@ export class UI5Handler {
     selector: UI5Selector,
     options?: { readonly timeout?: number; readonly interval?: number },
   ): Promise<void> {
-    return this.tracer.withSpan('praman.ui5.waitFor', async () => {
+    return this.tracer.withSpan(createSpanName('ui5', 'waitFor'), async () => {
       const timeout = options?.timeout ?? this.discoveryTimeout;
       const interval = options?.interval ?? DEFAULT_POLL_INTERVAL;
       const deadline = Date.now() + timeout;
@@ -586,8 +610,10 @@ export class UI5Handler {
       }
 
       throw new TimeoutError({
+        code: ErrorCode.ERR_TIMEOUT_CONTROL_DISCOVERY,
         message: `Timed out waiting for control: ${JSON.stringify(selector)}`,
         attempted: `Wait for control with selector: ${JSON.stringify(selector)}`,
+        retryable: true,
         timeoutMs: timeout,
         suggestions: [
           'Increase the timeout value',
@@ -630,16 +656,18 @@ export class UI5Handler {
    */
   @ui5Step
   async inspect(selector: UI5Selector): Promise<ControlInspection> {
-    return this.tracer.withSpan('praman.ui5.inspect', async () => {
+    return this.tracer.withSpan(createSpanName('ui5', 'inspect'), async () => {
       validateSelector(selector);
-      await this.internalWaitForUI5Stable();
+      await this.internalWaitForUI5Stable(this.ui5WaitTimeout);
 
       // Discover the control first to get its ID
       const ref = await this.internalFindControl(selector);
       if (ref === null) {
         throw new ControlError({
+          code: ErrorCode.ERR_CONTROL_NOT_FOUND,
           message: `Control not found for inspection: ${JSON.stringify(selector)}`,
           attempted: `Inspect control with selector: ${JSON.stringify(selector)}`,
+          retryable: true,
           suggestions: [
             'Verify the control ID exists in the UI5 view',
             'Check if the page has fully loaded (waitForUI5Stable)',
@@ -724,6 +752,9 @@ export class UI5Handler {
         }
       } else if (strategyName === 'recordreplay') {
         controlRef = await this.internalFindControl(selector);
+      } else {
+        // strategyName === 'registry'
+        controlRef = await this.internalFindControl(selector, { forceRegistryScan: true });
       }
       if (controlRef !== null) break;
     }

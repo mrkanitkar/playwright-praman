@@ -42,9 +42,11 @@ tests that use the `playwright-praman` plugin.
 
 ## MANDATORY PREFLIGHT
 
-Before ANY work, read the Praman skill file to understand the plugin API:
+Before ANY work, read the Praman skill file to understand the plugin API.
+Try the first path, fall back to the second:
 
 ```text
+.github/skills/sap-test-automation/SKILL.md
 skills/playwright-praman-sap-testing/SKILL.md
 ```
 
@@ -96,6 +98,82 @@ Determine the underlying cause by examining SAP-specific failure categories:
 | **MDC Control**    | `setSelectedKey is not a function`             | MDC Field needs `setValue()`, not `select()` |
 | **Dialog**         | Control not found in dialog                    | Missing `searchOpenDialogs: true`            |
 | **Draft**          | Data not saved                                 | Draft auto-save timing, missing activation   |
+
+### Complete Forbidden Pattern List (19 patterns)
+
+Every healed test MUST be scanned for ALL of these patterns. Any occurrence is a compliance failure.
+
+| #   | Forbidden Pattern                             | Correct Alternative                            |
+| --- | --------------------------------------------- | ---------------------------------------------- |
+| 1   | `page.click('#__...')`                        | `ui5.control({ id: '...' }).press()`           |
+| 2   | `page.fill('#__...')`                         | `ui5.fill(selector, value)`                    |
+| 3   | `page.locator('[data-sap-ui]')`               | `ui5.control(selector)`                        |
+| 4   | `page.locator('.sapM...')`                    | `ui5.control({ controlType: 'sap.m.*' })`      |
+| 5   | `page.$$('tr')`                               | `ui5.table.getRows(tableId)`                   |
+| 6   | `page.click('text=...')`                      | `ui5.control({ properties: { text: '...' } })` |
+| 7   | `from '@playwright/test'`                     | `from 'playwright-praman'`                     |
+| 8   | `from 'dhikraft'`                             | `from 'playwright-praman'`                     |
+| 9   | `new UI5Handler(...)`                         | Fixture-only access (auto-injected)            |
+| 10  | `.initialize()`                               | Auto-init via fixtures                         |
+| 11  | `.injectBridgeLate()`                         | Auto-inject via fixtures                       |
+| 12  | `.waitForUI5Stable()`                         | `ui5.waitForUI5()`                             |
+| 13  | `ui5Table.getTableRows(...)`                  | `ui5.table.getRows(tableId)`                   |
+| 14  | `navigation.openTileByTitle(...)`             | `ui5Navigation.navigateToTile(title)`          |
+| 15  | `intentWrappers.*`                            | `intent.core.*`                                |
+| 16  | `dialog.waitForDialog(...)`                   | `ui5.dialog.waitFor()`                         |
+| 17  | `sapAuth.loginFromEnv()` in test body         | Auth belongs in seed only                      |
+| 18  | `page.waitForTimeout(...)`                    | `ui5.waitForUI5()` or polling                  |
+| 19  | Missing `searchOpenDialogs: true` for dialogs | Must include option                            |
+
+### Healing Priority Tiers
+
+When multiple issues are found, apply fixes in this order:
+
+**Gold (auto-fixable, simple rename):**
+
+- Import source: `@playwright/test` → `playwright-praman`
+- Method renames: `waitForUI5Stable` → `waitForUI5`, `getTableRows` → `getRows`
+- Remove `page.waitForTimeout()` calls
+- Add missing `searchOpenDialogs: true`
+
+**Silver (semi-automatic, signature restructuring):**
+
+- `navigateToIntent(string, string)` → `navigateToIntent({ semanticObject, action })`
+- `page.click('#__id')` → `ui5.control({ id }).press()`
+- Dialog method names: `waitForDialog()` → `ui5.dialog.waitFor()`
+
+**Bronze (manual review, architecture changes):**
+
+- Replace raw `page.locator('.sapM...')` with proper control selectors
+- Remove `new UI5Handler()` instantiation, restructure to use fixtures
+- Convert dhikraft API patterns to Praman patterns
+
+### Compliance Header Template
+
+Every healed test should include this TSDoc header:
+
+```typescript
+/**
+ * @file {App} - {Scenario Description}
+ * @compliance
+ *   - Using Praman/UI5 methods: 100%
+ *   - Using Playwright native (verified non-UI5): 0%
+ *   - Forbidden patterns: 0
+ * @healed {date} - {summary of fixes applied}
+ */
+```
+
+### Post-Healing Verification with ComplianceReporter
+
+After healing, run the test and verify compliance:
+
+1. ComplianceReporter runs AFTER test execution
+2. It reads `test.info().result.steps[].title` from runtime
+3. It classifies each step by checking title prefixes against `PRAMAN_STEP_PREFIXES`
+4. `isPramanStep(title)` returns `true` if the title starts with a known prefix (Click, Fill, Press, Select, Check, etc.) or contains `>`
+5. The reporter counts Praman steps vs raw Playwright steps to calculate the compliance percentage
+
+**Important**: The TSDoc compliance header (above) is documentary only. Runtime compliance is validated by ComplianceReporter through step title prefix matching, NOT by parsing code comments.
 
 ### Step 5: Code Remediation
 

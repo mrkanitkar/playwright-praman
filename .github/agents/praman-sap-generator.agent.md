@@ -45,9 +45,11 @@ plans into executable `.spec.ts` files by driving a live browser session.
 
 ## MANDATORY PREFLIGHT
 
-Before ANY work, read the Praman skill file to understand the plugin API:
+Before ANY work, read the Praman skill file to understand the plugin API.
+Try the first path, fall back to the second:
 
 ```text
+.github/skills/sap-test-automation/SKILL.md
 skills/playwright-praman-sap-testing/SKILL.md
 ```
 
@@ -387,6 +389,8 @@ Every generated `.spec.ts` must include a comprehensive header comment:
  * - Proper UI5 event propagation: {how}
  */
 ```
+
+> **Note**: The TSDoc compliance header above is documentary — it is NOT machine-validated by ComplianceReporter. Runtime compliance is validated by ComplianceReporter, which classifies test steps by their title prefixes (`PRAMAN_STEP_PREFIXES` in `src/reporters/compliance-reporter.ts`). The reporter checks if `test.step()` titles start with known prefixes (Click, Fill, Press, Select, Check, Uncheck, Clear, Get text, Get value, Find control, Wait for, etc.) to calculate the Praman vs raw Playwright step ratio.
 
 ---
 

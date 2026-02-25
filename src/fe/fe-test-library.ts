@@ -261,6 +261,7 @@ export class FETestLibraryInstance {
         code: ErrorCode.ERR_BRIDGE_NOT_READY,
         message: 'FE Test Library is not initialized',
         attempted: 'Execute OPA5 Given/When/Then chain',
+        retryable: false,
         suggestions: ['Call initializeFETestLibrary() before execute()'],
       });
     }
@@ -283,6 +284,7 @@ export class FETestLibraryInstance {
         code: ErrorCode.ERR_BRIDGE_EXECUTION,
         message: `FE queue add failed: ${addResult.message ?? UNKNOWN_ERROR_MESSAGE}`,
         attempted: 'Add method calls to OPA5 queue',
+        retryable: true,
         suggestions: ['Verify page objects are configured correctly'],
       });
     }
@@ -293,6 +295,7 @@ export class FETestLibraryInstance {
         code: ErrorCode.ERR_BRIDGE_EXECUTION,
         message: `FE queue execution failed: ${execResult.message ?? UNKNOWN_ERROR_MESSAGE}`,
         attempted: 'Execute OPA5 queue',
+        retryable: true,
         suggestions: [
           'Check that OPA5 assertions are valid',
           'Verify the application state matches expectations',
@@ -424,6 +427,7 @@ export async function initializeFETestLibrary(
       code: ErrorCode.ERR_BRIDGE_INJECTION,
       message: `Failed to load FE test libraries: ${loadResult.message ?? UNKNOWN_ERROR_MESSAGE}`,
       attempted: 'Load SAP FE test libraries via sap.ui.require',
+      retryable: true,
       suggestions: [
         'Ensure UI5 runtime is loaded (version >= 1.100)',
         'Check that sap/fe/test modules are available',
@@ -438,6 +442,7 @@ export async function initializeFETestLibrary(
       code: ErrorCode.ERR_BRIDGE_EXECUTION,
       message: `Failed to initialize OPA5: ${initResult[1]}`,
       attempted: 'Initialize OPA5 page objects with config',
+      retryable: false,
       suggestions: [
         'Verify appId and componentId values are correct',
         'Check that entitySet exists in the OData service',

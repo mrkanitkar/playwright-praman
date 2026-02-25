@@ -147,13 +147,16 @@ export function createFindControlScript(): string {
       ${ENHANCED_MATCHING_SNIPPET}
 
       var selector = arguments[0];
+      var findOptions = arguments[1] || {};
+      var preferVisible = findOptions.preferVisibleControls !== false;
+      var forceRegistryScan = findOptions.forceRegistryScan === true;
       if (!selector) {
         return empty;
       }
 
-      // Tier 1: Direct ID lookup via registry (exact match)
+      // Tier 1: Direct ID lookup via registry (exact match) — skip when forceRegistryScan
       var selectorId = typeof selector === 'string' ? selector : selector.id;
-      if (selectorId) {
+      if (selectorId && !forceRegistryScan) {
         var directCtrl = bridge.getById(selectorId);
         if (directCtrl) {
           if (!selector.controlType
@@ -200,7 +203,7 @@ export function createFindControlScript(): string {
               if (!visibleMatch) visibleMatch = regCtrl;
             }
           }
-          var bestMatch = visibleMatch || firstMatch;
+          var bestMatch = preferVisible ? (visibleMatch || firstMatch) : firstMatch;
           if (bestMatch) return buildResult(bestMatch);
         }
       }

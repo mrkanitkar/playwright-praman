@@ -33,7 +33,7 @@ export type {
   AgentPlanControlRef,
   AgentPlanScenario,
   AgentPlanStep,
-  ComplianceReport,
+  AgentComplianceReport,
 } from './agent-types.js';
 
 // ── Registries ─────────────────────────────────────────────────────────────

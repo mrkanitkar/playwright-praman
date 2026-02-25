@@ -18,6 +18,8 @@
 
 import type { AiResponse, DiscoveredControl, PageContext } from './types.js';
 
+import { isContainerControl, isInteractiveControl } from '#core/constants/control-types.js';
+
 // ── Minimal page interface ─────────────────────────────────────────────────
 
 /**
@@ -134,19 +136,28 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
 
 // ── Node.js-side helpers ──────────────────────────────────────────────────
 
-/** Derives the `DiscoveredControl.category` from raw browser flags. */
+/**
+ * Derives the `DiscoveredControl.category` from the control type name.
+ *
+ * @remarks
+ * Uses the canonical Node-side control type sets from
+ * `#core/constants/control-types.js` as the primary source of truth.
+ * Browser-side boolean flags serve as a fallback for any types not yet
+ * registered in the canonical sets.
+ */
 function deriveCategory(
-  isInteractive: boolean,
-  isContainer: boolean,
+  controlType: string,
+  browserIsInteractive: boolean,
+  browserIsContainer: boolean,
 ): DiscoveredControl['category'] {
-  if (isInteractive) return 'interactive';
-  if (isContainer) return 'container';
+  if (isInteractiveControl(controlType) || browserIsInteractive) return 'interactive';
+  if (isContainerControl(controlType) || browserIsContainer) return 'container';
   return 'unknown';
 }
 
 /** Transforms one raw browser control record into a `DiscoveredControl`. */
 function toDiscoveredControl(raw: RawDiscoveredControl): DiscoveredControl {
-  const category = deriveCategory(raw.isInteractive, raw.isContainer);
+  const category = deriveCategory(raw.controlType, raw.isInteractive, raw.isContainer);
   const objectCategoryValue = raw.objectCategory !== 'unknown' ? raw.objectCategory : undefined;
 
   return {

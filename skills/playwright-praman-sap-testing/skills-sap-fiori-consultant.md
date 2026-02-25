@@ -112,13 +112,15 @@ You do NOT:
 // Pattern: Validate OData V2 entity read with Praman
 test('should read purchase order items via OData V2', async ({ page, ui5 }) => {
   await test.step('Navigate to Purchase Order detail', async () => {
-    await ui5.navigateByIntent('PurchaseOrder', 'display', { PurchaseOrder: '4500000001' });
+    await ui5Navigation.navigateToIntent(
+      { semanticObject: 'PurchaseOrder', action: 'display' },
+      { PurchaseOrder: '4500000001' },
+    );
     await ui5.waitForUI5Stable();
   });
 
   await test.step('Verify OData entity loaded in model', async () => {
-    const model = await ui5.getModel(page, ''); // default model
-    const poData = await model.getProperty('/PurchaseOrder');
+    const poData = await ui5.odata.getModelData('/PurchaseOrder');
     expect(poData).toBeDefined();
     expect(poData.PurchaseOrder).toBe('4500000001');
   });
@@ -491,7 +493,7 @@ test.describe('Purchase Order Creation Process', () => {
 
   test('should create purchase order end-to-end', async ({ page, ui5 }) => {
     await test.step('1. Navigate to Create PO app', async () => {
-      await ui5.navigateByIntent('PurchaseOrder', 'create');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
       await ui5.waitForUI5Stable();
     });
 

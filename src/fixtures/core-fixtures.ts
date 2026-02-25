@@ -215,7 +215,7 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
 
   ui5: async ({ page, pramanConfig, rootLogger, tracer }, use) => {
     const logger = createLogger('bridge', rootLogger);
-    const strategy = createInteractionStrategy(pramanConfig.interactionStrategy);
+    const strategy = createInteractionStrategy(pramanConfig.interactionStrategy, pramanConfig.opa5);
 
     // Listen for main frame navigation to reset bridge injection state.
     // After navigation the injected bridge script is gone, so the next
@@ -234,7 +234,12 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
       discoveryStrategies: pramanConfig.discoveryStrategies,
       config: {
         ui5WaitTimeout: pramanConfig.ui5WaitTimeout,
-        controlDiscoveryTimeout: pramanConfig.controlDiscoveryTimeout,
+        controlDiscoveryTimeout:
+          pramanConfig.selectors?.defaultTimeout ?? pramanConfig.controlDiscoveryTimeout,
+        preferVisibleControls:
+          pramanConfig.selectors?.preferVisibleControls ?? pramanConfig.preferVisibleControls,
+        skipStabilityWait:
+          pramanConfig.selectors?.skipStabilityWait ?? pramanConfig.skipStabilityWait,
       },
       tracer,
     });

@@ -79,7 +79,7 @@ tests/
 │   │   │   └── factory.test.ts
 │   │   └── api-resolver.test.ts
 │   ├── proxy/
-│   │   ├── dynamic-proxy.test.ts   # Single proxy handler
+│   │   ├── control-proxy.test.ts    # Single proxy handler
 │   │   ├── proxy-converter.test.ts # Bidirectional conversion
 │   │   ├── ui5-object-cache.test.ts # TTL + LRU
 │   │   └── discovery.test.ts       # 3-tier discovery
@@ -117,7 +117,7 @@ tests/
 │
 └── helpers/                       # Shared test utilities
     ├── mock-page.ts               # Mock Playwright Page
-    ├── mock-adapter.ts            # Mock BridgeAdapter
+    ├── mock-adapter.ts            # Mock bridge adapter (TODO: BridgeAdapter interface does not exist yet; use typed mock factories from tests/helpers/)
     ├── mock-config.ts             # Test config factory
     ├── fixtures.ts                # Test-specific fixtures
     └── assertions.ts              # Custom test assertions
@@ -199,21 +199,29 @@ export function createMockPage(overrides?: Partial<Page>): Page {
   } as unknown as Page;
 }
 
-// tests/helpers/mock-adapter.ts — Type-safe BridgeAdapter mock
+// tests/helpers/mock-adapter.ts — Type-safe bridge adapter mock
+// NOTE: BridgeAdapter interface does not exist in the current codebase.
+// The pattern below is illustrative. In practice, use the typed mock
+// factories available in tests/helpers/ (e.g., mock-config.ts,
+// mock-ui5-control.ts) and follow the actual bridge types defined
+// in src/bridge/bridge-types.ts.
 import { vi } from 'vitest';
-import type { BridgeAdapter, ControlHandle, MethodResult } from '#bridge/adapter';
+// TODO: Replace with actual bridge types from #bridge/bridge-types
+// import type { BridgeAdapter, ControlHandle, MethodResult } from '#bridge/adapter';
 
-export function createMockAdapter(overrides?: Partial<BridgeAdapter>): BridgeAdapter {
+export function createMockAdapter(
+  overrides?: Partial<Record<string, unknown>>,
+): Record<string, unknown> {
   return {
     inject: vi.fn().mockResolvedValue(undefined),
     findControl: vi.fn().mockResolvedValue({
       id: 'mock-control-1',
       controlType: 'sap.m.Button',
       visible: true,
-    } satisfies ControlHandle),
+    }),
     executeMethod: vi.fn().mockResolvedValue({
       returnType: 'empty',
-    } satisfies MethodResult),
+    }),
     dispose: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
@@ -332,9 +340,9 @@ describe('ControlError', () => {
 ### 3.5 Testing the Proxy (D16)
 
 ```typescript
-// tests/unit/proxy/dynamic-proxy.test.ts
+// tests/unit/proxy/control-proxy.test.ts
 import { describe, it, expect, vi } from 'vitest';
-import { createControlProxy } from '#proxy/dynamic-proxy';
+import { createControlProxy } from '#proxy/control-proxy';
 import { createMockPage, createMockAdapter } from '../helpers';
 
 describe('createControlProxy (D16: Single Unified Proxy)', () => {

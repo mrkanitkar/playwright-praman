@@ -36,13 +36,4 @@ describe('proxy barrel', () => {
   it('exports getDiscoveryPriorities', () => {
     expect(proxy.getDiscoveryPriorities).toBeTypeOf('function');
   });
-
-  // ── Method filter ──────────────────────────────────────────────────
-  it('exports isMethodAllowed', () => {
-    expect(proxy.isMethodAllowed).toBeTypeOf('function');
-  });
-
-  it('exports extractAllowedMethods', () => {
-    expect(proxy.extractAllowedMethods).toBeTypeOf('function');
-  });
 });

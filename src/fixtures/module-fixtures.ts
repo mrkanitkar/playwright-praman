@@ -312,7 +312,7 @@ export interface ModuleFixtures {
 export const moduleTest = coreTest.extend<ModuleFixtures>({
   ui5: async ({ page, pramanConfig, rootLogger }, use) => {
     const logger = createLogger('bridge', rootLogger);
-    const strategy = createInteractionStrategy(pramanConfig.interactionStrategy);
+    const strategy = createInteractionStrategy(pramanConfig.interactionStrategy, pramanConfig.opa5);
 
     const navigationListener = (frame: Frame): void => {
       if (frame === page.mainFrame()) {
@@ -328,7 +328,12 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       discoveryStrategies: pramanConfig.discoveryStrategies,
       config: {
         ui5WaitTimeout: pramanConfig.ui5WaitTimeout,
-        controlDiscoveryTimeout: pramanConfig.controlDiscoveryTimeout,
+        controlDiscoveryTimeout:
+          pramanConfig.selectors?.defaultTimeout ?? pramanConfig.controlDiscoveryTimeout,
+        preferVisibleControls:
+          pramanConfig.selectors?.preferVisibleControls ?? pramanConfig.preferVisibleControls,
+        skipStabilityWait:
+          pramanConfig.selectors?.skipStabilityWait ?? pramanConfig.skipStabilityWait,
       },
     });
 

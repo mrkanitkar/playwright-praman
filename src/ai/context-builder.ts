@@ -12,9 +12,10 @@
 
 import { discoverPage } from './bulk-discovery.js';
 import type { DiscoveryPage } from './bulk-discovery.js';
-import type { AiResponse, PageContext } from './types.js';
+import type { AiResponse, DiscoveredControl, PageContext } from './types.js';
 
 import type { PramanConfig } from '#core/config/schema.js';
+import { detectObjectCategory } from '#core/constants/object-categories.js';
 
 // ── Helper: read UI5 version from browser ─────────────────────────────────
 
@@ -59,6 +60,27 @@ async function readUi5Version(page: DiscoveryPage): Promise<string | undefined> 
     // Version detection is best-effort — silently omit on failure
     return undefined;
   }
+}
+
+// ── Helper: enrich object category from canonical constants ────────────────
+
+/**
+ * Enriches a discovered control's `objectCategory` using the canonical
+ * Node-side `detectObjectCategory()` from `#core/constants/object-categories.js`.
+ *
+ * @remarks
+ * The browser-side discovery already sets `objectCategory` via an inlined
+ * detection function. This Node-side pass ensures consistency with the
+ * canonical category rules and catches any additions not yet inlined in
+ * the browser script.
+ *
+ * @param control - Discovered control to enrich.
+ * @returns The control with `objectCategory` set when a non-`'unknown'` category is detected.
+ */
+function enrichObjectCategory(control: DiscoveredControl): DiscoveredControl {
+  const category = detectObjectCategory(control.controlType);
+  if (category === 'unknown') return control;
+  return { ...control, objectCategory: category };
 }
 
 // ── Main export ────────────────────────────────────────────────────────────
@@ -111,9 +133,23 @@ export async function buildPageContext(
   // ── Step 2: UI5 version detection (best-effort) ────────────────────────
   const ui5Version = await readUi5Version(page);
 
-  // ── Step 3: Enrich PageContext with ui5Version ─────────────────────────
+  // ── Step 3: Enrich controls with canonical object categories ───────────
+  const data = discoveryResult.data;
+  const controls = data.controls.map(enrichObjectCategory);
+  const buttons = data.buttons.map(enrichObjectCategory);
+  const formFields = data.formFields.map(enrichObjectCategory);
+  const tables = data.tables.map(enrichObjectCategory);
+  const navigationElements = data.navigationElements.map(enrichObjectCategory);
+
+  // ── Step 4: Merge enriched controls and ui5Version into PageContext ────
   const enrichedContext: PageContext = {
-    ...discoveryResult.data,
+    url: data.url,
+    controls,
+    buttons,
+    formFields,
+    tables,
+    navigationElements,
+    timestamp: data.timestamp,
     ...(ui5Version !== undefined && { ui5Version }),
   };
 
