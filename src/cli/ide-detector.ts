@@ -19,14 +19,14 @@
  */
 
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import process from 'node:process';
 
 /**
  * Result of scanning a project directory for known IDE marker files.
  */
 export interface IDEDetection {
-  /** Whether VS Code (`.vscode/` directory or `TERM_PROGRAM=vscode`) was detected. */
+  /** Whether VS Code (`.vscode/` directory or `TERM_PROGRAM=vscode` for current cwd scans) was detected. */
   readonly vscode: boolean;
   /** Whether Claude Code (`CLAUDE.md`) was detected. */
   readonly claude: boolean;
@@ -77,7 +77,8 @@ export function detectIDEs(targetDir: string): IDEDetection {
     markers.some((marker) => existsSync(join(targetDir, marker)));
 
   const vscodeByMarker = hasMarker(['.vscode']);
-  const vscodeByEnv = process.env['TERM_PROGRAM'] === 'vscode';
+  const isCurrentWorkingDirectoryScan = resolve(targetDir) === process.cwd();
+  const vscodeByEnv = isCurrentWorkingDirectoryScan && process.env['TERM_PROGRAM'] === 'vscode';
 
   return {
     vscode: vscodeByMarker || vscodeByEnv,

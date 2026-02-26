@@ -18,6 +18,7 @@
  * @module cli
  */
 import { join } from 'node:path';
+import process from 'node:process';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -130,14 +131,23 @@ describe('detectIDEs', () => {
     expect(result.jules).toBe(false);
   });
 
-  it('detects VS Code via TERM_PROGRAM env var fallback when no .vscode marker', () => {
+  it('detects VS Code via TERM_PROGRAM env var fallback for current working directory scans', () => {
+    mockExistsSync.mockReturnValue(false);
+    vi.stubEnv('TERM_PROGRAM', 'vscode');
+
+    const result = detectIDEs(process.cwd());
+
+    expect(result.vscode).toBe(true);
+    expect(result.claude).toBe(false);
+  });
+
+  it('does not activate VS Code env fallback for non-current-directory target scans', () => {
     mockExistsSync.mockReturnValue(false);
     vi.stubEnv('TERM_PROGRAM', 'vscode');
 
     const result = detectIDEs('/project');
 
-    expect(result.vscode).toBe(true);
-    expect(result.claude).toBe(false);
+    expect(result.vscode).toBe(false);
   });
 
   it('does not activate VS Code env fallback for other TERM_PROGRAM values', () => {
