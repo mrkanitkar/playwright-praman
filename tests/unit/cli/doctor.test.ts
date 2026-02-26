@@ -75,6 +75,7 @@ function makeDetection(overrides: Partial<IDEDetection> = {}): IDEDetection {
     cursor: false,
     opencode: false,
     jules: false,
+    copilot: false,
     ...overrides,
   };
 }

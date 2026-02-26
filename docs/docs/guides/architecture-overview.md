@@ -5,7 +5,7 @@ title: 'Architecture Overview'
 
 # Architecture Overview
 
-Praman v1.0 is a ground-up rebuild of the SAP UI5 test automation platform for Playwright. It ships as a single npm package (`playwright-praman`) with sub-path exports, organized into a strict 5-layer architecture.
+Praman v1.0 is a ground-up rebuild of the SAP UI5 test automation plugin for Playwright. It ships as a single npm package (`playwright-praman`) with sub-path exports, organized into a strict 5-layer architecture.
 
 ## 5-Layer Architecture
 
@@ -23,7 +23,7 @@ Praman v1.0 is a ground-up rebuild of the SAP UI5 test automation platform for P
 +---------------------------------------------------------------------+
 |  Layer 4: Fixtures + Auth + Navigation                              |
 |  core-fixtures | auth-fixtures | nav-fixtures | stability-fixtures  |
-|  UI5Handler (18 methods) | Auth Handler (6 strategies)              |
+|  UI5Handler (16 methods) | Auth Handler (6 strategies)              |
 |  Shell Handler | Footer Handler | WorkZone module                   |
 +---------------------------------------------------------------------+
 |  Layer 3: Control Proxy + UI5Object                                 |
@@ -163,7 +163,7 @@ Praman v1.0 decomposes these into focused modules following SRP (Single Responsi
 
 **UI5Handler** was decomposed from a 2,318 LOC god object into:
 
-- `ui5-handler.ts` (588 LOC) -- 18 core methods
+- `ui5-handler.ts` (588 LOC) -- 16 core methods
 - `shell-handler.ts` (102 LOC) -- FLP shell operations
 - `footer-handler.ts` (119 LOC) -- Footer bar operations
 - Navigation module (201 LOC) -- Route and hash navigation
@@ -181,7 +181,7 @@ Every module targets &lt;= 300 LOC. Exceptions are documented with justification
 
 | Metric                   | Value                       |
 | ------------------------ | --------------------------- |
-| Source files             | 129                         |
+| Source files             | 182                         |
 | Source LOC               | ~29,000                     |
 | Public functions         | 208                         |
 | Test files               | 109                         |

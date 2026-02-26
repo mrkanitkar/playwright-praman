@@ -1,13 +1,22 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2024-2026 ZesTest (support@zestest.in)
 import type { ReactNode } from 'react';
 import Layout from '@theme/Layout';
+
+function Section({ title, children }: { title: string; children: ReactNode }): ReactNode {
+  return (
+    <div className="praman-prose-section">
+      <h2>{title}</h2>
+      {children}
+    </div>
+  );
+}
 
 export default function Disclaimer(): ReactNode {
   return (
     <Layout title="Disclaimer" description="Praman Disclaimer">
-      <main style={{ maxWidth: 800, margin: '0 auto', padding: '4rem 2rem' }}>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#020617', marginBottom: '2rem' }}>
-          Disclaimer
-        </h1>
+      <main className="praman-prose-page">
+        <h1 style={{ marginBottom: '2rem' }}>Disclaimer</h1>
 
         <Section title="AI-Assisted Development">
           <p>
@@ -63,14 +72,5 @@ export default function Disclaimer(): ReactNode {
         </Section>
       </main>
     </Layout>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }): ReactNode {
-  return (
-    <div style={{ marginBottom: '2rem' }}>
-      <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.75rem' }}>{title}</h2>
-      <div style={{ fontSize: '0.95rem', color: '#1e293b', lineHeight: 1.7 }}>{children}</div>
-    </div>
   );
 }

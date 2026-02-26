@@ -36,6 +36,8 @@ export interface IDEDetection {
   readonly opencode: boolean;
   /** Whether Jules (`.jules/`) was detected. */
   readonly jules: boolean;
+  /** Whether GitHub Copilot (`.github/copilot-instructions.md` or `.github/agents/`) was detected. */
+  readonly copilot: boolean;
 }
 
 interface IDERule {
@@ -50,6 +52,11 @@ const IDE_RULES: readonly IDERule[] = [
   { name: 'cursor', label: 'Cursor', markers: ['.cursor', '.cursorrc'] },
   { name: 'opencode', label: 'OpenCode', markers: ['.opencode'] },
   { name: 'jules', label: 'Jules', markers: ['.jules'] },
+  {
+    name: 'copilot',
+    label: 'GitHub Copilot',
+    markers: ['.github/copilot-instructions.md', '.github/agents'],
+  },
 ];
 
 /**
@@ -78,6 +85,7 @@ export function detectIDEs(targetDir: string): IDEDetection {
     cursor: hasMarker(['.cursor', '.cursorrc']),
     opencode: hasMarker(['.opencode']),
     jules: hasMarker(['.jules']),
+    copilot: hasMarker(['.github/copilot-instructions.md', '.github/agents']),
   };
 }
 

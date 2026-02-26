@@ -17,7 +17,7 @@ This page provides a higher-level feature overview with usage examples and conte
 | ------------------------ | ----- |
 | **Public Functions**     | 120+  |
 | **Public Types**         | 100+  |
-| **Error Codes**          | 56    |
+| **Error Codes**          | 58    |
 | **Fixture Modules**      | 12    |
 | **Custom Matchers**      | 10    |
 | **UI5 Control Types**    | 199   |
@@ -103,7 +103,7 @@ Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visibl
 ## Configuration & Extensibility
 
 - **Zod-validated config** with environment variable overrides
-- **14 error classes, 56 error codes** with `retryable` flag and `suggestions[]`
+- **14 error classes, 58 error codes** with `retryable` flag and `suggestions[]`
 - **Structured logging** with secret redaction
 - **OpenTelemetry integration** for distributed tracing
 - **Playwright step decoration** for rich HTML reports
@@ -114,4 +114,6 @@ Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visibl
 - **5 SAP domain intents** — Procurement, Sales, Finance, Manufacturing, Master Data
 - **Compliance reporter** — tracks Praman vs raw Playwright usage
 - **OData trace reporter** — per-entity-set performance statistics
-- **CLI tools** — `init`, `doctor`, `uninstall`
+- **CLI tools** — `init` (scaffold + IDE agent installation), `doctor`, `uninstall`
+- **AI agents** — 3 Claude Code SAP agents (planner, generator, healer) installed by `init`
+- **Seed file** — authenticated SAP browser session for AI discovery (`tests/seeds/sap-seed.spec.ts`)

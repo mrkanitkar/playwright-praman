@@ -11,7 +11,7 @@ practical code examples.
 
 | Factor             | Tosca                          | Playwright + Praman                          |
 | ------------------ | ------------------------------ | -------------------------------------------- |
-| License cost       | Per-user commercial license    | Open source (MIT)                            |
+| License cost       | Per-user commercial license    | Open source (Apache 2.0)                     |
 | SAP Fiori support  | Via SAP UI5 scan / engine      | Native UI5 control registry                  |
 | CI/CD integration  | Tosca CI adapter               | First-class CLI (`npx playwright test`)      |
 | Version control    | Tosca workspace                | Git (standard branching, PRs, diffs)         |

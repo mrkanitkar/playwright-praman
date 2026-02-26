@@ -108,6 +108,132 @@ function PersonaGrid(): ReactNode {
   );
 }
 
+interface Guide {
+  icon: string;
+  from: string;
+  title: string;
+  desc: string;
+  path: string;
+}
+
+function QuickStartGuides(): ReactNode {
+  const guides: Guide[] = [
+    {
+      icon: '🔄',
+      from: 'Coming from wdi5',
+      title: 'Migration from wdi5',
+      desc: 'Map your wdi5 selectors, authenticators, and FE library patterns to Praman equivalents. Side-by-side code comparisons.',
+      path: '/docs/guides/migration-from-wdi5',
+    },
+    {
+      icon: '🎭',
+      from: 'Already using Playwright',
+      title: 'Migration from Vanilla Playwright',
+      desc: 'Add SAP UI5 control access to your existing Playwright suite. Drop-in fixture replacement with zero test rewrites.',
+      path: '/docs/guides/migration-from-playwright',
+    },
+    {
+      icon: '📖',
+      from: 'New to Playwright',
+      title: 'Playwright Primer for SAP Testers',
+      desc: 'Start here if you come from a manual testing or Selenium background. Covers async/await, fixtures, and web-first assertions.',
+      path: '/docs/guides/playwright-primer',
+    },
+    {
+      icon: '🏗️',
+      from: 'Coming from Tosca',
+      title: 'From Tosca to Playwright + Praman',
+      desc: 'Translate Tosca modules and TestCases into Playwright test files. Covers auth setup, FLP navigation, and table scanning.',
+      path: '/docs/guides/migration-from-tosca',
+    },
+    {
+      icon: '🤖',
+      from: 'Using Claude Code / Cursor / VS Code',
+      title: 'Agent & IDE Setup',
+      desc: 'Install AI agents, seed files, and IDE configs automatically via `init`. Covers Claude Code, VS Code, Cursor, and Jules.',
+      path: '/docs/guides/agent-setup',
+    },
+  ];
+
+  return (
+    <section style={{
+      borderTop: '1px solid var(--praman-border)',
+      background: 'var(--praman-surface-alt)',
+      padding: '3.5rem 2rem 5rem',
+    }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <p className="praman-section-label">Onboarding</p>
+          <h2 className="hero__title" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+            Quick Start by Background
+          </h2>
+          <p className="hero__subtitle" style={{ fontSize: '1rem' }}>
+            Pick the guide that matches where you are coming from.
+          </p>
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '1.25rem',
+        }}>
+          {guides.map((g) => (
+            <Link
+              key={g.path}
+              to={g.path}
+              style={{ textDecoration: 'none' }}
+            >
+              <div style={{
+                height: '100%',
+                padding: '1.5rem',
+                border: '1px solid var(--praman-border)',
+                borderRadius: '10px',
+                borderTop: '3px solid var(--ifm-color-primary)',
+                background: 'var(--ifm-background-color)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem',
+                transition: 'box-shadow 0.15s, transform 0.15s',
+              }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--praman-shadow-md)';
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+                  (e.currentTarget as HTMLDivElement).style.transform = 'none';
+                }}
+              >
+                <div style={{ fontSize: '1.6rem', lineHeight: 1 }}>{g.icon}</div>
+                <div style={{
+                  fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase',
+                  letterSpacing: '0.09em', color: 'var(--ifm-color-primary)',
+                }}>
+                  {g.from}
+                </div>
+                <div style={{ fontSize: '0.97rem', fontWeight: 700, color: 'var(--praman-ink)' }}>
+                  {g.title}
+                </div>
+                <p style={{
+                  fontSize: '0.83rem', color: 'var(--praman-ink-secondary)',
+                  lineHeight: 1.6, margin: 0, flex: 1,
+                }}>
+                  {g.desc}
+                </p>
+                <div style={{
+                  marginTop: '0.75rem', fontSize: '0.8rem', fontWeight: 600,
+                  color: 'var(--ifm-color-primary)',
+                }}>
+                  Read guide →
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Personas(): ReactNode {
   return (
     <Layout title="Personas" description="Who uses Praman — from SAP Program Managers to AI Engineers">
@@ -121,6 +247,7 @@ export default function Personas(): ReactNode {
           </p>
         </section>
         <PersonaGrid />
+        <QuickStartGuides />
       </main>
     </Layout>
   );

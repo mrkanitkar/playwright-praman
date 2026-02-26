@@ -20,6 +20,7 @@
 
 import process from 'node:process';
 
+import type { IDEDetection } from './ide-detector.js';
 import { detectIDEs, getIDELabels } from './ide-detector.js';
 import { logBanner, logError, logSection, logStep, logSuccess, logWarn } from './logger.js';
 import { scaffoldProject } from './scaffolder.js';
@@ -46,6 +47,45 @@ export interface InitOptions {
 
 /** Total number of init steps displayed to the user. */
 const TOTAL_STEPS = 4;
+
+/**
+ * Prints IDE-specific post-init instructions for each detected IDE.
+ *
+ * @param detection - The IDE detection result from {@link detectIDEs}.
+ */
+function printIDESetupInstructions(detection: IDEDetection): void {
+  if (detection.claude) {
+    logSection('Claude Code Setup');
+    logWarn('Append the Praman SAP agent section to your CLAUDE.md:');
+    logSuccess(
+      'cat node_modules/playwright-praman/docs/user-integration/claude-md-appendable.md >> CLAUDE.md',
+    );
+  }
+
+  if (detection.cursor) {
+    logSection('Cursor Setup');
+    logWarn('Append Praman rules to your Cursor config:');
+    logSuccess(
+      'cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable.mdc >> .cursorrules',
+    );
+  }
+
+  if (detection.jules) {
+    logSection('Jules Setup');
+    logWarn('Append Praman setup to your Jules config:');
+    logSuccess(
+      'cat node_modules/playwright-praman/docs/user-integration/jules-setup-appendable.md >> .jules/setup.md',
+    );
+  }
+
+  if (detection.copilot) {
+    logSection('GitHub Copilot Setup');
+    logWarn('Append Praman instructions to your Copilot config:');
+    logSuccess(
+      'cat node_modules/playwright-praman/docs/user-integration/copilot-instructions-appendable.md >> .github/copilot-instructions.md',
+    );
+  }
+}
 
 /**
  * Parses CLI arguments for the `init` command.
@@ -158,6 +198,7 @@ export async function runInit(args: readonly string[]): Promise<void> {
   const result = await scaffoldProject({
     targetDir: options.targetDir,
     force: options.force,
+    detection,
   });
 
   if (result.success) {
@@ -179,4 +220,7 @@ export async function runInit(args: readonly string[]): Promise<void> {
 
   logSuccess('Run: npx playwright install');
   logSuccess('Run: npx playwright test --ui');
+
+  // IDE-specific appendable instructions
+  printIDESetupInstructions(detection);
 }

@@ -5,7 +5,7 @@ title: 'AI Integration'
 
 # AI Integration
 
-Praman is an AI-first test automation platform. The `playwright-praman/ai` sub-path provides structured interfaces for LLM-driven test generation, page analysis, and autonomous agent workflows.
+Praman is an AI-first test automation plugin. The `playwright-praman/ai` sub-path provides structured interfaces for LLM-driven test generation, page analysis, and autonomous agent workflows.
 
 ## AiResponse Envelope
 

@@ -1,6 +1,170 @@
 import type { ReactNode } from 'react';
 import Layout from '@theme/Layout';
 
+/* ─── Feature Parity Comparison ────────────────────────────── */
+
+type CellStatus = 'check' | 'partial' | 'no';
+interface Cell { v: CellStatus; label: string }
+interface Row { feature: string; native: Cell; wdi5: Cell; praman: Cell }
+interface Section { title: string; rows: Row[] }
+
+const C = (v: CellStatus, label: string): Cell => ({ v, label });
+
+const SECTIONS: Section[] = [
+  {
+    title: 'General Test Automation',
+    rows: [
+      { feature: 'Modern async/await syntax',    native: C('check',   '✓'),                           wdi5: C('check',   '✓'),                          praman: C('check',   '✓') },
+      { feature: 'TypeScript support',            native: C('check',   '✓ Native, strict'),             wdi5: C('check',   '✓ Full TS, SAP UI5 generics'), praman: C('check',   '✓ Strict + branded types') },
+      { feature: 'Parallel execution',            native: C('check',   '✓ Workers'),                    wdi5: C('check',   '✓ maxInstances'),             praman: C('check',   '✓ Workers') },
+      { feature: 'Auto-wait for elements',        native: C('check',   '✓ Web-first assertions'),       wdi5: C('partial', '⚠ Basic polling'),            praman: C('check',   '✓ Web-first + UI5 stability') },
+      { feature: 'Visual regression testing',     native: C('check',   '✓ Native screenshots'),         wdi5: C('partial', '⚠ Plugin required'),          praman: C('check',   '✓ Native (Playwright)') },
+      { feature: 'Network interception',          native: C('check',   '✓ Full page.route()'),          wdi5: C('partial', '⚠ Limited'),                  praman: C('check',   '✓ Full + analytics blocking') },
+      { feature: 'Multi-browser support',         native: C('check',   '✓ Chrome / Firefox / WebKit'),  wdi5: C('check',   '✓ Chrome / Firefox / Safari'), praman: C('check',  '✓ Chrome / Firefox / WebKit') },
+    ],
+  },
+  {
+    title: 'Control Discovery & Interaction',
+    rows: [
+      { feature: 'UI5 control selector engine',        native: C('no',      '✗'),                          wdi5: C('check',   '✓ OPA5 selectors: ID, type, properties, bindingPath, ancestor…'), praman: C('check', '✓ ui5= engine, 4-tier strategy') },
+      { feature: 'Discovery strategy depth',           native: C('no',      '✗'),                          wdi5: C('partial', '⚠ Single-pass, ID + properties'),        praman: C('check',   '✓ Cache → ID → RecordReplay → registry') },
+      { feature: 'Control result caching',             native: C('no',      '✗'),                          wdi5: C('partial', '⚠ Manual key (wdio_ui5_key)'),            praman: C('check',   '✓ LRU 200 entries, 5 s TTL, automatic') },
+      { feature: 'Typed UI5 control interfaces',       native: C('no',      '✗'),                          wdi5: C('partial', '⚠ ~30 types, limited'),                   praman: C('check',   '✓ 199 controls, 4,092 methods') },
+      { feature: 'SmartField / MDC inner control',     native: C('no',      '✗'),                          wdi5: C('partial', '⚠ Outer wrapper only'),                   praman: C('check',   '✓ SmartField, SmartFilterBar, mdc.Field, mdc.ValueHelp') },
+      { feature: 'Interaction strategy selection',     native: C('no',      '✗'),                          wdi5: C('partial', '⚠ Fixed: RecordReplay + fireEvent fallback'), praman: C('check', '✓ UI5-native / DOM-first / OPA5') },
+      { feature: 'OPA5-standard interaction',          native: C('no',      '✗'),                          wdi5: C('check',   '✓ RecordReplay API (primary)'),              praman: C('check',   '✓ RecordReplay API (selectable)') },
+      { feature: 'Direct UI5 method access',           native: C('no',      '✗ page.evaluate only'),       wdi5: C('check',   '✓ firePress(), getValue()'),               praman: C('check',   '✓ Typed proxy + exec()') },
+      { feature: 'Method safety blacklist',            native: C('no',      '✗'),                          wdi5: C('no',      '✗'),                                       praman: C('check',   '✓ 71 static + 2 dynamic rules') },
+      { feature: 'Control metadata introspection',     native: C('no',      '✗'),                          wdi5: C('partial', '⚠ Basic'),                                 praman: C('check',   '✓ getControlMetadata(), retrieveMembers()') },
+      { feature: 'Auto-wait for UI5 stability',        native: C('no',      '✗'),                          wdi5: C('check',   '✓ waitForUI5()'),                           praman: C('check',   '✓ 3-tier: bootstrap → stable → DOM settle') },
+      { feature: 'Dialog auto-discovery',              native: C('no',      '✗'),                          wdi5: C('partial', '⚠ Manual'),                                praman: C('check',   '✓ 10 dialog types via sap-ui-static') },
+      { feature: 'UI5-specific custom assertions',     native: C('no',      '✗'),                          wdi5: C('partial', '⚠ Basic expect extensions'),               praman: C('check',   '✓ 10 matchers: ValueState, Binding, RowCount…') },
+      { feature: 'Table variants supported',           native: C('no',      '✗'),                          wdi5: C('partial', '⚠ Via getAggregation + FE ListReport'),   praman: C('check',   '✓ 6 variants incl. SmartTable, mdc.Table') },
+      { feature: 'UI5 control tree / page discovery',  native: C('no',      '✗'),                          wdi5: C('check',   '✓ getUI5ControlTree()'),                    praman: C('check',   '✓ discoverPage() → PageContext') },
+      { feature: 'UI5 bridge injection',               native: C('no',      '✗'),                          wdi5: C('check',   '✓'),                                        praman: C('check',   '✓') },
+      { feature: 'UI5 version compatibility',          native: C('no',      '✗'),                          wdi5: C('check',   '✓ 1.60+'),                                  praman: C('check',   '✓ 1.71+') },
+    ],
+  },
+  {
+    title: 'SAP Authentication',
+    rows: [
+      { feature: 'SAP Cloud (SAML / OAuth)',     native: C('no',      '✗ Manual'),             wdi5: C('check',   '✓ BTP / IAS built-in'),  praman: C('check',   '✓ Built-in, 6 strategies') },
+      { feature: 'SAP On-Premise (NetWeaver)',   native: C('no',      '✗ Manual'),             wdi5: C('check',   '✓ BasicAuthenticator'),  praman: C('check',   '✓ Basic auth, auto-detect') },
+      { feature: 'Session persistence',          native: C('check',   '✓ storageState'),       wdi5: C('partial', '⚠ Cookies only'),        praman: C('check',   '✓ storageState + SAP tokens') },
+      { feature: 'Auth strategy auto-detection', native: C('no',      '✗'),                    wdi5: C('no',      '✗'),                     praman: C('check',   '✓ detectSystemType()') },
+      { feature: 'Custom auth strategy plug-in', native: C('no',      '✗'),                    wdi5: C('check',   '✓ CustomAuthenticator'), praman: C('check',   '✓ registerAuthStrategy()') },
+    ],
+  },
+  {
+    title: 'Fiori Launchpad',
+    rows: [
+      { feature: 'Tile navigation',              native: C('no',      '✗ Manual DOM'),         wdi5: C('partial', '⚠ Hash/router only (goTo)'), praman: C('check', '✓ navigateToTile() by title') },
+      { feature: 'Intent-based navigation',      native: C('no',      '✗'),                    wdi5: C('partial', '⚠ Via hash fragment'),   praman: C('check',   '✓ navigateToIntent() with params') },
+      { feature: 'Shell search & open app',      native: C('no',      '✗'),                    wdi5: C('no',      '✗'),                     praman: C('check',   '✓ searchAndOpenApp()') },
+      { feature: 'FLP user locale / settings',   native: C('no',      '✗'),                    wdi5: C('no',      '✗'),                     praman: C('check',   '✓ getLanguage(), getDateFormat()…') },
+      { feature: 'SM12 lock management',         native: C('no',      '✗'),                    wdi5: C('no',      '✗'),                     praman: C('check',   '✓ getLockEntries(), auto-cleanup') },
+      { feature: 'BTP WorkZone frame support',   native: C('no',      '✗'),                    wdi5: C('check',   '✓ btpWorkZoneEnablement, toWorkZoneApp()'), praman: C('check', '✓ btpWorkZone fixture') },
+    ],
+  },
+  {
+    title: 'OData / Backend Testing',
+    rows: [
+      { feature: 'OData CRUD operations',        native: C('no',      '✗ fetch / axios manual'),  wdi5: C('no',      '✗ No native OData API'),  praman: C('check',   '✓ queryEntities, create, update, delete') },
+      { feature: 'Query params ($filter…)',       native: C('no',      '✗'),                       wdi5: C('no',      '✗'),                     praman: C('check',   '✓ $filter, $select, $expand, $orderby') },
+      { feature: 'CSRF token + ETag handling',   native: C('no',      '✗'),                       wdi5: C('no',      '✗'),                     praman: C('check',   '✓ Automatic') },
+      { feature: 'Model-level data access',      native: C('no',      '✗'),                       wdi5: C('partial', '⚠ Via getModel() on control'), praman: C('check', '✓ getModelData(), waitForODataLoad()') },
+      { feature: 'OData trace reporter',         native: C('no',      '✗'),                       wdi5: C('no',      '✗'),                     praman: C('check',   '✓ Per-entity-set call analytics') },
+    ],
+  },
+  {
+    title: 'AI & Test Intelligence',
+    rows: [
+      { feature: 'AI-first fixture design',      native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ Capability & recipe registries, SKILL.md') },
+      { feature: 'SAP domain intent APIs',       native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ 5 domains: procurement, sales, finance, mfg, master data') },
+      { feature: 'SAP vocabulary service',       native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ 6 domains, fuzzy match, field → selector') },
+      { feature: 'Agentic test generation',      native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ generateTest(), checkpoint, suggestActions()') },
+      { feature: 'LLM provider abstraction',     native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ Claude / OpenAI / Azure OpenAI') },
+      { feature: 'Fiori Elements test helpers',  native: C('no',  '✗'),   wdi5: C('check', '✓ wdi5-fe-library'),  praman: C('check',   '✓ listReport, objectPage, FE test library') },
+      { feature: 'Compliance reporter',          native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ Step categorisation, compliance %') },
+    ],
+  },
+  {
+    title: 'Developer Experience',
+    rows: [
+      { feature: 'Setup CLI',                 native: C('no',      '✗'),                   wdi5: C('partial', '⚠ wdio create wizard'),   praman: C('check',   '✓ npx playwright-praman init') },
+      { feature: 'Doctor / diagnostics CLI',  native: C('no',      '✗'),                   wdi5: C('no',      '✗'),                      praman: C('check',   '✓ npx playwright-praman doctor') },
+      { feature: 'Structured error codes',    native: C('partial', '⚠ JS Error only'),     wdi5: C('partial', '⚠ Basic messages'),      praman: C('check',   '✓ 14 classes, 56 codes, suggestions[]') },
+      { feature: 'API documentation',         native: C('check',   '✓ Full docs'),         wdi5: C('partial', '⚠ Partial'),             praman: C('check',   '✓ TSDoc + API Extractor') },
+      { feature: 'Playwright fixture pattern',native: C('check',   '✓ test.extend()'),    wdi5: C('no',      '✗'),                      praman: C('check',   '✓ 21 fixtures, 5 auto-fixtures') },
+    ],
+  },
+  {
+    title: 'Performance',
+    rows: [
+      { feature: 'Test execution speed',          native: C('check',   '⚡ Fast — native browser'),    wdi5: C('partial', '⚠ Moderate — WebDriver overhead'),   praman: C('check',  '⚡ Fast — Playwright-based') },
+      { feature: 'Browser startup time',           native: C('check',   '⚡ Fast'),                     wdi5: C('partial', '⚠ Slower — WebDriverIO session'),     praman: C('check',  '⚡ Fast') },
+      { feature: 'Parallel execution efficiency',  native: C('check',   '✓ High — workers'),            wdi5: C('partial', '⚠ Moderate — maxInstances'),          praman: C('check',  '✓ High — workers') },
+    ],
+  },
+];
+
+function ParityCell({ cell, isPraman }: { cell: Cell; isPraman: boolean }): ReactNode {
+  const cls = cell.v === 'check' ? 'praman-parity-check'
+    : cell.v === 'partial' ? 'praman-parity-partial'
+    : 'praman-parity-no';
+  return (
+    <td className={isPraman ? 'praman-parity-col--praman' : undefined}>
+      <span className={cls}>{cell.label}</span>
+    </td>
+  );
+}
+
+function ParityComparison(): ReactNode {
+  return (
+    <section className="praman-parity-wrap">
+      <div className="praman-parity-inner">
+        <div className="praman-parity-header">
+          <p className="praman-section-label">Comparison</p>
+          <h2>Feature Parity Comparison</h2>
+          <p>
+            Comprehensive comparison of SAP UI5 test automation capabilities across frameworks.
+            Playwright Native retains advantages in speed, ecosystem, and visual testing.
+          </p>
+        </div>
+        <div className="praman-parity-table-wrap">
+          <table className="praman-parity-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Playwright Native</th>
+                <th>WDO + WDI5</th>
+                <th>Playwright + Praman</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SECTIONS.map((section) => (
+                <>
+                  <tr key={section.title} className="praman-parity-section-row">
+                    <td colSpan={4}>{section.title}</td>
+                  </tr>
+                  {section.rows.map((row) => (
+                    <tr key={row.feature}>
+                      <td>{row.feature}</td>
+                      <ParityCell cell={row.native} isPraman={false} />
+                      <ParityCell cell={row.wdi5} isPraman={false} />
+                      <ParityCell cell={row.praman} isPraman={true} />
+                    </tr>
+                  ))}
+                </>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FeatureGrid(): ReactNode {
   const features = [
     {
@@ -126,6 +290,7 @@ export default function Features(): ReactNode {
         <Numbers />
         <div style={{ width: 48, height: 1, background: 'var(--praman-border)', margin: '0 auto' }} />
         <FeatureGrid />
+        <ParityComparison />
       </main>
     </Layout>
   );

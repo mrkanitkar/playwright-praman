@@ -7,14 +7,14 @@ Praman supports 6 pluggable authentication strategies for SAP systems.
 
 ## Strategies
 
-| Strategy        | Use Case                                 | Config Value         |
-| --------------- | ---------------------------------------- | -------------------- |
-| **Basic Auth**  | On-premise SAP NetWeaver / S/4HANA       | `'basic'`            |
-| **BTP SAML**    | SAP BTP with SAML IdP (IAS, Azure AD)    | `'btp-saml'`         |
-| **Office 365**  | Microsoft SSO for SAP connected to Azure | `'office365'`        |
-| **Custom**      | Custom login page or proprietary IdP     | `'custom'`           |
-| **API**         | API key or OAuth bearer token (headless) | via `SAPAuthHandler` |
-| **Certificate** | Client certificate authentication        | via `SAPAuthHandler` |
+| Strategy         | Use Case                                      | Config Value     |
+| ---------------- | --------------------------------------------- | ---------------- |
+| **On-Premise**   | On-premise SAP NetWeaver / S/4HANA            | `'onprem'`       |
+| **Cloud SAML**   | SAP BTP with SAML IdP (IAS, Azure AD)         | `'cloud-saml'`   |
+| **Office 365**   | Microsoft SSO for SAP connected to Azure      | `'office365'`    |
+| **Multi-Tenant** | SAP BTP multi-tenant apps with subdomain auth | `'multi-tenant'` |
+| **API**          | API key or OAuth bearer token (headless)      | `'api'`          |
+| **Certificate**  | Client certificate authentication             | `'certificate'`  |
 
 ## Setup Project Pattern
 
@@ -38,7 +38,7 @@ setup('SAP authentication', async ({ page, context }) => {
     url: process.env.SAP_BASE_URL ?? '',
     username: process.env.SAP_ONPREM_USERNAME ?? '',
     password: process.env.SAP_ONPREM_PASSWORD ?? '',
-    strategy: 'basic',
+    strategy: 'onprem',
   });
 
   const handler = new SAPAuthHandler({ strategy });
@@ -95,7 +95,7 @@ test('navigate after auth', async ({ ui5Navigation }) => {
 
 ## Strategy Examples
 
-### Basic Auth (On-Premise)
+### On-Premise (`onprem`)
 
 ```bash
 # .env
@@ -107,7 +107,7 @@ SAP_CLIENT=100
 SAP_LANGUAGE=EN
 ```
 
-### BTP SAML (Cloud)
+### Cloud SAML (`cloud-saml`)
 
 ```bash
 # .env
@@ -140,7 +140,7 @@ test('explicit auth', async ({ sapAuth, page }) => {
     url: 'https://sapserver.example.com',
     username: 'TESTUSER',
     password: 'secret',
-    strategy: 'basic',
+    strategy: 'onprem',
   });
 
   expect(sapAuth.isAuthenticated()).toBe(true);

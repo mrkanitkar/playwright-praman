@@ -183,6 +183,7 @@ describe('getIDELabels', () => {
       cursor: false,
       opencode: false,
       jules: false,
+      copilot: false,
     };
 
     const labels = getIDELabels(detection);
@@ -197,6 +198,7 @@ describe('getIDELabels', () => {
       cursor: false,
       opencode: false,
       jules: false,
+      copilot: false,
     };
 
     const labels = getIDELabels(detection);
@@ -212,6 +214,7 @@ describe('getIDELabels', () => {
       cursor: true,
       opencode: false,
       jules: false,
+      copilot: false,
     };
 
     const labels = getIDELabels(detection);
@@ -219,23 +222,25 @@ describe('getIDELabels', () => {
     expect(labels).toEqual(['Cursor']);
   });
 
-  it('returns labels for all five IDEs when all are detected', () => {
+  it('returns labels for all six IDEs when all are detected', () => {
     const detection = {
       vscode: true,
       claude: true,
       cursor: true,
       opencode: true,
       jules: true,
+      copilot: true,
     };
 
     const labels = getIDELabels(detection);
 
-    expect(labels).toHaveLength(5);
+    expect(labels).toHaveLength(6);
     expect(labels).toContain('VS Code');
     expect(labels).toContain('Claude Code');
     expect(labels).toContain('Cursor');
     expect(labels).toContain('OpenCode');
     expect(labels).toContain('Jules');
+    expect(labels).toContain('GitHub Copilot');
   });
 
   it('returns a readonly array', () => {
@@ -245,6 +250,7 @@ describe('getIDELabels', () => {
       cursor: false,
       opencode: false,
       jules: false,
+      copilot: false,
     };
 
     const labels = getIDELabels(detection);

@@ -90,7 +90,7 @@ const config: Config = {
       id: 'v1_launch',
       content:
         '🚀 Praman v1.0 is under active development. <a href="/docs">Read the docs</a> to get started.',
-      backgroundColor: '#0d9488',
+      backgroundColor: '#1e3c72',
       textColor: '#ffffff',
       isCloseable: true,
     },

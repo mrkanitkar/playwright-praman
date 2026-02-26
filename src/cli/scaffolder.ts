@@ -21,6 +21,9 @@
 import { access, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import type { IDEDetection } from './ide-detector.js';
+import { scaffoldIDEFiles } from './ide-installer.js';
+
 /**
  * Options for scaffolding a new Praman project.
  *
@@ -40,6 +43,11 @@ export interface ScaffoldOptions {
   readonly force?: boolean;
   /** Template variant to scaffold. Defaults to `'basic'`. */
   readonly template?: 'basic' | 'fiori';
+  /**
+   * IDE detection result from {@link detectIDEs}.
+   * When provided, installs IDE-specific agent, seed, and config files.
+   */
+  readonly detection?: IDEDetection;
 }
 
 /**
@@ -157,11 +165,18 @@ const SUBDIRECTORIES: readonly string[] = ['tests', 'tests/e2e', '.auth'];
  * ```
  */
 export async function scaffoldProject(options: ScaffoldOptions): Promise<ScaffoldResult> {
-  const { targetDir, force = false } = options;
+  const { targetDir, force = false, detection } = options;
 
   // Guard: check if directory already exists
   const exists = await directoryExists(targetDir);
   if (exists && !force) {
+    // Even in an existing project, install IDE-specific files when detected
+    if (detection !== undefined) {
+      const ideFiles = await scaffoldIDEFiles(targetDir, detection, force);
+      if (ideFiles.length > 0) {
+        return { success: true, filesCreated: ideFiles };
+      }
+    }
     return { success: false, reason: 'directory-exists' };
   }
 
@@ -183,6 +198,12 @@ export async function scaffoldProject(options: ScaffoldOptions): Promise<Scaffol
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from targetDir + known template file names
     await writeFile(filePath, content, 'utf8');
     filesCreated.push(filePath);
+  }
+
+  // Install IDE-specific agent, seed, and config files
+  if (detection !== undefined) {
+    const ideFiles = await scaffoldIDEFiles(targetDir, detection, force);
+    filesCreated.push(...ideFiles);
   }
 
   return { success: true, filesCreated };

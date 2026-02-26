@@ -338,10 +338,11 @@ array for self-healing tests. wdi5 errors are unstructured strings.
 ## Step-by-Step Migration Checklist
 
 1. **Install dependencies**: `npm install playwright-praman @playwright/test`
-2. **Create config files**: `praman.config.ts` and `playwright.config.ts`
-3. **Set up auth**: Create `tests/auth-setup.ts` using one of the 6 strategies
-4. **Convert selectors**: Replace `browser.asControl({ selector: {...} })` with `ui5.control({...})`
-5. **Convert assertions**: Replace WDIO `expect` with Playwright `expect` + UI5 matchers
-6. **Structure tests**: Convert OPA5 journey `describe/it` blocks to `test` + `test.step()`
-7. **Adopt navigation**: Replace `browser.url('#/hash')` with `ui5Navigation` methods
-8. **Run and verify**: `npx playwright test`
+2. **Install browsers**: `npx playwright install`
+3. **Create config files**: `praman.config.ts` and `playwright.config.ts`
+4. **Set up auth**: Create `tests/auth-setup.ts` using one of the 6 strategies
+5. **Convert selectors**: Replace `browser.asControl({ selector: {...} })` with `ui5.control({...})`
+6. **Convert assertions**: Replace WDIO `expect` with Playwright `expect` + UI5 matchers
+7. **Structure tests**: Convert OPA5 journey `describe/it` blocks to `test` + `test.step()`
+8. **Adopt navigation**: Replace `browser.url('#/hash')` with `ui5Navigation` methods
+9. **Run and verify**: `npx playwright test`

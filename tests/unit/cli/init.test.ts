@@ -82,6 +82,7 @@ function makeDetection(overrides: Partial<IDEDetection> = {}): IDEDetection {
     cursor: false,
     opencode: false,
     jules: false,
+    copilot: false,
     ...overrides,
   };
 }
@@ -394,14 +395,16 @@ describe('cli/init', () => {
   // ── runInit: scaffolding ──────────────────────────────────────────────────
 
   describe('scaffolding', () => {
-    it('calls scaffoldProject with targetDir and force', async () => {
+    it('calls scaffoldProject with targetDir, force, and detection', async () => {
       const { runInit } = await loadInit();
       await runInit(['--force', '--target', '/home/testuser/scaffold-test']);
 
-      expect(mockedScaffoldProject).toHaveBeenCalledWith({
-        targetDir: '/home/testuser/scaffold-test',
-        force: true,
-      });
+      expect(mockedScaffoldProject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          targetDir: '/home/testuser/scaffold-test',
+          force: true,
+        }),
+      );
     });
 
     it('displays logStep for scaffolding step', async () => {
@@ -438,10 +441,12 @@ describe('cli/init', () => {
       const { runInit } = await loadInit();
       await runInit([]);
 
-      expect(mockedScaffoldProject).toHaveBeenCalledWith({
-        targetDir: process.cwd(),
-        force: false,
-      });
+      expect(mockedScaffoldProject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          targetDir: process.cwd(),
+          force: false,
+        }),
+      );
     });
   });
 
