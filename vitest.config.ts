@@ -33,6 +33,9 @@ export default defineConfig({
         'src/auth/auth-teardown.ts',
         // Example/documentation file — not production code
         'src/core/examples/**',
+        // Build-time constant — tsup `define` replaces __PRAMAN_VERSION__ at compile time;
+        // the ternary fallback branch is unreachable in vitest (Vite also defines it).
+        'src/version.ts',
       ],
       // ── Tiered coverage thresholds (Google/Microsoft best practice) ──────
       // See CLAUDE.md and skills-tester.md for rationale.
