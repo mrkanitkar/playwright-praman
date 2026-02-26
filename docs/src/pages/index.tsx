@@ -325,7 +325,7 @@ function HeroCarousel(): ReactNode {
 
   return (
     <div
-      className="praman-hero-wrap praman-carousel"
+      className="praman-hero-wrap praman-carousel praman-hero-section"
       onMouseEnter={() => { setPaused(true); }}
       onMouseLeave={() => { setPaused(false); }}
     >
