@@ -215,7 +215,7 @@ npm install @azure/playwright
 Use the official Playwright image:
 
 ```bash
-docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/playwright:v1.52.0-noble npm test
+docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/playwright:v1.58.2-noble npm test
 ```
 
 ## Supply Chain Security
@@ -225,6 +225,10 @@ docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/playwright:v1.52.0-nobl
 - **SHA-pinned Actions** — all GitHub Actions use commit SHA references, not mutable tags
 - **2 production dependencies** — `pino` (MIT) and `zod` (MIT) only
 - **Security policy** — see [SECURITY.md](./SECURITY.md)
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ## License
 

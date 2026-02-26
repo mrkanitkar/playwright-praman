@@ -64,12 +64,14 @@ const mockMainFrame = { url: vi.fn().mockReturnValue('https://example.com') };
  */
 function createMockPage(): {
   route: ReturnType<typeof vi.fn>;
+  unroute: ReturnType<typeof vi.fn>;
   on: ReturnType<typeof vi.fn>;
   off: ReturnType<typeof vi.fn>;
   mainFrame: ReturnType<typeof vi.fn>;
 } {
   return {
     route: vi.fn().mockResolvedValue(undefined),
+    unroute: vi.fn().mockResolvedValue(undefined),
     on: vi.fn(),
     off: vi.fn(),
     mainFrame: vi.fn().mockReturnValue(mockMainFrame),

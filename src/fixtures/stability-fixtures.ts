@@ -115,15 +115,23 @@ export const stabilityTest = base.extend<StabilityFixtures, StabilityDeps>({
     async ({ page, pramanConfig }: { page: Page; pramanConfig: Readonly<PramanConfig> }, use) => {
       const patterns = [...DEFAULT_IGNORE_PATTERNS, ...pramanConfig.ignoreAutoWaitUrls];
 
-      for (const pattern of patterns) {
-        // security/detect-non-literal-regexp: pattern comes from config constants, not user input
-        // eslint-disable-next-line security/detect-non-literal-regexp -- patterns are from trusted constants/config
-        await page.route(new RegExp(pattern), async (route) => {
+      // eslint-disable-next-line security/detect-non-literal-regexp -- patterns are from trusted constants/config
+      const compiledPatterns = patterns.map((p) => new RegExp(p));
+
+      for (const regex of compiledPatterns) {
+        await page.route(regex, async (route) => {
           await route.abort();
         });
       }
 
-      await use();
+      try {
+        await use();
+      } finally {
+        // Teardown: explicitly unroute to avoid stale handlers on reused pages
+        for (const regex of compiledPatterns) {
+          await page.unroute(regex);
+        }
+      }
     },
     { auto: true },
   ],
