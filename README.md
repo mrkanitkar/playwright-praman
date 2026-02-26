@@ -153,6 +153,23 @@ test('AI-assisted test discovery', async ({ pramanAI, page }) => {
 | `playwright-praman/fe`         | SAP Fiori Elements helpers       |
 | `playwright-praman/reporters`  | Custom Playwright reporters      |
 
+## TypeScript Configuration
+
+For full type resolution of sub-path exports, use `moduleResolution: "node16"` or
+`"bundler"` in your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "module": "Node16",
+    "moduleResolution": "Node16"
+  }
+}
+```
+
+Each sub-path export provides separate `.d.ts` (ESM) and `.d.cts` (CJS) type
+declarations via conditional `"types"` in the package exports map.
+
 ## Build
 
 ```bash
@@ -161,6 +178,10 @@ npm run check:exports  # attw export validation
 npm run test:unit      # Vitest (hermetic)
 npm run ci             # lint + typecheck + test + build
 ```
+
+> **Note:** The published npm package includes `src/` (TypeScript source) alongside
+> compiled `dist/` output. This enables source-map debugging in consuming projects
+> and provides context for AI-assisted test generation agents.
 
 ## IDE Support
 
@@ -196,6 +217,14 @@ Use the official Playwright image:
 ```bash
 docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/playwright:v1.52.0-noble npm test
 ```
+
+## Supply Chain Security
+
+- **npm provenance** — every published version includes a [provenance attestation](https://docs.npmjs.com/generating-provenance-statements)
+- **SBOM** — CycloneDX 1.5 Software Bill of Materials generated per release
+- **SHA-pinned Actions** — all GitHub Actions use commit SHA references, not mutable tags
+- **2 production dependencies** — `pino` (MIT) and `zod` (MIT) only
+- **Security policy** — see [SECURITY.md](./SECURITY.md)
 
 ## License
 

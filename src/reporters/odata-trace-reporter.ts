@@ -40,6 +40,8 @@ import { join } from 'node:path';
 
 import type { FullResult, Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 
+import { createLogger } from '#core/logging/index.js';
+
 // ── Exported types ───────────────────────────────────────────────────────────
 
 /**
@@ -367,8 +369,10 @@ export class ODataTraceReporter implements Reporter {
     try {
       // Type assertion: JSON.parse returns any; cast to unknown for safe narrowing below
       parsed = JSON.parse(body.toString('utf8')) as unknown;
-    } catch {
-      return; // Silently skip malformed JSON
+    } catch (error: unknown) {
+      const log = createLogger('odata-reporter');
+      log.debug({ err: error }, 'Malformed JSON in OData trace attachment — skipping');
+      return;
     }
 
     const entries: unknown[] = Array.isArray(parsed) ? parsed : [parsed];

@@ -12,8 +12,10 @@
   "engines": {
     "node": ">=20"
   },
+  "sideEffects": false,
   "files": [
     "dist",
+    "!dist/**/*.map",
     "src",
     "skills/",
     "agents/",
@@ -29,6 +31,7 @@
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": {
@@ -36,7 +39,8 @@
         "require": "./dist/index.d.cts"
       },
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
     },
     "./ai": {
       "types": {
@@ -44,7 +48,8 @@
         "require": "./dist/ai/index.d.cts"
       },
       "import": "./dist/ai/index.js",
-      "require": "./dist/ai/index.cjs"
+      "require": "./dist/ai/index.cjs",
+      "default": "./dist/ai/index.js"
     },
     "./intents": {
       "types": {
@@ -52,7 +57,8 @@
         "require": "./dist/intents/index.d.cts"
       },
       "import": "./dist/intents/index.js",
-      "require": "./dist/intents/index.cjs"
+      "require": "./dist/intents/index.cjs",
+      "default": "./dist/intents/index.js"
     },
     "./vocabulary": {
       "types": {
@@ -60,7 +66,8 @@
         "require": "./dist/vocabulary/index.d.cts"
       },
       "import": "./dist/vocabulary/index.js",
-      "require": "./dist/vocabulary/index.cjs"
+      "require": "./dist/vocabulary/index.cjs",
+      "default": "./dist/vocabulary/index.js"
     },
     "./fe": {
       "types": {
@@ -68,7 +75,8 @@
         "require": "./dist/fe/index.d.cts"
       },
       "import": "./dist/fe/index.js",
-      "require": "./dist/fe/index.cjs"
+      "require": "./dist/fe/index.cjs",
+      "default": "./dist/fe/index.js"
     },
     "./reporters": {
       "types": {
@@ -76,7 +84,8 @@
         "require": "./dist/reporters/index.d.cts"
       },
       "import": "./dist/reporters/index.js",
-      "require": "./dist/reporters/index.cjs"
+      "require": "./dist/reporters/index.cjs",
+      "default": "./dist/reporters/index.js"
     }
   },
   "bin": {
@@ -136,9 +145,9 @@
     "@playwright/test": ">=1.50.0 <2.0.0"
   },
   "optionalDependencies": {
-    "@anthropic-ai/sdk": "^0.36.0",
-    "@opentelemetry/api": "1.9.0",
-    "@opentelemetry/sdk-node": "0.212.0",
+    "@anthropic-ai/sdk": "~0.36.0",
+    "@opentelemetry/api": ">=1.9.0",
+    "@opentelemetry/sdk-node": ">=0.212.0",
     "openai": "^6.22.0"
   },
   "devDependencies": {
@@ -147,11 +156,11 @@
     "@commitlint/config-conventional": "20.4.1",
     "@cyclonedx/cyclonedx-npm": "4.1.2",
     "@eslint/js": "9.39.3",
-    "@microsoft/api-extractor": "7.56.3",
+    "@microsoft/api-extractor": "7.57.6",
     "@microsoft/eslint-plugin-sdl": "1.1.0",
     "@playwright/test": "1.58.2",
     "@size-limit/file": "12.0.0",
-    "@ui5/mcp-server": "0.2.5",
+    "@ui5/mcp-server": "0.2.6",
     "@vitest/coverage-v8": "4.0.18",
     "@vitest/ui": "4.0.18",
     "cspell": "9.6.4",
@@ -164,14 +173,14 @@
     "eslint-plugin-playwright": "2.5.1",
     "eslint-plugin-promise": "7.2.1",
     "eslint-plugin-security": "3.0.1",
-    "eslint-plugin-sonarjs": "3.0.7",
-    "eslint-plugin-tsdoc": "0.5.0",
+    "eslint-plugin-sonarjs": "4.0.0",
+    "eslint-plugin-tsdoc": "0.5.2",
     "eslint-plugin-unicorn": "63.0.0",
     "glob": "13.0.3",
     "husky": "9.1.7",
     "knip": "5.83.1",
     "lint-staged": "16.2.7",
-    "markdownlint-cli2": "0.20.0",
+    "markdownlint-cli2": "0.21.0",
     "pino-pretty": "13.1.3",
     "prettier": "3.8.1",
     "release-please": "17.2.1",

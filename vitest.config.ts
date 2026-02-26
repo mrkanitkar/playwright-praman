@@ -2,6 +2,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  define: {
+    __PRAMAN_VERSION__: JSON.stringify('0.0.0-test'),
+  },
   plugins: [tsconfigPaths()],
   test: {
     include: ['tests/unit/**/*.test.ts'],

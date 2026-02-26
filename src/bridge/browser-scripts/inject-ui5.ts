@@ -199,6 +199,7 @@ export function createBridgeInjectionScript(): string {
       }
     } catch (e) {
       // Fatal injection error — surface to browser console for diagnostics
+      // NOTE: This console.error runs in browser context (page.evaluate), not Node.js
       console.error('[praman] Fatal bridge injection error:', e);
       return { success: false, error: String(e) };
     }

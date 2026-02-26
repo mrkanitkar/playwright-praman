@@ -46,7 +46,7 @@ export function assertValidScript(script: string): void {
   }
 
   // vm.Script validates JavaScript syntax without executing
-  // eslint-disable-next-line sonarjs/constructor-for-side-effects, sonarjs/code-eval -- Intentional: syntax validation only, no execution
+  // eslint-disable-next-line sonarjs/constructor-for-side-effects -- Intentional: syntax validation only, no execution
   new vm.Script(script);
 }
 

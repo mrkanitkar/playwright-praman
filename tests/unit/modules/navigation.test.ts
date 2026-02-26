@@ -156,6 +156,19 @@ describe('navigation module', () => {
         NavigationError,
       );
     });
+
+    it('escapes double quotes in tile title to prevent CSS selector injection', async () => {
+      const mockLocator = createMockLocator();
+      const page = createMockPage();
+      page.locator.mockReturnValue(mockLocator);
+
+      await navigateToTile(asPage(page), 'Tile with "quotes"');
+
+      const selector = page.locator.mock.calls[0]?.[0] as string;
+      expect(selector).toBe(
+        '[aria-label="Tile with \\"quotes\\""], [title="Tile with \\"quotes\\""]',
+      );
+    });
   });
 
   describe('navigateToIntent', () => {
@@ -267,6 +280,19 @@ describe('navigation module', () => {
       expect(searchLocator.fill).toHaveBeenCalledWith('Purchase Orders');
       expect(tileLocator.click).toHaveBeenCalledTimes(1);
       expect(waitForUI5Stable).toHaveBeenCalledTimes(1);
+    });
+
+    it('escapes double quotes in app title to prevent CSS selector injection', async () => {
+      const searchLocator = createMockLocator();
+      const tileLocator = createMockLocator();
+      const page = createMockPage();
+      page.locator.mockReturnValueOnce(searchLocator).mockReturnValueOnce(tileLocator);
+
+      await searchAndOpenApp(asPage(page), 'App "name"');
+
+      // Second locator call is the tile selector — must be escaped
+      const selector = page.locator.mock.calls[1]?.[0] as string;
+      expect(selector).toBe('[aria-label="App \\"name\\""], [title="App \\"name\\""]');
     });
   });
 

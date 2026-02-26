@@ -21,6 +21,7 @@
 import { ErrorCode } from '#core/errors/codes.js';
 import { ControlError } from '#core/errors/control-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
+import { createLogger } from '#core/logging/index.js';
 import { DEFAULT_TIMEOUTS } from '#core/utils/constants.js';
 
 /** @example `const v: TableVariant = 'sap.m.Table';` */
@@ -143,8 +144,9 @@ async function stabilityWait(page: TablePage, options?: TableOptions): Promise<v
       undefined,
       { timeout, polling: DEFAULT_TIMEOUTS.POLLING_INTERVAL },
     );
-  } catch {
-    /* non-fatal */
+  } catch (error: unknown) {
+    const log = createLogger('table');
+    log.debug({ err: error }, 'UI5 stability wait failed (non-fatal)');
   }
 }
 

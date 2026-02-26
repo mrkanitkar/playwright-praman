@@ -52,6 +52,7 @@ import type { LlmService } from '../ai/llm-service.js';
 import type { RecipeRegistry } from '../ai/recipe-registry.js';
 import type { AiResponse, PageContext } from '../ai/types.js';
 import type { PramanConfig } from '../core/config/schema.js';
+import { createLogger } from '../core/logging/index.js';
 import type { VocabularyService } from '../vocabulary/types.js';
 
 // ── Public fixture type ─────────────────────────────────────────────────────
@@ -195,8 +196,9 @@ export const aiTest = base.extend<AIFixtures, AIWorkerDeps>({
 
     try {
       await llm.close();
-    } catch {
-      // Non-fatal — LLM teardown failure should not fail the test
+    } catch (error: unknown) {
+      const log = createLogger('ai');
+      log.debug({ err: error }, 'LLM teardown failed (non-fatal)');
     }
   },
 });

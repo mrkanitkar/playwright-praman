@@ -261,8 +261,11 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
       try {
         // Clean up browser-side object map to prevent memory leaks
         const cleanupScript = createObjectCleanupScript();
-        await page.evaluate(cleanupScript).catch(() => {
-          // Cleanup failure is non-fatal — page may have navigated away
+        await page.evaluate(cleanupScript).catch((error: unknown) => {
+          logger.debug(
+            { err: error },
+            'Object map cleanup failed (non-fatal — page may have navigated away)',
+          );
         });
       } finally {
         await handler.destroy();

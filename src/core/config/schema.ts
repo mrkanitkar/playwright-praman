@@ -34,7 +34,7 @@
  * @module config
  */
 
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 // ── Auth sub-schema ──────────────────────────────────────────────────
 const authSchema = z.object({
