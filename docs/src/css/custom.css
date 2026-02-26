@@ -1,78 +1,125 @@
 /**
- * Praman Docusaurus Theme — Teal + Amber Dual Accent
- * Light: Teal #0d9488 primary, Amber #f59e0b secondary, Slate ink
- * Dark:  Teal #2dd4bf primary, Amber #f59e0b secondary, Navy bg
- * Font:  DM Sans
+ * Praman Docusaurus Theme — Corporate Blue
+ * Aligned with dhikraft visual identity:
+ *   - Primary: #0070ad / #1e3c72 / #2a5298 (deep corporate navy-blue)
+ *   - Accent:  #f59e0b / #ffd700 (gold)
+ *   - Font:    'Segoe UI' system stack (no external dependency)
+ *   - Hero:    linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)
+ *   - Shadows: blue-tinted three-tier system
  */
 
-/* ── Google Fonts import ──────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+/* ── No Google Fonts — system Segoe UI stack is used ──────── */
 
-/* ── Light Mode ─────────────────────────────────────────── */
+/* ── Light Mode ────────────────────────────────────────────── */
 :root {
-  --ifm-color-primary: #0d9488;
-  --ifm-color-primary-dark: #0b7e74;
-  --ifm-color-primary-darker: #0a776d;
-  --ifm-color-primary-darkest: #08625a;
-  --ifm-color-primary-light: #0faa9c;
-  --ifm-color-primary-lighter: #10b1a3;
-  --ifm-color-primary-lightest: #14ccbc;
+  /* Primary: Corporate Blue (dhikraft-aligned scale) */
+  --ifm-color-primary: #0070ad;
+  --ifm-color-primary-dark: #005b8c;
+  --ifm-color-primary-darker: #005280;
+  --ifm-color-primary-darkest: #003d5c;
+  --ifm-color-primary-light: #1a84c0;
+  --ifm-color-primary-lighter: #3392c8;
+  --ifm-color-primary-lightest: #4aa9d5;
 
-  --ifm-font-family-base: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --ifm-heading-font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Typography — Segoe UI system stack matching dhikraft */
+  --ifm-font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, 'Helvetica Neue', Arial, sans-serif;
+  --ifm-font-family-monospace: 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --ifm-heading-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, 'Helvetica Neue', Arial, sans-serif;
   --ifm-code-font-size: 90%;
-  --ifm-heading-font-weight: 700;
+  --ifm-heading-font-weight: 600;
   --ifm-font-weight-bold: 600;
+  --ifm-font-size-base: 1rem;
+  --ifm-line-height-base: 1.6;
 
+  /* Backgrounds */
   --ifm-background-color: #ffffff;
-  --ifm-navbar-background-color: rgba(255, 255, 255, 0.92);
-  --ifm-footer-background-color: #0f172a;
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.98);
+  --ifm-footer-background-color: #1e3c72;
 
-  --praman-accent-secondary: #f59e0b;
-  --praman-ink: #0f172a;
-  --praman-ink-secondary: #475569;
-  --praman-border: #e2e8f0;
-  --praman-surface-alt: #f8fafc;
+  /* dhikraft CSS variables — pulled verbatim */
+  --capgemini-blue: #0070ad;
+  --capgemini-dark-blue: #005b8c;
+  --capgemini-light-blue: #4a9bc7;
+  --capgemini-gray: #f2f2f2;
+  --capgemini-dark-gray: #444;
+  --capgemini-border: #e0e6ed;
+  --primary-text: #1e3c72;
+  --secondary-text: #333;
+  --gradient-primary: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  --gradient-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --shadow-light: 0 2px 8px rgba(0, 112, 173, 0.08);
+  --shadow-medium: 0 4px 16px rgba(0, 112, 173, 0.12);
+  --shadow-strong: 0 8px 32px rgba(0, 112, 173, 0.15);
 
-  --docusaurus-highlighted-code-line-bg: rgba(13, 148, 136, 0.1);
+  /* Praman aliases (map to dhikraft tokens) */
+  --praman-gold: #ffd700;
+  --praman-ink: #1e3c72;
+  --praman-ink-secondary: #444444;
+  --praman-border: #e0e6ed;
+  --praman-surface-alt: #f2f2f2;
+  --praman-hero-from: #1e3c72;
+  --praman-hero-to: #2a5298;
+
+  /* Shadows (alias dhikraft shadow vars) */
+  --praman-shadow-sm: var(--shadow-light);
+  --praman-shadow-md: var(--shadow-medium);
+  --praman-shadow-lg: var(--shadow-strong);
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 112, 173, 0.1);
 }
 
-/* ── Dark Mode ──────────────────────────────────────────── */
+/* ── Dark Mode ─────────────────────────────────────────────── */
 [data-theme='dark'] {
-  --ifm-color-primary: #2dd4bf;
-  --ifm-color-primary-dark: #1ac4af;
-  --ifm-color-primary-darker: #19b9a5;
-  --ifm-color-primary-darkest: #149888;
-  --ifm-color-primary-light: #4fdccb;
-  --ifm-color-primary-lighter: #5adfcf;
-  --ifm-color-primary-lightest: #7ee8db;
+  --ifm-color-primary: #4aa9d5;
+  --ifm-color-primary-dark: #3a9ac8;
+  --ifm-color-primary-darker: #3090bf;
+  --ifm-color-primary-darkest: #1a78a8;
+  --ifm-color-primary-light: #65b9e0;
+  --ifm-color-primary-lighter: #7ac5e8;
+  --ifm-color-primary-lightest: #99d5f0;
 
   --ifm-background-color: #0c1220;
-  --ifm-navbar-background-color: rgba(12, 18, 32, 0.92);
+  --ifm-navbar-background-color: rgba(12, 18, 32, 0.95);
   --ifm-footer-background-color: #070c16;
 
-  --praman-accent-secondary: #f59e0b;
-  --praman-ink: #f8fafc;
+  --praman-gold: #ffd700;
+  --praman-ink: #e8f0fe;
   --praman-ink-secondary: #94a3b8;
-  --praman-border: #1e293b;
-  --praman-surface-alt: #0f172a;
+  --praman-border: #1e3864;
+  --praman-surface-alt: #0f1e3a;
+  --praman-hero-from: #0c1220;
+  --praman-hero-to: #1e3c72;
 
-  --docusaurus-highlighted-code-line-bg: rgba(45, 212, 191, 0.15);
+  /* Override light-only variables so every consumer gets dark values */
+  --primary-text: #e8f0fe;
+  --capgemini-blue: #4aa9d5;
+
+  --praman-shadow-sm: 0 2px 8px rgba(74, 169, 213, 0.08);
+  --praman-shadow-md: 0 4px 16px rgba(74, 169, 213, 0.12);
+  --praman-shadow-lg: 0 8px 32px rgba(74, 169, 213, 0.15);
+
+  --docusaurus-highlighted-code-line-bg: rgba(74, 169, 213, 0.15);
 }
 
-/* ── Navbar glassmorphism ───────────────────────────────── */
+/* ── Navbar glassmorphism ───────────────────────────────────── */
 .navbar {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--praman-border);
-  box-shadow: none;
+  box-shadow: var(--praman-shadow-md);
+  height: 72px;
 }
 
 .navbar__title {
   font-weight: 700;
-  font-size: 1.2rem;
-  letter-spacing: -0.02em;
+  font-size: 1.25rem;
+  color: var(--ifm-color-primary);
+  letter-spacing: -0.01em;
+}
+
+.navbar__item.navbar__link {
+  font-size: 0.92rem;
+  font-weight: 500;
 }
 
 /* GitHub icon in navbar */
@@ -81,46 +128,224 @@
   width: 24px;
   height: 24px;
   display: flex;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%230f172a'/%3E%3C/svg%3E") no-repeat;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%230070ad'/%3E%3C/svg%3E") no-repeat;
 }
 
 [data-theme='dark'] .header-github-link::before {
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%23f8fafc'/%3E%3C/svg%3E") no-repeat;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' fill='%234aa9d5'/%3E%3C/svg%3E") no-repeat;
 }
 
-/* ── Announcement bar ───────────────────────────────────── */
+/* ── Announcement bar ──────────────────────────────────────── */
 div[class*='announcementBar'] {
   background: var(--ifm-color-primary) !important;
   color: #fff !important;
 }
 
-/* ── Hero section (landing page) ────────────────────────── */
+/* ── Global section h2 — exact dhikraft h2 style ──────────── */
+.praman-section-h2 {
+  font-size: 2.5em;
+  color: var(--primary-text);
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 15px;
+  margin: 50px 0 30px;
+}
+
+/* ── Hero — gradient banner (dhikraft-style) ───────────────── */
+.praman-hero-wrap {
+  background: linear-gradient(135deg, var(--praman-hero-from) 0%, var(--praman-hero-to) 100%);
+  width: 100%;
+}
+
 .hero--primary {
-  background: var(--ifm-background-color);
-  color: var(--praman-ink);
+  background: linear-gradient(135deg, var(--praman-hero-from) 0%, var(--praman-hero-to) 100%);
+  color: #ffffff;
   padding: 4rem 0;
 }
 
 [data-theme='dark'] .hero--primary {
-  background: var(--ifm-background-color);
+  background: linear-gradient(135deg, var(--praman-hero-from) 0%, var(--praman-hero-to) 100%);
 }
 
 .hero__title {
   font-size: 3.5rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.08;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .hero__subtitle {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 400;
-  color: var(--praman-ink-secondary);
-  max-width: 540px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 560px;
   margin: 0 auto;
 }
 
-/* ── Landing page custom components ─────────────────────── */
+/* ── Hero Carousel ─────────────────────────────────────────── */
+
+/* Outer wrapper: provides the gradient background */
+.praman-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fixed-height track — all slides absolutely stacked */
+.praman-carousel-inner {
+  position: relative;
+  height: 440px;
+}
+
+/* All slides: absolutely positioned, invisible by default */
+.praman-carousel-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  pointer-events: none;
+}
+
+/* Active slide: fully visible */
+.praman-carousel-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  z-index: 1;
+}
+
+/* Two-column layout: text left, SVG right */
+.praman-carousel-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  padding: 2.5rem 5rem 3.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.praman-carousel-text {
+  text-align: left;
+}
+
+/* Gold glassmorphic badge */
+.praman-carousel-badge {
+  display: inline-block;
+  padding: 0.28rem 0.9rem;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 0.76rem;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(4px);
+  color: #ffd700;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+}
+
+/* Slide title — slightly smaller than the old static hero */
+.praman-carousel-title {
+  font-size: 2.2rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+  color: #ffffff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.18);
+  margin-bottom: 0.9rem;
+}
+
+/* Slide subtitle */
+.praman-carousel-subtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 0.8rem;
+  max-width: 480px;
+}
+
+/* CTA buttons row */
+.praman-carousel-cta {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+  flex-wrap: wrap;
+}
+
+/* SVG illustration container */
+.praman-carousel-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.9;
+}
+
+/* ── Carousel nav arrows ────────────────────────────────────── */
+.praman-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.praman-carousel-arrow:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.praman-carousel-arrow-prev { left: 1.2rem; }
+.praman-carousel-arrow-next { right: 1.2rem; }
+
+/* ── Carousel dot navigation ────────────────────────────────── */
+.praman-carousel-dots {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.45rem;
+  z-index: 10;
+}
+
+.praman-carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.38);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  padding: 0;
+}
+
+.praman-carousel-dot.active {
+  background: #ffffff;
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ── Landing page components ───────────────────────────────── */
 .praman-pills {
   display: flex;
   align-items: center;
@@ -128,13 +353,13 @@ div[class*='announcementBar'] {
   gap: 0.6rem;
   font-size: 1.05rem;
   font-weight: 500;
-  color: var(--praman-ink-secondary);
+  color: rgba(255, 255, 255, 0.82);
   margin-bottom: 0.5rem;
 }
 
 .praman-pills .dot {
   font-size: 1.4rem;
-  color: var(--praman-accent-secondary);
+  color: var(--praman-gold);
   line-height: 1;
 }
 
@@ -148,11 +373,84 @@ div[class*='announcementBar'] {
 }
 
 .praman-section-title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   margin-bottom: 0.6rem;
   color: var(--praman-ink);
+}
+
+/* ── "Plugin at a Glance" — exact dhikraft layout ─────────── */
+
+/* Outer wrapper: page-level spacing */
+.praman-glance-outer {
+  padding: 40px 20px;
+  background: #ffffff;
+}
+
+/* Exact dhikraft .container: white card, border-radius 12px, shadow, padding 60px */
+.praman-glance-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 112, 173, 0.15);
+  padding: 60px;
+}
+
+/* Exact dhikraft h2: purple underline, 2.5em, margin 50px 0 30px */
+.praman-glance-title {
+  font-size: 2.5em;
+  font-weight: 400;
+  color: var(--primary-text);
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 15px;
+  margin: 0 0 30px;
+}
+
+/* 3-column grid for the three items */
+.praman-info-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin: 30px 0 0;
+}
+
+/* Exact dhikraft .summary-card: white bg, purple left border, radius, shadow */
+.praman-info-card {
+  background: #fff;
+  border-left: 5px solid #667eea;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 112, 173, 0.08);
+  padding: 20px 24px;
+}
+
+/* Exact dhikraft .summary-card h4: capgemini-blue, margin-top 0 */
+.praman-info-card h4 {
+  color: var(--capgemini-blue);
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+/* Exact dhikraft .summary-card p: 0.98em, margin 8px 0 0 */
+.praman-info-card p {
+  color: var(--primary-text);
+  font-size: 0.98em;
+  line-height: 1.8;
+  margin: 8px 0 0;
+}
+
+/* Inline code on white background */
+.praman-info-card code {
+  background: #f0f4ff;
+  color: #0070ad;
+  border: none;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'Courier New', monospace;
 }
 
 .praman-pitch-grid {
@@ -161,8 +459,9 @@ div[class*='announcementBar'] {
   gap: 1px;
   background: var(--praman-border);
   border: 1px solid var(--praman-border);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: var(--praman-shadow-md);
 }
 
 .praman-pitch-cell {
@@ -180,13 +479,14 @@ div[class*='announcementBar'] {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--praman-accent-secondary);
+  color: var(--praman-gold);
   margin-bottom: 0.4rem;
 }
 
 .praman-pitch-cell h3 {
   font-size: 0.98rem;
   font-weight: 700;
+  color: var(--praman-ink);
   margin-bottom: 0.4rem;
 }
 
@@ -196,15 +496,115 @@ div[class*='announcementBar'] {
   margin-bottom: 0;
 }
 
-/* ── Code showcase ──────────────────────────────────────── */
+/* ── Agent Flow: Signavio → Test Plan → Playwright ─────────── */
+
+.praman-agent-flow-outer {
+  padding: 2rem 2rem 2.5rem;
+  background: var(--praman-surface-alt);
+  border-top: 1px solid var(--praman-border);
+  border-bottom: 1px solid var(--praman-border);
+}
+
+/* 3 panels + 2 connectors: 1fr auto 1fr auto 1fr */
+.praman-agent-flow-grid {
+  display: grid;
+  grid-template-columns: 1fr 72px 1fr 72px 1fr;
+  align-items: stretch;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.praman-agent-flow-panel {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.praman-flow-step-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.3rem;
+}
+
+.praman-flow-panel-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--praman-ink);
+  margin-bottom: 0.65rem;
+}
+
+/* Code block override inside flow panels: full width, fills panel height */
+.praman-flow-block {
+  max-width: 100% !important;
+  min-height: 220px;
+  flex: 1;
+  font-size: 0.75rem !important;
+  text-align: left;
+}
+
+.praman-flow-block pre {
+  font-size: 0.73rem !important;
+  line-height: 1.45 !important;
+}
+
+/* ── Animated dot connector ─────────────────────────────────── */
+
+.praman-flow-connector {
+  position: relative;
+  align-self: center;
+  margin-top: 3.6rem; /* align with mid-point of panels */
+  height: 2px;
+}
+
+.praman-flow-line {
+  width: 100%;
+  height: 2px;
+  background: var(--praman-border);
+}
+
+.praman-flow-dot {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--praman-gold);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+  animation: flow-dot 1.65s ease-in-out infinite;
+}
+
+@keyframes flow-dot {
+  0%   { left: 0;              opacity: 0; }
+  8%   { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { left: calc(100% - 9px); opacity: 0; }
+}
+
+.praman-flow-arrow {
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-55%);
+  font-size: 1.4rem;
+  color: var(--praman-border);
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* ── Code showcase ─────────────────────────────────────────── */
 .praman-code-block {
-  background: #0f172a;
-  border-radius: 10px;
+  background: #1a3a6b;
+  border-radius: 12px;
   padding: 1.5rem 1.8rem;
   text-align: left;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--praman-shadow-lg);
   max-width: 580px;
   margin: 0 auto;
+  border: 1px solid rgba(74, 169, 213, 0.25);
 }
 
 .praman-code-dots {
@@ -225,7 +625,7 @@ div[class*='announcementBar'] {
 
 .praman-code-block pre {
   margin: 0;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   font-size: 0.82rem;
   line-height: 1.7;
   color: #e2e8f0;
@@ -236,10 +636,10 @@ div[class*='announcementBar'] {
 
 .praman-code-block .kw { color: #c4b5fd; }
 .praman-code-block .str { color: #86efac; }
-.praman-code-block .cmt { color: #64748b; }
+.praman-code-block .cmt { color: #94a3b8; }
 .praman-code-block .fn { color: #93c5fd; }
 
-/* ── Feature list ───────────────────────────────────────── */
+/* ── Feature list ──────────────────────────────────────────── */
 .praman-features-list {
   list-style: none;
   padding: 0;
@@ -268,6 +668,7 @@ div[class*='announcementBar'] {
 .praman-features-list h3 {
   font-size: 0.95rem;
   font-weight: 700;
+  color: var(--praman-ink);
   margin-bottom: 0.25rem;
 }
 
@@ -277,7 +678,7 @@ div[class*='announcementBar'] {
   margin-bottom: 0;
 }
 
-/* ── Philosophy section ─────────────────────────────────── */
+/* ── Philosophy section ────────────────────────────────────── */
 .praman-philosophy {
   background: var(--praman-surface-alt);
   border-top: 1px solid var(--praman-border);
@@ -307,14 +708,17 @@ div[class*='announcementBar'] {
 .praman-pillar {
   padding: 1.5rem;
   border: 1px solid var(--praman-border);
-  border-radius: 8px;
+  border-left: 3px solid var(--praman-gold);
+  border-radius: 12px;
   background: var(--ifm-background-color);
-  transition: border-color 0.15s;
-  border-left: 3px solid var(--praman-accent-secondary);
+  transition: all 0.2s ease;
+  box-shadow: var(--praman-shadow-sm);
 }
 
 .praman-pillar:hover {
   border-color: var(--ifm-color-primary);
+  box-shadow: var(--praman-shadow-md);
+  transform: translateY(-2px);
 }
 
 .praman-pillar-label {
@@ -322,13 +726,14 @@ div[class*='announcementBar'] {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--praman-accent-secondary);
+  color: var(--praman-gold);
   margin-bottom: 0.25rem;
 }
 
 .praman-pillar h3 {
   font-size: 0.92rem;
   font-weight: 700;
+  color: var(--praman-ink);
   margin-bottom: 0.3rem;
 }
 
@@ -338,7 +743,7 @@ div[class*='announcementBar'] {
   margin-bottom: 0;
 }
 
-/* ── Assurance bar ──────────────────────────────────────── */
+/* ── Assurance bar ─────────────────────────────────────────── */
 .praman-assurance {
   display: flex;
   justify-content: center;
@@ -357,12 +762,13 @@ div[class*='announcementBar'] {
   margin-right: 0.3rem;
 }
 
-/* ── CTA section ────────────────────────────────────────── */
+/* ── CTA section ───────────────────────────────────────────── */
 .praman-cta h2 {
   font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin-bottom: 0.75rem;
+  color: var(--praman-ink);
 }
 
 .praman-cta p {
@@ -374,37 +780,59 @@ div[class*='announcementBar'] {
   margin-right: auto;
 }
 
-/* ── Buttons ────────────────────────────────────────────── */
+/* ── Buttons ───────────────────────────────────────────────── */
 .praman-btn {
   padding: 0.7rem 1.8rem;
-  border-radius: 6px;
+  border-radius: 5px;
   font-weight: 600;
   font-size: 0.9rem;
   text-decoration: none;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
   display: inline-block;
 }
 
+/* Gold CTA button (primary action on white bg) */
 .praman-btn-dark {
-  background: var(--praman-ink);
-  color: #fff;
-}
-
-[data-theme='dark'] .praman-btn-dark {
-  background: var(--praman-accent-secondary);
-  color: #0c1220;
+  background: var(--ifm-color-primary);
+  color: #ffffff;
 }
 
 .praman-btn-dark:hover {
-  opacity: 0.9;
-  color: #fff;
+  background: var(--ifm-color-primary-dark);
+  color: #ffffff;
+  text-decoration: none;
+  box-shadow: var(--praman-shadow-md);
+}
+
+/* Gold button for hero (on dark gradient bg) */
+.praman-btn-hero-primary {
+  background: var(--praman-gold);
+  color: #1e3c72;
+  font-weight: 700;
+}
+
+.praman-btn-hero-primary:hover {
+  background: #e08e00;
+  color: #1e3c72;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
+}
+
+/* Glass outline button for hero */
+.praman-btn-hero-outline {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.praman-btn-hero-outline:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
   text-decoration: none;
 }
 
-[data-theme='dark'] .praman-btn-dark:hover {
-  color: #0c1220;
-}
-
+/* Light secondary button (white bg) */
 .praman-btn-light {
   background: var(--praman-surface-alt);
   color: var(--praman-ink);
@@ -414,39 +842,512 @@ div[class*='announcementBar'] {
 [data-theme='dark'] .praman-btn-light {
   background: transparent;
   color: var(--praman-ink);
-  border-color: #334155;
+  border-color: #1e3864;
 }
 
 .praman-btn-light:hover {
   border-color: var(--ifm-color-primary);
   color: var(--praman-ink);
   text-decoration: none;
+  box-shadow: var(--praman-shadow-sm);
 }
 
-/* ── Feature cards (docs pages) ─────────────────────────── */
+/* ── Reports Section ───────────────────────────────────────── */
+
+.praman-reports-outer {
+  padding: 3.5rem 2rem 4rem;
+  background: #ffffff;
+  border-top: 1px solid var(--praman-border);
+}
+
+/* 2×2 equal grid — 4 cards same size */
+.praman-reports-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Base card */
+.praman-report-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border-left: 5px solid #667eea;
+  box-shadow: 0 2px 12px rgba(0, 112, 173, 0.09);
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  /* Fixed height so all 4 cards are equal */
+  min-height: 265px;
+  box-sizing: border-box;
+}
+
+/* Left-border accent per card type */
+.praman-report-card--blue   { border-left-color: #0070ad; }
+.praman-report-card--purple { border-left-color: #667eea; }
+.praman-report-card--dark   { border-left-color: #1e3c72; }
+.praman-report-card--green  { border-left-color: #22c55e; }
+
+.praman-report-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.praman-report-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.praman-report-card-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--primary-text);
+  margin: 0;
+}
+
+.praman-report-card-desc {
+  font-size: 0.8rem;
+  color: var(--praman-ink-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.praman-report-card-sub {
+  font-size: 0.75rem;
+  color: var(--praman-ink-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Card 1: role list */
+.praman-report-role-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.praman-report-role-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.praman-report-role-badge {
+  display: inline-block;
+  min-width: 84px;
+  padding: 0.1rem 0.5rem;
+  border-radius: 3px;
+  background: var(--praman-surface-alt);
+  color: var(--capgemini-blue);
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.praman-report-role-kpi {
+  color: var(--praman-ink-secondary);
+  font-size: 0.74rem;
+}
+
+/* Card 2: metrics row */
+.praman-report-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.praman-report-metric {
+  text-align: center;
+  background: var(--praman-surface-alt);
+  border-radius: 6px;
+  padding: 0.4rem 0.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.praman-report-metric-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--capgemini-blue);
+  line-height: 1;
+}
+
+.praman-report-metric span:last-child {
+  font-size: 0.62rem;
+  color: var(--praman-ink-secondary);
+  font-weight: 500;
+}
+
+/* Card 3: heatmap */
+.praman-heatmap-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.praman-heatmap-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  row-gap: 0.2rem;
+  column-gap: 0.5rem;
+  align-items: center;
+}
+
+.praman-heatmap-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.72rem;
+  color: var(--praman-ink);
+  font-weight: 500;
+  grid-column: 1;
+}
+
+.praman-heatmap-time {
+  font-size: 0.68rem;
+  color: var(--praman-ink-secondary);
+  font-weight: 400;
+}
+
+.praman-heatmap-bar-track {
+  grid-column: 1;
+  height: 6px;
+  background: var(--praman-surface-alt);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.praman-heatmap-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.praman-heatmap-status {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* Card 4: evidence list */
+.praman-report-evidence-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.praman-report-evidence-list li {
+  font-size: 0.76rem;
+  color: var(--praman-ink-secondary);
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  line-height: 1.4;
+}
+
+.praman-evidence-check {
+  color: #22c55e;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Prose pages (contributing, disclaimer, code-of-conduct, license, notice) ── */
+
+.praman-prose-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem;
+}
+
+.praman-prose-page h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--praman-ink);
+  margin-bottom: 0.5rem;
+}
+
+.praman-prose-page h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--praman-ink);
+  margin-bottom: 0.65rem;
+  margin-top: 0;
+}
+
+.praman-prose-page h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--praman-ink);
+  margin-top: 1.25rem;
+  margin-bottom: 0.45rem;
+}
+
+.praman-prose-page p,
+.praman-prose-page li {
+  font-size: 0.95rem;
+  color: var(--praman-ink-secondary);
+  line-height: 1.7;
+}
+
+.praman-prose-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--praman-border);
+}
+
+.praman-prose-section:last-child {
+  border-bottom: none;
+}
+
+/* Inline code pill */
+.praman-prose-code {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.84rem;
+  background: var(--praman-surface-alt);
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  color: var(--praman-ink);
+  font-weight: 600;
+  border: 1px solid var(--praman-border);
+}
+
+/* Dark code block */
+.praman-prose-code-block {
+  background: #1a3a6b;
+  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.83rem;
+  color: #e2e8f0;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.praman-prose-code-block pre {
+  margin: 0;
+}
+
+/* Tables */
+.praman-prose-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.praman-prose-table th {
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  background: var(--praman-surface-alt);
+  border-bottom: 2px solid var(--ifm-color-primary);
+  font-weight: 700;
+  color: var(--praman-ink);
+  font-size: 0.85rem;
+}
+
+.praman-prose-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--praman-border);
+  color: var(--praman-ink-secondary);
+  font-size: 0.88rem;
+}
+
+/* Attribution box (notice.tsx) */
+.praman-prose-attr-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--praman-surface-alt);
+  border-radius: 10px;
+  border: 1px solid var(--praman-border);
+  border-left: 4px solid var(--ifm-color-primary);
+  margin-top: 1.5rem;
+}
+
+.praman-prose-attr-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--ifm-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.praman-prose-attr-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--praman-ink);
+  margin-bottom: 0.3rem;
+}
+
+.praman-prose-attr-title a {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  margin-left: 0.5rem;
+}
+
+/* License pre block */
+.praman-prose-license {
+  background: var(--praman-surface-alt);
+  border: 1px solid var(--praman-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.praman-prose-license pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.84rem;
+  color: var(--praman-ink);
+  line-height: 1.6;
+}
+
+/* ── Secondary page global consistency ─────────────────────── */
+/* Targets all custom pages except the index (which contains    */
+/* .praman-hero-section). !important is needed in dark mode to  */
+/* override hardcoded inline style attributes on those pages.   */
+main:not(:has(.praman-hero-section)) h1,
+main:not(:has(.praman-hero-section)) h2,
+main:not(:has(.praman-hero-section)) h3 {
+  color: var(--praman-ink);
+}
+
+main:not(:has(.praman-hero-section)) p,
+main:not(:has(.praman-hero-section)) li {
+  color: var(--praman-ink-secondary);
+}
+
+[data-theme='dark'] main:not(:has(.praman-hero-section)) h1,
+[data-theme='dark'] main:not(:has(.praman-hero-section)) h2,
+[data-theme='dark'] main:not(:has(.praman-hero-section)) h3 {
+  color: var(--praman-ink) !important;
+}
+
+[data-theme='dark'] main:not(:has(.praman-hero-section)) p,
+[data-theme='dark'] main:not(:has(.praman-hero-section)) li {
+  color: var(--praman-ink-secondary) !important;
+}
+
+[data-theme='dark'] main:not(:has(.praman-hero-section)) pre {
+  background: var(--praman-surface-alt) !important;
+  border-color: var(--praman-border) !important;
+  color: var(--praman-ink) !important;
+}
+
+/* ── Dark mode: unified page background ─────────────────────── */
+/* All section wrappers use the same page background so there   */
+/* are no alternating color bands. Only inner cards are raised. */
+
+/* Section wrappers — match page background */
+[data-theme='dark'] .praman-glance-outer,
+[data-theme='dark'] .praman-reports-outer,
+[data-theme='dark'] .praman-agent-flow-outer,
+[data-theme='dark'] .praman-philosophy {
+  background: var(--ifm-background-color);
+}
+
+/* Inner cards — subtle elevation above the flat background */
+[data-theme='dark'] .praman-glance-section {
+  background: var(--praman-surface-alt);
+  box-shadow: 0 8px 32px rgba(74, 169, 213, 0.10);
+  border: 1px solid var(--praman-border);
+}
+
+[data-theme='dark'] .praman-info-card {
+  background: var(--praman-surface-alt);
+  border-left-color: var(--praman-border);
+  box-shadow: none;
+}
+
+[data-theme='dark'] .praman-info-card code {
+  background: rgba(74, 169, 213, 0.12);
+  color: var(--ifm-color-primary-light);
+}
+
+[data-theme='dark'] .praman-report-card {
+  background: var(--praman-surface-alt);
+  box-shadow: none;
+}
+
+[data-theme='dark'] .praman-reports-outer {
+  border-top-color: var(--praman-border);
+}
+
+/* Text — fix variables with no dark-mode definition */
+[data-theme='dark'] .praman-glance-title {
+  color: var(--praman-ink);
+}
+
+[data-theme='dark'] .praman-info-card h4 {
+  color: var(--ifm-color-primary-light);
+}
+
+[data-theme='dark'] .praman-info-card p {
+  color: var(--praman-ink-secondary);
+}
+
+[data-theme='dark'] .praman-report-card-title {
+  color: var(--praman-ink);
+}
+
+/* ── Feature cards (docs pages) ────────────────────────────── */
 .feature-card {
   background: var(--ifm-background-color);
   border: 1px solid var(--praman-border);
   border-radius: 12px;
   padding: 2rem;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--praman-shadow-sm);
 }
 
 .feature-card:hover {
   border-color: var(--ifm-color-primary-lighter);
-  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.12);
+  box-shadow: var(--praman-shadow-lg);
   transform: translateY(-2px);
 }
 
 [data-theme='dark'] .feature-card {
-  background: #0f172a;
-  border-color: #1e293b;
+  background: #0f1e3a;
+  border-color: #1e3864;
 }
 
 [data-theme='dark'] .feature-card:hover {
-  border-color: rgba(45, 212, 191, 0.3);
-  box-shadow: 0 8px 24px rgba(45, 212, 191, 0.08);
+  border-color: rgba(74, 169, 213, 0.3);
+  box-shadow: var(--praman-shadow-lg);
 }
 
 .feature-icon {
@@ -454,13 +1355,13 @@ div[class*='announcementBar'] {
   margin-bottom: 1rem;
 }
 
-/* ── Code blocks ────────────────────────────────────────── */
+/* ── Code blocks (Prism) ───────────────────────────────────── */
 .prism-code {
   border-radius: 8px;
   border: 1px solid var(--praman-border);
 }
 
-/* ── Sidebar ────────────────────────────────────────────── */
+/* ── Sidebar ───────────────────────────────────────────────── */
 .menu__link {
   border-radius: 6px;
   transition: all 0.15s ease;
@@ -470,23 +1371,113 @@ div[class*='announcementBar'] {
   font-weight: 600;
 }
 
-/* ── Footer ─────────────────────────────────────────────── */
+/* ── Footer ────────────────────────────────────────────────── */
 .footer--dark {
-  background: linear-gradient(180deg, #0f172a 0%, #070c16 100%);
+  background: linear-gradient(180deg, #1e3c72 0%, #0d1f3c 100%);
 }
 
 .footer__logo {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
-/* ── Responsive ─────────────────────────────────────────── */
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Carousel: switch from absolute fade to simple show/hide */
+  .praman-carousel-inner {
+    height: auto;
+  }
+
+  .praman-carousel-slide {
+    position: relative;
+    inset: auto;
+    display: none;
+    opacity: 1;
+    transform: none;
+    pointer-events: none;
+  }
+
+  .praman-carousel-slide.active {
+    display: flex;
+    pointer-events: auto;
+    z-index: auto;
+  }
+
+  .praman-carousel-content {
+    grid-template-columns: 1fr;
+    padding: 2.5rem 1.5rem 3.5rem;
+    text-align: center;
+    gap: 0;
+  }
+
+  .praman-carousel-text {
+    text-align: center;
+  }
+
+  .praman-carousel-subtitle {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .praman-carousel-cta {
+    justify-content: center;
+  }
+
+  .praman-carousel-visual {
+    display: none;
+  }
+
+  .praman-carousel-arrow {
+    display: none;
+  }
+
+  .praman-carousel-title {
+    font-size: 1.85rem;
+  }
+
+  /* Agent flow: stack vertically on mobile */
+  .praman-agent-flow-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .praman-flow-connector {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .hero__title {
-    font-size: 2.4rem;
+    font-size: 2.5rem;
   }
 
   .hero__subtitle {
-    font-size: 1rem;
+    font-size: 1.2rem;
+  }
+
+  .praman-carousel-title {
+    font-size: 1.6rem;
+  }
+
+  .praman-reports-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .praman-report-card {
+    min-height: auto;
+  }
+
+  .praman-glance-title {
+    font-size: 1.9rem;
+  }
+
+  .praman-glance-section {
+    padding: 30px 24px;
+  }
+
+  .praman-info-cards {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   .praman-pitch-grid {
@@ -503,3 +1494,114 @@ div[class*='announcementBar'] {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Feature Parity Comparison table ──────────────────────── */
+.praman-parity-wrap {
+  padding: 4rem 2rem 5rem;
+  background: var(--ifm-background-color);
+  border-top: 1px solid var(--praman-border);
+}
+
+.praman-parity-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.praman-parity-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.praman-parity-header h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--praman-ink);
+  margin-bottom: 0.5rem;
+}
+
+.praman-parity-header p {
+  color: var(--praman-ink-secondary);
+  font-size: 0.92rem;
+}
+
+.praman-parity-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--praman-border);
+  box-shadow: var(--praman-shadow-sm);
+}
+
+.praman-parity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.praman-parity-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--ifm-color-primary);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.praman-parity-table thead th:first-child {
+  width: 30%;
+}
+
+.praman-parity-section-row td {
+  background: var(--praman-surface-alt);
+  color: var(--praman-ink);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.55rem 1rem;
+}
+
+.praman-parity-table tbody tr:not(.praman-parity-section-row):hover {
+  background: var(--praman-surface-alt);
+}
+
+.praman-parity-table tbody tr:not(.praman-parity-section-row) td {
+  padding: 0.62rem 1rem;
+  border-bottom: 1px solid var(--praman-border);
+  vertical-align: middle;
+  color: var(--praman-ink-secondary);
+}
+
+.praman-parity-table tbody tr:not(.praman-parity-section-row) td:first-child {
+  color: var(--praman-ink);
+  font-weight: 500;
+}
+
+.praman-parity-check {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.praman-parity-partial {
+  color: #d97706;
+  font-weight: 700;
+}
+
+.praman-parity-no {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.praman-parity-col--praman {
+  background: rgba(0, 112, 173, 0.04);
+}
+
+[data-theme='dark'] .praman-parity-col--praman {
+  background: rgba(74, 169, 213, 0.06);
+}
+
+[data-theme='dark'] .praman-parity-check { color: #4ade80; }
+[data-theme='dark'] .praman-parity-partial { color: #fbbf24; }
+[data-theme='dark'] .praman-parity-no { color: #f87171; }

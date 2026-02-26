@@ -3,7 +3,7 @@ sidebar_position: 3
 title: Error Reference
 ---
 
-Praman provides 14 typed error classes with 56 machine-readable error codes. Every error includes
+Praman provides 14 typed error classes with 58 machine-readable error codes. Every error includes
 the attempted operation, a `retryable` flag, and actionable recovery `suggestions`.
 
 ## Error Hierarchy
@@ -13,7 +13,7 @@ All errors extend `PramanError`, which extends `Error`:
 ```text
 Error
  └── PramanError
-      ├── AIError          (9 codes)
+      ├── AIError          (11 codes)
       ├── AuthError        (4 codes)
       ├── BridgeError      (5 codes)
       ├── ConfigError      (3 codes)
@@ -115,6 +115,8 @@ Error
 | `ERR_AI_RESPONSE_PARSE_FAILED` | Could not parse LLM response         | Yes       |
 | `ERR_AI_CONTEXT_BUILD_FAILED`  | Page context build failed            | Yes       |
 | `ERR_AI_STEP_INTERPRET_FAILED` | Step interpretation failed           | No        |
+| `ERR_AI_INVALID_REQUEST`       | Invalid or malformed AI request      | No        |
+| `ERR_AI_CAPABILITY_NOT_FOUND`  | Requested capability not in registry | No        |
 
 ### Plugin Errors
 

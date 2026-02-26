@@ -156,4 +156,5 @@ test('full access', async ({
 - [Authentication Guide](./authentication) — 6 auth strategies
 - [Selector Reference](./selectors) — `UI5Selector` fields and examples
 - [Fixture Reference](./fixtures) — all 12 fixture modules
-- [Error Reference](./errors) — 56 error codes with recovery suggestions
+- [Error Reference](./errors) — 58 error codes with recovery suggestions
+- [Agent & IDE Setup](./agent-setup) — install AI agents, seed files, and IDE configs
