@@ -23,6 +23,8 @@ vi.mock('#ai/capability-registry.generated.js', () => ({
   GENERATED_CAPABILITIES: [],
 }));
 
+import { VERSION } from '../../../src/version.js';
+
 import { CapabilityRegistry } from '#ai/capability-registry.js';
 import type { CapabilityEntry } from '#ai/types.js';
 
@@ -407,7 +409,7 @@ describe('CapabilityRegistry', () => {
     it('returns the package version', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A);
       const stats = registry.getStatistics();
-      expect(stats.version).toBe('1.0.1');
+      expect(stats.version).toBe(VERSION);
     });
 
     it('returns correct byPriority breakdown', () => {
@@ -450,7 +452,7 @@ describe('CapabilityRegistry', () => {
     it('returns the package version', () => {
       const registry = makeRegistry(SAMPLE_ENTRY_A);
       const json = registry.toJSON();
-      expect(json.version).toBe('1.0.1');
+      expect(json.version).toBe(VERSION);
     });
 
     it('includes a generatedAt timestamp', () => {

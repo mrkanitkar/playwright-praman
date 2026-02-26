@@ -8,7 +8,19 @@
  */
 
 /**
- * Package version — kept in sync with package.json via build script.
+ * Build-time version placeholder — replaced by tsup `define` from package.json.
+ *
+ * @remarks
+ * tsup replaces `__PRAMAN_VERSION__` with the literal value from
+ * `package.json#version` at build time. This eliminates manual sync.
+ * In development (vitest, tsx), the `declare` + fallback ensures
+ * the symbol resolves without a build step.
+ */
+// eslint-disable-next-line @typescript-eslint/naming-convention -- build-time placeholder replaced by tsup define
+declare const __PRAMAN_VERSION__: string;
+
+/**
+ * Package version — injected from package.json at build time.
  *
  * @remarks
  * Read at runtime by telemetry (`service.version`) and user-agent headers.
@@ -19,7 +31,8 @@
  * logger.info(`${PACKAGE_NAME}@${VERSION}`);
  * ```
  */
-export const VERSION = '1.0.1' as const;
+export const VERSION: string =
+  typeof __PRAMAN_VERSION__ !== 'undefined' ? __PRAMAN_VERSION__ : '0.0.0-dev';
 
 /**
  * Package name — used in telemetry and error reporting.

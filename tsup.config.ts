@@ -1,4 +1,7 @@
 import { defineConfig } from 'tsup';
+import pkg from './package.json' with { type: 'json' };
+
+const external = [...Object.keys(pkg.peerDependencies), ...Object.keys(pkg.optionalDependencies)];
 
 export default defineConfig({
   entry: {
@@ -10,6 +13,9 @@ export default defineConfig({
     'reporters/index': 'src/reporters/index.ts',
     'cli/index': 'src/cli/index.ts',
   },
+  define: {
+    __PRAMAN_VERSION__: JSON.stringify(pkg.version),
+  },
   format: ['esm', 'cjs'],
   tsconfig: 'tsconfig.build.json',
   dts: true,
@@ -20,5 +26,5 @@ export default defineConfig({
   treeshake: true,
   cjsInterop: true,
   shims: true,
-  external: ['@playwright/test', 'openai', '@opentelemetry/api', '@opentelemetry/sdk-node'],
+  external,
 });

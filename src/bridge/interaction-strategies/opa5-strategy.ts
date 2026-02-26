@@ -114,6 +114,7 @@ export class Opa5Strategy implements InteractionStrategy {
             interactionType: 'PRESS',
             interactionTimeout: ${String(timeout)}
           });
+          // NOTE: debug log calls in this strategy are browser-context template strings, gated by the debug flag
           ${debug ? `console.log('[praman:opa5]', 'press', '${controlId}', JSON.stringify({ success: true }));` : ''}
           return { success: true };
         } catch (e) {

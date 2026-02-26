@@ -25,6 +25,7 @@
 
 import { z } from 'zod';
 
+import { buildSystemPrompt, buildUserPrompt } from './agentic-prompts.js';
 import type { CapabilityRegistry } from './capability-registry.js';
 import type { buildPageContext } from './context-builder.js';
 import type { LlmService } from './llm-service.js';
@@ -34,7 +35,10 @@ import type { AgenticCheckpoint, AiGeneratedTest, AiResponse, PageContext } from
 
 import { PramanConfigSchema } from '#core/config/schema.js';
 import { ErrorCode } from '#core/errors/codes.js';
+import { createLogger } from '#core/logging/index.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
+
+const log = createLogger('agentic');
 
 /** Default config with overridden discovery timeout for context building. */
 const GENERATE_CONTEXT_CONFIG = Object.freeze(
@@ -65,91 +69,6 @@ const InterpretStepSchema = z.object({
   capability: z.string().min(1),
   confidence: z.number().min(0).max(1),
 });
-
-// ── Helper: build system prompt ─────────────────────────────────────────────
-
-function buildSystemPrompt(
-  capabilityRegistry: CapabilityRegistry,
-  recipeRegistry: RecipeRegistry,
-): string {
-  // Only include fixture and namespace priority entries (exclude implementation details)
-  const entries = capabilityRegistry
-    .list()
-    .filter((c) => c.priority === 'fixture' || c.priority === 'namespace');
-
-  // Group by namespace (derived from qualifiedName: "ui5.table.getRows" -> "ui5.table")
-  const grouped = new Map<string, { qualifiedName: string; name: string; description: string }[]>();
-  for (const entry of entries) {
-    const parts = entry.qualifiedName.split('.');
-    const namespace = parts.length > 1 ? parts.slice(0, -1).join('.') : (parts[0] ?? 'other');
-    const existing = grouped.get(namespace);
-    const item = {
-      qualifiedName: entry.qualifiedName,
-      name: entry.name,
-      description: entry.description,
-    };
-    if (existing !== undefined) {
-      existing.push(item);
-    } else {
-      grouped.set(namespace, [item]);
-    }
-  }
-
-  // Format as namespace-grouped listing
-  const capSections: string[] = [];
-  for (const [namespace, items] of grouped) {
-    capSections.push(`## ${namespace}`);
-    for (const item of items) {
-      capSections.push(`- ${item.qualifiedName}: ${item.description}`);
-    }
-    capSections.push('');
-  }
-
-  const recipeExamples = recipeRegistry
-    .getTopRecipes(5)
-    .map((r) => r.pattern)
-    .join('\n\n');
-
-  return [
-    'You are a Playwright test generator for SAP UI5 applications using the Praman library.',
-    'Generate both:',
-    '1. A numbered list of test steps (natural language)',
-    '2. Complete TypeScript test code using Praman fixtures',
-    '',
-    'Available capabilities (grouped by namespace):',
-    '',
-    ...capSections,
-    'Example recipes:',
-    recipeExamples,
-    '',
-    'Rules:',
-    '- Use only capabilities listed above',
-    '- Use TypeScript strict mode',
-    "- Import from 'playwright-praman'",
-    '- Use async/await',
-    '- Wrap test in test() block from Praman',
-    '',
-    'Respond with JSON: { "steps": ["step 1...", "step 2..."], "code": "import { test } from \'playwright-praman\';\\n..." }',
-  ].join('\n');
-}
-
-// ── Helper: build user prompt for generateTest ──────────────────────────────
-
-function buildUserPrompt(pageContext: PageContext, scenario: string): string {
-  return [
-    'Page context:',
-    JSON.stringify(pageContext, null, 2),
-    '',
-    'Test scenario:',
-    scenario,
-    '',
-    'Respond with JSON:',
-    '{',
-    '  "steps": ["step 1...", "step 2..."],',
-    '  "code": "import { test } from \'playwright-praman\';\\n..."',
-    '}',
-  ].join('\n');
-}
 
 // ── Main class ──────────────────────────────────────────────────────────────
 
@@ -234,6 +153,7 @@ export class AgenticHandler {
     page: Parameters<typeof buildPageContext>[0],
   ): Promise<AiResponse<AiGeneratedTest>> {
     const startTime = Date.now();
+    log.debug({ scenario }, 'generateTest: starting');
 
     // ── Step 1: Build page context ─────────────────────────────────────────
     const contextResult = await this.contextBuilder(page, GENERATE_CONTEXT_CONFIG);
@@ -273,9 +193,11 @@ export class AgenticHandler {
     ];
 
     // ── Step 3: Call LLM ───────────────────────────────────────────────────
+    log.debug('generateTest: calling LLM');
     const llmResult = await this.llm.chat(messages, AiGeneratedTestSchema);
 
     if (llmResult.status === 'error') {
+      log.debug({ error: llmResult.error }, 'generateTest: LLM call failed');
       return {
         status: 'error',
         data: undefined,
@@ -304,6 +226,11 @@ export class AgenticHandler {
         capabilities: capabilityIds.slice(0, 10),
       },
     };
+
+    log.debug(
+      { stepCount: raw.steps.length, duration: Date.now() - startTime },
+      'generateTest: success',
+    );
 
     return {
       status: 'success',
@@ -343,6 +270,7 @@ export class AgenticHandler {
     page: Parameters<typeof buildPageContext>[0],
   ): Promise<AiResponse<void>> {
     const startTime = Date.now();
+    log.debug({ step }, 'interpretStep: starting');
 
     const entries = this.capabilityRegistry
       .list()
@@ -437,6 +365,7 @@ export class AgenticHandler {
   @ui5Step
   async suggestActions(pageContext: PageContext): Promise<AiResponse<string[]>> {
     const startTime = Date.now();
+    log.debug({ controlCount: pageContext.controls.length }, 'suggestActions: starting');
 
     const prompt = [
       'You are a SAP UI5 test automation expert.',

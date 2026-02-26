@@ -66,6 +66,9 @@ const DEFAULT_LOGIN_BASE_DELAY = 1000;
 /** Default max retries for login attempts. */
 const DEFAULT_LOGIN_MAX_RETRIES = 2;
 
+/** Timeout for waiting for the logout button to appear. */
+const LOGOUT_BUTTON_TIMEOUT_MS = 5000;
+
 /**
  * Options for constructing a SAPAuthHandler.
  *
@@ -313,7 +316,7 @@ export class SAPAuthHandler {
 
           return false;
         },
-        { timeout: 5000 },
+        { timeout: LOGOUT_BUTTON_TIMEOUT_MS },
       );
       /* v8 ignore stop */
 

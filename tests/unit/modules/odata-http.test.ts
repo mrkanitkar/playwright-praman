@@ -333,7 +333,7 @@ describe('OData HTTP module', () => {
       expect(mock.request.post).not.toHaveBeenCalled();
     });
 
-    it('includes params in the URL query string', async () => {
+    it('passes params via Playwright native params option', async () => {
       const mock = createMockPage();
       mock.request.get.mockResolvedValue(createMockResponse(200, { result: 42 }));
 
@@ -347,8 +347,9 @@ describe('OData HTTP module', () => {
 
       const callArgs = mock.request.get.mock.calls[0] as unknown[];
       const url = callArgs[0] as string;
-      expect(url).toContain('ProductID=');
-      expect(url).toContain('Quantity=5');
+      expect(url).toBe(`${SERVICE_URL}/GetPrice`);
+      const opts = callArgs[1] as { params: Record<string, unknown> };
+      expect(opts.params).toEqual({ ProductID: "'123'", Quantity: 5 });
     });
 
     it('returns function import result', async () => {
@@ -373,7 +374,7 @@ describe('OData HTTP module', () => {
   // ── queryEntities ─────────────────────────────────────────────────────────
 
   describe('queryEntities', () => {
-    it('sends GET with $filter in the URL', async () => {
+    it('passes $filter via Playwright native params option', async () => {
       const mock = createMockPage();
       mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
 
@@ -383,10 +384,12 @@ describe('OData HTTP module', () => {
 
       const callArgs = mock.request.get.mock.calls[0] as unknown[];
       const url = callArgs[0] as string;
-      expect(url).toContain('$filter=Price gt 10');
+      expect(url).toBe(`${SERVICE_URL}/Products`);
+      const opts = callArgs[1] as { params: Record<string, unknown> };
+      expect(opts.params).toEqual({ $filter: 'Price gt 10' });
     });
 
-    it('builds full query string with all OData params', async () => {
+    it('passes all OData params via Playwright native params option', async () => {
       const mock = createMockPage();
       mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
 
@@ -401,12 +404,16 @@ describe('OData HTTP module', () => {
 
       const callArgs = mock.request.get.mock.calls[0] as unknown[];
       const url = callArgs[0] as string;
-      expect(url).toContain('$filter=Price gt 10');
-      expect(url).toContain('$select=Name,Price');
-      expect(url).toContain('$expand=Category');
-      expect(url).toContain('$orderby=Price desc');
-      expect(url).toContain('$top=20');
-      expect(url).toContain('$skip=10');
+      expect(url).toBe(`${SERVICE_URL}/Products`);
+      const opts = callArgs[1] as { params: Record<string, unknown> };
+      expect(opts.params).toEqual({
+        $filter: 'Price gt 10',
+        $select: 'Name,Price',
+        $expand: 'Category',
+        $orderby: 'Price desc',
+        $top: 20,
+        $skip: 10,
+      });
     });
 
     it('returns parsed entities from OData V4 response format', async () => {
@@ -437,31 +444,29 @@ describe('OData HTTP module', () => {
       expect(result.data).toHaveLength(0);
     });
 
-    it('sends $top only when skip is not provided', async () => {
+    it('passes only $top in params when skip is not provided', async () => {
       const mock = createMockPage();
       mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
 
       await queryEntities(asPage(mock), SERVICE_URL, 'Products', { top: 5 });
 
       const callArgs = mock.request.get.mock.calls[0] as unknown[];
-      const url = callArgs[0] as string;
-      expect(url).toContain('$top=5');
-      expect(url).not.toContain('$skip');
+      const opts = callArgs[1] as { params: Record<string, unknown> };
+      expect(opts.params).toEqual({ $top: 5 });
     });
 
-    it('sends $skip only when top is not provided', async () => {
+    it('passes only $skip in params when top is not provided', async () => {
       const mock = createMockPage();
       mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
 
       await queryEntities(asPage(mock), SERVICE_URL, 'Products', { skip: 20 });
 
       const callArgs = mock.request.get.mock.calls[0] as unknown[];
-      const url = callArgs[0] as string;
-      expect(url).toContain('$skip=20');
-      expect(url).not.toContain('$top');
+      const opts = callArgs[1] as { params: Record<string, unknown> };
+      expect(opts.params).toEqual({ $skip: 20 });
     });
 
-    it('sends both $skip and $top for pagination', async () => {
+    it('passes both $skip and $top in params for pagination', async () => {
       const mock = createMockPage();
       const entities = [{ Name: 'Widget B', Price: 25 }];
       mock.request.get.mockResolvedValue(createMockResponse(200, { value: entities }));
@@ -472,9 +477,8 @@ describe('OData HTTP module', () => {
       });
 
       const callArgs = mock.request.get.mock.calls[0] as unknown[];
-      const url = callArgs[0] as string;
-      expect(url).toContain('$skip=10');
-      expect(url).toContain('$top=5');
+      const opts = callArgs[1] as { params: Record<string, unknown> };
+      expect(opts.params).toEqual({ $skip: 10, $top: 5 });
       expect(result.data).toHaveLength(1);
     });
 
@@ -492,7 +496,7 @@ describe('OData HTTP module', () => {
       expect(result.data).toEqual(entities);
     });
 
-    it('generates no query string when no options are provided', async () => {
+    it('passes no params when no options are provided', async () => {
       const mock = createMockPage();
       mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
 
@@ -501,7 +505,8 @@ describe('OData HTTP module', () => {
       const callArgs = mock.request.get.mock.calls[0] as unknown[];
       const url = callArgs[0] as string;
       expect(url).toBe(`${SERVICE_URL}/Products`);
-      expect(url).not.toContain('?');
+      const opts = callArgs[1] as { params: unknown };
+      expect(opts.params).toBeUndefined();
     });
   });
 

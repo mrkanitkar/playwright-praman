@@ -111,11 +111,12 @@ interface APIResponse {
   headers(): Record<string, string>;
 }
 
-/** Internal: Request options. */
+/** Internal: Request options (mirrors Playwright's APIRequestContext options). */
 interface RequestOptions {
   headers?: Record<string, string> | undefined;
   data?: unknown;
   timeout?: number | undefined;
+  params?: Record<string, string | number | boolean> | undefined;
 }
 
 /**
@@ -194,18 +195,20 @@ function buildHeaders(options?: ODataHttpOptions): Record<string, string> {
   return headers;
 }
 
-/** Builds an OData query string from query options. */
-function buildQueryString(options?: ODataQueryOptions): string {
-  const params: string[] = [];
+/** Builds an OData query params object for Playwright's `params` option. */
+function buildQueryParams(
+  options?: ODataQueryOptions,
+): Record<string, string | number> | undefined {
+  const params: Record<string, string | number> = {};
 
-  if (options?.filter !== undefined) params.push(`$filter=${options.filter}`);
-  if (options?.select !== undefined) params.push(`$select=${options.select}`);
-  if (options?.expand !== undefined) params.push(`$expand=${options.expand}`);
-  if (options?.orderby !== undefined) params.push(`$orderby=${options.orderby}`);
-  if (options?.top !== undefined) params.push(`$top=${String(options.top)}`);
-  if (options?.skip !== undefined) params.push(`$skip=${String(options.skip)}`);
+  if (options?.filter !== undefined) params['$filter'] = options.filter;
+  if (options?.select !== undefined) params['$select'] = options.select;
+  if (options?.expand !== undefined) params['$expand'] = options.expand;
+  if (options?.orderby !== undefined) params['$orderby'] = options.orderby;
+  if (options?.top !== undefined) params['$top'] = options.top;
+  if (options?.skip !== undefined) params['$skip'] = options.skip;
 
-  return params.length > 0 ? `?${params.join('&')}` : '';
+  return Object.keys(params).length > 0 ? params : undefined;
 }
 
 /** Extracts status, data, and etag from an APIResponse. */
@@ -395,15 +398,20 @@ export async function callFunctionImport<TData = unknown>(
   options?: ODataHttpOptions,
 ): Promise<ODataHttpResult<TData>> {
   const operation = `callFunctionImport('${functionName}')`;
+  const url = `${serviceUrl}/${functionName}`;
 
-  const queryParts: string[] = [];
+  // Convert params to Playwright's native params format
+  let requestParams: Record<string, string | number | boolean> | undefined;
   if (params !== undefined) {
+    requestParams = {};
     for (const [key, value] of Object.entries(params)) {
-      queryParts.push(`${key}=${String(value)}`);
+      // eslint-disable-next-line security/detect-object-injection -- key is from OData function import params, not user input
+      requestParams[key] =
+        typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+          ? value
+          : String(value);
     }
   }
-  const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
-  const url = `${serviceUrl}/${functionName}${queryString}`;
 
   let response: APIResponse;
 
@@ -411,6 +419,7 @@ export async function callFunctionImport<TData = unknown>(
     const headers = buildHeaders(options);
     response = await page.request.get(url, {
       headers,
+      params: requestParams,
       timeout: options?.timeout,
     });
   } else {
@@ -418,6 +427,7 @@ export async function callFunctionImport<TData = unknown>(
     const headers = buildHeaders({ ...options, csrfToken: token });
     response = await page.request.post(url, {
       headers,
+      params: requestParams,
       timeout: options?.timeout,
     });
   }
@@ -452,12 +462,13 @@ export async function queryEntities<TData = unknown>(
   options?: ODataQueryOptions,
 ): Promise<ODataHttpResult<readonly TData[]>> {
   const operation = `queryEntities('${entitySet}')`;
-  const queryString = buildQueryString(options);
-  const url = `${serviceUrl}/${entitySet}${queryString}`;
+  const url = `${serviceUrl}/${entitySet}`;
   const headers = buildHeaders(options);
+  const params = buildQueryParams(options);
 
   const response = await page.request.get(url, {
     headers,
+    params,
     timeout: options?.timeout,
   });
 

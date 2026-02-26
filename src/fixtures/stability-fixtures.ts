@@ -44,6 +44,7 @@ import { test as base } from '@playwright/test';
 import type { Frame, Page } from '@playwright/test';
 
 import type { PramanConfig } from '#core/config/index.js';
+import { createLogger } from '#core/logging/index.js';
 import { DEFAULT_IGNORE_PATTERNS } from '#core/utils/constants.js';
 import { waitForUI5Stable } from '#core/utils/wait-helpers.js';
 
@@ -134,6 +135,8 @@ export const stabilityTest = base.extend<StabilityFixtures, StabilityDeps>({
         return;
       }
 
+      const log = createLogger('stability');
+
       const navigationListener = (frame: Frame): void => {
         if (frame !== page.mainFrame()) {
           return;
@@ -146,8 +149,8 @@ export const stabilityTest = base.extend<StabilityFixtures, StabilityDeps>({
             await waitForUI5Stable(page as Parameters<typeof waitForUI5Stable>[0], {
               timeout: pramanConfig.ui5WaitTimeout,
             });
-          } catch {
-            // Silently catch — stability wait failure should not break the test
+          } catch (error: unknown) {
+            log.debug({ err: error }, 'waitForUI5Stable failed after navigation (non-fatal)');
           }
         })();
       };

@@ -131,6 +131,32 @@ describe('loadConfig', () => {
     expect(config.discoveryStrategies).toEqual(['direct-id', 'recordreplay']);
   });
 
+  // ── PRAMAN_DEBUG convenience toggle ─────────────────────────────────
+  it('sets logLevel to debug when PRAMAN_DEBUG=true', async () => {
+    vi.stubEnv('PRAMAN_DEBUG', 'true');
+    const config = await loadConfig();
+    expect(config.logLevel).toBe('debug');
+  });
+
+  it('PRAMAN_LOG_LEVEL takes precedence over PRAMAN_DEBUG', async () => {
+    vi.stubEnv('PRAMAN_DEBUG', 'true');
+    vi.stubEnv('PRAMAN_LOG_LEVEL', 'error');
+    const config = await loadConfig();
+    expect(config.logLevel).toBe('error');
+  });
+
+  it('ignores PRAMAN_DEBUG when set to false', async () => {
+    vi.stubEnv('PRAMAN_DEBUG', 'false');
+    const config = await loadConfig();
+    expect(config.logLevel).toBe('info');
+  });
+
+  it('ignores PRAMAN_DEBUG when set to non-true value', async () => {
+    vi.stubEnv('PRAMAN_DEBUG', '1');
+    const config = await loadConfig();
+    expect(config.logLevel).toBe('info');
+  });
+
   // ── Invalid / fallback ────────────────────────────────────────────
   it('ignores invalid env var values (falls back to default)', async () => {
     vi.stubEnv('PRAMAN_LOG_LEVEL', 'invalid-level');

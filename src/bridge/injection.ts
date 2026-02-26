@@ -80,6 +80,7 @@ export async function injectBridgeEager(target: Page | BrowserContext): Promise<
     if (typeof sap !== 'undefined' && sap.ui && typeof sap.ui.require === 'function') {
       ${bridgeScript}
     } else if (Date.now() > deadline) {
+      // NOTE: This console.warn runs in browser context (addInitScript), not Node.js
       console.warn('[praman] Eager bridge injection timed out after ${String(timeoutMs)}ms — page may not be a UI5 application');
     } else {
       setTimeout(tryInject, ${String(BRIDGE_TIMEOUTS.POLLING_INTERVAL)});

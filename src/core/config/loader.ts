@@ -113,6 +113,12 @@ function readEnvOverrides(): Record<string, unknown> {
     }
   }
 
+  // PRAMAN_DEBUG=true is a convenience shorthand for logLevel: 'debug'.
+  // Lower priority than explicit PRAMAN_LOG_LEVEL.
+  if (envConfig['logLevel'] === undefined && process.env['PRAMAN_DEBUG'] === 'true') {
+    envConfig['logLevel'] = 'debug';
+  }
+
   return envConfig;
 }
 

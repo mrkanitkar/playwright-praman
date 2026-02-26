@@ -30,6 +30,19 @@ import { NavigationError } from '#core/errors/navigation-error.js';
 import { DEFAULT_TIMEOUTS } from '#core/utils/constants.js';
 import { waitForUI5Stable } from '#core/utils/wait-helpers.js';
 
+/**
+ * Escapes a string for safe interpolation into a CSS attribute selector.
+ *
+ * @remarks
+ * Prevents selector injection when tile/app titles contain `"`, `\`, or `]`.
+ *
+ * @param value - Raw attribute value.
+ * @returns Escaped string safe for `[attr="value"]` selectors.
+ */
+function escapeCssAttr(value: string): string {
+  return value.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+}
+
 /** Minimal subset of Playwright's Page used by navigation functions. */
 export interface NavigationPage {
   evaluate(pageFunction: string | ((...args: never[]) => unknown), arg?: unknown): Promise<unknown>;
@@ -159,7 +172,8 @@ export async function navigateToTile(
   tileTitle: string,
   options?: NavigationOptions,
 ): Promise<void> {
-  const tileLocator = page.locator(`[aria-label="${tileTitle}"], [title="${tileTitle}"]`);
+  const escaped = escapeCssAttr(tileTitle);
+  const tileLocator = page.locator(`[aria-label="${escaped}"], [title="${escaped}"]`);
   const visible = await tileLocator.isVisible();
   if (!visible) {
     throw new NavigationError({
@@ -304,7 +318,8 @@ export async function searchAndOpenApp(
 ): Promise<void> {
   const searchField = page.locator('#shellSearchField, [id$="shellSearch-input"]');
   await searchField.fill(appTitle);
-  const appTile = page.locator(`[aria-label="${appTitle}"], [title="${appTitle}"]`);
+  const escapedTitle = escapeCssAttr(appTitle);
+  const appTile = page.locator(`[aria-label="${escapedTitle}"], [title="${escapedTitle}"]`);
   await appTile.click();
   await stabilityWait(page, options);
 }
