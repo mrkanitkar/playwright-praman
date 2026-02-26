@@ -25,7 +25,7 @@
     "pendo", "hotjar", "fullstory", "appdynamics", "qualtrics", "Qualtrics",
     "googletagmanager", "optimizely", "walkmeusercontent", "siteintercept", "papi",
 
-    "cursorrc", "opencode",
+    "cursorrc", "cursorrules", "opencode", "appendable",
 
     "scaffolder", "serialisable", "certuser", "serializability", "Aggs",
     "checkmark", "deadcode", "healthcheck", "mdlint", "stringifying", "unparseable",
