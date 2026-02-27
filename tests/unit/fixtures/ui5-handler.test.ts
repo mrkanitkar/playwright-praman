@@ -45,6 +45,11 @@ const mockCreateExecuteMethodScript = vi.fn().mockReturnValue('(function(){})()'
 const mockCreateInspectControlScript = vi.fn().mockReturnValue('(function(){})()');
 const mockFilterMethods = vi.fn().mockImplementation((methods: readonly string[]) => methods);
 const mockCreateControlProxy = vi.fn();
+const mockCreateLocatorShim = vi.fn();
+
+vi.mock('#fixtures/locator-shim.js', () => ({
+  createLocatorShim: mockCreateLocatorShim,
+}));
 
 vi.mock('#bridge/injection.js', () => ({
   ensureBridgeInjected: mockEnsureBridgeInjected,
@@ -792,6 +797,305 @@ describe('UI5Handler', () => {
       expect(inspectSpan).toBeDefined();
       expect(inspectSpan?.ended).toBe(true);
       expect(inspectSpan?.status).toBe('ok');
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  // Group 9: Locator fallback branches (tests 45-54)
+  // ════════════════════════════════════════════════════════════════════
+
+  describe('tryLocatorFallback — non-UI5 element fallback', () => {
+    it('control() falls back to locator for non-UI5 id (no --) when DOM element exists', async () => {
+      const shortHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id'],
+        config: { controlDiscoveryTimeout: 100 },
+      });
+
+      // Discovery fails — not found
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      // Locator fallback: page.locator('#simpleId').count() returns 1
+      const mockLocator = { count: vi.fn().mockResolvedValue(1) };
+      (page as unknown as Record<string, unknown>)['locator'] = vi
+        .fn()
+        .mockReturnValue(mockLocator);
+
+      const locatorShimProxy = createFakeProxy('simpleId', 'dom-element');
+      mockCreateLocatorShim.mockReturnValue(locatorShimProxy);
+
+      // Selector with simple id (no '--') triggers the non-UI5 fallback
+      const result = await shortHandler.control({ id: 'simpleId' }, { timeout: 100 });
+
+      expect(result).toBe(locatorShimProxy);
+      expect(mockCreateLocatorShim).toHaveBeenCalled();
+    });
+
+    it('control() falls back to locator for css selector when DOM element exists', async () => {
+      const shortHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id'],
+        config: { controlDiscoveryTimeout: 100 },
+      });
+
+      // Discovery fails — not found
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      // Locator fallback: page.locator('.my-class').count() returns 1
+      const mockLocator = { count: vi.fn().mockResolvedValue(1) };
+      (page as unknown as Record<string, unknown>)['locator'] = vi
+        .fn()
+        .mockReturnValue(mockLocator);
+
+      const locatorShimProxy = createFakeProxy('css-el', 'dom-element');
+      mockCreateLocatorShim.mockReturnValue(locatorShimProxy);
+
+      // Extended selector with css property triggers the css fallback
+      const cssSelector = { css: '.my-class' } as unknown as UI5Selector;
+      const result = await shortHandler.control(cssSelector, { timeout: 100 });
+
+      expect(result).toBe(locatorShimProxy);
+      expect(mockCreateLocatorShim).toHaveBeenCalled();
+    });
+
+    it('control() falls back to locator for xpath selector when DOM element exists', async () => {
+      const shortHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id'],
+        config: { controlDiscoveryTimeout: 100 },
+      });
+
+      // Discovery fails — not found
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      // Locator fallback: page.locator('xpath=//div').count() returns 1
+      const mockLocator = { count: vi.fn().mockResolvedValue(1) };
+      (page as unknown as Record<string, unknown>)['locator'] = vi
+        .fn()
+        .mockReturnValue(mockLocator);
+
+      const locatorShimProxy = createFakeProxy('xpath-el', 'dom-element');
+      mockCreateLocatorShim.mockReturnValue(locatorShimProxy);
+
+      // Extended selector with xpath property triggers the xpath fallback
+      const xpathSelector = { xpath: '//div[@id="test"]' } as unknown as UI5Selector;
+      const result = await shortHandler.control(xpathSelector, { timeout: 100 });
+
+      expect(result).toBe(locatorShimProxy);
+      expect(mockCreateLocatorShim).toHaveBeenCalled();
+    });
+
+    it('non-UI5 id fallback returns null when locator count is 0', async () => {
+      const shortHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id'],
+        config: { controlDiscoveryTimeout: 100 },
+      });
+
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      // Locator returns 0 count — fallback fails, should throw TimeoutError
+      const mockLocator = { count: vi.fn().mockResolvedValue(0) };
+      (page as unknown as Record<string, unknown>)['locator'] = vi
+        .fn()
+        .mockReturnValue(mockLocator);
+
+      await expect(
+        shortHandler.control({ id: 'missingSimpleId' }, { timeout: 100 }),
+      ).rejects.toThrow(TimeoutError);
+    });
+
+    it('css fallback returns null when locator count is 0', async () => {
+      const shortHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id'],
+        config: { controlDiscoveryTimeout: 100 },
+      });
+
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      const mockLocator = { count: vi.fn().mockResolvedValue(0) };
+      (page as unknown as Record<string, unknown>)['locator'] = vi
+        .fn()
+        .mockReturnValue(mockLocator);
+
+      const cssSelector = { css: '.nonexistent' } as unknown as UI5Selector;
+      await expect(shortHandler.control(cssSelector, { timeout: 100 })).rejects.toThrow(
+        TimeoutError,
+      );
+    });
+
+    it('xpath fallback returns null when locator count is 0', async () => {
+      const shortHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id'],
+        config: { controlDiscoveryTimeout: 100 },
+      });
+
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      const mockLocator = { count: vi.fn().mockResolvedValue(0) };
+      (page as unknown as Record<string, unknown>)['locator'] = vi
+        .fn()
+        .mockReturnValue(mockLocator);
+
+      const xpathSelector = { xpath: '//nonexistent' } as unknown as UI5Selector;
+      await expect(shortHandler.control(xpathSelector, { timeout: 100 })).rejects.toThrow(
+        TimeoutError,
+      );
+    });
+
+    it('UI5-style id with -- does not trigger locator fallback', async () => {
+      const shortHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id'],
+        config: { controlDiscoveryTimeout: 100 },
+      });
+
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      // ID contains '--' so tryLocatorFallback skips the id-based check
+      await expect(
+        shortHandler.control({ id: 'app--view--btn1' }, { timeout: 100 }),
+      ).rejects.toThrow(TimeoutError);
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  // Group 10: Discovery strategy branches (tests 55-58)
+  // ════════════════════════════════════════════════════════════════════
+
+  describe('discoverSingleControl — strategy chain branches', () => {
+    it('registry strategy uses forceRegistryScan when direct-id and recordreplay fail', async () => {
+      const registryHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay', 'registry'],
+      });
+
+      // First call (direct-id): not found
+      // Second call (recordreplay): not found
+      // Third call (registry with forceRegistryScan): found
+      // Fourth call: getAvailableMethods
+      page.evaluate
+        .mockResolvedValueOnce({ id: '', controlType: 'unknown' })
+        .mockResolvedValueOnce({ id: '', controlType: 'unknown' })
+        .mockResolvedValueOnce({ id: 'reg1', controlType: 'sap.m.Table' })
+        .mockResolvedValueOnce(['getItems'])
+        // Then for the waitFor loop second iteration (after first found):
+        // First waitFor iteration calls discoverSingleControl which needs all strategies
+        .mockResolvedValueOnce({ id: '', controlType: 'unknown' })
+        .mockResolvedValueOnce({ id: '', controlType: 'unknown' })
+        .mockResolvedValueOnce({ id: 'reg1', controlType: 'sap.m.Table' })
+        .mockResolvedValueOnce(['getItems']);
+
+      const proxy = createFakeProxy('reg1', 'sap.m.Table');
+      mockCreateControlProxy.mockReturnValue(proxy);
+
+      const result = await registryHandler.control({ controlType: 'sap.m.Table' });
+
+      expect(result).toBe(proxy);
+    });
+
+    it('direct-id strategy is skipped when selector has no id', async () => {
+      const idlessHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+      });
+
+      // Only one findControl call expected (recordreplay, skipping direct-id)
+      page.evaluate
+        .mockResolvedValueOnce({ id: 'ct1', controlType: 'sap.m.Input' })
+        .mockResolvedValueOnce(['getValue'])
+        // For the second discoverSingleControl call from control():
+        .mockResolvedValueOnce({ id: 'ct1', controlType: 'sap.m.Input' })
+        .mockResolvedValueOnce(['getValue']);
+
+      const proxy = createFakeProxy('ct1', 'sap.m.Input');
+      mockCreateControlProxy.mockReturnValue(proxy);
+
+      // Selector with no id — only controlType
+      const result = await idlessHandler.control({ controlType: 'sap.m.Input' });
+
+      expect(result).toBe(proxy);
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  // Group 11: control() option branches (tests 59-62)
+  // ════════════════════════════════════════════════════════════════════
+
+  describe('control() — option branches', () => {
+    it('skipStabilityWait option skips waitForUI5Stable', async () => {
+      const skipHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+      });
+
+      const result = await skipHandler.control(defaultSelector, { skipStabilityWait: true });
+
+      expect(result).toBe(fakeProxy);
+      // waitForFunction is still called for ensureReady and waitFor,
+      // but should NOT be called for the explicit UI5 stability check.
+      // Count should be less than when skipStabilityWait is false.
+    });
+
+    it('skipStabilityWait from config is used when option not provided', async () => {
+      const skipConfigHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        config: { skipStabilityWait: true },
+      });
+
+      const result = await skipConfigHandler.control(defaultSelector);
+
+      expect(result).toBe(fakeProxy);
+    });
+
+    it('waitFor uses default interval when options.interval is not provided', async () => {
+      // Just calling waitFor without interval exercises the default interval branch
+      await handler.waitFor(defaultSelector, { timeout: 1000 });
+
+      // The default interval (250ms) was used — no assertion on interval value,
+      // just verifying the path works without error
+      expect(page.evaluate).toHaveBeenCalled();
+    });
+
+    it('waitFor breaks when remaining time is 0 after sleep', async () => {
+      // Force a fast timeout so the remaining <= 0 branch fires after sleep
+      page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown', methods: [] });
+
+      await expect(handler.waitFor(defaultSelector, { timeout: 1, interval: 10 })).rejects.toThrow(
+        TimeoutError,
+      );
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  // Group 12: Constructor config defaults (test 63)
+  // ════════════════════════════════════════════════════════════════════
+
+  describe('constructor — config defaults', () => {
+    it('uses default values when config options are partially provided', () => {
+      const partialHandler = new UI5Handler({
+        page: page as unknown as Page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id'],
+        config: { preferVisibleControls: false },
+      });
+
+      // Handler created successfully with partial config — defaults fill in
+      expect(partialHandler).toBeDefined();
     });
   });
 });

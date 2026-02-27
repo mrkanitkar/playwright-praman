@@ -418,6 +418,93 @@ describe('ai-fixtures fixture definitions', () => {
       expect(mocks.buildPageContext).toHaveBeenCalledOnce();
     });
 
+    it('discoveryPage adapter url() delegates to page.url()', async () => {
+      // Capture the discoveryPage passed to discoverPage mock
+      let capturedDiscoveryPage: Record<string, unknown> | undefined;
+      mocks.discoverPage.mockImplementation(async (discoveryPage: Record<string, unknown>) => {
+        capturedDiscoveryPage = discoveryPage;
+        return Promise.resolve({ status: 'success', data: {}, metadata: { duration: 0 } });
+      });
+
+      const fn = extractFixtureFn(fixtures['pramanAI']);
+      const ai = await runFixture<Record<string, unknown>>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+      });
+
+      // Invoke discoverPage to trigger the mock capture
+      const discoverPageFn = ai['discoverPage'] as (opts?: unknown) => Promise<unknown>;
+      await discoverPageFn();
+
+      expect(capturedDiscoveryPage).toBeDefined();
+      const urlFn = capturedDiscoveryPage?.['url'] as () => string;
+      const result = urlFn();
+      expect(result).toBe('https://example.com/fiori');
+      expect(mockPage.url).toHaveBeenCalled();
+    });
+
+    it('discoveryPage adapter evaluate() calls page.evaluate with string', async () => {
+      // Capture the discoveryPage passed to discoverPage mock
+      let capturedDiscoveryPage: Record<string, unknown> | undefined;
+      mocks.discoverPage.mockImplementation(async (discoveryPage: Record<string, unknown>) => {
+        capturedDiscoveryPage = discoveryPage;
+        return Promise.resolve({ status: 'success', data: {}, metadata: { duration: 0 } });
+      });
+
+      const fn = extractFixtureFn(fixtures['pramanAI']);
+      const ai = await runFixture<Record<string, unknown>>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+      });
+
+      // Invoke discoverPage to trigger the mock capture
+      const discoverPageFn = ai['discoverPage'] as (opts?: unknown) => Promise<unknown>;
+      await discoverPageFn();
+
+      expect(capturedDiscoveryPage).toBeDefined();
+      const evaluateFn = capturedDiscoveryPage?.['evaluate'] as (
+        fn: unknown,
+        arg?: unknown,
+      ) => Promise<unknown>;
+
+      // Test the string branch (typeof fn === 'string')
+      mockPage.evaluate.mockResolvedValueOnce('stringResult');
+      const stringResult = await evaluateFn('document.title');
+      expect(stringResult).toBe('stringResult');
+      expect(mockPage.evaluate).toHaveBeenCalledWith('document.title');
+    });
+
+    it('discoveryPage adapter evaluate() calls page.evaluate with function', async () => {
+      // Capture the discoveryPage passed to discoverPage mock
+      let capturedDiscoveryPage: Record<string, unknown> | undefined;
+      mocks.discoverPage.mockImplementation(async (discoveryPage: Record<string, unknown>) => {
+        capturedDiscoveryPage = discoveryPage;
+        return Promise.resolve({ status: 'success', data: {}, metadata: { duration: 0 } });
+      });
+
+      const fn = extractFixtureFn(fixtures['pramanAI']);
+      const ai = await runFixture<Record<string, unknown>>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+      });
+
+      // Invoke discoverPage to trigger the mock capture
+      const discoverPageFn = ai['discoverPage'] as (opts?: unknown) => Promise<unknown>;
+      await discoverPageFn();
+
+      expect(capturedDiscoveryPage).toBeDefined();
+      const evaluateFn = capturedDiscoveryPage?.['evaluate'] as (
+        fn: unknown,
+        arg?: unknown,
+      ) => Promise<unknown>;
+
+      // Test the function branch (typeof fn !== 'string')
+      const browserFn = (): number => 42;
+      mockPage.evaluate.mockResolvedValueOnce(42);
+      const fnResult = await evaluateFn(browserFn, 'someArg');
+      expect(fnResult).toBe(42);
+    });
+
     it('calls llm.close() during teardown', async () => {
       const fn = extractFixtureFn(fixtures['pramanAI']);
       await runFixture<Record<string, unknown>>(fn, {
