@@ -20,7 +20,7 @@
 
 /** Wraps body in try/catch IIFE returning fallback on error. */
 function iife(body: string, fallback: string): string {
-  return `(function(){try{${body}}catch(e){console.warn("[praman] Table operation error:",e.message);return ${fallback};}})()`;
+  return `(function(){try{${body}}catch(e){console.error("[praman] Table operation error:",e.message);return ${fallback};}})()`;
 }
 
 /** Generates `sap.ui.getCore().byId(id)` guard with fallback. */

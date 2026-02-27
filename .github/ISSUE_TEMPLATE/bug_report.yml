@@ -82,7 +82,7 @@ body:
       placeholder: |
         OS: macOS 15.3
         Node: 22.x
-        Playwright: 1.50.x
+        Playwright: 1.57.x
         playwright-praman: 1.0.1
         SAP UI5: 1.120.x (if applicable)
       render: shell

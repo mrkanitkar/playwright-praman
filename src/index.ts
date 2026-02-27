@@ -202,6 +202,7 @@ export type {
 
 // ── Date ────────────────────────────────────────────────────────────
 export {
+  DATE_FORMATS,
   formatDateForUI5,
   getDatePickerValue,
   getDateRangeSelection,

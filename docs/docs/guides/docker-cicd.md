@@ -25,7 +25,7 @@ The CI workflow (`.github/workflows/ci.yml`) runs on every push to `main` and ev
                                    |
                     +--------------v--------------+
                     | integration-tests           |
-                    | (PW 1.50.0, PW 1.58.2)      |
+                    | (PW 1.57.0, PW 1.58.2)      |
                     | SAP cloud auth via secrets   |
                     +-----------------------------+
 
@@ -74,7 +74,7 @@ Integration tests run against SAP cloud systems with Playwright version matrix:
 ```yaml
 strategy:
   matrix:
-    playwright-version: ['1.50.0', '1.58.2']
+    playwright-version: ['1.57.0', '1.58.2']
 env:
   SAP_CLOUD_BASE_URL: ${{ secrets.SAP_CLOUD_BASE_URL }}
   SAP_CLOUD_USERNAME: ${{ secrets.SAP_CLOUD_USERNAME }}
@@ -139,7 +139,7 @@ Additional quality commands available:
 Create a `Dockerfile` for running Praman tests in a container:
 
 ```dockerfile
-FROM mcr.microsoft.com/playwright:v1.50.0-noble
+FROM mcr.microsoft.com/playwright:v1.57.0-noble
 
 WORKDIR /app
 

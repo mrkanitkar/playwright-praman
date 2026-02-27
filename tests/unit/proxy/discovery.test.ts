@@ -89,7 +89,7 @@ describe('discoverControl', () => {
     cache.set(selector, mockProxy as never);
     const result = await discoverControl(selector, page, strategy, cache, ['recordreplay']);
     expect(result).toBeDefined();
-    expect(result?.id).toBe('btn1');
+    expect(result.id).toBe('btn1');
     // page.evaluate should NOT have been called (cache hit)
     expect(evaluateFn).not.toHaveBeenCalled();
   });

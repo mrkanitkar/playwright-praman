@@ -13,7 +13,7 @@
  * @remarks
  * Implements a three-tier stability system:
  * 1. {@link waitForUI5Stable} — Full UI5 pending-request wait (Tier 1)
- * 2. {@link briefDOMSettle} — Lightweight DOM mutation settling (Tier 2)
+ * 2. `briefDOMSettle` — Lightweight DOM mutation settling (Tier 2)
  * 3. {@link waitForUI5Bootstrap} — Initial UI5 library load detection (Tier 3)
  *
  * All functions use Playwright-native APIs (`page.waitForFunction`,
@@ -88,7 +88,7 @@ export interface WaitForUI5StableOptions {
  *
  * @remarks
  * Uses `page.waitForFunction()` to poll `sap.ui.getCore().getUIPending() === 0`.
- * When `skipStabilityWait` is true, falls back to {@link briefDOMSettle} instead.
+ * When `skipStabilityWait` is true, falls back to `briefDOMSettle` instead.
  *
  * Timeout errors are wrapped in {@link TimeoutError} with
  * code `ERR_TIMEOUT_OPERATION`.

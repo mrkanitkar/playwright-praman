@@ -507,7 +507,7 @@ export async function getDialogButtons(
   }
   const idJ = JSON.stringify(targetId);
   const script =
-    BY_ID_TRY +
+    BY_ID_BARE +
     idJ +
     ');if(!c)return [];var r=[];' +
     'function ab(b){if(!b)return;r.push({text:typeof b.getText==="function"?b.getText():"",id:b.getId(),' +
@@ -516,8 +516,22 @@ export async function getDialogButtons(
     'if(typeof c.getBeginButton==="function")ab(c.getBeginButton());' +
     'if(typeof c.getEndButton==="function")ab(c.getEndButton());' +
     'var bs=typeof c.getButtons==="function"?c.getButtons():[];' +
-    'for(var i=0;i<bs.length;i++)ab(bs[i]);return r;}catch(e){console.warn("[praman] getDialogButtons error:",e.message);return [];}})()';
-  return page.evaluate<readonly DialogButtonInfo[]>(script);
+    'for(var i=0;i<bs.length;i++)ab(bs[i]);return r;})()';
+  try {
+    return await page.evaluate<readonly DialogButtonInfo[]>(script);
+  } catch (error: unknown) {
+    throw new ControlError({
+      code: ErrorCode.ERR_CONTROL_AGGREGATION,
+      message: `Failed to read buttons from dialog "${targetId}": ${error instanceof Error ? error.message : String(error)}`,
+      attempted: `getDialogButtons("${targetId}")`,
+      retryable: true,
+      details: { dialogId: targetId },
+      suggestions: [
+        'Verify the dialog is still open when reading buttons',
+        'Check if the dialog type supports getBeginButton/getEndButton/getButtons',
+      ],
+    });
+  }
 }
 
 async function findTopmostDialog(

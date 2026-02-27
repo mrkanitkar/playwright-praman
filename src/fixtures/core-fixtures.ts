@@ -78,7 +78,7 @@ import { initTelemetry } from '#core/telemetry/index.js';
 import type { TracerWrapper } from '#core/telemetry/index.js';
 
 /** Minimum Playwright version required by Praman. */
-const MIN_PLAYWRIGHT_VERSION = '1.50.0';
+const MIN_PLAYWRIGHT_VERSION = '1.57.0';
 
 /**
  * Test-scoped fixture types for the core layer.

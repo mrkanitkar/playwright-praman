@@ -149,7 +149,7 @@ export async function discoverControl(
   cache: ControlProxyCache,
   discoveryStrategies: readonly DiscoveryStrategyName[],
   preferVisibleControls = true,
-): Promise<UI5ControlBase | null> {
+): Promise<UI5ControlBase> {
   // Tier 0: Cache lookup
   const cached = cache.get(selector);
   if (cached !== undefined) {
