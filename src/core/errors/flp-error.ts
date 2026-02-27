@@ -64,11 +64,35 @@ export interface FLPErrorOptions extends Omit<PramanErrorOptions, 'code' | 'retr
  *   flpService: 'SM12_SRV',
  * });
  * ```
+ *
+ * @sapModule FLP
+ * @browserContext Requires FLP shell loaded in browser
+ * @failureMode Shell not found — FLP shell header not present in the DOM
+ * @failureMode Permission denied — user lacks authorization for the requested FLP operation
+ * @failureMode API unavailable — FLP OData service endpoint unreachable
  */
 export class FLPError extends PramanError {
   readonly flpService: string | undefined;
   readonly username: string | undefined;
 
+  /**
+   * Creates a new FLPError instance.
+   *
+   * @param options - FLP error construction options including service context
+   *   and optional username for the failing operation.
+   *
+   * @example
+   * ```typescript
+   * import { FLPError } from '#core/errors/flp-error.js';
+   *
+   * const error = new FLPError({
+   *   message: 'FLP shell not found',
+   *   attempted: 'Navigate to Sales Order tile',
+   *   flpService: 'UI2/INTEROP',
+   *   username: 'TESTUSER01',
+   * });
+   * ```
+   */
   constructor(options: FLPErrorOptions) {
     super({
       ...options,
@@ -84,6 +108,18 @@ export class FLPError extends PramanError {
     Object.defineProperty(this, 'username', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes this error to a JSON-safe object with FLP-specific fields.
+   *
+   * @returns Base serialization extended with `flpService` and `username`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * console.log(json.flpService); // 'UI2/INTEROP'
+   * console.log(json.username);   // 'TESTUSER01'
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly flpService: string | undefined;
     readonly username: string | undefined;
@@ -95,6 +131,18 @@ export class FLPError extends PramanError {
     };
   }
 
+  /**
+   * Returns AI-agent-friendly context with FLP-specific diagnostic fields.
+   *
+   * @returns Base AI context extended with FLP service and user details.
+   *
+   * @example
+   * ```typescript
+   * const ctx = error.toAIContext();
+   * // LLM can use ctx.flpService to suggest corrective navigation
+   * // and ctx.username to verify authorization scope
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly flpService: string | undefined;
     readonly username: string | undefined;

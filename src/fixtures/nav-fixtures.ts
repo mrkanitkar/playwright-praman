@@ -248,6 +248,11 @@ export interface NavFixtures {
  *
  * @remarks
  * Declared as `{ option: true, scope: 'worker' }` placeholders (PW-MERGE-1).
+ *
+ * @example
+ * ```typescript
+ * import type { NavWorkerDeps } from '#fixtures/nav-fixtures.js';
+ * ```
  */
 export interface NavWorkerDeps {
   pramanConfig: Readonly<PramanConfig>;

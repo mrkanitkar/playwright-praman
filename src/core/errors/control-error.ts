@@ -63,6 +63,16 @@ export interface ControlErrorOptions extends Omit<PramanErrorOptions, 'code' | '
 /**
  * Error subclass for UI5 control interaction failures.
  *
+ * @aiContext Self-healing fields: lastKnownSelector, availableControls, suggestedSelector — enable AI agents to suggest corrected selectors
+ *
+ * @failureMode Not found — control ID or selector matches no controls in the UI5 view
+ *
+ * @failureMode Not visible — control exists but is hidden or not in the visible DOM
+ *
+ * @failureMode Not interactable — control is visible but disabled or read-only
+ *
+ * @browserContext Requires active UI5 page with rendered controls
+ *
  * @example
  * ```typescript
  * const error = new ControlError({
@@ -77,6 +87,24 @@ export class ControlError extends PramanError {
   readonly availableControls: readonly string[];
   readonly suggestedSelector: UI5Selector | undefined;
 
+  /**
+   * Creates a new ControlError instance.
+   *
+   * @param options - Control error construction options including self-healing selector fields.
+   *
+   * @example
+   * ```typescript
+   * import { ControlError } from '#core/errors/control-error.js';
+   *
+   * const error = new ControlError({
+   *   message: 'Control not found: submitBtn',
+   *   attempted: 'Find control with ID: submitBtn',
+   *   lastKnownSelector: { id: 'oldSubmitBtn' },
+   *   availableControls: ['btn1', 'btn2'],
+   *   suggestedSelector: { id: 'btn1' },
+   * });
+   * ```
+   */
   constructor(options: ControlErrorOptions) {
     super({
       ...options,
@@ -94,6 +122,19 @@ export class ControlError extends PramanError {
     Object.defineProperty(this, 'suggestedSelector', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes the error to a JSON-safe object with control interaction fields.
+   *
+   * @returns Base fields plus `lastKnownSelector`, `availableControls`, and `suggestedSelector`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * // json.lastKnownSelector === { id: 'oldSubmitBtn' }
+   * // json.availableControls === ['btn1', 'btn2']
+   * // json.suggestedSelector === { id: 'btn1' }
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly lastKnownSelector: UI5Selector | undefined;
     readonly availableControls: readonly string[];
@@ -107,6 +148,20 @@ export class ControlError extends PramanError {
     };
   }
 
+  /**
+   * Returns structured context for AI agents with control self-healing fields.
+   *
+   * @returns Base AI context plus `lastKnownSelector`, `availableControls`,
+   * and `suggestedSelector` fields to enable AI-driven selector correction.
+   *
+   * @example
+   * ```typescript
+   * const context = error.toAIContext();
+   * // context.lastKnownSelector — the selector that previously worked
+   * // context.availableControls — controls currently in the view
+   * // context.suggestedSelector — best-match selector suggestion
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly lastKnownSelector: UI5Selector | undefined;
     readonly availableControls: readonly string[];

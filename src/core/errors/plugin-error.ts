@@ -60,11 +60,34 @@ export interface PluginErrorOptions extends Omit<PramanErrorOptions, 'code' | 'r
  *   pluginName: 'my-plugin',
  * });
  * ```
+ *
+ * @failureMode Load failed — plugin module could not be imported
+ * @failureMode Init failed — plugin setup() threw an error
+ * @failureMode Incompatible version — plugin requires a different Praman version
  */
 export class PluginError extends PramanError {
   readonly pluginName: string;
   readonly pluginVersion: string | undefined;
 
+  /**
+   * Creates a new PluginError instance.
+   *
+   * @param options - Plugin error construction options including the required
+   *   plugin name and optional version for diagnostic context.
+   *
+   * @example
+   * ```typescript
+   * import { PluginError } from '#core/errors/plugin-error.js';
+   *
+   * const error = new PluginError({
+   *   message: 'Plugin incompatible with Praman v1.0',
+   *   attempted: 'Load plugin my-custom-auth',
+   *   pluginName: 'my-custom-auth',
+   *   pluginVersion: '0.5.0',
+   *   code: 'ERR_PLUGIN_INCOMPATIBLE',
+   * });
+   * ```
+   */
   constructor(options: PluginErrorOptions) {
     super({
       ...options,
@@ -80,6 +103,18 @@ export class PluginError extends PramanError {
     Object.defineProperty(this, 'pluginVersion', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes this error to a JSON-safe object with plugin-specific fields.
+   *
+   * @returns Base serialization extended with `pluginName` and `pluginVersion`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * console.log(json.pluginName);    // 'my-custom-auth'
+   * console.log(json.pluginVersion); // '0.5.0'
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly pluginName: string;
     readonly pluginVersion: string | undefined;
@@ -91,6 +126,18 @@ export class PluginError extends PramanError {
     };
   }
 
+  /**
+   * Returns AI-agent-friendly context with plugin-specific diagnostic fields.
+   *
+   * @returns Base AI context extended with plugin name and version details.
+   *
+   * @example
+   * ```typescript
+   * const ctx = error.toAIContext();
+   * // LLM can use ctx.pluginName to locate the plugin package
+   * // and ctx.pluginVersion to check compatibility requirements
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly pluginName: string;
     readonly pluginVersion: string | undefined;

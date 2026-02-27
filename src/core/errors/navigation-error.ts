@@ -57,11 +57,35 @@ export interface NavigationErrorOptions extends Omit<PramanErrorOptions, 'code' 
  *   attempted: 'Navigate to app',
  * });
  * ```
+ *
+ * @sapModule FLP
+ * @browserContext Requires active browser with FLP loaded
+ * @failureMode Tile not found — semantic object or action not available in FLP
+ * @failureMode Route failed — hash-based navigation did not resolve to a valid view
+ * @failureMode Timeout — navigation did not complete within configured timeout
  */
 export class NavigationError extends PramanError {
   readonly targetUrl: string | undefined;
   readonly currentUrl: string | undefined;
 
+  /**
+   * Creates a new NavigationError instance.
+   *
+   * @param options - Navigation error construction options including target
+   *   and current URLs for diagnostic context.
+   *
+   * @example
+   * ```typescript
+   * import { NavigationError } from '#core/errors/navigation-error.js';
+   *
+   * const error = new NavigationError({
+   *   message: 'FLP tile not found',
+   *   attempted: 'Navigate to Purchase Order app',
+   *   targetUrl: 'https://sap.example.com/app/po',
+   *   currentUrl: 'https://sap.example.com/flp',
+   * });
+   * ```
+   */
   constructor(options: NavigationErrorOptions) {
     super({
       ...options,
@@ -77,6 +101,18 @@ export class NavigationError extends PramanError {
     Object.defineProperty(this, 'currentUrl', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes this error to a JSON-safe object with navigation-specific fields.
+   *
+   * @returns Base serialization extended with `targetUrl` and `currentUrl`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * console.log(json.targetUrl);  // 'https://sap.example.com/app/po'
+   * console.log(json.currentUrl); // 'https://sap.example.com/flp'
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly targetUrl: string | undefined;
     readonly currentUrl: string | undefined;
@@ -88,6 +124,18 @@ export class NavigationError extends PramanError {
     };
   }
 
+  /**
+   * Returns AI-agent-friendly context with navigation-specific diagnostic fields.
+   *
+   * @returns Base AI context extended with target and current URL details.
+   *
+   * @example
+   * ```typescript
+   * const ctx = error.toAIContext();
+   * // LLM can compare ctx.targetUrl and ctx.currentUrl to diagnose
+   * // whether navigation started but resolved to the wrong view
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly targetUrl: string | undefined;
     readonly currentUrl: string | undefined;

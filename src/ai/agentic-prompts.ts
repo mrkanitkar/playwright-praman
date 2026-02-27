@@ -33,13 +33,19 @@ export const MAX_CONTEXT_CONTROLS = 200;
 /**
  * Builds the system prompt for LLM test generation.
  *
+ * @aiContext LLM prompt construction for AI-powered test generation
+ * @guarantee Includes capability listing and recipe examples in system prompt
+ *
  * @param capabilityRegistry - Registry of available Praman capabilities.
  * @param recipeRegistry - Registry of reusable test recipes.
  * @returns Formatted system prompt string.
  *
  * @example
  * ```typescript
- * const prompt = buildSystemPrompt(capabilities, recipes);
+ * import { buildSystemPrompt } from '#ai/agentic-prompts.js';
+ *
+ * const systemPrompt = buildSystemPrompt(capabilities, recipes);
+ * // Pass as system message to LLM provider
  * ```
  */
 export function buildSystemPrompt(
@@ -110,13 +116,19 @@ export function buildSystemPrompt(
 /**
  * Builds the user prompt for LLM test generation with bounded page context.
  *
+ * @aiContext LLM prompt with bounded page context for test step generation
+ * @guarantee Context truncated to MAX_CONTEXT_CHARS and MAX_CONTEXT_CONTROLS limits
+ *
  * @param pageContext - Current page context snapshot.
  * @param scenario - Natural language test scenario description.
  * @returns Formatted user prompt string.
  *
  * @example
  * ```typescript
- * const prompt = buildUserPrompt(pageContext, 'Create a purchase order');
+ * import { buildUserPrompt } from '#ai/agentic-prompts.js';
+ *
+ * const userPrompt = buildUserPrompt(pageContext, userIntent);
+ * // Pass as user message to LLM provider
  * ```
  */
 export function buildUserPrompt(pageContext: PageContext, scenario: string): string {

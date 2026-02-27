@@ -62,6 +62,18 @@ import {
 } from '../fe/object-page.js';
 import type { FioriElementsFixture } from '../fe/types.js';
 
+/**
+ * Fiori Elements fixture types providing list report and object page helpers.
+ *
+ * @fioriElement ListReport, ObjectPage
+ *
+ * @example
+ * ```typescript
+ * test('navigates list report', async ({ feListReport }) => {
+ *   await feListReport.getItemCount();
+ * });
+ * ```
+ */
 export interface FEFixtures {
   fe: FioriElementsFixture;
 }
@@ -69,7 +81,14 @@ export interface FEFixtures {
 /**
  * Creates the FE fixture object with all four sub-namespaces.
  *
- * @example `const fe = createFEFixture(page); await fe.listReport.search();`
+ * @param page - Playwright page instance (typed as `never` for loose coupling).
+ * @returns Fully-constructed FioriElementsFixture with all sub-namespaces.
+ *
+ * @example
+ * ```typescript
+ * const fe = createFEFixture(page);
+ * await fe.listReport.search();
+ * ```
  */
 export function createFEFixture(page: never): FioriElementsFixture {
   return {

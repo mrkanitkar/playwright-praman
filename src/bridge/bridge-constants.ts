@@ -47,6 +47,16 @@ export const BRIDGE_GLOBALS = Object.freeze({
  * @remarks
  * These values are used when the config does not provide overrides.
  * Calibrated from production SAP BTP deployments.
+ *
+ * @guarantee Calibrated from production SAP BTP deployments
+ *
+ * @example
+ * ```typescript
+ * import { BRIDGE_TIMEOUTS } from '#bridge/bridge-constants.js';
+ *
+ * const timeout = BRIDGE_TIMEOUTS.INJECTION; // 30_000ms
+ * const stability = BRIDGE_TIMEOUTS.UI5_STABLE; // 5_000ms
+ * ```
  */
 export const BRIDGE_TIMEOUTS = Object.freeze({
   /** Max time to wait for bridge injection to complete. */
@@ -71,6 +81,14 @@ export const BRIDGE_TIMEOUTS = Object.freeze({
  * at runtime.
  *
  * Source: mk v2.5.0 production field data + common SAP BTP services.
+ *
+ * @example
+ * ```typescript
+ * import { XHR_IGNORE_PATTERNS } from '#bridge/bridge-constants.js';
+ *
+ * // Merge with user-configured patterns
+ * const allPatterns = [...XHR_IGNORE_PATTERNS, ...userPatterns];
+ * ```
  */
 export const XHR_IGNORE_PATTERNS: readonly string[] = Object.freeze([
   'walkme',

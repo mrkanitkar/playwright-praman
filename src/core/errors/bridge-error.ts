@@ -52,6 +52,14 @@ export interface BridgeErrorOptions extends Omit<PramanErrorOptions, 'code' | 'r
 /**
  * Error subclass for bridge adapter failures.
  *
+ * @guarantee Bridge injection and readiness contract — thrown only after injection attempt
+ *
+ * @failureMode Injection timeout — bridge script failed to load within configured timeout
+ *
+ * @failureMode Version mismatch — UI5 version incompatible with bridge capabilities
+ *
+ * @browserContext Requires active browser session with UI5 application loaded
+ *
  * @example
  * ```typescript
  * const error = new BridgeError({
@@ -64,6 +72,23 @@ export class BridgeError extends PramanError {
   readonly ui5Version: string | undefined;
   readonly adapterType: string | undefined;
 
+  /**
+   * Creates a new BridgeError instance.
+   *
+   * @param options - Bridge error construction options including UI5 version and adapter type.
+   *
+   * @example
+   * ```typescript
+   * import { BridgeError } from '#core/errors/bridge-error.js';
+   *
+   * const error = new BridgeError({
+   *   message: 'Bridge injection timed out',
+   *   attempted: 'Inject RecordReplay bridge adapter',
+   *   ui5Version: '1.120.0',
+   *   adapterType: 'record-replay',
+   * });
+   * ```
+   */
   constructor(options: BridgeErrorOptions) {
     super({
       ...options,
@@ -79,6 +104,18 @@ export class BridgeError extends PramanError {
     Object.defineProperty(this, 'adapterType', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes the error to a JSON-safe object with bridge adapter fields.
+   *
+   * @returns Base fields plus `ui5Version` and `adapterType`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * // json.ui5Version === '1.120.0'
+   * // json.adapterType === 'record-replay'
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly ui5Version: string | undefined;
     readonly adapterType: string | undefined;
@@ -90,6 +127,19 @@ export class BridgeError extends PramanError {
     };
   }
 
+  /**
+   * Returns structured context for AI agents with bridge diagnostics.
+   *
+   * @returns Base AI context plus `ui5Version` and `adapterType` fields
+   * to help diagnose bridge injection and compatibility issues.
+   *
+   * @example
+   * ```typescript
+   * const context = error.toAIContext();
+   * // context.ui5Version, context.adapterType available
+   * // Send to LLM for bridge troubleshooting or version compatibility analysis
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly ui5Version: string | undefined;
     readonly adapterType: string | undefined;

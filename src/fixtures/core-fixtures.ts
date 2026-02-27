@@ -87,6 +87,15 @@ const MIN_PLAYWRIGHT_VERSION = '1.57.0';
  * Each fixture is created per test and torn down after the test completes.
  * - `pramanLogger` — child logger scoped to the test
  * - `ui5` — UI5Handler for control discovery, interaction, and lifecycle
+ *
+ * @browserContext Requires active browser session with UI5 page
+ *
+ * @example
+ * ```typescript
+ * test('uses logger', async ({ pramanLogger, ui5 }) => {
+ *   pramanLogger.info('Test started');
+ * });
+ * ```
  */
 interface TestFixtures {
   /** Child logger scoped to the current test. */
@@ -102,6 +111,13 @@ interface TestFixtures {
  * @remarks
  * Each fixture is created once per worker process and shared across
  * all tests in that worker. Auto fixtures are initialized automatically.
+ *
+ * @example
+ * ```typescript
+ * test('reads config', async ({ pramanConfig }) => {
+ *   expect(pramanConfig.logLevel).toBeDefined();
+ * });
+ * ```
  */
 interface WorkerFixtures {
   /** Validated, frozen Praman configuration loaded once per worker. */

@@ -69,6 +69,8 @@ export interface AIErrorOptions extends Omit<PramanErrorOptions, 'code' | 'retry
 /**
  * Error subclass for AI provider failures.
  *
+ * @aiContext AI provider failure context enabling LLM self-healing
+ *
  * @example
  * ```typescript
  * const error = new AIError({
@@ -83,6 +85,24 @@ export class AIError extends PramanError {
   readonly model: string | undefined;
   readonly tokenUsage: TokenUsage | undefined;
 
+  /**
+   * Creates a new AIError instance.
+   *
+   * @param options - AI error construction options including provider context.
+   *
+   * @example
+   * ```typescript
+   * import { AIError } from '#core/errors/ai-error.js';
+   *
+   * const error = new AIError({
+   *   message: 'Token limit exceeded for GPT-4o',
+   *   attempted: 'Generate test steps from intent',
+   *   provider: 'azure-openai',
+   *   model: 'gpt-4o',
+   *   tokenUsage: { prompt: 12000, completion: 0, total: 12000 },
+   * });
+   * ```
+   */
   constructor(options: AIErrorOptions) {
     super({
       ...options,
@@ -100,6 +120,19 @@ export class AIError extends PramanError {
     Object.defineProperty(this, 'tokenUsage', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes the error to a JSON-safe object with AI provider fields.
+   *
+   * @returns Base fields plus `provider`, `model`, and `tokenUsage`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * // json.provider === 'azure-openai'
+   * // json.model === 'gpt-4o'
+   * // json.tokenUsage === { prompt: 12000, completion: 0, total: 12000 }
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly provider: string | undefined;
     readonly model: string | undefined;
@@ -113,6 +146,19 @@ export class AIError extends PramanError {
     };
   }
 
+  /**
+   * Returns structured context for AI agents with provider diagnostics.
+   *
+   * @returns Base AI context plus `provider`, `model`, and `tokenUsage`
+   * fields to enable LLM self-healing and retry decisions.
+   *
+   * @example
+   * ```typescript
+   * const context = error.toAIContext();
+   * // context.provider, context.model, context.tokenUsage available
+   * // Send to LLM for provider fallback or token budget adjustment
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly provider: string | undefined;
     readonly model: string | undefined;
