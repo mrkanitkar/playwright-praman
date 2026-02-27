@@ -35,6 +35,8 @@ import type { MatcherOptions, MatcherResult } from './ui5-matchers.js';
 /**
  * Checks that a UI5 table has the expected number of rows.
  *
+ * @intent Assert the number of visible rows in a UI5 table.
+ *
  * @remarks
  * Retrieves rows via `page.evaluate()` with bridge scripts using the
  * `items` aggregation and compares the array length to the expected count.
@@ -75,6 +77,8 @@ export async function checkUI5RowCount(
 
 /**
  * Checks that a specific cell in a UI5 table has the expected text.
+ *
+ * @intent Assert the text content of a specific table cell by row and column index.
  *
  * @remarks
  * Navigates the table structure via aggregations:
@@ -151,6 +155,8 @@ export async function checkUI5CellText(
 
 /**
  * Checks that a UI5 table has the expected number of selected rows.
+ *
+ * @intent Assert the count of selected rows in a UI5 table.
  *
  * @remarks
  * Reads `selectedItems` property from the table control. If the value

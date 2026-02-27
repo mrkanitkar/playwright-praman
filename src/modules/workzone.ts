@@ -148,6 +148,8 @@ const GET_HASH_SCRIPT =
 /**
  * Creates a BTP WorkZone manager for dual-frame bridge injection.
  *
+ * @intent Initialize a manager for SAP BTP WorkZone dual-frame environments with bridge injection.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param adapter - Bridge adapter for injection management.
  * @returns A BTPWorkZoneManager instance.

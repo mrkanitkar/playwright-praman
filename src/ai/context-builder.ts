@@ -42,19 +42,14 @@ async function readUi5Version(page: DiscoveryPage): Promise<string | undefined> 
     const rawVersion = await page.evaluate(
       /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
       (() => {
-        interface SapWindow {
-          sap?: {
-            ui?: {
-              version?: string;
-              getVersionInfo?: () => { version?: string } | undefined;
-            };
-          };
-        }
-        const w = window as unknown as SapWindow;
-        const direct = w.sap?.ui?.version;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: window.sap is a UI5 runtime global with no Node.js type declarations
+        const sapUi = (window as any).sap?.ui as
+          | { version?: string; getVersionInfo?: () => { version?: string } | undefined }
+          | undefined;
+        const direct = sapUi?.version;
         if (typeof direct === 'string' && direct.length > 0) return direct;
         try {
-          const info = w.sap?.ui?.getVersionInfo?.();
+          const info = sapUi?.getVersionInfo?.();
           const v = info?.version;
           if (typeof v === 'string' && v.length > 0) return v;
         } catch {

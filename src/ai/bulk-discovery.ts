@@ -383,22 +383,14 @@ function browserDiscoverControls(args: BrowserArgs): {
   }
 
   // ── Inner: gather elements from the UI5 registry ──────────────────────
-  interface SapWindow {
-    sap?: {
-      ui?: {
-        core?: {
-          ElementRegistry?: { all?: () => Record<string, unknown> };
-          getCore?: () => { mElements?: Record<string, unknown> };
-        };
-      };
-    };
-  }
 
-  // Type assertion: browser-context — window.sap is a UI5 runtime global with no Node.js type declarations
-  const sapWindow = window as unknown as SapWindow;
+  /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- browser context: window.sap is a UI5 runtime global with no Node.js type declarations */
+  const sapWindow = window as any;
   let elementsMap: Record<string, unknown> = {};
   try {
-    const elementRegistry = sapWindow.sap?.ui?.core?.ElementRegistry;
+    const elementRegistry = (sapWindow.sap?.ui?.core?.ElementRegistry ?? undefined) as
+      | { all?: () => Record<string, unknown> }
+      | undefined;
     if (typeof elementRegistry?.all === 'function') {
       elementsMap = elementRegistry.all();
     } else {
@@ -407,6 +399,7 @@ function browserDiscoverControls(args: BrowserArgs): {
         elementsMap = core.mElements;
       }
     }
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   } catch {
     return [];
   }
@@ -505,8 +498,8 @@ export async function discoverPage(
 
     const rawResult = await page.evaluate(
       /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
-      // Type assertion: page.evaluate() requires (...args: never[]) => unknown signature; the actual browser-side function has typed args
-      browserDiscoverControls as unknown as (...args: never[]) => unknown,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- page.evaluate() requires compatible signature; browser function has typed args that are serialized by Playwright
+      browserDiscoverControls as any,
       /* v8 ignore stop */
       { interactiveOnly, includeHidden },
     );

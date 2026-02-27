@@ -19,6 +19,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { ControlDiscoveryResult } from '#bridge/bridge-types.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
+import { ControlError } from '#core/errors/control-error.js';
 import { ControlProxyCache } from '#proxy/cache.js';
 import { discoverControl } from '#proxy/discovery.js';
 
@@ -106,16 +107,49 @@ describe('discoverControl', () => {
     expect(evaluateFn).toHaveBeenCalled();
   });
 
-  it('returns null when control not found', async () => {
+  it('throws ControlError with ERR_CONTROL_NOT_FOUND when all strategies fail', async () => {
     const page = createMockPage({
       evaluate: vi.fn().mockResolvedValue(createEmptyResult()),
     });
     const strategy = createMockStrategy();
     const cache = new ControlProxyCache();
-    const result = await discoverControl({ id: 'nonexistent' }, page, strategy, cache, [
-      'recordreplay',
-    ]);
-    expect(result).toBeNull();
+
+    try {
+      await discoverControl({ id: 'nonexistent' }, page, strategy, cache, [
+        'recordreplay',
+      ]);
+      expect.fail('Expected discoverControl to throw ControlError');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(ControlError);
+      const controlError = error as ControlError;
+      expect(controlError.code).toBe('ERR_CONTROL_NOT_FOUND');
+      expect(controlError.retryable).toBe(true);
+      expect(controlError.suggestions.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('ControlError includes retryable=true and suggestions array', async () => {
+    const page = createMockPage({
+      evaluate: vi.fn().mockResolvedValue(createEmptyResult()),
+    });
+    const strategy = createMockStrategy();
+    const cache = new ControlProxyCache();
+
+    try {
+      await discoverControl({ controlType: 'sap.m.Button' }, page, strategy, cache, [
+        'recordreplay',
+      ]);
+      expect.fail('Expected discoverControl to throw ControlError');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(ControlError);
+      const controlError = error as ControlError;
+      expect(controlError.retryable).toBe(true);
+      expect(controlError.suggestions).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('control ID'),
+        ]),
+      );
+    }
   });
 
   it('caches discovered proxy for subsequent lookups', async () => {
@@ -159,7 +193,12 @@ describe('discoverControl', () => {
     const strategy = createMockStrategy();
     const cache = new ControlProxyCache();
     const selector = { controlType: 'sap.m.Button', properties: { text: 'Save' } };
-    await discoverControl(selector, page, strategy, cache, ['recordreplay']);
+    // discoverControl now throws when all strategies fail; we still want to assert the call args
+    try {
+      await discoverControl(selector, page, strategy, cache, ['recordreplay']);
+    } catch {
+      // Expected ControlError -- verified in separate test
+    }
     expect(evaluateFn).toHaveBeenCalledTimes(1);
     const [fn, args] = evaluateFn.mock.calls[0] as [unknown, Record<string, unknown>];
     expect(typeof fn).toBe('function');

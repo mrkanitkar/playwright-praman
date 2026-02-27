@@ -204,8 +204,8 @@ test('use vocabulary for field resolution', async ({ intent }) => {
 | Sales (SD)         | `vocabulary/domains/sales.json`         | Sales order, billing, customer fields |
 | Finance (FI)       | `vocabulary/domains/finance.json`       | GL accounts, postings, cost center    |
 | Manufacturing (PP) | `vocabulary/domains/manufacturing.json` | Production orders, BOMs, routings     |
-| Master Data        | `vocabulary/domains/master-data.json`   | Business partner, material, plant     |
-| Common             | `vocabulary/domains/common.json`        | Shared fields across all domains      |
+| Warehouse (WM/EWM) | `vocabulary/domains/warehouse.json`    | Storage, picking, goods movement      |
+| Quality (QM)       | `vocabulary/domains/quality.json`       | Inspections, lots, quality orders     |
 
 ---
 

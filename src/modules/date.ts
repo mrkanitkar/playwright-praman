@@ -168,6 +168,14 @@ function toValidDate(input: DateInput): Date {
 /**
  * Formats a Date object into a UI5-compatible date string.
  *
+ * @intent Convert a Date to a UI5 date format string for use with DatePicker controls.
+ * @guarantee Returns a correctly formatted date string matching the specified pattern.
+ * @ai
+ * @aiContext Pure function (no browser context). Supports ISO, SAP_INTERNAL, EUROPEAN, US, JAPANESE formats.
+ * Use to prepare date values before passing to setDatePickerValue().
+ * @sapModule sap.m.DatePicker — valueFormat conversion
+ * @businessContext Format dates for SAP UI5 date picker controls with locale-aware patterns.
+ *
  * @remarks
  * Pure function (no browser context). Supports the five patterns in {@link DATE_FORMATS}.
  *
@@ -222,6 +230,20 @@ export function formatDateForUI5(date: DateInput, format: string): string {
 
 /**
  * Sets a date value on a `sap.m.DatePicker` control.
+ *
+ * @intent Set a date on a UI5 DatePicker control with automatic format conversion.
+ * @guarantee On success, the control's value is set and fireChange() has been called.
+ * @prerequisite The control must be a sap.m.DatePicker and must exist in the UI5 view.
+ * @recipe Date picker interaction:
+ * 1. `await setDatePickerValue(page, controlId, date)`
+ * 2. Optionally validate: `await setAndValidateDate(page, controlId, date)`
+ * 3. Read back: `const val = await getDatePickerValue(page, controlId)`
+ * @ai
+ * @aiContext Reads the control's valueFormat, converts the input to match, then calls
+ * setValue() + fireChange(). This prevents the silent wrong-format bug where the date
+ * shows as invalid in the UI.
+ * @sapModule sap.m.DatePicker — setValue(), getValueFormat(), fireChange()
+ * @businessContext Set dates on SAP form fields (posting date, delivery date, etc.).
  *
  * @remarks
  * Reads the control's `valueFormat`, converts the input accordingly, then calls
@@ -301,6 +323,12 @@ export async function setDatePickerValue(
 /**
  * Gets the current value from a `sap.m.DatePicker` control.
  *
+ * @intent Read the current date string from a DatePicker control.
+ * @ai
+ * @aiContext Returns the raw string value from getValue(). Format depends on the control's valueFormat.
+ * @sapModule sap.m.DatePicker — getValue()
+ * @businessContext Read current date values from SAP form fields for assertions.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param controlId - The ID of the DatePicker control.
  * @returns The current date value string.
@@ -316,6 +344,15 @@ export async function getDatePickerValue(page: DatePage, controlId: string): Pro
 
 /**
  * Sets a date range on a `sap.m.DateRangeSelection` control.
+ *
+ * @intent Set both start and end dates on a DateRangeSelection control.
+ * @guarantee On success, both date values are set and fireChange() is called.
+ * @prerequisite startDate must be before or equal to endDate.
+ * @ai
+ * @aiContext Uses setDateValue() and setSecondDateValue() + fireChange(). Validates
+ * that start date is before or equal to end date before setting.
+ * @sapModule sap.m.DateRangeSelection — setDateValue(), setSecondDateValue()
+ * @businessContext Set date range filters (fiscal period, delivery window, reporting range).
  *
  * @param page - Playwright Page (or compatible subset).
  * @param controlId - The ID of the DateRangeSelection control.
@@ -380,6 +417,12 @@ export async function setDateRangeSelection(
 /**
  * Gets the current date range from a `sap.m.DateRangeSelection` control.
  *
+ * @intent Read the current start and end dates from a DateRangeSelection control.
+ * @ai
+ * @aiContext Returns ISO-formatted date strings from getDateValue() and getSecondDateValue().
+ * @sapModule sap.m.DateRangeSelection — getDateValue(), getSecondDateValue()
+ * @businessContext Read current date range filter values for assertions.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param controlId - The ID of the DateRangeSelection control.
  * @returns The start and end date strings.
@@ -414,6 +457,14 @@ export async function getDateRangeSelection(
 
 /**
  * Sets a date and validates that the control does not enter an error state.
+ *
+ * @intent Set a date and verify the control does not show a validation error.
+ * @guarantee On success, the date is set and the control's valueState is not 'Error'.
+ * @ai
+ * @aiContext Combines setDatePickerValue() with a valueState check. Throws if the date
+ * is outside the allowed range (minDate/maxDate) or format is invalid.
+ * @sapModule sap.m.DatePicker — setValue(), getValueState()
+ * @businessContext Safely set dates with validation in SAP forms (e.g., fiscal period constraints).
  *
  * @param page - Playwright Page (or compatible subset).
  * @param controlId - The ID of the DatePicker control.
@@ -460,6 +511,13 @@ export async function setAndValidateDate(
 
 /**
  * Sets a time value on a `sap.m.TimePicker` control.
+ *
+ * @intent Set a time value on a UI5 TimePicker control.
+ * @guarantee On success, the time value is set and fireChange() is called.
+ * @ai
+ * @aiContext Validates HH:mm or HH:mm:ss format before setting. Uses setValue() + fireChange().
+ * @sapModule sap.m.TimePicker — setValue(), fireChange()
+ * @businessContext Set time values in SAP forms (shift start, delivery time, etc.).
  *
  * @param page - Playwright Page (or compatible subset).
  * @param controlId - The ID of the TimePicker control.
@@ -516,6 +574,12 @@ export async function setTimePickerValue(
 
 /**
  * Gets the current value from a `sap.m.TimePicker` control.
+ *
+ * @intent Read the current time string from a TimePicker control.
+ * @ai
+ * @aiContext Returns the raw string value from getValue().
+ * @sapModule sap.m.TimePicker — getValue()
+ * @businessContext Read current time values from SAP form fields for assertions.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param controlId - The ID of the TimePicker control.

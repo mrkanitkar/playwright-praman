@@ -33,7 +33,7 @@
  * @module fixtures
  */
 
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS } from '#bridge/bridge-constants.js';
 import type {
@@ -56,14 +56,18 @@ import { ErrorCode } from '#core/errors/codes.js';
 import { ControlError } from '#core/errors/control-error.js';
 import { SelectorError } from '#core/errors/selector-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
+import { createLogger } from '#core/logging/index.js';
 import type { TracerWrapper } from '#core/telemetry/otel.js';
 import { getNoOpTracer } from '#core/telemetry/otel.js';
 import { createSpanName } from '#core/telemetry/spans.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
+import { createLocatorShim } from '#fixtures/locator-shim.js';
 import { ControlProxyCache } from '#proxy/cache.js';
 import { createControlProxy } from '#proxy/control-proxy.js';
+
+const logger = createLogger('ui5-handler');
 
 /** Default UI5 wait timeout in milliseconds. */
 const DEFAULT_UI5_WAIT_TIMEOUT = 30_000;
@@ -310,29 +314,45 @@ export class UI5Handler {
     return this.tracer.withSpan(createSpanName('ui5', 'findControl'), async () => {
       validateSelector(selector);
 
-      // Always poll for control discovery — use explicit timeout or configured default
-      await this.waitFor(selector, { timeout: options?.timeout ?? this.discoveryTimeout });
+      try {
+        // Always poll for control discovery — use explicit timeout or configured default
+        await this.waitFor(selector, { timeout: options?.timeout ?? this.discoveryTimeout });
 
-      const skip = options?.skipStabilityWait ?? this.skipStabilityWait;
-      if (!skip) {
-        await this.internalWaitForUI5Stable(this.ui5WaitTimeout);
+        const skip = options?.skipStabilityWait ?? this.skipStabilityWait;
+        if (!skip) {
+          await this.internalWaitForUI5Stable(this.ui5WaitTimeout);
+        }
+
+        const proxy = await this.discoverSingleControl(selector);
+
+        if (proxy === null) {
+          throw new ControlError({
+            code: ErrorCode.ERR_CONTROL_NOT_FOUND,
+            message: `Control not found: ${JSON.stringify(selector)}`,
+            attempted: `Find control with selector: ${JSON.stringify(selector)}`,
+            suggestions: [
+              'Verify the control ID exists in the UI5 view',
+              'Check if the page has fully loaded (waitForUI5Stable)',
+              'Try using controlType + properties instead of ID',
+            ],
+          });
+        }
+
+        return proxy;
+      } catch (error: unknown) {
+        // Auto-fallback: if discovery fails, try page.locator() for non-UI5 elements
+        if (error instanceof ControlError || error instanceof TimeoutError) {
+          const fallbackResult = await this.tryLocatorFallback(selector);
+          if (fallbackResult !== null) {
+            logger.warn(
+              { selector },
+              'UI5 control not found; falling back to Playwright locator for non-UI5 element',
+            );
+            return createLocatorShim(fallbackResult, selector);
+          }
+        }
+        throw error;
       }
-
-      const proxy = await this.discoverSingleControl(selector);
-
-      if (proxy === null) {
-        throw new ControlError({
-          message: `Control not found: ${JSON.stringify(selector)}`,
-          attempted: `Find control with selector: ${JSON.stringify(selector)}`,
-          suggestions: [
-            'Verify the control ID exists in the UI5 view',
-            'Check if the page has fully loaded (waitForUI5Stable)',
-            'Try using controlType + properties instead of ID',
-          ],
-        });
-      }
-
-      return proxy;
     });
   }
 
@@ -694,6 +714,7 @@ export class UI5Handler {
 
       if (result === null) {
         throw new ControlError({
+          code: ErrorCode.ERR_CONTROL_NOT_FOUND,
           message: `Failed to inspect control: ${ref.id}`,
           attempted: `Inspect control metadata for ID: ${ref.id}`,
           suggestions: [
@@ -737,6 +758,56 @@ export class UI5Handler {
   // eslint-disable-next-line @typescript-eslint/require-await -- interface consistency: destroy() is async for future cleanup needs
   async destroy(): Promise<void> {
     this.cache = new ControlProxyCache();
+  }
+
+  /**
+   * Attempts to find a DOM element via Playwright locator when UI5 discovery fails.
+   *
+   * @remarks
+   * Only activates when the selector contains a non-UI5 hint:
+   * - `id` without `--` separator (UI5 generated IDs use `--`)
+   * - `css` property (not part of standard UI5Selector but may be passed)
+   * - `xpath` property (not part of standard UI5Selector but may be passed)
+   *
+   * @param selector - The UI5 selector to extract fallback hints from.
+   * @returns A Playwright Locator if a DOM element is found, or null.
+   */
+  private async tryLocatorFallback(
+    selector: UI5Selector,
+  ): Promise<Locator | null> {
+    // Check for non-UI5 id (no '--' separator)
+    if (typeof selector.id === 'string' && !selector.id.includes('--')) {
+      const locator = this.page.locator(`#${selector.id}`);
+      const count = await locator.count();
+      if (count > 0) {
+        return locator;
+      }
+      return null;
+    }
+
+    // Check for css property (extended selector, not in standard UI5Selector)
+    if ('css' in selector && typeof (selector as Record<string, unknown>)['css'] === 'string') {
+      const cssValue = (selector as Record<string, unknown>)['css'] as string;
+      const locator = this.page.locator(cssValue);
+      const count = await locator.count();
+      if (count > 0) {
+        return locator;
+      }
+      return null;
+    }
+
+    // Check for xpath property (extended selector, not in standard UI5Selector)
+    if ('xpath' in selector && typeof (selector as Record<string, unknown>)['xpath'] === 'string') {
+      const xpathValue = (selector as Record<string, unknown>)['xpath'] as string;
+      const locator = this.page.locator(`xpath=${xpathValue}`);
+      const count = await locator.count();
+      if (count > 0) {
+        return locator;
+      }
+      return null;
+    }
+
+    return null;
   }
 
   /**

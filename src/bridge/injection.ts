@@ -29,6 +29,8 @@ import type { BrowserContext, Page } from '@playwright/test';
 import { BRIDGE_GLOBALS, BRIDGE_TIMEOUTS } from './bridge-constants.js';
 import { createBridgeInjectionScript } from './browser-scripts/inject-ui5.js';
 
+import { BridgeError } from '#core/errors/bridge-error.js';
+
 /** Tracks which pages have been lazily injected (WeakSet avoids memory leaks). */
 const injectedPages = new WeakSet<Page>();
 
@@ -130,17 +132,48 @@ export async function injectBridge(page: Page): Promise<void> {
   const timeout = BRIDGE_TIMEOUTS.INJECTION;
   const readyFlag = BRIDGE_GLOBALS.READY_FLAG;
 
-  // Step 1: Wait for UI5 framework availability
-  await page.waitForFunction(
-    'typeof sap !== "undefined" && sap.ui && typeof sap.ui.require === "function"',
-    { timeout },
-  );
+  try {
+    // Step 1: Wait for UI5 framework availability
+    await page.waitForFunction(
+      'typeof sap !== "undefined" && sap.ui && typeof sap.ui.require === "function"',
+      { timeout },
+    );
+  } catch (error: unknown) {
+    throw new BridgeError({
+      code: 'ERR_BRIDGE_TIMEOUT',
+      message: `UI5 framework not detected within ${String(timeout)}ms — page may not be a UI5 application`,
+      attempted: 'Wait for sap.ui.require to become available',
+      retryable: false,
+      ...(error instanceof Error ? { cause: error } : {}),
+      suggestions: [
+        'Verify the page URL points to a UI5/Fiori application',
+        'Check if the page has fully loaded before calling UI5 operations',
+        'For non-UI5 pages, use Playwright native methods instead of ui5.control()',
+        'Increase BRIDGE_TIMEOUTS.INJECTION if the app loads slowly',
+      ],
+    });
+  }
 
   // Step 2: Execute bridge injection script
   await page.evaluate(createBridgeInjectionScript());
 
-  // Step 3: Wait for bridge readiness
-  await page.waitForFunction(`window.${readyFlag} === true`, { timeout });
+  try {
+    // Step 3: Wait for bridge readiness
+    await page.waitForFunction(`window.${readyFlag} === true`, { timeout });
+  } catch (error: unknown) {
+    throw new BridgeError({
+      code: 'ERR_BRIDGE_INJECTION',
+      message: `Bridge injection script executed but bridge did not become ready within ${String(timeout)}ms`,
+      attempted: 'Wait for bridge readiness flag',
+      retryable: true,
+      ...(error instanceof Error ? { cause: error } : {}),
+      suggestions: [
+        'This may be a transient UI5 initialization timing issue',
+        'Try increasing the bridge injection timeout',
+        'Check browser console for JavaScript errors',
+      ],
+    });
+  }
 
   injectedPages.add(page);
 }
@@ -199,7 +232,23 @@ export function resetPageInjection(page: Page): void {
  */
 export async function waitForBridgeReady(page: Page, timeout?: number): Promise<void> {
   const readyFlag = BRIDGE_GLOBALS.READY_FLAG;
-  await page.waitForFunction(`window.${readyFlag} === true`, {
-    timeout: timeout ?? BRIDGE_TIMEOUTS.INJECTION,
-  });
+  const effectiveTimeout = timeout ?? BRIDGE_TIMEOUTS.INJECTION;
+  try {
+    await page.waitForFunction(`window.${readyFlag} === true`, {
+      timeout: effectiveTimeout,
+    });
+  } catch (error: unknown) {
+    throw new BridgeError({
+      code: 'ERR_BRIDGE_NOT_READY',
+      message: `Bridge did not become ready within ${String(effectiveTimeout)}ms`,
+      attempted: 'Wait for bridge readiness',
+      retryable: true,
+      ...(error instanceof Error ? { cause: error } : {}),
+      suggestions: [
+        'The page may not be a UI5 application',
+        'Try calling ensureBridgeInjected() first',
+        'Increase the timeout for slow-loading applications',
+      ],
+    });
+  }
 }

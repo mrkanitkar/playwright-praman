@@ -171,7 +171,7 @@ function dialogScanScript(titleFilter: string, typeFilter: string, returnAll: bo
     'return ' +
     (returnAll ? 'r' : 'null') +
     ';' +
-    '}catch(e){return ' +
+    '}catch(e){console.warn("[praman] Dialog scan error:",e.message);return ' +
     (returnAll ? '[]' : 'null') +
     ';}})()'
   );
@@ -181,6 +181,16 @@ function dialogScanScript(titleFilter: string, typeFilter: string, returnAll: bo
 
 /**
  * Waits for a dialog to appear in the UI5 static UI area.
+ *
+ * @intent Wait for a UI5 dialog to open, optionally filtering by title or type.
+ * Use before interacting with any dialog content.
+ * @guarantee On success, returns a DialogInfo for the first matching open dialog.
+ * @prerequisite An action that triggers a dialog must have been executed.
+ * @ai
+ * @aiContext UI5 dialogs live in sap-ui-static area, not the normal view tree.
+ * Always call this before confirmDialog() or dismissDialog() to ensure the dialog is open.
+ * @sapModule sap.m.Dialog, sap.m.MessageBox, sap.ui.comp.valuehelpdialog.ValueHelpDialog
+ * @businessContext Wait for confirmation dialogs, value help dialogs, or message boxes in SAP apps.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Options to filter by title or control type.
@@ -232,6 +242,13 @@ export async function waitForDialog(
 /**
  * Returns all currently open dialogs in the UI5 static UI area.
  *
+ * @intent List all currently open dialogs for inspection or decision-making.
+ * @ai
+ * @aiContext Scans sap-ui-static UIArea content for recognized dialog types.
+ * Returns empty array if no dialogs are open.
+ * @sapModule sap.m.Dialog, sap.m.Popover, sap.m.BusyDialog, sap.ui.comp.valuehelpdialog.ValueHelpDialog
+ * @businessContext Discover open dialog overlays for assertion or interaction.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @returns Array of dialog information objects (may be empty).
  *
@@ -247,6 +264,12 @@ export async function getOpenDialogs(page: DialogPage): Promise<readonly DialogI
 /**
  * Checks whether a specific dialog (by ID) is currently open.
  *
+ * @intent Check if a known dialog is currently open, by its UI5 control ID.
+ * @ai
+ * @aiContext Calls isOpen() on the control. Returns false if the control is not found or not open.
+ * @sapModule sap.m.Dialog — isOpen() check
+ * @businessContext Assert that a dialog has opened or closed after an action.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param dialogId - The UI5 control ID of the dialog.
  * @returns `true` if the dialog exists and is open, `false` otherwise.
@@ -260,7 +283,7 @@ export async function isDialogOpen(page: DialogPage, dialogId: string): Promise<
   return page.evaluate<boolean>(
     BY_ID_TRY +
       JSON.stringify(dialogId) +
-      ');if(!c)return false;return typeof c.isOpen==="function"?c.isOpen():false;}catch(e){return false;}})()',
+      ');if(!c)return false;return typeof c.isOpen==="function"?c.isOpen():false;}catch(e){console.warn("[praman] isDialogOpen error:",e.message);return false;}})()',
   );
 }
 
@@ -268,6 +291,14 @@ export async function isDialogOpen(page: DialogPage, dialogId: string): Promise<
 
 /**
  * Dismisses (closes) the topmost dialog, or a dialog matching the given title.
+ *
+ * @intent Close the topmost open dialog without confirming its action.
+ * @guarantee On success, the dialog's close() method has been called and UI5 is stable.
+ * @ai
+ * @aiContext Calls close() on the dialog control. Use for cancelling or dismissing.
+ * To confirm a dialog, use confirmDialog() instead.
+ * @sapModule sap.m.Dialog — close() method
+ * @businessContext Cancel or dismiss SAP dialog overlays (Cancel, Close, X button).
  *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Options to target a specific dialog by title.
@@ -298,6 +329,19 @@ export async function dismissDialog(page: DialogPage, options?: FindDialogOption
 
 /**
  * Confirms a dialog by pressing its begin button or a button matching common confirm labels.
+ *
+ * @intent Confirm (accept) the topmost dialog by pressing its primary action button.
+ * @guarantee On success, the dialog's begin button or a confirm-label button has been pressed.
+ * @recipe Multi-step dialog confirmation:
+ * 1. Execute the action that triggers the dialog
+ * 2. `await waitForDialog(page, { title: 'Confirm' })`
+ * 3. `await confirmDialog(page)`
+ * 4. `await waitForDialogClosed(page, dialogId)`
+ * @ai
+ * @aiContext Tries beginButton first, then scans buttons for labels: OK, Yes, Confirm, Save, Accept, Submit.
+ * Pass `buttonText` option to target a specific non-standard button.
+ * @sapModule sap.m.Dialog — beginButton / buttons aggregation / firePress()
+ * @businessContext Confirm SAP dialogs (save confirmation, delete confirmation, approval dialogs).
  *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Options to filter which dialog and optionally specify a custom button text.
@@ -382,6 +426,14 @@ function buildDefaultBtnScript(id: string): string {
 /**
  * Waits for a specific dialog to be closed.
  *
+ * @intent Wait until a specific dialog is no longer open.
+ * @guarantee On success, the dialog's isOpen() returns false or the control no longer exists.
+ * @ai
+ * @aiContext Polls isOpen() until false or timeout. Use after confirmDialog() or dismissDialog()
+ * to ensure the dialog has fully closed before proceeding.
+ * @sapModule sap.m.Dialog — isOpen() polling
+ * @businessContext Ensure dialog closure is complete before continuing with test assertions.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param dialogId - The UI5 control ID of the dialog.
  * @param options - Timeout and polling options.
@@ -402,7 +454,7 @@ export async function waitForDialogClosed(
   const pred =
     BY_ID_TRY +
     JSON.stringify(dialogId) +
-    ');if(!c)return true;return typeof c.isOpen==="function"?!c.isOpen():true;}catch(e){return true;}})()';
+    ');if(!c)return true;return typeof c.isOpen==="function"?!c.isOpen():true;}catch(e){console.warn("[praman] waitForDialogClosed error:",e.message);return true;}})()';
   try {
     await page.waitForFunction(pred, undefined, { timeout, polling });
   } catch {
@@ -423,6 +475,13 @@ export async function waitForDialogClosed(
 
 /**
  * Returns all buttons within a dialog (beginButton, endButton, and buttons aggregation).
+ *
+ * @intent List all buttons available in a dialog for inspection or custom interaction.
+ * @ai
+ * @aiContext Returns beginButton, endButton, and all buttons from the aggregation.
+ * If no dialogId is given, uses the topmost open dialog.
+ * @sapModule sap.m.Dialog — getBeginButton(), getEndButton(), getButtons()
+ * @businessContext Discover available actions in a dialog before deciding which button to press.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param dialogId - The UI5 control ID of the dialog. If omitted, uses the topmost open dialog.
@@ -457,7 +516,7 @@ export async function getDialogButtons(
     'if(typeof c.getBeginButton==="function")ab(c.getBeginButton());' +
     'if(typeof c.getEndButton==="function")ab(c.getEndButton());' +
     'var bs=typeof c.getButtons==="function"?c.getButtons():[];' +
-    'for(var i=0;i<bs.length;i++)ab(bs[i]);return r;}catch(e){return [];}})()';
+    'for(var i=0;i<bs.length;i++)ab(bs[i]);return r;}catch(e){console.warn("[praman] getDialogButtons error:",e.message);return [];}})()';
   return page.evaluate<readonly DialogButtonInfo[]>(script);
 }
 

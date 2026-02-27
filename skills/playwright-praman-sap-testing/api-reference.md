@@ -1,171 +1,171 @@
 # Praman API Reference
 
-> **Generated**: 2026-02-25 — do not edit manually, run `npm run generate:skill-md`
+> **Generated**: 2026-02-25 — signatures added manually (P9). Run `npm run generate:skill-md` to regenerate base table.
 
-| Function                      | Capability                                     | Description                                                                                    |
-| ----------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `agentic()`                   | `pramanAI.agentic`                             | The AgenticHandler instance for autonomous test operations with checkpoint-based resumability. |
-| `approvePurchaseOrder()`      | `intent.procurement.approvePurchaseOrder`      | Approves a purchase order through the Fiori UI.                                                |
-| `approveQuotation()`          | `intent.sales.approveQuotation`                | Approves a sales quotation through the Fiori UI.                                               |
-| `assertField()`               | `intent.core.assertField`                      | Resolves a field label via vocabulary, reads the control's text, and compares it.              |
-| `buildContext()`              | `pramanAI.buildContext`                        | Builds a complete AI page context from the current Playwright page state.                      |
-| `callFunctionImport()`        | `ui5.odata.callFunctionImport`                 | Calls an OData function import.                                                                |
-| `capabilities()`              | `pramanAI.capabilities`                        | The CapabilityRegistry instance for querying available capabilities.                           |
-| `check()`                     | `ui5.check`                                    | Checks a checkbox.                                                                             |
-| `checkDeliveryStatus()`       | `intent.sales.checkDeliveryStatus`             | Checks the delivery status for a sales order.                                                  |
-| `cleanup()`                   | `flpLocks.cleanup`                             | Cleans up all lock entries created during the test session.                                    |
-| `cleanup()`                   | `testData.cleanup`                             | Cleans up all test data files created during the test session.                                 |
-| `clear()`                     | `ui5.clear`                                    | Clears a control's text.                                                                       |
-| `clearCache()`                | `ui5.clearCache`                               | Clears the internal proxy cache.                                                               |
-| `clearFilters()`              | `fe.listReport.clearFilters`                   | Clears all filter values on the List Report filter bar.                                        |
-| `click()`                     | `ui5.click`                                    | Clicks a control.                                                                              |
-| `clickApply()`                | `ui5Footer.clickApply`                         | Clicks the Apply button in the footer toolbar.                                                 |
-| `clickButton()`               | `fe.objectPage.clickButton`                    | Clicks a button on the Object Page by its label.                                               |
-| `clickButton()`               | `intent.core.clickButton`                      | Clicks a sap.m.Button control matching the given button text.                                  |
-| `clickCancel()`               | `ui5Footer.clickCancel`                        | Clicks the Cancel button in the footer toolbar.                                                |
-| `clickCreate()`               | `ui5Footer.clickCreate`                        | Clicks the Create button in the footer toolbar.                                                |
-| `clickDelete()`               | `ui5Footer.clickDelete`                        | Clicks the Delete button in the footer toolbar.                                                |
-| `clickEdit()`                 | `fe.objectPage.clickEdit`                      | Clicks the Edit button on the Object Page.                                                     |
-| `clickEdit()`                 | `ui5Footer.clickEdit`                          | Clicks the Edit button in the footer toolbar.                                                  |
-| `clickHome()`                 | `ui5Shell.clickHome`                           | Clicks the home button in the SAP Shell header.                                                |
-| `clickItem()`                 | `fe.list.clickItem`                            | Clicks a list item at the given index.                                                         |
-| `clickRow()`                  | `ui5.table.clickRow`                           | Clicks a specific row to trigger navigation or selection.                                      |
-| `clickRow()`                  | `fe.table.clickRow`                            | Clicks a row in a Fiori Elements table.                                                        |
-| `clickSave()`                 | `fe.objectPage.clickSave`                      | Clicks the Save button on the Object Page.                                                     |
-| `clickSave()`                 | `ui5Footer.clickSave`                          | Clicks the Save button in the footer toolbar.                                                  |
-| `clickSettings()`             | `ui5.table.clickSettings`                      | Opens the table settings/personalization dialog.                                               |
-| `confirm()`                   | `ui5.dialog.confirm`                           | Confirms a dialog by clicking its confirmation button.                                         |
-| `confirmAndWait()`            | `intent.core.confirmAndWait`                   | Confirms a dialog and waits for UI5 to stabilize.                                              |
-| `confirmGoodsReceipt()`       | `intent.procurement.confirmGoodsReceipt`       | Confirms a goods receipt for a purchase order.                                                 |
-| `confirmProductionOrder()`    | `intent.manufacturing.confirmProductionOrder`  | Confirms a production order through the Fiori UI.                                              |
-| `control()`                   | `ui5.control`                                  | Discovers a single control matching the selector.                                              |
-| `controls()`                  | `ui5.controls`                                 | Discovers multiple controls matching the selector.                                             |
-| `createCustomerMaster()`      | `intent.masterData.createCustomerMaster`       | Creates a customer master record through the Fiori UI.                                         |
-| `createEntity()`              | `ui5.odata.createEntity`                       | Creates a new entity via OData HTTP POST.                                                      |
-| `createJournalEntry()`        | `intent.finance.createJournalEntry`            | Creates a journal entry through the Fiori UI.                                                  |
-| `createMaterialMaster()`      | `intent.masterData.createMaterialMaster`       | Creates a material master record through the Fiori UI.                                         |
-| `createProductionOrder()`     | `intent.manufacturing.createProductionOrder`   | Creates a production order through the Fiori UI.                                               |
-| `createPurchaseOrder()`       | `intent.procurement.createPurchaseOrder`       | Creates a purchase order through the Fiori UI.                                                 |
-| `createPurchaseRequisition()` | `intent.procurement.createPurchaseRequisition` | Creates a purchase requisition through the Fiori UI.                                           |
-| `createQuotation()`           | `intent.sales.createQuotation`                 | Creates a sales quotation through the Fiori UI.                                                |
-| `createSalesOrder()`          | `intent.sales.createSalesOrder`                | Creates a sales order through the Fiori UI.                                                    |
-| `createVendorMaster()`        | `intent.masterData.createVendorMaster`         | Creates a vendor master record through the Fiori UI.                                           |
-| `deleteAllLockEntries()`      | `flpLocks.deleteAllLockEntries`                | Deletes all lock entries for the current or specified user.                                    |
-| `deleteEntity()`              | `ui5.odata.deleteEntity`                       | Deletes an entity via OData HTTP DELETE.                                                       |
-| `deselectAll()`               | `ui5.table.deselectAll`                        | Deselects all rows in the table.                                                               |
-| `destroy()`                   | `ui5.destroy`                                  | Destroys the handler and cleans up resources.                                                  |
-| `detectType()`                | `ui5.table.detectType`                         | Detects the table type and returns metadata.                                                   |
-| `discoverPage()`              | `pramanAI.discoverPage`                        | Discovers the current page context using AI-powered analysis.                                  |
-| `dismiss()`                   | `ui5.dialog.dismiss`                           | Dismisses (closes) a dialog.                                                                   |
-| `ensureRowVisible()`          | `ui5.table.ensureRowVisible`                   | Scrolls the table to ensure the given row is visible.                                          |
-| `expectShellHeader()`         | `ui5Shell.expectShellHeader`                   | Asserts that the SAP Shell header is visible.                                                  |
-| `exportData()`                | `ui5.table.exportData`                         | Exports all table data as an array of record objects with string values.                       |
-| `fetchCSRFToken()`            | `ui5.odata.fetchCSRFToken`                     | Fetches a CSRF token from the OData service.                                                   |
-| `fill()`                      | `ui5.fill`                                     | Fills a control with text.                                                                     |
-| `fillField()`                 | `intent.core.fillField`                        | Resolves a field label via vocabulary and fills the matching UI5 control.                      |
-| `filterByColumn()`            | `ui5.table.filterByColumn`                     | Applies a filter to a specific column.                                                         |
-| `findItemByTitle()`           | `fe.list.findItemByTitle`                      | Finds the index of a list item by its title.                                                   |
-| `findRow()`                   | `fe.table.findRow`                             | Finds the first row matching the given column-value criteria.                                  |
-| `findRowByValues()`           | `ui5.table.findRowByValues`                    | Finds the first row matching the given column-value criteria.                                  |
-| `generate()`                  | `testData.generate`                            | Generates test data from a template with randomized values.                                    |
-| `getAllSettings()`            | `flpSettings.getAllSettings`                   | Returns all FLP user settings as a single object.                                              |
-| `getButtons()`                | `ui5.dialog.getButtons`                        | Returns the buttons available in a specific dialog.                                            |
-| `getCellByColumnName()`       | `ui5.table.getCellByColumnName`                | Returns the cell value at the given row and column name.                                       |
-| `getCellValue()`              | `ui5.table.getCellValue`                       | Returns the value of a specific cell by row and column index.                                  |
-| `getCellValue()`              | `fe.table.getCellValue`                        | Returns the cell value at a given row index and column name.                                   |
-| `getColumnNames()`            | `ui5.table.getColumnNames`                     | Returns the column header names of the table.                                                  |
-| `getColumnNames()`            | `fe.table.getColumnNames`                      | Returns the column header names for a Fiori Elements table.                                    |
-| `getCurrentHash()`            | `ui5Navigation.getCurrentHash`                 | Returns the current URL hash fragment.                                                         |
-| `getData()`                   | `ui5.table.getData`                            | Returns all table data as an array of record objects.                                          |
-| `getDateFormat()`             | `flpSettings.getDateFormat`                    | Returns the current FLP user date format setting.                                              |
-| `getDatePicker()`             | `ui5.date.getDatePicker`                       | Gets the current date value from a DatePicker control.                                         |
-| `getDateRange()`              | `ui5.date.getDateRange`                        | Gets the current start and end dates from a DateRangeSelection control.                        |
-| `getEntityCount()`            | `ui5.odata.getEntityCount`                     | Returns the $count for an entity set.                                                          |
-| `getFilterBar()`              | `fe.listReport.getFilterBar`                   | Returns the filter bar ID of the List Report page.                                             |
-| `getFilterValue()`            | `ui5.table.getFilterValue`                     | Returns the current filter value for a specific column.                                        |
-| `getFilterValue()`            | `fe.listReport.getFilterValue`                 | Returns the current value of a filter field.                                                   |
-| `getHeaderTitle()`            | `fe.objectPage.getHeaderTitle`                 | Returns the Object Page header title text.                                                     |
-| `getItemCount()`              | `fe.list.getItemCount`                         | Returns the number of items in a Fiori Elements list.                                          |
-| `getItemTitle()`              | `fe.list.getItemTitle`                         | Returns the title of a list item at the given index.                                           |
-| `getLanguage()`               | `flpSettings.getLanguage`                      | Returns the current FLP user language setting.                                                 |
-| `getLockEntries()`            | `flpLocks.getLockEntries`                      | Returns all lock entries for the current or specified user.                                    |
-| `getModelData()`              | `ui5.odata.getModelData`                       | Reads data from the OData model at the given path.                                             |
-| `getModelProperty()`          | `ui5.odata.getModelProperty`                   | Reads a single property value from the OData model.                                            |
-| `getNumberFormat()`           | `flpSettings.getNumberFormat`                  | Returns the current FLP user number format setting.                                            |
-| `getNumberOfLockEntries()`    | `flpLocks.getNumberOfLockEntries`              | Returns the number of lock entries for the current or specified user.                          |
-| `getOpen()`                   | `ui5.dialog.getOpen`                           | Returns all currently open dialogs.                                                            |
-| `getRowCount()`               | `ui5.table.getRowCount`                        | Returns the number of rows in the table.                                                       |
-| `getRowCount()`               | `fe.table.getRowCount`                         | Returns the row count for a Fiori Elements table.                                              |
-| `getRowCountAlt()`            | `ui5.table.getRowCountAlt`                     | Returns the row count using an alternative detection method.                                   |
-| `getRows()`                   | `ui5.table.getRows`                            | Returns all visible row data as string arrays.                                                 |
-| `getSectionData()`            | `fe.objectPage.getSectionData`                 | Returns the data from a specific section.                                                      |
-| `getSections()`               | `fe.objectPage.getSections`                    | Returns all sections on the Object Page.                                                       |
-| `getSelectedRows()`           | `ui5.table.getSelectedRows`                    | Returns indices of currently selected rows.                                                    |
-| `getSessionInfo()`            | `sapAuth.getSessionInfo`                       | Returns the current session metadata, or null if not authenticated.                            |
-| `getSortOrder()`              | `ui5.table.getSortOrder`                       | Returns the current sort order for a specific column.                                          |
-| `getTable()`                  | `fe.listReport.getTable`                       | Returns the main table ID of the List Report page.                                             |
-| `getText()`                   | `ui5.getText`                                  | Gets the text of a control.                                                                    |
-| `getTimeFormat()`             | `flpSettings.getTimeFormat`                    | Returns the current FLP user time format setting.                                              |
-| `getTimePicker()`             | `ui5.date.getTimePicker`                       | Gets the current time value from a TimePicker control.                                         |
-| `getTimezone()`               | `flpSettings.getTimezone`                      | Returns the current FLP user timezone setting.                                                 |
-| `getValue()`                  | `ui5.getValue`                                 | Gets the value of a control.                                                                   |
-| `getVariants()`               | `fe.listReport.getVariants`                    | Returns the list of available variant names.                                                   |
-| `hasPendingChanges()`         | `ui5.odata.hasPendingChanges`                  | Checks whether the OData model has unsaved changes.                                            |
-| `inspect()`                   | `ui5.inspect`                                  | Inspects a control and returns full metadata.                                                  |
-| `isAuthenticated()`           | `sapAuth.isAuthenticated`                      | Checks whether the current session is authenticated.                                           |
-| `isInEditMode()`              | `fe.objectPage.isInEditMode`                   | Checks whether the Object Page is currently in edit mode.                                      |
-| `isOpen()`                    | `ui5.dialog.isOpen`                            | Checks whether a specific dialog is currently open.                                            |
-| `isSessionExpired()`          | `sapAuth.isSessionExpired`                     | Checks whether the current session has expired.                                                |
-| `llm()`                       | `pramanAI.llm`                                 | The LlmService instance for direct LLM interactions.                                           |
-| `load()`                      | `testData.load`                                | Loads previously saved test data from a JSON file.                                             |
-| `login()`                     | `sapAuth.login`                                | Authenticates against the SAP system using the provided config.                                |
-| `loginFromEnv()`              | `sapAuth.loginFromEnv`                         | Authenticates using credentials from environment variables.                                    |
-| `logout()`                    | `sapAuth.logout`                               | Logs out of the SAP system.                                                                    |
-| `navigateAndSearch()`         | `intent.core.navigateAndSearch`                | Navigates to a list app and runs a search with the given criteria.                             |
-| `navigateBack()`              | `ui5Navigation.navigateBack`                   | Navigates back one step in the browser history.                                                |
-| `navigateForward()`           | `ui5Navigation.navigateForward`                | Navigates forward one step in the browser history.                                             |
-| `navigateToApp()`             | `ui5Navigation.navigateToApp`                  | Navigates to a Fiori Launchpad app by its semantic object and action.                          |
-| `navigateToHash()`            | `ui5Navigation.navigateToHash`                 | Navigates to a specific URL hash fragment.                                                     |
-| `navigateToHome()`            | `ui5Navigation.navigateToHome`                 | Navigates back to the Fiori Launchpad home page.                                               |
-| `navigateToIntent()`          | `ui5Navigation.navigateToIntent`               | Navigates to a semantic object intent with optional parameters.                                |
-| `navigateToItem()`            | `fe.listReport.navigateToItem`                 | Navigates to a specific item by clicking its row in the List Report.                           |
-| `navigateToSection()`         | `fe.objectPage.navigateToSection`              | Navigates to a specific section on the Object Page.                                            |
-| `navigateToTile()`            | `ui5Navigation.navigateToTile`                 | Navigates to a Fiori Launchpad tile by its title.                                              |
-| `openNotifications()`         | `ui5Shell.openNotifications`                   | Opens the notifications panel from the SAP Shell header.                                       |
-| `openUserMenu()`              | `ui5Shell.openUserMenu`                        | Opens the user menu from the SAP Shell header.                                                 |
-| `postVendorInvoice()`         | `intent.finance.postVendorInvoice`             | Posts a vendor invoice through the Fiori UI.                                                   |
-| `press()`                     | `ui5.press`                                    | Presses a control (alias for click).                                                           |
-| `processPayment()`            | `intent.finance.processPayment`                | Processes a payment through the Fiori UI.                                                      |
-| `queryEntities()`             | `ui5.odata.queryEntities`                      | Queries an entity set with optional OData query parameters.                                    |
-| `recipes()`                   | `pramanAI.recipes`                             | The RecipeRegistry instance for querying available test recipes.                               |
-| `save()`                      | `testData.save`                                | Saves test data to a JSON file for later reuse.                                                |
-| `search()`                    | `fe.listReport.search`                         | Triggers the Go/Search action on the List Report filter bar.                                   |
-| `searchAndOpenApp()`          | `ui5Navigation.searchAndOpenApp`               | Searches for an app in the Fiori Launchpad and opens it.                                       |
-| `searchCustomers()`           | `intent.sales.searchCustomers`                 | Searches for customers using filter criteria.                                                  |
-| `searchPurchaseOrders()`      | `intent.procurement.searchPurchaseOrders`      | Searches for purchase orders using filter criteria.                                            |
-| `searchSalesOrders()`         | `intent.sales.searchSalesOrders`               | Searches for sales orders using filter criteria.                                               |
-| `searchVendors()`             | `intent.procurement.searchVendors`             | Searches for vendors using filter criteria.                                                    |
-| `select()`                    | `ui5.select`                                   | Selects an item in a selection control.                                                        |
-| `selectAll()`                 | `ui5.table.selectAll`                          | Selects all rows in the table.                                                                 |
-| `selectItem()`                | `fe.list.selectItem`                           | Selects or deselects a list item at the given index.                                           |
-| `selectOption()`              | `intent.core.selectOption`                     | Resolves a field label via vocabulary and selects an item in the matching control.             |
-| `selectRow()`                 | `ui5.table.selectRow`                          | Selects a specific row by index.                                                               |
-| `selectRowByValues()`         | `ui5.table.selectRowByValues`                  | Finds and selects a row matching the given column-value criteria.                              |
-| `selectVariant()`             | `fe.listReport.selectVariant`                  | Selects a variant by name.                                                                     |
-| `setAndValidate()`            | `ui5.date.setAndValidate`                      | Sets a date and validates the input against the control's constraints.                         |
-| `setDatePicker()`             | `ui5.date.setDatePicker`                       | Sets a date value on a DatePicker control.                                                     |
-| `setDateRange()`              | `ui5.date.setDateRange`                        | Sets start and end dates on a DateRangeSelection control.                                      |
-| `setFilter()`                 | `fe.listReport.setFilter`                      | Sets a filter field value on the List Report filter bar.                                       |
-| `setTableCellValue()`         | `ui5.table.setTableCellValue`                  | Sets the value of a specific cell by row and column index.                                     |
-| `setTimePicker()`             | `ui5.date.setTimePicker`                       | Sets a time value on a TimePicker control.                                                     |
-| `sortByColumn()`              | `ui5.table.sortByColumn`                       | Sorts the table by a specific column.                                                          |
-| `uncheck()`                   | `ui5.uncheck`                                  | Unchecks a checkbox.                                                                           |
-| `updateEntity()`              | `ui5.odata.updateEntity`                       | Updates an existing entity via OData HTTP PATCH/PUT.                                           |
-| `vocabulary()`                | `pramanAI.vocabulary`                          | The VocabularyService instance for field label resolution.                                     |
-| `waitFor()`                   | `ui5.waitFor`                                  | Waits for a control to appear.                                                                 |
-| `waitFor()`                   | `ui5.dialog.waitFor`                           | Waits for a dialog to appear and returns its metadata.                                         |
-| `waitForClosed()`             | `ui5.dialog.waitForClosed`                     | Waits for a specific dialog to close.                                                          |
-| `waitForData()`               | `ui5.table.waitForData`                        | Waits for table data to load.                                                                  |
-| `waitForLoad()`               | `ui5.odata.waitForLoad`                        | Waits for all pending OData requests to complete.                                              |
-| `waitForSave()`               | `intent.core.waitForSave`                      | Waits for all pending UI5 rendering and OData requests to complete.                            |
-| `waitForUI5()`                | `ui5.waitForUI5`                               | Waits for UI5 to stabilize.                                                                    |
+| Function | Capability | Signature | Description |
+| --- | --- | --- | --- |
+| `agentic()` | `pramanAI.agentic` | `() => AgenticHandler` | The AgenticHandler instance for autonomous test operations with checkpoint-based resumability. |
+| `approvePurchaseOrder()` | `intent.procurement.approvePurchaseOrder` | `(params: { orderNumber: string }) => Promise<IntentResult>` | Approves a purchase order through the Fiori UI. |
+| `approveQuotation()` | `intent.sales.approveQuotation` | `(params: { quotationNumber: string }) => Promise<IntentResult>` | Approves a sales quotation through the Fiori UI. |
+| `assertField()` | `intent.core.assertField` | `(label: string, expected: string, options?: { domain?: string }) => Promise<IntentResult>` | Resolves a field label via vocabulary, reads the control's text, and compares it. |
+| `buildContext()` | `pramanAI.buildContext` | `(page: Page) => Promise<PageContext>` | Builds a complete AI page context from the current Playwright page state. |
+| `callFunctionImport()` | `ui5.odata.callFunctionImport` | `(functionName: string, params?: Record<string, unknown>, options?: ODataOptions) => Promise<unknown>` | Calls an OData function import. |
+| `capabilities()` | `pramanAI.capabilities` | `() => CapabilityRegistry` | The CapabilityRegistry instance for querying available capabilities. |
+| `check()` | `ui5.check` | `(selector: UI5Selector) => Promise<void>` | Checks a checkbox. |
+| `checkDeliveryStatus()` | `intent.sales.checkDeliveryStatus` | `(params: { orderNumber: string }) => Promise<IntentResult>` | Checks the delivery status for a sales order. |
+| `cleanup()` | `flpLocks.cleanup` | `() => Promise<void>` | Cleans up all lock entries created during the test session. |
+| `cleanup()` | `testData.cleanup` | `() => Promise<void>` | Cleans up all test data files created during the test session. |
+| `clear()` | `ui5.clear` | `(selector: UI5Selector) => Promise<void>` | Clears a control's text. |
+| `clearCache()` | `ui5.clearCache` | `() => void` | Clears the internal proxy cache. |
+| `clearFilters()` | `fe.listReport.clearFilters` | `() => Promise<void>` | Clears all filter values on the List Report filter bar. |
+| `click()` | `ui5.click` | `(selector: UI5Selector) => Promise<void>` | Clicks a control. |
+| `clickApply()` | `ui5Footer.clickApply` | `() => Promise<void>` | Clicks the Apply button in the footer toolbar. |
+| `clickButton()` | `fe.objectPage.clickButton` | `(label: string) => Promise<void>` | Clicks a button on the Object Page by its label. |
+| `clickButton()` | `intent.core.clickButton` | `(text: string) => Promise<IntentResult>` | Clicks a sap.m.Button control matching the given button text. |
+| `clickCancel()` | `ui5Footer.clickCancel` | `() => Promise<void>` | Clicks the Cancel button in the footer toolbar. |
+| `clickCreate()` | `ui5Footer.clickCreate` | `() => Promise<void>` | Clicks the Create button in the footer toolbar. |
+| `clickDelete()` | `ui5Footer.clickDelete` | `() => Promise<void>` | Clicks the Delete button in the footer toolbar. |
+| `clickEdit()` | `fe.objectPage.clickEdit` | `() => Promise<void>` | Clicks the Edit button on the Object Page. |
+| `clickEdit()` | `ui5Footer.clickEdit` | `() => Promise<void>` | Clicks the Edit button in the footer toolbar. |
+| `clickHome()` | `ui5Shell.clickHome` | `() => Promise<void>` | Clicks the home button in the SAP Shell header. |
+| `clickItem()` | `fe.list.clickItem` | `(index: number) => Promise<void>` | Clicks a list item at the given index. |
+| `clickRow()` | `ui5.table.clickRow` | `(tableId: string, rowIndex: number) => Promise<void>` | Clicks a specific row to trigger navigation or selection. |
+| `clickRow()` | `fe.table.clickRow` | `(tableId: string, rowIndex: number) => Promise<void>` | Clicks a row in a Fiori Elements table. |
+| `clickSave()` | `fe.objectPage.clickSave` | `() => Promise<void>` | Clicks the Save button on the Object Page. |
+| `clickSave()` | `ui5Footer.clickSave` | `() => Promise<void>` | Clicks the Save button in the footer toolbar. |
+| `clickSettings()` | `ui5.table.clickSettings` | `(tableId: string) => Promise<void>` | Opens the table settings/personalization dialog. |
+| `confirm()` | `ui5.dialog.confirm` | `(options?: FindDialogOptions) => Promise<void>` | Confirms a dialog by clicking its confirmation button. |
+| `confirmAndWait()` | `intent.core.confirmAndWait` | `() => Promise<IntentResult>` | Confirms a dialog and waits for UI5 to stabilize. |
+| `confirmGoodsReceipt()` | `intent.procurement.confirmGoodsReceipt` | `(params: { orderNumber: string; plant?: string }) => Promise<IntentResult>` | Confirms a goods receipt for a purchase order. |
+| `confirmProductionOrder()` | `intent.manufacturing.confirmProductionOrder` | `(params: { orderNumber: string }) => Promise<IntentResult>` | Confirms a production order through the Fiori UI. |
+| `control()` | `ui5.control` | `(selector: UI5Selector, options?: { timeout?: number }) => Promise<UI5ControlBase>` | Discovers a single control matching the selector. |
+| `controls()` | `ui5.controls` | `(selector: UI5Selector) => Promise<readonly UI5ControlBase[]>` | Discovers multiple controls matching the selector. |
+| `createCustomerMaster()` | `intent.masterData.createCustomerMaster` | `(params: { name: string; country: string; ... }) => Promise<IntentResult>` | Creates a customer master record through the Fiori UI. |
+| `createEntity()` | `ui5.odata.createEntity` | `(entitySet: string, data: Record<string, unknown>, options?: ODataOptions) => Promise<unknown>` | Creates a new entity via OData HTTP POST. |
+| `createJournalEntry()` | `intent.finance.createJournalEntry` | `(params: { documentDate: string; postingDate: string; glAccount: string; amount: number; ... }) => Promise<IntentResult>` | Creates a journal entry through the Fiori UI. |
+| `createMaterialMaster()` | `intent.masterData.createMaterialMaster` | `(params: { description: string; materialType: string; ... }) => Promise<IntentResult>` | Creates a material master record through the Fiori UI. |
+| `createProductionOrder()` | `intent.manufacturing.createProductionOrder` | `(params: { material: string; plant: string; quantity: number; ... }) => Promise<IntentResult>` | Creates a production order through the Fiori UI. |
+| `createPurchaseOrder()` | `intent.procurement.createPurchaseOrder` | `(params: { vendor: string; material: string; quantity: number; plant: string; ... }) => Promise<IntentResult>` | Creates a purchase order through the Fiori UI. |
+| `createPurchaseRequisition()` | `intent.procurement.createPurchaseRequisition` | `(params: { material: string; quantity: number; plant: string; ... }) => Promise<IntentResult>` | Creates a purchase requisition through the Fiori UI. |
+| `createQuotation()` | `intent.sales.createQuotation` | `(params: { soldToParty: string; material: string; ... }) => Promise<IntentResult>` | Creates a sales quotation through the Fiori UI. |
+| `createSalesOrder()` | `intent.sales.createSalesOrder` | `(params: { soldToParty: string; salesOrg: string; material: string; quantity: number; ... }) => Promise<IntentResult>` | Creates a sales order through the Fiori UI. |
+| `createVendorMaster()` | `intent.masterData.createVendorMaster` | `(params: { name: string; country: string; ... }) => Promise<IntentResult>` | Creates a vendor master record through the Fiori UI. |
+| `deleteAllLockEntries()` | `flpLocks.deleteAllLockEntries` | `(username?: string) => Promise<number>` | Deletes all lock entries for the current or specified user. |
+| `deleteEntity()` | `ui5.odata.deleteEntity` | `(entitySet: string, key: string, options?: ODataOptions) => Promise<void>` | Deletes an entity via OData HTTP DELETE. |
+| `deselectAll()` | `ui5.table.deselectAll` | `(tableId: string) => Promise<void>` | Deselects all rows in the table. |
+| `destroy()` | `ui5.destroy` | `() => Promise<void>` | Destroys the handler and cleans up resources. |
+| `detectType()` | `ui5.table.detectType` | `(tableId: string) => Promise<TableInfo>` | Detects the table type and returns metadata. |
+| `discoverPage()` | `pramanAI.discoverPage` | `(options?: { interactiveOnly?: boolean }) => Promise<PageInventory>` | Discovers the current page context using AI-powered analysis. |
+| `dismiss()` | `ui5.dialog.dismiss` | `(options?: FindDialogOptions) => Promise<void>` | Dismisses (closes) a dialog. |
+| `ensureRowVisible()` | `ui5.table.ensureRowVisible` | `(tableId: string, rowIndex: number) => Promise<void>` | Scrolls the table to ensure the given row is visible. |
+| `expectShellHeader()` | `ui5Shell.expectShellHeader` | `() => Promise<void>` | Asserts that the SAP Shell header is visible. |
+| `exportData()` | `ui5.table.exportData` | `(tableId: string) => Promise<Record<string, string>[]>` | Exports all table data as an array of record objects with string values. |
+| `fetchCSRFToken()` | `ui5.odata.fetchCSRFToken` | `(serviceUrl: string) => Promise<string>` | Fetches a CSRF token from the OData service. |
+| `fill()` | `ui5.fill` | `(selector: UI5Selector, value: string) => Promise<void>` | Fills a control with text. |
+| `fillField()` | `intent.core.fillField` | `(label: string, value: string, options?: { domain?: string }) => Promise<IntentResult>` | Resolves a field label via vocabulary and fills the matching UI5 control. |
+| `filterByColumn()` | `ui5.table.filterByColumn` | `(tableId: string, columnName: string, value: string) => Promise<void>` | Applies a filter to a specific column. |
+| `findItemByTitle()` | `fe.list.findItemByTitle` | `(listId: string, title: string) => Promise<number>` | Finds the index of a list item by its title. |
+| `findRow()` | `fe.table.findRow` | `(tableId: string, criteria: Record<string, string>) => Promise<number>` | Finds the first row matching the given column-value criteria. |
+| `findRowByValues()` | `ui5.table.findRowByValues` | `(tableId: string, criteria: Record<string, string>) => Promise<number>` | Finds the first row matching the given column-value criteria. |
+| `generate()` | `testData.generate` | `<T>(template: T) => T` | Generates test data from a template with randomized values. |
+| `getAllSettings()` | `flpSettings.getAllSettings` | `() => Promise<FLPUserSettings>` | Returns all FLP user settings as a single object. |
+| `getButtons()` | `ui5.dialog.getButtons` | `(dialogId?: string) => Promise<readonly string[]>` | Returns the buttons available in a specific dialog. |
+| `getCellByColumnName()` | `ui5.table.getCellByColumnName` | `(tableId: string, rowIndex: number, columnName: string) => Promise<string>` | Returns the cell value at the given row and column name. |
+| `getCellValue()` | `ui5.table.getCellValue` | `(tableId: string, rowIndex: number, colIndex: number) => Promise<string>` | Returns the value of a specific cell by row and column index. |
+| `getCellValue()` | `fe.table.getCellValue` | `(tableId: string, rowIndex: number, columnName: string) => Promise<string>` | Returns the cell value at a given row index and column name. |
+| `getColumnNames()` | `ui5.table.getColumnNames` | `(tableId: string) => Promise<readonly string[]>` | Returns the column header names of the table. |
+| `getColumnNames()` | `fe.table.getColumnNames` | `(tableId: string) => Promise<readonly string[]>` | Returns the column header names for a Fiori Elements table. |
+| `getCurrentHash()` | `ui5Navigation.getCurrentHash` | `() => Promise<string>` | Returns the current URL hash fragment. |
+| `getData()` | `ui5.table.getData` | `(tableId: string) => Promise<Record<string, string>[]>` | Returns all table data as an array of record objects. |
+| `getDateFormat()` | `flpSettings.getDateFormat` | `() => Promise<string>` | Returns the current FLP user date format setting. |
+| `getDatePicker()` | `ui5.date.getDatePicker` | `(controlId: string) => Promise<string>` | Gets the current date value from a DatePicker control. |
+| `getDateRange()` | `ui5.date.getDateRange` | `(controlId: string) => Promise<{ start: string; end: string }>` | Gets the current start and end dates from a DateRangeSelection control. |
+| `getEntityCount()` | `ui5.odata.getEntityCount` | `(entitySet: string, options?: ODataOptions) => Promise<number>` | Returns the $count for an entity set. |
+| `getFilterBar()` | `fe.listReport.getFilterBar` | `() => Promise<string>` | Returns the filter bar ID of the List Report page. |
+| `getFilterValue()` | `ui5.table.getFilterValue` | `(tableId: string, columnName: string) => Promise<string>` | Returns the current filter value for a specific column. |
+| `getFilterValue()` | `fe.listReport.getFilterValue` | `(fieldName: string) => Promise<string>` | Returns the current value of a filter field. |
+| `getHeaderTitle()` | `fe.objectPage.getHeaderTitle` | `() => Promise<string>` | Returns the Object Page header title text. |
+| `getItemCount()` | `fe.list.getItemCount` | `(listId: string) => Promise<number>` | Returns the number of items in a Fiori Elements list. |
+| `getItemTitle()` | `fe.list.getItemTitle` | `(listId: string, index: number) => Promise<string>` | Returns the title of a list item at the given index. |
+| `getLanguage()` | `flpSettings.getLanguage` | `() => Promise<string>` | Returns the current FLP user language setting. |
+| `getLockEntries()` | `flpLocks.getLockEntries` | `(username?: string) => Promise<readonly LockEntry[]>` | Returns all lock entries for the current or specified user. |
+| `getModelData()` | `ui5.odata.getModelData` | `(path: string, options?: ODataOptions) => Promise<unknown>` | Reads data from the OData model at the given path. |
+| `getModelProperty()` | `ui5.odata.getModelProperty` | `(path: string, property: string, options?: ODataOptions) => Promise<unknown>` | Reads a single property value from the OData model. |
+| `getNumberFormat()` | `flpSettings.getNumberFormat` | `() => Promise<string>` | Returns the current FLP user number format setting. |
+| `getNumberOfLockEntries()` | `flpLocks.getNumberOfLockEntries` | `(username?: string) => Promise<number>` | Returns the number of lock entries for the current or specified user. |
+| `getOpen()` | `ui5.dialog.getOpen` | `() => Promise<readonly DialogInfo[]>` | Returns all currently open dialogs. |
+| `getRowCount()` | `ui5.table.getRowCount` | `(tableId: string) => Promise<number>` | Returns the number of rows in the table. |
+| `getRowCount()` | `fe.table.getRowCount` | `(tableId: string) => Promise<number>` | Returns the row count for a Fiori Elements table. |
+| `getRowCountAlt()` | `ui5.table.getRowCountAlt` | `(tableId: string) => Promise<number>` | Returns the row count using an alternative detection method. |
+| `getRows()` | `ui5.table.getRows` | `(tableId: string) => Promise<readonly string[][]>` | Returns all visible row data as string arrays. |
+| `getSectionData()` | `fe.objectPage.getSectionData` | `(sectionTitle: string) => Promise<unknown>` | Returns the data from a specific section. |
+| `getSections()` | `fe.objectPage.getSections` | `() => Promise<readonly string[]>` | Returns all sections on the Object Page. |
+| `getSelectedRows()` | `ui5.table.getSelectedRows` | `(tableId: string) => Promise<readonly number[]>` | Returns indices of currently selected rows. |
+| `getSessionInfo()` | `sapAuth.getSessionInfo` | `() => SessionInfo \| null` | Returns the current session metadata, or null if not authenticated. |
+| `getSortOrder()` | `ui5.table.getSortOrder` | `(tableId: string, columnName: string) => Promise<string>` | Returns the current sort order for a specific column. |
+| `getTable()` | `fe.listReport.getTable` | `() => Promise<string>` | Returns the main table ID of the List Report page. |
+| `getText()` | `ui5.getText` | `(selector: UI5Selector) => Promise<string>` | Gets the text of a control. |
+| `getTimeFormat()` | `flpSettings.getTimeFormat` | `() => Promise<string>` | Returns the current FLP user time format setting. |
+| `getTimePicker()` | `ui5.date.getTimePicker` | `(controlId: string) => Promise<string>` | Gets the current time value from a TimePicker control. |
+| `getTimezone()` | `flpSettings.getTimezone` | `() => Promise<string>` | Returns the current FLP user timezone setting. |
+| `getValue()` | `ui5.getValue` | `(selector: UI5Selector) => Promise<string>` | Gets the value of a control. |
+| `getVariants()` | `fe.listReport.getVariants` | `() => Promise<readonly string[]>` | Returns the list of available variant names. |
+| `hasPendingChanges()` | `ui5.odata.hasPendingChanges` | `(options?: ODataOptions) => Promise<boolean>` | Checks whether the OData model has unsaved changes. |
+| `inspect()` | `ui5.inspect` | `(selector: UI5Selector) => Promise<ControlInspection>` | Inspects a control and returns full metadata. |
+| `isAuthenticated()` | `sapAuth.isAuthenticated` | `() => Promise<boolean>` | Checks whether the current session is authenticated. |
+| `isInEditMode()` | `fe.objectPage.isInEditMode` | `() => Promise<boolean>` | Checks whether the Object Page is currently in edit mode. |
+| `isOpen()` | `ui5.dialog.isOpen` | `(dialogId: string) => Promise<boolean>` | Checks whether a specific dialog is currently open. |
+| `isSessionExpired()` | `sapAuth.isSessionExpired` | `(timeoutMs?: number) => boolean` | Checks whether the current session has expired. |
+| `llm()` | `pramanAI.llm` | `() => LlmService` | The LlmService instance for direct LLM interactions. |
+| `load()` | `testData.load` | `<T>(filename: string) => Promise<T>` | Loads previously saved test data from a JSON file. |
+| `login()` | `sapAuth.login` | `(config: SAPAuthConfig) => Promise<void>` | Authenticates against the SAP system using the provided config. |
+| `loginFromEnv()` | `sapAuth.loginFromEnv` | `() => Promise<void>` | Authenticates using credentials from environment variables. |
+| `logout()` | `sapAuth.logout` | `() => Promise<void>` | Logs out of the SAP system. |
+| `navigateAndSearch()` | `intent.core.navigateAndSearch` | `(app: string, criteria: Record<string, string>) => Promise<IntentResult>` | Navigates to a list app and runs a search with the given criteria. |
+| `navigateBack()` | `ui5Navigation.navigateBack` | `() => Promise<void>` | Navigates back one step in the browser history. |
+| `navigateForward()` | `ui5Navigation.navigateForward` | `() => Promise<void>` | Navigates forward one step in the browser history. |
+| `navigateToApp()` | `ui5Navigation.navigateToApp` | `(semanticObject: string) => Promise<void>` | Navigates to a Fiori Launchpad app by its semantic object and action. |
+| `navigateToHash()` | `ui5Navigation.navigateToHash` | `(hash: string) => Promise<void>` | Navigates to a specific URL hash fragment. |
+| `navigateToHome()` | `ui5Navigation.navigateToHome` | `() => Promise<void>` | Navigates back to the Fiori Launchpad home page. |
+| `navigateToIntent()` | `ui5Navigation.navigateToIntent` | `(semanticObject: string, action: string, params?: Record<string, string>) => Promise<void>` | Navigates to a semantic object intent with optional parameters. |
+| `navigateToItem()` | `fe.listReport.navigateToItem` | `(rowIndex: number) => Promise<void>` | Navigates to a specific item by clicking its row in the List Report. |
+| `navigateToSection()` | `fe.objectPage.navigateToSection` | `(sectionTitle: string) => Promise<void>` | Navigates to a specific section on the Object Page. |
+| `navigateToTile()` | `ui5Navigation.navigateToTile` | `(title: string) => Promise<void>` | Navigates to a Fiori Launchpad tile by its title. |
+| `openNotifications()` | `ui5Shell.openNotifications` | `() => Promise<void>` | Opens the notifications panel from the SAP Shell header. |
+| `openUserMenu()` | `ui5Shell.openUserMenu` | `() => Promise<void>` | Opens the user menu from the SAP Shell header. |
+| `postVendorInvoice()` | `intent.finance.postVendorInvoice` | `(params: { vendor: string; invoiceDate: string; amount: number; ... }) => Promise<IntentResult>` | Posts a vendor invoice through the Fiori UI. |
+| `press()` | `ui5.press` | `(selector: UI5Selector) => Promise<void>` | Presses a control (alias for click). |
+| `processPayment()` | `intent.finance.processPayment` | `(params: { vendor: string; amount: number; ... }) => Promise<IntentResult>` | Processes a payment through the Fiori UI. |
+| `queryEntities()` | `ui5.odata.queryEntities` | `(entitySet: string, query?: ODataQueryParams, options?: ODataOptions) => Promise<unknown[]>` | Queries an entity set with optional OData query parameters. |
+| `recipes()` | `pramanAI.recipes` | `() => RecipeRegistry` | The RecipeRegistry instance for querying available test recipes. |
+| `save()` | `testData.save` | `(filename: string, data: unknown) => Promise<void>` | Saves test data to a JSON file for later reuse. |
+| `search()` | `fe.listReport.search` | `() => Promise<void>` | Triggers the Go/Search action on the List Report filter bar. |
+| `searchAndOpenApp()` | `ui5Navigation.searchAndOpenApp` | `(appTitle: string) => Promise<void>` | Searches for an app in the Fiori Launchpad and opens it. |
+| `searchCustomers()` | `intent.sales.searchCustomers` | `(criteria: Record<string, string>) => Promise<IntentResult>` | Searches for customers using filter criteria. |
+| `searchPurchaseOrders()` | `intent.procurement.searchPurchaseOrders` | `(criteria: Record<string, string>) => Promise<IntentResult>` | Searches for purchase orders using filter criteria. |
+| `searchSalesOrders()` | `intent.sales.searchSalesOrders` | `(criteria: Record<string, string>) => Promise<IntentResult>` | Searches for sales orders using filter criteria. |
+| `searchVendors()` | `intent.procurement.searchVendors` | `(criteria: Record<string, string>) => Promise<IntentResult>` | Searches for vendors using filter criteria. |
+| `select()` | `ui5.select` | `(selector: UI5Selector, key: string) => Promise<void>` | Selects an item in a selection control. |
+| `selectAll()` | `ui5.table.selectAll` | `(tableId: string) => Promise<void>` | Selects all rows in the table. |
+| `selectItem()` | `fe.list.selectItem` | `(listId: string, index: number, selected?: boolean) => Promise<void>` | Selects or deselects a list item at the given index. |
+| `selectOption()` | `intent.core.selectOption` | `(label: string, value: string, options?: { domain?: string }) => Promise<IntentResult>` | Resolves a field label via vocabulary and selects an item in the matching control. |
+| `selectRow()` | `ui5.table.selectRow` | `(tableId: string, rowIndex: number) => Promise<void>` | Selects a specific row by index. |
+| `selectRowByValues()` | `ui5.table.selectRowByValues` | `(tableId: string, criteria: Record<string, string>) => Promise<void>` | Finds and selects a row matching the given column-value criteria. |
+| `selectVariant()` | `fe.listReport.selectVariant` | `(variantName: string) => Promise<void>` | Selects a variant by name. |
+| `setAndValidate()` | `ui5.date.setAndValidate` | `(controlId: string, date: string, format?: string) => Promise<void>` | Sets a date and validates the input against the control's constraints. |
+| `setDatePicker()` | `ui5.date.setDatePicker` | `(controlId: string, date: string, format?: string) => Promise<void>` | Sets a date value on a DatePicker control. |
+| `setDateRange()` | `ui5.date.setDateRange` | `(controlId: string, start: string, end: string, format?: string) => Promise<void>` | Sets start and end dates on a DateRangeSelection control. |
+| `setFilter()` | `fe.listReport.setFilter` | `(fieldName: string, value: string) => Promise<void>` | Sets a filter field value on the List Report filter bar. |
+| `setTableCellValue()` | `ui5.table.setTableCellValue` | `(tableId: string, rowIndex: number, colIndex: number, value: string) => Promise<void>` | Sets the value of a specific cell by row and column index. |
+| `setTimePicker()` | `ui5.date.setTimePicker` | `(controlId: string, time: string) => Promise<void>` | Sets a time value on a TimePicker control. |
+| `sortByColumn()` | `ui5.table.sortByColumn` | `(tableId: string, columnName: string, order?: 'asc' \| 'desc') => Promise<void>` | Sorts the table by a specific column. |
+| `uncheck()` | `ui5.uncheck` | `(selector: UI5Selector) => Promise<void>` | Unchecks a checkbox. |
+| `updateEntity()` | `ui5.odata.updateEntity` | `(entitySet: string, key: string, data: Record<string, unknown>, options?: ODataOptions) => Promise<unknown>` | Updates an existing entity via OData HTTP PATCH/PUT. |
+| `vocabulary()` | `pramanAI.vocabulary` | `() => VocabularyService` | The VocabularyService instance for field label resolution. |
+| `waitFor()` | `ui5.waitFor` | `(selector: UI5Selector, options?: { timeout?: number }) => Promise<void>` | Waits for a control to appear. |
+| `waitFor()` | `ui5.dialog.waitFor` | `(options?: { title?: string; timeout?: number }) => Promise<DialogInfo>` | Waits for a dialog to appear and returns its metadata. |
+| `waitForClosed()` | `ui5.dialog.waitForClosed` | `(dialogId: string, options?: { timeout?: number }) => Promise<void>` | Waits for a specific dialog to close. |
+| `waitForData()` | `ui5.table.waitForData` | `(tableId: string, options?: { timeout?: number }) => Promise<void>` | Waits for table data to load. |
+| `waitForLoad()` | `ui5.odata.waitForLoad` | `(options?: ODataOptions) => Promise<void>` | Waits for all pending OData requests to complete. |
+| `waitForSave()` | `intent.core.waitForSave` | `(options?: { timeout?: number }) => Promise<IntentResult>` | Waits for all pending UI5 rendering and OData requests to complete. |
+| `waitForUI5()` | `ui5.waitForUI5` | `(timeout?: number) => Promise<void>` | Waits for UI5 to stabilize. |

@@ -48,8 +48,10 @@ describe('ErrorCode', () => {
     expect(ErrorCode.ERR_CONTROL_NOT_ENABLED).toBe('ERR_CONTROL_NOT_ENABLED');
     expect(ErrorCode.ERR_CONTROL_NOT_INTERACTABLE).toBe('ERR_CONTROL_NOT_INTERACTABLE');
     expect(ErrorCode.ERR_CONTROL_PROPERTY).toBe('ERR_CONTROL_PROPERTY');
+    expect(ErrorCode.ERR_CONTROL_NOT_UI5).toBe('ERR_CONTROL_NOT_UI5');
     expect(ErrorCode.ERR_CONTROL_AGGREGATION).toBe('ERR_CONTROL_AGGREGATION');
     expect(ErrorCode.ERR_CONTROL_METHOD).toBe('ERR_CONTROL_METHOD');
+    expect(ErrorCode.ERR_CONTROL_INTERACTION_FAILED).toBe('ERR_CONTROL_INTERACTION_FAILED');
   });
 
   it('defines auth error codes', () => {
@@ -123,8 +125,8 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 59 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(59);
+  it('has exactly 60 error codes', () => {
+    expect(Object.keys(ErrorCode)).toHaveLength(60);
   });
 
   // ── Immutability test ────────────────────────────────────────────────
@@ -137,6 +139,7 @@ describe('ErrorCode', () => {
     expectTypeOf<ErrorCodeType>().toExtend<string>();
     expectTypeOf<'ERR_CONFIG_INVALID'>().toExtend<ErrorCodeType>();
     expectTypeOf<'ERR_BRIDGE_TIMEOUT'>().toExtend<ErrorCodeType>();
+    expectTypeOf<'ERR_CONTROL_NOT_UI5'>().toExtend<ErrorCodeType>();
   });
 
   it('rejects invalid error codes at type level', () => {

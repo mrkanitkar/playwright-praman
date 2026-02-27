@@ -20,6 +20,50 @@
 - **AI-powered test generation** — intent-based testing with LLM support
 - **Cross-platform** — Windows 10/11, macOS, Linux, Docker
 
+## When to Use Praman vs Native Playwright
+
+Use this decision tree to determine the right API for each element:
+
+```text
+Is the element on the page?
+  |
+  +-- Is it a UI5 control? (sap.m.*, sap.ui.*, sap.ui.comp.*)
+  |     |
+  |     +-- YES --> Use Praman: ui5.control(), ui5.press(), ui5.fill()
+  |     |
+  |     +-- NOT SURE --> Check with ui5.control({ controlType: '...' })
+  |           |
+  |           +-- Found --> Use Praman fixtures
+  |           +-- Not found --> Use Playwright native (page.locator())
+  |
+  +-- Is it a login form or IDP redirect page?
+  |     |
+  |     +-- YES --> Use Playwright native: page.locator(), page.fill()
+  |                 (Auth pages are plain HTML, not UI5)
+  |
+  +-- Is it a standard HTML element on a UI5 page?
+  |     |
+  |     +-- YES --> Use Playwright native: page.locator()
+  |                 (e.g., FLP space tabs, custom HTML fragments)
+  |
+  +-- Is it a hybrid page (UI5 + non-UI5)?
+        |
+        +-- YES --> Use both! See examples/hybrid-login.spec.ts
+                    Playwright native for HTML, Praman for UI5 controls
+```
+
+### Quick Reference
+
+| Scenario | API | Example |
+| --- | --- | --- |
+| UI5 Button, Input, Table, Dialog | `ui5.control()`, `ui5.press()`, `ui5.fill()` | `await ui5.press({ controlType: 'sap.m.Button', properties: { text: 'Save' } })` |
+| UI5 SmartField / SmartTable | `ui5.control()` + proxy methods | `const table = await smartTable.getTable()` |
+| Controls inside dialogs | `ui5.control()` with `searchOpenDialogs: true` | `await ui5.control({ id: 'myDialog--field', searchOpenDialogs: true })` |
+| SAP login form (HTML) | `page.locator()`, `page.fill()` | `await page.locator('#sap-user').fill(username)` |
+| IDP redirect (IAS, Azure AD) | `page.locator()`, `page.fill()` | `await page.locator('input[name="email"]').fill(email)` |
+| FLP space tabs | `page.getByText()` | `await page.getByText('My Space', { exact: true }).click()` |
+| Page title verification | `expect(page).toHaveTitle()` | `await expect(page).toHaveTitle(/Home/)` |
+
 ## Install
 
 ```bash
@@ -126,7 +170,11 @@ test('AI-assisted test discovery', async ({ pramanAI, page }) => {
   await test.step('Discover page controls', async () => {
     const context = await pramanAI.discoverPage({ interactiveOnly: true });
     if (context.status === 'success') {
-      console.log(`Found ${context.data.controls.length} interactive controls`);
+      // Use test.info() annotations instead of console.log (Praman rule #5)
+      test.info().annotations.push({
+        type: 'info',
+        description: `Found ${context.data.controls.length} interactive controls`,
+      });
     }
   });
 
@@ -136,10 +184,29 @@ test('AI-assisted test discovery', async ({ pramanAI, page }) => {
       page,
     );
     if (result.status === 'success') {
-      console.log(result.data.code); // Generated TypeScript test
+      // Generated TypeScript test code is available in result.data.code
+      expect(result.data.code).toBeTruthy();
     }
   });
 });
+```
+
+## Examples
+
+Runnable example files are in the [`examples/`](./examples/) directory:
+
+| Example | Description |
+| --- | --- |
+| [`basic-test.spec.ts`](./examples/basic-test.spec.ts) | Minimal UI5 control discovery test |
+| [`hybrid-login.spec.ts`](./examples/hybrid-login.spec.ts) | Playwright native login + Praman UI5 app test (auto-fallback) |
+| [`table-operations.spec.ts`](./examples/table-operations.spec.ts) | Table `getRows()`, OData binding, `getContextByIndex()` |
+| [`dialog-handling.spec.ts`](./examples/dialog-handling.spec.ts) | `searchOpenDialogs`, dialog open/close, value help |
+| [`auth-setup.ts`](./examples/auth-setup.ts) | Complete SAP authentication setup (OnPrem, BTP, Office 365) |
+| [`bom-e2e-praman-gold-standard.spec.ts`](./examples/bom-e2e-praman-gold-standard.spec.ts) | Full BOM end-to-end test (gold standard reference) |
+
+```bash
+# Run a specific example
+npx playwright test examples/basic-test.spec.ts
 ```
 
 ## Sub-path Exports
@@ -178,10 +245,6 @@ npm run check:exports  # attw export validation
 npm run test:unit      # Vitest (hermetic)
 npm run ci             # lint + typecheck + test + build
 ```
-
-> **Note:** The published npm package includes `src/` (TypeScript source) alongside
-> compiled `dist/` output. This enables source-map debugging in consuming projects
-> and provides context for AI-assisted test generation agents.
 
 ## IDE Support
 
@@ -225,6 +288,81 @@ docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/playwright:v1.58.2-nobl
 - **SHA-pinned Actions** — all GitHub Actions use commit SHA references, not mutable tags
 - **2 production dependencies** — `pino` (MIT) and `zod` (MIT) only
 - **Security policy** — see [SECURITY.md](./SECURITY.md)
+
+## Troubleshooting
+
+### Common Error Codes
+
+**`ERR_BRIDGE_TIMEOUT`** -- Page is not a UI5 application, or UI5 has not finished loading.
+
+- Verify the URL points to a UI5/Fiori app.
+- Add `await page.waitForLoadState('domcontentloaded')` before the first `ui5.*` call.
+- Check if the page uses a non-standard UI5 bootstrap.
+
+**`ERR_BRIDGE_INJECTION`** -- The UI5 bridge script could not be injected.
+
+- Check for Content Security Policy (CSP) headers blocking inline scripts.
+- Ensure the page has loaded before calling `ui5.control()`.
+
+**`ERR_CONTROL_NOT_FOUND`** -- No UI5 control matches the given selector.
+
+- Verify the control ID or `controlType` + `properties` combination.
+- Use `searchOpenDialogs: true` if the control is inside a dialog.
+- Check that `ui5.waitForUI5()` was called after navigation.
+
+**`ERR_CONTROL_NOT_INTERACTABLE`** -- Control found but not interactive.
+
+- Check `getEnabled()` and `getVisible()` before interacting.
+- Wait for async operations to complete with `ui5.waitForUI5()`.
+
+**`ERR_TIMEOUT_UI5_STABLE`** -- UI5 did not reach a stable state within the timeout.
+
+- SAP apps with continuous polling (e.g., FLP home) may never reach idle.
+- Use `expect().toPass()` with custom intervals instead.
+- Increase the timeout for slow systems.
+
+### Enable Debug Logging
+
+Praman uses [pino](https://github.com/pinojs/pino) for structured logging. Set the
+`LOG_LEVEL` environment variable to enable verbose output:
+
+```bash
+# Show all debug messages
+LOG_LEVEL=debug npx playwright test
+
+# Show only warnings and errors
+LOG_LEVEL=warn npx playwright test
+```
+
+### Minimal playwright.config.ts
+
+```typescript
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  timeout: 120_000, // SAP apps need longer timeouts
+  expect: { timeout: 30_000 },
+
+  projects: [
+    // Auth setup -- runs first, saves session
+    {
+      name: 'auth',
+      testMatch: '**/auth-setup.ts',
+    },
+    // Main tests -- reuse saved session
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: '.auth/sap-session.json',
+        baseURL: process.env.SAP_BASE_URL,
+      },
+      dependencies: ['auth'],
+    },
+  ],
+});
+```
 
 ## Changelog
 

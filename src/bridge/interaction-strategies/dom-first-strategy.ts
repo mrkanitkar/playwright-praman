@@ -15,6 +15,10 @@
  * Better for form elements and scenarios where UI5 events
  * are unreliable.
  *
+ * All browser-side scripts use `page.evaluate(fn, args)` to safely
+ * pass arguments via Playwright's structured clone serialization,
+ * eliminating string interpolation injection risks (P17).
+ *
  * @module interaction-strategies
  */
 
@@ -38,6 +42,26 @@ interface BridgeResult {
   readonly error?: string;
 }
 
+/** Arguments passed to the browser-side press script. */
+interface PressArgs {
+  readonly ns: string;
+  readonly controlId: string;
+}
+
+/** Arguments passed to the browser-side enterText script. */
+interface EnterTextArgs {
+  readonly ns: string;
+  readonly controlId: string;
+  readonly text: string;
+}
+
+/** Arguments passed to the browser-side select script. */
+interface SelectArgs {
+  readonly ns: string;
+  readonly controlId: string;
+  readonly itemId: string;
+}
+
 /**
  * Interaction strategy using DOM events first, UI5 fallback second.
  *
@@ -53,22 +77,46 @@ export class DomFirstStrategy implements InteractionStrategy {
 
   /** {@inheritDoc InteractionStrategy.press} */
   async press(page: Page, controlId: string): Promise<void> {
-    const ns = BRIDGE_GLOBALS.NAMESPACE;
     const result: BridgeResult = await page.evaluate(
-      `(function() {
-        var bridge = window.${ns};
-        if (!bridge) return { success: false, error: 'Bridge not available' };
-        var ctrl = bridge.getById('${controlId}');
-        if (!ctrl) return { success: false, error: 'Control not found: ${controlId}' };
-        var dom = ctrl.getDomRef ? ctrl.getDomRef() : null;
-        if (dom) { dom.click(); return { success: true }; }
-        var fired = false;
-        if (typeof ctrl.firePress === 'function') { ctrl.firePress(); fired = true; }
-        if (typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); fired = true; }
+      /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
+      (args: PressArgs) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: bridge is injected at runtime on window
+        const bridge = (window as any)[args.ns] as
+          | { getById?: (id: string) => Record<string, unknown> | undefined }
+          | undefined;
+        // eslint-disable-next-line sonarjs/no-duplicate-string -- browser-context: module-level constants are not serialized by page.evaluate()
+        if (bridge === undefined) return { success: false, error: 'Bridge not available' };
+        const ctrl = bridge.getById !== undefined ? bridge.getById(args.controlId) : undefined;
+        if (ctrl === undefined) {
+          return { success: false, error: `Control not found: ${args.controlId}` };
+        }
+        const getDomRef = ctrl['getDomRef'] as (() => HTMLElement | null) | undefined;
+        const dom = getDomRef !== undefined ? getDomRef.call(ctrl) : null;
+        if (dom !== null) {
+          dom.click();
+          return { success: true };
+        }
+        let fired = false;
+        const firePress = ctrl['firePress'] as (() => void) | undefined;
+        if (firePress !== undefined) {
+          firePress.call(ctrl);
+          fired = true;
+        }
+        const fireSelect = ctrl['fireSelect'] as (() => void) | undefined;
+        if (fireSelect !== undefined) {
+          fireSelect.call(ctrl);
+          fired = true;
+        }
         if (fired) return { success: true };
-        if (typeof ctrl.fireTap === 'function') { ctrl.fireTap(); return { success: true }; }
-        return { success: false, error: 'No interaction method available for: ${controlId}' };
-      })()`,
+        const fireTap = ctrl['fireTap'] as (() => void) | undefined;
+        if (fireTap !== undefined) {
+          fireTap.call(ctrl);
+          return { success: true };
+        }
+        return { success: false, error: `No interaction method available for: ${args.controlId}` };
+      },
+      /* v8 ignore stop */
+      { ns: BRIDGE_GLOBALS.NAMESPACE, controlId },
     );
     if (!result.success) {
       throw new ControlError({
@@ -88,25 +136,46 @@ export class DomFirstStrategy implements InteractionStrategy {
 
   /** {@inheritDoc InteractionStrategy.enterText} */
   async enterText(page: Page, controlId: string, text: string): Promise<void> {
-    const ns = BRIDGE_GLOBALS.NAMESPACE;
-    const escaped = text.replaceAll('\\', '\\\\').replaceAll("'", "\\'");
     const result: BridgeResult = await page.evaluate(
-      `(function() {
-        var bridge = window.${ns};
-        if (!bridge) return { success: false, error: 'Bridge not available' };
-        var ctrl = bridge.getById('${controlId}');
-        if (!ctrl) return { success: false, error: 'Control not found: ${controlId}' };
-        var dom = ctrl.getFocusDomRef ? ctrl.getFocusDomRef() : (ctrl.getDomRef ? ctrl.getDomRef() : null);
-        if (dom && dom.tagName === 'INPUT') {
-          dom.value = '${escaped}';
+      /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
+      (args: EnterTextArgs) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: bridge is injected at runtime on window
+        const bridge = (window as any)[args.ns] as
+          | { getById?: (id: string) => Record<string, unknown> | undefined }
+          | undefined;
+        if (bridge === undefined) return { success: false, error: 'Bridge not available' };
+        const ctrl = bridge.getById !== undefined ? bridge.getById(args.controlId) : undefined;
+        if (ctrl === undefined) {
+          return { success: false, error: `Control not found: ${args.controlId}` };
+        }
+        const getFocusDomRef = ctrl['getFocusDomRef'] as (() => HTMLElement | null) | undefined;
+        const getDomRef = ctrl['getDomRef'] as (() => HTMLElement | null) | undefined;
+        let dom: HTMLElement | null = null;
+        if (getFocusDomRef !== undefined) {
+          dom = getFocusDomRef.call(ctrl);
+        } else if (getDomRef !== undefined) {
+          dom = getDomRef.call(ctrl);
+        }
+        if (dom !== null && dom.tagName === 'INPUT') {
+          (dom as HTMLInputElement).value = args.text;
           dom.dispatchEvent(new Event('input', { bubbles: true }));
           dom.dispatchEvent(new Event('change', { bubbles: true }));
           return { success: true };
         }
-        if (typeof ctrl.setValue === 'function') { ctrl.setValue('${escaped}'); }
-        if (typeof ctrl.fireChange === 'function') { ctrl.fireChange({ value: '${escaped}' }); }
+        const setValue = ctrl['setValue'] as ((v: string) => void) | undefined;
+        if (setValue !== undefined) {
+          setValue.call(ctrl, args.text);
+        }
+        const fireChange = ctrl['fireChange'] as
+          | ((params: { value: string }) => void)
+          | undefined;
+        if (fireChange !== undefined) {
+          fireChange.call(ctrl, { value: args.text });
+        }
         return { success: true };
-      })()`,
+      },
+      /* v8 ignore stop */
+      { ns: BRIDGE_GLOBALS.NAMESPACE, controlId, text },
     );
     if (!result.success) {
       throw new ControlError({
@@ -125,21 +194,38 @@ export class DomFirstStrategy implements InteractionStrategy {
 
   /** {@inheritDoc InteractionStrategy.select} */
   async select(page: Page, controlId: string, itemId: string): Promise<void> {
-    const ns = BRIDGE_GLOBALS.NAMESPACE;
     const result: BridgeResult = await page.evaluate(
-      `(function() {
-        var bridge = window.${ns};
-        if (!bridge) return { success: false, error: 'Bridge not available' };
-        var ctrl = bridge.getById('${controlId}');
-        if (!ctrl) return { success: false, error: 'Control not found: ${controlId}' };
-        if (typeof ctrl.setSelectedKey === 'function') { ctrl.setSelectedKey('${itemId}'); }
-        if (typeof ctrl.fireSelectionChange === 'function') {
-          ctrl.fireSelectionChange({ selectedItem: bridge.getById('${itemId}') });
-        } else if (typeof ctrl.fireChange === 'function') {
-          ctrl.fireChange({ selectedItem: bridge.getById('${itemId}') });
+      /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
+      (args: SelectArgs) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: bridge is injected at runtime on window
+        const bridge = (window as any)[args.ns] as
+          | { getById?: (id: string) => Record<string, unknown> | undefined }
+          | undefined;
+        if (bridge === undefined) return { success: false, error: 'Bridge not available' };
+        const ctrl = bridge.getById !== undefined ? bridge.getById(args.controlId) : undefined;
+        if (ctrl === undefined) {
+          return { success: false, error: `Control not found: ${args.controlId}` };
+        }
+        const setSelectedKey = ctrl['setSelectedKey'] as ((key: string) => void) | undefined;
+        if (setSelectedKey !== undefined) {
+          setSelectedKey.call(ctrl, args.itemId);
+        }
+        const fireSelectionChange = ctrl['fireSelectionChange'] as
+          | ((params: { selectedItem: unknown }) => void)
+          | undefined;
+        const fireChange = ctrl['fireChange'] as
+          | ((params: { selectedItem: unknown }) => void)
+          | undefined;
+        const selectedItem = bridge.getById !== undefined ? bridge.getById(args.itemId) : undefined;
+        if (fireSelectionChange !== undefined) {
+          fireSelectionChange.call(ctrl, { selectedItem });
+        } else if (fireChange !== undefined) {
+          fireChange.call(ctrl, { selectedItem });
         }
         return { success: true };
-      })()`,
+      },
+      /* v8 ignore stop */
+      { ns: BRIDGE_GLOBALS.NAMESPACE, controlId, itemId },
     );
     if (!result.success) {
       throw new ControlError({

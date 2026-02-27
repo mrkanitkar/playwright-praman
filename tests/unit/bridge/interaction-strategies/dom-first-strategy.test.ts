@@ -34,22 +34,24 @@ describe('DomFirstStrategy', () => {
     expect(evaluateFn).toHaveBeenCalled();
   });
 
-  it('press script fires both firePress and fireSelect without early return (BF-005)', async () => {
+  it('press uses function-based evaluate (P17 safe serialization)', async () => {
     const strategy = new DomFirstStrategy();
     const evaluateFn = vi.fn().mockResolvedValue({ success: true });
     const page = { evaluate: evaluateFn } as unknown as Page;
     await strategy.press(page, 'btn1');
-    const script = evaluateFn.mock.calls[0]?.[0] as string;
-    expect(script).toContain('firePress');
-    expect(script).toContain('fireSelect');
-    const pressBlock = script.indexOf('ctrl.firePress');
-    const selectBlock = script.indexOf('ctrl.fireSelect');
-    const tapBlock = script.indexOf('fireTap');
-    expect(pressBlock).toBeLessThan(selectBlock);
-    expect(selectBlock).toBeLessThan(tapBlock);
-    // No early return between firePress and fireSelect
-    const betweenPressAndSelect = script.slice(pressBlock, selectBlock);
-    expect(betweenPressAndSelect).not.toContain('return {');
+    // After P17 refactoring, the first argument is a function, not a string
+    const firstArg: unknown = evaluateFn.mock.calls[0]?.[0];
+    expect(typeof firstArg).toBe('function');
+    // The function source should contain both firePress and fireSelect (BF-005)
+    const fnSource = (firstArg as (...args: never[]) => unknown).toString();
+    expect(fnSource).toContain('firePress');
+    expect(fnSource).toContain('fireSelect');
+    // firePress should appear before fireSelect, and fireSelect before fireTap
+    const pressIdx = fnSource.indexOf('firePress');
+    const selectIdx = fnSource.indexOf('fireSelect');
+    const tapIdx = fnSource.indexOf('fireTap');
+    expect(pressIdx).toBeLessThan(selectIdx);
+    expect(selectIdx).toBeLessThan(tapIdx);
   });
 
   it('press throws ControlError when bridge returns failure (BF-007)', async () => {

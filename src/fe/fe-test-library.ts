@@ -393,6 +393,8 @@ export class FETestLibraryInstance {
 /**
  * Factory function to initialize the FE Test Library.
  *
+ * @intent Initialize the SAP Fiori Elements OPA5 test library for Given/When/Then test execution.
+ *
  * @remarks
  * Injects browser-side scripts to load SAP FE test libraries and initialize
  * OPA5 page objects. Optionally detects BTP WorkZone environment.

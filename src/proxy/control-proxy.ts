@@ -193,16 +193,23 @@ export interface ControlProxyState {
 /**
  * Metadata extracted from a UI5 control's metadata object.
  *
+ * @intent Provide a structured representation of a UI5 control's metadata for discovery and introspection.
+ *
  * @remarks
- * Returned by `getControlMetadata()`. Contains the control's class name
- * and the names of all properties, aggregations, and events declared in
- * the metadata (including inherited ones).
+ * Returned by the `getControlMetadata()` proxy method. Contains the control's
+ * class name and the names of all properties, aggregations, and events declared
+ * in the metadata (including inherited ones from the prototype chain).
+ *
+ * This is a **discovery API** — use it to inspect unknown controls at runtime,
+ * enumerate available properties for assertion, or verify control types in tests.
  *
  * @example
  * ```typescript
  * const meta = await control.getControlMetadata();
  * logger.info(meta.className); // 'sap.m.Button'
  * logger.info(meta.properties); // ['text', 'enabled', 'type', 'icon']
+ * logger.info(meta.aggregations); // ['content', 'tooltip', 'customData']
+ * logger.info(meta.events); // ['press', 'tap']
  * ```
  */
 export interface ControlMetadataResult {
@@ -219,16 +226,27 @@ export interface ControlMetadataResult {
 /**
  * Full introspection info for a UI5 control — metadata plus prototype methods.
  *
+ * @intent Provide complete runtime introspection of a UI5 control including all callable methods.
+ *
  * @remarks
- * Returned by `getControlInfoFull()`. Extends metadata with the control's
- * ID and a list of all methods found on its prototype chain (filtered to
- * exclude internal/blacklisted members).
+ * Returned by the `getControlInfoFull()` proxy method. Extends metadata with
+ * the control's ID and a list of all methods found on its prototype chain
+ * (filtered to exclude internal/blacklisted members like `_*`, `*Render`,
+ * and `constructor`).
+ *
+ * This is a **discovery API** — use it to inspect unknown controls, enumerate
+ * available methods for dynamic invocation, or build AI-driven test generation
+ * that adapts to the control's capabilities at runtime.
  *
  * @example
  * ```typescript
  * const info = await control.getControlInfoFull();
  * logger.info(info.id); // 'saveBtn'
- * logger.info(info.methods); // ['getText', 'setText', ...]
+ * logger.info(info.controlType); // 'sap.m.Button'
+ * logger.info(info.methods); // ['getText', 'setText', 'getEnabled', ...]
+ * logger.info(info.properties); // ['text', 'enabled', 'type', 'icon']
+ * logger.info(info.aggregations); // ['content', 'tooltip', 'customData']
+ * logger.info(info.events); // ['press', 'tap']
  * ```
  */
 export interface ControlInfoFull {
@@ -388,6 +406,12 @@ function resolveKnownProperty(
       return async (itemId: string) =>
         state.interactionStrategy.select(state.page, state.id, itemId);
     case 'exec':
+      // Security: exec() serializes `fn` via .toString() and reconstructs it in the
+      // browser via new Function(). This is safe in the Playwright test context because
+      // page.evaluate() itself already permits arbitrary browser-side code execution.
+      // However, never pass unsanitized external input as the `fn` parameter — always
+      // use a function literal. External data should be passed via `args`, which are
+      // safely serialized through Playwright's structured clone transfer.
       return async (
         fn: (...execArgs: unknown[]) => unknown,
         ...args: unknown[]
@@ -453,6 +477,8 @@ function resolveKnownProperty(
           });
         }
       };
+    // Discovery API: Returns structured metadata (className, properties, aggregations, events)
+    // from the UI5 control's metadata object via the browser-side bridge.
     case 'getControlMetadata':
       return async (): Promise<ControlMetadataResult> =>
         state.page.evaluate(
@@ -491,6 +517,9 @@ function resolveKnownProperty(
           /* v8 ignore stop */
           { controlId: state.id, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
         );
+    // Discovery API: Full introspection — metadata + all callable prototype methods.
+    // Walks the prototype chain and filters out internal (_*), render (*Render),
+    // and constructor methods. Used by AI agents for dynamic test generation.
     case 'getControlInfoFull':
       return async (): Promise<ControlInfoFull> =>
         state.page.evaluate(
@@ -560,6 +589,8 @@ function resolveKnownProperty(
           /* v8 ignore stop */
           { controlId: state.id, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
         );
+    // Discovery API: Returns only the method names from the control's prototype chain.
+    // Lightweight alternative to getControlInfoFull when only method names are needed.
     case 'retrieveMembers':
       return async (): Promise<readonly string[]> =>
         state.page.evaluate(
@@ -661,6 +692,23 @@ function throwIfBlacklisted(prop: string, state: ControlProxyState): void {
 export function createControlProxy(state: ControlProxyState): UI5ControlBase {
   const forwarderCache = new Map<string, (...args: unknown[]) => unknown>();
 
+  /** Wraps a non-PramanError into a structured BridgeError for page.evaluate failures. */
+  function wrapEvaluateError(error: unknown, methodName: string, retriesExhausted: boolean): BridgeError {
+    return new BridgeError({
+      code: 'ERR_BRIDGE_EXECUTION',
+      message: `page.evaluate() failed for ${methodName} on ${state.controlType}#${state.id}: ${error instanceof Error ? error.message : String(error)}`,
+      attempted: `Execute ${methodName}() on control ${state.controlType}#${state.id}`,
+      retryable: isContextDestroyedError(error) && !retriesExhausted,
+      ...(error instanceof Error ? { cause: error } : {}),
+      suggestions: [
+        'The control may have been destroyed during navigation',
+        'Check if the page context is still valid',
+        'Ensure the bridge is injected before calling methods',
+        'If this is a transient error, retry the operation',
+      ],
+    });
+  }
+
   /** Executes a method via page.evaluate with context-destroyed retry logic. */
   async function executeMethod(methodName: string, args: unknown[]): Promise<unknown> {
     // Function-form page.evaluate uses CDP Runtime.callFunctionOn —
@@ -679,7 +727,10 @@ export function createControlProxy(state: ControlProxyState): UI5ControlBase {
         return await handleReturn(result, state);
       } catch (error: unknown) {
         if (!isContextDestroyedError(error) || attempt === MAX_CONTEXT_RETRIES - 1) {
-          throw error;
+          if (error instanceof BridgeError || error instanceof ControlError) {
+            throw error; // Already a PramanError subclass
+          }
+          throw wrapEvaluateError(error, methodName, attempt === MAX_CONTEXT_RETRIES - 1);
         }
         lastError = error;
         await new Promise<void>((resolve) => {
@@ -688,7 +739,16 @@ export function createControlProxy(state: ControlProxyState): UI5ControlBase {
       }
     }
     // Should never reach here, but satisfy TypeScript
-    throw lastError;
+    throw lastError instanceof Error
+      ? new BridgeError({
+          code: 'ERR_BRIDGE_EXECUTION',
+          message: `All ${String(MAX_CONTEXT_RETRIES)} retries exhausted for ${methodName} on ${state.controlType}#${state.id}`,
+          attempted: `Execute ${methodName}() with retry`,
+          retryable: false,
+          cause: lastError,
+          suggestions: ['The execution context was repeatedly destroyed', 'Consider reloading the page'],
+        })
+      : lastError;
   }
 
   function getOrCreateForwarder(methodName: string): (...args: unknown[]) => unknown {

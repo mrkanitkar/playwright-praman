@@ -260,7 +260,7 @@ export class AgenticHandler {
    * ```typescript
    * const result = await handler.interpretStep('Fill Vendor field with 100001', page);
    * if (result.status === 'error') {
-   *   console.error('Step failed:', result.error.message);
+   *   log.error({ err: result.error }, 'Step failed');
    * }
    * ```
    */

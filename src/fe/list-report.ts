@@ -89,6 +89,9 @@ async function stabilityWait(page: ListReportPage, options?: ListReportOptions):
 }
 
 /** Finds the main table on a List Report page (SmartTable first, then MDC Table).
+ *
+ * @intent Discover the main table control on a Fiori Elements List Report page.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Optional timeout settings.
  * @returns The control ID of the table.
@@ -120,6 +123,9 @@ export async function getListReportTable(
 }
 
 /** Finds the filter bar on a List Report page (SmartFilterBar first, then MDC FilterBar).
+ *
+ * @intent Discover the filter bar control on a Fiori Elements List Report page.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Optional timeout settings.
  * @returns The control ID of the filter bar.
@@ -151,6 +157,9 @@ export async function getFilterBar(
 }
 
 /** Sets a filter field value on the filter bar.
+ *
+ * @intent Set a filter field value on the SmartFilterBar or MDC FilterBar.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param filterBarId - The UI5 control ID of the filter bar.
  * @param fieldName - The name/key of the filter field.
@@ -190,6 +199,9 @@ export async function setFilterBarField(
 }
 
 /** Gets the current value of a filter field on the filter bar.
+ *
+ * @intent Read the current value of a filter field on the filter bar.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param filterBarId - The UI5 control ID of the filter bar.
  * @param fieldName - The name/key of the filter field.
@@ -212,6 +224,9 @@ export async function getFilterBarFieldValue(
 }
 
 /** Executes search on the filter bar (Go button). Waits for UI5 stability after.
+ *
+ * @intent Trigger the filter bar search (equivalent to pressing the Go button).
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param filterBarId - The UI5 control ID of the filter bar.
  * @param options - Optional timeout and stability settings.
@@ -244,6 +259,9 @@ export async function executeSearch(
 }
 
 /** Clears all filter fields on the filter bar.
+ *
+ * @intent Reset all filter fields on the filter bar to their default values.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param filterBarId - The UI5 control ID of the filter bar.
  * @param options - Optional timeout and stability settings.
@@ -276,6 +294,9 @@ export async function clearFilterBar(
 }
 
 /** Navigates to a table item by row index. Fires press/tap on the row.
+ *
+ * @intent Navigate from the List Report to an Object Page by clicking a table row.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID of the table.
  * @param rowIndex - Zero-based row index to navigate to.
@@ -318,6 +339,9 @@ export async function navigateToItem(
 }
 
 /** Gets the names of all available variants on the List Report page.
+ *
+ * @intent List all available view variants on the List Report page.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @returns Array of variant names. Empty array if no VariantManagement control exists.
  * @example
@@ -333,6 +357,9 @@ export async function getAvailableVariants(page: ListReportPage): Promise<readon
 }
 
 /** Selects a variant by name on the List Report page.
+ *
+ * @intent Select a saved view variant by its display name on the List Report.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param variantName - The display name of the variant to select.
  * @param options - Optional timeout and stability settings.

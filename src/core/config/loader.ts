@@ -37,7 +37,12 @@ import process from 'node:process';
 import type { PramanConfig, PramanConfigInput } from './schema.js';
 import { PramanConfigSchema } from './schema.js';
 
+import { ConfigError } from '#core/errors/config-error.js';
+import { createLogger } from '#core/logging/index.js';
+import type { ValidationIssue } from '#core/types/validation.js';
 import { assertNever } from '#core/utils/assert-never.js';
+
+const log = createLogger('config:loader');
 
 /**
  * Options for loading Praman configuration.
@@ -150,15 +155,39 @@ export async function loadConfig(options?: LoadConfigOptions): Promise<Readonly<
     return Object.freeze(result.data);
   }
 
-  // If env vars caused validation failure, fall back to overrides-only
+  // If env vars caused validation failure, fall back to overrides-only and warn
   const fallbackResult = PramanConfigSchema.safeParse(options?.overrides ?? {});
   if (fallbackResult.success) {
+    log.warn(
+      {
+        zodErrors: result.error.issues.map((issue) => ({
+          path: issue.path,
+          message: issue.message,
+          code: issue.code,
+        })),
+      },
+      'Config validation failed due to invalid env vars — falling back to overrides-only config',
+    );
     return Object.freeze(fallbackResult.data);
   }
 
-  // Last resort: pure defaults
-  const defaultResult = PramanConfigSchema.parse({});
-  return Object.freeze(defaultResult);
+  // Overrides themselves are invalid — this is a developer mistake, throw
+  throw new ConfigError({
+    message: 'Config validation failed: invalid overrides provided to loadConfig()',
+    attempted: 'Validate merged configuration (overrides + env vars)',
+    validationErrors: result.error.issues.map(
+      (issue): ValidationIssue => ({
+        path: issue.path.map((segment) => (typeof segment === 'symbol' ? String(segment) : segment)),
+        message: issue.message,
+        code: issue.code,
+      }),
+    ),
+    suggestions: [
+      'Check the overrides passed to loadConfig() for invalid values',
+      'Use defineConfig() for type-safe config authoring',
+      'Run PramanConfigSchema.safeParse(overrides) to inspect validation errors',
+    ],
+  });
 }
 
 /**

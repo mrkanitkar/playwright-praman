@@ -90,6 +90,9 @@ async function stabilityWait(page: ObjectPagePage, options?: ObjectPageOptions):
 }
 
 /** Finds the sap.uxap.ObjectPageLayout control on the current page.
+ *
+ * @intent Discover the Object Page layout control on a Fiori Elements Object Page.
+ *
  * @param page - Page to evaluate on.
  * @param options - Optional timeout settings.
  * @returns The control ID of the ObjectPageLayout.
@@ -123,6 +126,9 @@ export async function getObjectPageLayout(
 }
 
 /** Navigates to a specific section within the Object Page by title or ID.
+ *
+ * @intent Scroll to and activate a specific section on the Object Page.
+ *
  * @param page - Page to evaluate on.
  * @param sectionIdentifier - Section title or ID.
  * @param options - Optional timeout and stability settings.
@@ -159,6 +165,9 @@ export async function navigateToSection(
 }
 
 /** Reads form field data from a section of the Object Page.
+ *
+ * @intent Extract all form field key-value pairs from an Object Page section.
+ *
  * @param page - Page to evaluate on.
  * @param sectionIdentifier - Section title or ID.
  * @returns Key-value pairs from form controls in the section.
@@ -193,6 +202,9 @@ export async function getSectionData(
 }
 
 /** Clicks a button in the Object Page header actions or footer bar.
+ *
+ * @intent Click a named button in the Object Page header or footer toolbar.
+ *
  * @param page - Page to evaluate on.
  * @param buttonName - Text label of the button.
  * @param options - Optional timeout and stability settings.
@@ -230,6 +242,9 @@ export async function clickObjectPageButton(
 }
 
 /** Clicks the "Edit" button on the Object Page.
+ *
+ * @intent Switch the Object Page to edit mode by clicking the Edit button.
+ *
  * @example
  * ```typescript
  * await clickEditButton(page);
@@ -243,6 +258,9 @@ export async function clickEditButton(
 }
 
 /** Clicks the "Save" button on the Object Page.
+ *
+ * @intent Persist changes by clicking the Save button on the Object Page footer.
+ *
  * @example
  * ```typescript
  * await clickSaveButton(page);
@@ -256,6 +274,9 @@ export async function clickSaveButton(
 }
 
 /** Returns all sections in the Object Page with visibility, index, and sub-sections.
+ *
+ * @intent List all sections in the Object Page layout for discovery or assertion.
+ *
  * @param page - Page to evaluate on.
  * @returns Array of section descriptors.
  * @example
@@ -270,6 +291,9 @@ export async function getObjectPageSections(
 }
 
 /** Returns the header title of the Object Page.
+ *
+ * @intent Read the Object Page header title for assertion or identification.
+ *
  * @param page - Page to evaluate on.
  * @returns The header title string, or empty string if not found.
  * @example
@@ -282,6 +306,9 @@ export async function getHeaderTitle(page: ObjectPagePage): Promise<string> {
 }
 
 /** Checks whether the Object Page is currently in edit mode.
+ *
+ * @intent Determine the current edit/display state of the Object Page.
+ *
  * @remarks Checks `showFooter` property and `ui` model `/editable`/`/editMode`.
  * @param page - Page to evaluate on.
  * @returns `true` if in edit mode, `false` otherwise.
