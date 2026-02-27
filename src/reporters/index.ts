@@ -34,11 +34,7 @@ export type {
 
 // ── OData Trace Reporter ─────────────────────────────────────────────────────
 
-export {
-  extractEntitySet,
-  ODataTraceReporter,
-  parseODataQueryParams,
-} from './odata-trace-reporter.js';
+export { ODataTraceReporter } from './odata-trace-reporter.js';
 export type {
   ODataEntityStats,
   ODataTraceEntry,

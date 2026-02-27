@@ -29,6 +29,7 @@ import { createMockTracer } from '../../helpers/mock-tracer-wrapper.js';
 
 import type { ControlInspection } from '#bridge/bridge-types.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
+import { ErrorCode } from '#core/errors/codes.js';
 import { ControlError } from '#core/errors/control-error.js';
 import { SelectorError } from '#core/errors/selector-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
@@ -127,6 +128,7 @@ function createMockPage(): Page & {
     on: vi.fn(),
     off: vi.fn(),
     mainFrame: vi.fn(),
+    locator: vi.fn().mockReturnValue({ count: vi.fn().mockResolvedValue(0) }),
   } as unknown as Page & {
     evaluate: ReturnType<typeof vi.fn>;
     waitForFunction: ReturnType<typeof vi.fn>;
@@ -726,7 +728,13 @@ describe('UI5Handler', () => {
     it('throws ControlError when control is not found', async () => {
       page.evaluate.mockResolvedValue({ id: '', controlType: 'unknown' });
 
-      await expect(handler.inspect(defaultSelector)).rejects.toThrow(ControlError);
+      try {
+        await handler.inspect(defaultSelector);
+        expect.fail('Expected inspect to throw ControlError');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(ControlError);
+        expect((error as ControlError).code).toBe(ErrorCode.ERR_CONTROL_NOT_FOUND);
+      }
     });
 
     it('throws ControlError when inspect script returns null', async () => {
@@ -735,7 +743,13 @@ describe('UI5Handler', () => {
         .mockResolvedValueOnce({ id: 'btn1', controlType: 'sap.m.Button' })
         .mockResolvedValueOnce(null);
 
-      await expect(handler.inspect(defaultSelector)).rejects.toThrow(ControlError);
+      try {
+        await handler.inspect(defaultSelector);
+        expect.fail('Expected inspect to throw ControlError');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(ControlError);
+        expect((error as ControlError).code).toBe(ErrorCode.ERR_CONTROL_NOT_FOUND);
+      }
     });
 
     it('throws SelectorError for empty selector', async () => {

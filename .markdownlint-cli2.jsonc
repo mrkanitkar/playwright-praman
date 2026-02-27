@@ -14,6 +14,7 @@
     "docs/capabilities.md",
     "docs/docs/**",
     "temp/**",
+    "examples/**",
     "node_modules/",
     "CODE_OF_CONDUCT.md"
   ]

@@ -108,12 +108,9 @@ async function setHash(page: NavigationPage, hash: string): Promise<void> {
   await page.evaluate(
     /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
     ((h: string) => {
-      // Type assertion: window.hasher is an FLP runtime global (Hasher.js) with no Node.js type declarations
-      interface HasherWindow {
-        hasher?: { setHash(hash: string): void };
-      }
-      const w = window as unknown as HasherWindow;
-      w.hasher?.setHash(h);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: window.hasher is an FLP runtime global (Hasher.js) with no Node.js type declarations
+      const w = (window as any).hasher as { setHash?: (hash: string) => void } | undefined;
+      w?.setHash?.(h);
     }) as (...args: never[]) => unknown,
     /* v8 ignore stop */
     hash,
@@ -122,6 +119,15 @@ async function setHash(page: NavigationPage, hash: string): Promise<void> {
 
 /**
  * Navigates to a SAP app by semantic object hash.
+ *
+ * @intent Navigate to a specific SAP Fiori app using its semantic object hash.
+ * Use when the AI agent needs to open a particular app from the FLP.
+ * @guarantee On success, the FLP hash is set to the given appId and UI5 is stable.
+ * @prerequisite The page must be on the SAP Fiori Launchpad (FLP).
+ * @ai
+ * @aiContext Commonly used as the first step after authentication to reach the target app.
+ * @sapModule sap.ushell.Container — FLP shell navigation via hasher.setHash()
+ * @businessContext SAP Fiori Launchpad cross-app navigation using semantic objects.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param appId - Semantic object hash (e.g., 'PurchaseOrder-manage').
@@ -156,6 +162,16 @@ export async function navigateToApp(
 
 /**
  * Navigates to an FLP tile by its title text.
+ *
+ * @intent Open a Fiori Launchpad tile by its visible title.
+ * Use when the agent needs to navigate via UI interaction rather than hash.
+ * @guarantee On success, the tile is clicked and UI5 stability is reached.
+ * @prerequisite The FLP home page must be loaded and the tile must be visible.
+ * @ai
+ * @aiContext Use navigateToApp() for hash-based navigation; use this when
+ * the semantic object hash is unknown but the tile title is visible.
+ * @sapModule sap.ushell.ui.launchpad.Tile — FLP tile click navigation
+ * @businessContext User-facing tile-based navigation on SAP Fiori Launchpad home screen.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tileTitle - Title text of the FLP tile.
@@ -195,6 +211,14 @@ export async function navigateToTile(
 /**
  * Navigates to an SAP intent with optional parameters.
  *
+ * @intent Navigate using a structured semantic object + action pair with optional query params.
+ * Prefer this over navigateToApp() when parameters need to be passed to the target app.
+ * @ai
+ * @aiContext Build the intent from the app's cross-navigation inbound config.
+ * Parameters are appended as URL query string (e.g., `#PurchaseOrder-manage?PurchaseOrder=4500001234`).
+ * @sapModule sap.ushell.Container — FLP intent-based navigation with parameters
+ * @businessContext Cross-app navigation with context parameters in SAP Fiori.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param intent - Semantic object and action descriptor.
  * @param params - Optional query parameters for the intent.
@@ -224,6 +248,11 @@ export async function navigateToIntent(
 /**
  * Navigates to a specific hash directly.
  *
+ * @intent Set the FLP URL hash directly for low-level navigation.
+ * @ai
+ * @aiContext Use when the full hash is known. For structured navigation, prefer navigateToIntent().
+ * @sapModule sap.ushell.Container — Direct hash manipulation via window.hasher
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param hash - The hash to navigate to (without leading '#').
  * @param options - Navigation options.
@@ -245,6 +274,14 @@ export async function navigateToHash(
 /**
  * Navigates to the FLP home screen (#Shell-home).
  *
+ * @intent Return to the Fiori Launchpad home screen.
+ * Use between test scenarios or to reset the navigation state.
+ * @guarantee On success, the hash is set to 'Shell-home' and UI5 is stable.
+ * @ai
+ * @aiContext Commonly used to return to the launchpad between tests or after completing a flow.
+ * @sapModule sap.ushell.Container — FLP home navigation
+ * @businessContext Reset navigation to the SAP Fiori Launchpad home screen.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Navigation options.
  *
@@ -263,6 +300,11 @@ export async function navigateToHome(
 
 /**
  * Navigates back in browser history.
+ *
+ * @intent Go back to the previous page in browser history.
+ * @ai
+ * @aiContext Uses Playwright's goBack(). Waits for UI5 stability after navigation.
+ * @sapModule sap.ushell.Container — Browser history back navigation
  *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Navigation options.
@@ -283,6 +325,11 @@ export async function navigateBack(
 /**
  * Navigates forward in browser history.
  *
+ * @intent Go forward in browser history after a back navigation.
+ * @ai
+ * @aiContext Uses Playwright's goForward(). Waits for UI5 stability after navigation.
+ * @sapModule sap.ushell.Container — Browser history forward navigation
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Navigation options.
  *
@@ -301,6 +348,14 @@ export async function navigateForward(
 
 /**
  * Searches for an app in the FLP shell search bar and opens it.
+ *
+ * @intent Search for and open an application using the FLP shell search bar.
+ * Use when the tile is not visible on the home screen but can be found via search.
+ * @ai
+ * @aiContext Types the app title into the shell search field, then clicks the matching result.
+ * Fallback navigation method when tile-based or hash-based navigation is not feasible.
+ * @sapModule sap.ushell.ui.shell.ShellHeadItem — FLP shell search bar interaction
+ * @businessContext App discovery via FLP search when the user has many tiles or the tile is hidden.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param appTitle - Title of the app to search for.
@@ -326,6 +381,12 @@ export async function searchAndOpenApp(
 
 /**
  * Returns the current URL hash (without leading '#').
+ *
+ * @intent Read the current FLP navigation hash to determine which app is active.
+ * @ai
+ * @aiContext Pure read operation (no stability wait). Use for assertions or conditional navigation.
+ * @sapModule sap.ushell.Container — Read current FLP hash from window.location.hash
+ * @businessContext Determine the current active SAP Fiori app from the URL hash.
  *
  * @param page - Playwright Page (or compatible subset).
  * @returns The current hash string.

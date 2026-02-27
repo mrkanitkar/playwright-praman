@@ -245,6 +245,8 @@ function assertSuccessStatus(status: number, url: string, operation: string): vo
 /**
  * Creates a new entity via HTTP POST.
  *
+ * @intent Create a new OData entity by sending a POST request to the service.
+ *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.
  * @param entitySet - Name of the entity set.
@@ -287,6 +289,8 @@ export async function createEntity<TData = unknown>(
 
 /**
  * Updates an existing entity via HTTP PATCH.
+ *
+ * @intent Update an existing OData entity by sending a PATCH request with partial data.
  *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.
@@ -332,6 +336,8 @@ export async function updateEntity<TData = unknown>(
 /**
  * Deletes an entity via HTTP DELETE.
  *
+ * @intent Remove an OData entity by sending a DELETE request to the service.
+ *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.
  * @param entitySet - Name of the entity set.
@@ -370,6 +376,8 @@ export async function deleteEntity(
 
 /**
  * Calls an OData function import via HTTP.
+ *
+ * @intent Invoke an OData function import with parameters via HTTP GET or POST.
  *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.
@@ -439,6 +447,8 @@ export async function callFunctionImport<TData = unknown>(
 
 /**
  * Queries an entity set via HTTP GET with OData system query options.
+ *
+ * @intent Read a collection of OData entities with optional filtering, sorting, and paging.
  *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.

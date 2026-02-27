@@ -52,6 +52,7 @@ import { ensureBridgeInjected } from '#bridge/injection.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
 import { filterMethods } from '#bridge/method-blacklist.js';
 import type { DiscoveryStrategyName } from '#core/config/schema.js';
+import { ControlError } from '#core/errors/control-error.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
 
@@ -125,7 +126,8 @@ async function tryStrategy(
  * @param cache - Proxy cache for fast repeat lookups.
  * @param discoveryStrategies - Configured strategy names from PramanConfig.
  * @param preferVisibleControls - When true, prefer visible controls in registry scan (default: true).
- * @returns The discovered proxy, or `null` if not found.
+ * @returns The discovered proxy.
+ * @throws ControlError with code `ERR_CONTROL_NOT_FOUND` when all strategies fail.
  *
  * @example
  * ```typescript
@@ -137,9 +139,7 @@ async function tryStrategy(
  *   ['recordreplay'],
  *   true,
  * );
- * if (control) {
- *   const text = await control.getText();
- * }
+ * const text = await control.getText();
  * ```
  */
 export async function discoverControl(
@@ -170,7 +170,17 @@ export async function discoverControl(
   }
 
   if (discoveryResult === null) {
-    return null;
+    throw new ControlError({
+      code: 'ERR_CONTROL_NOT_FOUND',
+      message: `Control not found after trying all discovery strategies: ${JSON.stringify(selector)}`,
+      attempted: `Discover control with selector: ${JSON.stringify(selector)}`,
+      retryable: true,
+      suggestions: [
+        'Verify the control ID exists in the UI5 view',
+        'Check if the page has fully loaded (waitForUI5Stable)',
+        'Try using controlType + properties instead of ID',
+      ],
+    });
   }
 
   // Filter methods through blacklist

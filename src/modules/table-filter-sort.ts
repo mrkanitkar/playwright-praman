@@ -113,6 +113,8 @@ function isGridVariant(variant: string): boolean {
 /**
  * Applies a filter to a table column.
  *
+ * @intent Filter a UI5 table column by a specified value and operator.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param columnIndex - Zero-based column index.
@@ -160,6 +162,8 @@ export async function filterByColumn(
 /**
  * Sorts a table by a specific column.
  *
+ * @intent Sort a UI5 table by a specified column in ascending or descending order.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param columnIndex - Zero-based column index.
@@ -204,6 +208,8 @@ export async function sortByColumn(
 /**
  * Returns the current sort state of a table column.
  *
+ * @intent Read the current sort direction and column for a UI5 table column.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param columnIndex - Zero-based column index.
@@ -227,6 +233,8 @@ export async function getSortOrder(
 /**
  * Returns the current filter value of a table column.
  *
+ * @intent Read the currently applied filter value for a UI5 table column.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param columnIndex - Zero-based column index.
@@ -249,6 +257,8 @@ export async function getFilterValue(
 
 /**
  * Exports visible table data as an array of objects keyed by column header text.
+ *
+ * @intent Extract all visible table data as structured JSON objects for assertions or export.
  *
  * @remarks This does NOT create a file export; it reads cell values as JSON objects.
  * @param page - Playwright Page (or compatible subset).
@@ -275,7 +285,7 @@ export async function exportTableData(
     (grid
       ? 'var cols=c.getColumns();var names=[];for(var i=0;i<cols.length;i++){var lbl=cols[i].getLabel();names.push(typeof lbl==="string"?lbl:(lbl&&typeof lbl.getText==="function"?lbl.getText():""));}return names;'
       : 'var cols=c.getColumns();var names=[];for(var i=0;i<cols.length;i++){var hdr=cols[i].getHeader();names.push(hdr&&typeof hdr.getText==="function"?hdr.getText():"");}return names;') +
-    '}catch(e){return[];}})()';
+    '}catch(e){console.warn("[praman] Column names scan error:",e.message);return[];}})()';
   const colNames = await page.evaluate<readonly string[]>(colNamesScript);
   const columnsJson = options?.columns !== undefined ? JSON.stringify(options.columns) : 'null';
   const script = exportTableDataScript(
@@ -289,6 +299,8 @@ export async function exportTableData(
 
 /**
  * Clicks the settings/personalization button in the table toolbar.
+ *
+ * @intent Open the table personalization/settings dialog by clicking its toolbar button.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.

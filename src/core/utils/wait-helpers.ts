@@ -117,11 +117,11 @@ export async function waitForUI5Stable(
     await page.waitForFunction(
       /* v8 ignore start -- browser-context function, not executable in Node tests */
       () => {
-        // Type assertion: sap global is a UI5 runtime object with no Node.js type declarations
-        interface SapWindow {
-          sap?: { ui?: { getCore?: () => { getUIPending?: () => number } | undefined } };
-        }
-        return (window as unknown as SapWindow).sap?.ui?.getCore?.()?.getUIPending?.() === 0;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- browser context: sap global is a UI5 runtime object with no Node.js type declarations
+        const sapCore = (window as any).sap?.ui?.getCore?.() as
+          | { getUIPending?: () => number }
+          | undefined;
+        return sapCore?.getUIPending?.() === 0;
       },
       /* v8 ignore stop */
       { timeout, polling },
@@ -198,11 +198,8 @@ export async function waitForUI5Bootstrap(
     await page.waitForFunction(
       /* v8 ignore start -- browser-context function, not executable in Node tests */
       () => {
-        // Type assertion: sap global is a UI5 runtime object with no Node.js type declarations
-        interface SapWindow {
-          sap?: { ui?: { getCore?: unknown } };
-        }
-        return typeof (window as unknown as SapWindow).sap?.ui?.getCore === 'function';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: sap global is a UI5 runtime object with no Node.js type declarations
+        return typeof (window as any).sap?.ui?.getCore === 'function';
       },
       /* v8 ignore stop */
       { timeout },

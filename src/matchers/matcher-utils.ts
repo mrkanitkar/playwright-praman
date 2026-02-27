@@ -64,6 +64,8 @@ export interface UI5BindingInfo {
 /**
  * Retrieves a control property via `page.evaluate()` using the bridge.
  *
+ * @intent Read a single property value from a UI5 control for matcher assertions.
+ *
  * @remarks
  * Ensures the bridge is injected, then executes the getter method for
  * the given property on the target control. Mirrors the logic from
@@ -116,6 +118,8 @@ export async function getControlProperty(
 
 /**
  * Retrieves a control aggregation via `page.evaluate()` using the bridge.
+ *
+ * @intent Read an aggregation (child controls) from a UI5 control for table/list assertions.
  *
  * @remarks
  * Ensures the bridge is injected, then executes the getter method for
@@ -183,6 +187,8 @@ export async function getControlAggregation(
 /**
  * Retrieves UI5 binding info for a property on a control.
  *
+ * @intent Inspect the data binding configuration of a UI5 control property.
+ *
  * @remarks
  * Uses an inline browser script to call `getBindingInfo()` and `getBinding()`
  * on the target control. Returns binding path, model name, and current value.
@@ -242,6 +248,8 @@ export async function getUI5BindingInfo(
 
 /**
  * Retrieves the fully qualified UI5 control type for a given control ID.
+ *
+ * @intent Determine the runtime UI5 control class for type-based assertions.
  *
  * @remarks
  * Uses an inline browser script to call `getMetadata().getName()` on the
@@ -305,6 +313,8 @@ export interface PollableMatcherResult {
 
 /**
  * Retries a matcher check function until it passes or the timeout expires.
+ *
+ * @intent Implement web-first auto-retry polling for asynchronous UI5 matcher checks.
  *
  * @remarks
  * Implements web-first auto-retry behavior for custom UI5 matchers.

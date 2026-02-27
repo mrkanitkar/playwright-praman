@@ -158,6 +158,13 @@ function modelArg(modelName: string | undefined): string {
 /**
  * Retrieves data from a UI5 OData model at the given path.
  *
+ * @intent Read data from the UI5 OData model at a specific binding path.
+ * @ai
+ * @aiContext Accesses the component's OData model via getData() or getProperty().
+ * Path must start with '/'. Use modelName option for named models.
+ * @sapModule sap.ui.model.odata.v2.ODataModel, sap.ui.model.odata.v4.ODataModel
+ * @businessContext Read OData entity data from the UI5 model layer for data-level assertions.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param path - OData model path (must start with '/').
  * @param options - OData options (timeout, modelName).
@@ -216,6 +223,13 @@ export async function getModelData(
 /**
  * Reads a single property from a UI5 OData model.
  *
+ * @intent Read a specific property value from the OData model.
+ * @ai
+ * @aiContext Uses model.getProperty() for single-value reads. More efficient than getModelData()
+ * when only one property is needed.
+ * @sapModule sap.ui.model.odata.v2.ODataModel, sap.ui.model.odata.v4.ODataModel
+ * @businessContext Read individual entity properties for targeted assertions.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param path - OData model property path (must start with '/').
  * @param options - OData options (timeout, modelName).
@@ -270,6 +284,15 @@ export async function getModelProperty(
 
 /**
  * Waits for OData data to load by polling a binding path.
+ *
+ * @intent Wait until OData data is loaded at a specific binding path.
+ * @guarantee On success, the model has non-null data at the specified path.
+ * @prerequisite An OData model must be configured on the component.
+ * @ai
+ * @aiContext Polls the model until getData() returns non-empty data or timeout.
+ * Use after navigation or filter changes to wait for backend response.
+ * @sapModule sap.ui.model.odata.v2.ODataModel, sap.ui.model.odata.v4.ODataModel
+ * @businessContext Wait for SAP backend data to load before asserting on table or form content.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Wait options (timeout, polling, bindingPath, modelName).
@@ -326,6 +349,15 @@ export async function waitForODataLoad(
 
 /**
  * Fetches a CSRF token from an OData service using a HEAD request.
+ *
+ * @intent Fetch a CSRF token for subsequent write operations (POST/PATCH/DELETE).
+ * @guarantee On success, returns a valid CSRF token string.
+ * @prerequisite The user session must be authenticated against the OData service.
+ * @ai
+ * @aiContext Sends HEAD request with 'X-CSRF-Token: Fetch' header. Required before any
+ * write operation in SAP OData services. Token is typically valid for the session duration.
+ * @sapModule sap.ui.model.odata.v2.ODataModel — CSRF token handling
+ * @businessContext Obtain CSRF token for secure write operations against SAP OData services.
  *
  * @param page - Playwright Page with request API (or compatible subset).
  * @param serviceUrl - The OData service root URL.
@@ -400,6 +432,12 @@ export async function fetchCSRFToken(
 /**
  * Reads the number of entities in a binding from the UI5 model.
  *
+ * @intent Count the number of entities at a specific OData model path.
+ * @ai
+ * @aiContext Returns array length from getData() at the path. Returns 0 if not an array.
+ * @sapModule sap.ui.model.odata.v2.ODataModel, sap.ui.model.odata.v4.ODataModel
+ * @businessContext Verify expected entity counts in list bindings.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param path - OData model path (must start with '/').
  * @param options - OData options (timeout, modelName).
@@ -439,6 +477,13 @@ export async function getEntityCount(
 
 /**
  * Checks whether the UI5 OData model has unsaved (pending) changes.
+ *
+ * @intent Check if the OData model has unsaved changes (dirty state).
+ * @ai
+ * @aiContext Calls model.hasPendingChanges(). Useful to verify before navigating away or
+ * to assert that edits have been properly saved.
+ * @sapModule sap.ui.model.odata.v2.ODataModel, sap.ui.model.odata.v4.ODataModel
+ * @businessContext Detect unsaved changes before navigation to prevent data loss warnings.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param options - OData options (modelName).

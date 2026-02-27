@@ -33,7 +33,7 @@
  * Categories (14):
  * - Config (3): schema validation, file not found, parse failure
  * - Bridge (5): timeout, injection, readiness, version mismatch, execution
- * - Control (8): not found, visibility, enabled, interactable, property, aggregation, method, interaction failed
+ * - Control (9): not found, visibility, enabled, interactable, not ui5, property, aggregation, method, interaction failed
  * - Auth (4): failure, timeout, session expired, invalid strategy
  * - Navigation (3): tile not found, route failed, timeout
  * - OData (3): request failed, parse, CSRF token
@@ -63,6 +63,7 @@ export const ErrorCode = Object.freeze({
   ERR_CONTROL_NOT_VISIBLE: 'ERR_CONTROL_NOT_VISIBLE',
   ERR_CONTROL_NOT_ENABLED: 'ERR_CONTROL_NOT_ENABLED',
   ERR_CONTROL_NOT_INTERACTABLE: 'ERR_CONTROL_NOT_INTERACTABLE',
+  ERR_CONTROL_NOT_UI5: 'ERR_CONTROL_NOT_UI5',
   ERR_CONTROL_PROPERTY: 'ERR_CONTROL_PROPERTY',
   ERR_CONTROL_AGGREGATION: 'ERR_CONTROL_AGGREGATION',
   ERR_CONTROL_METHOD: 'ERR_CONTROL_METHOD',

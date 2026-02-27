@@ -152,6 +152,17 @@ async function stabilityWait(page: TablePage, options?: TableOptions): Promise<v
 
 /**
  * Detects the UI5 table variant for a given control ID.
+ *
+ * @intent Identify the table type (sap.m.Table, sap.ui.table.Table, SmartTable, MDC Table)
+ * so subsequent table operations use the correct API calls.
+ * @guarantee On success, returns a TableInfo with correct variant and effectiveId.
+ * @prerequisite The tableId must reference a valid UI5 table control in the DOM.
+ * @ai
+ * @aiContext Always call this first before other table operations. SmartTable wraps
+ * an inner table; the effectiveId points to the actual table control inside.
+ * @sapModule sap.ui.comp.smarttable.SmartTable, sap.m.Table, sap.ui.table.Table, sap.ui.mdc.Table
+ * @businessContext Unified table detection across all 6 SAP UI5 table variants.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @example `const info = await detectTableType(page, 'myTable');`
@@ -209,6 +220,13 @@ export async function detectTableType(page: TablePage, tableId: string): Promise
 
 /**
  * Returns row IDs from a UI5 table.
+ *
+ * @intent Retrieve the UI5 control IDs of all visible rows in a table.
+ * @ai
+ * @aiContext Returns DOM row IDs (not OData keys). Use for iterating rows or passing to other APIs.
+ * @sapModule sap.m.Table, sap.ui.table.Table — getItems() / getRows() aggregation
+ * @businessContext Read table row references for subsequent row-level operations.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param options - Table options.
@@ -234,6 +252,13 @@ export async function getTableRows(
 
 /**
  * Returns the total row count from a UI5 table's binding.
+ *
+ * @intent Get the total number of rows in a table (from binding length or items count).
+ * @ai
+ * @aiContext For grid tables, reads binding.getLength(). For responsive tables, reads items.length.
+ * @sapModule sap.m.Table, sap.ui.table.Table — row binding length
+ * @businessContext Verify expected data volume in a table before proceeding with row operations.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param options - Table options.
@@ -263,6 +288,13 @@ export async function getTableRowCount(
 
 /**
  * Returns the text value of a specific table cell.
+ *
+ * @intent Read the display text of a cell at a specific row and column position.
+ * @ai
+ * @aiContext Uses getText() or getValue() on the inner cell control. Returns text representation.
+ * @sapModule sap.m.Table, sap.ui.table.Table — cell control text/value access
+ * @businessContext Extract specific cell values for assertion or data extraction in E2E tests.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param rowIndex - Zero-based row index.
@@ -309,6 +341,14 @@ export async function getTableCellValue(
 
 /**
  * Returns all table data as plain JSON objects from OData binding contexts.
+ *
+ * @intent Extract all OData entity data bound to the table rows as JSON objects.
+ * @ai
+ * @aiContext Reads binding contexts (getObject()) for each row. Returns raw OData entity data,
+ * not display text. Useful for data-level assertions.
+ * @sapModule sap.m.Table, sap.ui.table.Table — OData binding context data extraction
+ * @businessContext Bulk data extraction from SAP tables for validation against business rules.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param options - Table options.
@@ -338,6 +378,14 @@ export async function getTableData(
 
 /**
  * Selects a table row by index.
+ *
+ * @intent Select (highlight) a table row by its zero-based index.
+ * @guarantee On success, the row is selected in the table's selection model.
+ * @ai
+ * @aiContext Uses SelectionPlugin for grid tables, setSelectedItem for responsive tables.
+ * @sapModule sap.m.Table, sap.ui.table.Table — row selection API
+ * @businessContext Select a specific row for subsequent actions (delete, edit, navigate).
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param rowIndex - Zero-based row index.
@@ -379,6 +427,13 @@ export async function selectTableRow(
 
 /**
  * Selects all rows in a UI5 table.
+ *
+ * @intent Select all rows in the table (equivalent to "Select All" checkbox).
+ * @ai
+ * @aiContext Uses selectAll() on both grid and responsive table variants.
+ * @sapModule sap.m.Table, sap.ui.table.Table — selectAll() API
+ * @businessContext Mass selection for bulk operations like delete or export.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param options - Table options.
@@ -407,6 +462,13 @@ export async function selectAllTableRows(
 
 /**
  * Deselects all rows in a UI5 table.
+ *
+ * @intent Clear all row selections in the table.
+ * @ai
+ * @aiContext Uses clearSelection() for grid tables, removeSelections(true) for responsive tables.
+ * @sapModule sap.m.Table, sap.ui.table.Table — clearSelection() / removeSelections()
+ * @businessContext Reset table selection state before a new selection operation.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param options - Table options.
@@ -435,6 +497,16 @@ export async function deselectAllTableRows(
 
 /**
  * Waits for table data to load with a minimum row count.
+ *
+ * @intent Wait until the table has loaded at least N rows of data.
+ * @guarantee On success, the table binding has at least minRows entries.
+ * @prerequisite The table must be bound to an OData model that will eventually load data.
+ * @ai
+ * @aiContext Polls via waitForFunction() until row count meets minRows threshold or timeout. Use after
+ * navigation or search to ensure data is loaded before reading cell values.
+ * @sapModule sap.m.Table, sap.ui.table.Table — binding length polling
+ * @businessContext Wait for OData response to populate table before proceeding with assertions.
+ *
  * @remarks Uses `page.waitForFunction()` with a browser-side predicate. Throws `TimeoutError` on timeout.
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
@@ -477,6 +549,13 @@ export async function waitForTableData(
 
 /**
  * Returns the indices of selected rows.
+ *
+ * @intent Get the zero-based indices of all currently selected rows.
+ * @ai
+ * @aiContext Uses getSelectedIndices() for grid tables, getSelectedItems() for responsive tables.
+ * @sapModule sap.m.Table, sap.ui.table.Table — selection state query
+ * @businessContext Verify or capture which rows the user has selected for subsequent actions.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param options - Table options.

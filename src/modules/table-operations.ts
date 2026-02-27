@@ -78,6 +78,8 @@ function isGridVariant(info: TableInfo): boolean {
 /**
  * Returns the column header names from a UI5 table.
  *
+ * @intent Retrieve all column header texts from a UI5 table for column-aware lookups.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @returns Ordered array of column header texts.
@@ -99,6 +101,8 @@ export async function getColumnNames(
 
 /**
  * Finds the first row whose cells match all specified column-value criteria.
+ *
+ * @intent Search a UI5 table for the first row matching column-value criteria.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
@@ -128,6 +132,8 @@ export async function findRowByValues(
 
 /**
  * Returns the cell text at a given row and column name.
+ *
+ * @intent Read a table cell value using a column header name instead of a numeric index.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
@@ -170,6 +176,8 @@ export async function getCellByColumnName(
 /**
  * Clicks (presses) a table row by index.
  *
+ * @intent Trigger a press/tap event on a specific table row for navigation or selection.
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
  * @param rowIndex - Zero-based row index.
@@ -202,6 +210,12 @@ export async function clickRow(
 
 /**
  * Finds a row by column values and selects it.
+ *
+ * @intent Locate a table row matching column criteria and select it programmatically.
+ *
+ * @recipe Table row selection by value: 1. Resolve column names via `getColumnNames()`,
+ * 2. Search rows for matching cell values via `findRowByValues()`,
+ * 3. Select the matched row via `selectTableRow()`.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
@@ -240,6 +254,8 @@ export async function selectRowByValues(
 /**
  * Ensures a table row is visible by scrolling if needed (grid tables only).
  *
+ * @intent Scroll a grid table to bring a specific row into the visible viewport.
+ *
  * @remarks For responsive tables this is a no-op since they auto-scroll.
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
@@ -265,6 +281,8 @@ export async function ensureRowVisible(
 
 /**
  * Sets a table cell value via inner control interaction.
+ *
+ * @intent Write a value to a specific editable table cell by row and column index.
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID.
@@ -311,6 +329,8 @@ export async function setTableCellValue(
 
 /**
  * Returns the total row count from a UI5 table.
+ *
+ * @intent Read the total number of rows currently loaded in a UI5 table.
  *
  * @remarks Convenience wrapper around `getTableRowCount` from `table.ts`.
  * @param page - Playwright Page (or compatible subset).

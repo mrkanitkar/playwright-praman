@@ -78,6 +78,8 @@ export interface MatcherOptions {
 /**
  * Checks that a UI5 control's `text` property matches the expected value.
  *
+ * @intent Assert that a UI5 control displays specific text content.
+ *
  * @remarks
  * Supports both exact string comparison and RegExp pattern matching.
  * Uses `page.evaluate()` with bridge scripts to retrieve the property value.
@@ -122,6 +124,8 @@ export async function checkUI5Text(
 /**
  * Checks that a UI5 control is visible.
  *
+ * @intent Assert that a UI5 control is visible in the view.
+ *
  * @remarks
  * Reads the `visible` property via `page.evaluate()` with bridge scripts.
  * A control is considered visible only when the property is strictly `true`.
@@ -160,6 +164,8 @@ export async function checkUI5Visible(
 /**
  * Checks that a UI5 control is enabled.
  *
+ * @intent Assert that a UI5 control is enabled and interactive.
+ *
  * @remarks
  * Reads the `enabled` property via `page.evaluate()` with bridge scripts.
  * A control is considered enabled only when the property is strictly `true`.
@@ -197,6 +203,8 @@ export async function checkUI5Enabled(
 
 /**
  * Checks that a UI5 control property matches the expected value.
+ *
+ * @intent Assert that any UI5 control property has an expected value.
  *
  * @remarks
  * Uses strict equality (`===`) for primitive values and `JSON.stringify`
@@ -241,6 +249,8 @@ export async function checkUI5Property(
 /**
  * Checks that a UI5 control's `valueState` property matches the expected state.
  *
+ * @intent Assert the validation state (None, Error, Warning, Success, Information) of a UI5 control.
+ *
  * @remarks
  * Common value states in UI5: `'None'`, `'Error'`, `'Warning'`, `'Success'`, `'Information'`.
  * Uses exact string comparison.
@@ -280,6 +290,8 @@ export async function checkUI5ValueState(
 
 /**
  * Checks that a UI5 control has a binding on a specified property.
+ *
+ * @intent Assert that a UI5 control property is data-bound, optionally to a specific path.
  *
  * @remarks
  * Uses {@link getUI5BindingInfo} to retrieve the binding information.
@@ -341,6 +353,8 @@ export async function checkUI5Binding(
 
 /**
  * Checks that a UI5 control is of the expected type.
+ *
+ * @intent Assert the fully qualified UI5 control type (e.g., sap.m.Button).
  *
  * @remarks
  * Uses {@link getUI5ControlType} to retrieve the fully qualified control

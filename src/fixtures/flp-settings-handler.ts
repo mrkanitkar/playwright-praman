@@ -276,10 +276,8 @@ export class FLPSettingsHandler {
             return null;
           }
           const user = sap.ushell.Container.getUser();
-          // Type assertion: browser-context — User object has dynamic getter methods (getLanguage, getDateFormat, etc.) not in ambient types
-          const userRecord = user as unknown as Record<string, (() => unknown) | undefined>;
-          // eslint-disable-next-line security/detect-object-injection -- getter name is from internal API, not user input
-          const fn = userRecord[g];
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, security/detect-object-injection -- browser context: User object has dynamic getter methods (getLanguage, getDateFormat, etc.) not in ambient types; getter name is from internal API, not user input
+          const fn = (user as any)[g] as (() => unknown) | undefined;
           return fn !== undefined ? String(fn()) : null;
         },
         /* v8 ignore stop */

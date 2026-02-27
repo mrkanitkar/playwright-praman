@@ -46,7 +46,7 @@
 import { test as base } from '@playwright/test';
 
 import type { AgenticHandler } from '../ai/agentic-handler.js';
-import type { DiscoverPageOptions } from '../ai/bulk-discovery.js';
+import type { DiscoverPageOptions, DiscoveryPage } from '../ai/bulk-discovery.js';
 import type { CapabilityRegistry } from '../ai/capability-registry.js';
 import type { LlmService } from '../ai/llm-service.js';
 import type { RecipeRegistry } from '../ai/recipe-registry.js';
@@ -180,9 +180,17 @@ export const aiTest = base.extend<AIFixtures, AIWorkerDeps>({
     const recipes = new RecipeRegistry();
     const vocabulary = createVocabularyService();
     const agentic = new AgenticHandler(llm, buildPageContext, capabilities, recipes);
-    // Type assertion: Playwright Page structurally satisfies DiscoveryPage (url() + evaluate())
-    // but the fixture's inferred page type from mergeTests is narrower than the import-time Page
-    const discoveryPage = page as unknown as Parameters<typeof discoverPage>[0];
+    // Structural adapter: Playwright Page satisfies DiscoveryPage (url() + evaluate())
+    // but the fixture's inferred page type from mergeTests is narrower than the import-time Page.
+    // Use an explicit structural adapter instead of double type assertion.
+    const discoveryPage: DiscoveryPage = {
+      url: () => page.url(),
+      evaluate: async (fn, arg) => {
+        if (typeof fn === 'string') return page.evaluate(fn);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- bridge adapter: DiscoveryPage.evaluate uses (...args: never[]) => unknown for maximum flexibility; Playwright's overloads require a narrower type
+        return page.evaluate(fn as any, arg);
+      },
+    };
 
     await use({
       discoverPage: async (opts?: DiscoverPageOptions) => discoverPage(discoveryPage, opts),

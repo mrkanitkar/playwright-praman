@@ -19,6 +19,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { MethodExecutionResult } from '#bridge/bridge-types.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
+import { BridgeError } from '#core/errors/bridge-error.js';
+import { ControlError } from '#core/errors/control-error.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import type {
   ControlInfoFull,
@@ -1155,7 +1157,7 @@ describe('control-proxy', () => {
       }
     });
 
-    it('retries up to MAX_CONTEXT_RETRIES (3) times then throws', async () => {
+    it('retries up to MAX_CONTEXT_RETRIES (3) times then throws BridgeError', async () => {
       vi.useFakeTimers();
       try {
         const contextError = new Error('Execution context was destroyed');
@@ -1175,33 +1177,50 @@ describe('control-proxy', () => {
         await vi.advanceTimersByTimeAsync(3000);
 
         const error = await promise;
-        expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toBe('Execution context was destroyed');
+        expect(error).toBeInstanceOf(BridgeError);
+        expect((error as BridgeError).code).toBe('ERR_BRIDGE_EXECUTION');
+        expect((error as BridgeError).retryable).toBe(false);
         expect(evaluateMock).toHaveBeenCalledTimes(3);
       } finally {
         vi.useRealTimers();
       }
     });
 
-    it('does not retry for non-context-destroyed errors', async () => {
+    it('does not retry for non-context-destroyed errors and wraps in BridgeError', async () => {
       const evaluateMock = vi.fn().mockRejectedValue(new Error('Some other error'));
 
       const page = { evaluate: evaluateMock } as unknown as Page;
       const state = createTestState({ page });
       const proxy = createControlProxy(state) as TestProxy;
 
-      await expect(proxy.getText()).rejects.toThrow('Some other error');
+      try {
+        await proxy.getText();
+        expect.fail('Expected getText to throw');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(BridgeError);
+        const bridgeError = error as BridgeError;
+        expect(bridgeError.code).toBe('ERR_BRIDGE_EXECUTION');
+        expect(bridgeError.message).toContain('Some other error');
+      }
       expect(evaluateMock).toHaveBeenCalledTimes(1);
     });
 
-    it('does not retry for non-Error rejections', async () => {
+    it('does not retry for non-Error rejections and wraps in BridgeError without cause', async () => {
       const evaluateMock = vi.fn().mockRejectedValue('string rejection');
 
       const page = { evaluate: evaluateMock } as unknown as Page;
       const state = createTestState({ page });
       const proxy = createControlProxy(state) as TestProxy;
 
-      await expect(proxy.getText()).rejects.toBe('string rejection');
+      try {
+        await proxy.getText();
+        expect.fail('Expected getText to throw');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(BridgeError);
+        const bridgeError = error as BridgeError;
+        expect(bridgeError.code).toBe('ERR_BRIDGE_EXECUTION');
+        expect(bridgeError.cause).toBeUndefined();
+      }
       expect(evaluateMock).toHaveBeenCalledTimes(1);
     });
 
@@ -1230,6 +1249,106 @@ describe('control-proxy', () => {
         expect(evaluateMock).toHaveBeenCalledTimes(3);
       } finally {
         vi.useRealTimers();
+      }
+    });
+  });
+
+  // ── page.evaluate error wrapping (P33) ──────────────────────────────
+  describe('page.evaluate error wrapping', () => {
+    it('wraps generic Error from page.evaluate in BridgeError with ERR_BRIDGE_EXECUTION', async () => {
+      const evaluateMock = vi.fn().mockRejectedValue(new Error('test browser error'));
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const state = createTestState({ page });
+      const proxy = createControlProxy(state) as TestProxy;
+
+      try {
+        await proxy.getText();
+        expect.fail('Expected getText to throw');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(BridgeError);
+        const bridgeError = error as BridgeError;
+        expect(bridgeError.code).toBe('ERR_BRIDGE_EXECUTION');
+      }
+    });
+
+    it('BridgeError wrapper includes cause chain to original error', async () => {
+      const originalError = new Error('original evaluate failure');
+      const evaluateMock = vi.fn().mockRejectedValue(originalError);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const state = createTestState({ page });
+      const proxy = createControlProxy(state) as TestProxy;
+
+      try {
+        await proxy.getText();
+        expect.fail('Expected getText to throw');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(BridgeError);
+        const bridgeError = error as BridgeError;
+        expect(bridgeError.cause).toBeInstanceOf(Error);
+        expect((bridgeError.cause as Error).message).toBe('original evaluate failure');
+      }
+    });
+
+    it('passes through existing BridgeError without double-wrapping', async () => {
+      const existingBridgeError = new BridgeError({
+        code: 'ERR_BRIDGE_NOT_READY',
+        message: 'Bridge not ready',
+        attempted: 'test',
+        retryable: true,
+        suggestions: [],
+      });
+      const evaluateMock = vi.fn().mockRejectedValue(existingBridgeError);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const state = createTestState({ page });
+      const proxy = createControlProxy(state) as TestProxy;
+
+      try {
+        await proxy.getText();
+        expect.fail('Expected getText to throw');
+      } catch (error: unknown) {
+        expect(error).toBe(existingBridgeError); // Same reference, not wrapped
+      }
+    });
+
+    it('passes through existing ControlError without double-wrapping', async () => {
+      const existingControlError = new ControlError({
+        code: 'ERR_CONTROL_NOT_FOUND',
+        message: 'Control not found',
+        attempted: 'test',
+        suggestions: [],
+      });
+      const evaluateMock = vi.fn().mockRejectedValue(existingControlError);
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const state = createTestState({ page });
+      const proxy = createControlProxy(state) as TestProxy;
+
+      try {
+        await proxy.getText();
+        expect.fail('Expected getText to throw');
+      } catch (error: unknown) {
+        expect(error).toBe(existingControlError); // Same reference, not wrapped
+      }
+    });
+
+    it('wraps non-Error rejection in BridgeError without cause', async () => {
+      const evaluateMock = vi.fn().mockRejectedValue('string error value');
+
+      const page = { evaluate: evaluateMock } as unknown as Page;
+      const state = createTestState({ page });
+      const proxy = createControlProxy(state) as TestProxy;
+
+      try {
+        await proxy.getText();
+        expect.fail('Expected getText to throw');
+      } catch (error: unknown) {
+        expect(error).toBeInstanceOf(BridgeError);
+        const bridgeError = error as BridgeError;
+        expect(bridgeError.cause).toBeUndefined();
+        expect(bridgeError.message).toContain('string error value');
       }
     });
   });

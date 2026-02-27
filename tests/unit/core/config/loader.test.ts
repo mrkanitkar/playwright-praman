@@ -17,6 +17,7 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 
 import { defineConfig, loadConfig } from '#core/config/loader.js';
+import { ConfigError } from '#core/errors/config-error.js';
 
 describe('loadConfig', () => {
   afterEach(() => {
@@ -170,16 +171,36 @@ describe('loadConfig', () => {
     expect(config.ui5WaitTimeout).toBe(30_000);
   });
 
-  it('falls back to pure defaults when both env and overrides cause validation failure', async () => {
+  it('throws ConfigError when both env and overrides cause validation failure', async () => {
     // Set an invalid env var to cause first parse to fail
     vi.stubEnv('PRAMAN_LOG_LEVEL', 'invalid-level');
     // Pass invalid overrides to cause fallback parse to also fail
+    await expect(
+      loadConfig({ overrides: { logLevel: 'also-invalid' as 'info' } }),
+    ).rejects.toThrow(ConfigError);
+  });
+
+  it('ConfigError includes validation errors and suggestions', async () => {
+    vi.stubEnv('PRAMAN_LOG_LEVEL', 'invalid-level');
+    try {
+      await loadConfig({ overrides: { logLevel: 'also-invalid' as 'info' } });
+      expect.fail('Expected ConfigError to be thrown');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(ConfigError);
+      const configError = error as ConfigError;
+      expect(configError.validationErrors.length).toBeGreaterThan(0);
+      expect(configError.suggestions.length).toBeGreaterThan(0);
+      expect(configError.retryable).toBe(false);
+    }
+  });
+
+  it('logs warning and falls back to overrides when only env vars are invalid', async () => {
+    vi.stubEnv('PRAMAN_LOG_LEVEL', 'invalid-level');
+    // Valid overrides should succeed even when env vars are invalid
     const config = await loadConfig({
-      overrides: { logLevel: 'also-invalid' as 'info' },
+      overrides: { logLevel: 'debug' },
     });
-    // Should fall back to pure defaults
-    expect(config.logLevel).toBe('info');
-    expect(config.ui5WaitTimeout).toBe(30_000);
+    expect(config.logLevel).toBe('debug');
     expect(Object.isFrozen(config)).toBe(true);
   });
 });

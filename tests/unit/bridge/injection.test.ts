@@ -27,6 +27,7 @@ import {
   resetPageInjection,
   waitForBridgeReady,
 } from '#bridge/injection.js';
+import { BridgeError } from '#core/errors/bridge-error.js';
 
 describe('isBridgeReady', () => {
   it('returns false when bridge not injected', async () => {
@@ -104,6 +105,89 @@ describe('injectBridge', () => {
     const firstCall = waitForFunctionFn.mock.calls[0] as unknown[];
     expect(firstCall[1]).toEqual(expect.objectContaining({ timeout: BRIDGE_TIMEOUTS.INJECTION }));
   });
+
+  it('throws BridgeError with ERR_BRIDGE_TIMEOUT when UI5 is not detected', async () => {
+    const timeoutError = new Error('Waiting for function: timeout 30000ms exceeded');
+    const waitForFunctionFn = vi.fn().mockRejectedValue(timeoutError);
+    const page = {
+      waitForFunction: waitForFunctionFn,
+      evaluate: vi.fn().mockResolvedValue(undefined),
+    } as unknown as Page;
+
+    try {
+      await injectBridge(page);
+      expect.fail('Expected injectBridge to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      const bridgeError = error as BridgeError;
+      expect(bridgeError.code).toBe('ERR_BRIDGE_TIMEOUT');
+      expect(bridgeError.retryable).toBe(false);
+      expect(bridgeError.suggestions.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('throws BridgeError with ERR_BRIDGE_INJECTION when bridge fails to become ready', async () => {
+    const readyError = new Error('Waiting for function: timeout 30000ms exceeded');
+    const waitForFunctionFn = vi
+      .fn()
+      .mockResolvedValueOnce(undefined) // UI5 detection succeeds
+      .mockRejectedValueOnce(readyError); // Bridge readiness fails
+    const page = {
+      waitForFunction: waitForFunctionFn,
+      evaluate: vi.fn().mockResolvedValue(undefined),
+    } as unknown as Page;
+
+    try {
+      await injectBridge(page);
+      expect.fail('Expected injectBridge to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      const bridgeError = error as BridgeError;
+      expect(bridgeError.code).toBe('ERR_BRIDGE_INJECTION');
+      expect(bridgeError.retryable).toBe(true);
+    }
+  });
+
+  it('BridgeError includes cause chain from original timeout', async () => {
+    const originalError = new Error('Waiting for function: timeout 30000ms exceeded');
+    const waitForFunctionFn = vi.fn().mockRejectedValue(originalError);
+    const page = {
+      waitForFunction: waitForFunctionFn,
+      evaluate: vi.fn().mockResolvedValue(undefined),
+    } as unknown as Page;
+
+    try {
+      await injectBridge(page);
+      expect.fail('Expected injectBridge to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      const bridgeError = error as BridgeError;
+      expect(bridgeError.cause).toBeInstanceOf(Error);
+      expect((bridgeError.cause as Error).message).toBe(originalError.message);
+    }
+  });
+
+  it('BridgeError includes actionable suggestions array', async () => {
+    const timeoutError = new Error('Waiting for function: timeout 30000ms exceeded');
+    const waitForFunctionFn = vi.fn().mockRejectedValue(timeoutError);
+    const page = {
+      waitForFunction: waitForFunctionFn,
+      evaluate: vi.fn().mockResolvedValue(undefined),
+    } as unknown as Page;
+
+    try {
+      await injectBridge(page);
+      expect.fail('Expected injectBridge to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      const bridgeError = error as BridgeError;
+      expect(bridgeError.suggestions).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('Playwright native methods'),
+        ]),
+      );
+    }
+  });
 });
 
 describe('ensureBridgeInjected', () => {
@@ -161,6 +245,59 @@ describe('waitForBridgeReady', () => {
     await waitForBridgeReady(page, 5000);
     const call = waitForFunctionFn.mock.calls[0] as unknown[];
     expect(call[1]).toEqual(expect.objectContaining({ timeout: 5000 }));
+  });
+
+  it('throws BridgeError with ERR_BRIDGE_NOT_READY on timeout', async () => {
+    const timeoutError = new Error('Waiting for function: timeout 30000ms exceeded');
+    const waitForFunctionFn = vi.fn().mockRejectedValue(timeoutError);
+    const page = {
+      evaluate: vi.fn(),
+      waitForFunction: waitForFunctionFn,
+    } as unknown as Page;
+
+    try {
+      await waitForBridgeReady(page);
+      expect.fail('Expected waitForBridgeReady to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      const bridgeError = error as BridgeError;
+      expect(bridgeError.code).toBe('ERR_BRIDGE_NOT_READY');
+    }
+  });
+
+  it('BridgeError from waitForBridgeReady includes retryable=true', async () => {
+    const timeoutError = new Error('Waiting for function: timeout 30000ms exceeded');
+    const waitForFunctionFn = vi.fn().mockRejectedValue(timeoutError);
+    const page = {
+      evaluate: vi.fn(),
+      waitForFunction: waitForFunctionFn,
+    } as unknown as Page;
+
+    try {
+      await waitForBridgeReady(page);
+      expect.fail('Expected waitForBridgeReady to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      expect((error as BridgeError).retryable).toBe(true);
+    }
+  });
+
+  it('BridgeError from waitForBridgeReady includes cause from original timeout error', async () => {
+    const timeoutError = new Error('Waiting for function: timeout 30000ms exceeded');
+    const waitForFunctionFn = vi.fn().mockRejectedValue(timeoutError);
+    const page = {
+      evaluate: vi.fn(),
+      waitForFunction: waitForFunctionFn,
+    } as unknown as Page;
+
+    try {
+      await waitForBridgeReady(page);
+      expect.fail('Expected waitForBridgeReady to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      expect((error as BridgeError).cause).toBeInstanceOf(Error);
+      expect(((error as BridgeError).cause as Error).message).toBe(timeoutError.message);
+    }
   });
 });
 

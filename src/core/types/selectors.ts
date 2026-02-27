@@ -25,13 +25,39 @@
  * All selector fields are optional; at least one must be provided for a valid query.
  * The `ancestor` and `descendant` fields are recursive for hierarchical matching.
  *
- * @example
+ * When `searchOpenDialogs` is `true`, the selector engine also searches controls
+ * rendered inside the UI5 static area (sap.ui.core.UIArea for open dialogs,
+ * popovers, and message boxes). This is essential for interacting with dialog
+ * controls, which exist outside the main view DOM hierarchy.
+ *
+ * @example Basic selector
  * ```typescript
  * import type { UI5Selector } from '#core/types/selectors.js';
  *
  * const selector: UI5Selector = {
  *   controlType: 'sap.m.Button',
  *   properties: { text: 'Save' },
+ * };
+ * ```
+ *
+ * @example Searching inside open dialogs
+ * ```typescript
+ * import type { UI5Selector } from '#core/types/selectors.js';
+ *
+ * // Find a button inside an open confirmation dialog
+ * const dialogButton: UI5Selector = {
+ *   controlType: 'sap.m.Button',
+ *   properties: { text: 'OK' },
+ *   searchOpenDialogs: true,
+ * };
+ *
+ * // Find an input field inside a value help dialog
+ * const valueHelpInput: UI5Selector = {
+ *   controlType: 'sap.m.Input',
+ *   searchOpenDialogs: true,
+ *   ancestor: {
+ *     controlType: 'sap.ui.comp.valuehelpdialog.ValueHelpDialog',
+ *   },
  * };
  * ```
  */

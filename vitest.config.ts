@@ -74,8 +74,14 @@ export default defineConfig({
         },
         'src/core/utils/**/*.ts': {
           statements: 95,
-          branches: 85,
-          functions: 90,
+          branches: 90,
+          functions: 95,
+          lines: 95,
+        },
+        'src/core/constants/**/*.ts': {
+          statements: 95,
+          branches: 90,
+          functions: 95,
           lines: 95,
         },
         'src/core/compat/**/*.ts': {
