@@ -25,7 +25,7 @@ import type { AuthPage, AuthStrategy, SAPAuthConfig } from '../auth-types.js';
 import { AuthError } from '#core/errors/auth-error.js';
 
 /** Default auth timeout in milliseconds. */
-const DEFAULT_AUTH_TIMEOUT = 30_000;
+const DEFAULT_AUTH_TIMEOUT = 60_000;
 
 /** Strategy name constant to avoid duplicate string literals. */
 const STRATEGY_NAME = 'cloud-saml';
@@ -58,6 +58,13 @@ const IAS_PASSWORD_SELECTORS = [
   '#j_password',
   'input[name="password"]',
   'input[type="password"]',
+] as const;
+
+/** IAS "Continue" button selectors for two-step login (username → Continue → password). */
+const IAS_CONTINUE_SELECTORS = [
+  'button:has-text("Continue")',
+  'input[type="submit"][value="Continue"]',
+  'button[type="submit"]',
 ] as const;
 
 /** IAS submit button selector chain (classic + modern IAS forms). */
@@ -160,13 +167,9 @@ async function clickWithFallback(
   for (const selector of selectors) {
     try {
       await page.waitForSelector(selector, { timeout });
-
-      await page.evaluate((sel: string) => {
-        const element = document.querySelector<HTMLElement>(sel);
-        if (element !== null) {
-          element.click();
-        }
-      }, selector);
+      // Use page.click() instead of page.evaluate(querySelector) because
+      // Playwright pseudo-selectors like :has-text() are not valid CSS.
+      await page.click(selector);
       return;
     } catch {
       // Selector not found, try next
@@ -265,7 +268,28 @@ export class CloudSAMLAuthStrategy implements AuthStrategy {
       timeout,
     );
 
-    // Fill password
+    // Handle two-step IAS login: username → Continue → password → submit
+    // Modern SAP IAS shows username first, then password after clicking "Continue".
+    // Try to find the password field first (classic single-page form).
+    // If not found within 3s, click the "Continue" button and wait for password.
+    const SHORT_PROBE_TIMEOUT = 1000;
+    let passwordVisible = false;
+    for (const sel of IAS_PASSWORD_SELECTORS) {
+      try {
+        await page.waitForSelector(sel, { timeout: SHORT_PROBE_TIMEOUT });
+        passwordVisible = true;
+        break;
+      } catch {
+        // Not found yet
+      }
+    }
+
+    if (!passwordVisible) {
+      // Two-step flow: click "Continue" to reveal the password field
+      await clickWithFallback(page, IAS_CONTINUE_SELECTORS, 'continue', timeout);
+    }
+
+    // Fill password (now visible after Continue or on classic single-page form)
     await fillWithFallback(page, IAS_PASSWORD_SELECTORS, config.password, 'password', timeout);
 
     // Click submit

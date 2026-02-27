@@ -11,7 +11,7 @@
  * BOM Complete End-to-End Test Flow — Praman v1.0
  *
  * @remarks
- * Adapted from dhikraft gold standard (1 Feb 2026) to use playwright-praman.
+ * Adapted from legacy gold standard (1 Feb 2026) to use playwright-praman.
  * All UI5 interactions use the Praman ui5 fixture (UI5Handler + proxy chain).
  * Smart waits replace page.waitForTimeout() per Praman Principle 8.
  *

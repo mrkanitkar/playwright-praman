@@ -1,0 +1,3776 @@
+# playwright-praman
+
+> AI-First SAP UI5 Test Automation Platform for Playwright.
+> Version: 1.0.1 | License: Apache-2.0
+> Install: npm install playwright-praman @playwright/test
+> Import: import { test, expect } from 'playwright-praman'
+> Generated: 2026-02-27 from source docs and API reports
+
+## Quick Start
+
+# Getting Started with Praman
+
+Praman is an AI-first SAP UI5 test automation platform built on Playwright.
+This guide walks you from zero to a running test in minutes.
+
+## Installation
+
+```bash
+npm install -D playwright-praman @playwright/test
+npx playwright install chromium
+```
+
+## Project Setup
+
+### 1. Create playwright.config.ts
+
+```typescript
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  timeout: 60_000,
+  retries: 1,
+  projects: [
+    // Auth setup project -- runs first, saves session
+    {
+      name: 'auth',
+      testMatch: '**/auth-setup.ts',
+    },
+    // Main test project -- reuses saved session
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: '.auth/sap-session.json',
+        baseURL: process.env['SAP_BASE_URL'],
+      },
+      dependencies: ['auth'],
+    },
+  ],
+});
+```
+
+### 2. Set Up Authentication
+
+Copy the example auth setup into your project:
+
+```bash
+mkdir -p tests
+cp node_modules/playwright-praman/examples/auth-setup.ts tests/auth-setup.ts
+```
+
+Or create your own `tests/auth-setup.ts`. See `examples/auth-setup.ts` for a
+complete reference covering OnPrem, BTP Cloud SAML, and Office 365 strategies.
+
+Set environment variables (in `.env.test` or CI secrets):
+
+```bash
+SAP_BASE_URL=https://your-sap-system.example.com
+SAP_USERNAME=TEST_USER
+SAP_PASSWORD=SecurePassword123
+SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'
+SAP_CLIENT=100             # OnPrem only
+```
+
+### 3. Add .auth to .gitignore
+
+```bash
+echo '.auth/' >> .gitignore
+```
+
+## Your First Test
+
+Create `tests/purchase-order.spec.ts`:
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('navigate to Purchase Order app and verify table', async ({
+  ui5,
+  ui5Navigation,
+}) => {
+  // Step 1: Navigate to the Fiori app
+  await test.step('Open Purchase Order app', async () => {
+    await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+  });
+
+  // Step 2: Wait for UI5 to stabilize
+  await test.step('Wait for page load', async () => {
+    await ui5.waitForUI5();
+  });
+
+  // Step 3: Discover a control by type
+  await test.step('Find the Create button', async () => {
+    const createBtn = await ui5.control({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Create' },
+    });
+    // The control proxy exposes all UI5 methods
+    const text = await createBtn.getText();
+    expect(text).toBe('Create');
+  });
+
+  // Step 4: Read table data
+  await test.step('Verify table has rows', async () => {
+    const rowCount = await ui5.table.getRowCount('myTable');
+    expect(rowCount).toBeGreaterThan(0);
+  });
+});
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+npx playwright test
+
+# Run a specific test file
+npx playwright test tests/purchase-order.spec.ts
+
+# Run with visible browser
+npx playwright test --headed
+
+# Run with Playwright UI mode
+npx playwright test --ui
+```
+
+## Common Patterns
+
+### Control Discovery
+
+```typescript
+// By ID
+const btn = await ui5.control({ id: 'submitBtn' });
+
+// By control type + properties
+const input = await ui5.control({
+  controlType: 'sap.m.Input',
+  properties: { placeholder: 'Enter vendor' },
+});
+
+// Multiple controls
+const buttons = await ui5.controls({ controlType: 'sap.m.Button' });
+```
+
+### Input Fields (Gold Pattern)
+
+Always use `setValue()` + `fireChange()` + `waitForUI5()` together:
+
+```typescript
+const input = await ui5.control({ id: 'vendorInput' });
+await input.setValue('SUP-001');
+await input.fireChange({ value: 'SUP-001' });
+await ui5.waitForUI5();
+```
+
+Or use the shorthand:
+
+```typescript
+await ui5.fill({ id: 'vendorInput' }, 'SUP-001');
+```
+
+### Table Operations
+
+```typescript
+// Read table data
+const rows = await ui5.table.getRows('purchaseOrderTable');
+const columns = await ui5.table.getColumnNames('purchaseOrderTable');
+
+// Find a row by column values
+const rowIndex = await ui5.table.findRowByValues('purchaseOrderTable', {
+  'Purchase Order': '4500001234',
+});
+
+// Click a row
+await ui5.table.clickRow('purchaseOrderTable', rowIndex);
+
+// Get a specific cell value
+const vendor = await ui5.table.getCellByColumnName(
+  'purchaseOrderTable',
+  0,
+  'Vendor',
+);
+```
+
+### Dialog Handling
+
+```typescript
+// Wait for a dialog to appear
+const dialog = await ui5.dialog.waitFor();
+
+// Confirm a dialog
+await ui5.dialog.confirm();
+
+// Dismiss a dialog
+await ui5.dialog.dismiss();
+
+// Find controls inside a dialog
+const dialogBtn = await ui5.control({
+  controlType: 'sap.m.Button',
+  properties: { text: 'OK' },
+  searchOpenDialogs: true,
+});
+```
+
+### Navigation
+
+```typescript
+// Navigate to a Fiori app by semantic object
+await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+
+// Navigate to a tile by title
+await ui5Navigation.navigateToTile('Manage Purchase Orders');
+
+// Navigate to a specific URL hash
+await ui5Navigation.navigateToHash('#PurchaseOrder-manage&/PurchaseOrders');
+
+// Go back
+await ui5Navigation.navigateBack();
+
+// Go to FLP home
+await ui5Navigation.navigateToHome();
+```
+
+### Fiori Elements Shortcuts
+
+```typescript
+// List Report
+await fe.listReport.setFilter('Vendor', 'SUP-001');
+await fe.listReport.search();
+await fe.listReport.navigateToItem(0);
+
+// Object Page
+const title = await fe.objectPage.getHeaderTitle();
+await fe.objectPage.clickEdit();
+await fe.objectPage.navigateToSection('Items');
+await fe.objectPage.clickSave();
+```
+
+### Business Intent APIs
+
+```typescript
+// Create a purchase order using business terms (vocabulary-resolved)
+await intent.procurement.createPurchaseOrder({
+  vendor: 'SUP-001',
+  material: 'MAT001',
+  quantity: 10,
+  plant: '1000',
+  companyCode: '1000',
+  purchasingOrg: '1000',
+});
+
+// Fill a field using business vocabulary
+await intent.core.fillField('Vendor', 'SUP-001');
+```
+
+## Project Structure
+
+```text
+my-sap-tests/
+  tests/
+    auth-setup.ts          # Authentication (runs once)
+    purchase-order.spec.ts # Your test files
+    sales-order.spec.ts
+  .auth/
+    sap-session.json       # Saved session (gitignored)
+  playwright.config.ts
+  package.json
+```
+
+## Persona Quick-Start Guides
+
+### Test Automation Engineer
+
+Focus on **fixtures, assertions, and test.step()** for structured test flows.
+
+Key fixtures available in every test:
+
+| Fixture | Purpose |
+| --- | --- |
+| `ui5` | Core control discovery and interaction |
+| `ui5.table` | Table read, filter, sort, select |
+| `ui5.dialog` | Dialog lifecycle (wait, confirm, dismiss) |
+| `ui5.date` | DatePicker and TimePicker operations |
+| `ui5.odata` | OData model reads and HTTP operations |
+| `ui5Navigation` | FLP and in-app navigation |
+| `ui5Footer` | Footer toolbar buttons (Save, Edit, Cancel) |
+| `ui5Shell` | Shell header (Home, Notifications, User menu) |
+| `fe` | Fiori Elements List Report, Object Page, Table |
+| `intent` | Business intent APIs (procurement, sales, finance) |
+
+Always wrap multi-step flows in `test.step()` for clear reporting:
+
+```typescript
+await test.step('Create purchase order', async () => {
+  // ... multiple interactions
+});
+```
+
+### AI Agent (Copilot / Claude Code)
+
+Focus on **imports, capabilities, and error codes** for automated test generation.
+
+**Single import**: `import { test, expect } from 'playwright-praman'`
+
+**Capability query**: Use `pramanAI.capabilities.forAI()` to discover available
+operations at runtime.
+
+**Error codes**: All errors extend `PramanError` with structured fields:
+
+- `code` -- machine-readable (e.g., `ERR_CONTROL_NOT_FOUND`)
+- `retryable` -- boolean indicating if retry is appropriate
+- `suggestions[]` -- array of human-readable fix suggestions
+
+**Skill files**: Read `node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.md`
+for the complete 7-rule compliance framework.
+
+**Forbidden patterns**: Never use `page.click('#__...')`, `page.fill('#__...')`,
+or `page.locator('.sapM...')` for UI5 elements. Always use Praman fixtures.
+
+### SAP Business Analyst
+
+Focus on **intents and vocabulary** for writing tests in business terms.
+
+The intent API lets you write tests using SAP business terminology instead
+of technical control IDs:
+
+```typescript
+// Instead of finding controls by ID:
+await intent.core.fillField('Vendor', 'SUP-001');
+await intent.core.fillField('Material', 'MAT001');
+await intent.core.fillField('Quantity', '10');
+
+// Or use domain-specific intents:
+await intent.procurement.createPurchaseOrder({
+  vendor: 'SUP-001',
+  material: 'MAT001',
+  quantity: 10,
+  plant: '1000',
+});
+```
+
+Supported vocabulary domains: procurement (MM), sales (SD), finance (FI),
+manufacturing (PP), warehouse (WM/EWM), quality (QM).
+
+See `docs/docs/guides/vocabulary-system.md` for term mappings and
+`docs/docs/guides/intent-api.md` for the full intent API reference.
+
+## Further Reading
+
+| Topic | Documentation |
+| --- | --- |
+| Full API reference | `skills/playwright-praman-sap-testing/api-reference.md` |
+| Authentication strategies | `skills/playwright-praman-sap-testing/authentication.md` |
+| AI capabilities | `skills/playwright-praman-sap-testing/ai-capabilities.md` |
+| Architecture overview | `docs/docs/guides/architecture-overview.md` |
+| Vocabulary system | `docs/docs/guides/vocabulary-system.md` |
+| Error handling | `docs/docs/guides/errors.md` |
+| Documentation map | `DOCS-MAP.md` |
+
+## Selector Reference
+
+Selectors are the primary way to find UI5 controls on a page. Praman uses `UI5Selector` objects
+that query the UI5 runtime's control registry — not the DOM.
+
+## UI5Selector Fields
+
+| Field               | Type                      | Description                                       |
+| ------------------- | ------------------------- | ------------------------------------------------- |
+| `controlType`       | `string`                  | Fully qualified UI5 type (e.g., `'sap.m.Button'`) |
+| `id`                | `string \| RegExp`        | Control ID or pattern                             |
+| `viewName`          | `string`                  | Owning view name for scoped discovery             |
+| `viewId`            | `string`                  | Owning view ID for scoped discovery               |
+| `properties`        | `Record<string, unknown>` | Property matchers (key-value pairs)               |
+| `bindingPath`       | `Record<string, string>`  | OData binding path matchers                       |
+| `i18NText`          | `Record<string, string>`  | i18n text matchers (translated values)            |
+| `ancestor`          | `UI5Selector`             | Parent control must match this selector           |
+| `descendant`        | `UI5Selector`             | Child control must match this selector            |
+| `interaction`       | `UI5Interaction`          | Sub-control targeting (idSuffix, domChildWith)    |
+| `searchOpenDialogs` | `boolean`                 | Also search controls inside open dialogs          |
+
+All fields are optional. At least one must be provided.
+
+## Examples
+
+### By ID
+
+```typescript
+const button = await ui5.control({ id: 'saveBtn' });
+```
+
+### By ID with RegExp
+
+```typescript
+const button = await ui5.control({ id: /submit/i });
+```
+
+### By Control Type
+
+```typescript
+const buttons = await ui5.controls({ controlType: 'sap.m.Button' });
+```
+
+### By Type + Properties
+
+```typescript
+const input = await ui5.control({
+  controlType: 'sap.m.Input',
+  properties: { placeholder: 'Enter vendor' },
+});
+```
+
+### Scoped to View
+
+```typescript
+const field = await ui5.control({
+  controlType: 'sap.m.Input',
+  viewName: 'myApp.view.Detail',
+  properties: { value: '' },
+});
+```
+
+### By Binding Path
+
+```typescript
+const field = await ui5.control({
+  controlType: 'sap.m.Input',
+  bindingPath: { value: '/PurchaseOrder/Vendor' },
+});
+```
+
+### With Ancestor
+
+```typescript
+const cellInput = await ui5.control({
+  controlType: 'sap.m.Input',
+  ancestor: {
+    controlType: 'sap.m.Table',
+    id: 'poTable',
+  },
+});
+```
+
+### With Descendant
+
+```typescript
+const form = await ui5.control({
+  controlType: 'sap.ui.layout.form.SimpleForm',
+  descendant: {
+    controlType: 'sap.m.Input',
+    properties: { placeholder: 'Vendor' },
+  },
+});
+```
+
+### Interaction Sub-Targeting
+
+```typescript
+// Target the arrow button inside a ComboBox
+const combo = await ui5.control({
+  controlType: 'sap.m.ComboBox',
+  id: 'countrySelect',
+  interaction: { idSuffix: 'arrow' },
+});
+```
+
+### Search Inside Dialogs
+
+```typescript
+const dialogButton = await ui5.control({
+  controlType: 'sap.m.Button',
+  properties: { text: 'OK' },
+  searchOpenDialogs: true,
+});
+```
+
+## Selector String Format
+
+Praman registers a `ui5=` custom selector engine with Playwright, enabling usage in `page.locator()`:
+
+```typescript
+const locator = page.locator('ui5={"controlType":"sap.m.Button","properties":{"text":"Save"}}');
+await locator.click();
+```
+
+## Control Type Cheat Sheet
+
+| Control        | `controlType`                               | Common Properties                             |
+| -------------- | ------------------------------------------- | --------------------------------------------- |
+| Button         | `sap.m.Button`                              | `text`, `icon`, `type`, `enabled`             |
+| Input          | `sap.m.Input`                               | `value`, `placeholder`, `enabled`, `editable` |
+| Text           | `sap.m.Text`                                | `text`                                        |
+| Label          | `sap.m.Label`                               | `text`, `required`                            |
+| Select         | `sap.m.Select`                              | `selectedKey`                                 |
+| ComboBox       | `sap.m.ComboBox`                            | `value`, `selectedKey`                        |
+| CheckBox       | `sap.m.CheckBox`                            | `selected`, `text`                            |
+| DatePicker     | `sap.m.DatePicker`                          | `value`, `dateValue`                          |
+| TextArea       | `sap.m.TextArea`                            | `value`, `rows`                               |
+| Link           | `sap.m.Link`                                | `text`, `href`                                |
+| GenericTile    | `sap.m.GenericTile`                         | `header`, `subheader`                         |
+| Table          | `sap.m.Table`                               | `headerText`                                  |
+| SmartField     | `sap.ui.comp.smartfield.SmartField`         | `value`, `editable`                           |
+| SmartTable     | `sap.ui.comp.smarttable.SmartTable`         | `entitySet`, `useTablePersonalisation`        |
+| SmartFilterBar | `sap.ui.comp.smartfilterbar.SmartFilterBar` | `entitySet`                                   |
+
+:::note SmartField Inner Controls
+`SmartField` wraps inner controls (Input, ComboBox, etc.). `getControlType()` returns
+`sap.ui.comp.smartfield.SmartField`, not the inner control type. Use `properties` matching
+to target by value rather than relying on the inner control type.
+:::
+
+## Discovery Strategies
+
+Praman uses a multi-strategy chain for control discovery:
+
+1. **LRU Cache** (200 entries, 5s TTL) — instant for repeat lookups
+2. **Direct ID** — `sap.ui.getCore().byId(id)` for exact ID matches
+3. **RecordReplay** — SAP's RecordReplay API (requires UI5 >= 1.94)
+4. **Registry Scan** — full `ElementRegistry` scan as fallback
+
+Configure the strategy chain:
+
+```typescript
+import { defineConfig } from 'playwright-praman';
+
+export default defineConfig({
+  discoveryStrategies: ['direct-id', 'recordreplay'],
+});
+```
+
+## Fixtures
+
+Praman provides 12 fixture modules merged into a single `test` object via Playwright's `mergeTests()`.
+
+## Import
+
+```typescript
+import { test, expect } from 'playwright-praman';
+```
+
+## Fixture Summary
+
+| Fixture         | Scope  | Type           | Description                                                                           |
+| --------------- | ------ | -------------- | ------------------------------------------------------------------------------------- |
+| `ui5`           | test   | Core           | Control discovery, interaction, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces |
+| `ui5Navigation` | test   | Navigation     | 9 FLP navigation methods                                                              |
+| `btpWorkZone`   | test   | Navigation     | Dual-frame BTP WorkZone manager                                                       |
+| `sapAuth`       | test   | Authentication | SAP authentication (6 strategies)                                                     |
+| `fe`            | test   | Fiori Elements | `.listReport`, `.objectPage`, `.table`, `.list` helpers                               |
+| `pramanAI`      | test   | AI             | Page discovery, agentic handler, LLM, vocabulary                                      |
+| `intent`        | test   | Business       | `.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`                 |
+| `ui5Shell`      | test   | FLP            | Shell header (home, user menu)                                                        |
+| `ui5Footer`     | test   | FLP            | Page footer bar (Save, Edit, Delete, etc.)                                            |
+| `flpLocks`      | test   | FLP            | SM12 lock management with auto-cleanup                                                |
+| `flpSettings`   | test   | FLP            | User settings reader (language, date format)                                          |
+| `testData`      | test   | Data           | Template-based data generation with auto-cleanup                                      |
+| `pramanConfig`  | worker | Infrastructure | Frozen config (loaded once per worker)                                                |
+| `pramanLogger`  | test   | Infrastructure | Test-scoped pino logger                                                               |
+| `rootLogger`    | worker | Infrastructure | Worker-scoped root logger                                                             |
+| `tracer`        | worker | Infrastructure | OpenTelemetry tracer (NoOp when disabled)                                             |
+
+## Auto-Fixtures
+
+These fixtures fire automatically without being requested in the test signature:
+
+| Auto-Fixture           | Scope  | Purpose                                       |
+| ---------------------- | ------ | --------------------------------------------- |
+| `playwrightCompat`     | worker | Playwright version compatibility checks       |
+| `selectorRegistration` | worker | Registers `ui5=` custom selector engine       |
+| `matcherRegistration`  | worker | Registers 10 custom UI5 matchers              |
+| `requestInterceptor`   | test   | Blocks WalkMe, analytics, overlay scripts     |
+| `ui5Stability`         | test   | Auto-waits for UI5 stability after navigation |
+
+## Core Fixture: `ui5`
+
+The main fixture for control discovery and interaction.
+
+### Control Discovery
+
+```typescript
+test('discover controls', async ({ ui5 }) => {
+  // Single control
+  const btn = await ui5.control({ id: 'saveBtn' });
+
+  // Multiple controls
+  const buttons = await ui5.controls({ controlType: 'sap.m.Button' });
+
+  // Interaction shortcuts
+  await ui5.click({ id: 'submitBtn' });
+  await ui5.fill({ id: 'nameInput' }, 'John Doe');
+  await ui5.select({ id: 'countrySelect' }, 'US');
+  await ui5.check({ id: 'agreeCheckbox' });
+  await ui5.clear({ id: 'searchField' });
+});
+```
+
+### Sub-Namespaces
+
+```typescript
+test('sub-namespaces', async ({ ui5 }) => {
+  // Table operations
+  const rows = await ui5.table.getRows('poTable');
+  const count = await ui5.table.getRowCount('poTable');
+
+  // Dialog management
+  await ui5.dialog.waitFor();
+  await ui5.dialog.confirm();
+
+  // Date/time operations
+  await ui5.date.setDatePicker('startDate', new Date('2026-01-15'));
+
+  // OData model access
+  const data = await ui5.odata.getModelData('/PurchaseOrders');
+});
+```
+
+## Navigation Fixture: `ui5Navigation`
+
+```typescript
+test('navigation', async ({ ui5Navigation }) => {
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+  await ui5Navigation.navigateToTile('Create Purchase Order');
+  await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', { plant: '1000' });
+  await ui5Navigation.navigateToHome();
+  await ui5Navigation.navigateBack();
+
+  const hash = await ui5Navigation.getCurrentHash();
+});
+```
+
+## Auth Fixture: `sapAuth`
+
+```typescript
+test('auth control', async ({ sapAuth, page }) => {
+  await sapAuth.login(page, { url, username, password, strategy: 'basic' });
+  expect(sapAuth.isAuthenticated()).toBe(true);
+  // Auto-logout on teardown
+});
+```
+
+## Fiori Elements Fixture: `fe`
+
+```typescript
+test('FE patterns', async ({ fe }) => {
+  await fe.listReport.setFilter('Status', 'Active');
+  await fe.listReport.search();
+  await fe.listReport.navigateToItem(0);
+
+  const title = await fe.objectPage.getHeaderTitle();
+  await fe.objectPage.clickEdit();
+  await fe.objectPage.clickSave();
+});
+```
+
+## AI Fixture: `pramanAI`
+
+```typescript
+test('AI discovery', async ({ pramanAI }) => {
+  const context = await pramanAI.discoverPage({ interactiveOnly: true });
+  const result = await pramanAI.agentic.generateTest(
+    'Create a purchase order for vendor 100001',
+    page,
+  );
+});
+```
+
+## Intent Fixture: `intent`
+
+```typescript
+test('business intents', async ({ intent }) => {
+  await intent.procurement.createPurchaseOrder({
+    vendor: '100001',
+    material: 'MAT-001',
+    quantity: 10,
+    plant: '1000',
+  });
+
+  await intent.finance.postVendorInvoice({
+    vendor: '100001',
+    amount: 5000,
+    currency: 'EUR',
+  });
+});
+```
+
+## Shell & Footer Fixtures
+
+```typescript
+test('shell and footer', async ({ ui5Shell, ui5Footer }) => {
+  await ui5Shell.expectShellHeader();
+  await ui5Footer.clickEdit();
+  // ... edit form fields ...
+  await ui5Footer.clickSave();
+  await ui5Shell.clickHome();
+});
+```
+
+## Lock Management: `flpLocks`
+
+```typescript
+test('lock management', async ({ flpLocks }) => {
+  const count = await flpLocks.getNumberOfLockEntries('TESTUSER');
+  // Auto-cleanup on teardown
+  await flpLocks.deleteAllLockEntries('TESTUSER');
+});
+```
+
+## Test Data: `testData`
+
+```typescript
+test('test data', async ({ testData }) => {
+  const po = testData.generate({
+    documentNumber: '{{uuid}}',
+    createdAt: '{{timestamp}}',
+    vendor: '100001',
+  });
+  await testData.save('po-input.json', po);
+  // Auto-cleanup on teardown
+});
+```
+
+## Standalone Usage
+
+Individual fixture modules can be imported for lighter setups:
+
+```typescript
+import { coreTest } from 'playwright-praman';
+import { authTest } from 'playwright-praman';
+import { mergeTests } from '@playwright/test';
+
+// Compose only what you need
+const test = mergeTests(coreTest, authTest);
+```
+
+## Control Interactions
+
+The `ui5` fixture provides high-level methods for interacting with UI5 controls. Each method
+discovers the control, waits for UI5 stability, and performs the action through the configured
+interaction strategy.
+
+## Interaction Methods
+
+### click
+
+Clicks a UI5 control. Uses the configured interaction strategy (UI5-native `firePress()` by
+default, with DOM click fallback).
+
+```typescript
+await ui5.click({ id: 'submitBtn' });
+await ui5.click({ controlType: 'sap.m.Button', properties: { text: 'Save' } });
+```
+
+### fill
+
+Sets the value of an input control. Fires both `liveChange` and `change` events to ensure
+OData model bindings update.
+
+```typescript
+await ui5.fill({ id: 'vendorInput' }, '100001');
+await ui5.fill({ controlType: 'sap.m.Input', viewName: 'myApp.view.Detail' }, 'New Value');
+```
+
+### press
+
+Triggers a press action on a control. Equivalent to `click` but semantically clearer for
+buttons, links, and tiles.
+
+```typescript
+await ui5.press({ id: 'confirmBtn' });
+```
+
+### select
+
+Selects an item in a dropdown (Select, ComboBox, MultiComboBox). Accepts selection by key or
+display text.
+
+```typescript
+await ui5.select({ id: 'countrySelect' }, 'US');
+await ui5.select({ id: 'statusComboBox' }, 'Active');
+```
+
+### check / uncheck
+
+Toggles checkbox and switch controls.
+
+```typescript
+await ui5.check({ id: 'agreeCheckbox' });
+await ui5.uncheck({ id: 'optionalCheckbox' });
+```
+
+### clear
+
+Clears the value of an input control and fires change events.
+
+```typescript
+await ui5.clear({ id: 'searchField' });
+```
+
+### getText
+
+Reads the text property of a control.
+
+```typescript
+const label = await ui5.getText({ id: 'headerTitle' });
+expect(label).toBe('Purchase Order Details');
+```
+
+### getProperty
+
+Reads any property from a UI5 control by name.
+
+```typescript
+const enabled = await ui5.getProperty({ id: 'saveBtn' }, 'enabled');
+const visible = await ui5.getProperty({ id: 'statusText' }, 'visible');
+```
+
+### waitForUI5
+
+Manually triggers a UI5 stability wait. Normally called automatically, but useful after custom
+browser-side operations.
+
+```typescript
+await ui5.click({ id: 'triggerLongLoad' });
+await ui5.waitForUI5(30_000); // Custom timeout in milliseconds
+```
+
+## Auto-Waiting Behavior
+
+Every `ui5.*` method calls `waitForUI5Stable()` before executing. This differs from Playwright's
+native auto-waiting in a critical way:
+
+| Aspect                | Playwright Auto-Wait                         | Praman Auto-Wait                                         |
+| --------------------- | -------------------------------------------- | -------------------------------------------------------- |
+| **What it waits for** | DOM actionability (visible, enabled, stable) | UI5 runtime pending operations (XHR, promises, bindings) |
+| **Scope**             | Single element                               | Entire UI5 application                                   |
+| **Source of truth**   | DOM state                                    | `sap.ui.getCore().getUIDirty()` + pending request count  |
+| **When it fires**     | Before each locator action                   | Before each `ui5.*` call                                 |
+
+Playwright's auto-wait checks whether a specific DOM element is visible and enabled. Praman's
+auto-wait checks whether the entire UI5 framework has finished all asynchronous operations —
+this includes OData requests triggered by other controls, model binding updates, and view
+rendering.
+
+### The Three-Tier Wait
+
+When a page navigation occurs, Praman executes a three-tier wait:
+
+1. **waitForUI5Bootstrap** (60s) — waits for `window.sap.ui.getCore` to exist
+2. **waitForUI5Stable** (15s) — waits for zero pending async operations
+3. **briefDOMSettle** (500ms) — brief pause for final DOM rendering
+
+For subsequent interactions (not navigation), only `waitForUI5Stable` is called.
+
+### Skipping the Stability Wait
+
+For performance-critical paths where you know UI5 is already stable:
+
+```typescript
+import { defineConfig } from 'playwright-praman';
+
+export default defineConfig({
+  skipStabilityWait: true, // Uses briefDOMSettle (500ms) instead
+});
+```
+
+## Complete Example
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('edit and save a purchase order', async ({ ui5, ui5Navigation }) => {
+  // Navigate to the app
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+
+  // Click the first row to open details
+  await ui5.click({
+    controlType: 'sap.m.ColumnListItem',
+    ancestor: { id: 'poTable' },
+  });
+
+  // Edit mode
+  await ui5.click({ id: 'editBtn' });
+
+  // Fill fields
+  await ui5.fill({ id: 'vendorInput' }, '100002');
+  await ui5.select({ id: 'purchOrgSelect' }, '1000');
+  await ui5.check({ id: 'urgentCheckbox' });
+
+  // Clear and refill
+  await ui5.clear({ id: 'noteField' });
+  await ui5.fill({ id: 'noteField' }, 'Updated via automated test');
+
+  // Read values back
+  const vendor = await ui5.getText({ id: 'vendorInput' });
+  expect(vendor).toBe('100002');
+
+  // Save
+  await ui5.click({ id: 'saveBtn' });
+});
+```
+
+## Interaction Under the Hood
+
+Each interaction method follows this sequence:
+
+1. **Stability guard** — `waitForUI5Stable()` ensures no pending async operations
+2. **Control discovery** — finds the control via the multi-strategy chain (cache, direct-ID,
+   RecordReplay, registry scan)
+3. **Strategy execution** — delegates to the configured interaction strategy (ui5-native,
+   dom-first, or opa5)
+4. **Step decoration** — wraps the entire operation in a Playwright `test.step()` for HTML
+   report visibility
+
+If the primary strategy method fails (e.g., `firePress()` not available), the strategy
+automatically falls back to its secondary method (e.g., DOM click).
+
+## Custom Matchers
+
+Praman extends Playwright's `expect()` with 10 UI5-specific matchers that query control state
+directly from the UI5 runtime. These matchers check the **UI5 model/control state**, not the
+DOM — which is the source of truth in SAP applications.
+
+## Key Difference From Playwright Matchers
+
+Standard Playwright matchers inspect DOM attributes:
+
+```typescript
+// Playwright: checks DOM attribute
+await expect(page.locator('#saveBtn')).toBeEnabled();
+```
+
+Praman matchers query the UI5 control API:
+
+```typescript
+// Praman: checks UI5 control state via sap.ui.getCore().byId()
+await expect(page).toBeUI5Enabled('saveBtn');
+```
+
+Why does this matter? A control can appear enabled in the DOM but be disabled in the UI5 model
+(e.g., during a pending OData operation). The UI5 state is the source of truth.
+
+## Important: Matchers Receive controlId, Not Locator
+
+Unlike Playwright's built-in matchers that operate on `Locator` objects, Praman matchers receive
+a **control ID string** as their first argument and are called on `page`:
+
+```typescript
+// Correct — pass string controlId to page expectation
+await expect(page).toHaveUI5Text('headerTitle', 'Purchase Order');
+
+// Wrong — these are NOT locator-based matchers
+// await expect(locator).toHaveUI5Text('Purchase Order'); // Does not work
+```
+
+## All 10 Matchers
+
+### toHaveUI5Text
+
+Asserts the `text` property of a control matches the expected value. Supports both exact string
+and RegExp matching.
+
+```typescript
+await expect(page).toHaveUI5Text('headerTitle', 'Purchase Order Details');
+await expect(page).toHaveUI5Text('headerTitle', /Purchase Order/);
+```
+
+**Error message preview:**
+
+```
+Expected: "Purchase Order Details"
+Received: "Sales Order Details"
+Control: headerTitle (sap.m.Title)
+```
+
+### toBeUI5Visible
+
+Asserts the control's `visible` property is `true`.
+
+```typescript
+await expect(page).toBeUI5Visible('saveBtn');
+```
+
+**Negation:**
+
+```typescript
+await expect(page).not.toBeUI5Visible('hiddenPanel');
+```
+
+### toBeUI5Enabled
+
+Asserts the control's `enabled` property is `true`.
+
+```typescript
+await expect(page).toBeUI5Enabled('submitBtn');
+```
+
+**Negation:**
+
+```typescript
+await expect(page).not.toBeUI5Enabled('disabledInput');
+```
+
+### toHaveUI5Property
+
+Asserts any named property of a control matches the expected value.
+
+```typescript
+await expect(page).toHaveUI5Property('vendorInput', 'value', '100001');
+await expect(page).toHaveUI5Property('saveBtn', 'type', 'Emphasized');
+await expect(page).toHaveUI5Property('statusIcon', 'src', /accept/);
+```
+
+### toHaveUI5ValueState
+
+Asserts the control's `valueState` property matches one of the UI5 value states.
+
+```typescript
+await expect(page).toHaveUI5ValueState('vendorInput', 'Error');
+await expect(page).toHaveUI5ValueState('amountField', 'Success');
+await expect(page).toHaveUI5ValueState('noteInput', 'None');
+```
+
+Valid value states: `'None'`, `'Success'`, `'Warning'`, `'Error'`, `'Information'`.
+
+### toHaveUI5Binding
+
+Asserts the control has an OData binding at the specified path.
+
+```typescript
+await expect(page).toHaveUI5Binding('vendorField', '/PurchaseOrder/Vendor');
+await expect(page).toHaveUI5Binding('priceField', '/PO/NetAmount');
+```
+
+### toBeUI5ControlType
+
+Asserts the control's fully qualified type name.
+
+```typescript
+await expect(page).toBeUI5ControlType('saveBtn', 'sap.m.Button');
+await expect(page).toBeUI5ControlType('mainTable', 'sap.ui.table.Table');
+```
+
+### toHaveUI5RowCount
+
+Asserts the number of rows in a table control.
+
+```typescript
+await expect(page).toHaveUI5RowCount('poTable', 5);
+await expect(page).toHaveUI5RowCount('emptyTable', 0);
+```
+
+### toHaveUI5CellText
+
+Asserts the text content of a specific table cell by row and column index (both zero-based).
+
+```typescript
+await expect(page).toHaveUI5CellText('poTable', 0, 0, '4500000001');
+await expect(page).toHaveUI5CellText('poTable', 0, 2, 'Active');
+await expect(page).toHaveUI5CellText('poTable', 1, 3, /pending/i);
+```
+
+### toHaveUI5SelectedRows
+
+Asserts which row indices are currently selected in a table.
+
+```typescript
+await expect(page).toHaveUI5SelectedRows('poTable', [0, 2]);
+await expect(page).toHaveUI5SelectedRows('poTable', []); // No selection
+```
+
+## Auto-Retry Mechanism
+
+All Praman matchers are registered as async custom matchers. They query the UI5 runtime via
+`page.evaluate()` on each poll iteration. Playwright's `expect()` auto-retries failed assertions
+until the configured timeout (default 5 seconds).
+
+This means you do not need manual retry loops:
+
+```typescript
+// This auto-retries for up to 5 seconds:
+await expect(page).toHaveUI5Text('statusField', 'Approved');
+```
+
+For longer waits, increase the timeout:
+
+```typescript
+await expect(page).toHaveUI5Text('statusField', 'Approved', { timeout: 15_000 });
+```
+
+## Using expect.poll() With UI5 Methods
+
+For custom assertions beyond the 10 built-in matchers, use `expect.poll()` with `ui5.*` methods:
+
+```typescript
+// Poll until the control value matches
+await expect
+  .poll(async () => ui5.getProperty({ id: 'vendorInput' }, 'value'), { timeout: 10_000 })
+  .toBe('100001');
+
+// Poll for table row count
+await expect
+  .poll(async () => ui5.table.getRowCount('poTable'), { timeout: 15_000 })
+  .toBeGreaterThan(0);
+```
+
+## Comparison With Playwright Built-In Matchers
+
+| Matcher Type               | Source of Truth          | Auto-Retry | Needs Locator           |
+| -------------------------- | ------------------------ | ---------- | ----------------------- |
+| Playwright `toBeEnabled()` | DOM `disabled` attribute | Yes        | Yes (`Locator`)         |
+| Praman `toBeUI5Enabled()`  | UI5 `getEnabled()` API   | Yes        | No (string `controlId`) |
+| Playwright `toHaveText()`  | DOM `textContent`        | Yes        | Yes (`Locator`)         |
+| Praman `toHaveUI5Text()`   | UI5 `getText()` API      | Yes        | No (string `controlId`) |
+| Playwright `toBeVisible()` | DOM intersection/display | Yes        | Yes (`Locator`)         |
+| Praman `toBeUI5Visible()`  | UI5 `getVisible()` API   | Yes        | No (string `controlId`) |
+
+Use Praman matchers when you need to check the UI5 model state. Use Playwright matchers when you
+need to verify DOM-level rendering (e.g., CSS visibility, element position).
+
+## Complete Example
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('validate purchase order form', async ({ ui5, page }) => {
+  // Check form state
+  await expect(page).toBeUI5Visible('vendorInput');
+  await expect(page).toBeUI5Enabled('vendorInput');
+
+  // Fill and validate
+  await ui5.fill({ id: 'vendorInput' }, 'INVALID');
+  await expect(page).toHaveUI5ValueState('vendorInput', 'Error');
+
+  await ui5.fill({ id: 'vendorInput' }, '100001');
+  await expect(page).toHaveUI5ValueState('vendorInput', 'None');
+  await expect(page).toHaveUI5Text('vendorName', 'Acme Corp');
+
+  // Check binding
+  await expect(page).toHaveUI5Binding('vendorInput', '/PurchaseOrder/Vendor');
+
+  // Verify table
+  await expect(page).toHaveUI5RowCount('itemTable', 3);
+  await expect(page).toHaveUI5CellText('itemTable', 0, 0, 'MAT-001');
+  await expect(page).toHaveUI5CellText('itemTable', 0, 1, '10');
+
+  // Check button states
+  await expect(page).toBeUI5Enabled('saveBtn');
+  await expect(page).not.toBeUI5Enabled('deleteBtn');
+  await expect(page).toBeUI5ControlType('saveBtn', 'sap.m.Button');
+});
+```
+
+## Registration
+
+Matchers are auto-registered via the `matcherRegistration` worker-scoped auto-fixture. No setup
+code is needed — just import `{ expect }` from `playwright-praman` and the matchers are available.
+
+```typescript
+import { test, expect } from 'playwright-praman';
+// All 10 matchers are ready to use
+```
+
+## Navigation
+
+Praman provides 9 navigation functions via the `ui5Navigation` fixture, plus BTP WorkZone
+iframe management via `btpWorkZone`. All navigation uses the FLP's own `hasher` API for
+reliable hash-based routing without full page reloads.
+
+## Why Not page.goto()?
+
+SAP Fiori Launchpad uses hash-based routing. Calling `page.goto()` with a new URL triggers a
+full page reload, which means:
+
+- UI5 core must re-bootstrap (30-60 seconds on BTP)
+- All OData models are re-initialized
+- Authentication may need to re-negotiate
+
+Praman's navigation functions use `window.hasher.setHash()` via `page.evaluate()`, which
+changes the hash fragment without a page reload. The FLP router handles the transition
+in-place.
+
+## Navigation Methods
+
+### navigateToApp
+
+Navigates to an app by its semantic object-action string. This is the most common navigation
+method.
+
+```typescript
+await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+await ui5Navigation.navigateToApp('SalesOrder-create');
+await ui5Navigation.navigateToApp('Material-display');
+```
+
+### navigateToTile
+
+Clicks an FLP tile by its visible title text. Useful for homepage-based navigation.
+
+```typescript
+await ui5Navigation.navigateToTile('Create Purchase Order');
+await ui5Navigation.navigateToTile('Manage Sales Orders');
+```
+
+### navigateToIntent
+
+Navigates using a semantic object + action + optional parameters. This is the most flexible
+method for parameterized navigation.
+
+```typescript
+// Basic intent
+await ui5Navigation.navigateToIntent('PurchaseOrder', 'create');
+
+// With parameters
+await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', {
+  plant: '1000',
+  purchOrg: '1000',
+});
+
+// Produces hash: #PurchaseOrder-create?plant=1000&purchOrg=1000
+```
+
+### navigateToHash
+
+Sets the URL hash fragment directly. Useful for deep-linking to specific views or states.
+
+```typescript
+await ui5Navigation.navigateToHash("PurchaseOrder-manage&/PurchaseOrders('4500000001')");
+await ui5Navigation.navigateToHash('Shell-home');
+```
+
+### navigateToHome
+
+Returns to the FLP homepage.
+
+```typescript
+await ui5Navigation.navigateToHome();
+```
+
+### navigateBack / navigateForward
+
+Browser history navigation.
+
+```typescript
+await ui5Navigation.navigateBack();
+await ui5Navigation.navigateForward();
+```
+
+### searchAndOpenApp
+
+Types a query into the FLP shell search bar and opens the first result.
+
+```typescript
+await ui5Navigation.searchAndOpenApp('Purchase Order');
+await ui5Navigation.searchAndOpenApp('Vendor Master');
+```
+
+### getCurrentHash
+
+Reads the current URL hash fragment. Useful for assertions.
+
+```typescript
+const hash = await ui5Navigation.getCurrentHash();
+expect(hash).toContain('PurchaseOrder');
+expect(hash).toContain('manage');
+```
+
+## Auto-Stability After Navigation
+
+Every navigation function calls `waitForUI5Stable()` after changing the hash. This ensures the
+target app has fully loaded before the next test step executes.
+
+To skip this wait (e.g., if you have a custom wait):
+
+```typescript
+// The waitForStable option is available on navigation methods
+await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+// Stability wait fires automatically after this call returns
+```
+
+## Intent Navigation Patterns
+
+### Simple Navigation
+
+```typescript
+test('open purchase order', async ({ ui5Navigation }) => {
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+});
+```
+
+### Parameterized Navigation
+
+```typescript
+test('open specific purchase order', async ({ ui5Navigation }) => {
+  await ui5Navigation.navigateToIntent('PurchaseOrder', 'display', {
+    PurchaseOrder: '4500000001',
+  });
+});
+```
+
+### Multi-Step Navigation
+
+```typescript
+test('list report to object page', async ({ ui5Navigation, ui5 }) => {
+  // Step 1: Navigate to list report
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+
+  // Step 2: Click a row to navigate to object page
+  await ui5.click({
+    controlType: 'sap.m.ColumnListItem',
+    ancestor: { id: 'poTable' },
+  });
+
+  // Step 3: Verify we're on the object page
+  const hash = await ui5Navigation.getCurrentHash();
+  expect(hash).toContain('PurchaseOrders');
+
+  // Step 4: Go back
+  await ui5Navigation.navigateBack();
+});
+```
+
+## BTP WorkZone Iframe Management
+
+SAP BTP WorkZone renders applications inside nested iframes. The `btpWorkZone` fixture handles
+frame switching transparently.
+
+### The Frame Structure
+
+```
+Outer Frame (WorkZone shell)
+  └── Inner Frame (workspace / application)
+        └── UI5 Application
+```
+
+Without frame management, Playwright targets the outer frame and cannot find UI5 controls
+inside the inner workspace frame.
+
+### Using btpWorkZone
+
+```typescript
+import { test } from 'playwright-praman';
+
+test('WorkZone navigation', async ({ btpWorkZone, ui5, page }) => {
+  // The manager detects the frame structure automatically
+  const workspace = btpWorkZone.getWorkspaceFrame();
+
+  // UI5 operations automatically target the correct frame
+  await ui5.click({ id: 'saveBtn' });
+});
+```
+
+### Cross-Frame Operations
+
+When you need to interact with controls in both the outer shell and inner workspace:
+
+```typescript
+test('shell + workspace', async ({ btpWorkZone, ui5Shell, ui5 }) => {
+  // Shell header is in the outer frame
+  await ui5Shell.expectShellHeader();
+
+  // Application controls are in the inner frame
+  await ui5.click({ id: 'appButton' });
+});
+```
+
+## Step Decoration
+
+Every navigation call is wrapped in a Playwright `test.step()` for HTML report visibility:
+
+```
+test 'create purchase order'
+  ├── ui5Navigation.navigateToApp: PurchaseOrder-create
+  ├── ui5.fill: vendorInput
+  ├── ui5.click: saveBtn
+  └── ui5Navigation.navigateToHome
+```
+
+## Complete Example
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('end-to-end purchase order workflow', async ({ ui5Navigation, ui5, ui5Shell, ui5Footer }) => {
+  // Navigate to create app
+  await ui5Navigation.navigateToApp('PurchaseOrder-create');
+
+  // Fill form
+  await ui5.fill({ id: 'vendorInput' }, '100001');
+  await ui5.select({ id: 'purchOrgSelect' }, '1000');
+
+  // Save via footer
+  await ui5Footer.clickSave();
+
+  // Verify navigation to display view
+  const hash = await ui5Navigation.getCurrentHash();
+  expect(hash).toContain('PurchaseOrder');
+
+  // Navigate home
+  await ui5Shell.clickHome();
+
+  // Verify we're on the homepage
+  const homeHash = await ui5Navigation.getCurrentHash();
+  expect(homeHash).toContain('Shell-home');
+});
+```
+
+## Authentication
+
+Praman supports 6 pluggable authentication strategies for SAP systems.
+
+## Strategies
+
+| Strategy         | Use Case                                      | Config Value     |
+| ---------------- | --------------------------------------------- | ---------------- |
+| **On-Premise**   | On-premise SAP NetWeaver / S/4HANA            | `'onprem'`       |
+| **Cloud SAML**   | SAP BTP with SAML IdP (IAS, Azure AD)         | `'cloud-saml'`   |
+| **Office 365**   | Microsoft SSO for SAP connected to Azure      | `'office365'`    |
+| **Multi-Tenant** | SAP BTP multi-tenant apps with subdomain auth | `'multi-tenant'` |
+| **API**          | API key or OAuth bearer token (headless)      | `'api'`          |
+| **Certificate**  | Client certificate authentication             | `'certificate'`  |
+
+## Setup Project Pattern
+
+The recommended pattern uses Playwright's **setup projects** to authenticate once and share the session across all tests.
+
+### 1. Auth Setup File
+
+Create `tests/auth-setup.ts` (or use Praman's built-in `src/auth/auth-setup.ts`):
+
+```typescript
+import { join } from 'node:path';
+import { test as setup } from '@playwright/test';
+
+const authFile = join(process.cwd(), '.auth', 'sap-session.json');
+
+setup('SAP authentication', async ({ page, context }) => {
+  const { SAPAuthHandler } = await import('playwright-praman/auth');
+  const { createAuthStrategy } = await import('playwright-praman/auth');
+
+  const strategy = createAuthStrategy({
+    url: process.env.SAP_BASE_URL ?? '',
+    username: process.env.SAP_ONPREM_USERNAME ?? '',
+    password: process.env.SAP_ONPREM_PASSWORD ?? '',
+    strategy: 'onprem',
+  });
+
+  const handler = new SAPAuthHandler({ strategy });
+  await handler.login(page, {
+    url: process.env.SAP_BASE_URL ?? '',
+    username: process.env.SAP_ONPREM_USERNAME ?? '',
+    password: process.env.SAP_ONPREM_PASSWORD ?? '',
+    client: process.env.SAP_CLIENT,
+    language: process.env.SAP_LANGUAGE,
+  });
+
+  await context.storageState({ path: authFile });
+});
+```
+
+### 2. Playwright Config
+
+```typescript
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'setup',
+      testMatch: /auth-setup\.ts/,
+      teardown: 'teardown',
+    },
+    {
+      name: 'teardown',
+      testMatch: /auth-teardown\.ts/,
+    },
+    {
+      name: 'chromium',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: '.auth/sap-session.json',
+      },
+    },
+  ],
+});
+```
+
+### 3. Tests Use Saved Session
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+// No login code needed — storageState handles it
+test('navigate after auth', async ({ ui5Navigation }) => {
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+});
+```
+
+## Strategy Examples
+
+### On-Premise (`onprem`)
+
+```bash
+# .env
+SAP_ACTIVE_SYSTEM=onprem
+SAP_ONPREM_BASE_URL=https://sapserver.example.com:8443/sap/bc/ui5_ui5/
+SAP_ONPREM_USERNAME=TESTUSER
+SAP_ONPREM_PASSWORD=secret
+SAP_CLIENT=100
+SAP_LANGUAGE=EN
+```
+
+### Cloud SAML (`cloud-saml`)
+
+```bash
+# .env
+SAP_ACTIVE_SYSTEM=cloud
+SAP_CLOUD_BASE_URL=https://tenant.launchpad.cfapps.eu10.hana.ondemand.com
+SAP_CLOUD_USERNAME=user@company.com
+SAP_CLOUD_PASSWORD=secret
+```
+
+### Office 365 SSO
+
+```bash
+# .env
+SAP_ACTIVE_SYSTEM=cloud
+SAP_AUTH_STRATEGY=office365
+SAP_CLOUD_BASE_URL=https://tenant.launchpad.cfapps.eu10.hana.ondemand.com
+SAP_CLOUD_USERNAME=user@company.onmicrosoft.com
+SAP_CLOUD_PASSWORD=secret
+```
+
+## Using the `sapAuth` Fixture
+
+For tests that need explicit auth control:
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('explicit auth', async ({ sapAuth, page }) => {
+  await sapAuth.login(page, {
+    url: 'https://sapserver.example.com',
+    username: 'TESTUSER',
+    password: 'secret',
+    strategy: 'onprem',
+  });
+
+  expect(sapAuth.isAuthenticated()).toBe(true);
+
+  const session = sapAuth.getSessionInfo();
+  expect(session.user).toBe('TESTUSER');
+
+  // Auto-logout on fixture teardown
+});
+```
+
+## Session Expiry
+
+The default session timeout is 1800 seconds (30 minutes), matching SAP ICM defaults.
+See [Product Decision P5-PD-002](../decisions/product-decisions#p5-pd-002-session-timeout-default) for rationale.
+
+## BTP WorkZone Authentication
+
+BTP WorkZone renders apps inside nested iframes. The `btpWorkZone` fixture handles frame context automatically:
+
+```typescript
+test('WorkZone app', async ({ btpWorkZone, ui5 }) => {
+  const workspace = btpWorkZone.getWorkspaceFrame();
+  // All operations route through the correct frame
+});
+```
+
+## Configuration
+
+Praman uses a Zod-validated configuration system. All fields have defaults — an empty `{}` is valid.
+
+## Config File
+
+Create `praman.config.ts` in your project root:
+
+```typescript
+import { defineConfig } from 'playwright-praman';
+
+export default defineConfig({
+  logLevel: 'info',
+  ui5WaitTimeout: 30_000,
+  controlDiscoveryTimeout: 10_000,
+  interactionStrategy: 'ui5-native',
+  discoveryStrategies: ['direct-id', 'recordreplay'],
+  auth: {
+    strategy: 'basic',
+    baseUrl: process.env.SAP_BASE_URL!,
+    username: process.env.SAP_USER!,
+    password: process.env.SAP_PASS!,
+    client: '100',
+    language: 'EN',
+  },
+  ai: {
+    provider: 'azure-openai',
+    apiKey: process.env.AZURE_OPENAI_KEY,
+    endpoint: process.env.AZURE_OPENAI_ENDPOINT,
+    deployment: 'gpt-4o',
+  },
+  telemetry: {
+    openTelemetry: false,
+    exporter: 'otlp',
+    endpoint: 'http://localhost:4318',
+    serviceName: 'sap-e2e-tests',
+  },
+});
+```
+
+## Top-Level Options
+
+| Field                     | Type                                                  | Default                         | Description                                          |
+| ------------------------- | ----------------------------------------------------- | ------------------------------- | ---------------------------------------------------- |
+| `logLevel`                | `'error' \| 'warn' \| 'info' \| 'debug' \| 'verbose'` | `'info'`                        | Pino log level                                       |
+| `ui5WaitTimeout`          | `number`                                              | `30_000`                        | Max ms to wait for UI5 stability                     |
+| `controlDiscoveryTimeout` | `number`                                              | `10_000`                        | Max ms for control discovery                         |
+| `interactionStrategy`     | `'ui5-native' \| 'dom-first' \| 'opa5'`               | `'ui5-native'`                  | How to interact with controls                        |
+| `discoveryStrategies`     | `string[]`                                            | `['direct-id', 'recordreplay']` | Ordered strategy chain                               |
+| `skipStabilityWait`       | `boolean`                                             | `false`                         | Skip `waitForUI5Stable()`, use brief DOM settle      |
+| `preferVisibleControls`   | `boolean`                                             | `true`                          | Prefer visible controls over hidden ones             |
+| `ignoreAutoWaitUrls`      | `string[]`                                            | `[]`                            | Additional URL patterns to block (WalkMe, analytics) |
+
+## Auth Sub-Schema
+
+| Field      | Type                                               | Default    | Description             |
+| ---------- | -------------------------------------------------- | ---------- | ----------------------- |
+| `strategy` | `'btp-saml' \| 'basic' \| 'office365' \| 'custom'` | `'basic'`  | Authentication strategy |
+| `baseUrl`  | `string` (URL)                                     | _required_ | SAP system base URL     |
+| `username` | `string`                                           | —          | Login username          |
+| `password` | `string`                                           | —          | Login password          |
+| `client`   | `string`                                           | `'100'`    | SAP client number       |
+| `language` | `string`                                           | `'EN'`     | SAP logon language      |
+
+## AI Sub-Schema
+
+| Field             | Type                                        | Default          | Description                                          |
+| ----------------- | ------------------------------------------- | ---------------- | ---------------------------------------------------- |
+| `provider`        | `'azure-openai' \| 'openai' \| 'anthropic'` | `'azure-openai'` | LLM provider                                         |
+| `apiKey`          | `string`                                    | —                | OpenAI / Azure OpenAI API key                        |
+| `anthropicApiKey` | `string`                                    | —                | Anthropic API key (separate for security)            |
+| `model`           | `string`                                    | —                | Model name (e.g., `'gpt-4o'`, `'claude-sonnet-4-6'`) |
+| `temperature`     | `number`                                    | `0.3`            | LLM temperature (0-2)                                |
+| `maxTokens`       | `number`                                    | —                | Max tokens per response                              |
+| `endpoint`        | `string` (URL)                              | —                | Azure OpenAI resource endpoint                       |
+| `deployment`      | `string`                                    | —                | Azure OpenAI deployment name                         |
+| `apiVersion`      | `string`                                    | —                | Azure API version                                    |
+
+## Telemetry Sub-Schema
+
+| Field           | Type                                    | Default               | Description                  |
+| --------------- | --------------------------------------- | --------------------- | ---------------------------- |
+| `openTelemetry` | `boolean`                               | `false`               | Enable OpenTelemetry tracing |
+| `exporter`      | `'otlp' \| 'azure-monitor' \| 'jaeger'` | `'otlp'`              | Trace exporter               |
+| `endpoint`      | `string` (URL)                          | —                     | Exporter endpoint URL        |
+| `serviceName`   | `string`                                | `'playwright-praman'` | Service name in traces       |
+
+## Selectors Sub-Schema
+
+| Field                   | Type      | Default  | Description                       |
+| ----------------------- | --------- | -------- | --------------------------------- |
+| `defaultTimeout`        | `number`  | `10_000` | Default selector timeout (ms)     |
+| `preferVisibleControls` | `boolean` | `true`   | Prefer visible controls           |
+| `skipStabilityWait`     | `boolean` | `false`  | Skip stability wait for selectors |
+
+## OPA5 Sub-Schema
+
+| Field                | Type      | Default | Description                   |
+| -------------------- | --------- | ------- | ----------------------------- |
+| `interactionTimeout` | `number`  | `5_000` | OPA5 interaction timeout (ms) |
+| `autoWait`           | `boolean` | `true`  | Auto-wait for OPA5 readiness  |
+| `debug`              | `boolean` | `false` | Enable OPA5 debug mode        |
+
+## Environment Variable Overrides
+
+Top-level config fields can be overridden via environment variables:
+
+| Environment Variable               | Config Field              |
+| ---------------------------------- | ------------------------- |
+| `PRAMAN_LOG_LEVEL`                 | `logLevel`                |
+| `PRAMAN_UI5_WAIT_TIMEOUT`          | `ui5WaitTimeout`          |
+| `PRAMAN_CONTROL_DISCOVERY_TIMEOUT` | `controlDiscoveryTimeout` |
+| `PRAMAN_INTERACTION_STRATEGY`      | `interactionStrategy`     |
+| `PRAMAN_SKIP_STABILITY_WAIT`       | `skipStabilityWait`       |
+
+**Precedence** (highest to lowest):
+
+1. Per-call options (e.g., `ui5.control({ ... }, { timeout: 5000 })`)
+2. Selectors sub-schema config
+3. Top-level config
+4. Environment variable overrides
+5. Schema defaults
+
+## Complete `playwright.config.ts` Example
+
+```typescript
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests/e2e',
+  timeout: 120_000,
+  expect: { timeout: 10_000 },
+  fullyParallel: false,
+  retries: 1,
+  workers: 1,
+  reporter: [
+    ['html', { open: 'never' }],
+    ['playwright-praman/reporters', { type: 'compliance', outputDir: 'reports' }],
+  ],
+  use: {
+    baseURL: process.env.SAP_BASE_URL,
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  projects: [
+    {
+      name: 'setup',
+      testMatch: /auth-setup\.ts/,
+      teardown: 'teardown',
+    },
+    {
+      name: 'teardown',
+      testMatch: /auth-teardown\.ts/,
+    },
+    {
+      name: 'chromium',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: '.auth/sap-session.json',
+      },
+    },
+  ],
+});
+```
+
+## Validation
+
+Config is validated with Zod at load time. Invalid config fails fast:
+
+```typescript
+import { loadConfig } from 'playwright-praman';
+
+const config = await loadConfig();
+// Throws ConfigError with ERR_CONFIG_INVALID if schema fails
+// Returns Readonly<PramanConfig> — deeply frozen, mutation throws
+```
+
+## Error Codes
+
+Praman provides 14 typed error classes with 58 machine-readable error codes. Every error includes
+the attempted operation, a `retryable` flag, and actionable recovery `suggestions`.
+
+## Error Hierarchy
+
+All errors extend `PramanError`, which extends `Error`:
+
+```text
+Error
+ └── PramanError
+      ├── AIError          (11 codes)
+      ├── AuthError        (4 codes)
+      ├── BridgeError      (5 codes)
+      ├── ConfigError      (3 codes)
+      ├── ControlError     (8 codes)
+      ├── FLPError         (5 codes)
+      ├── IntentError      (4 codes)
+      ├── NavigationError  (3 codes)
+      ├── ODataError       (3 codes)
+      ├── PluginError      (3 codes)
+      ├── SelectorError    (3 codes)
+      ├── TimeoutError     (3 codes)
+      └── VocabularyError  (4 codes)
+```
+
+## Error Codes
+
+### Config Errors
+
+| Code                   | Description                                    | Retryable |
+| ---------------------- | ---------------------------------------------- | --------- |
+| `ERR_CONFIG_INVALID`   | Zod schema validation failed                   | No        |
+| `ERR_CONFIG_NOT_FOUND` | Config file not found at expected path         | No        |
+| `ERR_CONFIG_PARSE`     | Config file could not be parsed (syntax error) | No        |
+
+### Bridge Errors
+
+| Code                   | Description                              | Retryable |
+| ---------------------- | ---------------------------------------- | --------- |
+| `ERR_BRIDGE_TIMEOUT`   | Bridge injection exceeded timeout        | Yes       |
+| `ERR_BRIDGE_INJECTION` | Bridge script failed to inject into page | Yes       |
+| `ERR_BRIDGE_NOT_READY` | Bridge not ready (UI5 not loaded)        | Yes       |
+| `ERR_BRIDGE_VERSION`   | UI5 version mismatch or unsupported      | No        |
+| `ERR_BRIDGE_EXECUTION` | Bridge script execution failed           | Yes       |
+
+### Control Errors
+
+| Code                             | Description                                     | Retryable |
+| -------------------------------- | ----------------------------------------------- | --------- |
+| `ERR_CONTROL_NOT_FOUND`          | Control not found with given selector           | Yes       |
+| `ERR_CONTROL_NOT_VISIBLE`        | Control exists but is not visible               | Yes       |
+| `ERR_CONTROL_NOT_ENABLED`        | Control is visible but disabled                 | No        |
+| `ERR_CONTROL_NOT_INTERACTABLE`   | Control cannot receive interactions             | No        |
+| `ERR_CONTROL_PROPERTY`           | Property read/write failed                      | No        |
+| `ERR_CONTROL_AGGREGATION`        | Aggregation access failed                       | No        |
+| `ERR_CONTROL_METHOD`             | Method invocation failed (possibly blacklisted) | No        |
+| `ERR_CONTROL_INTERACTION_FAILED` | Click/type/select operation failed              | Yes       |
+
+### Auth Errors
+
+| Code                        | Description                               | Retryable |
+| --------------------------- | ----------------------------------------- | --------- |
+| `ERR_AUTH_FAILED`           | Authentication failed (wrong credentials) | No        |
+| `ERR_AUTH_TIMEOUT`          | Login page did not respond in time        | Yes       |
+| `ERR_AUTH_SESSION_EXPIRED`  | Session expired (default: 30 min)         | Yes       |
+| `ERR_AUTH_STRATEGY_INVALID` | Unknown or misconfigured auth strategy    | No        |
+
+### Navigation Errors
+
+| Code                     | Description                         | Retryable |
+| ------------------------ | ----------------------------------- | --------- |
+| `ERR_NAV_TILE_NOT_FOUND` | FLP tile not found by title         | No        |
+| `ERR_NAV_ROUTE_FAILED`   | Hash navigation did not resolve     | Yes       |
+| `ERR_NAV_TIMEOUT`        | Navigation did not complete in time | Yes       |
+
+### OData Errors
+
+| Code                       | Description                           | Retryable |
+| -------------------------- | ------------------------------------- | --------- |
+| `ERR_ODATA_REQUEST_FAILED` | HTTP request to OData service failed  | Yes       |
+| `ERR_ODATA_PARSE`          | OData response could not be parsed    | No        |
+| `ERR_ODATA_CSRF`           | CSRF token fetch or validation failed | Yes       |
+
+### Selector Errors
+
+| Code                     | Description                          | Retryable |
+| ------------------------ | ------------------------------------ | --------- |
+| `ERR_SELECTOR_INVALID`   | Selector object is malformed         | No        |
+| `ERR_SELECTOR_AMBIGUOUS` | Multiple controls match the selector | No        |
+| `ERR_SELECTOR_PARSE`     | Selector string could not be parsed  | No        |
+
+### Timeout Errors
+
+| Code                            | Description                        | Retryable |
+| ------------------------------- | ---------------------------------- | --------- |
+| `ERR_TIMEOUT_UI5_STABLE`        | UI5 did not reach stable state     | Yes       |
+| `ERR_TIMEOUT_CONTROL_DISCOVERY` | Control discovery exceeded timeout | Yes       |
+| `ERR_TIMEOUT_OPERATION`         | Generic operation timeout          | Yes       |
+
+### AI Errors
+
+| Code                           | Description                          | Retryable |
+| ------------------------------ | ------------------------------------ | --------- |
+| `ERR_AI_PROVIDER_UNAVAILABLE`  | LLM provider not reachable           | Yes       |
+| `ERR_AI_RESPONSE_INVALID`      | LLM returned invalid response format | Yes       |
+| `ERR_AI_TOKEN_LIMIT`           | Prompt exceeded token limit          | No        |
+| `ERR_AI_RATE_LIMITED`          | Provider rate limit hit              | Yes       |
+| `ERR_AI_NOT_CONFIGURED`        | AI provider not configured           | No        |
+| `ERR_AI_LLM_CALL_FAILED`       | LLM API call failed                  | Yes       |
+| `ERR_AI_RESPONSE_PARSE_FAILED` | Could not parse LLM response         | Yes       |
+| `ERR_AI_CONTEXT_BUILD_FAILED`  | Page context build failed            | Yes       |
+| `ERR_AI_STEP_INTERPRET_FAILED` | Step interpretation failed           | No        |
+| `ERR_AI_INVALID_REQUEST`       | Invalid or malformed AI request      | No        |
+| `ERR_AI_CAPABILITY_NOT_FOUND`  | Requested capability not in registry | No        |
+
+### Plugin Errors
+
+| Code                      | Description                       | Retryable |
+| ------------------------- | --------------------------------- | --------- |
+| `ERR_PLUGIN_LOAD`         | Plugin module could not be loaded | No        |
+| `ERR_PLUGIN_INIT`         | Plugin initialization failed      | Yes       |
+| `ERR_PLUGIN_INCOMPATIBLE` | Plugin version incompatible       | No        |
+
+### Vocabulary Errors
+
+| Code                           | Description                             | Retryable |
+| ------------------------------ | --------------------------------------- | --------- |
+| `ERR_VOCAB_TERM_NOT_FOUND`     | Business term not in vocabulary         | No        |
+| `ERR_VOCAB_DOMAIN_LOAD_FAILED` | Domain JSON failed to load              | Yes       |
+| `ERR_VOCAB_JSON_INVALID`       | Domain vocabulary JSON malformed        | No        |
+| `ERR_VOCAB_AMBIGUOUS_MATCH`    | Multiple terms match with similar score | No        |
+
+### Intent Errors
+
+| Code                           | Description                          | Retryable |
+| ------------------------------ | ------------------------------------ | --------- |
+| `ERR_INTENT_FIELD_NOT_FOUND`   | Form field not found for intent      | No        |
+| `ERR_INTENT_ACTION_FAILED`     | Intent action could not be completed | Yes       |
+| `ERR_INTENT_NAVIGATION_FAILED` | Intent navigation to app failed      | Yes       |
+| `ERR_INTENT_VALIDATION_FAILED` | Intent input validation failed       | No        |
+
+### FLP Errors
+
+| Code                        | Description                   | Retryable |
+| --------------------------- | ----------------------------- | --------- |
+| `ERR_FLP_SHELL_NOT_FOUND`   | FLP shell container not found | Yes       |
+| `ERR_FLP_PERMISSION_DENIED` | Insufficient FLP permissions  | No        |
+| `ERR_FLP_API_UNAVAILABLE`   | FLP UShell API not available  | Yes       |
+| `ERR_FLP_INVALID_USER`      | FLP user context invalid      | No        |
+| `ERR_FLP_OPERATION_TIMEOUT` | FLP operation timed out       | Yes       |
+
+## Using Errors in Tests
+
+### Catch and Inspect
+
+```typescript
+import { test } from 'playwright-praman';
+import { ControlError } from 'playwright-praman';
+
+test('handle control not found', async ({ ui5 }) => {
+  try {
+    await ui5.control({ id: 'nonExistent' });
+  } catch (error) {
+    if (error instanceof ControlError) {
+      console.log(error.code); // 'ERR_CONTROL_NOT_FOUND'
+      console.log(error.retryable); // true
+      console.log(error.suggestions); // ['Verify the control ID...', ...]
+      console.log(error.toUserMessage()); // Human-readable
+      console.log(error.toAIContext()); // Machine-readable for AI agents
+    }
+  }
+});
+```
+
+### Error Properties
+
+Every `PramanError` includes:
+
+| Property      | Type        | Description                                             |
+| ------------- | ----------- | ------------------------------------------------------- |
+| `code`        | `ErrorCode` | Machine-readable code (e.g., `'ERR_CONTROL_NOT_FOUND'`) |
+| `message`     | `string`    | Human-readable description                              |
+| `attempted`   | `string`    | What operation was attempted                            |
+| `retryable`   | `boolean`   | Whether the operation can be retried                    |
+| `suggestions` | `string[]`  | 2-4 actionable recovery steps                           |
+| `details`     | `Record`    | Additional context (selector, timeout, etc.)            |
+| `timestamp`   | `string`    | ISO-8601 timestamp                                      |
+
+### Serialization
+
+```typescript
+// For humans
+error.toUserMessage();
+// "Control not found: #saveBtn. Try: Verify the control ID exists..."
+
+// For logging (JSON)
+error.toJSON();
+// { code, message, attempted, retryable, suggestions, details, timestamp }
+
+// For AI agents
+error.toAIContext();
+// Structured context optimized for LLM consumption
+```
+
+## Fiori Elements
+
+# Fiori Elements Testing
+
+The `playwright-praman/fe` sub-path provides specialized helpers for testing SAP Fiori Elements applications, including List Report, Object Page, table operations, and the FE Test Library integration.
+
+## Getting Started
+
+```typescript
+import {
+  getListReportTable,
+  getFilterBar,
+  setFilterBarField,
+  executeSearch,
+  navigateToItem,
+  getObjectPageLayout,
+  getHeaderTitle,
+  navigateToSection,
+} from 'playwright-praman/fe';
+```
+
+## List Report Operations
+
+### Finding the Table and Filter Bar
+
+```typescript
+// Discover the main List Report table
+const tableId = await getListReportTable(page);
+
+// Discover the filter bar
+const filterBarId = await getFilterBar(page);
+```
+
+Both functions wait for UI5 stability before querying and throw a `ControlError` if the control is not found.
+
+### Filter Bar Operations
+
+```typescript
+// Set a filter field value
+await setFilterBarField(page, filterBarId, 'CompanyCode', '1000');
+
+// Read a filter field value
+const value = await getFilterBarFieldValue(page, filterBarId, 'CompanyCode');
+
+// Clear all filter bar fields
+await clearFilterBar(page, filterBarId);
+
+// Execute search (triggers the Go button)
+await executeSearch(page, filterBarId);
+```
+
+### Variant Management
+
+```typescript
+// List available variants
+const variants = await getAvailableVariants(page);
+// ['Standard', 'My Open Orders', 'Last 30 Days']
+
+// Select a variant by name
+await selectVariant(page, 'My Open Orders');
+```
+
+### Row Navigation
+
+```typescript
+// Navigate to a specific row (opens Object Page)
+await navigateToItem(page, tableId, 0); // Click first row
+```
+
+### Options
+
+All List Report functions accept an optional `ListReportOptions` parameter:
+
+```typescript
+interface ListReportOptions {
+  readonly timeout?: number; // Default: CONTROL_DISCOVERY timeout
+  readonly skipStabilityWait?: boolean; // Default: false
+}
+
+// Example with options
+await executeSearch(page, filterBarId, { timeout: 15_000 });
+```
+
+## Object Page Operations
+
+### Layout and Header
+
+```typescript
+// Discover the Object Page layout
+const layoutId = await getObjectPageLayout(page);
+
+// Read the header title
+const title = await getHeaderTitle(page);
+// 'Purchase Order 4500012345'
+```
+
+### Sections
+
+```typescript
+// Get all sections with their sub-sections
+const sections = await getObjectPageSections(page);
+// [
+//   { id: 'sec1', title: 'General Information', visible: true, index: 0, subSections: [...] },
+//   { id: 'sec2', title: 'Items', visible: true, index: 1, subSections: [...] },
+// ]
+
+// Navigate to a specific section
+await navigateToSection(page, 'Items');
+
+// Read form data from a section
+const data = await getSectionData(page, 'General Information');
+// { 'Vendor': 'Acme GmbH', 'Company Code': '1000', ... }
+```
+
+### Edit Mode
+
+```typescript
+// Check if Object Page is in edit mode
+const editing = await isInEditMode(page);
+
+// Toggle edit mode
+await clickEditButton(page);
+
+// Click custom buttons
+await clickObjectPageButton(page, 'Delete');
+
+// Save changes
+await clickSaveButton(page);
+```
+
+## FE Table Helpers
+
+For direct table manipulation (works with both List Report and Object Page tables):
+
+```typescript
+import {
+  feGetTableRowCount,
+  feGetColumnNames,
+  feGetCellValue,
+  feClickRow,
+  feFindRowByValues,
+} from 'playwright-praman/fe';
+
+// Get row count
+const count = await feGetTableRowCount(page, tableId);
+
+// Get column headers
+const columns = await feGetColumnNames(page, tableId);
+// ['Material', 'Description', 'Quantity', 'Unit Price']
+
+// Read a cell value by row index and column name
+const material = await feGetCellValue(page, tableId, 0, 'Material');
+
+// Click a row
+await feClickRow(page, tableId, 2);
+
+// Find a row by column values
+const rowIndex = await feFindRowByValues(page, tableId, {
+  Material: 'RAW-0001',
+  Quantity: '100',
+});
+```
+
+## FE List Helpers
+
+For list-based Fiori Elements views (e.g., Master-Detail):
+
+```typescript
+import {
+  feGetListItemCount,
+  feGetListItemTitle,
+  feGetListItemDescription,
+  feClickListItem,
+  feSelectListItem,
+  feFindListItemByTitle,
+} from 'playwright-praman/fe';
+
+// Get number of list items
+const count = await feGetListItemCount(page, listId);
+
+// Read item titles and descriptions
+const title = await feGetListItemTitle(page, listId, 0);
+const desc = await feGetListItemDescription(page, listId, 0);
+
+// Interact with list items
+await feClickListItem(page, listId, 0);
+await feSelectListItem(page, listId, 2);
+
+// Find item by title text
+const index = await feFindListItemByTitle(page, listId, 'Purchase Order 4500012345');
+```
+
+## FE Test Library Integration
+
+Praman integrates with SAP's own Fiori Elements Test Library (`sap.fe.test`):
+
+```typescript
+import { initializeFETestLibrary, FETestLibraryInstance } from 'playwright-praman/fe';
+
+// Initialize the FE Test Library on the page
+await initializeFETestLibrary(page, {
+  timeout: 30_000,
+});
+
+// The test library provides SAP's official FE testing API
+// through the bridge, enabling assertions that match SAP's own test patterns
+```
+
+## Complete Example
+
+A typical Fiori Elements List Report to Object Page test flow:
+
+```typescript
+import { test, expect } from 'playwright-praman';
+import {
+  getListReportTable,
+  getFilterBar,
+  setFilterBarField,
+  executeSearch,
+  navigateToItem,
+  getHeaderTitle,
+  getObjectPageSections,
+  getSectionData,
+} from 'playwright-praman/fe';
+
+test('browse purchase orders and view details', async ({ page, ui5 }) => {
+  await test.step('Navigate to List Report', async () => {
+    await page.goto(
+      '/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html#PurchaseOrder-manage',
+    );
+    await ui5.waitForUI5();
+  });
+
+  await test.step('Filter by company code', async () => {
+    const filterBar = await getFilterBar(page);
+    await setFilterBarField(page, filterBar, 'CompanyCode', '1000');
+    await executeSearch(page, filterBar);
+  });
+
+  await test.step('Navigate to first purchase order', async () => {
+    const table = await getListReportTable(page);
+    await navigateToItem(page, table, 0);
+    await ui5.waitForUI5();
+  });
+
+  await test.step('Verify Object Page header', async () => {
+    const title = await getHeaderTitle(page);
+    expect(title).toContain('Purchase Order');
+  });
+
+  await test.step('Read General Information section', async () => {
+    const data = await getSectionData(page, 'General Information');
+    expect(data).toHaveProperty('Vendor');
+    expect(data).toHaveProperty('Company Code');
+  });
+});
+```
+
+## Error Handling
+
+All FE helpers throw structured `ControlError` or `NavigationError` instances with suggestions:
+
+```typescript
+try {
+  await getListReportTable(page);
+} catch (error) {
+  // ControlError {
+  //   code: 'ERR_CONTROL_NOT_FOUND',
+  //   message: 'List Report table not found on current page',
+  //   suggestions: [
+  //     'Verify the current page is a Fiori Elements List Report',
+  //     'Wait for the page to fully load before accessing the table',
+  //   ]
+  // }
+}
+```
+
+## OData Operations
+
+Praman provides two approaches to OData data access: **model operations** (browser-side, via
+`ui5.odata`) and **HTTP operations** (server-side, via `ui5.odata`). This page covers both,
+including V2 vs V4 differences and the ODataTraceReporter.
+
+## Two Approaches
+
+| Approach             | Access Path                  | Use Case                                  |
+| -------------------- | ---------------------------- | ----------------------------------------- |
+| **Model operations** | Browser-side UI5 model       | Reading data the UI already loaded        |
+| **HTTP operations**  | Direct HTTP to OData service | CRUD operations, test data setup/teardown |
+
+## Model Operations (Browser-Side)
+
+Model operations query the UI5 OData model that is already loaded in the browser. No additional
+HTTP requests are made — you are reading the same data the UI5 application is displaying.
+
+### getModelData
+
+Reads data at any model path. Returns the full object tree.
+
+```typescript
+const orders = await ui5.odata.getModelData('/PurchaseOrders');
+console.log(orders.length); // Number of loaded POs
+
+const singlePO = await ui5.odata.getModelData("/PurchaseOrders('4500000001')");
+console.log(singlePO.Vendor); // '100001'
+```
+
+### getModelProperty
+
+Reads a single property value from the model.
+
+```typescript
+const vendor = await ui5.odata.getModelProperty("/PurchaseOrders('4500000001')/Vendor");
+const amount = await ui5.odata.getModelProperty("/PurchaseOrders('4500000001')/NetAmount");
+```
+
+### getEntityCount
+
+Counts entities in a set. Reads from the model, not from $count.
+
+```typescript
+const count = await ui5.odata.getEntityCount('/PurchaseOrders');
+expect(count).toBeGreaterThan(0);
+```
+
+### waitForODataLoad
+
+Polls the model until data is available at the given path. Useful after navigation when
+OData requests are still in flight.
+
+```typescript
+await ui5.odata.waitForODataLoad('/PurchaseOrders');
+// Data is now available
+const orders = await ui5.odata.getModelData('/PurchaseOrders');
+```
+
+Default timeout: 15 seconds. Polling interval: 100ms.
+
+### hasPendingChanges
+
+Checks if the model has unsaved changes (dirty state).
+
+```typescript
+await ui5.fill({ id: 'vendorInput' }, '100002');
+const dirty = await ui5.odata.hasPendingChanges();
+expect(dirty).toBe(true);
+
+await ui5.click({ id: 'saveBtn' });
+const clean = await ui5.odata.hasPendingChanges();
+expect(clean).toBe(false);
+```
+
+### fetchCSRFToken
+
+Fetches a CSRF token from an OData service URL. Needed for write operations via HTTP.
+
+```typescript
+const token = await ui5.odata.fetchCSRFToken('/sap/opu/odata/sap/API_PO_SRV');
+// Use token in custom HTTP requests
+```
+
+### Named Model Support
+
+By default, model operations query the component's default model. To query a named model:
+
+```typescript
+const data = await ui5.odata.getModelData('/Products', { modelName: 'productModel' });
+```
+
+## HTTP Operations (Server-Side)
+
+HTTP operations perform direct OData CRUD operations against the service endpoint using
+Playwright's request context. These are independent of the browser — useful for test data
+setup, teardown, and backend verification.
+
+### queryEntities
+
+Performs an HTTP GET with OData query parameters.
+
+```typescript
+const orders = await ui5.odata.queryEntities('/sap/opu/odata/sap/API_PO_SRV', 'PurchaseOrders', {
+  filter: "Status eq 'A'",
+  select: 'PONumber,Vendor,Amount',
+  expand: 'Items',
+  orderby: 'PONumber desc',
+  top: 10,
+  skip: 0,
+});
+```
+
+### createEntity
+
+Performs an HTTP POST with automatic CSRF token management.
+
+```typescript
+const newPO = await ui5.odata.createEntity('/sap/opu/odata/sap/API_PO_SRV', 'PurchaseOrders', {
+  Vendor: '100001',
+  PurchOrg: '1000',
+  CompanyCode: '1000',
+  Items: [{ Material: 'MAT-001', Quantity: 10, Unit: 'EA' }],
+});
+console.log(newPO.PONumber); // Server-generated PO number
+```
+
+### updateEntity
+
+Performs an HTTP PATCH with CSRF token and optional ETag for optimistic concurrency.
+
+```typescript
+await ui5.odata.updateEntity('/sap/opu/odata/sap/API_PO_SRV', 'PurchaseOrders', "'4500000001'", {
+  Status: 'B',
+  Note: 'Updated by test',
+});
+```
+
+### deleteEntity
+
+Performs an HTTP DELETE with CSRF token.
+
+```typescript
+await ui5.odata.deleteEntity('/sap/opu/odata/sap/API_PO_SRV', 'PurchaseOrders', "'4500000001'");
+```
+
+### callFunctionImport
+
+Calls an OData function import (action).
+
+```typescript
+const result = await ui5.odata.callFunctionImport('/sap/opu/odata/sap/API_PO_SRV', 'ApprovePO', {
+  PONumber: '4500000001',
+});
+```
+
+## OData V2 vs V4 Differences
+
+| Aspect             | OData V2                                            | OData V4                                   |
+| ------------------ | --------------------------------------------------- | ------------------------------------------ |
+| **Model class**    | `sap.ui.model.odata.v2.ODataModel`                  | `sap.ui.model.odata.v4.ODataModel`         |
+| **URL convention** | `/sap/opu/odata/sap/SERVICE_SRV`                    | `/sap/opu/odata4/sap/SERVICE/srvd_a2x/...` |
+| **Batch**          | `$batch` with changesets                            | `$batch` with JSON:API format              |
+| **CSRF token**     | Fetched via HEAD request with `X-CSRF-Token: Fetch` | Same mechanism                             |
+| **Deep insert**    | Supported via navigation properties                 | Supported natively                         |
+| **Filter syntax**  | `$filter=Status eq 'A'`                             | `$filter=Status eq 'A'` (same)             |
+
+Praman's model operations work with both V2 and V4 models transparently — the model class
+handles the protocol differences. HTTP operations use the URL conventions of your service.
+
+## OData Trace Reporter
+
+The `ODataTraceReporter` captures all OData HTTP requests during test runs and generates a
+performance trace. See the [Reporters](./reporters.md) guide for configuration.
+
+The trace output includes per-entity-set statistics:
+
+```json
+{
+  "entitySets": {
+    "PurchaseOrders": {
+      "GET": { "count": 12, "avgDuration": 340, "maxDuration": 1200, "errors": 0 },
+      "POST": { "count": 2, "avgDuration": 890, "maxDuration": 1100, "errors": 0 },
+      "PATCH": { "count": 1, "avgDuration": 450, "maxDuration": 450, "errors": 0 }
+    },
+    "Vendors": {
+      "GET": { "count": 3, "avgDuration": 120, "maxDuration": 200, "errors": 0 }
+    }
+  },
+  "totalRequests": 18,
+  "totalErrors": 0,
+  "totalDuration": 8400
+}
+```
+
+## Complete Example
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('verify OData model state after form edit', async ({ ui5, ui5Navigation }) => {
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+
+  // Wait for initial data load
+  await ui5.odata.waitForODataLoad('/PurchaseOrders');
+
+  // Read model data
+  const orders = await ui5.odata.getModelData('/PurchaseOrders');
+  expect(orders.length).toBeGreaterThan(0);
+
+  // Navigate to first PO
+  await ui5.click({
+    controlType: 'sap.m.ColumnListItem',
+    ancestor: { id: 'poTable' },
+  });
+
+  // Edit a field
+  await ui5.click({ id: 'editBtn' });
+  await ui5.fill({ id: 'noteField' }, 'Test note');
+
+  // Verify model has pending changes
+  const dirty = await ui5.odata.hasPendingChanges();
+  expect(dirty).toBe(true);
+
+  // Save
+  await ui5.click({ id: 'saveBtn' });
+
+  // Verify model is clean
+  const clean = await ui5.odata.hasPendingChanges();
+  expect(clean).toBe(false);
+});
+
+test('seed and cleanup test data via HTTP', async ({ ui5 }) => {
+  // Setup: create test PO via direct HTTP
+  const po = await ui5.odata.createEntity('/sap/opu/odata/sap/API_PO_SRV', 'PurchaseOrders', {
+    Vendor: '100001',
+    PurchOrg: '1000',
+    CompanyCode: '1000',
+  });
+
+  // ... run test steps ...
+
+  // Cleanup: delete the test PO
+  await ui5.odata.deleteEntity(
+    '/sap/opu/odata/sap/API_PO_SRV',
+    'PurchaseOrders',
+    `'${po.PONumber}'`,
+  );
+});
+```
+
+## API Signatures
+
+> Public API surface from API Extractor report. TypeScript declaration signatures.
+
+```ts
+import { expect } from '@playwright/test';
+import { Logger } from 'pino';
+import { Page } from '@playwright/test';
+import * as _playwright_test from '@playwright/test';
+import { z } from 'zod';
+
+// @public
+export class AIError extends PramanError {
+    constructor(options: AIErrorOptions);
+    readonly model: string | undefined;
+    readonly provider: string | undefined;
+    //
+    toAIContext(): AIErrorContext & {
+        readonly provider: string | undefined;
+        readonly model: string | undefined;
+        readonly tokenUsage: TokenUsage | undefined;
+    };
+    //
+    toJSON(): SerializedPramanError & {
+        readonly provider: string | undefined;
+        readonly model: string | undefined;
+        readonly tokenUsage: TokenUsage | undefined;
+    };
+    //
+    readonly tokenUsage: TokenUsage | undefined;
+}
+
+// @public
+export type AiResponse<T> = {
+    readonly status: 'success';
+    readonly data: T;
+    readonly metadata: AiResponseMetadata;
+} | {
+    readonly status: 'error';
+    readonly data: undefined;
+    readonly error: AiResponseError;
+    readonly metadata: AiResponseMetadata;
+} | {
+    readonly status: 'partial';
+    readonly data: Partial<T>;
+    readonly error?: AiResponseError;
+    readonly metadata: AiResponseMetadata;
+};
+
+//
+// @public
+export type AppId = Brand<string, 'AppId'>;
+
+// @public
+export function appId(id: string): AppId;
+
+// @public
+export class AuthError extends PramanError {
+    constructor(options: AuthErrorOptions);
+    readonly loginUrl: string | undefined;
+    readonly strategy: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly strategy: string | undefined;
+        readonly loginUrl: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly strategy: string | undefined;
+        readonly loginUrl: string | undefined;
+    };
+}
+
+// @public
+export interface AuthStrategy {
+    authenticate(page: AuthPage, config: Readonly<SAPAuthConfig>): Promise<void>;
+    isAuthenticated(page: AuthPage): Promise<boolean>;
+    readonly name: string;
+}
+
+//
+// @public
+export const authTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & AuthFixtures & AuthFixtureOptions, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & AuthDeps>;
+
+// @public
+export type BindingPath = Brand<string, 'BindingPath'>;
+
+// @public
+export function bindingPath(path: string): BindingPath;
+
+// @public
+export class BridgeError extends PramanError {
+    constructor(options: BridgeErrorOptions);
+    readonly adapterType: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly ui5Version: string | undefined;
+        readonly adapterType: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly ui5Version: string | undefined;
+        readonly adapterType: string | undefined;
+    };
+    readonly ui5Version: string | undefined;
+}
+
+//
+// @public
+export function callFunctionImport<TData = unknown>(page: ODataHttpPage, serviceUrl: string, functionName: string, params?: Readonly<Record<string, unknown>>, method?: 'GET' | 'POST', options?: ODataHttpOptions): Promise<ODataHttpResult<TData>>;
+
+// @public
+export const capabilities: {
+    readonly list: () => CapabilityEntry[];
+    readonly listByPriority: (priority: "fixture" | "namespace" | "implementation") => CapabilityEntry[];
+    readonly listFixtures: () => CapabilityEntry[];
+    readonly has: (name: string) => boolean;
+    readonly find: (query: string) => CapabilityEntry[];
+    readonly findByName: (name: string) => CapabilityEntry | undefined;
+    readonly getStatistics: () => CapabilityStats;
+    readonly toJSON: () => CapabilitiesJSON;
+    readonly forAI: () => CapabilitiesJSON;
+    readonly forControl: (controlType: string) => CapabilityEntry[];
+    readonly describe: (name: string) => string | undefined;
+    readonly getCategories: () => readonly CapabilityCategory[];
+    readonly byCategory: (category: CapabilityCategory) => CapabilityEntry[];
+    readonly byNamespace: (namespace: string) => CapabilityEntry[];
+    readonly get: (id: string) => CapabilityEntry | undefined;
+    readonly forProvider: (provider: "claude" | "openai" | "gemini") => string;
+    readonly registry: CapabilityRegistry;
+};
+
+// @public
+export interface CapabilitiesJSON {
+    readonly byPriority: {
+        readonly fixture: number;
+        readonly namespace: number;
+        readonly implementation: number;
+    };
+    readonly fixtures: readonly CapabilityEntry[];
+    readonly generatedAt: string;
+    readonly methods: readonly CapabilityEntry[];
+    readonly name: string;
+    readonly totalMethods: number;
+    readonly version: string;
+}
+
+//
+// @public (undocumented)
+export type CapabilityEntry = z.infer<typeof CapabilityEntrySchema>;
+
+// @public
+export class CapabilityRegistry {
+    constructor();
+    byCategory(category: CapabilityCategory): CapabilityEntry[];
+    byNamespace(namespace: string): CapabilityEntry[];
+    find(query: string): CapabilityEntry[];
+    findByName(name: string): CapabilityEntry | undefined;
+    forAI(): CapabilitiesJSON;
+    forProvider(provider: AiProviderName): string;
+    get(id: string): CapabilityEntry | undefined;
+    getStatistics(): CapabilityStats;
+    has(name: string): boolean;
+    list(): CapabilityEntry[];
+    listByPriority(priority: 'fixture' | 'namespace' | 'implementation'): CapabilityEntry[];
+    register(entry: CapabilityEntry): void;
+    static readonly registryVersion = 1;
+    toJSON(): CapabilitiesJSON;
+}
+
+// @public
+export interface CapabilityStats {
+    readonly byPriority: {
+        readonly fixture: number;
+        readonly namespace: number;
+        readonly implementation: number;
+    };
+    readonly categories: readonly CapabilityCategory[];
+    readonly generatedAt: string;
+    readonly totalMethods: number;
+    readonly version: string;
+}
+
+//
+// @public
+export function clickRow(page: TableOperationsPage, tableId: string, rowIndex: number): Promise<void>;
+
+//
+// @public
+export function clickTableSettingsButton(page: TableFilterSortPage, tableId: string, options?: TableOptions): Promise<void>;
+
+// @public
+export type ColumnValueCriteria = Readonly<Record<string, string>>;
+
+// @public
+export class ConfigError extends PramanError {
+    constructor(options: ConfigErrorOptions);
+    readonly configPath: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly validationErrors: readonly ValidationIssue[];
+        readonly configPath: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly validationErrors: readonly ValidationIssue[];
+        readonly configPath: string | undefined;
+    };
+    //
+    readonly validationErrors: readonly ValidationIssue[];
+}
+
+//
+// @public
+export function confirmDialog(page: DialogPage, options?: FindDialogOptions & {
+    readonly buttonText?: string;
+}): Promise<void>;
+
+// @public
+export class ControlError extends PramanError {
+    constructor(options: ControlErrorOptions);
+    readonly availableControls: readonly string[];
+    readonly lastKnownSelector: UI5Selector | undefined;
+    readonly suggestedSelector: UI5Selector | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly lastKnownSelector: UI5Selector | undefined;
+        readonly availableControls: readonly string[];
+        readonly suggestedSelector: UI5Selector | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly lastKnownSelector: UI5Selector | undefined;
+        readonly availableControls: readonly string[];
+        readonly suggestedSelector: UI5Selector | undefined;
+    };
+}
+
+// @public
+export type ControlId = Brand<string, 'ControlId'>;
+
+// @public
+export function controlId(id: string): ControlId;
+
+//
+// @public
+export const coreTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures>;
+
+// @public
+export function createEntity<TData = unknown>(page: ODataHttpPage, serviceUrl: string, entitySet: string, data: unknown, options?: ODataHttpOptions): Promise<ODataHttpResult<TData>>;
+
+// @public
+export interface CSRFTokenResult {
+    readonly serviceUrl: string;
+    readonly token: string;
+}
+
+// @public
+export type CSSSelector = Brand<string, 'CSSSelector'>;
+
+// @public
+export function cssSelector(selector: string): CSSSelector;
+
+// @public
+export const DATE_FORMATS: {
+    readonly ISO: "yyyy-MM-dd";
+    readonly SAP_INTERNAL: "yyyyMMdd";
+    readonly EUROPEAN: "dd.MM.yyyy";
+    readonly US: "MM/dd/yyyy";
+    readonly JAPANESE: "yyyy/MM/dd";
+};
+
+// @public
+export type DateFormatPattern = (typeof DATE_FORMATS)[keyof typeof DATE_FORMATS];
+
+// @public
+export type DateInput = Date | string;
+
+// @public
+export interface DateOptions {
+    readonly locale?: string;
+    readonly skipStabilityWait?: boolean;
+    readonly timeout?: number;
+    readonly timezone?: string;
+}
+
+// @public
+export interface DateRangeResult {
+    readonly endDate: string;
+    readonly startDate: string;
+}
+
+// @public
+export const DEFAULT_TIMEOUTS: Readonly<{
+    readonly UI5_WAIT: 15000;
+    readonly CONTROL_DISCOVERY: 10000;
+    readonly UI5_BOOTSTRAP: 60000;
+    readonly DOM_SETTLE: 500;
+    readonly POLLING_INTERVAL: 100;
+    readonly CACHE_TTL: 5000;
+}>;
+
+// @public
+export function defineConfig(input: PramanConfigInput): PramanConfigInput;
+
+// @public
+export function deleteEntity(page: ODataHttpPage, serviceUrl: string, entitySet: string, key: string, options?: ODataHttpOptions): Promise<void>;
+
+//
+// @public
+export function deselectAllTableRows(page: TablePage, tableId: string, options?: TableOptions): Promise<void>;
+
+// @public
+export function detectTableType(page: TablePage, tableId: string): Promise<TableInfo>;
+
+// @public
+export interface DialogButtonInfo {
+    readonly enabled: boolean;
+    readonly id: string;
+    readonly text: string;
+    readonly type?: string;
+}
+
+//
+// @public
+export type DialogControlType = (typeof DIALOG_CONTROL_TYPES)[number];
+
+// @public
+export interface DialogInfo {
+    readonly controlType: string;
+    readonly id: string;
+    readonly isOpen: boolean;
+    readonly title: string;
+}
+
+// @public
+export interface DialogOptions {
+    readonly polling?: number;
+    readonly skipStabilityWait?: boolean;
+    readonly timeout?: number;
+}
+
+// @public
+export function dismissDialog(page: DialogPage, options?: FindDialogOptions): Promise<void>;
+
+// @public
+export function ensureRowVisible(page: TableOperationsPage, tableId: string, rowIndex: number): Promise<void>;
+
+// @public
+export const ErrorCode: Readonly<{
+    readonly ERR_CONFIG_INVALID: "ERR_CONFIG_INVALID";
+    readonly ERR_CONFIG_NOT_FOUND: "ERR_CONFIG_NOT_FOUND";
+    readonly ERR_CONFIG_PARSE: "ERR_CONFIG_PARSE";
+    readonly ERR_BRIDGE_TIMEOUT: "ERR_BRIDGE_TIMEOUT";
+    readonly ERR_BRIDGE_INJECTION: "ERR_BRIDGE_INJECTION";
+    readonly ERR_BRIDGE_NOT_READY: "ERR_BRIDGE_NOT_READY";
+    readonly ERR_BRIDGE_VERSION: "ERR_BRIDGE_VERSION";
+    readonly ERR_BRIDGE_EXECUTION: "ERR_BRIDGE_EXECUTION";
+    readonly ERR_CONTROL_NOT_FOUND: "ERR_CONTROL_NOT_FOUND";
+    readonly ERR_CONTROL_NOT_VISIBLE: "ERR_CONTROL_NOT_VISIBLE";
+    readonly ERR_CONTROL_NOT_ENABLED: "ERR_CONTROL_NOT_ENABLED";
+    readonly ERR_CONTROL_NOT_INTERACTABLE: "ERR_CONTROL_NOT_INTERACTABLE";
+    readonly ERR_CONTROL_NOT_UI5: "ERR_CONTROL_NOT_UI5";
+    readonly ERR_CONTROL_PROPERTY: "ERR_CONTROL_PROPERTY";
+    readonly ERR_CONTROL_AGGREGATION: "ERR_CONTROL_AGGREGATION";
+    readonly ERR_CONTROL_METHOD: "ERR_CONTROL_METHOD";
+    readonly ERR_CONTROL_INTERACTION_FAILED: "ERR_CONTROL_INTERACTION_FAILED";
+    readonly ERR_AUTH_FAILED: "ERR_AUTH_FAILED";
+    readonly ERR_AUTH_TIMEOUT: "ERR_AUTH_TIMEOUT";
+    readonly ERR_AUTH_SESSION_EXPIRED: "ERR_AUTH_SESSION_EXPIRED";
+    readonly ERR_AUTH_STRATEGY_INVALID: "ERR_AUTH_STRATEGY_INVALID";
+    readonly ERR_NAV_TILE_NOT_FOUND: "ERR_NAV_TILE_NOT_FOUND";
+    readonly ERR_NAV_ROUTE_FAILED: "ERR_NAV_ROUTE_FAILED";
+    readonly ERR_NAV_TIMEOUT: "ERR_NAV_TIMEOUT";
+    readonly ERR_ODATA_REQUEST_FAILED: "ERR_ODATA_REQUEST_FAILED";
+    readonly ERR_ODATA_PARSE: "ERR_ODATA_PARSE";
+    readonly ERR_ODATA_CSRF: "ERR_ODATA_CSRF";
+    readonly ERR_SELECTOR_INVALID: "ERR_SELECTOR_INVALID";
+    readonly ERR_SELECTOR_AMBIGUOUS: "ERR_SELECTOR_AMBIGUOUS";
+    readonly ERR_SELECTOR_PARSE: "ERR_SELECTOR_PARSE";
+    readonly ERR_TIMEOUT_UI5_STABLE: "ERR_TIMEOUT_UI5_STABLE";
+    readonly ERR_TIMEOUT_CONTROL_DISCOVERY: "ERR_TIMEOUT_CONTROL_DISCOVERY";
+    readonly ERR_TIMEOUT_OPERATION: "ERR_TIMEOUT_OPERATION";
+    readonly ERR_AI_PROVIDER_UNAVAILABLE: "ERR_AI_PROVIDER_UNAVAILABLE";
+    readonly ERR_AI_RESPONSE_INVALID: "ERR_AI_RESPONSE_INVALID";
+    readonly ERR_AI_TOKEN_LIMIT: "ERR_AI_TOKEN_LIMIT";
+    readonly ERR_AI_RATE_LIMITED: "ERR_AI_RATE_LIMITED";
+    readonly ERR_AI_NOT_CONFIGURED: "ERR_AI_NOT_CONFIGURED";
+    readonly ERR_AI_LLM_CALL_FAILED: "ERR_AI_LLM_CALL_FAILED";
+    readonly ERR_AI_RESPONSE_PARSE_FAILED: "ERR_AI_RESPONSE_PARSE_FAILED";
+    readonly ERR_AI_CONTEXT_BUILD_FAILED: "ERR_AI_CONTEXT_BUILD_FAILED";
+    readonly ERR_AI_STEP_INTERPRET_FAILED: "ERR_AI_STEP_INTERPRET_FAILED";
+    readonly ERR_AI_INVALID_REQUEST: "ERR_AI_INVALID_REQUEST";
+    readonly ERR_AI_CAPABILITY_NOT_FOUND: "ERR_AI_CAPABILITY_NOT_FOUND";
+    readonly ERR_PLUGIN_LOAD: "ERR_PLUGIN_LOAD";
+    readonly ERR_PLUGIN_INIT: "ERR_PLUGIN_INIT";
+    readonly ERR_PLUGIN_INCOMPATIBLE: "ERR_PLUGIN_INCOMPATIBLE";
+    readonly ERR_VOCAB_TERM_NOT_FOUND: "ERR_VOCAB_TERM_NOT_FOUND";
+    readonly ERR_VOCAB_DOMAIN_LOAD_FAILED: "ERR_VOCAB_DOMAIN_LOAD_FAILED";
+    readonly ERR_VOCAB_JSON_INVALID: "ERR_VOCAB_JSON_INVALID";
+    readonly ERR_VOCAB_AMBIGUOUS_MATCH: "ERR_VOCAB_AMBIGUOUS_MATCH";
+    readonly ERR_INTENT_FIELD_NOT_FOUND: "ERR_INTENT_FIELD_NOT_FOUND";
+    readonly ERR_INTENT_ACTION_FAILED: "ERR_INTENT_ACTION_FAILED";
+    readonly ERR_INTENT_NAVIGATION_FAILED: "ERR_INTENT_NAVIGATION_FAILED";
+    readonly ERR_INTENT_VALIDATION_FAILED: "ERR_INTENT_VALIDATION_FAILED";
+    readonly ERR_FLP_SHELL_NOT_FOUND: "ERR_FLP_SHELL_NOT_FOUND";
+    readonly ERR_FLP_PERMISSION_DENIED: "ERR_FLP_PERMISSION_DENIED";
+    readonly ERR_FLP_API_UNAVAILABLE: "ERR_FLP_API_UNAVAILABLE";
+    readonly ERR_FLP_INVALID_USER: "ERR_FLP_INVALID_USER";
+    readonly ERR_FLP_OPERATION_TIMEOUT: "ERR_FLP_OPERATION_TIMEOUT";
+}>;
+
+// @public
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+
+export { expect }
+
+// @public
+export function exportTableData(page: TableFilterSortPage, tableId: string, options?: TableExportOptions): Promise<readonly Record<string, string>[]>;
+
+//
+// @public
+export type ExtendedUI5Handler = UI5Handler & {
+    readonly table: ReturnType<typeof createTableFixture>;
+    readonly dialog: ReturnType<typeof createDialogFixture>;
+    readonly date: ReturnType<typeof createDateFixture>;
+    readonly odata: ReturnType<typeof createODataFixture>;
+};
+
+//
+// @public
+export function fetchCSRFToken(page: ODataCSRFPage, serviceUrl: string): Promise<CSRFTokenResult>;
+
+// @public
+export function filterByColumn(page: TableFilterSortPage, tableId: string, columnIndex: number, filterValue: string, options?: TableFilterOptions): Promise<void>;
+
+// @public
+export interface FindDialogOptions extends DialogOptions {
+    readonly controlType?: string;
+    readonly title?: string;
+}
+
+// @public
+export function findRowByValues(page: TableOperationsPage, tableId: string, columnValues: ColumnValueCriteria): Promise<number>;
+
+// @public
+export class FLPError extends PramanError {
+    constructor(options: FLPErrorOptions);
+    readonly flpService: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly flpService: string | undefined;
+        readonly username: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly flpService: string | undefined;
+        readonly username: string | undefined;
+    };
+    readonly username: string | undefined;
+}
+
+// @public
+export function formatDateForUI5(date: DateInput, format: string): string;
+
+// @public
+export function getCellByColumnName(page: TableOperationsPage, tableId: string, rowIndex: number, columnName: string, options?: TableOptions): Promise<string>;
+
+// @public
+export function getColumnNames(page: TableOperationsPage, tableId: string): Promise<readonly string[]>;
+
+//
+// @public
+export function getCurrentHash(page: NavigationPage): Promise<string>;
+
+//
+// @public
+export function getDatePickerValue(page: DatePage, controlId: string): Promise<string>;
+
+// @public
+export function getDateRangeSelection(page: DatePage, controlId: string): Promise<DateRangeResult>;
+
+// @public
+export function getDialogButtons(page: DialogPage, dialogId?: string): Promise<readonly DialogButtonInfo[]>;
+
+//
+// @public
+export function getEntityCount(page: ODataPage, path: string, options?: ODataOptions): Promise<number>;
+
+// @public
+export function getFilterValue(page: TableFilterSortPage, tableId: string, columnIndex: number): Promise<string | null>;
+
+// @public
+export function getModelData(page: ODataPage, path: string, options?: ODataOptions): Promise<unknown>;
+
+// @public
+export function getModelProperty(page: ODataPage, path: string, options?: ODataOptions): Promise<unknown>;
+
+// @public
+export function getOpenDialogs(page: DialogPage): Promise<readonly DialogInfo[]>;
+
+// @public
+export function getRowCount(page: TableOperationsPage, tableId: string, options?: TableOptions): Promise<number>;
+
+// @public
+export function getSelectedRows(page: TablePage, tableId: string, options?: TableOptions): Promise<readonly number[]>;
+
+// @public
+export function getSortOrder(page: TableFilterSortPage, tableId: string, columnIndex: number): Promise<SortOrderInfo | null>;
+
+// @public
+export function getTableCellValue(page: TablePage, tableId: string, rowIndex: number, colIndex: number, options?: TableOptions): Promise<string>;
+
+// @public
+export function getTableData(page: TablePage, tableId: string, options?: TableOptions): Promise<readonly Record<string, unknown>[]>;
+
+// @public
+export function getTableRowCount(page: TablePage, tableId: string, options?: TableOptions): Promise<number>;
+
+// @public
+export function getTableRows(page: TablePage, tableId: string, options?: TableOptions): Promise<readonly string[]>;
+
+// @public
+export function getTimePickerValue(page: DatePage, controlId: string): Promise<string>;
+
+// @public
+export function hasPendingChanges(page: ODataPage, options?: ODataOptions): Promise<boolean>;
+
+// @public
+export class IntentError extends PramanError {
+    constructor(options: IntentErrorOptions);
+    readonly fieldName: string | undefined;
+    readonly sapDomain: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly fieldName: string | undefined;
+        readonly sapDomain: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly fieldName: string | undefined;
+        readonly sapDomain: string | undefined;
+    };
+}
+
+// @public
+export function isDialogOpen(page: DialogPage, dialogId: string): Promise<boolean>;
+
+// @public
+export function loadConfig(options?: LoadConfigOptions): Promise<Readonly<PramanConfig>>;
+
+// @public
+export interface LoadConfigOptions {
+    readonly overrides?: PramanConfigInput;
+}
+
+// @public
+export function navigateBack(page: NavigationPage, options?: NavigationOptions): Promise<void>;
+
+// @public
+export function navigateForward(page: NavigationPage, options?: NavigationOptions): Promise<void>;
+
+// @public
+export function navigateToApp(page: NavigationPage, appId: string, options?: NavigationOptions): Promise<void>;
+
+// @public
+export function navigateToHash(page: NavigationPage, hash: string, options?: NavigationOptions): Promise<void>;
+
+// @public
+export function navigateToHome(page: NavigationPage, options?: NavigationOptions): Promise<void>;
+
+//
+// @public
+export function navigateToIntent(page: NavigationPage, intent: NavigationIntent, params?: Readonly<Record<string, string>>, options?: NavigationOptions): Promise<void>;
+
+// @public
+export function navigateToTile(page: NavigationPage, tileTitle: string, options?: NavigationOptions): Promise<void>;
+
+// @public
+export class NavigationError extends PramanError {
+    constructor(options: NavigationErrorOptions);
+    readonly currentUrl: string | undefined;
+    readonly targetUrl: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly targetUrl: string | undefined;
+        readonly currentUrl: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly targetUrl: string | undefined;
+        readonly currentUrl: string | undefined;
+    };
+}
+
+// @public
+export interface NavigationOptions {
+    readonly baseURL?: string;
+    readonly timeout?: number;
+    readonly waitForStable?: boolean;
+}
+
+// @public
+export class ODataError extends PramanError {
+    constructor(options: ODataErrorOptions);
+    readonly entitySet: string | undefined;
+    readonly requestUrl: string | undefined;
+    readonly statusCode: number | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly statusCode: number | undefined;
+        readonly requestUrl: string | undefined;
+        readonly entitySet: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly statusCode: number | undefined;
+        readonly requestUrl: string | undefined;
+        readonly entitySet: string | undefined;
+    };
+}
+
+// @public
+export interface ODataHttpOptions {
+    readonly csrfToken?: string;
+    readonly headers?: Readonly<Record<string, string>>;
+    readonly timeout?: number;
+}
+
+// @public
+export interface ODataHttpResult<TData = unknown> {
+    readonly data: TData;
+    readonly etag?: string;
+    readonly status: number;
+}
+
+// @public
+export interface ODataOptions {
+    readonly modelName?: string;
+    readonly timeout?: number;
+}
+
+// @public
+export type ODataPath = `/${string}`;
+
+// @public
+export interface ODataQueryOptions extends ODataHttpOptions {
+    readonly expand?: string;
+    readonly filter?: string;
+    readonly orderby?: string;
+    readonly select?: string;
+    readonly skip?: number;
+    readonly top?: number;
+}
+
+// @public
+export const PACKAGE_NAME: "playwright-praman";
+
+// @public
+export class PluginError extends PramanError {
+    constructor(options: PluginErrorOptions);
+    readonly pluginName: string;
+    readonly pluginVersion: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly pluginName: string;
+        readonly pluginVersion: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly pluginName: string;
+        readonly pluginVersion: string | undefined;
+    };
+}
+
+//
+// @public
+export type PramanConfig = z.output<typeof PramanConfigSchema>;
+
+// @public
+export type PramanConfigInput = z.input<typeof PramanConfigSchema>;
+
+// @public
+export class PramanError extends Error {
+    constructor(options: PramanErrorOptions);
+    readonly attempted: string;
+    readonly code: ErrorCode;
+    readonly details: Readonly<Record<string, unknown>>;
+    readonly retryable: boolean;
+    readonly severity: 'error' | 'warning' | 'info';
+    readonly suggestions: readonly string[];
+    readonly timestamp: string;
+    toAIContext(): AIErrorContext;
+    toJSON(): SerializedPramanError;
+    toUserMessage(): string;
+}
+
+// @public
+export function queryEntities<TData = unknown>(page: ODataHttpPage, serviceUrl: string, entitySet: string, options?: ODataQueryOptions): Promise<ODataHttpResult<readonly TData[]>>;
+
+//
+// @public (undocumented)
+export type RecipeEntry = z.infer<typeof RecipeEntrySchema>;
+
+//
+// @public (undocumented)
+export type RecipePriority = z.infer<typeof RecipePrioritySchema>;
+
+// @public
+export class RecipeRegistry {
+    constructor();
+    forAI(): RecipeEntry[];
+    static fromEntries(entries: readonly RecipeEntry[]): RecipeRegistry;
+    getTopRecipes(n: number): RecipeEntry[];
+    search(query: string): RecipeEntry[];
+    select(filter: RecipeFilter): RecipeEntry[];
+    selectByDomain(domain: string): RecipeEntry[];
+    selectByPriority(priority: RecipePriority): RecipeEntry[];
+}
+
+// @public
+export const recipes: {
+    readonly select: (filter: {
+        readonly domain?: string;
+        readonly priority?: RecipePriority;
+    }) => RecipeEntry[];
+    readonly selectByDomain: (domain: string) => RecipeEntry[];
+    readonly selectByPriority: (priority: RecipePriority) => RecipeEntry[];
+    readonly search: (query: string) => RecipeEntry[];
+    readonly forAI: () => RecipeEntry[];
+    readonly getTopRecipes: (n: number) => RecipeEntry[];
+    readonly list: () => RecipeEntry[];
+    readonly find: (query: string) => RecipeEntry[];
+    readonly has: (name: string) => boolean;
+    readonly getSteps: (name: string) => string | undefined;
+    readonly describe: (name: string) => string | undefined;
+    readonly getDomains: () => string[];
+    readonly forDomain: (domain: string) => RecipeEntry[];
+    readonly forCapability: (capability: string) => RecipeEntry[];
+    readonly forProcess: (process: string) => RecipeEntry[];
+    readonly toJSON: () => readonly RecipeEntry[];
+    readonly validate: (name: string) => {
+        readonly valid: boolean;
+    };
+    readonly registry: RecipeRegistry;
+};
+
+//
+// @public
+export function retry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T>;
+
+// @public
+export interface SAPAuthConfig {
+    readonly certificateKeyPath?: string | undefined;
+    readonly certificatePath?: string | undefined;
+    readonly client?: string | undefined;
+    readonly language?: string | undefined;
+    readonly loginEndpoint?: string | undefined;
+    readonly password: string;
+    readonly staySignedIn?: boolean | undefined;
+    readonly storageStatePath?: string | undefined;
+    readonly strategy?: string | undefined;
+    readonly subdomain?: string | undefined;
+    readonly timeout?: number | undefined;
+    readonly url: string;
+    readonly username: string;
+}
+
+// @public
+export function searchAndOpenApp(page: NavigationPage, appTitle: string, options?: NavigationOptions): Promise<void>;
+
+// @public
+export function selectAllTableRows(page: TablePage, tableId: string, options?: TableOptions): Promise<void>;
+
+// @public
+export class SelectorError extends PramanError {
+    constructor(options: SelectorErrorOptions);
+    readonly parsedSelector: UI5Selector | undefined;
+    readonly selectorString: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly selectorString: string | undefined;
+        readonly parsedSelector: UI5Selector | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly selectorString: string | undefined;
+        readonly parsedSelector: UI5Selector | undefined;
+    };
+}
+
+// @public
+export function selectRowByValues(page: TableOperationsPage, tableId: string, columnValues: ColumnValueCriteria, options?: TableOptions): Promise<void>;
+
+// @public
+export function selectTableRow(page: TablePage, tableId: string, rowIndex: number, options?: TableOptions): Promise<void>;
+
+// @public
+export type SemanticObjectAction = `${string}-${string}`;
+
+// @public
+export interface SessionInfo {
+    readonly authenticatedAt: number;
+    readonly isValid: boolean;
+    readonly strategyName: string;
+}
+
+// @public
+export function setAndValidateDate(page: DatePage, controlId: string, date: DateInput, options?: DateOptions): Promise<void>;
+
+// @public
+export function setDatePickerValue(page: DatePage, controlId: string, date: DateInput, options?: DateOptions): Promise<void>;
+
+// @public
+export function setDateRangeSelection(page: DatePage, controlId: string, startDate: DateInput, endDate: DateInput, options?: DateOptions): Promise<void>;
+
+// @public
+export function setTableCellValue(page: TableOperationsPage, tableId: string, rowIndex: number, colIndex: number, value: string): Promise<void>;
+
+// @public
+export function setTimePickerValue(page: DatePage, controlId: string, time: string, options?: DateOptions): Promise<void>;
+
+// @public
+export interface SmartTableInfo {
+    readonly effectiveId: string;
+    readonly kind: 'smart';
+    readonly smartTableId: string;
+    readonly variant: TableVariant;
+}
+
+// @public
+export function sortByColumn(page: TableFilterSortPage, tableId: string, columnIndex: number, options?: TableSortOptions): Promise<void>;
+
+// @public
+export interface SortOrderInfo {
+    readonly columnIndex: number;
+    readonly columnName: string;
+    readonly descending: boolean;
+}
+
+// @public
+export interface StandardTableInfo {
+    readonly effectiveId: string;
+    readonly kind: 'standard';
+    readonly variant: TableVariant;
+}
+
+// @public
+export interface TableExportOptions extends TableOptions {
+    readonly columns?: readonly number[] | undefined;
+    readonly format?: 'csv' | 'xlsx' | undefined;
+    readonly includeHeaders?: boolean | undefined;
+}
+
+// @public
+export interface TableFilterOptions extends TableOptions {
+    readonly operator?: string | undefined;
+}
+
+// @public
+export type TableInfo = StandardTableInfo | SmartTableInfo;
+
+// @public (undocumented)
+export interface TableOptions {
+    readonly skipStabilityWait?: boolean;
+    readonly timeout?: number;
+}
+
+// @public
+export interface TableSortOptions extends TableOptions {
+    readonly descending?: boolean | undefined;
+}
+
+// @public (undocumented)
+export type TableVariant = 'sap.m.Table' | 'sap.ui.table.Table' | 'sap.ui.table.TreeTable' | 'sap.ui.table.AnalyticalTable' | 'sap.ui.comp.smarttable.SmartTable' | 'sap.ui.mdc.Table';
+
+//
+// @public
+export const test: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures & AuthFixtures & AuthFixtureOptions & NavFixtures & StabilityFixtures & FEFixtures & AIFixtures & IntentTestFixtures & IntentFixtureDeps & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & AuthDeps & NavWorkerDeps & StabilityDeps & AIWorkerDeps>;
+
+// @public
+export class TimeoutError extends PramanError {
+    constructor(options: TimeoutErrorOptions);
+    readonly elapsed: number | undefined;
+    readonly timeoutMs: number;
+    toAIContext(): AIErrorContext & {
+        readonly timeoutMs: number;
+        readonly elapsed: number | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly timeoutMs: number;
+        readonly elapsed: number | undefined;
+    };
+}
+
+// @public
+export interface UI5ControlBase {
+    [method: string]: any;
+    readonly controlType: string;
+    getAggregation(name: string): Promise<readonly UI5ControlBase[]>;
+    getBindingInfo(name: string): Promise<unknown>;
+    getControlType(): Promise<string>;
+    getDomRef(): Promise<Element | null>;
+    getId(): Promise<string>;
+    getModel(name?: string): Promise<unknown>;
+    getProperty(name: string): Promise<unknown>;
+    getVisible(): Promise<boolean>;
+    readonly id: string;
+    isBound(propertyName: string): Promise<boolean>;
+    setProperty(name: string, value: unknown): Promise<void>;
+}
+
+// @public
+export interface UI5NavigationAPI {
+    getCurrentHash(): Promise<string>;
+    navigateBack(options?: NavigationOptions): Promise<void>;
+    navigateForward(options?: NavigationOptions): Promise<void>;
+    navigateToApp(appId: string, options?: NavigationOptions): Promise<void>;
+    navigateToHash(hash: string, options?: NavigationOptions): Promise<void>;
+    navigateToHome(options?: NavigationOptions): Promise<void>;
+    navigateToIntent(intent: NavigationIntent, params?: Readonly<Record<string, string>>, options?: NavigationOptions): Promise<void>;
+    navigateToTile(title: string, options?: NavigationOptions): Promise<void>;
+    searchAndOpenApp(title: string, options?: NavigationOptions): Promise<void>;
+}
+
+// @public
+export interface UI5Selector {
+    readonly ancestor?: UI5Selector;
+    readonly bindingPath?: Readonly<Record<string, string>>;
+    readonly controlType?: string;
+    readonly descendant?: UI5Selector;
+    readonly i18NText?: Readonly<Record<string, string>>;
+    readonly id?: string | RegExp;
+    readonly interaction?: UI5Interaction;
+    readonly properties?: Readonly<Record<string, unknown>>;
+    readonly searchOpenDialogs?: boolean;
+    readonly viewId?: string;
+    readonly viewName?: string;
+}
+
+// @public
+export function updateEntity<TData = unknown>(page: ODataHttpPage, serviceUrl: string, entitySet: string, key: string, data: unknown, options?: ODataHttpOptions): Promise<ODataHttpResult<TData>>;
+
+// @public
+export const VERSION: string;
+
+// @public
+export type ViewName = Brand<string, 'ViewName'>;
+
+// @public
+export function viewName(name: string): ViewName;
+
+// @public
+export class VocabularyError extends PramanError {
+    constructor(options: VocabularyErrorOptions);
+    readonly domain: string | undefined;
+    readonly term: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly term: string | undefined;
+        readonly domain: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly term: string | undefined;
+        readonly domain: string | undefined;
+    };
+}
+
+// @public
+export function waitForDialog(page: DialogPage, options?: FindDialogOptions): Promise<DialogInfo>;
+
+// @public
+export function waitForDialogClosed(page: DialogPage, dialogId: string, options?: DialogOptions): Promise<void>;
+
+// @public
+export function waitForODataLoad(page: ODataPage, options?: WaitForODataLoadOptions): Promise<void>;
+
+// @public
+export interface WaitForODataLoadOptions extends ODataOptions {
+    readonly bindingPath?: ODataEntityPath;
+    readonly polling?: number;
+}
+
+// @public
+export function waitForTableData(page: TablePage, tableId: string, options?: WaitForTableDataOptions): Promise<void>;
+
+// @public (undocumented)
+export interface WaitForTableDataOptions extends TableOptions {
+    readonly minRows?: number;
+    readonly polling?: number;
+}
+
+//
+// @public
+export function waitForUI5Bootstrap(page: WaitPage, options?: {
+    readonly timeout?: number;
+}): Promise<void>;
+
+//
+// @public
+export function waitForUI5Stable(page: WaitPage, options?: WaitForUI5StableOptions): Promise<void>;
+
+// Warnings were encountered during analysis:
+//
+// dist/index.d.ts:4804:5 - (ae-forgotten-export) The symbol "createTableFixture" needs to be exported by the entry point index.d.ts
+// dist/index.d.ts:4805:5 - (ae-forgotten-export) The symbol "createDialogFixture" needs to be exported by the entry point index.d.ts
+// dist/index.d.ts:4806:5 - (ae-forgotten-export) The symbol "createDateFixture" needs to be exported by the entry point index.d.ts
+// dist/index.d.ts:4807:5 - (ae-forgotten-export) The symbol "createODataFixture" needs to be exported by the entry point index.d.ts
+// dist/recipes-CIWzbAfm.d.ts:432:5 - (ae-forgotten-export) The symbol "AiResponseMetadata" needs to be exported by the entry point index.d.ts
+// dist/recipes-CIWzbAfm.d.ts:436:5 - (ae-forgotten-export) The symbol "AiResponseError" needs to be exported by the entry point index.d.ts
+// dist/recipes-CIWzbAfm.d.ts:1650:5 - (ae-forgotten-export) The symbol "CapabilityCategory" needs to be exported by the entry point index.d.ts
+```
+
+## Code Examples
+
+### Basic Test
+
+# Basic UI5 Control Discovery
+
+The simplest possible Praman test. Demonstrates control discovery by type and property, property verification, and `ui5.press()`.
+
+## Source
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test.describe('Basic UI5 Control Discovery', () => {
+  test('find a GenericTile by header text', async ({ page, ui5 }) => {
+    await test.step('Navigate to Fiori Launchpad', async () => {
+      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
+    });
+
+    await test.step('Discover tile control', async () => {
+      // Use ui5.control() to find a GenericTile by its header property.
+      // Praman injects the UI5 bridge automatically on first call.
+      const tile = await ui5.control({
+        controlType: 'sap.m.GenericTile',
+        properties: { header: 'My App' },
+      });
+
+      // Verify the control type returned by the bridge
+      const controlType = await tile.getControlType();
+      expect(controlType).toBe('sap.m.GenericTile');
+
+      // Read a property via the typed proxy
+      const header = await tile.getProperty('header');
+      expect(header).toBe('My App');
+    });
+
+    await test.step('Press the tile to navigate', async () => {
+      // ui5.press() calls firePress() on the control and waits for UI5 stability
+      await ui5.press({
+        controlType: 'sap.m.GenericTile',
+        properties: { header: 'My App' },
+      });
+
+      // Wait for the target app to finish loading
+      await ui5.waitForUI5();
+    });
+  });
+});
+```
+
+## Key Concepts
+
+- **`ui5.control()`** discovers controls through the UI5 runtime's control registry -- not the DOM
+- **`controlType` + `properties`** is the most common selector pattern
+- **`ui5.press()`** fires the UI5 press event and automatically calls `waitForUI5()`
+- **`test.step()`** groups actions for clear Playwright HTML reports
+
+### Dialog Handling
+
+# Dialog Handling
+
+Demonstrates how to open, interact with, and close SAP UI5 dialogs using Praman.
+
+## Critical Pattern: `searchOpenDialogs`
+
+```typescript
+// Without searchOpenDialogs -- ONLY searches main view
+const btn = await ui5.control({ id: 'myBtn' }); // Won't find dialog controls!
+
+// With searchOpenDialogs -- searches dialogs too
+const btn = await ui5.control({ id: 'myBtn', searchOpenDialogs: true }); // Correct
+```
+
+:::warning
+Always use `searchOpenDialogs: true` when finding controls inside an `sap.m.Dialog`. Without it, `ui5.control()` only searches the main view and will throw `ERR_CONTROL_NOT_FOUND`.
+:::
+
+## Source
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test.describe('Dialog Handling', () => {
+  test('open dialog, fill fields, and dismiss', async ({ page, ui5 }) => {
+    await test.step('Navigate to app', async () => {
+      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
+
+      await expect(async () => {
+        await ui5.press({
+          controlType: 'sap.m.GenericTile',
+          properties: { header: 'My App' },
+        });
+      }).toPass({ timeout: 60_000, intervals: [5000, 10_000] });
+
+      await ui5.waitForUI5();
+    });
+
+    await test.step('Open Create dialog', async () => {
+      await ui5.press({
+        controlType: 'sap.m.Button',
+        properties: { text: 'Create' },
+      });
+      await ui5.waitForUI5();
+    });
+
+    await test.step('Verify dialog structure', async () => {
+      // searchOpenDialogs: true is REQUIRED for dialog controls
+      const nameField = await ui5.control({
+        id: 'createDialog--nameField',
+        searchOpenDialogs: true,
+      });
+
+      const controlType = await nameField.getControlType();
+      expect(controlType).toBe('sap.ui.comp.smartfield.SmartField');
+
+      const isRequired = await nameField.getRequired();
+      expect(isRequired).toBe(true);
+    });
+
+    await test.step('Fill dialog fields', async () => {
+      // ui5.fill() = atomic setValue + fireChange + waitForUI5
+      await ui5.fill(
+        { id: 'createDialog--nameInput', searchOpenDialogs: true },
+        'Test Entry',
+      );
+      await ui5.waitForUI5();
+
+      const value = await ui5.getValue({
+        id: 'createDialog--nameInput',
+        searchOpenDialogs: true,
+      });
+      expect(value).toBe('Test Entry');
+    });
+
+    await test.step('Dismiss dialog with Cancel', async () => {
+      await ui5.press({
+        id: 'createDialog--cancelBtn',
+        searchOpenDialogs: true,
+      });
+      await ui5.waitForUI5();
+
+      // Verify dialog closed
+      let dialogClosed = false;
+      try {
+        await ui5.control({
+          id: 'createDialog--cancelBtn',
+          searchOpenDialogs: true,
+        });
+      } catch {
+        dialogClosed = true;
+      }
+      expect(dialogClosed).toBe(true);
+    });
+  });
+
+  test('confirm dialog with value help', async ({ page, ui5 }) => {
+    await test.step('Open value help dialog', async () => {
+      await ui5.press({
+        id: 'myField-input-vhi',
+        searchOpenDialogs: true,
+      });
+
+      const vhDialog = await ui5.control({
+        id: 'myField-input-valueHelpDialog',
+        searchOpenDialogs: true,
+      });
+      const isOpen = await vhDialog.isOpen();
+      expect(isOpen).toBe(true);
+    });
+
+    await test.step('Close value help dialog', async () => {
+      const vhDialog = await ui5.control({
+        id: 'myField-input-valueHelpDialog',
+        searchOpenDialogs: true,
+      });
+      // close() calls the UI5 Dialog.close() method directly
+      await vhDialog.close();
+      await ui5.waitForUI5();
+    });
+  });
+});
+```
+
+## Key Concepts
+
+- **`searchOpenDialogs: true`** -- mandatory for any control inside a dialog
+- **`ui5.fill()`** -- atomic `setValue()` + `fireChange()` + `waitForUI5()`
+- **`isOpen()` / `close()`** -- UI5 Dialog lifecycle methods via proxy
+- **Value help dialogs** are secondary dialogs that open from SmartField icons
+
+### Table Operations
+
+# Table Operations
+
+Demonstrates how to interact with SAP UI5 tables: discovering SmartTables, reading rows, and accessing OData binding data.
+
+## Supported Table Types
+
+This pattern works for:
+
+- **`sap.ui.table.Table`** (grid table) -- use directly
+- **`sap.m.Table`** (responsive table) -- use directly
+- **`sap.ui.comp.smarttable.SmartTable`** -- use `getTable()` to get the inner table first
+
+## Source
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test.describe('Table Operations', () => {
+  test('read table rows and OData binding data', async ({ page, ui5 }) => {
+    await test.step('Navigate to app with table', async () => {
+      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
+
+      await expect(async () => {
+        await ui5.press({
+          controlType: 'sap.m.GenericTile',
+          properties: { header: 'My List Report' },
+        });
+      }).toPass({ timeout: 60_000, intervals: [5000, 10_000] });
+
+      await ui5.waitForUI5();
+    });
+
+    await test.step('Discover table and read rows', async () => {
+      // SmartTable wraps an inner table
+      const smartTable = await ui5.control({
+        controlType: 'sap.ui.comp.smarttable.SmartTable',
+      });
+
+      // getTable() returns the inner table control as a proxy
+      const innerTable = await smartTable.getTable();
+
+      // getRows() returns array of row proxies
+      const rows = await innerTable.getRows();
+      expect(rows.length).toBeGreaterThan(0);
+    });
+
+    await test.step('Read OData binding from rows', async () => {
+      const smartTable = await ui5.control({
+        controlType: 'sap.ui.comp.smarttable.SmartTable',
+      });
+      const innerTable = await smartTable.getTable();
+
+      // Wait for OData data to load using Playwright auto-retry
+      await expect(async () => {
+        const rows = await innerTable.getRows();
+        let dataRowCount = 0;
+        for (const row of rows) {
+          const ctx = await row.getBindingContext();
+          if (ctx) dataRowCount++;
+        }
+        expect(dataRowCount).toBeGreaterThan(0);
+      }).toPass({ timeout: 60_000, intervals: [1000, 2000, 5000] });
+    });
+
+    await test.step('Read entity data via getContextByIndex', async () => {
+      const smartTable = await ui5.control({
+        controlType: 'sap.ui.comp.smarttable.SmartTable',
+      });
+      const innerTable = await smartTable.getTable();
+
+      // getContextByIndex returns OData binding context for a specific row
+      const ctx = await innerTable.getContextByIndex(0);
+      expect(ctx).toBeTruthy();
+
+      // getObject() returns the full OData entity as a plain object
+      const entity = await ctx.getObject();
+      expect(entity).toBeTruthy();
+    });
+  });
+});
+```
+
+## Key Concepts
+
+- **SmartTable pattern**: `ui5.control({ controlType: 'sap.ui.comp.smarttable.SmartTable' })` then `getTable()` for the inner table
+- **`getRows()`** -- returns proxy instances for each visible row
+- **`getBindingContext()`** -- accesses the OData model binding for a row
+- **`getContextByIndex(n)`** -- shortcut for getting the nth row's binding context
+- **`getObject()`** -- returns the full OData entity as a plain JavaScript object
+- **`expect().toPass()`** -- Playwright auto-retry for waiting on async OData data loading

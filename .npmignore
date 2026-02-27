@@ -1,0 +1,58 @@
+# Explicit .npmignore — defense-in-depth alongside `files` field in package.json.
+# Prevents accidental publish of dev/test/CI artifacts.
+
+# Test suites
+tests/
+
+# Git hooks
+.husky/
+
+# IDE / AI agent configs (dev-only)
+.cursor/
+.github/
+.idea/
+.antigravity/
+.vscode/
+.jules/
+
+# Documentation source (Docusaurus site)
+docs/
+
+# Project planning & specs
+plans/
+specs/
+temp/
+ok/
+scripts/
+landing-previews/
+api-reports/
+
+# Config files
+*.config.ts
+*.config.mjs
+eslint.config.mjs
+.commitlintrc.json
+.cspell.json
+.lintstagedrc.json
+.prettierrc.json
+.markdownlint-cli2.jsonc
+.size-limit.json
+tsdoc.json
+typedoc*.json
+knip.config.ts
+tsconfig*.json
+playwright.config.ts
+api-extractor.json
+license-report.json
+
+# Environment & secrets
+.env*
+.mcp.json*
+
+# Build artifacts not needed in package
+playwright-praman.sbom.json
+.nvmrc
+.gitattributes
+.editorconfig
+AGENTS.md
+CLAUDE.md

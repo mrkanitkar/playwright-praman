@@ -72,7 +72,9 @@
 
     "TESTUSER", "testuser",
 
-    "apos"
+    "apos",
+
+    "llmstxt"
   ],
   "ignorePaths": [
     "node_modules", "dist", "coverage", "*.lock",

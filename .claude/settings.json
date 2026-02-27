@@ -1,4 +1,35 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/maheshwar/Documents/projects/mk1 log --oneline --all --grep=\"llms\")",
+      "Bash(git -C /Users/maheshwar/Documents/projects/mk1 log --oneline --all -20)",
+      "WebFetch(domain:llmstxt.org)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:www.mintlify.com)",
+      "Read(//Users/maheshwar/Documents/projects/mk1/docs/docs/api/**)",
+      "Bash(head -40 /Users/maheshwar/Documents/projects/mk1/docs/docs/api/index/functions/*.md)",
+      "Bash(for f in /Users/maheshwar/Documents/projects/mk1/docs/docs/guides/*.md)",
+      "Bash(do head -5 \"$f\")",
+      "Bash(for f in /Users/maheshwar/Documents/projects/mk1/docs/docs/decisions/*.md)",
+      "WebFetch(domain:docusaurus.community)",
+      "WebFetch(domain:microsoft.github.io)",
+      "WebFetch(domain:developers.openai.com)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:python.langchain.com)",
+      "WebFetch(domain:v03.api.js.langchain.com)",
+      "WebFetch(domain:js.langchain.com)",
+      "WebFetch(domain:platform.openai.com)",
+      "WebFetch(domain:reference.langchain.com)",
+      "WebFetch(domain:docs.langchain.com)",
+      "WebFetch(domain:newsletter.victordibia.com)",
+      "WebFetch(domain:latenode.com)",
+      "WebFetch(domain:cookbook.openai.com)",
+      "WebFetch(domain:simonwillison.net)"
+    ]
+  },
   "model": "claude-opus-4-6",
   "effort": "high",
   "permissionMode": "plan",
@@ -7,7 +38,9 @@
   "lspServers": {
     "typescript": {
       "command": "vtsls",
-      "args": ["--stdio"],
+      "args": [
+        "--stdio"
+      ],
       "extensionToLanguage": {
         ".ts": "typescript",
         ".tsx": "typescriptreact",

@@ -24,7 +24,7 @@ import type { RecipeEntry } from './schemas/recipe.schema.js';
  * Static list of generated recipe entries.
  *
  * @remarks
- * Generated on 2026-02-25 with 14 entries.
+ * Generated on 2026-02-27 with 14 entries.
  */
 export const GENERATED_RECIPES: readonly RecipeEntry[] = [
   {

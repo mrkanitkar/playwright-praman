@@ -57,6 +57,8 @@ export interface AuthPage {
     pageFunction: string | ((...args: never[]) => T),
     arg?: unknown,
   ): Promise<T>;
+  /** Click an element matching a selector. */
+  click(selector: string, options?: Record<string, unknown>): Promise<void>;
   /** Get a locator for a selector. */
   locator(selector: string, options?: Record<string, unknown>): unknown;
 }
