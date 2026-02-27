@@ -39,3 +39,18 @@ test('discover a UI5 control', async ({ ui5, ui5Navigation }) => {
 - [Agent & IDE Setup](./guides/agent-setup.md) — AI agents, seed file, and IDE configs installed by `init`
 
 API documentation is auto-generated from source code TSDoc comments — see the **API Reference** in the navbar.
+
+## LLM-Friendly Docs
+
+Praman publishes documentation in the [llmstxt.org](https://llmstxt.org) standard for AI agents, RAG pipelines, and LLM tools:
+
+| File | Content |
+| --- | --- |
+| [`llms.txt`](https://mrkanitkar.github.io/playwright-praman/llms.txt) | Link index — all docs with descriptions |
+| [`llms-full.txt`](https://mrkanitkar.github.io/playwright-praman/llms-full.txt) | Complete documentation in a single file |
+| [`llms-quickstart.txt`](https://mrkanitkar.github.io/playwright-praman/llms-quickstart.txt) | Setup, fixtures, selectors, matchers |
+| [`llms-sap-testing.txt`](https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt) | Auth, FLP, OData, Fiori Elements, cookbook |
+| [`llms-migration.txt`](https://mrkanitkar.github.io/playwright-praman/llms-migration.txt) | Migration from Playwright, wdi5, Tosca |
+| [`llms-architecture.txt`](https://mrkanitkar.github.io/playwright-praman/llms-architecture.txt) | Architecture, bridge, proxy, ADRs |
+
+These files are regenerated on every build and deployed alongside the site.

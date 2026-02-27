@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# LLM-friendly documentation (llmstxt.org standard)
+# AI agents: fetch these files for structured documentation context
+# llms.txt        — link index with descriptions
+# llms-full.txt   — complete documentation in a single file
+# llms-quickstart.txt    — setup, fixtures, selectors, matchers
+# llms-sap-testing.txt   — SAP auth, FLP, OData, Fiori Elements
+# llms-migration.txt     — migration from Playwright, wdi5, Tosca
+# llms-architecture.txt  — architecture, bridge, proxy, ADRs
+
+Sitemap: https://mrkanitkar.github.io/playwright-praman/sitemap.xml

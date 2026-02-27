@@ -27,6 +27,12 @@ const config: Config = {
     },
   },
 
+  // ── HTML <head> tags for AI agent discoverability ──
+  headTags: [
+    { tagName: 'link', attributes: { rel: 'alternate', type: 'text/plain', href: '/playwright-praman/llms.txt', title: 'LLM-friendly documentation index' } },
+    { tagName: 'link', attributes: { rel: 'alternate', type: 'text/plain', href: '/playwright-praman/llms-full.txt', title: 'LLM-friendly full documentation' } },
+  ],
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
@@ -55,6 +61,217 @@ const config: Config = {
         excludePrivate: true,
         excludeProtected: true,
         excludeInternal: true,
+      },
+    ],
+
+    // LLM-friendly docs — generates llms.txt following llmstxt.org standard
+    [
+      'docusaurus-plugin-llms',
+      {
+        title: 'Praman — AI-First SAP UI5 Test Automation for Playwright',
+        description:
+          'Praman extends Playwright with deep SAP UI5 awareness — typed control proxies, ' +
+          'UI5 stability synchronization, FLP navigation, OData operations, Fiori Elements ' +
+          'testing, and AI-powered test generation. Single npm package: playwright-praman.',
+        version: '1.0',
+
+        // ── Generation flags ──
+        generateLLMsTxt: true,
+        generateLLMsFullTxt: true,
+        generateMarkdownFiles: true,
+
+        // ── Content cleaning (best practice for LLM consumption) ──
+        excludeImports: true,
+        removeDuplicateHeadings: true,
+
+        // ── Exclude API docs from main files (280 TypeDoc pages are too noisy) ──
+        ignoreFiles: ['api/**/*', '**/typedoc-sidebar.cjs'],
+
+        // ── Document ordering: most important guides first ──
+        includeOrder: [
+          'intro.md',
+          'guides/getting-started.md',
+          'guides/configuration.md',
+          'guides/fixtures.md',
+          'guides/selectors.md',
+          'guides/control-interactions.md',
+          'guides/custom-matchers.md',
+          'guides/authentication.md',
+          'guides/navigation.md',
+          'guides/fiori-elements.md',
+          'guides/odata-operations.md',
+          'guides/odata-mocking.md',
+          'guides/sap-control-cookbook.md',
+          'guides/errors.md',
+          'guides/debugging.md',
+          'guides/capabilities.md',
+          'guides/capabilities-recipes.md',
+          'guides/intent-api.md',
+          'guides/vocabulary-system.md',
+          'guides/interaction-strategies.md',
+          'guides/fixture-composition.md',
+          'guides/control-proxy.md',
+          'guides/bridge-internals.md',
+          'guides/architecture-overview.md',
+          'guides/ai-integration.md',
+          'guides/agent-setup.md',
+          'guides/gold-standard-test.md',
+          'guides/playwright-primer.md',
+          'guides/reporters.md',
+          'guides/docker-cicd.md',
+          'guides/cross-browser.md',
+          'guides/visual-regression.md',
+          'guides/accessibility-testing.md',
+          'guides/component-testing.md',
+          'guides/performance-benchmarks.md',
+          'guides/lifecycle-extensibility.md',
+          'guides/multi-tool-integration.md',
+          'guides/cloud-alm-integration.md',
+          'guides/sap-activate-alignment.md',
+          'guides/transaction-mapping.md',
+          'guides/business-process-examples.md',
+          'guides/ide-setup.md',
+          'guides/upgrade-testing.md',
+          'guides/behavioral-equivalence.md',
+          'guides/glossary.md',
+          'guides/migration-from-playwright.md',
+          'guides/migration-from-wdi5.md',
+          'guides/migration-from-tosca.md',
+          'examples/*',
+          'decisions/*',
+        ],
+        includeUnmatchedLast: true,
+
+        // ── Performance ──
+        processingBatchSize: 100,
+        logLevel: 'normal',
+
+        // ── Custom intro text ──
+        rootContent:
+          '> Praman is an AI-first SAP UI5 test automation plugin for Playwright.\n' +
+          '> Install: `npm install playwright-praman @playwright/test`\n' +
+          '> Import: `import { test, expect } from \'playwright-praman\';`',
+        fullRootContent:
+          '> This file contains the complete Praman documentation (excluding auto-generated API reference).\n' +
+          '> For topic-specific context, see llms-quickstart.txt, llms-sap-testing.txt, ' +
+          'llms-migration.txt, and llms-architecture.txt.',
+
+        // ── Topic-specific custom files for AI agent personas ──
+        customLLMFiles: [
+          {
+            filename: 'llms-quickstart.txt',
+            title: 'Praman Quick Start Guide',
+            description:
+              'Essential setup and core concepts: installation, configuration, fixtures, selectors, matchers.',
+            includePatterns: [
+              'intro.md',
+              'guides/getting-started.md',
+              'guides/configuration.md',
+              'guides/fixtures.md',
+              'guides/fixture-composition.md',
+              'guides/selectors.md',
+              'guides/control-interactions.md',
+              'guides/custom-matchers.md',
+              'guides/errors.md',
+              'guides/debugging.md',
+              'guides/playwright-primer.md',
+              'examples/basic-test.md',
+            ],
+            fullContent: true,
+          },
+          {
+            filename: 'llms-sap-testing.txt',
+            title: 'Praman SAP UI5 Testing Guide',
+            description:
+              'Authentication, navigation, FLP, OData, Fiori Elements, control cookbook, ' +
+              'gold standard tests, and SAP-specific examples.',
+            includePatterns: [
+              'guides/authentication.md',
+              'guides/navigation.md',
+              'guides/fiori-elements.md',
+              'guides/odata-operations.md',
+              'guides/odata-mocking.md',
+              'guides/sap-control-cookbook.md',
+              'guides/gold-standard-test.md',
+              'guides/interaction-strategies.md',
+              'guides/intent-api.md',
+              'guides/vocabulary-system.md',
+              'guides/capabilities.md',
+              'guides/capabilities-recipes.md',
+              'guides/sap-activate-alignment.md',
+              'guides/transaction-mapping.md',
+              'guides/business-process-examples.md',
+              'examples/auth-setup.md',
+              'examples/dialog-handling.md',
+              'examples/gold-standard-bom.md',
+              'examples/table-operations.md',
+              'examples/hybrid-login.md',
+            ],
+            fullContent: true,
+          },
+          {
+            filename: 'llms-migration.txt',
+            title: 'Praman Migration Guides',
+            description:
+              'Step-by-step migration from vanilla Playwright, wdi5, and Tosca to Praman.',
+            includePatterns: [
+              'guides/migration-from-playwright.md',
+              'guides/migration-from-wdi5.md',
+              'guides/migration-from-tosca.md',
+              'guides/behavioral-equivalence.md',
+            ],
+            fullContent: true,
+          },
+          {
+            filename: 'llms-architecture.txt',
+            title: 'Praman Architecture & Design Decisions',
+            description:
+              'Five-layer architecture, bridge internals, control proxy pattern, and ADRs.',
+            includePatterns: [
+              'guides/architecture-overview.md',
+              'guides/bridge-internals.md',
+              'guides/control-proxy.md',
+              'guides/ai-integration.md',
+              'guides/lifecycle-extensibility.md',
+              'decisions/*',
+            ],
+            fullContent: true,
+          },
+        ],
+      },
+    ],
+
+    // Image zoom — click-to-zoom on doc images (medium-style)
+    'docusaurus-plugin-image-zoom',
+
+    // Ideal Image — responsive srcsets, lazy loading, WebP/AVIF
+    [
+      '@docusaurus/plugin-ideal-image',
+      {
+        quality: 70,
+        max: 1030,
+        min: 640,
+        steps: 2,
+        disableInDev: false,
+      },
+    ],
+  ],
+
+  // ── Themes ──
+  themes: [
+    // Local search — offline full-text search, no Algolia account needed
+    [
+      '@easyops-cn/docusaurus-search-local',
+      {
+        hashed: true,
+        language: ['en'],
+        indexDocs: true,
+        indexPages: true,
+        docsRouteBasePath: '/docs',
+        highlightSearchTermsOnTargetPage: true,
+        searchResultLimits: 8,
+        searchResultContextMaxLength: 50,
+        explicitSearchResultPath: true,
       },
     ],
   ],
@@ -171,6 +388,7 @@ const config: Config = {
               label: 'TypeDoc API',
               href: 'https://mrkanitkar.github.io/playwright-praman/api-html/index.html',
             },
+            { label: 'llms.txt', href: 'https://mrkanitkar.github.io/playwright-praman/llms.txt' },
           ],
         },
         {
@@ -222,6 +440,14 @@ const config: Config = {
     tableOfContents: {
       minHeadingLevel: 2,
       maxHeadingLevel: 4,
+    },
+    // Image zoom — click-to-zoom on doc images (medium-style)
+    zoom: {
+      selector: '.markdown :not(em) > img',
+      background: {
+        light: 'rgb(255, 255, 255)',
+        dark: 'rgb(50, 50, 50)',
+      },
     },
   } satisfies Preset.ThemeConfig,
 };
