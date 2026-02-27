@@ -97,8 +97,8 @@ describe('CloudSAMLAuthStrategy', () => {
     it('performs successful SAML login via IAS', async () => {
       await strategy.authenticate(page, config);
 
-      expect(page.goto).toHaveBeenCalledWith(config.url, { timeout: 30_000 });
-      expect(page.waitForLoadState).toHaveBeenCalledWith('domcontentloaded', { timeout: 30_000 });
+      expect(page.goto).toHaveBeenCalledWith(config.url, { timeout: 60_000 });
+      expect(page.waitForLoadState).toHaveBeenCalledWith('domcontentloaded', { timeout: 60_000 });
       expect(page.waitForSelector).toHaveBeenCalled();
       expect(page.evaluate).toHaveBeenCalled();
       expect(page.waitForURL).toHaveBeenCalled();
@@ -110,7 +110,7 @@ describe('CloudSAMLAuthStrategy', () => {
       // Should have waited for IAS username selector
       expect(page.waitForSelector).toHaveBeenCalledWith(
         'input[name="j_username"]',
-        expect.objectContaining({ timeout: 30_000 }),
+        expect.objectContaining({ timeout: 60_000 }),
       );
     });
 
@@ -165,7 +165,7 @@ describe('CloudSAMLAuthStrategy', () => {
       // Should have tried the fallback selector
       expect(page.waitForSelector).toHaveBeenCalledWith(
         '#j_username',
-        expect.objectContaining({ timeout: 30_000 }),
+        expect.objectContaining({ timeout: 60_000 }),
       );
     });
 
@@ -245,9 +245,9 @@ describe('CloudSAMLAuthStrategy', () => {
       // eslint-disable-next-line @typescript-eslint/promise-function-async -- mock implementation requires explicit Promise returns
       page.waitForSelector.mockImplementation(() => {
         waitForSelectorCallCount++;
-        // First 3 calls succeed (username, password, submit),
-        // 4th call (shell header) fails
-        if (waitForSelectorCallCount === 4) {
+        // Calls: 1=username, 2=password probe, 3=password fill, 4=submit,
+        // 5=shell header (fails)
+        if (waitForSelectorCallCount === 5) {
           return Promise.reject(new Error('Timeout'));
         }
         return Promise.resolve(undefined);

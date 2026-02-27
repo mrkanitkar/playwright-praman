@@ -78,6 +78,8 @@ export interface MockAuthPage extends AuthPage {
   > &
     AuthPage['waitForFunction'];
   readonly evaluate: Mock<(...args: any[]) => any> & AuthPage['evaluate'];
+  readonly click: Mock<(...args: Parameters<AuthPage['click']>) => ReturnType<AuthPage['click']>> &
+    AuthPage['click'];
   readonly locator: Mock<(selector: string) => MockLocator> & AuthPage['locator'];
 }
 
@@ -158,5 +160,6 @@ export function createMockAuthPage(options?: MockAuthPageOptions): MockAuthPage 
     waitForFunction: vi.fn().mockResolvedValue(undefined),
     locator: locatorFactory,
     evaluate: vi.fn().mockResolvedValue(undefined),
+    click: vi.fn().mockResolvedValue(undefined),
   } as MockAuthPage;
 }
