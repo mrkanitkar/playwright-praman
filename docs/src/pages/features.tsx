@@ -86,6 +86,7 @@ const SECTIONS: Section[] = [
       { feature: 'LLM provider abstraction',     native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ Claude / OpenAI / Azure OpenAI') },
       { feature: 'Fiori Elements test helpers',  native: C('no',  '✗'),   wdi5: C('check', '✓ wdi5-fe-library'),  praman: C('check',   '✓ listReport, objectPage, FE test library') },
       { feature: 'Compliance reporter',          native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ Step categorisation, compliance %') },
+      { feature: 'LLM-friendly docs (llms.txt)',  native: C('no',  '✗'),   wdi5: C('no',  '✗'),                     praman: C('check',   '✓ llmstxt.org standard, 4 topic files') },
     ],
   },
   {

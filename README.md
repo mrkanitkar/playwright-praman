@@ -265,6 +265,26 @@ npm run ci             # lint + typecheck + test + build
 | OpenAI Codex / Jules  | `AGENTS.md`, `.jules/setup.md`    |
 | Cursor                | `.cursor/rules/`                  |
 
+## LLM-Friendly Documentation (llms.txt)
+
+Praman publishes its documentation in the [llmstxt.org](https://llmstxt.org) standard. AI agents and RAG pipelines can fetch these files directly:
+
+| File | Content |
+| --- | --- |
+| [`llms.txt`](https://mrkanitkar.github.io/playwright-praman/llms.txt) | Link index — all docs with descriptions |
+| [`llms-full.txt`](https://mrkanitkar.github.io/playwright-praman/llms-full.txt) | Complete documentation in a single file |
+| [`llms-quickstart.txt`](https://mrkanitkar.github.io/playwright-praman/llms-quickstart.txt) | Setup, fixtures, selectors, matchers |
+| [`llms-sap-testing.txt`](https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt) | Auth, FLP, OData, Fiori Elements, cookbook |
+| [`llms-migration.txt`](https://mrkanitkar.github.io/playwright-praman/llms-migration.txt) | Migration from Playwright, wdi5, Tosca |
+| [`llms-architecture.txt`](https://mrkanitkar.github.io/playwright-praman/llms-architecture.txt) | Architecture, bridge, proxy, ADRs |
+
+Add to your agent instructions (CLAUDE.md, `.cursorrules`, `copilot-instructions.md`):
+
+```markdown
+For Praman docs: https://mrkanitkar.github.io/playwright-praman/llms-full.txt
+For SAP testing: https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt
+```
+
 ## Azure Playwright (Optional)
 
 For scalable cloud-based test execution, see [Azure Playwright Workspaces](https://github.com/Azure/playwright-workspaces).
