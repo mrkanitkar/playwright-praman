@@ -262,3 +262,60 @@ Coverage thresholds are enforced per-file (not just project-wide):
 | Tier 1 | Error classes       | 100%       | 100%     |
 | Tier 2 | Core infrastructure | 95%        | 90%      |
 | Tier 3 | All other modules   | 90%        | 85%      |
+
+## Praman-Specific Azure Playwright Configuration
+
+When running Praman tests with [Azure Playwright Testing](https://learn.microsoft.com/en-us/azure/playwright-testing/), the bridge must communicate with cloud-hosted browsers. This works out of the box because the bridge uses standard `page.evaluate()` calls that serialize across remote browser connections.
+
+### Service Configuration
+
+Create a `playwright.service.config.ts` that extends your base config:
+
+```typescript
+import { defineConfig } from '@playwright/test';
+import { getServiceConfig } from '@azure/microsoft-playwright-testing';
+import baseConfig from './playwright.config';
+
+export default defineConfig(baseConfig, getServiceConfig(baseConfig), {
+  workers: 20,
+  use: {
+    // Increase timeouts for cloud browser latency
+    actionTimeout: 15_000,
+    navigationTimeout: 60_000,
+  },
+  expect: {
+    timeout: 10_000,
+  },
+});
+```
+
+### Environment Variables
+
+Set these in your CI pipeline or `.env` file:
+
+```bash
+PLAYWRIGHT_SERVICE_URL=wss://eastus.api.playwright.microsoft.com/...
+PLAYWRIGHT_SERVICE_ACCESS_TOKEN=<your-token>
+# Praman bridge timeout (higher for cloud latency)
+PRAMAN_CONTROL_DISCOVERY_TIMEOUT=45000
+```
+
+### Worker and Timeout Considerations
+
+Azure Playwright Testing supports up to 50 parallel workers. Keep these points in mind:
+
+- **SAP session limits**: Your SAP system may restrict concurrent sessions per user. Use separate test accounts per worker shard, or reduce `workers` to match your license.
+- **Bridge injection latency**: Cloud browsers add 50-200ms round-trip overhead per `page.evaluate()` call. Increase `controlDiscoveryTimeout` to 45 seconds or higher.
+- **Auth state reuse**: Use Playwright's `storageState` to persist authentication and avoid re-login on every worker. This is especially important at scale because SAP IdP rate-limits login attempts.
+
+### Running in CI
+
+```yaml
+- name: Run Praman tests on Azure Playwright
+  run: npx playwright test --config=playwright.service.config.ts
+  env:
+    PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
+    PLAYWRIGHT_SERVICE_ACCESS_TOKEN: ${{ secrets.PLAYWRIGHT_SERVICE_ACCESS_TOKEN }}
+    SAP_CLOUD_BASE_URL: ${{ secrets.SAP_CLOUD_BASE_URL }}
+    PRAMAN_CONTROL_DISCOVERY_TIMEOUT: '45000'
+```

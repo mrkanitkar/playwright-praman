@@ -792,33 +792,96 @@ function EvidenceArtifacts(): ReactNode {
 /* ─── Report Index (gallery) ──────────────────────────────── */
 
 function ReportGallery(): ReactNode {
-  const reports = [
-    { title: 'SAP FI — Period Close Validation', scope: 'FI-GL, FI-AP, FI-AR, FI-AA, CO-PA', passRate: 83, status: 'Sample', active: true },
-    { title: 'Procure-to-Pay E2E', scope: 'MM, FI-AP, Treasury', passRate: 0, status: 'Coming Soon', active: false },
-    { title: 'Order-to-Cash E2E', scope: 'SD, FI-AR, Billing', passRate: 0, status: 'Coming Soon', active: false },
-    { title: 'Asset Migration Validation', scope: 'FI-AA, Data Migration', passRate: 0, status: 'Coming Soon', active: false },
+  const allReports = [
+    { title: 'Executive Dashboard', scope: 'Steering Committee quality overview', slug: 'executive-dashboard', icon: '\u{1F4CA}' },
+    { title: 'Process Deep Dive', scope: 'O2C, P2P, R2R, H2R, P2D, WM drill-down', slug: 'process-deep-dive', icon: '\u{1F504}' },
+    { title: 'Role Readiness', scope: 'Day-1 readiness by business role', slug: 'role-readiness', icon: '\u{1F465}' },
+    { title: 'Data Migration', scope: 'Master data validation & accuracy', slug: 'data-migration', icon: '\u{1F4E6}' },
+    { title: 'Risk Register', scope: 'CFO risk report with revenue exposure', slug: 'risk-register', icon: '\u26A0\uFE0F' },
+    { title: 'Performance Heatmap', scope: 'Transaction response times & SLAs', slug: 'performance', icon: '\u{1F525}' },
+    { title: 'SAP FI Quality', scope: 'Financial Accounting module validation', slug: '#sap-fi-report', icon: '\u{1F4B0}' },
+    { title: 'Accessibility Audit', scope: 'WCAG 2.1 AA across 16 Fiori apps', slug: 'accessibility', icon: '\u267F' },
+    { title: 'Interface Quality', scope: '142 interfaces, 20 third-party systems', slug: 'interfaces', icon: '\u{1F517}' },
+    { title: 'Global Impact', scope: '18 countries, network simulation', slug: 'global-impact', icon: '\u{1F30D}' },
+    { title: 'User Experience', scope: 'Locale, browser, device testing', slug: 'user-experience', icon: '\u{1F464}' },
+    { title: 'E2E Cross-System', scope: '8 end-to-end scenarios across systems', slug: 'e2e-quality', icon: '\u{1F500}' },
+    { title: 'How It Works', scope: 'Praman architecture & data flow', slug: 'how-it-works', icon: '\u2699\uFE0F' },
   ];
 
   return (
     <section className="er-section" style={{ paddingBottom: 0 }}>
-      <div className="er-gallery-grid">
-        {reports.map((r) => (
-          <div key={r.title} className={`er-gallery-card ${r.active ? 'er-gallery-card--active' : ''}`}>
-            <div className="er-gallery-card-top">
-              <span className={`er-badge ${r.active ? 'er-badge--green' : 'er-badge--gray'}`}>{r.status}</span>
-            </div>
-            <h3 className="er-gallery-title">{r.title}</h3>
-            <p className="er-gallery-scope">{r.scope}</p>
-            {r.active && (
-              <div className="er-gallery-rate">
-                <div className="er-rate-bar" style={{ height: 6 }}>
-                  <div className="er-rate-bar-fill" style={{ width: `${r.passRate}%`, background: '#22c55e' }} />
-                </div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--praman-ink-secondary)' }}>{r.passRate}% pass rate</span>
-              </div>
-            )}
-          </div>
-        ))}
+      {/* Important note */}
+      <div style={{
+        maxWidth: 960,
+        margin: '0 auto 1.5rem',
+        padding: '0.75rem 1rem',
+        background: 'rgba(245, 158, 11, 0.08)',
+        border: '1px solid rgba(245, 158, 11, 0.3)',
+        borderRadius: 8,
+        fontSize: '0.85rem',
+        color: 'var(--ifm-font-color-base)',
+      }}>
+        <strong>Important:</strong> These reports are examples of what you can design and develop. Please read the documentation help for more details.
+      </div>
+
+      {/* Full Dashboard banner */}
+      <a
+        href="/playwright-praman/example-reports/dashboard"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: 'block',
+          maxWidth: 960,
+          margin: '0 auto 1rem',
+          padding: '0.75rem 1.25rem',
+          background: 'linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%)',
+          borderRadius: 8,
+          color: '#fff',
+          textDecoration: 'none',
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ fontSize: '1rem', fontWeight: 700 }}>S/4HANA Quality Dashboard — All Reports</div>
+        <div style={{ fontSize: '0.78rem', opacity: 0.8, marginTop: 2 }}>Full tabbed dashboard with steering committee view, risk register, performance heatmap, and more</div>
+      </a>
+
+      {/* Compact report link list */}
+      <div style={{
+        maxWidth: 960,
+        margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+        gap: '0.5rem',
+      }}>
+        {allReports.map((r) => {
+          const isAnchor = r.slug.startsWith('#');
+          return (
+            <a
+              key={r.slug}
+              href={isAnchor ? r.slug : `/playwright-praman/example-reports/${r.slug}`}
+              target={isAnchor ? undefined : '_blank'}
+              rel={isAnchor ? undefined : 'noopener noreferrer'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.5rem 0.75rem',
+                background: 'var(--ifm-card-background-color)',
+                border: '1px solid var(--praman-border, #e2e8f0)',
+                borderRadius: 6,
+                textDecoration: 'none',
+                color: 'inherit',
+                fontSize: '0.82rem',
+                transition: 'border-color 0.15s, box-shadow 0.15s',
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--ifm-color-primary)'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--praman-border, #e2e8f0)'; e.currentTarget.style.boxShadow = 'none'; }}
+            >
+              <span>{r.icon}</span>
+              <span><strong>{r.title}</strong><br /><span style={{ fontSize: '0.72rem', color: 'var(--praman-ink-secondary, #64748b)' }}>{r.scope}</span></span>
+            </a>
+          );
+        })}
       </div>
     </section>
   );
@@ -849,7 +912,7 @@ export default function ExampleReports(): ReactNode {
         </div>
 
         {/* Sample Report */}
-        <div className="er-report-container">
+        <div id="sap-fi-report" className="er-report-container">
           <ReportHeader />
           <ExecutiveSummary />
           <TestModuleResults />

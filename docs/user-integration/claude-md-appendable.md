@@ -2,12 +2,18 @@
 
 Append this to your project's `CLAUDE.md` to enable SAP UI5 test generation with Praman.
 
+> **Complete guide**: For installation, config, fixtures, and troubleshooting, see
+> `node_modules/playwright-praman/docs/user-integration/CLAUDE-USER.md`
+
 ---
 
-## Praman SAP Agent Setup
+## Praman + Playwright SAP Agent Setup
 
-**Package**: `playwright-praman`
+**Package**: `playwright-praman` (extends Playwright with UI5-aware fixtures)
 **Primary skill reference**: `node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.md`
+
+SAP pages are always hybrid — UI5 controls, Web Components, and plain DOM coexist.
+Use **Praman fixtures for UI5 controls** and **Playwright native for everything else** (login forms, Web Components, custom HTML).
 
 ### Setup Steps
 
@@ -43,9 +49,9 @@ After setup, you have 6 agents in `.claude/agents/`:
 
 ### The 7 Mandatory Rules (All Praman Agents)
 
-1. EVERY UI5 element → `ui5.control()` + proxy methods ONLY
-2. NEVER use Playwright native selectors for UI5 elements
-3. Non-UI5 elements → Playwright native permitted (verify first)
+1. UI5 controls (`sap.m.*`, `sap.ui.comp.*`, `sap.ui.mdc.*`) → `ui5.control()` + proxy methods ONLY
+2. NEVER use Playwright native selectors for UI5 controls
+3. Non-UI5 elements (login forms, Web Components, custom HTML) → Playwright native (`page.locator()`)
 4. `import { test, expect } from 'playwright-praman'` ONLY
 5. Auth via seed — raw Playwright auth in seed, never `sapAuth.login()` in test body
 6. Post-generation: scan 16+ forbidden patterns

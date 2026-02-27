@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design 4 — Warm Sapphire</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sapphire: #1e40af;
+  --sapphire-dark: #1e3a5f;
+  --sapphire-light: #3b82f6;
+  --amber: #f59e0b;
+  --amber-light: #fbbf24;
+  --bg: #fefce8;
+  --bg-warm: #fffbeb;
+  --bg-white: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #475569;
+  --border: #e2e8f0;
+}
+
+body { font-family: 'Inter', system-ui, sans-serif; color: var(--text); background: var(--bg-white); line-height: 1.65; }
+
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3rem; height: 64px;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.navbar-brand { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.4rem; color: var(--sapphire); }
+.navbar-links { display: flex; gap: 2rem; }
+.navbar-links a { text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; }
+.navbar-links a:hover { color: var(--sapphire); }
+
+/* ── Hero ── */
+.hero {
+  margin-top: 64px;
+  background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 40%, #1e40af 100%);
+  color: #fff; padding: 7rem 3rem 6rem; text-align: center;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; bottom: -100px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 200px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(245,158,11,0.15), transparent);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.82rem; font-weight: 600; color: var(--amber-light);
+  margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.hero-eyebrow .bar { width: 32px; height: 2px; background: var(--amber); }
+.hero h1 {
+  font-family: 'Playfair Display', serif; font-size: 3.8rem; font-weight: 800;
+  line-height: 1.1; max-width: 800px; margin: 0 auto 1.2rem;
+  letter-spacing: -0.01em;
+}
+.hero-desc {
+  font-size: 1.2rem; font-weight: 400; opacity: 0.85;
+  max-width: 600px; margin: 0 auto 2.5rem; line-height: 1.6;
+}
+.hero-buttons { display: flex; gap: 1rem; justify-content: center; }
+.btn {
+  padding: 0.8rem 2rem; border-radius: 6px; font-weight: 600; font-size: 0.95rem;
+  text-decoration: none; transition: all 0.2s; border: 2px solid transparent;
+}
+.btn-amber { background: var(--amber); color: #1e293b; border-color: var(--amber); }
+.btn-amber:hover { background: var(--amber-light); }
+.btn-outline { background: transparent; color: #fff; border-color: rgba(255,255,255,0.3); }
+.btn-outline:hover { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05); }
+
+/* ── Section ── */
+.section { padding: 5rem 3rem; max-width: 1200px; margin: 0 auto; }
+.section-warm { background: var(--bg-warm); padding: 5rem 3rem; }
+.section-warm .inner { max-width: 1200px; margin: 0 auto; }
+.section-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sapphire); margin-bottom: 0.5rem; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 800; margin-bottom: 0.75rem; }
+.section-desc { font-size: 1.05rem; color: var(--text-secondary); max-width: 560px; margin-bottom: 3rem; }
+
+/* ── Pitch: Horizontal cards ── */
+.pitch-row { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.pitch-item {
+  flex: 1; padding: 2rem; border-right: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.pitch-item:last-child { border-right: none; }
+.pitch-item:hover { background: var(--bg-warm); }
+.pitch-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 800; color: var(--sapphire); opacity: 0.15; margin-bottom: 0.5rem; }
+.pitch-step { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--amber); margin-bottom: 0.5rem; }
+.pitch-item h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.pitch-item p { font-size: 0.88rem; color: var(--text-secondary); }
+
+/* ── Features ── */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.feature-card {
+  background: var(--bg-white); border: 1px solid var(--border); border-radius: 10px;
+  padding: 2rem; transition: all 0.2s;
+}
+.feature-card:hover { border-color: var(--sapphire-light); box-shadow: 0 4px 20px rgba(30,64,175,0.08); }
+.feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+.feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.feature-card p { color: var(--text-secondary); font-size: 0.88rem; }
+
+/* ── Philosophy ── */
+.philosophy-quote {
+  font-family: 'Playfair Display', serif; font-size: 1.3rem;
+  color: var(--sapphire-dark); max-width: 750px; margin: 0 auto 3rem;
+  text-align: center; line-height: 1.6; font-style: italic;
+}
+.pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+.pillar-card {
+  background: var(--bg-white); border: 1px solid var(--border); border-radius: 10px;
+  padding: 2rem; position: relative; transition: all 0.2s;
+  border-left: 4px solid var(--amber);
+}
+.pillar-card:hover { box-shadow: 0 4px 20px rgba(30,64,175,0.08); }
+.pillar-sanskrit { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--amber); margin-bottom: 0.3rem; }
+.pillar-card h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 0.4rem; }
+.pillar-card p { color: var(--text-secondary); font-size: 0.85rem; }
+
+/* ── CTA ── */
+.cta {
+  background: linear-gradient(160deg, #0f172a, #1e3a5f, #1e40af);
+  padding: 5rem 3rem; text-align: center; color: #fff;
+}
+.cta h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin-bottom: 1rem; }
+.cta p { font-size: 1.05rem; opacity: 0.85; margin-bottom: 2rem; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+.footer {
+  background: #0f172a; color: rgba(255,255,255,0.5); padding: 2.5rem 3rem;
+  text-align: center; font-size: 0.85rem;
+}
+.footer a { color: var(--amber-light); text-decoration: none; }
+
+@media (max-width: 900px) {
+  .hero h1 { font-size: 2.5rem; }
+  .pitch-row { flex-direction: column; }
+  .pitch-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .pitch-item:last-child { border-bottom: none; }
+  .features-grid, .pillars-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .features-grid, .pillars-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">Praman</div>
+  <div class="navbar-links">
+    <a href="#">Documentation</a>
+    <a href="#">API Reference</a>
+    <a href="#">TypeDoc</a>
+    <a href="#">GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow"><span class="bar"></span> Agentic-First &middot; Open Source</div>
+  <h1>The Evidence Standard for SAP S/4HANA</h1>
+  <p class="hero-desc">
+    Praman empowers Enterprise IT to master SAP testing with autonomous,
+    self-correcting capabilities built on Playwright and AI intelligence.
+  </p>
+  <div class="hero-buttons">
+    <a href="#" class="btn btn-amber">Get Started</a>
+    <a href="#" class="btn btn-outline">API Reference</a>
+  </div>
+</section>
+
+<div class="section">
+  <div class="section-label">Why Praman</div>
+  <h2 class="section-title">The Case for Autonomous SAP Testing</h2>
+  <p class="section-desc">Every enterprise transformation deserves evidence, not hope.</p>
+  <div class="pitch-row">
+    <div class="pitch-item"><div class="pitch-num">01</div><div class="pitch-step">Why</div><h3>UI5 breaks generic tools</h3><p>Fiori's control tree is invisible to CSS selectors. Legacy tools fail on every transport.</p></div>
+    <div class="pitch-item"><div class="pitch-num">02</div><div class="pitch-step">What</div><h3>AI-native SAP testing</h3><p>Typed proxies and bridge adapters that speak UI5 natively. Controls, not DOM nodes.</p></div>
+    <div class="pitch-item"><div class="pitch-num">03</div><div class="pitch-step">So What</div><h3>Evidence-based releases</h3><p>Self-healing tests, diagnostics, and compliance reporters that prove deployment safety.</p></div>
+    <div class="pitch-item"><div class="pitch-num">04</div><div class="pitch-step">Then What</div><h3>Agentic test evolution</h3><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+  </div>
+</div>
+
+<div class="section-warm">
+  <div class="inner">
+    <div style="text-align:center;">
+      <div class="section-label">Platform</div>
+      <h2 class="section-title">Six Pillars of Capability</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto;">Engineered for the complexity and scale of enterprise SAP landscapes.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">&#x1F916;</div><h3>AI-First Architecture</h3><p>SKILL.md entry points, capabilities discovery, compliance verification for AI coding agents.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x1F527;</div><h3>32+ Powerful Fixtures</h3><p>UI5 controls, OData, navigation, auth via Playwright's dependency injection.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x1F3AF;</div><h3>SAP UI5 Native</h3><p>ui5.control() with auto-retry and self-healing. Control APIs, not DOM selectors.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x1F3D7;</div><h3>5-Layer Architecture</h3><p>Core &rarr; Bridge &rarr; Proxy &rarr; Fixtures &rarr; AI. Clean separation of concerns.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x1F4CA;</div><h3>Enterprise Observability</h3><p>OpenTelemetry, pino logging, compliance reporters. Full visibility into every action.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x26A1;</div><h3>Playwright Native</h3><p>Parallel execution, auto-wait, trace viewer, UI mode. Full Playwright, zero compromise.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="text-align:center;">
+  <div class="section-label">Our Philosophy</div>
+  <h2 class="section-title">The Four Pillars of Evidence</h2>
+  <div class="philosophy-quote">
+    &ldquo;In Ancient India, <em>Prama&#x304;n&#x323;a</em> was the standard used to separate fact from illusion.
+    In the Modern Enterprise, <strong>Praman</strong> is the standard that separates
+    a &lsquo;Successful Deployment&rsquo; from a &lsquo;Business Disruption.&rsquo;&rdquo;
+  </div>
+  <div class="pillars-grid" style="text-align:left;">
+    <div class="pillar-card"><div class="pillar-sanskrit">Pratyaksha</div><h3>Perception</h3><p>Real-time, deep-object visibility into the S/4HANA Fiori layer.</p></div>
+    <div class="pillar-card"><div class="pillar-sanskrit">Anum&#x101;na</div><h3>Inference</h3><p>Agentic AI that predicts and heals breaks before they impact the user.</p></div>
+    <div class="pillar-card"><div class="pillar-sanskrit">Upam&#x101;na</div><h3>Comparison</h3><p>Validation between Legacy ECC and New S/4HANA states.</p></div>
+    <div class="pillar-card"><div class="pillar-sanskrit">Shabda</div><h3>Authority</h3><p>Playwright — the gold standard of modern web automation.</p></div>
+  </div>
+</div>
+
+<div class="cta">
+  <h2>Demand the Standard Your Enterprise Deserves</h2>
+  <p>Open source. Runs in your CISO-approved environment. Fully customizable.</p>
+  <div class="hero-buttons" style="justify-content:center;">
+    <a href="#" class="btn btn-amber">Get Started</a>
+    <a href="#" class="btn btn-outline">View on GitHub</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>Praman &mdash; AI-First SAP UI5 Test Automation &middot; <a href="#">GitHub</a> &middot; <a href="#">npm</a></p>
+  <p style="margin-top:0.5rem;opacity:0.5;">Crafted with Prudence. Powered by Purpose.</p>
+</footer>
+
+</body>
+</html>

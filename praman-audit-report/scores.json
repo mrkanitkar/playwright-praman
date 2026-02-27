@@ -1,0 +1,67 @@
+{
+  "auditDate": "2026-02-27",
+  "pluginName": "playwright-praman",
+  "pluginVersion": "1.0.1",
+  "implementation": {
+    "total": 53,
+    "maxPossible": 53,
+    "sections": {
+      "architecture": { "score": 9, "max": 10, "pass": 8, "friction": 2, "fail": 0, "na": 0 },
+      "typescript": { "score": 11, "max": 12, "pass": 10, "friction": 2, "fail": 0, "na": 0 },
+      "async": { "score": 7, "max": 8, "pass": 6, "friction": 2, "fail": 0, "na": 0 },
+      "errors": { "score": 9, "max": 9, "pass": 9, "friction": 0, "fail": 0, "na": 0 },
+      "config": { "score": 6, "max": 7, "pass": 5, "friction": 2, "fail": 0, "na": 0 },
+      "testing": { "score": 7, "max": 7, "pass": 7, "friction": 0, "fail": 0, "na": 0 }
+    }
+  },
+  "operability": {
+    "total": 40,
+    "maxPossible": 45,
+    "sections": {
+      "discovery": { "score": 9, "max": 10, "pass": 8, "friction": 2, "fail": 0, "na": 0 },
+      "sapOps": { "score": 11, "max": 12, "pass": 10, "friction": 2, "fail": 0, "na": 0 },
+      "debug": { "score": 7, "max": 8, "pass": 6, "friction": 2, "fail": 0, "na": 0 },
+      "advanced": { "score": 7, "max": 8, "pass": 6, "friction": 2, "fail": 0, "na": 0 },
+      "extension": { "score": 6, "max": 7, "pass": 5, "friction": 2, "fail": 0, "na": 0 }
+    }
+  },
+  "bestPractices": {
+    "total": 120,
+    "maxPossible": 145,
+    "sections": {
+      "anthropicClaude": { "score": 18, "max": 20, "pass": 16, "friction": 4, "fail": 0, "na": 0 },
+      "openaiCodex": { "score": 15, "max": 18, "pass": 13, "friction": 4, "fail": 1, "na": 0 },
+      "googleGeminiADK": { "score": 14, "max": 18, "pass": 12, "friction": 4, "fail": 0, "na": 2 },
+      "microsoftAutoGen": { "score": 16, "max": 20, "pass": 13, "friction": 5, "fail": 0, "na": 2 },
+      "aws": { "score": 9, "max": 12, "pass": 7, "friction": 4, "fail": 0, "na": 1 },
+      "playwright": { "score": 14, "max": 15, "pass": 13, "friction": 2, "fail": 0, "na": 0 },
+      "nodejs": { "score": 12, "max": 12, "pass": 12, "friction": 0, "fail": 0, "na": 0 },
+      "sapEcosystem": { "score": 22, "max": 30, "pass": 18, "friction": 8, "fail": 0, "na": 4 }
+    }
+  },
+  "frameworkIntegration": {
+    "mcpWrapper": { "pathACodeGen": "n/a", "pathBOrchestrator": "yellow", "effort": "5 days" },
+    "googleADK": { "pathACodeGen": "green", "pathBOrchestrator": "yellow", "effort": "1 week (wrapper needed)" },
+    "langGraph": { "pathACodeGen": "green", "pathBOrchestrator": "yellow", "effort": "1 week (wrapper needed)" },
+    "autoGen": { "pathACodeGen": "green", "pathBOrchestrator": "yellow", "effort": "1 week (wrapper needed)" },
+    "openaiCodex": { "pathACodeGen": "green", "pathBOrchestrator": "yellow", "effort": "1 week (wrapper needed)" },
+    "claudeCode": { "pathACodeGen": "green", "pathBOrchestrator": "yellow", "effort": "Minimal (already works)" },
+    "pramanAgentic": { "pathACodeGen": "n/a", "pathBOrchestrator": "green", "effort": "Built-in" }
+  },
+  "documentation": {
+    "total": 17,
+    "maxPossible": 20,
+    "sections": {
+      "aiDiscoveryFiles": { "score": 9, "max": 10, "pass": 8, "friction": 2, "fail": 0, "na": 0 },
+      "docusaurus": { "score": 8, "max": 10, "pass": 6, "friction": 4, "fail": 0, "na": 0 }
+    }
+  },
+  "overallScore": {
+    "implementation": "49/53 (92%)",
+    "operability": "40/45 (89%)",
+    "bestPractices": "120/145 (83%)",
+    "documentation": "17/20 (85%)",
+    "overallGrade": "A-",
+    "readinessLevel": "Production-ready with minor improvements needed"
+  }
+}

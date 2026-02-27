@@ -4,11 +4,11 @@ Append to `.antigravity/rules.md` for Google Antigravity agent support.
 
 ---
 
-## SAP UI5 Testing with Praman
+## SAP UI5 Testing with Praman + Playwright
 
 **Skill file**: `node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.md`
 
-Read this file before generating any SAP UI5 test.
+Read this file before generating any SAP UI5 test. SAP pages are hybrid — use Praman fixtures for UI5 controls, Playwright native for login forms, Web Components, and plain DOM.
 
 ## Import
 
@@ -18,7 +18,7 @@ import { test, expect } from 'playwright-praman';
 
 ## Rules
 
-1. ALL UI5 elements via `ui5.control()` — never Playwright native
+1. UI5 controls → Praman fixtures (`ui5.control()`); non-UI5 → Playwright native
 2. Input: `setValue()` + `fireChange()` + `waitForUI5()` always together
 3. Auth in seed: raw Playwright auth in `tests/seeds/sap-seed.spec.ts` only (no Praman fixtures)
 4. TSDoc compliance header in every generated test

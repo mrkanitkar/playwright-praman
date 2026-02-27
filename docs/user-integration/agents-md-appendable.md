@@ -4,16 +4,20 @@ Append this to your project's `AGENTS.md` for universal AI agent support.
 
 ---
 
-## SAP UI5 Test Generation with Praman
+## SAP UI5 Test Generation with Praman + Playwright
 
-**Package**: `playwright-praman`
+**Package**: `playwright-praman` (extends Playwright with UI5-aware fixtures)
 **Full skill reference**: `node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.md`
+
+SAP pages are always hybrid — UI5 controls, Web Components, and plain DOM coexist on every page.
+A single test uses **Praman fixtures for UI5** and **Playwright native for everything else**.
+The rule is per-element, not per-page.
 
 ### The 7 Mandatory Rules
 
-1. EVERY UI5 element → `ui5.control()` + proxy methods ONLY
+1. UI5 controls (`sap.m.*`, `sap.ui.comp.*`, `sap.ui.mdc.*`) → `ui5.control()` + proxy methods ONLY
 2. NEVER use Playwright native selectors for UI5 elements (`page.click('#__...')`, `page.locator('.sapM...')`)
-3. Non-UI5 elements → Playwright native permitted (verify element is NOT UI5 first)
+3. Non-UI5 elements (login forms, Web Components, custom HTML) → Playwright native (`page.locator()`, `page.getByRole()`)
 4. `import { test, expect } from 'playwright-praman'` — the ONLY valid import
 5. Auth via seed — raw Playwright auth in `tests/seeds/sap-seed.spec.ts`, NEVER `sapAuth.login()` in test body
 6. Post-generation: scan against 16+ forbidden patterns before writing test

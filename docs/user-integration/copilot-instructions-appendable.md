@@ -4,9 +4,12 @@ Append this to your project's `.github/copilot-instructions.md` to enable SAP UI
 
 ---
 
-## Praman SAP Testing with GitHub Copilot
+## Praman + Playwright SAP Testing with GitHub Copilot
 
 **Primary entry point**: `node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.md`
+
+SAP pages are always hybrid — UI5 controls, Web Components, and plain DOM coexist.
+Use **Praman fixtures for UI5 controls** and **Playwright native for everything else** (login forms, Web Components, custom HTML).
 
 ### Setup
 
@@ -35,8 +38,8 @@ cp node_modules/playwright-praman/seeds/sap-seed.spec.ts tests/seeds/
 When generating SAP tests, ALWAYS:
 
 1. Import ONLY from `playwright-praman`: `import { test, expect } from 'playwright-praman'`
-2. Use Praman fixtures for ALL UI5 elements — NEVER `page.click('#__...')`, `page.locator('[data-sap-ui]')`
-3. Use Playwright native ONLY for verified non-UI5 elements
+2. UI5 controls (`sap.m.*`, `sap.ui.comp.*`, `sap.ui.mdc.*`) → Praman fixtures ONLY
+3. Non-UI5 elements (login forms, Web Components, custom HTML) → Playwright native (`page.locator()`)
 4. Keep auth in seed file — NEVER `sapAuth.login()` in test body
 5. Use `setValue()` + `fireChange()` + `waitForUI5()` for every input
 6. Use `searchOpenDialogs: true` for dialog controls

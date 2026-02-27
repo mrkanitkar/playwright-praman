@@ -18,6 +18,45 @@ npm install -D playwright-praman @playwright/test
 npx playwright install chromium
 ```
 
+## Agent & IDE Setup (Required)
+
+After installing the package, run the `init` command to scaffold agent definitions, seed files, and IDE configuration. This step is **required** before proceeding — it sets up the AI agents, test seeds, and editor integrations that Praman depends on:
+
+```bash
+npx playwright-praman init
+```
+
+`init` detects your IDE and installs the appropriate files:
+
+| IDE / Agent        | What gets installed                                                           |
+| ------------------ | ----------------------------------------------------------------------------- |
+| **Claude Code**    | `.claude/agents/` (planner, generator, healer), `.claude/prompts/`, seed file |
+| **GitHub Copilot** | `.github/agents/` (planner, generator, healer)                                |
+| **Cursor**         | `.cursor/rules/praman.mdc`                                                    |
+| **VS Code**        | `.vscode/settings.json`, extensions, code snippets                            |
+| **Jules**          | `.jules/praman-setup.md`                                                      |
+
+After `init`, append the Praman instructions to your AI agent config:
+
+```bash
+# Claude Code
+cat node_modules/playwright-praman/docs/user-integration/claude-md-appendable.md >> CLAUDE.md
+
+# GitHub Copilot
+cat node_modules/playwright-praman/docs/user-integration/copilot-instructions-appendable.md >> .github/copilot-instructions.md
+
+# Cursor
+cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable.mdc >> .cursorrules
+```
+
+:::warning
+Do not skip this step. Without `init`, AI agents (Claude Code, Copilot, Cursor) will not have the Praman skill files, seed specs, or prompt definitions needed to plan, generate, and heal SAP tests.
+:::
+
+:::tip
+For manual installation, re-running on existing projects, seed file details, and LLM-friendly documentation (llms.txt), see the full [Agent & IDE Setup](./agent-setup) guide.
+:::
+
 ## Project Setup
 
 ### 1. Create Praman Configuration
@@ -107,10 +146,7 @@ Create `tests/purchase-order.spec.ts`:
 ```typescript
 import { test, expect } from 'playwright-praman';
 
-test('navigate to Purchase Order app and verify table', async ({
-  ui5,
-  ui5Navigation,
-}) => {
+test('navigate to Purchase Order app and verify table', async ({ ui5, ui5Navigation }) => {
   // Step 1: Navigate to the Fiori app
   await test.step('Open Purchase Order app', async () => {
     await ui5Navigation.navigateToApp('PurchaseOrder-manage');
@@ -139,6 +175,476 @@ test('navigate to Purchase Order app and verify table', async ({
   });
 });
 ```
+
+## Real-World Example: BOM End-to-End Test
+
+Praman's AI agents follow a **plan → generate → heal** pipeline. The planner explores a live SAP system, discovers controls, and produces a structured test plan. The generator converts the plan into executable Playwright + Praman test code. Below is a real example from an SAP S/4HANA Cloud BOM application.
+
+### AI-Generated Test Plan
+
+The AI planner agent explored the Maintain Bill of Material app and produced this test plan:
+
+<details>
+<summary>bom-create.plan.md (click to expand)</summary>
+
+#### Application Overview
+
+SAP S/4HANA Cloud — Maintain Bill of Material (Version 2). Fiori Elements V4 List Report with Create BOM dialog. UI5 Version 1.142.4. System: Partner Demo Customizing LXG/100.
+
+#### 1. BOM Navigation and App Loading
+
+##### 1.1. Navigate to Maintain BOM app from FLP
+
+| #   | Step                                                  | Expected Result                                                              |
+| --- | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| 1   | Verify FLP Home page loaded after login               | Page title contains "Home"; Shell Bar visible with "S/4HANA Cloud"           |
+| 2   | Click "Bills Of Material" tab in FLP space navigation | Tab becomes active; BOM tiles visible                                        |
+| 3   | Click "Maintain Bill Of Material (Version 2)" tile    | URL changes to `#MaterialBOM-maintainMaterialBOM`                            |
+| 4   | Wait for List Report to load                          | Filter bar visible (Material, Plant, BOM Usage); "Create BOM" button enabled |
+
+#### 2. Create BOM Dialog Interactions
+
+##### 2.1. Open Create BOM dialog and verify fields
+
+| #   | Step                      | Expected Result                                                                                           |
+| --- | ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| 1   | Click "Create BOM" button | Dialog opens with heading "Create BOM"                                                                    |
+| 2   | Verify all dialog fields  | Material (required), Plant, BOM Usage (required), Alternative BOM, Change Number, Valid From (pre-filled) |
+| 3   | Verify footer buttons     | "Create BOM" submit and "Cancel" buttons visible and enabled                                              |
+| 4   | Click "Cancel"            | Dialog closes; List Report visible                                                                        |
+
+##### 2.2. Test Material Value Help
+
+| #   | Step                                   | Expected Result                                                       |
+| --- | -------------------------------------- | --------------------------------------------------------------------- |
+| 1   | Click "Create BOM" to open dialog      | Dialog opens                                                          |
+| 2   | Click Value Help icon next to Material | "Select: Material" dialog opens with Material and Description columns |
+| 3   | Verify material data loaded            | At least one row with Material number and description                 |
+| 4   | Click a material row                   | Value help closes; Material field populated                           |
+| 5   | Click "Cancel" to close dialog         | Dialog closes cleanly                                                 |
+
+##### 2.3. Test Plant Value Help
+
+| #   | Step                                | Expected Result                                             |
+| --- | ----------------------------------- | ----------------------------------------------------------- |
+| 1   | Click "Create BOM" to open dialog   | Dialog opens                                                |
+| 2   | Click Value Help icon next to Plant | "Select: Plant" dialog opens with Plant, Plant Name columns |
+| 3   | Verify plant data loaded            | Plants listed (e.g. 1010 DE Plant, 1110 GB Plant)           |
+| 4   | Click a plant row                   | Value help closes; Plant field populated                    |
+| 5   | Click "Cancel" to close dialog      | Dialog closes cleanly                                       |
+
+##### 2.4. Test BOM Usage dropdown
+
+| #   | Step                              | Expected Result                                                                         |
+| --- | --------------------------------- | --------------------------------------------------------------------------------------- |
+| 1   | Click "Create BOM" to open dialog | Dialog opens                                                                            |
+| 2   | Click Value Help on BOM Usage     | Dropdown opens with usage types                                                         |
+| 3   | Verify options                    | Production (1), Engineering/Design (2), Universal (3), Plant Maintenance (4), Sales (5) |
+| 4   | Select "Production (1)"           | BOM Usage field shows "Production (1)"                                                  |
+| 5   | Click "Cancel" to close dialog    | Dialog closes cleanly                                                                   |
+
+#### 3. Complete BOM Creation Flow
+
+##### 3.1. Fill all fields and submit
+
+| #   | Step                                    | Expected Result                                                              |
+| --- | --------------------------------------- | ---------------------------------------------------------------------------- |
+| 1   | Navigate to app, click "Create BOM"     | Dialog opens                                                                 |
+| 2   | Select Material via Value Help          | Material field populated                                                     |
+| 3   | Select Plant via Value Help             | Plant field populated                                                        |
+| 4   | Select BOM Usage "Production (1)"       | BOM Usage set                                                                |
+| 5   | Verify all required fields filled       | Material, BOM Usage, Valid From all have values; Create BOM enabled          |
+| 6   | Click "Create BOM" submit               | Success: dialog closes, returns to list. Error: error message dialog appears |
+| 7   | If error, close error dialog and cancel | User returns to list report                                                  |
+
+##### 3.2. Verify validation errors
+
+| #   | Step                                        | Expected Result                                                      |
+| --- | ------------------------------------------- | -------------------------------------------------------------------- |
+| 1   | Open Create BOM dialog                      | Dialog opens                                                         |
+| 2   | Select invalid Material + Plant combination | Both fields populated                                                |
+| 3   | Select BOM Usage "Production (1)"           | BOM Usage set                                                        |
+| 4   | Click "Create BOM" submit                   | Error dialog: "Material not maintained in plant" with message M3351  |
+| 5   | Click "Close" on error dialog               | Error dialog closes; Create BOM dialog remains with values preserved |
+| 6   | Click "Cancel"                              | Dialog closes; returns to list report                                |
+
+</details>
+
+### Generated Gold Standard Test
+
+The AI generator converted scenario **3.1** (Complete BOM Creation Flow) from the plan above into the following production-grade test. Copy it into your project:
+
+```bash
+cp node_modules/playwright-praman/examples/bom-e2e-praman-gold-standard.spec.ts tests/
+```
+
+Here is the full test — 8 steps covering navigation, dialog handling, value help tables, OData-driven data selection, form fill, and graceful error recovery:
+
+<details>
+<summary>bom-e2e-praman-gold-standard.spec.ts (click to expand)</summary>
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+// ── V2 SmartField Control ID Constants ──────────────────────────────
+const IDS = {
+  // ── Dialog fields (sap.ui.comp.smartfield.SmartField) ──
+  materialField: 'createBOMFragment--material',
+  materialInput: 'createBOMFragment--material-input',
+  materialVHIcon: 'createBOMFragment--material-input-vhi',
+  materialVHDialog: 'createBOMFragment--material-input-valueHelpDialog',
+  materialVHTable: 'createBOMFragment--material-input-valueHelpDialog-table',
+
+  plantField: 'createBOMFragment--plant',
+  plantInput: 'createBOMFragment--plant-input',
+  plantVHIcon: 'createBOMFragment--plant-input-vhi',
+  plantVHDialog: 'createBOMFragment--plant-input-valueHelpDialog',
+  plantVHTable: 'createBOMFragment--plant-input-valueHelpDialog-table',
+
+  bomUsageField: 'createBOMFragment--variantUsage',
+  bomUsageCombo: 'createBOMFragment--variantUsage-comboBoxEdit',
+
+  // ── Dialog buttons ──
+  okBtn: 'createBOMFragment--OkBtn',
+  cancelBtn: 'createBOMFragment--CancelBtn',
+} as const;
+
+// ── Test Data ───────────────────────────────────────────────────────
+const TEST_DATA = {
+  flpSpaceTab: 'Bills Of Material',
+  tileHeader: 'Maintain Bill Of Material',
+  bomUsageKey: '1', // Production
+} as const;
+
+test.describe('BOM End-to-End Flow', () => {
+  test('Complete BOM Flow - V2 SmartField Single Session', async ({ page, ui5 }) => {
+    // Step 1: Navigate to BOM Maintenance App
+    await test.step('Step 1: Navigate to BOM Maintenance App', async () => {
+      await page.goto(process.env.SAP_CLOUD_BASE_URL!);
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page).toHaveTitle(/Home/, { timeout: 60000 });
+
+      // FLP space tabs — DOM click is the only reliable method
+      await page.getByText(TEST_DATA.flpSpaceTab, { exact: true }).click();
+
+      // Click tile with toPass() retry for slow SAP systems
+      await expect(async () => {
+        await ui5.press({
+          controlType: 'sap.m.GenericTile',
+          properties: { header: TEST_DATA.tileHeader },
+        });
+      }).toPass({ timeout: 60000, intervals: [5000, 10000] });
+
+      // Wait for Create BOM button — proves V1 app loaded
+      let createBtn: Awaited<ReturnType<typeof ui5.control>>;
+      await expect(async () => {
+        createBtn = await ui5.control({
+          controlType: 'sap.m.Button',
+          properties: { text: 'Create BOM' },
+        });
+        const text = await createBtn.getProperty('text');
+        expect(text).toBe('Create BOM');
+      }).toPass({ timeout: 120000, intervals: [5000, 10000] });
+    });
+
+    // Step 2: Open Create BOM Dialog and Verify Structure
+    await test.step('Step 2: Open Create BOM Dialog', async () => {
+      await ui5.press({
+        controlType: 'sap.m.Button',
+        properties: { text: 'Create BOM' },
+      });
+      await ui5.waitForUI5();
+
+      // Verify dialog opened — Material SmartField exists inside dialog
+      const materialField = await ui5.control({
+        id: IDS.materialField,
+        searchOpenDialogs: true,
+      });
+      const materialType = await materialField.getControlType();
+      expect(materialType).toBe('sap.ui.comp.smartfield.SmartField');
+      expect(await materialField.getRequired()).toBe(true);
+
+      // Verify BOM Usage SmartField
+      const bomUsageField = await ui5.control({
+        id: IDS.bomUsageField,
+        searchOpenDialogs: true,
+      });
+      expect(await bomUsageField.getControlType()).toBe('sap.ui.comp.smartfield.SmartField');
+      expect(await bomUsageField.getRequired()).toBe(true);
+
+      // Verify dialog footer buttons
+      const createDialogBtn = await ui5.control({
+        id: IDS.okBtn,
+        searchOpenDialogs: true,
+      });
+      expect(await createDialogBtn.getProperty('text')).toBe('Create');
+      const cancelDialogBtn = await ui5.control({
+        id: IDS.cancelBtn,
+        searchOpenDialogs: true,
+      });
+      expect(await cancelDialogBtn.getProperty('text')).toBe('Cancel');
+    });
+
+    // Step 3: Test Material Value Help
+    await test.step('Step 3: Test Material Value Help', async () => {
+      await ui5.press({ id: IDS.materialVHIcon, searchOpenDialogs: true });
+
+      const materialDialog = await ui5.control({
+        id: IDS.materialVHDialog,
+        searchOpenDialogs: true,
+      });
+      expect(await materialDialog.isOpen()).toBe(true);
+      await ui5.waitForUI5();
+
+      // Get inner table via SmartTable.getTable()
+      const smartTable = await ui5.control({
+        id: IDS.materialVHTable,
+        searchOpenDialogs: true,
+      });
+      const innerTable = await smartTable.getTable();
+      const rows = (await innerTable.getRows()) as unknown[];
+      expect(rows.length).toBeGreaterThan(0);
+
+      // Wait for OData data to load
+      await expect(async () => {
+        let count = 0;
+        for (const row of rows) {
+          const ctx = await (
+            row as { getBindingContext: () => Promise<unknown> }
+          ).getBindingContext();
+          if (ctx) count++;
+        }
+        expect(count).toBeGreaterThan(0);
+      }).toPass({ timeout: 60000, intervals: [1000, 2000, 5000] });
+
+      await materialDialog.close();
+      await ui5.waitForUI5();
+    });
+
+    // Step 4: Test Plant Value Help
+    await test.step('Step 4: Test Plant Value Help', async () => {
+      await ui5.press({ id: IDS.plantVHIcon, searchOpenDialogs: true });
+
+      const plantDialog = await ui5.control({
+        id: IDS.plantVHDialog,
+        searchOpenDialogs: true,
+      });
+      expect(await plantDialog.isOpen()).toBe(true);
+      await ui5.waitForUI5();
+
+      const smartTable = await ui5.control({
+        id: IDS.plantVHTable,
+        searchOpenDialogs: true,
+      });
+      const innerTable = await smartTable.getTable();
+      const rows = (await innerTable.getRows()) as unknown[];
+
+      await expect(async () => {
+        let count = 0;
+        for (const row of rows) {
+          const ctx = await (
+            row as { getBindingContext: () => Promise<unknown> }
+          ).getBindingContext();
+          if (ctx) count++;
+        }
+        expect(count).toBeGreaterThan(0);
+      }).toPass({ timeout: 60000, intervals: [1000, 2000, 5000] });
+
+      await plantDialog.close();
+      await ui5.waitForUI5();
+    });
+
+    // Step 5: Test BOM Usage Dropdown (Inner ComboBox)
+    await test.step('Step 5: Test BOM Usage Dropdown', async () => {
+      const bomUsageCombo = await ui5.control({
+        id: IDS.bomUsageCombo,
+        searchOpenDialogs: true,
+      });
+
+      // Get items via proxy
+      const rawItems = await bomUsageCombo.getItems();
+      const items: Array<{ key: string; text: string }> = [];
+      if (Array.isArray(rawItems)) {
+        for (const itemProxy of rawItems) {
+          const key = await itemProxy.getKey();
+          const text = await itemProxy.getText();
+          items.push({ key: String(key), text: String(text) });
+        }
+      }
+      expect(items.length).toBeGreaterThan(0);
+
+      // Verify open/close cycle
+      await bomUsageCombo.open();
+      await ui5.waitForUI5();
+      expect(await bomUsageCombo.isOpen()).toBe(true);
+      await bomUsageCombo.close();
+      await ui5.waitForUI5();
+      expect(await bomUsageCombo.isOpen()).toBe(false);
+    });
+
+    // Step 6: Fill Form with Valid Data
+    await test.step('Step 6: Fill Form with Valid Data', async () => {
+      // === FILL MATERIAL ===
+      await ui5.press({ id: IDS.materialVHIcon, searchOpenDialogs: true });
+      const materialDialogControl = await ui5.control({
+        id: IDS.materialVHDialog,
+        searchOpenDialogs: true,
+      });
+      await expect(async () => {
+        expect(await materialDialogControl.isOpen()).toBe(true);
+      }).toPass({ timeout: 30000, intervals: [1000, 2000] });
+
+      const smartTableMat = await ui5.control({
+        id: IDS.materialVHTable,
+        searchOpenDialogs: true,
+      });
+      const innerTableMat = await smartTableMat.getTable();
+
+      let materialValue = '';
+      await expect(async () => {
+        const ctx = await innerTableMat.getContextByIndex(0);
+        expect(ctx).toBeTruthy();
+        const data = (await ctx.getObject()) as { Material?: string };
+        expect(data?.Material).toBeTruthy();
+        materialValue = data!.Material!;
+      }).toPass({ timeout: 60000, intervals: [1000, 2000, 5000] });
+
+      await materialDialogControl.close();
+      await ui5.waitForUI5();
+      await ui5.fill({ id: IDS.materialInput, searchOpenDialogs: true }, materialValue);
+      await ui5.waitForUI5();
+
+      // === FILL PLANT ===
+      await ui5.press({ id: IDS.plantVHIcon, searchOpenDialogs: true });
+      const plantDialogControl = await ui5.control({
+        id: IDS.plantVHDialog,
+        searchOpenDialogs: true,
+      });
+      await expect(async () => {
+        expect(await plantDialogControl.isOpen()).toBe(true);
+      }).toPass({ timeout: 30000, intervals: [1000, 2000] });
+
+      const smartTablePlant = await ui5.control({
+        id: IDS.plantVHTable,
+        searchOpenDialogs: true,
+      });
+      const innerTablePlant = await smartTablePlant.getTable();
+
+      let plantValue = '';
+      await expect(async () => {
+        const ctx = await innerTablePlant.getContextByIndex(0);
+        expect(ctx).toBeTruthy();
+        const data = (await ctx.getObject()) as { Plant?: string };
+        expect(data?.Plant).toBeTruthy();
+        plantValue = data!.Plant!;
+      }).toPass({ timeout: 60000, intervals: [1000, 2000, 5000] });
+
+      await plantDialogControl.close();
+      await ui5.waitForUI5();
+      await ui5.fill({ id: IDS.plantInput, searchOpenDialogs: true }, plantValue);
+      await ui5.waitForUI5();
+
+      // === FILL BOM USAGE ===
+      const bomUsageControl = await ui5.control({
+        id: IDS.bomUsageCombo,
+        searchOpenDialogs: true,
+      });
+      await bomUsageControl.open();
+      await ui5.waitForUI5();
+      await bomUsageControl.setSelectedKey(TEST_DATA.bomUsageKey);
+      await bomUsageControl.fireChange({ value: TEST_DATA.bomUsageKey });
+      await bomUsageControl.close();
+      await ui5.waitForUI5();
+
+      // === VERIFY ALL VALUES ===
+      const finalMaterial =
+        (await ui5.getValue({
+          id: IDS.materialInput,
+          searchOpenDialogs: true,
+        })) ?? '';
+      const finalPlant =
+        (await ui5.getValue({
+          id: IDS.plantInput,
+          searchOpenDialogs: true,
+        })) ?? '';
+      const finalBomUsageCtrl = await ui5.control({
+        id: IDS.bomUsageCombo,
+        searchOpenDialogs: true,
+      });
+      const finalBomUsageKey = (await finalBomUsageCtrl.getSelectedKey()) ?? '';
+
+      expect(finalMaterial).toBe(materialValue);
+      expect(finalPlant).toBe(plantValue);
+      expect(finalBomUsageKey).toBe(TEST_DATA.bomUsageKey);
+    });
+
+    // Step 7: Click Create Button and Handle Result
+    await test.step('Step 7: Click Create and handle result', async () => {
+      const createBtn = await ui5.control({
+        id: IDS.okBtn,
+        searchOpenDialogs: true,
+      });
+      expect(await createBtn.getProperty('text')).toBe('Create');
+      expect(await createBtn.getEnabled()).toBe(true);
+
+      await ui5.press({ id: IDS.okBtn, searchOpenDialogs: true });
+      await ui5.waitForUI5();
+
+      // Graceful error recovery — close error dialogs, cancel if needed
+      let dialogStillOpen = false;
+      try {
+        const okBtnCheck = await ui5.control({
+          id: IDS.okBtn,
+          searchOpenDialogs: true,
+        });
+        dialogStillOpen = (await okBtnCheck.getEnabled()) !== undefined;
+      } catch {
+        dialogStillOpen = false;
+      }
+
+      if (dialogStillOpen) {
+        try {
+          await ui5.press({ id: IDS.cancelBtn, searchOpenDialogs: true });
+          await ui5.waitForUI5();
+        } catch {
+          // Dialog already closed
+        }
+      }
+    });
+
+    // Step 8: Verify Return to BOM List
+    await test.step('Step 8: Verify return to BOM List Report', async () => {
+      const createBtn = await ui5.control(
+        {
+          controlType: 'sap.m.Button',
+          properties: { text: 'Create BOM' },
+        },
+        { timeout: 30000 },
+      );
+      expect(await createBtn.getProperty('text')).toBe('Create BOM');
+      expect(await createBtn.getProperty('enabled')).toBe(true);
+    });
+  });
+});
+```
+
+</details>
+
+**Key patterns demonstrated:**
+
+| Pattern                             | Example                                             |
+| ----------------------------------- | --------------------------------------------------- |
+| `searchOpenDialogs: true`           | All controls inside the Create BOM dialog           |
+| `ui5.fill()`                        | Atomic `setValue` + `fireChange` + `waitForUI5`     |
+| `SmartTable.getTable()`             | Access inner `sap.ui.table.Table` from SmartTable   |
+| `getContextByIndex().getObject()`   | Read OData entity data from table rows              |
+| `setSelectedKey()` + `fireChange()` | ComboBox selection (localization-safe)              |
+| `toPass()` retry                    | Handle slow OData loads and SAP system latency      |
+| Graceful error recovery             | Close error dialogs and cancel without hard failure |
+
+:::info From plan to code
+Both the test plan and the gold standard test above were produced by Praman's AI agents against a live SAP S/4HANA Cloud system. Run the full **plan → generate → heal** pipeline on your own SAP app with the `/praman-sap-coverage` prompt.
+:::
 
 ## Running Tests
 
@@ -253,11 +759,7 @@ const rowIndex = await ui5.table.findRowByValues('purchaseOrderTable', {
 await ui5.table.clickRow('purchaseOrderTable', rowIndex);
 
 // Get a specific cell value
-const vendor = await ui5.table.getCellByColumnName(
-  'purchaseOrderTable',
-  0,
-  'Vendor',
-);
+const vendor = await ui5.table.getCellByColumnName('purchaseOrderTable', 0, 'Vendor');
 ```
 
 ### Dialog Handling
@@ -337,18 +839,18 @@ await intent.core.fillField('Vendor', 'SUP-001');
 
 ## Fixture Quick Reference
 
-| Fixture | Purpose |
-| --- | --- |
-| `ui5` | Core control discovery and interaction |
-| `ui5.table` | Table read, filter, sort, select |
-| `ui5.dialog` | Dialog lifecycle (wait, confirm, dismiss) |
-| `ui5.date` | DatePicker and TimePicker operations |
-| `ui5.odata` | OData model reads and HTTP operations |
-| `ui5Navigation` | FLP and in-app navigation |
-| `ui5Footer` | Footer toolbar buttons (Save, Edit, Cancel) |
-| `ui5Shell` | Shell header (Home, Notifications, User menu) |
-| `fe` | Fiori Elements List Report, Object Page, Table |
-| `intent` | Business intent APIs (procurement, sales, finance) |
+| Fixture         | Purpose                                            |
+| --------------- | -------------------------------------------------- |
+| `ui5`           | Core control discovery and interaction             |
+| `ui5.table`     | Table read, filter, sort, select                   |
+| `ui5.dialog`    | Dialog lifecycle (wait, confirm, dismiss)          |
+| `ui5.date`      | DatePicker and TimePicker operations               |
+| `ui5.odata`     | OData model reads and HTTP operations              |
+| `ui5Navigation` | FLP and in-app navigation                          |
+| `ui5Footer`     | Footer toolbar buttons (Save, Edit, Cancel)        |
+| `ui5Shell`      | Shell header (Home, Notifications, User menu)      |
+| `fe`            | Fiori Elements List Report, Object Page, Table     |
+| `intent`        | Business intent APIs (procurement, sales, finance) |
 
 Always wrap multi-step flows in `test.step()` for clear reporting:
 
@@ -413,15 +915,15 @@ my-sap-tests/
 
 ## Next Steps
 
-| Topic | Documentation |
-| --- | --- |
-| Configuration reference | [Configuration](./configuration) |
-| Authentication strategies | [Authentication](./authentication) |
-| Selector reference | [Selectors](./selectors) |
-| Fixture reference | [Fixtures](./fixtures) |
-| Error reference | [Errors](./errors) |
-| Agent & IDE setup | [Agent Setup](./agent-setup) |
-| Vocabulary system | [Vocabulary](./vocabulary-system) |
-| Intent API | [Intent API](./intent-api) |
-| Examples | [Examples](../examples/) |
-| Architecture overview | [Architecture](./architecture-overview) |
+| Topic                     | Documentation                           |
+| ------------------------- | --------------------------------------- |
+| Configuration reference   | [Configuration](./configuration)        |
+| Authentication strategies | [Authentication](./authentication)      |
+| Selector reference        | [Selectors](./selectors)                |
+| Fixture reference         | [Fixtures](./fixtures)                  |
+| Error reference           | [Errors](./errors)                      |
+| Agent & IDE setup         | [Agent Setup](./agent-setup)            |
+| Vocabulary system         | [Vocabulary](./vocabulary-system)       |
+| Intent API                | [Intent API](./intent-api)              |
+| Examples                  | [Examples](../examples/)                |
+| Architecture overview     | [Architecture](./architecture-overview) |

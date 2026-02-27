@@ -36,6 +36,9 @@ export default tseslint.config(
       'skills/**',
       '.github/skills/**',
       'temp/**',
+      'examples/**',
+      'praman-audit-report/**',
+      'landing-previews/**',
     ],
   },
 

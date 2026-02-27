@@ -74,7 +74,8 @@
 
     "apos",
 
-    "llmstxt"
+    "llmstxt",
+    "llms"
   ],
   "ignorePaths": [
     "node_modules", "dist", "coverage", "*.lock",

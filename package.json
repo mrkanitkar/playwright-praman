@@ -19,6 +19,7 @@
     "skills/",
     "agents/",
     "docs/user-integration/",
+    "examples/",
     "seeds/",
     "capabilities.yaml",
     "recipes.yaml",
