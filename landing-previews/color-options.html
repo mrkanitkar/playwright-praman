@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color &amp; Font Options — Minimal Zen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f4f4f5; padding: 2rem; font-family: 'Inter', sans-serif; }
+h1 { font-size: 1.5rem; font-weight: 700; color: #18181b; margin-bottom: 0.3rem; }
+p.intro { color: #71717a; margin-bottom: 2rem; font-size: 0.92rem; }
+.option { margin-bottom: 2rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.option-header { padding: 0.75rem 1.5rem; background: #fff; border-bottom: 1px solid #e4e4e7; display: flex; justify-content: space-between; align-items: center; }
+.option-header h2 { font-size: 1rem; font-weight: 700; }
+.option-header .meta { font-size: 0.78rem; color: #71717a; }
+.preview { padding: 4rem 2rem; text-align: center; }
+.preview .tag { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 99px; font-size: 0.72rem; font-weight: 500; margin-bottom: 1.2rem; }
+.preview h3 { margin-bottom: 0.8rem; line-height: 1.1; }
+.preview .desc { max-width: 480px; margin: 0 auto 1rem; line-height: 1.6; }
+.preview .pills { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.preview .pills .dot { line-height: 1; }
+.preview .btns { display: flex; gap: 0.6rem; justify-content: center; margin-top: 1.5rem; }
+.preview .btns a { padding: 0.6rem 1.5rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; text-decoration: none; }
+.preview .section-label { text-transform: uppercase; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+.preview .section-title { margin-bottom: 0.4rem; }
+.preview .feature-title { font-weight: 700; margin-bottom: 0.2rem; }
+.preview .feature-desc { max-width: 500px; margin: 0 auto; }
+
+/* ── Option A: Current (Inter + Indigo/Zinc) ── */
+.optA { background: #ffffff; color: #18181b; font-family: 'Inter', sans-serif; }
+.optA .tag { border: 1px solid #e4e4e7; color: #52525b; }
+.optA h3 { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.04em; color: #18181b; }
+.optA .desc { font-size: 1.1rem; color: #52525b; }
+.optA .pills { font-size: 0.95rem; font-weight: 500; color: #52525b; }
+.optA .pills .dot { font-size: 1.2rem; color: #4f46e5; }
+.optA .section-label { color: #4f46e5; }
+.optA .section-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+.optA .feature-title { font-size: 0.9rem; color: #18181b; }
+.optA .feature-desc { font-size: 0.82rem; color: #52525b; }
+.optA .btns a:first-child { background: #18181b; color: #fff; }
+.optA .btns a:last-child { background: #fafafa; color: #18181b; border: 1px solid #e4e4e7; }
+
+/* ── Option B: DM Sans + Teal/Slate ── */
+.optB { background: #ffffff; color: #0f172a; font-family: 'DM Sans', sans-serif; }
+.optB .tag { border: 1px solid #e2e8f0; color: #64748b; }
+.optB h3 { font-size: 2.8rem; font-weight: 700; letter-spacing: -0.03em; color: #0f172a; }
+.optB .desc { font-size: 1.1rem; color: #475569; }
+.optB .pills { font-size: 0.95rem; font-weight: 500; color: #475569; }
+.optB .pills .dot { font-size: 1.2rem; color: #0d9488; }
+.optB .section-label { color: #0d9488; }
+.optB .section-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+.optB .feature-title { font-size: 0.9rem; color: #0f172a; }
+.optB .feature-desc { font-size: 0.82rem; color: #475569; }
+.optB .btns a:first-child { background: #0f172a; color: #fff; }
+.optB .btns a:last-child { background: #f8fafc; color: #0f172a; border: 1px solid #e2e8f0; }
+
+/* ── Option C: Plus Jakarta Sans + Deep Blue/Warm Gray ── */
+.optC { background: #fafaf9; color: #1c1917; font-family: 'Plus Jakarta Sans', sans-serif; }
+.optC .tag { border: 1px solid #d6d3d1; color: #78716c; }
+.optC h3 { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; color: #1c1917; }
+.optC .desc { font-size: 1.1rem; color: #57534e; }
+.optC .pills { font-size: 0.95rem; font-weight: 500; color: #57534e; }
+.optC .pills .dot { font-size: 1.2rem; color: #1d4ed8; }
+.optC .section-label { color: #1d4ed8; }
+.optC .section-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+.optC .feature-title { font-size: 0.9rem; color: #1c1917; }
+.optC .feature-desc { font-size: 0.82rem; color: #57534e; }
+.optC .btns a:first-child { background: #1d4ed8; color: #fff; }
+.optC .btns a:last-child { background: #fff; color: #1c1917; border: 1px solid #d6d3d1; }
+
+/* ── Option D: Source Sans 3 + Emerald/Neutral ── */
+.optD { background: #ffffff; color: #171717; font-family: 'Source Sans 3', sans-serif; }
+.optD .tag { border: 1px solid #e5e5e5; color: #737373; }
+.optD h3 { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.02em; color: #171717; }
+.optD .desc { font-size: 1.15rem; color: #525252; }
+.optD .pills { font-size: 0.95rem; font-weight: 500; color: #525252; }
+.optD .pills .dot { font-size: 1.2rem; color: #059669; }
+.optD .section-label { color: #059669; }
+.optD .section-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.01em; }
+.optD .feature-title { font-size: 0.9rem; color: #171717; }
+.optD .feature-desc { font-size: 0.84rem; color: #525252; }
+.optD .btns a:first-child { background: #171717; color: #fff; }
+.optD .btns a:last-child { background: #fafafa; color: #171717; border: 1px solid #e5e5e5; }
+
+/* ── Option E: Outfit + Purple-Violet/Cool Gray ── */
+.optE { background: #faf5ff; color: #1e1b4b; font-family: 'Outfit', sans-serif; }
+.optE .tag { border: 1px solid #e9d5ff; color: #7c3aed; }
+.optE h3 { font-size: 2.8rem; font-weight: 700; letter-spacing: -0.03em; color: #1e1b4b; }
+.optE .desc { font-size: 1.1rem; color: #6b7280; }
+.optE .pills { font-size: 0.95rem; font-weight: 500; color: #6b7280; }
+.optE .pills .dot { font-size: 1.2rem; color: #7c3aed; }
+.optE .section-label { color: #7c3aed; }
+.optE .section-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+.optE .feature-title { font-size: 0.9rem; color: #1e1b4b; }
+.optE .feature-desc { font-size: 0.82rem; color: #6b7280; }
+.optE .btns a:first-child { background: #7c3aed; color: #fff; }
+.optE .btns a:last-child { background: #fff; color: #1e1b4b; border: 1px solid #e9d5ff; }
+</style>
+</head>
+<body>
+
+<h1>Color &amp; Font Options</h1>
+<p class="intro">Same Minimal Zen layout — 5 different color schemes and typefaces. Compare hero, labels, buttons, and body text.</p>
+
+<!-- ── A: Current ── -->
+<div class="option">
+  <div class="option-header"><h2>A — Inter + Indigo/Zinc (Current)</h2><div class="meta">Font: Inter &middot; Accent: #4f46e5 &middot; Ink: #18181b</div></div>
+  <div class="preview optA">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #e4e4e7;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── B: DM Sans + Teal ── -->
+<div class="option">
+  <div class="option-header"><h2>B — DM Sans + Teal/Slate</h2><div class="meta">Font: DM Sans &middot; Accent: #0d9488 &middot; Ink: #0f172a</div></div>
+  <div class="preview optB">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #e2e8f0;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── C: Plus Jakarta Sans + Deep Blue ── -->
+<div class="option">
+  <div class="option-header"><h2>C — Plus Jakarta Sans + Blue/Warm Stone</h2><div class="meta">Font: Plus Jakarta Sans &middot; Accent: #1d4ed8 &middot; Ink: #1c1917</div></div>
+  <div class="preview optC">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #d6d3d1;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── D: Source Sans 3 + Emerald ── -->
+<div class="option">
+  <div class="option-header"><h2>D — Source Sans 3 + Emerald/Neutral</h2><div class="meta">Font: Source Sans 3 &middot; Accent: #059669 &middot; Ink: #171717</div></div>
+  <div class="preview optD">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #e5e5e5;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── E: Outfit + Violet ── -->
+<div class="option">
+  <div class="option-header"><h2>E — Outfit + Violet/Cool Gray</h2><div class="meta">Font: Outfit &middot; Accent: #7c3aed &middot; Ink: #1e1b4b &middot; BG: #faf5ff</div></div>
+  <div class="preview optE">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #e9d5ff;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

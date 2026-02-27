@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design 3 — Split Hero / Clean Corporate</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #4f46e5;
+  --primary-dark: #3730a3;
+  --primary-light: #818cf8;
+  --accent: #0ea5e9;
+  --success: #10b981;
+  --bg: #ffffff;
+  --bg-alt: #f8fafc;
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+}
+
+body { font-family: 'Inter', system-ui, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3rem; height: 64px;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.navbar-brand { font-weight: 800; font-size: 1.3rem; color: var(--primary-dark); }
+.navbar-links { display: flex; gap: 2rem; align-items: center; }
+.navbar-links a { text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; }
+.navbar-links a:hover { color: var(--primary); }
+.navbar-cta { padding: 0.45rem 1.2rem; border-radius: 6px; background: var(--primary); color: #fff; font-weight: 600; font-size: 0.85rem; text-decoration: none; }
+
+/* ── Hero: Split Layout ── */
+.hero {
+  margin-top: 64px; min-height: calc(100vh - 64px);
+  display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+  max-width: 1300px; margin-left: auto; margin-right: auto; padding: 4rem 3rem;
+  gap: 4rem;
+}
+.hero-content .tag {
+  display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px;
+  background: #ede9fe; color: var(--primary); font-size: 0.78rem; font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-size: 3.5rem; font-weight: 800; letter-spacing: -0.03em;
+  line-height: 1.1; margin-bottom: 1.2rem;
+}
+.hero h1 .gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-desc { font-size: 1.15rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 2rem; max-width: 520px; }
+.hero-buttons { display: flex; gap: 1rem; }
+.btn {
+  padding: 0.75rem 1.8rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+  text-decoration: none; transition: all 0.2s; border: 1.5px solid transparent;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 20px rgba(79,70,229,0.25); }
+.btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+.hero-visual {
+  background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #7c3aed 100%);
+  border-radius: 16px; padding: 2.5rem; color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(79,70,229,0.25);
+}
+.hero-visual::before {
+  content: ''; position: absolute; top: -30%; right: -30%;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent);
+}
+.code-block {
+  background: rgba(0,0,0,0.3); border-radius: 10px; padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.8;
+  position: relative; z-index: 1;
+}
+.code-block .keyword { color: #c4b5fd; }
+.code-block .string { color: #86efac; }
+.code-block .comment { color: rgba(255,255,255,0.35); }
+.code-block .fn { color: #93c5fd; }
+
+/* ── Section ── */
+.section { padding: 5rem 3rem; max-width: 1200px; margin: 0 auto; }
+.section-alt { background: var(--bg-alt); padding: 5rem 3rem; }
+.section-alt .inner { max-width: 1200px; margin: 0 auto; }
+.section-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 0.5rem; }
+.section-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+.section-desc { font-size: 1.05rem; color: var(--text-secondary); max-width: 560px; margin-bottom: 3rem; }
+
+/* ── Elevator: Timeline ── */
+.timeline { position: relative; padding-left: 3rem; }
+.timeline::before { content: ''; position: absolute; left: 11px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+.timeline-item { position: relative; padding-bottom: 2.5rem; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-dot {
+  position: absolute; left: -3rem; top: 4px; width: 24px; height: 24px;
+  border-radius: 50%; background: var(--primary); border: 3px solid #fff;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.timeline-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); margin-bottom: 0.25rem; }
+.timeline-item h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
+.timeline-item p { color: var(--text-secondary); font-size: 0.92rem; max-width: 500px; }
+
+/* ── Features ── */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.feature-card {
+  border: 1px solid var(--border); border-radius: 12px; padding: 2rem;
+  transition: all 0.2s; background: var(--bg);
+}
+.feature-card:hover { border-color: var(--primary-light); box-shadow: 0 8px 30px rgba(79,70,229,0.08); transform: translateY(-2px); }
+.feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+.feature-card h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 0.5rem; }
+.feature-card p { color: var(--text-secondary); font-size: 0.88rem; }
+
+/* ── Philosophy ── */
+.philosophy-header { text-align: center; margin-bottom: 2rem; }
+.philosophy-quote {
+  font-size: 1.1rem; font-style: italic; color: var(--text-secondary);
+  max-width: 700px; margin: 0 auto 3rem; text-align: center; line-height: 1.7;
+}
+.philosophy-quote strong { color: var(--primary-dark); }
+.pillars-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+.pillar {
+  border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem;
+  position: relative; transition: all 0.2s;
+}
+.pillar:hover { border-color: var(--primary-light); box-shadow: 0 4px 20px rgba(79,70,229,0.06); }
+.pillar-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); margin-bottom: 0.3rem; }
+.pillar h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+.pillar p { color: var(--text-secondary); font-size: 0.85rem; }
+
+/* ── Enterprise Strip ── */
+.enterprise-strip {
+  background: var(--bg-alt); padding: 3rem; text-align: center;
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.strip-items { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-top: 1rem; }
+.strip-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
+.strip-item .check { color: var(--success); font-weight: 700; font-size: 1.1rem; }
+
+/* ── CTA ── */
+.cta {
+  background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #7c3aed 100%);
+  padding: 5rem 3rem; text-align: center; color: #fff;
+}
+.cta h2 { font-size: 2.2rem; font-weight: 800; margin-bottom: 1rem; }
+.cta p { font-size: 1.05rem; opacity: 0.85; margin-bottom: 2rem; max-width: 480px; margin-left: auto; margin-right: auto; }
+.btn-white { background: #fff; color: var(--primary-dark); }
+.btn-white:hover { box-shadow: 0 4px 20px rgba(255,255,255,0.3); }
+.btn-ghost-white { background: transparent; color: #fff; border-color: rgba(255,255,255,0.3); }
+.btn-ghost-white:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); }
+
+/* ── Footer ── */
+.footer { background: #0f172a; color: rgba(255,255,255,0.5); padding: 2.5rem 3rem; text-align: center; font-size: 0.85rem; }
+.footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
+  .hero h1 { font-size: 2.5rem; }
+  .hero-visual { display: none; }
+  .features-grid, .pillars-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .features-grid, .pillars-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">Praman</div>
+  <div class="navbar-links">
+    <a href="#">Documentation</a>
+    <a href="#">API Reference</a>
+    <a href="#">TypeDoc</a>
+    <a href="#" class="navbar-cta">GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h1>Test SAP S/4HANA with <span class="gradient">Autonomous Intelligence</span></h1>
+    <p class="hero-desc">
+      Built on Playwright's speed and AI intelligence, Praman delivers
+      autonomous, self-correcting testing for enterprise SAP landscapes.
+      Runs in your CISO-approved environment. Fully customizable.
+    </p>
+    <div class="hero-buttons">
+      <a href="#" class="btn btn-primary">Get Started</a>
+      <a href="#" class="btn btn-secondary">API Reference</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="code-block">
+      <span class="comment">// Praman: AI-first SAP testing</span><br>
+      <span class="keyword">import</span> { <span class="fn">test</span> } <span class="keyword">from</span> <span class="string">'playwright-praman'</span>;<br><br>
+      <span class="fn">test</span>(<span class="string">'verify purchase order'</span>, <span class="keyword">async</span> ({ <span class="fn">ui5</span>, <span class="fn">odata</span> }) => {<br>
+      &nbsp;&nbsp;<span class="keyword">await</span> <span class="fn">ui5</span>.<span class="fn">control</span>({ id: <span class="string">'orderTable'</span> });<br>
+      &nbsp;&nbsp;<span class="keyword">await</span> <span class="fn">odata</span>.<span class="fn">read</span>(<span class="string">'/PurchaseOrders'</span>);<br>
+      });<br>
+    </div>
+  </div>
+</section>
+
+<div class="section">
+  <div class="section-label">Why Praman</div>
+  <h2 class="section-title">The Elevator Pitch</h2>
+  <p class="section-desc">Four questions. Four answers. One clear path forward.</p>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-label">Why</div><h3>SAP UI5 breaks what generic tools can't see</h3><p>Fiori apps render through a control tree invisible to CSS selectors. Legacy tools produce brittle tests that fail on every transport.</p></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-label">What</div><h3>AI-native testing built for UI5's architecture</h3><p>Praman speaks UI5 natively through typed proxies and bridge adapters. It discovers controls, not DOM nodes.</p></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-label">So What</div><h3>Deploy with evidence, not anxiety</h3><p>Self-healing tests, structured diagnostics, and compliance reporters give your release the proof it needs.</p></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-label">Then What</div><h3>AI agents that write and maintain your tests</h3><p>SKILL.md entry points and AI-first APIs let agents evolve your test suite autonomously.</p></div>
+  </div>
+</div>
+
+<div class="section-alt">
+  <div class="inner">
+    <div style="text-align:center;">
+      <div class="section-label">Capabilities</div>
+      <h2 class="section-title">Built for Enterprise SAP</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto;">Six capabilities engineered for the complexity of S/4HANA landscapes.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">&#x1F916;</div><h3>AI-First Architecture</h3><p>SKILL.md entry points, capabilities discovery, compliance verification for AI coding agents.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x1F527;</div><h3>32+ Powerful Fixtures</h3><p>UI5 controls, OData, navigation, auth — zero initialization through Playwright DI.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x1F3AF;</div><h3>SAP UI5 Native</h3><p>ui5.control() with auto-retry and self-healing. Control APIs, not DOM selectors.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x1F3D7;</div><h3>5-Layer Architecture</h3><p>Core &rarr; Bridge &rarr; Proxy &rarr; Fixtures &rarr; AI. Clean separation of concerns.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x1F4CA;</div><h3>Enterprise Observability</h3><p>OpenTelemetry, pino logging, compliance reporters. Full visibility into every action.</p></div>
+      <div class="feature-card"><div class="feature-icon">&#x26A1;</div><h3>Playwright Native</h3><p>Parallel execution, auto-wait, trace viewer, UI mode. Full Playwright, zero compromise.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="philosophy-header">
+    <div class="section-label">Our Philosophy</div>
+    <h2 class="section-title">The Four Pillars of Evidence</h2>
+  </div>
+  <div class="philosophy-quote">
+    &ldquo;In Ancient India, <em>Prama&#x304;n&#x323;a</em> was the standard used to separate fact from illusion.
+    In the Modern Enterprise, <strong>Praman</strong> is the standard used to separate a
+    &lsquo;Successful Deployment&rsquo; from a &lsquo;Business Disruption&rsquo;.&rdquo;
+  </div>
+  <div class="pillars-row">
+    <div class="pillar"><div class="pillar-label">Pratyaksha</div><h3>Perception</h3><p>Real-time, deep-object visibility into the S/4HANA Fiori layer. See controls, not DOM nodes.</p></div>
+    <div class="pillar"><div class="pillar-label">Anum&#x101;na</div><h3>Inference</h3><p>Agentic AI that predicts and heals breaks before they impact the user.</p></div>
+    <div class="pillar"><div class="pillar-label">Upam&#x101;na</div><h3>Comparison</h3><p>Seamless validation between Legacy ECC and New S/4HANA states.</p></div>
+    <div class="pillar"><div class="pillar-label">Shabda</div><h3>Authority</h3><p>The reliability of Playwright — the gold standard of modern web automation.</p></div>
+  </div>
+</div>
+
+<div class="enterprise-strip">
+  <div class="section-label">Enterprise Ready</div>
+  <div class="strip-items">
+    <div class="strip-item"><span class="check">&#10003;</span> CISO-Approved Environment</div>
+    <div class="strip-item"><span class="check">&#10003;</span> Open Source</div>
+    <div class="strip-item"><span class="check">&#10003;</span> Fully Customizable</div>
+    <div class="strip-item"><span class="check">&#10003;</span> Cross-Platform</div>
+    <div class="strip-item"><span class="check">&#10003;</span> TypeScript Native</div>
+  </div>
+</div>
+
+<div class="cta">
+  <h2>Demand the Standard Your Enterprise Deserves</h2>
+  <p>Start testing SAP S/4HANA with autonomous intelligence today.</p>
+  <div class="hero-buttons" style="justify-content:center;">
+    <a href="#" class="btn btn-white">Get Started</a>
+    <a href="#" class="btn btn-ghost-white">View on GitHub</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>Praman &mdash; AI-First SAP UI5 Test Automation Platform &middot; <a href="#">GitHub</a> &middot; <a href="#">npm</a></p>
+  <p style="margin-top:0.5rem;opacity:0.5;">Crafted with Prudence. Powered by Purpose.</p>
+</footer>
+
+</body>
+</html>

@@ -108,15 +108,19 @@ If you are an AI agent helping a user **write SAP UI5 tests** with `playwright-p
 
 ### What is Praman?
 
-An AI-First SAP UI5 Test Automation Platform for Playwright.
+An AI-First SAP UI5 Test Automation Platform that **extends Playwright** with UI5-aware fixtures.
 Install: `npm i -D playwright-praman`
 Import: `import { test, expect } from 'playwright-praman'`
 
+SAP pages are always hybrid — UI5 controls, Web Components, and plain DOM coexist on every page.
+A single test uses **Praman fixtures for UI5** and **Playwright native for everything else**.
+The rule is per-element, not per-page.
+
 ### The 7 Mandatory Rules
 
-1. EVERY UI5 element → `ui5.control()` + proxy methods ONLY
+1. UI5 controls (`sap.m.*`, `sap.ui.comp.*`, `sap.ui.mdc.*`) → `ui5.control()` + proxy methods ONLY
 2. NEVER use Playwright native selectors for UI5 elements (`page.click('#__...')`, `page.locator('.sapM...')`)
-3. Non-UI5 elements → Playwright native permitted (verify element is NOT UI5 first)
+3. Non-UI5 elements (login forms, Web Components, custom HTML) → Playwright native (`page.locator()`, `page.getByRole()`)
 4. `import { test, expect } from 'playwright-praman'` — the ONLY valid import
 5. Auth via seed — raw Playwright auth in seed file, NEVER `sapAuth.login()` in test body
 6. Post-generation: scan against 16+ forbidden patterns before writing test
@@ -178,6 +182,7 @@ test.describe('{App Name} Tests', () => {
 | `fe.objectPage` | `clickEdit()`, `clickSave()`, `navigateToSection(id)`, `getSections()`                                     |
 | `intent.core`   | `fillField(label, value)`, `clickButton(text)`, `selectOption(label, opt)`, `assertField(label, expected)` |
 | `sapAuth`       | `login(page, config)`, `loginFromEnv(page)` — **seed file only, NEVER in tests**                           |
+| `btpWorkZone`   | `switchTenant(id)`, `getTenantId()`, `navigateWorkZone(space, page)` — BTP Work Zone multi-tenant          |
 | `pramanAI`      | `discoverPage()`, `buildContext()`, `capabilities`, `recipes`                                              |
 
 ### Forbidden Patterns
@@ -191,6 +196,25 @@ test.describe('{App Name} Tests', () => {
 | `from '@playwright/test'`       | `from 'playwright-praman'`     |
 | `page.waitForTimeout(...)`      | `ui5.waitForUI5()`             |
 | `new UI5Handler(...)`           | Use fixture `ui5` directly     |
+
+### Custom Matchers
+
+Praman extends Playwright's `expect()` with UI5-aware matchers. All support auto-retry via `timeout` option.
+
+| Matcher                 | Signature                                                       | Example                                                 |
+| ----------------------- | --------------------------------------------------------------- | ------------------------------------------------------- |
+| `toHaveUI5Text`         | `expect(proxy).toHaveUI5Text(expected, options?)`               | `await expect(btn).toHaveUI5Text('Save')`               |
+| `toBeUI5Visible`        | `expect(proxy).toBeUI5Visible(options?)`                        | `await expect(field).toBeUI5Visible()`                  |
+| `toBeUI5Enabled`        | `expect(proxy).toBeUI5Enabled(options?)`                        | `await expect(btn).toBeUI5Enabled()`                    |
+| `toHaveUI5Property`     | `expect(proxy).toHaveUI5Property(prop, expected, options?)`     | `await expect(ctrl).toHaveUI5Property('value', '100')`  |
+| `toHaveUI5ValueState`   | `expect(proxy).toHaveUI5ValueState(state, options?)`            | `await expect(field).toHaveUI5ValueState('Error')`      |
+| `toHaveUI5Binding`      | `expect(proxy).toHaveUI5Binding(path, options?)`                | `await expect(field).toHaveUI5Binding('/Material')`     |
+| `toBeUI5ControlType`    | `expect(proxy).toBeUI5ControlType(type, options?)`              | `await expect(ctrl).toBeUI5ControlType('sap.m.Input')`  |
+| `toHaveUI5CellText`     | `expect(proxy).toHaveUI5CellText(row, col, expected, options?)` | `await expect(table).toHaveUI5CellText(0, 1, 'Active')` |
+| `toHaveUI5RowCount`     | `expect(proxy).toHaveUI5RowCount(expected, options?)`           | `await expect(table).toHaveUI5RowCount(5)`              |
+| `toHaveUI5SelectedRows` | `expect(proxy).toHaveUI5SelectedRows(expected, options?)`       | `await expect(table).toHaveUI5SelectedRows([0, 2])`     |
+
+All matchers accept a `ControlProxy` (from `ui5.control()`) as the argument.
 
 ### Error Self-Correction
 

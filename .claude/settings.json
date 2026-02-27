@@ -27,7 +27,12 @@
       "WebFetch(domain:newsletter.victordibia.com)",
       "WebFetch(domain:latenode.com)",
       "WebFetch(domain:cookbook.openai.com)",
-      "WebFetch(domain:simonwillison.net)"
+      "WebFetch(domain:simonwillison.net)",
+      "Bash(git reset HEAD -- plans/)"
+    ],
+    "additionalDirectories": [
+      "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",
+      "/Users/maheshwar/Documents/projects/mk1/dist"
     ]
   },
   "model": "claude-opus-4-6",

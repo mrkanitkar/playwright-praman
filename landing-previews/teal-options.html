@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DM Sans — 8 Color Combinations</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f1f5f9; padding: 2rem; font-family: 'DM Sans', sans-serif; color: #0f172a; }
+h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.3rem; }
+p.intro { color: #64748b; margin-bottom: 2rem; font-size: 0.92rem; }
+.option { margin-bottom: 2.5rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.option-header { padding: 0.75rem 1.5rem; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+.option-header h2 { font-size: 1rem; font-weight: 700; }
+.option-header .meta { font-size: 0.78rem; color: #64748b; }
+.swatches { display: flex; gap: 6px; align-items: center; }
+.swatch { width: 20px; height: 20px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.08); }
+
+/* ── Shared preview layout ── */
+.preview { padding: 4rem 2rem; text-align: center; font-family: 'DM Sans', sans-serif; }
+.preview .tag { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 99px; font-size: 0.72rem; font-weight: 500; margin-bottom: 1.2rem; }
+.preview h3 { font-size: 2.8rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 0.8rem; }
+.preview .desc { max-width: 480px; margin: 0 auto 1rem; line-height: 1.6; font-size: 1.1rem; }
+.preview .pills { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.95rem; font-weight: 500; margin-bottom: 0.4rem; }
+.preview .pills .dot { font-size: 1.2rem; line-height: 1; }
+.preview .btns { display: flex; gap: 0.6rem; justify-content: center; margin-top: 1.5rem; }
+.preview .btns a { padding: 0.6rem 1.5rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; text-decoration: none; }
+.preview .section-label { text-transform: uppercase; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+.preview .section-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+.preview .feature-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.2rem; }
+.preview .feature-desc { max-width: 500px; margin: 0 auto; font-size: 0.82rem; }
+.preview .pitch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; border-radius: 10px; overflow: hidden; max-width: 700px; margin: 1.5rem auto 0; text-align: left; }
+.preview .pitch-cell { padding: 1.5rem; }
+.preview .pitch-step { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+.preview .pitch-cell h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem; }
+.preview .pitch-cell p { font-size: 0.82rem; line-height: 1.5; }
+.preview .pillar-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; max-width: 700px; margin: 1rem auto 0; text-align: left; }
+.preview .pillar-card { padding: 1rem; border-radius: 8px; }
+.preview .pillar-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.15rem; }
+.preview .pillar-card h4 { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.2rem; }
+.preview .pillar-card p { font-size: 0.75rem; line-height: 1.4; }
+
+/* ═══════════════════════════════════════════════
+   1 — Classic Teal: Deep teal accent, slate ink
+   ═══════════════════════════════════════════════ */
+.opt1 { background: #ffffff; color: #0f172a; }
+.opt1 .tag { border: 1px solid #e2e8f0; color: #64748b; }
+.opt1 h3 { color: #0f172a; }
+.opt1 .desc { color: #475569; }
+.opt1 .pills { color: #475569; }
+.opt1 .pills .dot { color: #0d9488; }
+.opt1 .section-label { color: #0d9488; }
+.opt1 .section-title { color: #0f172a; }
+.opt1 .feature-title { color: #0f172a; }
+.opt1 .feature-desc { color: #475569; }
+.opt1 .btns a:first-child { background: #0f172a; color: #fff; }
+.opt1 .btns a:last-child { background: #f8fafc; color: #0f172a; border: 1px solid #e2e8f0; }
+.opt1 .pitch-grid { background: #e2e8f0; }
+.opt1 .pitch-cell { background: #fff; }
+.opt1 .pitch-step { color: #0d9488; }
+.opt1 .pitch-cell h4 { color: #0f172a; }
+.opt1 .pitch-cell p { color: #475569; }
+.opt1 .pillar-card { border: 1px solid #e2e8f0; background: #fff; }
+.opt1 .pillar-label { color: #0d9488; }
+.opt1 .pillar-card h4 { color: #0f172a; }
+.opt1 .pillar-card p { color: #475569; }
+
+/* ═══════════════════════════════════════════════
+   2 — Ocean Teal: Richer teal, warm off-white bg
+   ═══════════════════════════════════════════════ */
+.opt2 { background: #f0fdfa; color: #134e4a; }
+.opt2 .tag { border: 1px solid #99f6e4; color: #0f766e; }
+.opt2 h3 { color: #134e4a; }
+.opt2 .desc { color: #3b6b67; }
+.opt2 .pills { color: #3b6b67; }
+.opt2 .pills .dot { color: #14b8a6; }
+.opt2 .section-label { color: #14b8a6; }
+.opt2 .section-title { color: #134e4a; }
+.opt2 .feature-title { color: #134e4a; }
+.opt2 .feature-desc { color: #3b6b67; }
+.opt2 .btns a:first-child { background: #134e4a; color: #fff; }
+.opt2 .btns a:last-child { background: #ffffff; color: #134e4a; border: 1px solid #99f6e4; }
+.opt2 .pitch-grid { background: #ccfbf1; }
+.opt2 .pitch-cell { background: #f0fdfa; }
+.opt2 .pitch-step { color: #14b8a6; }
+.opt2 .pitch-cell h4 { color: #134e4a; }
+.opt2 .pitch-cell p { color: #3b6b67; }
+.opt2 .pillar-card { border: 1px solid #99f6e4; background: #ffffff; }
+.opt2 .pillar-label { color: #14b8a6; }
+.opt2 .pillar-card h4 { color: #134e4a; }
+.opt2 .pillar-card p { color: #3b6b67; }
+
+/* ═══════════════════════════════════════════════
+   3 — Midnight Teal: Dark slate bg, luminous teal
+   ═══════════════════════════════════════════════ */
+.opt3 { background: #0f172a; color: #e2e8f0; }
+.opt3 .tag { border: 1px solid #334155; color: #94a3b8; }
+.opt3 h3 { color: #f1f5f9; }
+.opt3 .desc { color: #94a3b8; }
+.opt3 .pills { color: #94a3b8; }
+.opt3 .pills .dot { color: #2dd4bf; }
+.opt3 .section-label { color: #2dd4bf; }
+.opt3 .section-title { color: #f1f5f9; }
+.opt3 .feature-title { color: #f1f5f9; }
+.opt3 .feature-desc { color: #94a3b8; }
+.opt3 .btns a:first-child { background: #2dd4bf; color: #0f172a; }
+.opt3 .btns a:last-child { background: transparent; color: #e2e8f0; border: 1px solid #334155; }
+.opt3 .pitch-grid { background: #334155; }
+.opt3 .pitch-cell { background: #1e293b; }
+.opt3 .pitch-step { color: #2dd4bf; }
+.opt3 .pitch-cell h4 { color: #f1f5f9; }
+.opt3 .pitch-cell p { color: #94a3b8; }
+.opt3 .pillar-card { border: 1px solid #334155; background: #1e293b; }
+.opt3 .pillar-label { color: #2dd4bf; }
+.opt3 .pillar-card h4 { color: #f1f5f9; }
+.opt3 .pillar-card p { color: #94a3b8; }
+
+/* ═══════════════════════════════════════════════
+   4 — Steel Teal: Cool gray bg, muted teal accent
+   ═══════════════════════════════════════════════ */
+.opt4 { background: #f8fafc; color: #1e293b; }
+.opt4 .tag { border: 1px solid #cbd5e1; color: #64748b; }
+.opt4 h3 { color: #1e293b; }
+.opt4 .desc { color: #64748b; }
+.opt4 .pills { color: #64748b; }
+.opt4 .pills .dot { color: #0f766e; }
+.opt4 .section-label { color: #0f766e; }
+.opt4 .section-title { color: #1e293b; }
+.opt4 .feature-title { color: #1e293b; }
+.opt4 .feature-desc { color: #64748b; }
+.opt4 .btns a:first-child { background: #0f766e; color: #fff; }
+.opt4 .btns a:last-child { background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; }
+.opt4 .pitch-grid { background: #cbd5e1; }
+.opt4 .pitch-cell { background: #ffffff; }
+.opt4 .pitch-step { color: #0f766e; }
+.opt4 .pitch-cell h4 { color: #1e293b; }
+.opt4 .pitch-cell p { color: #64748b; }
+.opt4 .pillar-card { border: 1px solid #cbd5e1; background: #ffffff; }
+.opt4 .pillar-label { color: #0f766e; }
+.opt4 .pillar-card h4 { color: #1e293b; }
+.opt4 .pillar-card p { color: #64748b; }
+
+/* ═══════════════════════════════════════════════
+   5 — Teal + Amber: Teal primary, warm amber CTA
+   ═══════════════════════════════════════════════ */
+.opt5 { background: #ffffff; color: #0f172a; }
+.opt5 .tag { border: 1px solid #e2e8f0; color: #64748b; }
+.opt5 h3 { color: #0f172a; }
+.opt5 .desc { color: #475569; }
+.opt5 .pills { color: #475569; }
+.opt5 .pills .dot { color: #0d9488; }
+.opt5 .section-label { color: #0d9488; }
+.opt5 .section-title { color: #0f172a; }
+.opt5 .feature-title { color: #0f172a; }
+.opt5 .feature-desc { color: #475569; }
+.opt5 .btns a:first-child { background: #0d9488; color: #fff; }
+.opt5 .btns a:last-child { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+.opt5 .pitch-grid { background: #e2e8f0; }
+.opt5 .pitch-cell { background: #fff; }
+.opt5 .pitch-step { color: #0d9488; }
+.opt5 .pitch-cell h4 { color: #0f172a; }
+.opt5 .pitch-cell p { color: #475569; }
+.opt5 .pillar-card { border: 1px solid #e2e8f0; background: #fff; border-left: 3px solid #f59e0b; }
+.opt5 .pillar-label { color: #f59e0b; }
+.opt5 .pillar-card h4 { color: #0f172a; }
+.opt5 .pillar-card p { color: #475569; }
+
+/* ═══════════════════════════════════════════════
+   6 — Coca-Cola Red: Bold red accent, charcoal ink
+   ═══════════════════════════════════════════════ */
+.opt6 { background: #ffffff; color: #1a1a1a; }
+.opt6 .tag { border: 1px solid #e5e5e5; color: #737373; }
+.opt6 h3 { color: #1a1a1a; }
+.opt6 .desc { color: #525252; }
+.opt6 .pills { color: #525252; }
+.opt6 .pills .dot { color: #dc2626; }
+.opt6 .section-label { color: #dc2626; }
+.opt6 .section-title { color: #1a1a1a; }
+.opt6 .feature-title { color: #1a1a1a; }
+.opt6 .feature-desc { color: #525252; }
+.opt6 .btns a:first-child { background: #dc2626; color: #fff; }
+.opt6 .btns a:last-child { background: #fafafa; color: #1a1a1a; border: 1px solid #e5e5e5; }
+.opt6 .pitch-grid { background: #e5e5e5; }
+.opt6 .pitch-cell { background: #fff; }
+.opt6 .pitch-step { color: #dc2626; }
+.opt6 .pitch-cell h4 { color: #1a1a1a; }
+.opt6 .pitch-cell p { color: #525252; }
+.opt6 .pillar-card { border: 1px solid #e5e5e5; background: #fff; border-top: 3px solid #dc2626; }
+.opt6 .pillar-label { color: #dc2626; }
+.opt6 .pillar-card h4 { color: #1a1a1a; }
+.opt6 .pillar-card p { color: #525252; }
+
+/* ═══════════════════════════════════════════════
+   7 — Gen Z Neon: Dark bg, neon lime + hot pink
+   ═══════════════════════════════════════════════ */
+.opt7 { background: #0a0a0a; color: #e5e5e5; }
+.opt7 .tag { border: 1px solid #a3e635; color: #a3e635; background: rgba(163,230,53,0.08); }
+.opt7 h3 {
+  color: #ffffff;
+  background: linear-gradient(135deg, #a3e635 0%, #22d3ee 50%, #ec4899 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.opt7 .desc { color: #a3a3a3; }
+.opt7 .pills { color: #a3a3a3; }
+.opt7 .pills .dot { color: #a3e635; }
+.opt7 .section-label { color: #a3e635; }
+.opt7 .section-title { color: #ffffff; }
+.opt7 .feature-title { color: #ffffff; }
+.opt7 .feature-desc { color: #a3a3a3; }
+.opt7 .btns a:first-child { background: linear-gradient(135deg, #a3e635, #22d3ee); color: #0a0a0a; font-weight: 700; }
+.opt7 .btns a:last-child { background: transparent; color: #e5e5e5; border: 1px solid #333; }
+.opt7 .pitch-grid { background: #262626; border-radius: 12px; }
+.opt7 .pitch-cell { background: #171717; }
+.opt7 .pitch-step { color: #ec4899; }
+.opt7 .pitch-cell h4 { color: #ffffff; }
+.opt7 .pitch-cell p { color: #a3a3a3; }
+.opt7 .pillar-card { border: 1px solid #262626; background: #171717; border-top: 2px solid transparent; background-clip: padding-box; position: relative; }
+.opt7 .pillar-card::before { content: ''; position: absolute; top: -2px; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #a3e635, #22d3ee, #ec4899); border-radius: 8px 8px 0 0; }
+.opt7 .pillar-label { color: #22d3ee; }
+.opt7 .pillar-card h4 { color: #ffffff; }
+.opt7 .pillar-card p { color: #a3a3a3; }
+
+/* ═══════════════════════════════════════════════
+   8 — Teal + Amber Dark: Deep dark bg, teal + amber
+   ═══════════════════════════════════════════════ */
+.opt8 { background: #0c1220; color: #e2e8f0; }
+.opt8 .tag { border: 1px solid #1e3a5f; color: #2dd4bf; background: rgba(45,212,191,0.06); }
+.opt8 h3 { color: #f8fafc; }
+.opt8 .desc { color: #94a3b8; }
+.opt8 .pills { color: #94a3b8; }
+.opt8 .pills .dot { color: #f59e0b; }
+.opt8 .section-label { color: #2dd4bf; }
+.opt8 .section-title { color: #f8fafc; }
+.opt8 .feature-title { color: #f8fafc; }
+.opt8 .feature-desc { color: #94a3b8; }
+.opt8 .btns a:first-child { background: #f59e0b; color: #0c1220; font-weight: 700; }
+.opt8 .btns a:last-child { background: transparent; color: #e2e8f0; border: 1px solid #334155; }
+.opt8 .pitch-grid { background: #1e293b; border-radius: 12px; }
+.opt8 .pitch-cell { background: #0f172a; }
+.opt8 .pitch-step { color: #f59e0b; }
+.opt8 .pitch-cell h4 { color: #f8fafc; }
+.opt8 .pitch-cell p { color: #94a3b8; }
+.opt8 .pillar-card { border: 1px solid #1e293b; background: #0f172a; border-left: 3px solid #f59e0b; }
+.opt8 .pillar-label { color: #2dd4bf; }
+.opt8 .pillar-card h4 { color: #f8fafc; }
+.opt8 .pillar-card p { color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<h1>DM Sans — 8 Color Combinations</h1>
+<p class="intro">All options use DM Sans. 5 teal + Coca-Cola red + Gen Z neon + Teal-Amber dark.</p>
+
+<!-- ═══ 1: Classic Teal ═══ -->
+<div class="option">
+  <div class="option-header">
+    <h2>1 — Classic Teal / Slate</h2>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="swatches">
+        <div class="swatch" style="background:#0d9488;"></div>
+        <div class="swatch" style="background:#0f172a;"></div>
+        <div class="swatch" style="background:#475569;"></div>
+        <div class="swatch" style="background:#ffffff;"></div>
+      </div>
+      <div class="meta">Accent: #0d9488 &middot; Ink: #0f172a &middot; BG: white</div>
+    </div>
+  </div>
+  <div class="preview opt1">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div class="pitch-grid">
+      <div class="pitch-cell"><div class="pitch-step">Why</div><h4>End to End Quality Matters</h4><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">What</div><h4>Agentic AI Native Quality Automation</h4><p>Input Signavio flow, connect to HANA using OData, speak to UI5 elements.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">So What</div><h4>Deploy with evidence</h4><p>Data Integrity Validation, Performance Heatmap, Accessibility, Compliance.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">Then What</div><h4>Tests that write themselves</h4><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+    </div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #e2e8f0;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e2e8f0;">
+      <div class="section-label">Philosophy</div>
+      <div class="section-title">Four Pillars of Evidence</div>
+      <div class="pillar-row">
+        <div class="pillar-card"><div class="pillar-label">Pratyaksha</div><h4>Perception</h4><p>Deep visibility into the Fiori layer.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Anum&#x101;na</div><h4>Inference</h4><p>AI that predicts and heals breaks.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Upam&#x101;na</div><h4>Comparison</h4><p>Legacy ECC vs. new S/4HANA.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Shabda</div><h4>Authority</h4><p>Playwright — the gold standard.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 2: Ocean Teal ═══ -->
+<div class="option">
+  <div class="option-header">
+    <h2>2 — Ocean Teal / Warm Mint</h2>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="swatches">
+        <div class="swatch" style="background:#14b8a6;"></div>
+        <div class="swatch" style="background:#134e4a;"></div>
+        <div class="swatch" style="background:#3b6b67;"></div>
+        <div class="swatch" style="background:#f0fdfa;"></div>
+      </div>
+      <div class="meta">Accent: #14b8a6 &middot; Ink: #134e4a &middot; BG: #f0fdfa (teal tint)</div>
+    </div>
+  </div>
+  <div class="preview opt2">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div class="pitch-grid">
+      <div class="pitch-cell"><div class="pitch-step">Why</div><h4>End to End Quality Matters</h4><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">What</div><h4>Agentic AI Native Quality Automation</h4><p>Input Signavio flow, connect to HANA using OData, speak to UI5 elements.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">So What</div><h4>Deploy with evidence</h4><p>Data Integrity Validation, Performance Heatmap, Accessibility, Compliance.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">Then What</div><h4>Tests that write themselves</h4><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+    </div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #99f6e4;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #99f6e4;">
+      <div class="section-label">Philosophy</div>
+      <div class="section-title">Four Pillars of Evidence</div>
+      <div class="pillar-row">
+        <div class="pillar-card"><div class="pillar-label">Pratyaksha</div><h4>Perception</h4><p>Deep visibility into the Fiori layer.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Anum&#x101;na</div><h4>Inference</h4><p>AI that predicts and heals breaks.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Upam&#x101;na</div><h4>Comparison</h4><p>Legacy ECC vs. new S/4HANA.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Shabda</div><h4>Authority</h4><p>Playwright — the gold standard.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 3: Midnight Teal ═══ -->
+<div class="option">
+  <div class="option-header">
+    <h2>3 — Midnight Teal / Dark Mode</h2>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="swatches">
+        <div class="swatch" style="background:#2dd4bf;"></div>
+        <div class="swatch" style="background:#0f172a;"></div>
+        <div class="swatch" style="background:#1e293b;"></div>
+        <div class="swatch" style="background:#94a3b8;"></div>
+      </div>
+      <div class="meta">Accent: #2dd4bf &middot; Ink: #f1f5f9 &middot; BG: #0f172a (dark)</div>
+    </div>
+  </div>
+  <div class="preview opt3">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div class="pitch-grid">
+      <div class="pitch-cell"><div class="pitch-step">Why</div><h4>End to End Quality Matters</h4><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">What</div><h4>Agentic AI Native Quality Automation</h4><p>Input Signavio flow, connect to HANA using OData, speak to UI5 elements.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">So What</div><h4>Deploy with evidence</h4><p>Data Integrity Validation, Performance Heatmap, Accessibility, Compliance.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">Then What</div><h4>Tests that write themselves</h4><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+    </div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #334155;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #334155;">
+      <div class="section-label">Philosophy</div>
+      <div class="section-title">Four Pillars of Evidence</div>
+      <div class="pillar-row">
+        <div class="pillar-card"><div class="pillar-label">Pratyaksha</div><h4>Perception</h4><p>Deep visibility into the Fiori layer.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Anum&#x101;na</div><h4>Inference</h4><p>AI that predicts and heals breaks.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Upam&#x101;na</div><h4>Comparison</h4><p>Legacy ECC vs. new S/4HANA.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Shabda</div><h4>Authority</h4><p>Playwright — the gold standard.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 4: Steel Teal ═══ -->
+<div class="option">
+  <div class="option-header">
+    <h2>4 — Steel Teal / Cool Gray</h2>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="swatches">
+        <div class="swatch" style="background:#0f766e;"></div>
+        <div class="swatch" style="background:#1e293b;"></div>
+        <div class="swatch" style="background:#64748b;"></div>
+        <div class="swatch" style="background:#f8fafc;"></div>
+      </div>
+      <div class="meta">Accent: #0f766e &middot; Ink: #1e293b &middot; BG: #f8fafc (cool gray)</div>
+    </div>
+  </div>
+  <div class="preview opt4">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div class="pitch-grid">
+      <div class="pitch-cell"><div class="pitch-step">Why</div><h4>End to End Quality Matters</h4><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">What</div><h4>Agentic AI Native Quality Automation</h4><p>Input Signavio flow, connect to HANA using OData, speak to UI5 elements.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">So What</div><h4>Deploy with evidence</h4><p>Data Integrity Validation, Performance Heatmap, Accessibility, Compliance.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">Then What</div><h4>Tests that write themselves</h4><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+    </div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #cbd5e1;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #cbd5e1;">
+      <div class="section-label">Philosophy</div>
+      <div class="section-title">Four Pillars of Evidence</div>
+      <div class="pillar-row">
+        <div class="pillar-card"><div class="pillar-label">Pratyaksha</div><h4>Perception</h4><p>Deep visibility into the Fiori layer.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Anum&#x101;na</div><h4>Inference</h4><p>AI that predicts and heals breaks.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Upam&#x101;na</div><h4>Comparison</h4><p>Legacy ECC vs. new S/4HANA.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Shabda</div><h4>Authority</h4><p>Playwright — the gold standard.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 5: Teal + Amber ═══ -->
+<div class="option">
+  <div class="option-header">
+    <h2>5 — Teal + Amber Dual Accent</h2>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="swatches">
+        <div class="swatch" style="background:#0d9488;"></div>
+        <div class="swatch" style="background:#f59e0b;"></div>
+        <div class="swatch" style="background:#0f172a;"></div>
+        <div class="swatch" style="background:#ffffff;"></div>
+      </div>
+      <div class="meta">Primary: #0d9488 &middot; Secondary: #f59e0b &middot; Ink: #0f172a &middot; BG: white</div>
+    </div>
+  </div>
+  <div class="preview opt5">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div class="pitch-grid">
+      <div class="pitch-cell"><div class="pitch-step">Why</div><h4>End to End Quality Matters</h4><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">What</div><h4>Agentic AI Native Quality Automation</h4><p>Input Signavio flow, connect to HANA using OData, speak to UI5 elements.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">So What</div><h4>Deploy with evidence</h4><p>Data Integrity Validation, Performance Heatmap, Accessibility, Compliance.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">Then What</div><h4>Tests that write themselves</h4><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+    </div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #e2e8f0;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e2e8f0;">
+      <div class="section-label">Philosophy</div>
+      <div class="section-title">Four Pillars of Evidence</div>
+      <div class="pillar-row">
+        <div class="pillar-card"><div class="pillar-label">Pratyaksha</div><h4>Perception</h4><p>Deep visibility into the Fiori layer.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Anum&#x101;na</div><h4>Inference</h4><p>AI that predicts and heals breaks.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Upam&#x101;na</div><h4>Comparison</h4><p>Legacy ECC vs. new S/4HANA.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Shabda</div><h4>Authority</h4><p>Playwright — the gold standard.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 6: Coca-Cola Red ═══ -->
+<div class="option">
+  <div class="option-header">
+    <h2>6 — Coca-Cola Red / Charcoal</h2>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="swatches">
+        <div class="swatch" style="background:#dc2626;"></div>
+        <div class="swatch" style="background:#1a1a1a;"></div>
+        <div class="swatch" style="background:#525252;"></div>
+        <div class="swatch" style="background:#ffffff;"></div>
+      </div>
+      <div class="meta">Accent: #dc2626 &middot; Ink: #1a1a1a &middot; BG: white</div>
+    </div>
+  </div>
+  <div class="preview opt6">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div class="pitch-grid">
+      <div class="pitch-cell"><div class="pitch-step">Why</div><h4>End to End Quality Matters</h4><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">What</div><h4>Agentic AI Native Quality Automation</h4><p>Input Signavio flow, connect to HANA using OData, speak to UI5 elements.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">So What</div><h4>Deploy with evidence</h4><p>Data Integrity Validation, Performance Heatmap, Accessibility, Compliance.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">Then What</div><h4>Tests that write themselves</h4><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+    </div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #e5e5e5;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e5e5e5;">
+      <div class="section-label">Philosophy</div>
+      <div class="section-title">Four Pillars of Evidence</div>
+      <div class="pillar-row">
+        <div class="pillar-card"><div class="pillar-label">Pratyaksha</div><h4>Perception</h4><p>Deep visibility into the Fiori layer.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Anum&#x101;na</div><h4>Inference</h4><p>AI that predicts and heals breaks.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Upam&#x101;na</div><h4>Comparison</h4><p>Legacy ECC vs. new S/4HANA.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Shabda</div><h4>Authority</h4><p>Playwright — the gold standard.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 8: Teal + Amber Dark ═══ -->
+<div class="option">
+  <div class="option-header">
+    <h2>8 — Teal + Amber / Dark Mode</h2>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="swatches">
+        <div class="swatch" style="background:#2dd4bf;"></div>
+        <div class="swatch" style="background:#f59e0b;"></div>
+        <div class="swatch" style="background:#0c1220;"></div>
+        <div class="swatch" style="background:#0f172a;"></div>
+      </div>
+      <div class="meta">Teal: #2dd4bf &middot; Amber: #f59e0b &middot; BG: #0c1220 (dark navy)</div>
+    </div>
+  </div>
+  <div class="preview opt8">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div class="pitch-grid">
+      <div class="pitch-cell"><div class="pitch-step">Why</div><h4>End to End Quality Matters</h4><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">What</div><h4>Agentic AI Native Quality Automation</h4><p>Input Signavio flow, connect to HANA using OData, speak to UI5 elements.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">So What</div><h4>Deploy with evidence</h4><p>Data Integrity Validation, Performance Heatmap, Accessibility, Compliance.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">Then What</div><h4>Tests that write themselves</h4><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+    </div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #1e293b;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #1e293b;">
+      <div class="section-label">Philosophy</div>
+      <div class="section-title">Four Pillars of Evidence</div>
+      <div class="pillar-row">
+        <div class="pillar-card"><div class="pillar-label">Pratyaksha</div><h4>Perception</h4><p>Deep visibility into the Fiori layer.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Anum&#x101;na</div><h4>Inference</h4><p>AI that predicts and heals breaks.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Upam&#x101;na</div><h4>Comparison</h4><p>Legacy ECC vs. new S/4HANA.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Shabda</div><h4>Authority</h4><p>Playwright — the gold standard.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 7: Gen Z Neon ═══ -->
+<div class="option">
+  <div class="option-header">
+    <h2>7 — Gen Z Neon / Dark</h2>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="swatches">
+        <div class="swatch" style="background:linear-gradient(135deg,#a3e635,#22d3ee);"></div>
+        <div class="swatch" style="background:#ec4899;"></div>
+        <div class="swatch" style="background:#0a0a0a;"></div>
+        <div class="swatch" style="background:#171717;"></div>
+      </div>
+      <div class="meta">Neon Lime #a3e635 &middot; Cyan #22d3ee &middot; Hot Pink #ec4899 &middot; BG: #0a0a0a</div>
+    </div>
+  </div>
+  <div class="preview opt7">
+    <div class="tag">Open Source &middot; Agentic-First</div>
+    <h3>Transform your SAP to S/4 HANA with evidence, not hope.</h3>
+    <p class="desc">Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA. Built on Playwright. Powered by AI.</p>
+    <div class="pills"><span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span></div>
+    <div class="pills"><span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span></div>
+    <div class="btns"><a href="#">Get Started</a><a href="#">API Reference</a></div>
+    <div class="pitch-grid">
+      <div class="pitch-cell"><div class="pitch-step">Why</div><h4>End to End Quality Matters</h4><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">What</div><h4>Agentic AI Native Quality Automation</h4><p>Input Signavio flow, connect to HANA using OData, speak to UI5 elements.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">So What</div><h4>Deploy with evidence</h4><p>Data Integrity Validation, Performance Heatmap, Accessibility, Compliance.</p></div>
+      <div class="pitch-cell"><div class="pitch-step">Then What</div><h4>Tests that write themselves</h4><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+    </div>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #262626;">
+      <div class="section-label">Capabilities</div>
+      <div class="section-title">What you get</div>
+      <div style="margin-top:1rem;"><div class="feature-title">21 Fixtures, 199 Typed Interfaces, 4,092 Methods</div><p class="feature-desc">61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more.</p></div>
+    </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #262626;">
+      <div class="section-label">Philosophy</div>
+      <div class="section-title">Four Pillars of Evidence</div>
+      <div class="pillar-row">
+        <div class="pillar-card"><div class="pillar-label">Pratyaksha</div><h4>Perception</h4><p>Deep visibility into the Fiori layer.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Anum&#x101;na</div><h4>Inference</h4><p>AI that predicts and heals breaks.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Upam&#x101;na</div><h4>Comparison</h4><p>Legacy ECC vs. new S/4HANA.</p></div>
+        <div class="pillar-card"><div class="pillar-label">Shabda</div><h4>Authority</h4><p>Playwright — the gold standard.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

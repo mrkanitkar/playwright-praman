@@ -19,7 +19,7 @@ const config: Config = {
   projectName: 'playwright-praman',
   trailingSlash: false,
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
 
   markdown: {
     hooks: {
@@ -153,6 +153,14 @@ const config: Config = {
           'guides/migration-from-playwright.md',
           'guides/migration-from-wdi5.md',
           'guides/migration-from-tosca.md',
+          'guides/test-data-management.md',
+          'guides/parallel-execution.md',
+          'guides/custom-controls.md',
+          'guides/i18n-testing.md',
+          'guides/security-testing.md',
+          'guides/websocket-testing.md',
+          'changelog.md',
+          'security.md',
           'examples/*',
           'decisions/*',
         ],
@@ -192,6 +200,12 @@ const config: Config = {
               'guides/debugging.md',
               'guides/playwright-primer.md',
               'examples/basic-test.md',
+              'guides/test-data-management.md',
+              'guides/parallel-execution.md',
+              'guides/custom-controls.md',
+              'guides/i18n-testing.md',
+              'guides/security-testing.md',
+              'guides/websocket-testing.md',
             ],
             fullContent: true,
           },
@@ -222,6 +236,11 @@ const config: Config = {
               'examples/gold-standard-bom.md',
               'examples/table-operations.md',
               'examples/hybrid-login.md',
+              'examples/odata-crud.md',
+              'examples/fiori-elements.md',
+              'examples/intent-api.md',
+              'examples/vocabulary-discovery.md',
+              'examples/btp-multi-tenant.md',
             ],
             fullContent: true,
           },
@@ -300,8 +319,20 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           showLastUpdateTime: false,
           showLastUpdateAuthor: false,
+          lastVersion: 'current',
+          versions: {
+            current: {
+              label: '1.x',
+              badge: true,
+            },
+          },
         },
-        blog: false, // Enable when blog posts are added
+        blog: {
+          showReadingTime: true,
+          blogTitle: 'Praman Blog',
+          blogDescription: 'Updates, releases, and guides for Praman',
+          postsPerPage: 10,
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -384,6 +415,12 @@ const config: Config = {
           position: 'left',
           label: 'TypeDoc API',
           target: '_self',
+        },
+        // ── Menu 8: Blog ──
+        {
+          to: '/blog',
+          position: 'left',
+          label: 'Blog',
         },
         // ── Right side ──
         {

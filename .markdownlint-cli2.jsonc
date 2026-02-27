@@ -15,6 +15,10 @@
     "docs/docs/**",
     "temp/**",
     "examples/**",
+    "praman-audit-report/**",
+    "landing-previews/**",
+    "docs/blog/**",
+    "docs/user-integration/**",
     "node_modules/",
     "CODE_OF_CONDUCT.md",
     "llms*.txt"

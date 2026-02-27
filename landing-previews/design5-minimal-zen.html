@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design 5 — Minimal Zen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #18181b;
+  --ink-secondary: #52525b;
+  --ink-tertiary: #a1a1aa;
+  --accent: #4f46e5;
+  --accent-muted: #6366f1;
+  --surface: #ffffff;
+  --surface-alt: #fafafa;
+  --border: #e4e4e7;
+  --border-subtle: #f4f4f5;
+}
+
+body { font-family: 'Inter', system-ui, sans-serif; color: var(--ink); background: var(--surface); line-height: 1.7; }
+
+/* ── Navbar ── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3rem; height: 56px;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.navbar-brand { font-weight: 700; font-size: 1.1rem; color: var(--ink); letter-spacing: -0.02em; }
+.navbar-links { display: flex; gap: 2rem; }
+.navbar-links a { text-decoration: none; color: var(--ink-secondary); font-size: 0.85rem; font-weight: 500; }
+.navbar-links a:hover { color: var(--accent); }
+
+/* ── Hero: Ultra-minimal ── */
+.hero {
+  margin-top: 56px; padding: 10rem 3rem 8rem;
+  text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;
+}
+.hero-tag {
+  display: inline-block; padding: 0.3rem 0.8rem; border-radius: 99px;
+  border: 1px solid var(--border); font-size: 0.78rem; font-weight: 500;
+  color: var(--ink-secondary); margin-bottom: 2rem;
+}
+.hero h1 {
+  font-size: 3.8rem; font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1.08; margin-bottom: 1.5rem;
+}
+.hero-desc {
+  font-size: 1.2rem; color: var(--ink-secondary); max-width: 540px;
+  margin: 0 auto 2.5rem; line-height: 1.65;
+}
+.hero-pills {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  font-size: 1.05rem; font-weight: 500; color: var(--ink-secondary); margin-bottom: 0.5rem;
+}
+.hero-pills .dot { font-size: 1.4rem; color: var(--accent); line-height: 1; }
+.hero-buttons { display: flex; gap: 0.75rem; justify-content: center; margin-top: 2rem; }
+.btn {
+  padding: 0.7rem 1.8rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem;
+  text-decoration: none; transition: all 0.15s;
+}
+.btn-dark { background: var(--ink); color: #fff; }
+.btn-dark:hover { background: #27272a; }
+.btn-light { background: var(--surface-alt); color: var(--ink); border: 1px solid var(--border); }
+.btn-light:hover { border-color: var(--ink-secondary); }
+
+/* ── Code Showcase ── */
+.code-showcase {
+  max-width: 580px; margin: 0 auto; padding: 3rem 3rem 0; text-align: center;
+}
+.code-label {
+  font-size: 0.82rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--accent); margin-bottom: 1rem;
+}
+.code-block {
+  background: var(--ink); border-radius: 10px; padding: 1.5rem 1.8rem;
+  text-align: left; box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+.code-dots {
+  display: flex; gap: 6px; margin-bottom: 1rem;
+}
+.code-dots span {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.code-dots span:nth-child(1) { background: #ef4444; }
+.code-dots span:nth-child(2) { background: #f59e0b; }
+.code-dots span:nth-child(3) { background: #22c55e; }
+.code-block pre {
+  margin: 0; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.82rem; line-height: 1.7; color: #e2e8f0;
+}
+.code-block .keyword { color: #c4b5fd; }
+.code-block .string { color: #86efac; }
+.code-block .comment { color: #64748b; }
+.code-block .fn { color: #93c5fd; }
+
+/* ── Divider ── */
+.divider { width: 48px; height: 1px; background: var(--border); margin: 0 auto; }
+
+/* ── Sections ── */
+.section { padding: 5rem 3rem; max-width: 900px; margin: 0 auto; }
+.section-wide { max-width: 1100px; }
+.section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.5rem; }
+.section-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.6rem; }
+.section-desc { font-size: 1rem; color: var(--ink-secondary); margin-bottom: 2.5rem; }
+
+/* ── Pitch: Stacked pairs ── */
+.pitch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.pitch-cell { background: var(--surface); padding: 2rem; }
+.pitch-cell:hover { background: var(--surface-alt); }
+.pitch-step { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.4rem; }
+.pitch-cell h3 { font-size: 0.98rem; font-weight: 700; margin-bottom: 0.4rem; }
+.pitch-cell p { color: var(--ink-secondary); font-size: 0.88rem; }
+
+/* ── Features: Compact list ── */
+.features-list { list-style: none; }
+.features-list li {
+  display: grid; grid-template-columns: 40px 1fr; gap: 1.5rem; align-items: start;
+  padding: 1.5rem 0; border-bottom: 1px solid var(--border-subtle);
+}
+.features-list li:last-child { border-bottom: none; }
+.features-list .icon { font-size: 1.5rem; text-align: center; padding-top: 2px; }
+.features-list h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; }
+.features-list p { color: var(--ink-secondary); font-size: 0.88rem; }
+
+/* ── Philosophy ── */
+.philosophy-section { background: var(--surface-alt); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); }
+.philosophy-quote {
+  font-size: 1.15rem; font-style: italic; color: var(--ink-secondary);
+  max-width: 640px; margin: 0 auto 3rem; text-align: center; line-height: 1.7;
+}
+.philosophy-quote strong { color: var(--ink); }
+.pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.pillar {
+  padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface); transition: border-color 0.15s;
+}
+.pillar:hover { border-color: var(--accent-muted); }
+.pillar-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 0.25rem; }
+.pillar h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.3rem; }
+.pillar p { color: var(--ink-secondary); font-size: 0.82rem; }
+
+/* ── Assurance Bar ── */
+.assurance { text-align: center; padding: 2.5rem 3rem; }
+.assurance-items { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; }
+.assurance-item { font-size: 0.85rem; color: var(--ink-secondary); font-weight: 500; }
+.assurance-item span { color: var(--accent); margin-right: 0.3rem; }
+
+/* ── CTA ── */
+.cta { text-align: center; padding: 5rem 3rem; }
+.cta h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+.cta p { color: var(--ink-secondary); font-size: 1rem; margin-bottom: 2rem; max-width: 440px; margin-left: auto; margin-right: auto; }
+
+/* ── Footer ── */
+.footer {
+  padding: 2rem 3rem; text-align: center; font-size: 0.82rem;
+  color: var(--ink-tertiary); border-top: 1px solid var(--border-subtle);
+}
+.footer a { color: var(--ink-secondary); text-decoration: none; }
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2.4rem; }
+  .hero { padding: 6rem 1.5rem 4rem; }
+  .pitch-grid { grid-template-columns: 1fr; }
+  .pillars-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .pillars-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">praman</div>
+  <div class="navbar-links">
+    <a href="#">Docs</a><a href="#">API</a><a href="#">GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">Open Source &middot; Agentic-First</div>
+  <h1>Transform your SAP to S/4 HANA with evidence, not hope.</h1>
+  <p class="hero-desc">
+    Praman is the autonomous agentic testing Playwright plugin for SAP S/4HANA.
+    Built on Playwright. Powered by AI.
+  </p>
+  <div class="hero-pills">
+    <span>Your Environment</span><span class="dot">&bull;</span><span>Any Agent</span><span class="dot">&bull;</span><span>Any LLM</span>
+  </div>
+  <div class="hero-pills">
+    <span>Greenfield</span><span class="dot">&bull;</span><span>Brownfield</span><span class="dot">&bull;</span><span>Bluefield</span>
+  </div>
+  <div class="hero-buttons">
+    <a href="#" class="btn btn-dark">Get Started</a>
+    <a href="#" class="btn btn-light">API Reference</a>
+  </div>
+</section>
+
+<div class="code-showcase">
+  <p class="code-label">Your agent generates SAP S/4HANA Playwright scripts</p>
+  <div class="code-block">
+    <div class="code-dots"><span></span><span></span><span></span></div>
+    <pre><code><span class="comment">// Praman: AI-first SAP testing</span>
+<span class="keyword">import</span> { <span class="fn">test</span> } <span class="keyword">from</span> <span class="string">'playwright-praman'</span>;
+
+<span class="fn">test</span>(<span class="string">'verify purchase order'</span>, <span class="keyword">async</span> ({ <span class="fn">ui5</span>, <span class="fn">odata</span> }) =&gt; {
+  <span class="keyword">await</span> <span class="fn">ui5</span>.<span class="fn">control</span>({ id: <span class="string">'orderTable'</span> });
+  <span class="keyword">await</span> <span class="fn">odata</span>.<span class="fn">read</span>(<span class="string">'/PurchaseOrders'</span>);
+});</code></pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="section section-wide">
+  <div class="section-label" style="text-align:center;">Why Praman</div>
+  <h2 class="section-title" style="text-align:center;">The Problem. The Solution. The Proof.</h2>
+  <p class="section-desc" style="text-align:center;max-width:500px;margin-left:auto;margin-right:auto;">Four questions that define why autonomous SAP testing matters.</p>
+  <div class="pitch-grid">
+    <div class="pitch-cell"><div class="pitch-step">Why</div><h3>End to End Quality Matters</h3><p>Third party apps, Business flows, Test data, UI5 controls, Delay in timeline.</p></div>
+    <div class="pitch-cell"><div class="pitch-step">What</div><h3>Agentic AI Native Quality Automation</h3><p>Input Signavio flow or test case, connect to HANA using OData, check data availability and speak to UI5 elements and web components.</p></div>
+    <div class="pitch-cell"><div class="pitch-step">So What</div><h3>Deploy with evidence</h3><p>Data Integrity Validation, Business Flow Performance Heatmap in every run, Accessibility Testing, Compliance.</p></div>
+    <div class="pitch-cell"><div class="pitch-step">Then What</div><h3>Tests that write themselves</h3><p>AI agents write, maintain, and evolve tests through SKILL.md entry points.</p></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Capabilities</div>
+  <h2 class="section-title">What you get</h2>
+  <ul class="features-list">
+    <li><div class="icon">&#x1F916;</div><div><h3>AI-First Architecture</h3><p>SKILL.md entry points, capabilities.list() discovery, compliance verification. Built for Copilot, Claude, and Jules.</p></div></li>
+    <li><div class="icon">&#x1F527;</div><div><h3>21 Fixtures, 199 Typed Interfaces, 4,092 Methods</h3><p>61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more. OData CRUD, Fiori Elements, FLP navigation, SAP auth, SM12 locks, AI discovery. Just destructure and go.</p></div></li>
+    <li><div class="icon">&#x1F3AF;</div><div><h3>SAP UI5 Native — LTS 1.108 &middot; 1.120 &middot; 1.136</h3><p>ui5.control() with auto-retry, self-healing, and 3-tier API resolution across UI5 LTS versions. Uses UI5's own control APIs, not brittle DOM selectors.</p></div></li>
+    <li><div class="icon">&#x1F3D7;</div><div><h3>6-Layer Architecture</h3><p>Core Infrastructure &rarr; Selectors &amp; Matchers &rarr; Bridge &amp; Browser Scripts &rarr; Control Proxy &rarr; Fixtures &amp; Auth &rarr; AI &amp; Intents. 3 interaction strategies, 7 return-type handlers, TTL+LRU caching, 10 error subclasses.</p></div></li>
+    <li><div class="icon">&#x1F4CA;</div><div><h3>Enterprise Observability</h3><p>OpenTelemetry tracing with Azure and AWS, role-based quality reports, pino structured logging, compliance reporters, defect video, logs. Full visibility into every action.</p></div></li>
+    <li><div class="icon">&#x26A1;</div><div><h3>Playwright Native</h3><p>Extends @playwright/test. Parallel execution, auto-wait, trace viewer, UI mode. Zero compromise.</p></div></li>
+  </ul>
+</div>
+
+<div class="philosophy-section">
+  <div class="section section-wide" style="text-align:center;">
+    <div class="section-label">Philosophy</div>
+    <h2 class="section-title">Four Pillars of Evidence</h2>
+    <div class="philosophy-quote">
+      &ldquo;In Ancient India, <em>Prama&#x304;n&#x323;a</em> was the standard to separate fact from illusion.
+      In the Modern Enterprise, <strong>Praman</strong> separates a &lsquo;Successful Deployment&rsquo;
+      from a &lsquo;Business Disruption.&rsquo;&rdquo;
+    </div>
+    <div class="pillars-grid" style="text-align:left;">
+      <div class="pillar"><div class="pillar-label">Pratyaksha</div><h3>Perception</h3><p>Real-time, deep-object visibility into the S/4HANA Fiori layer.</p></div>
+      <div class="pillar"><div class="pillar-label">Anum&#x101;na</div><h3>Inference</h3><p>Agentic AI that predicts and heals breaks before user impact.</p></div>
+      <div class="pillar"><div class="pillar-label">Upam&#x101;na</div><h3>Comparison</h3><p>Validation between Legacy ECC and New S/4HANA states.</p></div>
+      <div class="pillar"><div class="pillar-label">Shabda</div><h3>Authority</h3><p>Playwright — the gold standard of modern web automation.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="assurance">
+  <div class="assurance-items">
+    <div class="assurance-item"><span>&#10003;</span> CISO-Approved</div>
+    <div class="assurance-item"><span>&#10003;</span> Open Source</div>
+    <div class="assurance-item"><span>&#10003;</span> Customizable</div>
+    <div class="assurance-item"><span>&#10003;</span> Cross-Platform</div>
+    <div class="assurance-item"><span>&#10003;</span> TypeScript</div>
+  </div>
+</div>
+
+<div class="cta">
+  <h2>Start testing with evidence.</h2>
+  <p>Open source. Your environment. Your rules.</p>
+  <div class="hero-buttons">
+    <a href="#" class="btn btn-dark">Get Started</a>
+    <a href="#" class="btn btn-light">View on GitHub</a>
+  </div>
+</div>
+
+<footer class="footer">
+  Praman &middot; <a href="#">GitHub</a> &middot; <a href="#">npm</a> &middot; Crafted with Prudence. Powered by Purpose.
+</footer>
+
+</body>
+</html>
