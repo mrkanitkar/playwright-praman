@@ -51,6 +51,10 @@ export interface AuthErrorOptions extends Omit<PramanErrorOptions, 'code' | 'ret
 /**
  * Error subclass for authentication failures.
  *
+ * @sapModule BC-SEC
+ *
+ * @businessContext SAP authentication lifecycle — login, session refresh, SSO token handling
+ *
  * @example
  * ```typescript
  * const error = new AuthError({
@@ -64,6 +68,23 @@ export class AuthError extends PramanError {
   readonly strategy: string | undefined;
   readonly loginUrl: string | undefined;
 
+  /**
+   * Creates a new AuthError instance.
+   *
+   * @param options - Auth error construction options including strategy and login URL.
+   *
+   * @example
+   * ```typescript
+   * import { AuthError } from '#core/errors/auth-error.js';
+   *
+   * const error = new AuthError({
+   *   message: 'SAML authentication failed',
+   *   attempted: 'Login to SAP BTP',
+   *   strategy: 'btp-saml',
+   *   loginUrl: 'https://accounts.sap.com/login',
+   * });
+   * ```
+   */
   constructor(options: AuthErrorOptions) {
     super({
       ...options,
@@ -79,6 +100,18 @@ export class AuthError extends PramanError {
     Object.defineProperty(this, 'loginUrl', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes the error to a JSON-safe object with authentication fields.
+   *
+   * @returns Base fields plus `strategy` and `loginUrl`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * // json.strategy === 'btp-saml'
+   * // json.loginUrl === 'https://accounts.sap.com/login'
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly strategy: string | undefined;
     readonly loginUrl: string | undefined;
@@ -90,6 +123,19 @@ export class AuthError extends PramanError {
     };
   }
 
+  /**
+   * Returns structured context for AI agents with authentication diagnostics.
+   *
+   * @returns Base AI context plus `strategy` and `loginUrl` fields
+   * to help diagnose authentication configuration issues.
+   *
+   * @example
+   * ```typescript
+   * const context = error.toAIContext();
+   * // context.strategy, context.loginUrl available
+   * // Send to LLM for auth troubleshooting suggestions
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly strategy: string | undefined;
     readonly loginUrl: string | undefined;

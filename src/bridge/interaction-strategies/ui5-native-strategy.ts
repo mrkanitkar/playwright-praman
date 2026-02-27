@@ -27,10 +27,16 @@ import { ErrorCode } from '#core/errors/codes.js';
 import { ControlError } from '#core/errors/control-error.js';
 
 /**
- * Shape returned by browser-side interaction scripts.
+ * Shape returned by browser-side bridge interaction calls.
  *
  * @see `BridgeResult` in `#core/types/bridge.js` for the canonical 4-field envelope.
  * This is intentionally narrower (2 fields) because browser IIFEs don't return `duration` or `data`.
+ *
+ * @example
+ * ```typescript
+ * const result: BridgeResult = { success: true };
+ * const failure: BridgeResult = { success: false, error: 'Control not interactable' };
+ * ```
  */
 interface BridgeResult {
   readonly success: boolean;

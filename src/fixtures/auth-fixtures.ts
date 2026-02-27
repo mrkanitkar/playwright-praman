@@ -91,6 +91,11 @@ export interface AuthFixtures {
  * PW-MERGE-1: `pramanConfig` is declared as a fixture option placeholder
  * so TypeScript understands the dependency chain. At runtime, coreTest
  * supplies the real value via `mergeTests(coreTest, authTest)`.
+ *
+ * @example
+ * ```typescript
+ * import type { AuthDeps } from '#fixtures/auth-fixtures.js';
+ * ```
  */
 export interface AuthDeps {
   /** Validated, frozen Praman configuration from coreTest. */

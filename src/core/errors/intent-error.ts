@@ -68,11 +68,38 @@ export interface IntentErrorOptions extends Omit<PramanErrorOptions, 'code' | 'r
  *   sapDomain: 'procurement',
  * });
  * ```
+ *
+ * @sapModule MM/SD/FI/PP
+ * @businessContext SAP domain intent operations — field fill, button click, navigation, assertion
+ * @failureMode Field not found — intent target field does not exist in the current view
+ * @failureMode Action failed — SAP business action did not complete successfully
  */
 export class IntentError extends PramanError {
   readonly fieldName: string | undefined;
   readonly sapDomain: string | undefined;
 
+  /**
+   * Creates a new IntentError instance.
+   *
+   * @param options - Intent error construction options including field name
+   *   and SAP domain context for the failing operation.
+   *
+   * @example
+   * ```typescript
+   * import { IntentError } from '#core/errors/intent-error.js';
+   *
+   * const error = new IntentError({
+   *   message: 'Field selector not resolved: supplier',
+   *   attempted: 'Fill field via vocabulary: supplier',
+   *   fieldName: 'supplier',
+   *   sapDomain: 'procurement',
+   *   suggestions: [
+   *     'Verify the field name exists in vocabulary/domains/procurement.json',
+   *     'Provide a custom selector via options.selectors',
+   *   ],
+   * });
+   * ```
+   */
   constructor(options: IntentErrorOptions) {
     super({
       ...options,
@@ -88,6 +115,18 @@ export class IntentError extends PramanError {
     Object.defineProperty(this, 'sapDomain', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes this error to a JSON-safe object with intent-specific fields.
+   *
+   * @returns Base serialization extended with `fieldName` and `sapDomain`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * console.log(json.fieldName); // 'supplier'
+   * console.log(json.sapDomain); // 'procurement'
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly fieldName: string | undefined;
     readonly sapDomain: string | undefined;
@@ -99,6 +138,18 @@ export class IntentError extends PramanError {
     };
   }
 
+  /**
+   * Returns AI-agent-friendly context with intent-specific diagnostic fields.
+   *
+   * @returns Base AI context extended with field name and SAP domain details.
+   *
+   * @example
+   * ```typescript
+   * const ctx = error.toAIContext();
+   * // LLM can use ctx.fieldName to look up vocabulary alternatives
+   * // and ctx.sapDomain to narrow the search scope
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly fieldName: string | undefined;
     readonly sapDomain: string | undefined;

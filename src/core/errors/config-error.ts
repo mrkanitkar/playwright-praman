@@ -54,6 +54,12 @@ export interface ConfigErrorOptions extends Omit<PramanErrorOptions, 'code' | 'r
 /**
  * Error subclass for configuration failures.
  *
+ * @failureMode Invalid config file — YAML/JSON parse error or Zod schema validation failure
+ *
+ * @failureMode Missing config — no praman.config.ts/yml found in project root
+ *
+ * @failureMode Schema validation — config values out of range or wrong type
+ *
  * @example
  * ```typescript
  * const error = new ConfigError({
@@ -67,6 +73,23 @@ export class ConfigError extends PramanError {
   readonly validationErrors: readonly ValidationIssue[];
   readonly configPath: string | undefined;
 
+  /**
+   * Creates a new ConfigError instance.
+   *
+   * @param options - Config error construction options including validation errors and config path.
+   *
+   * @example
+   * ```typescript
+   * import { ConfigError } from '#core/errors/config-error.js';
+   *
+   * const error = new ConfigError({
+   *   message: 'Config file contains invalid values',
+   *   attempted: 'Load config from praman.config.ts',
+   *   configPath: '/app/praman.config.ts',
+   *   validationErrors: [{ path: ['auth'], message: 'Required', code: 'invalid_type' }],
+   * });
+   * ```
+   */
   constructor(options: ConfigErrorOptions) {
     super({
       ...options,
@@ -82,6 +105,18 @@ export class ConfigError extends PramanError {
     Object.defineProperty(this, 'configPath', { writable: false, configurable: false });
   }
 
+  /**
+   * Serializes the error to a JSON-safe object with configuration fields.
+   *
+   * @returns Base fields plus `validationErrors` and `configPath`.
+   *
+   * @example
+   * ```typescript
+   * const json = error.toJSON();
+   * // json.configPath === '/app/praman.config.ts'
+   * // json.validationErrors === [{ path: ['auth'], message: 'Required', code: 'invalid_type' }]
+   * ```
+   */
   override toJSON(): SerializedPramanError & {
     readonly validationErrors: readonly ValidationIssue[];
     readonly configPath: string | undefined;
@@ -93,6 +128,19 @@ export class ConfigError extends PramanError {
     };
   }
 
+  /**
+   * Returns structured context for AI agents with configuration diagnostics.
+   *
+   * @returns Base AI context plus `validationErrors` and `configPath` fields
+   * to help diagnose configuration issues and suggest fixes.
+   *
+   * @example
+   * ```typescript
+   * const context = error.toAIContext();
+   * // context.validationErrors, context.configPath available
+   * // Send to LLM for config fix suggestions
+   * ```
+   */
   override toAIContext(): AIErrorContext & {
     readonly validationErrors: readonly ValidationIssue[];
     readonly configPath: string | undefined;

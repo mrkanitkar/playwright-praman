@@ -286,7 +286,16 @@ export interface IntentFixture {
   };
 }
 
-/** Test fixture map for the intentTest extension. */
+/**
+ * Test fixture map for the intentTest extension.
+ *
+ * @example
+ * ```typescript
+ * test('uses intents', async ({ intent }) => {
+ *   await intent.core.fillField('Name', 'Test');
+ * });
+ * ```
+ */
 export interface IntentTestFixtures {
   /** SAP business intent operations. */
   intent: IntentFixture;
@@ -321,7 +330,14 @@ export interface IntentTestFixtures {
  * ```
  */
 
-/** Cross-fixture dependencies injected via PW-MERGE-1 option placeholders. */
+/**
+ * Cross-fixture dependencies injected via PW-MERGE-1 option placeholders.
+ *
+ * @example
+ * ```typescript
+ * import type { IntentFixtureDeps } from '#fixtures/intent-fixtures.js';
+ * ```
+ */
 export interface IntentFixtureDeps {
   /** UI5Handler — overridden at runtime by mergeTests(). */
   ui5: UI5Handler;

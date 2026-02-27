@@ -22,6 +22,14 @@ import type { BridgeReturnType } from '#core/types/bridge.js';
 
 /**
  * Utility functions available on the injected bridge.
+ *
+ * @browserContext Available only inside page.evaluate() calls
+ *
+ * @example
+ * ```typescript
+ * const methods = bridge.utils.retrieveControlMethods('__button0');
+ * const properties = bridge.utils.retrieveControlProperties('__button0');
+ * ```
  */
 export interface PramanBridgeUtils {
   /** Retrieves methods from a UI5 control's prototype chain. */
@@ -36,6 +44,16 @@ export interface PramanBridgeUtils {
  * @remarks
  * The bridge is injected via `page.evaluate()` (W14: lazy-only injection).
  * This interface describes the complete API surface available to browser scripts.
+ *
+ * @browserContext Window-level object, only exists inside browser context
+ * @guarantee Available after bridge injection completes successfully
+ *
+ * @example
+ * ```typescript
+ * // Inside page.evaluate():
+ * const bridge = window.__praman_bridge;
+ * const control = bridge.getById('__button0');
+ * ```
  */
 export interface PramanBridge {
   /** Bridge implementation version. */
@@ -95,6 +113,15 @@ export interface BridgeControlRef {
  * @remarks
  * Returned by `findControl` browser scripts. Contains the minimal info
  * needed to construct a proxy on the Node side.
+ *
+ * @example
+ * ```typescript
+ * const result: ControlDiscoveryResult = {
+ *   id: '__button0',
+ *   controlType: 'sap.m.Button',
+ *   properties: { text: 'Save', enabled: true },
+ * };
+ * ```
  */
 export interface ControlDiscoveryResult {
   /** UI5 control ID. */

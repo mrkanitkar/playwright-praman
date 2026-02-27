@@ -28,6 +28,10 @@
  * await feClickListItem(page, 'myList', 0);
  * ```
  *
+ * @fioriElement ListReport
+ * @sapModule sap.m.List
+ * @ui5Version \>= 1.84.0
+ *
  * @module fe
  */
 

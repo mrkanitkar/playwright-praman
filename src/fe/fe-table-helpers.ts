@@ -33,6 +33,10 @@
  * await feClickRow(page, 'myTable', 0);
  * ```
  *
+ * @fioriElement Table
+ * @sapModule sap.m.Table, sap.ui.table.Table
+ * @ui5Version \>= 1.84.0
+ *
  * @module fe
  */
 
