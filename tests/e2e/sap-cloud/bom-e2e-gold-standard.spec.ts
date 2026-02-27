@@ -22,10 +22,10 @@
  * KEY SUCCESS FACTORS:
  * - SINGLE TEST with test.step() - ensures same browser page throughout!
  * - test.describe.serial() does NOT share page between tests.
- * - 100% dhikraft compliance for UI5 elements
+ * - 100% Praman compliance for UI5 elements
  * - Proper timing and synchronization
  * - Robust value help handling
- * - Correct ComboBox interaction with setTimeout pattern
+ * - Correct ComboBox interaction pattern
  * - Comprehensive validation and error reporting
  *
  * Steps:
@@ -50,11 +50,11 @@
  * - createBOMFragment--CancelBtn (Cancel button)
  *
  * ═══════════════════════════════════════════════════════════════
- * 🔍 DHIKRAFT COMPLIANCE REPORT
+ * 🔍 PRAMAN COMPLIANCE REPORT
  * ═══════════════════════════════════════════════════════════════
  *
  * UI5 Elements Interacted: 15+
- * - Using dhikraft/UI5 methods: 100% ✅
+ * - Using Praman/UI5 methods: 100% ✅
  * - Using Playwright native DOM: 0% (except Tab key navigation)
  *
  * UI5 Methods Used:
@@ -191,7 +191,7 @@ test.describe('BOM End-to-End Flow', () => {
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // STEP 3: Test Material Value Help (Using dhikraft Proxy)
+    // STEP 3: Test Material Value Help (Using Praman Proxy)
     // ═══════════════════════════════════════════════════════════════
     await test.step('Step 3: Test Material Value Help', async () => {
       // Open Material value help using UI5 control
@@ -230,7 +230,7 @@ test.describe('BOM End-to-End Flow', () => {
           ).getBindingContext();
           if (ctx) rowCount++;
         }
-        if (rowCount === 0) await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        if (rowCount === 0) await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',
@@ -243,7 +243,7 @@ test.describe('BOM End-to-End Flow', () => {
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // STEP 4: Test Plant Value Help (Using dhikraft Proxy)
+    // STEP 4: Test Plant Value Help (Using Praman Proxy)
     // ═══════════════════════════════════════════════════════════════
     await test.step('Step 4: Test Plant Value Help', async () => {
       // Open Plant value help using UI5 control
@@ -277,7 +277,7 @@ test.describe('BOM End-to-End Flow', () => {
           ).getBindingContext();
           if (ctx) rowCount++;
         }
-        if (rowCount === 0) await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        if (rowCount === 0) await ui5.waitForUI5();
       }
 
       test
@@ -290,16 +290,16 @@ test.describe('BOM End-to-End Flow', () => {
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // STEP 5: Test BOM Usage Dropdown (Using dhikraft Proxy)
+    // STEP 5: Test BOM Usage Dropdown (Using Praman Proxy)
     // ═══════════════════════════════════════════════════════════════
     await test.step('Step 5: Test BOM Usage Dropdown', async () => {
       // BOM Usage is a SmartField (variantUsage) with inner ComboBox (variantUsage-comboBoxEdit)
-      // P2D Phase 1: Using dhikraft proxy instead of page.evaluate
+      // Using Praman proxy instead of page.evaluate
       const bomUsageCombo = await ui5.control({
         id: 'createBOMFragment--variantUsage-comboBoxEdit',
       });
 
-      // P2D: Migrated from page.evaluate - use dhikraft proxy getItems()
+      // Migrated from page.evaluate — use Praman proxy getItems()
       // Note: getItems() returns UI5 Items, we need to extract key/text via proxy
       const rawItems = await bomUsageCombo.getItems();
       const items: Array<{ key: string; text: string }> = [];
@@ -340,7 +340,7 @@ test.describe('BOM End-to-End Flow', () => {
     });
 
     // ═══════════════════════════════════════════════════════════════
-    // STEP 6: Fill Form with Valid Data (Using dhikraft Proxy)
+    // STEP 6: Fill Form with Valid Data (Using Praman Proxy)
     // ═══════════════════════════════════════════════════════════════
     await test.step('Step 6: Fill Form with Valid Data', async () => {
       // === FILL MATERIAL ===
@@ -363,7 +363,7 @@ test.describe('BOM End-to-End Flow', () => {
         } catch (e) {
           // Dialog not ready yet
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',
@@ -390,7 +390,7 @@ test.describe('BOM End-to-End Flow', () => {
             break;
           }
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',
@@ -433,7 +433,7 @@ test.describe('BOM End-to-End Flow', () => {
         } catch (e) {
           /* dialog not ready yet */
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test
         .info()
@@ -459,7 +459,7 @@ test.describe('BOM End-to-End Flow', () => {
             break;
           }
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',
@@ -482,7 +482,7 @@ test.describe('BOM End-to-End Flow', () => {
       }
 
       // === FILL BOM USAGE ===
-      // P2D Phase 5: Select BOM Usage using dhikraft proxy
+      // Select BOM Usage using Praman proxy
       const bomUsageControl = await ui5.control({
         id: 'createBOMFragment--variantUsage-comboBoxEdit',
       });
@@ -491,7 +491,7 @@ test.describe('BOM End-to-End Flow', () => {
       await bomUsageControl.open();
       await ui5.waitForUI5();
 
-      // Set selected key using dhikraft proxy
+      // Set selected key using Praman proxy
       await bomUsageControl.setSelectedKey('1'); // Select "1 (Production)"
 
       // Fire change event for validation (simpler than fireSelectionChange which requires selectedItem object)
@@ -505,7 +505,7 @@ test.describe('BOM End-to-End Flow', () => {
         .annotations.push({ type: 'info', description: 'BOM Usage set to: 1 (Production)' });
       await ui5.waitForUI5();
 
-      // P2D Phase 5: Verify the value was actually set using dhikraft proxy
+      // Verify the value was actually set using Praman proxy
       const selectedKey = await bomUsageControl.getSelectedKey();
 
       // Also check SmartField
@@ -524,7 +524,7 @@ test.describe('BOM End-to-End Flow', () => {
       expect(verifyBomUsage.comboBoxKey).toBe('1');
 
       // === VERIFY ALL VALUES BEFORE PROCEEDING ===
-      // P2D Phase 5: Migrated to dhikraft proxy
+      // Migrated to Praman proxy
       const materialInputCtrl = await ui5.control({ id: 'createBOMFragment--material-input' });
       const plantInputCtrl = await ui5.control({ id: 'createBOMFragment--plant-input' });
       const bomUsageCtrl = await ui5.control({
@@ -537,7 +537,7 @@ test.describe('BOM End-to-End Flow', () => {
         plantValue: (await plantInputCtrl.getValue()) || '',
         bomUsageKey: (await bomUsageCtrl.getSelectedKey()) || '',
         createBtnEnabled: (await createBtnCtrl.getEnabled()) || false,
-        createBtnVisible: (await createBtnCtrl.getVisible()) || false, // Now works - dhikraft blacklist fixed
+        createBtnVisible: (await createBtnCtrl.getVisible()) || false,
       };
 
       test.info().annotations.push({
@@ -576,7 +576,7 @@ test.describe('BOM End-to-End Flow', () => {
       await createBtn.press();
       await ui5.waitForUI5();
 
-      // P2D Phase 6: Check for validation using dhikraft proxy where possible
+      // Check for validation using Praman proxy where possible
       // Check if dialog is still open by checking if OkBtn still exists
       let dialogStillOpen = false;
       let fieldValues = { material: '', plant: '', bomUsage: '' };
@@ -601,7 +601,7 @@ test.describe('BOM End-to-End Flow', () => {
         dialogStillOpen = false;
       }
 
-      // P2D Phase 7e: Migrated message checks to dhikraft proxy where possible
+      // Migrated message checks to Praman proxy where possible
       // Note: byFieldGroupId('messageBox') is a Core API - use try-catch with controlType selector
       let messageChecks = {
         hasMessagePopover: false,

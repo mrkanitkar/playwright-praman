@@ -1,0 +1,29 @@
+{
+  "output": {
+    "filePath": "praman-context.md",
+    "style": "markdown",
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "showLineNumbers": false,
+    "topFilesLength": 10
+  },
+  "include": [
+    "src/**",
+    "docs/**",
+    "skills/**"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**",
+      "package-lock.json",
+      "*.lock",
+      "*.tgz",
+      ".playwright-mcp/**",
+      "landing-previews/**"
+    ]
+  }
+}

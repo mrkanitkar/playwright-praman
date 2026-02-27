@@ -60,6 +60,7 @@ export default defineConfig({
       name: 'e2e-auth-setup',
       testMatch: /auth-setup\.ts/,
       testDir: './src/auth',
+      timeout: 120_000,
       use: {
         ...devices['Desktop Chrome'],
         headless: false,

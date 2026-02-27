@@ -29,8 +29,24 @@ const config: Config = {
 
   // ── HTML <head> tags for AI agent discoverability ──
   headTags: [
-    { tagName: 'link', attributes: { rel: 'alternate', type: 'text/plain', href: '/playwright-praman/llms.txt', title: 'LLM-friendly documentation index' } },
-    { tagName: 'link', attributes: { rel: 'alternate', type: 'text/plain', href: '/playwright-praman/llms-full.txt', title: 'LLM-friendly full documentation' } },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'alternate',
+        type: 'text/plain',
+        href: '/playwright-praman/llms.txt',
+        title: 'LLM-friendly documentation index',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'alternate',
+        type: 'text/plain',
+        href: '/playwright-praman/llms-full.txt',
+        title: 'LLM-friendly full documentation',
+      },
+    },
   ],
 
   i18n: {
@@ -150,7 +166,7 @@ const config: Config = {
         rootContent:
           '> Praman is an AI-first SAP UI5 test automation plugin for Playwright.\n' +
           '> Install: `npm install playwright-praman @playwright/test`\n' +
-          '> Import: `import { test, expect } from \'playwright-praman\';`',
+          "> Import: `import { test, expect } from 'playwright-praman';`",
         fullRootContent:
           '> This file contains the complete Praman documentation (excluding auto-generated API reference).\n' +
           '> For topic-specific context, see llms-quickstart.txt, llms-sap-testing.txt, ' +
@@ -343,7 +359,13 @@ const config: Config = {
           position: 'left',
           label: 'Demo',
         },
-        // ── Menu 5: Documentation ──
+        // ── Menu 5: Example Reports ──
+        {
+          to: '/example-reports',
+          position: 'left',
+          label: 'Example Reports',
+        },
+        // ── Menu 6: Documentation ──
         {
           type: 'docSidebar',
           sidebarId: 'docsSidebar',

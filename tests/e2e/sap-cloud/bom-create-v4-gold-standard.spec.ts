@@ -252,7 +252,7 @@ test.describe('BOM Create V4 End-to-End Flow', () => {
         } catch {
           // VH not ready yet
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',
@@ -281,7 +281,7 @@ test.describe('BOM Create V4 End-to-End Flow', () => {
           }
         }
         if (rowCount === 0) {
-          await new Promise<void>((resolve) => setTimeout(resolve, 500));
+          await ui5.waitForUI5();
         }
       }
       test.info().annotations.push({
@@ -315,7 +315,7 @@ test.describe('BOM Create V4 End-to-End Flow', () => {
         } catch {
           // VH not ready yet
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       expect(vhOpen).toBe(true);
       await ui5.waitForUI5();
@@ -334,7 +334,7 @@ test.describe('BOM Create V4 End-to-End Flow', () => {
           }
         }
         if (rowCount === 0) {
-          await new Promise<void>((resolve) => setTimeout(resolve, 500));
+          await ui5.waitForUI5();
         }
       }
       test.info().annotations.push({
@@ -388,7 +388,7 @@ test.describe('BOM Create V4 End-to-End Flow', () => {
         } catch {
           // VH not ready yet
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',
@@ -410,7 +410,7 @@ test.describe('BOM Create V4 End-to-End Flow', () => {
             break;
           }
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',
@@ -447,7 +447,7 @@ test.describe('BOM Create V4 End-to-End Flow', () => {
         } catch {
           // VH not ready yet
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',
@@ -469,7 +469,7 @@ test.describe('BOM Create V4 End-to-End Flow', () => {
             break;
           }
         }
-        await new Promise<void>((resolve) => setTimeout(resolve, 500));
+        await ui5.waitForUI5();
       }
       test.info().annotations.push({
         type: 'info',

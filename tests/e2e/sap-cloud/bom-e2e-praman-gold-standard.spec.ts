@@ -14,7 +14,7 @@
  *
  * STATUS: CONVERTED TO PRAMAN FIXTURES - 25 Feb 2026
  * MARKER: e2egold-praman
- * VERSION: v3.0 (Praman Gold Standard — converted from v2.0 dhikraft)
+ * VERSION: v3.0 (Praman Gold Standard)
  *
  * This is the Praman GOLD STANDARD for SAP BOM testing on the V1 app
  * (Maintain Bill Of Material) using SmartField controls (sap.ui.comp).
@@ -28,7 +28,7 @@
  * - Extracted IDS const map for all control IDs
  * - Added getRequired() checks for mandatory fields
  * - Graceful error recovery in Step 7 (no hard fail)
- * - Removed all dhikraft/P2D migration comments
+ * - Removed all legacy P2D migration comments
  *
  * Steps:
  * 1. Navigate to BOM app

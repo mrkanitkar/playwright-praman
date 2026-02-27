@@ -28,7 +28,9 @@
     "README.md",
     "DISCLAIMER.md",
     "SECURITY.md",
-    "CONTRIBUTING.md"
+    "CONTRIBUTING.md",
+    "llms.txt",
+    "llms-full.txt"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -128,9 +130,10 @@
     "generate:skill-md": "tsx scripts/generate-skill-md.ts",
     "generate:skill": "tsx scripts/generate-skill-md.ts",
     "validate:skill-md": "tsx scripts/validate-skill-md.ts",
-    "build:full": "npm run generate:capabilities && npm run generate:skill-md && npm run build",
+    "build:full": "npm run generate:capabilities && npm run generate:skill-md && npm run build && npm run generate:llms-txt",
     "generate:proxies": "tsx scripts/generate-typed-proxies.ts",
     "generate:sbom": "cyclonedx-npm --output-file playwright-praman.sbom.json --spec-version 1.5 --ignore-npm-errors",
+    "generate:llms-txt": "tsx scripts/generate-llms-txt.ts",
     "generate:schema": "tsx scripts/generate-json-schema.ts",
     "setup:ide": "tsx scripts/setup-ide.ts",
     "audit": "npm audit --audit-level=high",

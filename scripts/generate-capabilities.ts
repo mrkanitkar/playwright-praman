@@ -113,7 +113,16 @@ function generateCapabilityRegistryTs(entries: readonly CapabilityEntry[]): stri
     return indented;
   });
 
-  return `/* eslint-disable max-lines, sonarjs/no-duplicate-string */
+  return `/**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
+/* eslint-disable max-lines, sonarjs/no-duplicate-string */
 /**
  * AUTO-GENERATED — do not edit manually.
  *
@@ -150,7 +159,16 @@ function generateRecipeRegistryTs(entries: readonly RecipeEntry[]): string {
       .join('\n');
   });
 
-  return `/* eslint-disable sonarjs/no-duplicate-string */
+  return `/**
+ * @license
+ * Copyright (c) ZesTest 2025-2030. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file may contain AI-assisted code.
+ * See LICENSE and NOTICE files for details.
+ */
+
+/* eslint-disable sonarjs/no-duplicate-string */
 /**
  * AUTO-GENERATED — do not edit manually.
  *
