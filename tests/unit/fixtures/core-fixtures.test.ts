@@ -456,7 +456,7 @@ describe('core-fixtures worker-scoped fixture definitions', () => {
       const fn = extractFixtureFn(fixtures['playwrightCompat']);
       await runFixture(fn, {});
 
-      expect(mockAssertMinVersion).toHaveBeenCalledWith('1.50.0');
+      expect(mockAssertMinVersion).toHaveBeenCalledWith('1.57.0');
     });
 
     it('returns Playwright feature flags', async () => {

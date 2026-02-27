@@ -122,7 +122,7 @@ The architecture is guided by 29 documented design decisions:
 | D11 | No plugin API in v1.0                                                    | Extension     |
 | D12 | Auto-generated SKILL.md + Docusaurus + TypeDoc                           | Docs          |
 | D13 | Apache 2.0 license                                                       | Legal         |
-| D14 | Playwright `>=1.50.0 <2.0.0` with CI matrix                              | Compat        |
+| D14 | Playwright `>=1.57.0 <2.0.0` with CI matrix                              | Compat        |
 | D15 | Security: dep scanning, secret redaction, SBOM, provenance               | Security      |
 | D16 | Single unified proxy (no double-proxy)                                   | Proxy         |
 | D17 | Bidirectional proxy conversion (`UI5Object` &lt;-&gt; `UI5ControlProxy`) | Proxy         |

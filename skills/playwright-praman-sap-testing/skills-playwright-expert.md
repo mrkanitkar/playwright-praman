@@ -351,7 +351,7 @@ test('Create Purchase Order', async ({ page, ui5, navigation }) => {
 
 ### 7.1 Purpose
 
-Abstract Playwright API differences across versions (D14: `>=1.50.0 <2.0.0`).
+Abstract Playwright API differences across versions (D14: `>=1.57.0 <2.0.0`).
 The compat layer is a module with pure functions -- not a class.
 
 ```typescript
@@ -364,7 +364,7 @@ import {
 } from '#core/compat/playwright-compat.js';
 
 // Check minimum version requirement
-assertMinVersion('1.50.0');
+assertMinVersion('1.57.0');
 
 // Feature detection for conditional capabilities
 if (hasFeature('hasClockAPI')) {
@@ -382,7 +382,7 @@ const features = getPlaywrightFeatures(); // { hasClockAPI, hasAriaSnapshot, ...
 import { getPlaywrightVersion, assertMinVersion } from '#core/compat/playwright-compat.js';
 
 const version = getPlaywrightVersion(); // e.g., { major: 1, minor: 58, patch: 2 }
-assertMinVersion('1.50.0'); // throws if installed version is too old
+assertMinVersion('1.57.0'); // throws if installed version is too old
 ```
 
 ---

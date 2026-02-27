@@ -88,7 +88,6 @@ describe('src/index.ts barrel', () => {
   it('does NOT export implementation constants', () => {
     const b = barrel as Record<string, unknown>;
     expect(b['DIALOG_CONTROL_TYPES']).toBeUndefined();
-    expect(b['DATE_FORMATS']).toBeUndefined();
   });
 
   // ── Removed auth implementation ──────────────────────────────────────

@@ -18,6 +18,7 @@
  */
 import {
   clickTableSettingsButtonScript,
+  columnNamesScript,
   exportTableDataScript,
   filterByColumnScript,
   getFilterValueScript,
@@ -280,13 +281,9 @@ export async function exportTableData(
   const info = await detectTableType(page, tableId);
   const grid = isGridVariant(info.variant);
   // Get column names first via a separate evaluate
-  const colNamesScript =
-    `(function(){try{var c=sap.ui.getCore().byId(${JSON.stringify(info.effectiveId)});if(!c)return[];` +
-    (grid
-      ? 'var cols=c.getColumns();var names=[];for(var i=0;i<cols.length;i++){var lbl=cols[i].getLabel();names.push(typeof lbl==="string"?lbl:(lbl&&typeof lbl.getText==="function"?lbl.getText():""));}return names;'
-      : 'var cols=c.getColumns();var names=[];for(var i=0;i<cols.length;i++){var hdr=cols[i].getHeader();names.push(hdr&&typeof hdr.getText==="function"?hdr.getText():"");}return names;') +
-    '}catch(e){console.warn("[praman] Column names scan error:",e.message);return[];}})()';
-  const colNames = await page.evaluate<readonly string[]>(colNamesScript);
+  const colNames = await page.evaluate<readonly string[]>(
+    columnNamesScript(info.effectiveId, grid),
+  );
   const columnsJson = options?.columns !== undefined ? JSON.stringify(options.columns) : 'null';
   const script = exportTableDataScript(
     info.effectiveId,

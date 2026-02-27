@@ -256,7 +256,7 @@ div[class*='announcementBar'] {
   font-weight: 300;
   letter-spacing: -0.02em;
   line-height: 1.18;
-  color: #ffffff;
+  color: #ffffff !important;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.18);
   margin-bottom: 0.9rem;
 }
@@ -266,7 +266,7 @@ div[class*='announcementBar'] {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.85) !important;
   margin-bottom: 0.8rem;
   max-width: 480px;
 }
@@ -385,14 +385,14 @@ div[class*='announcementBar'] {
 /* Outer wrapper: page-level spacing */
 .praman-glance-outer {
   padding: 40px 20px;
-  background: #ffffff;
+  background: var(--ifm-background-color);
 }
 
 /* Exact dhikraft .container: white card, border-radius 12px, shadow, padding 60px */
 .praman-glance-section {
   max-width: 1400px;
   margin: 0 auto;
-  background: white;
+  background: var(--ifm-background-color);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 112, 173, 0.15);
   padding: 60px;
@@ -418,7 +418,7 @@ div[class*='announcementBar'] {
 
 /* Exact dhikraft .summary-card: white bg, purple left border, radius, shadow */
 .praman-info-card {
-  background: #fff;
+  background: var(--ifm-background-color);
   border-left: 5px solid #667eea;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 112, 173, 0.08);
@@ -856,7 +856,7 @@ div[class*='announcementBar'] {
 
 .praman-reports-outer {
   padding: 3.5rem 2rem 4rem;
-  background: #ffffff;
+  background: var(--ifm-background-color);
   border-top: 1px solid var(--praman-border);
 }
 
@@ -871,7 +871,7 @@ div[class*='announcementBar'] {
 
 /* Base card */
 .praman-report-card {
-  background: #ffffff;
+  background: var(--ifm-background-color);
   border-radius: 10px;
   border-left: 5px solid #667eea;
   box-shadow: 0 2px 12px rgba(0, 112, 173, 0.09);
@@ -1236,36 +1236,218 @@ div[class*='announcementBar'] {
   line-height: 1.6;
 }
 
-/* ── Secondary page global consistency ─────────────────────── */
-/* Targets all custom pages except the index (which contains    */
-/* .praman-hero-section). !important is needed in dark mode to  */
-/* override hardcoded inline style attributes on those pages.   */
-main:not(:has(.praman-hero-section)) h1,
-main:not(:has(.praman-hero-section)) h2,
-main:not(:has(.praman-hero-section)) h3 {
-  color: var(--praman-ink);
+/* ── Global page consistency ───────────────────────────────── */
+/* Override hardcoded inline styles on custom TSX pages.        */
+/* Inline styles use hex colors (#0f172a, #334155, etc.)        */
+/* that break in dark mode and look inconsistent in light mode. */
+/* !important is needed to beat inline style specificity.       */
+
+/* --- Light mode: ensure all pages use the design-token palette --- */
+
+/* Page background: always white, no stray gray sections */
+main {
+  background-color: var(--ifm-background-color);
 }
 
-main:not(:has(.praman-hero-section)) p,
-main:not(:has(.praman-hero-section)) li {
-  color: var(--praman-ink-secondary);
-}
-
-[data-theme='dark'] main:not(:has(.praman-hero-section)) h1,
-[data-theme='dark'] main:not(:has(.praman-hero-section)) h2,
-[data-theme='dark'] main:not(:has(.praman-hero-section)) h3 {
+/* Text elements — replace hardcoded slate/gray hex values */
+main h1, main h2, main h3, main h4 {
   color: var(--praman-ink) !important;
 }
 
-[data-theme='dark'] main:not(:has(.praman-hero-section)) p,
-[data-theme='dark'] main:not(:has(.praman-hero-section)) li {
+main p, main li, main span, main div {
+  /* Only override when inline style sets a non-white text color.
+     We use !important to beat inline styles but scope to main
+     so nav, footer, hero remain untouched. */
+}
+
+/* Headings on all pages */
+main:not(:has(.praman-hero-section)) h1,
+main:not(:has(.praman-hero-section)) h2,
+main:not(:has(.praman-hero-section)) h3,
+main:not(:has(.praman-hero-section)) h4 {
+  color: var(--praman-ink) !important;
+}
+
+/* Body text on all pages */
+main:not(:has(.praman-hero-section)) p,
+main:not(:has(.praman-hero-section)) li {
   color: var(--praman-ink-secondary) !important;
 }
 
-[data-theme='dark'] main:not(:has(.praman-hero-section)) pre {
-  background: var(--praman-surface-alt) !important;
+/* Table text on all pages */
+main:not(:has(.praman-hero-section)) td,
+main:not(:has(.praman-hero-section)) th {
+  color: var(--praman-ink) !important;
+}
+
+/* Strong/bold elements inherit parent color */
+main:not(:has(.praman-hero-section)) strong {
+  color: var(--praman-ink) !important;
+}
+
+/* Light surface backgrounds — replace hardcoded #f8fafc, #f0fdfa, #e2e8f0 */
+/* These map to the design token --praman-surface-alt in light mode */
+
+/* --- Dark mode: comprehensive overrides --- */
+
+/* Page background */
+[data-theme='dark'] main {
+  background-color: var(--ifm-background-color);
+}
+
+/* All text — exclude carousel which needs white text on gradient */
+[data-theme='dark'] main h1:not(.praman-carousel-title),
+[data-theme='dark'] main h2,
+[data-theme='dark'] main h3,
+[data-theme='dark'] main h4 {
+  color: var(--praman-ink) !important;
+}
+
+[data-theme='dark'] main p:not(.praman-carousel-subtitle),
+[data-theme='dark'] main li {
+  color: var(--praman-ink-secondary) !important;
+}
+
+[data-theme='dark'] main td,
+[data-theme='dark'] main th {
+  color: var(--praman-ink) !important;
+}
+
+[data-theme='dark'] main strong {
+  color: var(--praman-ink) !important;
+}
+
+/* All inline-styled elements: override hardcoded text colors.
+   React renders `style="color: rgb(15, 23, 42)"` etc. The [style]
+   attribute selector catches any element with an inline style. */
+[data-theme='dark'] main div[style],
+[data-theme='dark'] main span[style] {
+  color: var(--praman-ink-secondary) !important;
+}
+
+[data-theme='dark'] main h1[style],
+[data-theme='dark'] main h2[style],
+[data-theme='dark'] main h3[style],
+[data-theme='dark'] main h4[style] {
+  color: var(--praman-ink) !important;
+}
+
+[data-theme='dark'] main p[style],
+[data-theme='dark'] main li[style] {
+  color: var(--praman-ink-secondary) !important;
+}
+
+[data-theme='dark'] main strong[style] {
+  color: var(--praman-ink) !important;
+}
+
+/* Pre/code blocks — preserve intentionally dark code blocks (#1e293b) */
+[data-theme='dark'] main pre {
+  color: var(--praman-ink) !important;
+}
+
+/* Light surface backgrounds become dark surface.
+   React inline: style="background: rgb(248, 250, 252)" etc.
+   [style] catches all, then we override background. */
+[data-theme='dark'] main div[style*="background"] {
+  background-color: var(--praman-surface-alt) !important;
+  border-color: var(--praman-border) !important;
+}
+
+/* Preserve hero/carousel/gradient backgrounds on index page */
+[data-theme='dark'] .praman-hero-wrap,
+[data-theme='dark'] .praman-hero-wrap div[style],
+[data-theme='dark'] .praman-carousel div[style] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Preserve intentional dark code blocks (#1e293b backgrounds) */
+[data-theme='dark'] .praman-code-block {
+  background: #0f1e3a !important;
+  border-color: var(--praman-border) !important;
+}
+
+[data-theme='dark'] .praman-code-block pre,
+[data-theme='dark'] .praman-code-block code {
+  background: transparent !important;
+  color: #e2e8f0 !important;
+}
+
+/* Code syntax coloring inside dark code blocks */
+[data-theme='dark'] .praman-code-block .kw { color: #c4b5fd !important; }
+[data-theme='dark'] .praman-code-block .str { color: #86efac !important; }
+[data-theme='dark'] .praman-code-block .cmt { color: #94a3b8 !important; }
+[data-theme='dark'] .praman-code-block .fn { color: #93c5fd !important; }
+
+/* Table headers & rows */
+[data-theme='dark'] main th[style] {
+  background-color: var(--praman-surface-alt) !important;
   border-color: var(--praman-border) !important;
   color: var(--praman-ink) !important;
+}
+
+[data-theme='dark'] main td[style] {
+  color: var(--praman-ink-secondary) !important;
+  border-color: var(--praman-border) !important;
+}
+
+[data-theme='dark'] main tr[style] {
+  background-color: var(--praman-surface-alt) !important;
+}
+
+[data-theme='dark'] main table {
+  border-color: var(--praman-border) !important;
+}
+
+[data-theme='dark'] main td {
+  border-color: var(--praman-border) !important;
+}
+
+/* Inline code pills — remap light grays to dark palette */
+[data-theme='dark'] main code[style] {
+  background: rgba(74, 169, 213, 0.12) !important;
+  color: var(--ifm-color-primary-light) !important;
+}
+
+/* HR and borders */
+[data-theme='dark'] main hr {
+  border-color: var(--praman-border) !important;
+}
+
+/* ── Light-mode consistency ───────────────────────────────── */
+/* Home page non-hero sections also need variable-based colors */
+
+/* Sections on the home page below the hero carousel */
+main:has(.praman-hero-section) .praman-section-title {
+  color: var(--praman-ink) !important;
+}
+
+main:has(.praman-hero-section) .praman-section-label {
+  color: var(--ifm-color-primary) !important;
+}
+
+/* Ensure architecture page inline styles use tokens in light mode too */
+main h1[style], main h2[style], main h3[style] {
+  color: var(--praman-ink) !important;
+}
+
+main p[style], main li[style] {
+  color: var(--praman-ink-secondary) !important;
+}
+
+main div[style] {
+  /* Don't override all divs in light mode — only dark mode needs this */
+}
+
+/* Feature parity table on /features page */
+.praman-parity-table tbody tr:not(.praman-parity-section-row) td:first-child {
+  color: var(--praman-ink) !important;
+}
+
+/* Persona cards */
+main div[style*="border-top"] {
+  border-color: var(--ifm-color-primary) !important;
 }
 
 /* ── Dark mode: unified page background ─────────────────────── */

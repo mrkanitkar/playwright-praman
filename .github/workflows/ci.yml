@@ -92,7 +92,7 @@ jobs:
     needs: [quality, build]
     strategy:
       matrix:
-        playwright-version: ['1.50.0', '1.58.2']
+        playwright-version: ['1.57.0', '1.58.2']
     env:
       SAP_CLOUD_BASE_URL: ${{ secrets.SAP_CLOUD_BASE_URL }}
       SAP_CLOUD_USERNAME: ${{ secrets.SAP_CLOUD_USERNAME }}

@@ -582,7 +582,7 @@ npx knip --strict
   "files": ["dist", "LICENSE"],         // BP-NODE: only publish dist
   "exports": { /* sub-path exports */ },
   "peerDependencies": {
-    "@playwright/test": ">=1.50.0 <2.0.0"
+    "@playwright/test": ">=1.57.0 <2.0.0"
   }
 }
 ```
