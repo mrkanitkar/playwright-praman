@@ -282,6 +282,20 @@ describe('dialog module', () => {
 
       await expect(dismissDialog(asPage(page))).rejects.toThrow(ControlError);
     });
+
+    it('filters by controlType when specified', async () => {
+      const page = createMockPage();
+      page.evaluate
+        .mockResolvedValueOnce([MOCK_DIALOG, MOCK_DIALOG_2]) // getOpenDialogs
+        .mockResolvedValueOnce(true); // close
+      page.waitForFunction.mockResolvedValue(undefined);
+
+      await dismissDialog(asPage(page), { controlType: 'sap.m.SelectDialog' });
+
+      // Close script should target dlg2 (filtered by controlType)
+      const closeScript = (page.evaluate.mock.calls[1] as unknown[])[0] as string;
+      expect(closeScript).toContain('dlg2');
+    });
   });
 
   describe('confirmDialog', () => {
@@ -396,6 +410,24 @@ describe('dialog module', () => {
       // The buttons script should target the topmost dialog (dlg2)
       const buttonsScript = (page.evaluate.mock.calls[1] as unknown[])[0] as string;
       expect(buttonsScript).toContain('dlg2');
+    });
+
+    it('returns empty array when no dialogId and no open dialogs', async () => {
+      const page = createMockPage();
+      page.evaluate.mockResolvedValueOnce([]); // getOpenDialogs returns empty
+
+      const result = await getDialogButtons(asPage(page));
+
+      expect(result).toEqual([]);
+      // Should only call evaluate once (getOpenDialogs), not a second time for buttons
+      expect(page.evaluate).toHaveBeenCalledTimes(1);
+    });
+
+    it('throws ControlError when page.evaluate fails reading buttons', async () => {
+      const page = createMockPage();
+      page.evaluate.mockRejectedValue(new Error('Evaluate failed'));
+
+      await expect(getDialogButtons(asPage(page), 'dlg1')).rejects.toThrow(ControlError);
     });
   });
 

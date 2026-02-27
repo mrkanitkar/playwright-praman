@@ -113,6 +113,36 @@ describe('retry', () => {
     expect(fn).toHaveBeenCalledTimes(2);
   });
 
+  it('wraps non-Error thrown values into Error instances', async () => {
+    // Covers the `!(error instanceof Error)` branch at line 121: `new Error(String(error))`
+    const fn = vi.fn<() => Promise<string>>().mockImplementation(() => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error, no-throw-literal -- testing non-Error throw handling
+      throw 'string-rejection';
+    });
+
+    await expect(retry(fn, { maxRetries: 0, baseDelay: 1 })).rejects.toThrow('string-rejection');
+
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('wraps non-Error thrown values and still retries', async () => {
+    // Verifies that non-Error values are properly wrapped and retrying continues
+    let callCount = 0;
+    const fn = vi.fn<() => Promise<string>>().mockImplementation(async () => {
+      callCount++;
+      if (callCount < 3) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error, no-throw-literal -- testing non-Error throw handling
+        throw 42;
+      }
+      return Promise.resolve('ok');
+    });
+
+    const result = await retry(fn, { maxRetries: 3, baseDelay: 1, maxDelay: 10, jitter: false });
+
+    expect(result).toBe('ok');
+    expect(fn).toHaveBeenCalledTimes(3);
+  });
+
   it('skips retry entirely when shouldRetry returns false on first error', async () => {
     const fn = vi.fn<() => Promise<string>>().mockRejectedValue(new Error('non-retryable'));
 

@@ -167,6 +167,49 @@ describe('injectBridge', () => {
     }
   });
 
+  it('throws BridgeError without cause when UI5 timeout throws a non-Error value', async () => {
+    // Covers the `!(error instanceof Error)` branch in the first catch block (line 147)
+    const waitForFunctionFn = vi.fn().mockRejectedValue('string-error');
+    const page = {
+      waitForFunction: waitForFunctionFn,
+      evaluate: vi.fn().mockResolvedValue(undefined),
+    } as unknown as Page;
+
+    try {
+      await injectBridge(page);
+      expect.fail('Expected injectBridge to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      const bridgeError = error as BridgeError;
+      expect(bridgeError.code).toBe('ERR_BRIDGE_TIMEOUT');
+      // Non-Error values should NOT set a cause
+      expect(bridgeError.cause).toBeUndefined();
+    }
+  });
+
+  it('throws BridgeError without cause when bridge readiness throws a non-Error value', async () => {
+    // Covers the `!(error instanceof Error)` branch in the second catch block (line 169)
+    const waitForFunctionFn = vi
+      .fn()
+      .mockResolvedValueOnce(undefined) // UI5 detection succeeds
+      .mockRejectedValueOnce(42); // Bridge readiness fails with non-Error
+    const page = {
+      waitForFunction: waitForFunctionFn,
+      evaluate: vi.fn().mockResolvedValue(undefined),
+    } as unknown as Page;
+
+    try {
+      await injectBridge(page);
+      expect.fail('Expected injectBridge to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      const bridgeError = error as BridgeError;
+      expect(bridgeError.code).toBe('ERR_BRIDGE_INJECTION');
+      // Non-Error values should NOT set a cause
+      expect(bridgeError.cause).toBeUndefined();
+    }
+  });
+
   it('BridgeError includes actionable suggestions array', async () => {
     const timeoutError = new Error('Waiting for function: timeout 30000ms exceeded');
     const waitForFunctionFn = vi.fn().mockRejectedValue(timeoutError);
@@ -182,9 +225,7 @@ describe('injectBridge', () => {
       expect(error).toBeInstanceOf(BridgeError);
       const bridgeError = error as BridgeError;
       expect(bridgeError.suggestions).toEqual(
-        expect.arrayContaining([
-          expect.stringContaining('Playwright native methods'),
-        ]),
+        expect.arrayContaining([expect.stringContaining('Playwright native methods')]),
       );
     }
   });
@@ -297,6 +338,26 @@ describe('waitForBridgeReady', () => {
       expect(error).toBeInstanceOf(BridgeError);
       expect((error as BridgeError).cause).toBeInstanceOf(Error);
       expect(((error as BridgeError).cause as Error).message).toBe(timeoutError.message);
+    }
+  });
+
+  it('throws BridgeError without cause when waitForFunction throws a non-Error value', async () => {
+    // Covers the `!(error instanceof Error)` branch in waitForBridgeReady (line 246)
+    const waitForFunctionFn = vi.fn().mockRejectedValue('non-error-rejection');
+    const page = {
+      evaluate: vi.fn(),
+      waitForFunction: waitForFunctionFn,
+    } as unknown as Page;
+
+    try {
+      await waitForBridgeReady(page);
+      expect.fail('Expected waitForBridgeReady to throw');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(BridgeError);
+      const bridgeError = error as BridgeError;
+      expect(bridgeError.code).toBe('ERR_BRIDGE_NOT_READY');
+      // Non-Error values should NOT set a cause
+      expect(bridgeError.cause).toBeUndefined();
     }
   });
 });
