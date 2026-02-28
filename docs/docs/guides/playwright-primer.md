@@ -1,5 +1,5 @@
 ---
-sidebar_position: 18
+sidebar_position: 5
 title: 'Playwright Primer for SAP Testers'
 ---
 

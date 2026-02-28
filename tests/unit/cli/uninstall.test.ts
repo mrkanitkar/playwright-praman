@@ -35,15 +35,27 @@ vi.mock('node:fs', () => ({
 const mockUnlink = vi.fn().mockResolvedValue(undefined);
 const mockReaddir = vi.fn().mockResolvedValue([]);
 const mockRmdir = vi.fn().mockResolvedValue(undefined);
+const mockRm = vi.fn().mockResolvedValue(undefined);
 vi.mock('node:fs/promises', () => ({
   unlink: mockUnlink,
   readdir: mockReaddir,
   rmdir: mockRmdir,
+  rm: mockRm,
 }));
 
 const mockExecSync = vi.fn();
 vi.mock('node:child_process', () => ({
   execSync: mockExecSync,
+}));
+
+/** Mock for readline question — controls interactive prompt response. */
+const mockQuestion = vi.fn();
+const mockClose = vi.fn();
+vi.mock('node:readline', () => ({
+  createInterface: vi.fn(() => ({
+    question: mockQuestion,
+    close: mockClose,
+  })),
 }));
 
 vi.mock('../../../src/cli/logger.js', () => ({
@@ -63,6 +75,13 @@ const { parseUninstallArgs, getScaffoldedFiles, runUninstall } =
 
 /** Safe non-tmp test path to avoid sonarjs/publicly-writable-directories. */
 const TEST_DIR = join('/home', 'testuser', 'project');
+
+/** Simulates user typing 'y' or 'n' at the interactive prompt. */
+function mockPromptAnswer(answer: string): void {
+  mockQuestion.mockImplementation((_msg: string, callback: (answer: string) => void) => {
+    callback(answer);
+  });
+}
 
 // ── Tests ───────────────────────────────────────────────────────────────────
 
@@ -156,14 +175,15 @@ describe('cli/uninstall', () => {
     it('returns entries only for files that exist on disk', () => {
       mockExistsSync.mockImplementation(
         (p: string) =>
-          p === join(TEST_DIR, 'playwright.config.ts') || p === join(TEST_DIR, 'AGENTS.md'),
+          p === join(TEST_DIR, 'playwright.config.ts') ||
+          p === join(TEST_DIR, '.github/copilot-instructions.md'),
       );
 
       const files = getScaffoldedFiles(TEST_DIR, baseOptions);
 
       expect(files).toHaveLength(2);
       expect(files.map((f) => f.relativePath)).toContain('playwright.config.ts');
-      expect(files.map((f) => f.relativePath)).toContain('AGENTS.md');
+      expect(files.map((f) => f.relativePath)).toContain('.github/copilot-instructions.md');
     });
 
     it('returns empty array when no scaffolded files exist', () => {
@@ -219,7 +239,24 @@ describe('cli/uninstall', () => {
       expect(categories.has('ide')).toBe(true);
       expect(categories.has('skill')).toBe(true);
       expect(categories.has('seed')).toBe(true);
-      expect(categories.has('vocabulary')).toBe(true);
+    });
+
+    it('includes auth.setup.ts in seed category', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const paths = files.map((f) => f.relativePath);
+
+      expect(paths).toContain('tests/auth.setup.ts');
+    });
+
+    it('includes .gitignore in config category', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const paths = files.map((f) => f.relativePath);
+
+      expect(paths).toContain('.gitignore');
     });
   });
 
@@ -241,11 +278,13 @@ describe('cli/uninstall', () => {
       expect(mockUnlink).not.toHaveBeenCalled();
     });
 
-    it('displays grouped manifest in dry-run mode', async () => {
+    it('displays grouped manifest and prompts when no --confirm', async () => {
       mockExistsSync.mockImplementation(
         (p: string) =>
-          p === join(TEST_DIR, 'playwright.config.ts') || p === join(TEST_DIR, 'AGENTS.md'),
+          p === join(TEST_DIR, 'playwright.config.ts') ||
+          p === join(TEST_DIR, '.github/copilot-instructions.md'),
       );
+      mockPromptAnswer('n');
 
       await runUninstall({
         targetDir: TEST_DIR,
@@ -257,10 +296,12 @@ describe('cli/uninstall', () => {
 
       expect(logSection).toHaveBeenCalled();
       expect(logStep).toHaveBeenCalled();
+      expect(mockQuestion).toHaveBeenCalled();
     });
 
-    it('does not delete files in dry-run mode', async () => {
+    it('does not delete files when user declines prompt', async () => {
       mockExistsSync.mockReturnValue(true);
+      mockPromptAnswer('n');
 
       await runUninstall({
         targetDir: TEST_DIR,
@@ -271,10 +312,14 @@ describe('cli/uninstall', () => {
       });
 
       expect(mockUnlink).not.toHaveBeenCalled();
+      expect(logWarn).toHaveBeenCalledWith('Aborted. No files were removed.');
     });
 
-    it('shows dry-run message with --confirm suggestion', async () => {
-      mockExistsSync.mockReturnValue(true);
+    it('deletes files when user approves prompt', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
+      );
+      mockPromptAnswer('y');
 
       await runUninstall({
         targetDir: TEST_DIR,
@@ -284,10 +329,10 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
-      expect(logWarn).toHaveBeenCalledWith(expect.stringContaining('Run with --confirm'));
+      expect(mockUnlink).toHaveBeenCalledWith(join(TEST_DIR, 'playwright.config.ts'));
     });
 
-    it('deletes files when confirm is true', async () => {
+    it('skips prompt and deletes files when --confirm is set', async () => {
       mockExistsSync.mockImplementation(
         (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
@@ -300,13 +345,15 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
+      expect(mockQuestion).not.toHaveBeenCalled();
       expect(mockUnlink).toHaveBeenCalledWith(join(TEST_DIR, 'playwright.config.ts'));
     });
 
     it('logs success with count after confirmed removal', async () => {
       mockExistsSync.mockImplementation(
         (p: string) =>
-          p === join(TEST_DIR, 'playwright.config.ts') || p === join(TEST_DIR, 'AGENTS.md'),
+          p === join(TEST_DIR, 'playwright.config.ts') ||
+          p === join(TEST_DIR, '.github/copilot-instructions.md'),
       );
 
       await runUninstall({
@@ -357,7 +404,9 @@ describe('cli/uninstall', () => {
     });
 
     it('does not remove targetDir itself even if empty', async () => {
-      mockExistsSync.mockImplementation((p: string) => p === join(TEST_DIR, 'AGENTS.md'));
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
+      );
       mockReaddir.mockResolvedValue([]);
 
       await runUninstall({
@@ -368,7 +417,7 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
-      // AGENTS.md is in targetDir root, dirname is targetDir — should NOT be rmdir'd
+      // playwright.config.ts is in targetDir root, dirname is targetDir — should NOT be rmdir'd
       expect(mockRmdir).not.toHaveBeenCalledWith(TEST_DIR);
     });
 
@@ -412,7 +461,7 @@ describe('cli/uninstall', () => {
       );
     });
 
-    it('does not call execSync when removeBrowsers is false', async () => {
+    it('does not call browser uninstall when removeBrowsers is false', async () => {
       mockExistsSync.mockImplementation(
         (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
@@ -425,7 +474,50 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
-      expect(mockExecSync).not.toHaveBeenCalled();
+      expect(mockExecSync).not.toHaveBeenCalledWith(
+        'npx playwright uninstall --all',
+        expect.anything(),
+      );
+    });
+
+    it('runs npm uninstall playwright-praman after file removal', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
+      );
+
+      await runUninstall({
+        targetDir: TEST_DIR,
+        confirm: true,
+        keepConfig: false,
+        keepAgents: false,
+        removeBrowsers: false,
+      });
+
+      expect(mockExecSync).toHaveBeenCalledWith(
+        'npm uninstall playwright-praman',
+        expect.objectContaining({ cwd: TEST_DIR }),
+      );
+    });
+
+    it('handles npm uninstall failure gracefully', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
+      );
+      mockExecSync.mockImplementation(() => {
+        throw new Error('uninstall failed');
+      });
+
+      await runUninstall({
+        targetDir: TEST_DIR,
+        confirm: true,
+        keepConfig: false,
+        keepAgents: false,
+        removeBrowsers: false,
+      });
+
+      expect(logWarn).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to uninstall playwright-praman'),
+      );
     });
   });
 });

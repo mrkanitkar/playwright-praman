@@ -86,15 +86,6 @@ describe('cli/scaffolder', () => {
       expect(mkdirCalls).toContain(join(TEST_DIR, 'tests'));
     });
 
-    it('creates tests/e2e/ subdirectory', async () => {
-      const options: ScaffoldOptions = { targetDir: TEST_DIR };
-
-      await scaffoldProject(options);
-
-      const mkdirCalls = mockFs.mocks.mkdir.mock.calls.map((call: unknown[]) => String(call[0]));
-      expect(mkdirCalls).toContain(join(TEST_DIR, 'tests', 'e2e'));
-    });
-
     it('creates .auth/ subdirectory', async () => {
       const options: ScaffoldOptions = { targetDir: TEST_DIR };
 
@@ -108,14 +99,6 @@ describe('cli/scaffolder', () => {
   // ── scaffoldProject — template files ──────────────────────────────────────
 
   describe('scaffoldProject — writes expected template files', () => {
-    it('writes playwright.config.ts', async () => {
-      const options: ScaffoldOptions = { targetDir: TEST_DIR };
-
-      await scaffoldProject(options);
-
-      expect(mockFs.written.has(join(TEST_DIR, 'playwright.config.ts'))).toBe(true);
-    });
-
     it('writes praman.config.ts', async () => {
       const options: ScaffoldOptions = { targetDir: TEST_DIR };
 
@@ -132,13 +115,12 @@ describe('cli/scaffolder', () => {
       expect(mockFs.written.has(join(TEST_DIR, 'tsconfig.json'))).toBe(true);
     });
 
-    it('playwright.config.ts imports from playwright-praman', async () => {
+    it('writes .gitignore', async () => {
       const options: ScaffoldOptions = { targetDir: TEST_DIR };
 
       await scaffoldProject(options);
 
-      const content = mockFs.written.get(join(TEST_DIR, 'playwright.config.ts'));
-      expect(content).toContain('playwright-praman');
+      expect(mockFs.written.has(join(TEST_DIR, '.gitignore'))).toBe(true);
     });
 
     it('returns all created file paths in the result', async () => {
@@ -148,9 +130,9 @@ describe('cli/scaffolder', () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.filesCreated).toContain(join(TEST_DIR, 'playwright.config.ts'));
         expect(result.filesCreated).toContain(join(TEST_DIR, 'praman.config.ts'));
         expect(result.filesCreated).toContain(join(TEST_DIR, 'tsconfig.json'));
+        expect(result.filesCreated).toContain(join(TEST_DIR, '.gitignore'));
       }
     });
   });
@@ -224,9 +206,9 @@ describe('cli/scaffolder', () => {
 
       await scaffoldProject(options);
 
-      expect(mockFs.written.has(join(EXISTING_DIR, 'playwright.config.ts'))).toBe(true);
       expect(mockFs.written.has(join(EXISTING_DIR, 'praman.config.ts'))).toBe(true);
       expect(mockFs.written.has(join(EXISTING_DIR, 'tsconfig.json'))).toBe(true);
+      expect(mockFs.written.has(join(EXISTING_DIR, '.gitignore'))).toBe(true);
     });
   });
 
@@ -241,7 +223,7 @@ describe('cli/scaffolder', () => {
       expect(result.success).toBe(true);
       // basic template should still produce the standard files
       if (result.success) {
-        expect(result.filesCreated).toContain(join(TEST_DIR, 'playwright.config.ts'));
+        expect(result.filesCreated).toContain(join(TEST_DIR, 'praman.config.ts'));
       }
     });
 

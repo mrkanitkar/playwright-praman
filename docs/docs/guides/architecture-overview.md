@@ -1,76 +1,89 @@
 ---
-sidebar_position: 21
+sidebar_position: 46
 title: 'Architecture Overview'
 ---
 
 # Architecture Overview
 
-Praman v1.0 is a ground-up rebuild of the SAP UI5 test automation plugin for Playwright. It ships as a single npm package (`playwright-praman`) with sub-path exports, organized into a strict 5-layer architecture.
+Praman v1.0 ships as a single npm package (`playwright-praman`) with sub-path exports, organized into a strict 5-layer architecture where lower layers never import from higher layers.
 
 ## 5-Layer Architecture
 
 ```
-+---------------------------------------------------------------------+
-|                     Test Author / AI Agent                           |
-|  import { test, expect } from 'playwright-praman';                  |
-|  import { procurement } from 'playwright-praman/intents';           |
-+-----------------------------------+---------------------------------+
-                                    |
-+-----------------------------------v---------------------------------+
-|  Layer 5: AI & Intent API                                           |
-|  Sub-path exports:                                                  |
-|  playwright-praman/ai, /intents, /vocabulary, /fe, /reporters       |
-+---------------------------------------------------------------------+
-|  Layer 4: Fixtures + Auth + Navigation                              |
-|  core-fixtures | auth-fixtures | nav-fixtures | stability-fixtures  |
-|  UI5Handler (16 methods) | Auth Handler (6 strategies)              |
-|  Shell Handler | Footer Handler | WorkZone module                   |
-+---------------------------------------------------------------------+
-|  Layer 3: Control Proxy + UI5Object                                 |
-|  control-proxy.ts (unified proxy handler)                           |
-|  ui5-object.ts | UI5ObjectCache (TTL + LRU)                        |
-|  discovery.ts (3-tier: cache -> ID -> RecordReplay)                 |
-+---------------------------------------------------------------------+
-|  Layer 2: Bridge + Browser Scripts                                  |
-|  injection.ts (lazy bridge injection)                               |
-|  browser-scripts/ (inject-ui5, find-control, execute-method, etc.)  |
-|  Interaction Strategies: UI5Native, DomFirst, Opa5                  |
-+---------------------------------------------------------------------+
-|  Layer 1: Core Infrastructure                                       |
-|  Config (Zod) | Errors (13 subclasses) | Logger (pino)              |
-|  Telemetry (OTel) | Types (199 typed interfaces) | Compat (PW ver) |
-+---------------------------------------------------------------------+
-|  Layer 0: Playwright Test Runner                                    |
-|  @playwright/test (page, browser, context, expect)                  |
-+---------------------------------------------------------------------+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Test Author / AI Agent                                                 │
+│  import { test, expect } from 'playwright-praman'                      │
+│  import { procurement } from 'playwright-praman/intents'               │
+└──────────────────────────────────┬──────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────┐
+│  Layer 5 — Public API (6 sub-path exports)                              │
+│                                                                         │
+│  playwright-praman  /ai  /intents  /vocabulary  /fe  /reporters         │
+└──────────────────────────────────┬──────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────┐
+│  Layer 4 — Fixtures + Modules                                           │
+│                                                                         │
+│  Fixtures  core · auth · nav · stability · ai · fe · intent · flp      │
+│            Merged via mergeTests() into a single test object            │
+│  Modules   table · dialog · date · navigation · odata · workzone        │
+│  Auth      cloud-saml · office365 · onprem · api-key · cert · tenant   │
+└──────────────────────────────────┬──────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────┐
+│  Layer 3 — Control Proxy                                                │
+│                                                                         │
+│  control-proxy.ts  ·  discovery.ts  ·  ui5-object.ts  ·  cache.ts      │
+│  3-tier discovery: object cache → stable ID → type + property search   │
+└──────────────────────────────────┬──────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────┐
+│  Layer 2 — Bridge                                                       │
+│                                                                         │
+│  injection.ts  (lazy bridge bootstrap into browser context)             │
+│  browser-scripts/  inject-ui5 · find-control · execute-method · ...    │
+│  Interaction strategies:  UI5Native  ·  DomFirst  ·  OPA5              │
+└──────────────────────────────────┬──────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────┐
+│  Layer 1 — Core Infrastructure                                          │
+│                                                                         │
+│  config (Zod)  ·  errors (13 subclasses)  ·  logging (pino)            │
+│  telemetry (OTel)  ·  types (199 interfaces)  ·  utils  ·  compat      │
+└──────────────────────────────────┬──────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────┐
+│  @playwright/test  (external dependency)                                │
+│  page  ·  browser  ·  context  ·  expect                               │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Layer Dependency Rules
 
 The architecture enforces a strict **downward-only dependency rule**:
 
-- Lower layers NEVER import from higher layers.
 - Layer 1 (Core) has zero internal dependencies beyond Node.js builtins.
 - Layer 2 (Bridge) imports only from Layer 1.
 - Layer 3 (Proxy) imports from Layers 1 and 2.
-- Layer 4 (Fixtures) imports from Layers 1, 2, and 3.
-- Layer 5 (AI/Intents) imports from Layers 1-4.
+- Layer 4 (Fixtures + Modules) imports from Layers 1, 2, and 3.
+- Layer 5 (Public API) re-exports from Layers 1–4; no higher layer imports from it.
 
 This is enforced at compile time via TypeScript path aliases (`#core/*`, `#bridge/*`, `#proxy/*`, `#fixtures/*`) and ESLint import rules.
 
-:::info[Internal Source Code]
-The path aliases below (`#core/*`, `#bridge/*`, `#proxy/*`) are internal to Praman's source code and are not available to end users. They enforce layer boundaries during development.
+:::info Internal path aliases
+The aliases below are internal to Praman's source code and are not available to package consumers. They enforce layer boundaries during development.
 :::
 
 ```typescript
-// Allowed: Layer 3 imports from Layer 1
+// Allowed: Layer 3 importing from Layer 1
 import { ErrorCode } from '#core/errors/codes.js';
 
-// Allowed: Layer 3 imports from Layer 2
+// Allowed: Layer 3 importing from Layer 2
 import { ensureBridgeInjected } from '#bridge/injection.js';
 
-// FORBIDDEN: Layer 1 importing from Layer 3
-// import { ControlProxy } from '#proxy/control-proxy.js'; // compile error
+// FORBIDDEN: Layer 1 importing from Layer 3 — compile error
+// import { ControlProxy } from '#proxy/control-proxy.js';
 ```
 
 ## Sub-Path Exports
@@ -103,7 +116,7 @@ Each export provides both ESM and CJS outputs:
 
 All exports are validated by `@arethetypeswrong/cli` (attw) in CI.
 
-## Design Decisions Summary (D1-D29)
+## Design Decisions Summary (D1–D29)
 
 The architecture is guided by 29 documented design decisions:
 
@@ -111,7 +124,7 @@ The architecture is guided by 29 documented design decisions:
 | --- | ------------------------------------------------------------------------ | ------------- |
 | D1  | Single package with sub-path exports (not monorepo)                      | Packaging     |
 | D2  | Internal fixture composition via `extend()` chain                        | Fixtures      |
-| D3  | ~~Version-negotiated bridge adapters~~ (REMOVED Phase 3)                 | Bridge        |
+| D3  | ~~Version-negotiated bridge adapters~~ (removed — superseded by D4)      | Bridge        |
 | D4  | Hybrid typed proxy: 199 typed interfaces + dynamic fallback              | Proxy         |
 | D5  | 4-layer observability: Reporter + pino + OTel + AI telemetry             | Observability |
 | D6  | Zod validation at external boundaries only                               | Validation    |
@@ -141,39 +154,49 @@ The architecture is guided by 29 documented design decisions:
 
 ## Module Decomposition Rationale
 
-The predecessor (dhikraft v2.5.0) suffered from monolithic files:
+The predecessor plugin (v2.5.0) suffered from monolithic files:
 
 | File                   | LOC   | Problem                                  |
 | ---------------------- | ----- | ---------------------------------------- |
 | `ui5-handler.ts`       | 2,318 | God object handling all UI5 operations   |
-| `dhikraft-fixtures.ts` | 2,263 | All 32 fixtures in one file              |
+| `plugin-fixtures.ts`   | 2,263 | All 32 fixtures in one file              |
 | `ui5-control-proxy.ts` | 1,829 | Double-proxy with redundant interception |
 
 Praman v1.0 decomposes these into focused modules following SRP (Single Responsibility Principle):
 
 **Fixtures** are split by domain:
 
-- `core-fixtures.ts` -- UI5 control operations
-- `auth-fixtures.ts` -- Authentication strategies
-- `nav-fixtures.ts` -- Navigation and routing
-- `stability-fixtures.ts` -- Wait conditions and stability checks
-- `ai-fixtures.ts` -- AI agent fixtures
-- `fe-fixtures.ts` -- Fiori Elements fixtures
-- `intent-fixtures.ts` -- Intent API fixtures
+- `core-fixtures.ts` — UI5 control operations
+- `auth-fixtures.ts` — Authentication strategies
+- `nav-fixtures.ts` — Navigation and routing
+- `stability-fixtures.ts` — Wait conditions and stability checks
+- `ai-fixtures.ts` — AI agent fixtures
+- `fe-fixtures.ts` — Fiori Elements fixtures
+- `intent-fixtures.ts` — Intent API fixtures
+- `shell-footer-fixtures.ts`, `flp-locks-fixtures.ts`, `flp-settings-fixtures.ts` — FLP-specific fixtures
+
+**Modules** handle domain operations independently of fixtures:
+
+- `table.ts` + `table-operations.ts` + `table-filter-sort.ts` — Grid and SmartTable
+- `dialog.ts` — Dialog detection and interaction
+- `date.ts` — DatePicker and range fields
+- `navigation.ts` — UI5 routing and hash navigation
+- `odata.ts` + `odata-http.ts` — OData model access and CRUD
+- `workzone.ts` — BTP WorkZone helpers
 
 **UI5Handler** was decomposed from a 2,318 LOC god object into:
 
-- `ui5-handler.ts` (588 LOC) -- 16 core methods
-- `shell-handler.ts` (102 LOC) -- FLP shell operations
-- `footer-handler.ts` (119 LOC) -- Footer bar operations
-- Navigation module (201 LOC) -- Route and hash navigation
+- `ui5-handler.ts` (588 LOC) — 16 core methods
+- `shell-handler.ts` (102 LOC) — FLP shell operations
+- `footer-handler.ts` (119 LOC) — Footer bar operations
+- `navigation.ts` (201 LOC) — Route and hash navigation
 
 **Control proxy** was simplified from a double-proxy pattern (1,829 LOC) into:
 
-- `control-proxy.ts` (653 LOC) -- Unified single proxy handler
-- `ui5-object.ts` (383 LOC) -- Non-control object proxy
-- `discovery.ts` (111 LOC) -- 3-tier control discovery
-- `cache.ts` (104 LOC) -- Proxy cache with RegExp keys
+- `control-proxy.ts` (653 LOC) — Unified single proxy handler
+- `ui5-object.ts` (383 LOC) — Non-control object proxy
+- `discovery.ts` (111 LOC) — 3-tier control discovery
+- `cache.ts` (104 LOC) — Proxy cache with RegExp keys
 
 Every module targets &lt;= 300 LOC. Exceptions are documented with justification comments.
 
@@ -181,7 +204,7 @@ Every module targets &lt;= 300 LOC. Exceptions are documented with justification
 
 | Metric                   | Value                       |
 | ------------------------ | --------------------------- |
-| Source files             | 182                         |
+| Source files             | ~150                        |
 | Source LOC               | ~29,000                     |
 | Public functions         | 208                         |
 | Test files               | 109                         |

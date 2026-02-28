@@ -28,11 +28,22 @@
       "WebFetch(domain:latenode.com)",
       "WebFetch(domain:cookbook.openai.com)",
       "WebFetch(domain:simonwillison.net)",
-      "Bash(git reset HEAD -- plans/)"
+      "Bash(git reset HEAD -- plans/)",
+      "Bash(gh workflow run ci.yml --ref main)",
+      "Bash(gh workflow run docs.yml --ref main)",
+      "WebFetch(domain:help.sap.com)",
+      "WebFetch(domain:api.sap.com)",
+      "Bash(npm info formdata-node@6 version)",
+      "Bash(npm info @anthropic-ai/sdk@0.36.3 dependencies)",
+      "Bash(npm info node-domexception versions --json)",
+      "Bash(npm info node-domexception@2.0.2)",
+      "Bash(npm info @anthropic-ai/sdk versions --json)",
+      "Bash(npm info @anthropic-ai/sdk@0.78.0 dependencies)"
     ],
     "additionalDirectories": [
       "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",
-      "/Users/maheshwar/Documents/projects/mk1/dist"
+      "/Users/maheshwar/Documents/projects/mk1/dist",
+      "/Users/maheshwar/Documents/projects/mk1"
     ]
   },
   "model": "claude-opus-4-6",

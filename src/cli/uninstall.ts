@@ -20,9 +20,10 @@
 
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { readdir, rmdir, unlink } from 'node:fs/promises';
+import { readdir, rm, rmdir, unlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import process from 'node:process';
+import { createInterface } from 'node:readline';
 
 import { logSection, logStep, logSuccess, logWarn } from './logger.js';
 
@@ -62,35 +63,108 @@ export interface FileEntry {
   /** Path relative to the project root. */
   readonly relativePath: string;
   /** Category of the scaffolded file. */
-  readonly category: 'agent' | 'ide' | 'skill' | 'seed' | 'config' | 'vocabulary';
+  readonly category: 'agent' | 'ide' | 'skill' | 'seed' | 'config';
   /** Human-readable label for display. */
   readonly label: string;
 }
 
 /** Full manifest of scaffolded files that may be removed. */
 const SCAFFOLDED_MANIFEST: readonly FileEntry[] = [
-  // config
+  // config — created by scaffolder.ts
   { relativePath: 'playwright.config.ts', category: 'config', label: 'Playwright config' },
   { relativePath: 'praman.config.ts', category: 'config', label: 'Praman config' },
   { relativePath: 'tsconfig.json', category: 'config', label: 'TypeScript config' },
-  // agent
+
+  // agent — Claude Code
+  {
+    relativePath: '.claude/agents/praman-sap-planner.md',
+    category: 'agent',
+    label: 'Claude planner agent',
+  },
+  {
+    relativePath: '.claude/agents/praman-sap-generator.md',
+    category: 'agent',
+    label: 'Claude generator agent',
+  },
+  {
+    relativePath: '.claude/agents/praman-sap-healer.md',
+    category: 'agent',
+    label: 'Claude healer agent',
+  },
+  {
+    relativePath: '.claude/prompts/praman-sap-plan.md',
+    category: 'agent',
+    label: 'Claude plan prompt',
+  },
+  {
+    relativePath: '.claude/prompts/praman-sap-generate.md',
+    category: 'agent',
+    label: 'Claude generate prompt',
+  },
+  {
+    relativePath: '.claude/prompts/praman-sap-heal.md',
+    category: 'agent',
+    label: 'Claude heal prompt',
+  },
+  {
+    relativePath: '.claude/prompts/praman-sap-coverage.md',
+    category: 'agent',
+    label: 'Claude coverage prompt',
+  },
+
+  // agent — Copilot
+  {
+    relativePath: '.github/agents/praman-sap-planner.agent.md',
+    category: 'agent',
+    label: 'Copilot planner agent',
+  },
+  {
+    relativePath: '.github/agents/praman-sap-generator.agent.md',
+    category: 'agent',
+    label: 'Copilot generator agent',
+  },
+  {
+    relativePath: '.github/agents/praman-sap-healer.agent.md',
+    category: 'agent',
+    label: 'Copilot healer agent',
+  },
   {
     relativePath: '.github/copilot-instructions.md',
     category: 'agent',
     label: 'Copilot instructions',
   },
-  { relativePath: 'AGENTS.md', category: 'agent', label: 'OpenAI Agents config' },
-  { relativePath: 'CLAUDE.md', category: 'agent', label: 'Claude Code config' },
+
   // ide
+  { relativePath: '.vscode/settings.json', category: 'ide', label: 'VS Code settings' },
   { relativePath: '.vscode/extensions.json', category: 'ide', label: 'VS Code extensions' },
-  { relativePath: '.cursor/rules/', category: 'ide', label: 'Cursor rules' },
-  { relativePath: '.jules/setup.md', category: 'ide', label: 'Jules setup' },
-  // skill
-  { relativePath: '.github/skills/', category: 'skill', label: 'GitHub skills' },
+  { relativePath: '.vscode/praman.code-snippets', category: 'ide', label: 'VS Code snippets' },
+  { relativePath: '.cursor/rules/praman.mdc', category: 'ide', label: 'Cursor rules' },
+  { relativePath: '.jules/praman-setup.md', category: 'ide', label: 'Jules setup' },
+
+  // skill — entire directory handled via removeDirectory
+  {
+    relativePath: 'skills/playwright-praman-sap-testing/',
+    category: 'skill',
+    label: 'Praman skill files',
+  },
+
   // seed
-  { relativePath: 'tests/example.spec.ts', category: 'seed', label: 'Example test seed' },
-  // vocabulary
-  { relativePath: 'vocabulary/', category: 'vocabulary', label: 'Vocabulary JSON files' },
+  { relativePath: 'tests/seeds/sap-seed.spec.ts', category: 'seed', label: 'SAP seed file' },
+  { relativePath: 'tests/auth.setup.ts', category: 'seed', label: 'SAP auth setup' },
+
+  // examples
+  {
+    relativePath: 'tests/bom-e2e-praman-gold-standard.spec.ts',
+    category: 'seed',
+    label: 'Gold-standard example',
+  },
+  {
+    relativePath: 'specs/bom-create-complete.plan.md',
+    category: 'seed',
+    label: 'Example plan spec',
+  },
+  { relativePath: '.env.example', category: 'config', label: 'Environment template' },
+  { relativePath: '.gitignore', category: 'config', label: 'Git ignore rules' },
 ];
 
 /** Category display labels for grouped output. */
@@ -100,7 +174,6 @@ const CATEGORY_LABELS: Readonly<Record<FileEntry['category'], string>> = {
   ide: 'IDE Settings',
   skill: 'Skill Files',
   seed: 'Seed Tests',
-  vocabulary: 'Vocabulary',
 };
 
 /**
@@ -195,16 +268,21 @@ function displayManifest(files: readonly FileEntry[]): void {
   }
 }
 
-/** Removes files and cleans empty parent directories. Returns count of removed files. */
+/** Removes files/directories and cleans empty parent directories. Returns count removed. */
 async function removeFiles(files: readonly FileEntry[], targetDir: string): Promise<number> {
   const dirsToCheck = new Set<string>();
   let removed = 0;
 
   for (const file of files) {
+    const isDir = file.relativePath.endsWith('/');
     const fullPath = join(targetDir, file.relativePath);
     try {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from targetDir + known manifest paths
-      await unlink(fullPath);
+      if (isDir) {
+        await rm(fullPath, { recursive: true, force: true });
+      } else {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from targetDir + known manifest paths
+        await unlink(fullPath);
+      }
       removed++;
       dirsToCheck.add(dirname(fullPath));
     } catch {
@@ -216,28 +294,45 @@ async function removeFiles(files: readonly FileEntry[], targetDir: string): Prom
   return removed;
 }
 
-/** Removes empty directories bottom-up, stopping at targetDir. */
+/** Removes empty directories bottom-up, walking parent chain up to targetDir. */
 async function cleanEmptyDirs(dirs: ReadonlySet<string>, targetDir: string): Promise<void> {
+  const visited = new Set<string>();
   const sortedDirs = [...dirs].sort((a, b) => b.length - a.length);
-  for (const dir of sortedDirs) {
-    if (dir === targetDir || !dir.startsWith(targetDir)) {
-      continue;
-    }
-    try {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename -- path derived from targetDir + dirname of known manifest paths
-      const entries = await readdir(dir);
-      if (entries.length === 0) {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- empty directory inside targetDir
-        await rmdir(dir);
+
+  for (const startDir of sortedDirs) {
+    let dir = startDir;
+    while (dir !== targetDir && dir.startsWith(targetDir) && !visited.has(dir)) {
+      visited.add(dir);
+      try {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- path derived from targetDir + dirname of known manifest paths
+        const entries = await readdir(dir);
+        if (entries.length === 0) {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename -- empty directory inside targetDir
+          await rmdir(dir);
+          dir = dirname(dir);
+        } else {
+          break;
+        }
+      } catch {
+        break;
       }
-    } catch {
-      // Directory may already be removed or inaccessible — skip silently
     }
   }
 }
 
+/** Prompts the user for yes/no confirmation via stdin. */
+async function promptConfirm(message: string): Promise<boolean> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(`${message} (y/N) `, (answer) => {
+      rl.close();
+      resolve(answer.trim().toLowerCase() === 'y');
+    });
+  });
+}
+
 /** Attempts to uninstall Playwright browsers via npx. */
-function removeBrowsers(): void {
+function removeBrowsersCmd(): void {
   try {
     // eslint-disable-next-line sonarjs/no-os-command-from-path -- intentional: Playwright CLI browser removal via npx
     execSync('npx playwright uninstall --all', { stdio: 'inherit' });
@@ -247,13 +342,25 @@ function removeBrowsers(): void {
   }
 }
 
+/** Runs `npm uninstall playwright-praman` to remove the package. */
+function uninstallPackage(targetDir: string): void {
+  try {
+    // eslint-disable-next-line sonarjs/no-os-command-from-path -- intentional: npm uninstall via CLI
+    execSync('npm uninstall playwright-praman', { cwd: targetDir, stdio: 'inherit' });
+    logSuccess('playwright-praman package removed.');
+  } catch {
+    logWarn('Failed to uninstall playwright-praman package.');
+  }
+}
+
 /**
  * Executes the uninstall command, removing scaffolded files from the project.
  *
  * @remarks
- * In dry-run mode (default), lists what would be removed without deleting.
- * With `--confirm`, deletes files and cleans up empty parent directories.
+ * Lists what will be removed and prompts the user for confirmation.
+ * With `--confirm`, skips the interactive prompt.
  * With `--remove-browsers`, also runs `npx playwright uninstall --all`.
+ * Always runs `npm uninstall playwright-praman` after file removal.
  *
  * @param options - Uninstall configuration.
  *
@@ -278,18 +385,22 @@ export async function runUninstall(options: UninstallOptions): Promise<void> {
 
   displayManifest(files);
 
+  // Interactive confirmation unless --confirm flag is set
   if (!options.confirm) {
-    logWarn(
-      `Dry-run: ${String(files.length)} file(s) would be removed. Run with --confirm to remove these files.`,
-    );
-    return;
+    logWarn(`This will remove ${String(files.length)} file(s) and uninstall playwright-praman.`);
+    const approved = await promptConfirm('Proceed with removal?');
+    if (!approved) {
+      logWarn('Aborted. No files were removed.');
+      return;
+    }
   }
 
   const removed = await removeFiles(files, options.targetDir);
 
   if (options.removeBrowsers) {
-    removeBrowsers();
+    removeBrowsersCmd();
   }
 
+  uninstallPackage(options.targetDir);
   logSuccess(`Removed ${String(removed)} of ${String(files.length)} scaffolded file(s).`);
 }

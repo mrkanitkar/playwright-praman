@@ -18,6 +18,8 @@
  * @module types
  */
 
+import type { UI5ControlMap } from './controls.js';
+
 /**
  * UI5 control selector — the primary type for control discovery.
  *
@@ -63,7 +65,7 @@
  */
 export interface UI5Selector {
   /** UI5 fully qualified control type, e.g., `'sap.m.Button'`. */
-  readonly controlType?: string;
+  readonly controlType?: keyof UI5ControlMap | (string & {});
   /** Control ID or RegExp pattern for ID matching. */
   readonly id?: string | RegExp;
   /** Owning view name for scoped discovery. */

@@ -11,7 +11,7 @@
  * Complete SAP Authentication Setup for Praman.
  *
  * @remarks
- * Copy this file into your project as `tests/auth-setup.ts` and configure
+ * Copied into your project as `tests/auth.setup.ts` by `npx playwright-praman init`. Configure
  * it in `playwright.config.ts` as a setup project. This file handles:
  *
  * - SAP system login (OnPrem, BTP Cloud SAML, or Office 365)
@@ -23,12 +23,12 @@
  * @example
  * ```bash
  * # Required environment variables (set in .env.test or CI secrets):
- * SAP_BASE_URL=https://your-sap-system.example.com
- * SAP_USERNAME=TEST_USER
- * SAP_PASSWORD=SecurePassword123
- * SAP_CLIENT=100           # OnPrem only, optional
- * SAP_LANGUAGE=EN           # Optional, default EN
- * SAP_AUTH_STRATEGY=basic   # 'basic' | 'btp-saml' | 'office365'
+ * SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
+ * SAP_CLOUD_USERNAME=TEST_USER
+ * SAP_CLOUD_PASSWORD=SecurePassword123
+ * SAP_AUTH_STRATEGY=btp-saml   # 'basic' | 'btp-saml' | 'office365'
+ * SAP_CLIENT=100               # OnPrem only, optional
+ * SAP_LANGUAGE=EN               # Optional, default EN
  * ```
  */
 
@@ -46,7 +46,7 @@ import { test as setup } from '@playwright/test';
 // ---------------------------------------------------------------------------
 
 /** Path where the authenticated browser state (cookies/storage) is saved. */
-const AUTH_STATE_PATH = join(process.cwd(), '.auth', 'sap-session.json');
+const AUTH_STATE_PATH = join(process.cwd(), '.auth', 'sap-state.json');
 
 /**
  * Read a required environment variable or throw a clear error.
@@ -59,7 +59,7 @@ function requireEnv(name: string): string {
   if (value === undefined || value === '') {
     throw new Error(
       `Missing required environment variable: ${name}. ` +
-        'Set it in your .env.test file or CI secrets.',
+        'Set it in your .env file or CI secrets.',
     );
   }
   return value;
@@ -78,25 +78,20 @@ function requireEnv(name: string): string {
  *
  * export default defineConfig({
  *   projects: [
- *     // Auth setup — runs first, saves session to .auth/sap-session.json
+ *     // Auth setup — runs first, saves session to .auth/sap-state.json
  *     {
- *       name: 'auth',
- *       testMatch: '**\/auth-setup.ts',
- *       teardown: 'auth-teardown',  // optional
- *     },
- *     // Auth teardown — runs after all tests (optional)
- *     {
- *       name: 'auth-teardown',
- *       testMatch: '**\/auth-teardown.ts',
+ *       name: 'auth-setup',
+ *       testMatch: '**\/auth.setup.ts',
  *     },
  *     // Main test project — reuses saved session
  *     {
  *       name: 'chromium',
  *       use: {
  *         ...devices['Desktop Chrome'],
- *         storageState: '.auth/sap-session.json',
+ *         storageState: '.auth/sap-state.json',
  *       },
- *       dependencies: ['auth'],
+ *       dependencies: ['auth-setup'],
+ *       testIgnore: '**\/auth.setup.ts',
  *     },
  *   ],
  * });
@@ -104,10 +99,10 @@ function requireEnv(name: string): string {
  */
 setup('SAP authentication', async ({ page, context }) => {
   // ---- Read config from environment ----
-  const baseUrl = requireEnv('SAP_BASE_URL');
-  const username = requireEnv('SAP_USERNAME');
-  const password = requireEnv('SAP_PASSWORD');
-  const strategy = process.env['SAP_AUTH_STRATEGY'] ?? 'basic';
+  const baseUrl = requireEnv('SAP_CLOUD_BASE_URL');
+  const username = requireEnv('SAP_CLOUD_USERNAME');
+  const password = requireEnv('SAP_CLOUD_PASSWORD');
+  const strategy = process.env['SAP_AUTH_STRATEGY'] ?? 'btp-saml';
   const client = process.env['SAP_CLIENT'] ?? '100';
   const language = process.env['SAP_LANGUAGE'] ?? 'EN';
 
@@ -129,9 +124,7 @@ setup('SAP authentication', async ({ page, context }) => {
     await page.locator('#sap-password, input[name="sap-password"]').fill(password);
 
     // Submit the form
-    await page.locator(
-      '#LOGON_BUTTON, button[type="submit"], input[type="submit"]',
-    ).click();
+    await page.locator('#LOGON_BUTTON, button[type="submit"], input[type="submit"]').click();
 
     // Wait for the Fiori Launchpad shell header to appear (login complete)
     await page.waitForSelector('#shell-header, .sapUshellShellHead', {
@@ -144,10 +137,9 @@ setup('SAP authentication', async ({ page, context }) => {
     await page.goto(baseUrl);
 
     // IAS redirects to its own login page — wait for the form
-    await page.waitForSelector(
-      'input[name="j_username"], input[name="email"], #logOnFormEmail',
-      { timeout: 30_000 },
-    );
+    await page.waitForSelector('input[name="j_username"], input[name="email"], #logOnFormEmail', {
+      timeout: 30_000,
+    });
 
     // Fill IAS login form
     const emailField = page.locator(
@@ -161,12 +153,13 @@ setup('SAP authentication', async ({ page, context }) => {
     await passwordField.fill(password);
 
     // Click Log On
-    await page.locator(
-      'button[type="submit"], #logOnFormSubmit, input[type="submit"]',
-    ).click();
+    await page.locator('button[type="submit"], #logOnFormSubmit, input[type="submit"]').click();
 
     // Wait for redirect back to the app (SAML RelayState)
-    await page.waitForURL(`${baseUrl}/**`, { timeout: 60_000 });
+    // Use regex instead of glob — glob ** does not match hash fragments (#Shell-home)
+    await page.waitForURL(new RegExp(`^${baseUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`), {
+      timeout: 60_000,
+    });
 
     // Wait for the Fiori Launchpad shell header
     await page.waitForSelector('#shell-header, .sapUshellShellHead', {
@@ -194,9 +187,7 @@ setup('SAP authentication', async ({ page, context }) => {
 
     // Handle "Stay signed in?" prompt (if it appears)
     const staySignedIn = page.locator('#idSIButton9, input[type="submit"]');
-    const staySignedInVisible = await staySignedIn
-      .isVisible()
-      .catch(() => false);
+    const staySignedInVisible = await staySignedIn.isVisible().catch(() => false);
     if (staySignedInVisible) {
       await staySignedIn.click();
     }
@@ -207,8 +198,7 @@ setup('SAP authentication', async ({ page, context }) => {
     });
   } else {
     throw new Error(
-      `Unknown auth strategy: "${strategy}". ` +
-        'Supported: "basic", "btp-saml", "office365".',
+      `Unknown auth strategy: "${strategy}". ` + 'Supported: "basic", "btp-saml", "office365".',
     );
   }
 
@@ -226,7 +216,7 @@ setup('SAP authentication', async ({ page, context }) => {
 // teardown('SAP logout', async ({ page }) => {
 //   // Navigate to SAP ICF logoff endpoint to invalidate server session
 //   await page.goto(
-//     `${process.env['SAP_BASE_URL']}/sap/public/bc/icf/logoff`,
+//     `${process.env['SAP_CLOUD_BASE_URL']}/sap/public/bc/icf/logoff`,
 //   );
 //   // Clear browser cookies
 //   await page.context().clearCookies();

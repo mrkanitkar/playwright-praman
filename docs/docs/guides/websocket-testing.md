@@ -1,5 +1,5 @@
 ---
-sidebar_position: 53
+sidebar_position: 45
 title: 'WebSocket & Real-Time Testing'
 ---
 

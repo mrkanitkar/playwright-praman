@@ -1,5 +1,5 @@
 ---
-sidebar_position: 39
+sidebar_position: 28
 title: Visual Regression Testing
 ---
 

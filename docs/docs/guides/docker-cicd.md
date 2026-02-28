@@ -1,5 +1,5 @@
 ---
-sidebar_position: 27
+sidebar_position: 31
 title: 'Docker & CI/CD'
 ---
 
