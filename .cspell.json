@@ -75,7 +75,27 @@
     "apos",
 
     "llmstxt",
-    "llms"
+    "llms",
+
+    "floorplan", "floorplans", "Floorplans",
+    "embedder", "Embedder",
+    "tsyringe",
+    "JSESSIONID", "SESSIONID",
+    "myapp",
+    "eastus",
+    "STAD", "SWNC", "SAPWL", "STATREC",
+    "geolocation",
+    "EBICS",
+    "tcodes",
+    "PFCG",
+    "Sichern", "Enregistrer",
+    "xyznonexistent",
+    "MATNR", "BUKRS",
+    "framesent", "framereceived", "connectionfailed",
+
+    "langgraph", "langchain", "Pydantic", "upvote",
+    "recordreply", "mycompany", "roundtrips",
+    "ASRT", "IWFND", "MAINT"
   ],
   "ignorePaths": [
     "node_modules", "dist", "coverage", "*.lock",
