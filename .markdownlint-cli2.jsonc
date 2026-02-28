@@ -21,6 +21,9 @@
     "docs/user-integration/**",
     "node_modules/",
     "CODE_OF_CONDUCT.md",
-    "llms*.txt"
+    "llms*.txt",
+    "api-reports/**",
+    "docs/api/**",
+    "playwright-report/**"
   ]
 }
