@@ -39,7 +39,10 @@
       "Bash(npm info node-domexception@2.0.2)",
       "Bash(npm info @anthropic-ai/sdk versions --json)",
       "Bash(npm info @anthropic-ai/sdk@0.78.0 dependencies)",
-      "Bash(gh workflow run CI)"
+      "Bash(gh workflow run CI)",
+      "Bash(npx playwright-praman --version)",
+      "Bash(npx playwright-praman init --skip-install)",
+      "Bash(npx playwright-praman --help)"
     ],
     "additionalDirectories": [
       "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",

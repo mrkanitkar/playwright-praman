@@ -95,7 +95,7 @@
     }
   },
   "bin": {
-    "playwright-praman": "./dist/cli/index.js"
+    "playwright-praman": "./dist/cli/index.cjs"
   },
   "scripts": {
     "build": "tsup",
