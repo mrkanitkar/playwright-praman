@@ -25,7 +25,7 @@ import { createLogger } from '#core/logging/index.js';
 const log = createLogger('agentic');
 
 /** Maximum characters for the serialized page context in LLM prompts. */
-export const MAX_CONTEXT_CHARS = 50_000;
+const MAX_CONTEXT_CHARS = 50_000;
 
 /** Maximum number of controls to include in the page context. */
 export const MAX_CONTEXT_CONTROLS = 200;
