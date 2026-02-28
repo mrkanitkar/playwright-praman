@@ -377,7 +377,7 @@ Same test suite run across Chrome, Firefox, WebKit (Safari), Edge with different
 | `closingTasks[].runtime`      | SAP Backend (SM37) | Batch job execution time                                           |
 | **Tax & compliance**          |                    |                                                                    |
 | `taxCalculation.accuracy`     | Playwright         | Tax determination results vs expected                              |
-| `witholdingTax.status`        | Playwright         | WHT posting and reporting tests                                    |
+| `withholdingTax.status`       | Playwright         | WHT posting and reporting tests                                    |
 | `regulatoryReports`           | Config             | Country-specific reporting requirements                            |
 
 </details>
