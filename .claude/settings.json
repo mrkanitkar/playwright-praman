@@ -38,7 +38,8 @@
       "Bash(npm info node-domexception versions --json)",
       "Bash(npm info node-domexception@2.0.2)",
       "Bash(npm info @anthropic-ai/sdk versions --json)",
-      "Bash(npm info @anthropic-ai/sdk@0.78.0 dependencies)"
+      "Bash(npm info @anthropic-ai/sdk@0.78.0 dependencies)",
+      "Bash(gh workflow run CI)"
     ],
     "additionalDirectories": [
       "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",
