@@ -1,5 +1,5 @@
 ---
-sidebar_position: 41
+sidebar_position: 3
 title: Agent & IDE Setup
 ---
 
@@ -241,14 +241,14 @@ Use the coverage prompt to run the full pipeline:
 
 Praman publishes its documentation in the [llmstxt.org](https://llmstxt.org) standard. AI agents can fetch these files directly for context:
 
-| URL | Content | Use Case |
-| --- | --- | --- |
-| `/playwright-praman/llms.txt` | Link index with descriptions | Discovery — find the right doc |
-| `/playwright-praman/llms-full.txt` | All 63 docs in one file | Full context for general agents |
-| `/playwright-praman/llms-quickstart.txt` | Setup, fixtures, selectors, matchers | Onboarding and first test |
-| `/playwright-praman/llms-sap-testing.txt` | Auth, FLP, OData, FE, cookbook, examples | SAP test planning and generation |
-| `/playwright-praman/llms-migration.txt` | Playwright, wdi5, Tosca migration | Migration assistants |
-| `/playwright-praman/llms-architecture.txt` | Architecture, bridge, proxy, ADRs | Architecture decisions |
+| URL                                        | Content                                  | Use Case                         |
+| ------------------------------------------ | ---------------------------------------- | -------------------------------- |
+| `/playwright-praman/llms.txt`              | Link index with descriptions             | Discovery — find the right doc   |
+| `/playwright-praman/llms-full.txt`         | All 63 docs in one file                  | Full context for general agents  |
+| `/playwright-praman/llms-quickstart.txt`   | Setup, fixtures, selectors, matchers     | Onboarding and first test        |
+| `/playwright-praman/llms-sap-testing.txt`  | Auth, FLP, OData, FE, cookbook, examples | SAP test planning and generation |
+| `/playwright-praman/llms-migration.txt`    | Playwright, wdi5, Tosca migration        | Migration assistants             |
+| `/playwright-praman/llms-architecture.txt` | Architecture, bridge, proxy, ADRs        | Architecture decisions           |
 
 ### Pointing agents to llms.txt
 
@@ -258,6 +258,7 @@ Add to your agent instructions (CLAUDE.md, `.cursorrules`, copilot-instructions.
 ## Praman Documentation
 
 For Praman API and usage, fetch the appropriate llms.txt file:
+
 - General: https://mrkanitkar.github.io/playwright-praman/llms-full.txt
 - SAP testing: https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt
 - Quick start: https://mrkanitkar.github.io/playwright-praman/llms-quickstart.txt

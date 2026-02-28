@@ -1,11 +1,17 @@
 ---
-sidebar_position: 9
+sidebar_position: 11
 title: UI5 Control Interactions
 ---
 
 The `ui5` fixture provides high-level methods for interacting with UI5 controls. Each method
 discovers the control, waits for UI5 stability, and performs the action through the configured
 interaction strategy.
+
+:::tip Typed Control Returns
+When you use `controlType` in your selector, the returned control is typed to the specific interface
+(e.g., `UI5Button`, `UI5Input`). This gives you autocomplete for control-specific methods. See
+[Typed Control Returns](/docs/guides/typed-controls) for details.
+:::
 
 ## Interaction Methods
 

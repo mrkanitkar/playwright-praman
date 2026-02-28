@@ -147,6 +147,31 @@ describe('InteractiveControlType', () => {
   });
 });
 
+describe('Generic control<K>() overload type inference', () => {
+  it('narrows return type when controlType is a known literal', () => {
+    // Simulates: ui5.control({ controlType: 'sap.m.Button' }) → UI5Button
+    type Result = UI5ControlMap['sap.m.Button'];
+    expectTypeOf<Result>().toExtend<UI5Button>();
+    expectTypeOf<Result>().toExtend<UI5ControlBase>();
+  });
+
+  it('all map values extend UI5ControlBase', () => {
+    // Every key in the map produces a type extending UI5ControlBase
+    type AllValues = UI5ControlMap[keyof UI5ControlMap];
+    expectTypeOf<AllValues>().toExtend<UI5ControlBase>();
+  });
+
+  it('selector controlType accepts known literals and arbitrary strings', () => {
+    // Known literal narrows
+    const known: keyof UI5ControlMap | (string & {}) = 'sap.m.Button';
+    expectTypeOf(known).toExtend<string>();
+
+    // Arbitrary string also accepted (backwards compat)
+    const arbitrary: keyof UI5ControlMap | (string & {}) = 'sap.custom.MyControl';
+    expectTypeOf(arbitrary).toExtend<string>();
+  });
+});
+
 describe('ContainerControlType', () => {
   it('accepts known container control types', () => {
     expectTypeOf<'sap.m.Page'>().toExtend<ContainerControlType>();

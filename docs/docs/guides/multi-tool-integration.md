@@ -1,9 +1,9 @@
 ---
-sidebar_position: 43
+sidebar_position: 55
 title: Multi-Tool Integration
 ---
 
-# Multi-Tool Integration (P5-024)
+# Multi-Tool Integration
 
 Praman generates test results as standard Playwright output (HTML, JUnit XML, JSON). For teams
 using external test management tools -- Tricentis qTest, TestRail, Xray for Jira -- this guide

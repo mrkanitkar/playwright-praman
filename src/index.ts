@@ -104,7 +104,7 @@ export type { AuthStrategy, SAPAuthConfig, SessionInfo } from './auth/index.js';
 
 // ── Types ────────────────────────────────────────────────────────────
 export type { UI5Selector } from './core/types/selectors.js';
-export type { UI5ControlBase } from './core/types/controls.js';
+export type { UI5ControlBase, UI5ControlMap } from './core/types/controls.js';
 export type {
   AppId,
   BindingPath,

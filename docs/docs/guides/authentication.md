@@ -155,7 +155,7 @@ test('explicit auth', async ({ sapAuth, page }) => {
 ## Session Expiry
 
 The default session timeout is 1800 seconds (30 minutes), matching SAP ICM defaults.
-See [Product Decision P5-PD-002](../decisions/product-decisions#p5-pd-002-session-timeout-default) for rationale.
+The 30-minute default matches SAP ICM session timeout defaults.
 
 ## BTP WorkZone Authentication
 

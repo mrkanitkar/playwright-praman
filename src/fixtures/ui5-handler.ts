@@ -60,7 +60,7 @@ import { createLogger } from '#core/logging/index.js';
 import type { TracerWrapper } from '#core/telemetry/otel.js';
 import { getNoOpTracer } from '#core/telemetry/otel.js';
 import { createSpanName } from '#core/telemetry/spans.js';
-import type { UI5ControlBase } from '#core/types/controls.js';
+import type { UI5ControlBase, UI5ControlMap } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
 import { ui5Step } from '#core/utils/step-decorator.js';
 import { createLocatorShim } from '#fixtures/locator-shim.js';
@@ -283,6 +283,42 @@ export class UI5Handler {
   }
 
   /**
+   * Discovers a single UI5 control matching the selector with typed return.
+   *
+   * @remarks
+   * When `controlType` is provided as a known UI5 control type string literal,
+   * the return type narrows to the specific typed interface (e.g., `UI5Button`).
+   * When only `id` or other non-typed selectors are used, returns `UI5ControlBase`.
+   *
+   * @ai
+   * @aiContext Use to find a UI5 control by type. Returns typed proxy with control-specific methods.
+   *
+   * @typeParam TControlType - Control type key inferred from `selector.controlType`.
+   * @param selector - UI5 selector with a known `controlType`.
+   * @param options - Optional timeout and stability wait overrides.
+   * @returns Typed control proxy matching the specified control type.
+   * @throws ControlError if control not found.
+   * @throws SelectorError if selector is empty.
+   * @throws TimeoutError if control not found within timeout.
+   *
+   * @example
+   * ```typescript
+   * // Typed: returns UI5Button with getText(), press(), getEnabled()
+   * const btn = await handler.control({
+   *   controlType: 'sap.m.Button',
+   *   properties: { text: 'Save' },
+   * });
+   * const text = await btn.getText(); // string (not any)
+   *
+   * // Untyped: returns UI5ControlBase (existing behavior)
+   * const ctrl = await handler.control({ id: 'myControl' });
+   * ```
+   */
+  async control<TControlType extends keyof UI5ControlMap>(
+    selector: UI5Selector & { readonly controlType: TControlType },
+    options?: { readonly timeout?: number; readonly skipStabilityWait?: boolean },
+  ): Promise<UI5ControlMap[TControlType]>;
+  /**
    * Discovers a single control matching the selector.
    *
    * @ai
@@ -290,7 +326,7 @@ export class UI5Handler {
    *
    * @param selector - The UI5 selector to search for.
    * @param options - Optional discovery options.
-   * @returns The discovered control proxy.
+   * @returns The discovered control proxy with base methods and dynamic method access.
    * @throws ControlError if control not found.
    * @throws SelectorError if selector is empty.
    * @throws TimeoutError if control not found within timeout.
@@ -306,6 +342,10 @@ export class UI5Handler {
    * );
    * ```
    */
+  async control(
+    selector: UI5Selector,
+    options?: { readonly timeout?: number; readonly skipStabilityWait?: boolean },
+  ): Promise<UI5ControlBase>;
   @ui5Step
   async control(
     selector: UI5Selector,
@@ -772,9 +812,7 @@ export class UI5Handler {
    * @param selector - The UI5 selector to extract fallback hints from.
    * @returns A Playwright Locator if a DOM element is found, or null.
    */
-  private async tryLocatorFallback(
-    selector: UI5Selector,
-  ): Promise<Locator | null> {
+  private async tryLocatorFallback(selector: UI5Selector): Promise<Locator | null> {
     // Check for non-UI5 id (no '--' separator)
     if (typeof selector.id === 'string' && !selector.id.includes('--')) {
       const locator = this.page.locator(`#${selector.id}`);

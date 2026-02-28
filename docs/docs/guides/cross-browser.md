@@ -1,5 +1,5 @@
 ---
-sidebar_position: 38
+sidebar_position: 27
 title: Cross-Browser Testing
 ---
 

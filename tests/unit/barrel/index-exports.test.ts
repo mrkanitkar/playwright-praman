@@ -22,6 +22,7 @@ import * as barrel from '../../../src/index.js';
 import type {
   NavigationOptions,
   UI5ControlBase,
+  UI5ControlMap,
   UI5NavigationAPI,
   UI5Selector,
 } from '../../../src/index.js';
@@ -132,6 +133,7 @@ describe('src/index.ts barrel', () => {
     // Assigning to expectTypeOf verifies they are not `never` or `any`.
     expectTypeOf<UI5Selector>().not.toBeNever();
     expectTypeOf<UI5ControlBase>().not.toBeNever();
+    expectTypeOf<UI5ControlMap>().not.toBeNever();
     expectTypeOf<NavigationOptions>().not.toBeNever();
     expectTypeOf<UI5NavigationAPI>().not.toBeNever();
   });

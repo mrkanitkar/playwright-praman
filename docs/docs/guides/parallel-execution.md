@@ -1,5 +1,5 @@
 ---
-sidebar_position: 49
+sidebar_position: 34
 title: 'Parallel Execution & Sharding'
 ---
 

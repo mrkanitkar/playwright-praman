@@ -1,5 +1,5 @@
 ---
-sidebar_position: 46
+sidebar_position: 41
 title: 'Lifecycle Hook Extensibility'
 description: "Extend praman's test lifecycle using Playwright-native patterns"
 ---

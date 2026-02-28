@@ -1,5 +1,5 @@
 ---
-sidebar_position: 24
+sidebar_position: 15
 title: 'Fiori Elements Testing'
 ---
 

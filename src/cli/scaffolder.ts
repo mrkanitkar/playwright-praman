@@ -79,18 +79,11 @@ async function directoryExists(dirPath: string): Promise<boolean> {
 
 // ── Template content ──────────────────────────────────────────────────────────
 
-const PLAYWRIGHT_CONFIG_TEMPLATE = `import { defineConfig } from '@playwright/test';
-import type { PramanConfig } from 'playwright-praman';
-
-export default defineConfig({
-  testDir: './tests/e2e',
-  timeout: 60_000,
-  retries: 1,
-  use: {
-    baseURL: process.env['SAP_CLOUD_BASE_URL'] ?? 'https://localhost:8080',
-    trace: 'on-first-retry',
-  },
-});
+const GITIGNORE_TEMPLATE = `.env
+.auth/
+test-results/
+playwright-report/
+node_modules/
 `;
 
 const PRAMAN_CONFIG_TEMPLATE = `import type { PramanConfig } from 'playwright-praman';
@@ -126,21 +119,21 @@ const TSCONFIG_TEMPLATE = `{
 
 /** File template definitions: relative path from targetDir to content. */
 const TEMPLATE_FILES: readonly (readonly [string, string])[] = [
-  ['playwright.config.ts', PLAYWRIGHT_CONFIG_TEMPLATE],
   ['praman.config.ts', PRAMAN_CONFIG_TEMPLATE],
   ['tsconfig.json', TSCONFIG_TEMPLATE],
+  ['.gitignore', GITIGNORE_TEMPLATE],
 ];
 
 /** Subdirectories to create inside the target directory. */
-const SUBDIRECTORIES: readonly string[] = ['tests', 'tests/e2e', '.auth'];
+const SUBDIRECTORIES: readonly string[] = ['tests', '.auth'];
 
 /**
  * Scaffolds a new Praman project at the specified target directory.
  *
  * @remarks
- * Creates the directory structure (`tests/`, `tests/e2e/`, `.auth/`),
- * writes template config files (`playwright.config.ts`, `praman.config.ts`,
- * `tsconfig.json`), and returns the list of created file paths.
+ * Creates the directory structure (`tests/`, `.auth/`), writes template
+ * config files (`praman.config.ts`, `tsconfig.json`, `.gitignore`), and
+ * returns the list of created file paths.
  *
  * If the target directory already exists and `force` is not `true`, the
  * function returns a failure result with reason `'directory-exists'`.

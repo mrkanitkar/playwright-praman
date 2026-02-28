@@ -1,5 +1,5 @@
 ---
-sidebar_position: 51
+sidebar_position: 43
 title: 'Localization & i18n Testing'
 ---
 

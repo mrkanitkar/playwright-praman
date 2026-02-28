@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 7
 title: Selector Reference
 ---
 
@@ -8,19 +8,19 @@ that query the UI5 runtime's control registry — not the DOM.
 
 ## UI5Selector Fields
 
-| Field               | Type                      | Description                                       |
-| ------------------- | ------------------------- | ------------------------------------------------- |
-| `controlType`       | `string`                  | Fully qualified UI5 type (e.g., `'sap.m.Button'`) |
-| `id`                | `string \| RegExp`        | Control ID or pattern                             |
-| `viewName`          | `string`                  | Owning view name for scoped discovery             |
-| `viewId`            | `string`                  | Owning view ID for scoped discovery               |
-| `properties`        | `Record<string, unknown>` | Property matchers (key-value pairs)               |
-| `bindingPath`       | `Record<string, string>`  | OData binding path matchers                       |
-| `i18NText`          | `Record<string, string>`  | i18n text matchers (translated values)            |
-| `ancestor`          | `UI5Selector`             | Parent control must match this selector           |
-| `descendant`        | `UI5Selector`             | Child control must match this selector            |
-| `interaction`       | `UI5Interaction`          | Sub-control targeting (idSuffix, domChildWith)    |
-| `searchOpenDialogs` | `boolean`                 | Also search controls inside open dialogs          |
+| Field               | Type                      | Description                                                                                                                                                                   |
+| ------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `controlType`       | `string`                  | Fully qualified UI5 type (e.g., `'sap.m.Button'`). When provided as a string literal, [narrows the return type](/docs/guides/typed-controls) to a control-specific interface. |
+| `id`                | `string \| RegExp`        | Control ID or pattern                                                                                                                                                         |
+| `viewName`          | `string`                  | Owning view name for scoped discovery                                                                                                                                         |
+| `viewId`            | `string`                  | Owning view ID for scoped discovery                                                                                                                                           |
+| `properties`        | `Record<string, unknown>` | Property matchers (key-value pairs)                                                                                                                                           |
+| `bindingPath`       | `Record<string, string>`  | OData binding path matchers                                                                                                                                                   |
+| `i18NText`          | `Record<string, string>`  | i18n text matchers (translated values)                                                                                                                                        |
+| `ancestor`          | `UI5Selector`             | Parent control must match this selector                                                                                                                                       |
+| `descendant`        | `UI5Selector`             | Child control must match this selector                                                                                                                                        |
+| `interaction`       | `UI5Interaction`          | Sub-control targeting (idSuffix, domChildWith)                                                                                                                                |
+| `searchOpenDialogs` | `boolean`                 | Also search controls inside open dialogs                                                                                                                                      |
 
 All fields are optional. At least one must be provided.
 
@@ -43,6 +43,12 @@ const button = await ui5.control({ id: /submit/i });
 ```typescript
 const buttons = await ui5.controls({ controlType: 'sap.m.Button' });
 ```
+
+:::tip Typed Returns
+When you use `controlType` with `ui5.control()` (singular), the return type narrows to the specific
+typed interface (e.g., `UI5Button`). See [Typed Control Returns](/docs/guides/typed-controls) for
+full details and examples.
+:::
 
 ### By Type + Properties
 

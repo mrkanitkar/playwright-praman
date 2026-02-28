@@ -20,6 +20,11 @@ const button = await ui5.control({ id: 'saveBtn' });
 // `button` is a Proxy, not the actual UI5 control
 ```
 
+:::tip Typed Returns
+When you provide `controlType` as a string literal, the proxy is typed to the specific control
+interface — e.g., `UI5Button` instead of `UI5ControlBase`. See [Typed Control Returns](/docs/guides/typed-controls).
+:::
+
 When you call a method on the proxy (e.g., `button.getText()`), the proxy's `get` trap:
 
 1. Checks if the method is a **built-in safe method** (press, enterText, select, etc.)
@@ -157,18 +162,18 @@ console.log(members.methods); // ['getValue', 'setValue', 'getEnabled', ...]
 
 ## Comparison: wdi5 WDI5Control vs Praman UI5ControlBase
 
-| Aspect               | wdi5 WDI5Control               | Praman UI5ControlBase                                               |
-| -------------------- | ------------------------------ | ------------------------------------------------------------------- |
-| **Proxy mechanism**  | Class with `getProperty(name)` | ES Proxy with `get` trap                                            |
-| **Method calls**     | `control.getProperty('value')` | `control.getValue()` (direct)                                       |
-| **Return handling**  | Manual unwrapping              | Auto-detect 7 return types                                          |
-| **Blacklist**        | Partial (small list)           | 71 static + 2 dynamic rules                                         |
-| **Chaining**         | Limited, must re-wrap          | Automatic proxy wrapping                                            |
-| **Type safety**      | Partial TypeScript             | Full TypeScript with 199 control interfaces                         |
-| **Introspection**    | Basic                          | `getControlMetadata()`, `retrieveMembers()`, `getControlInfoFull()` |
-| **Custom execution** | `executeMethod()`              | `exec(fn, ...args)`                                                 |
-| **Step decoration**  | None                           | Every call wrapped in `test.step()`                                 |
-| **Caching**          | None                           | LRU cache (200 entries, 5s TTL)                                     |
+| Aspect               | wdi5 WDI5Control               | Praman UI5ControlBase                                                            |
+| -------------------- | ------------------------------ | -------------------------------------------------------------------------------- |
+| **Proxy mechanism**  | Class with `getProperty(name)` | ES Proxy with `get` trap                                                         |
+| **Method calls**     | `control.getProperty('value')` | `control.getValue()` (direct)                                                    |
+| **Return handling**  | Manual unwrapping              | Auto-detect 7 return types                                                       |
+| **Blacklist**        | Partial (small list)           | 71 static + 2 dynamic rules                                                      |
+| **Chaining**         | Limited, must re-wrap          | Automatic proxy wrapping                                                         |
+| **Type safety**      | Partial TypeScript             | Full TypeScript with [199 typed control interfaces](/docs/guides/typed-controls) |
+| **Introspection**    | Basic                          | `getControlMetadata()`, `retrieveMembers()`, `getControlInfoFull()`              |
+| **Custom execution** | `executeMethod()`              | `exec(fn, ...args)`                                                              |
+| **Step decoration**  | None                           | Every call wrapped in `test.step()`                                              |
+| **Caching**          | None                           | LRU cache (200 entries, 5s TTL)                                                  |
 
 The key difference: wdi5 uses a class-based approach where you call generic methods like
 `getProperty('value')`. Praman uses an ES Proxy where you call `getValue()` directly — matching

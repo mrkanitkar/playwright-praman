@@ -18,6 +18,9 @@
  * @module cli/init
  */
 
+import { execSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import process from 'node:process';
 
 import type { IDEDetection } from './ide-detector.js';
@@ -46,7 +49,7 @@ export interface InitOptions {
 }
 
 /** Total number of init steps displayed to the user. */
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 /**
  * Prints IDE-specific post-init instructions for each detected IDE.
@@ -78,13 +81,67 @@ function printIDESetupInstructions(detection: IDEDetection): void {
     );
   }
 
-  if (detection.copilot) {
+  if (detection.copilot || detection.vscode) {
     logSection('GitHub Copilot Setup');
-    logWarn('Append Praman instructions to your Copilot config:');
-    logSuccess(
-      'cat node_modules/playwright-praman/docs/user-integration/copilot-instructions-appendable.md >> .github/copilot-instructions.md',
-    );
+    logSuccess('Copilot agents and instructions installed automatically');
   }
+}
+
+/**
+ * Installs required packages and Chromium browser.
+ *
+ * @remarks
+ * Checks each dependency independently so partial installs are completed.
+ * Always ensures Chromium browser is installed, even when packages already exist.
+ *
+ * @returns `true` if all critical packages are available, `false` on failure.
+ */
+function installPackageIfNeeded(options: InitOptions): boolean {
+  if (options.skipInstall) {
+    logWarn('Skipped package install (--skip-install)');
+    return true;
+  }
+
+  // Check which packages are missing
+  const modules = join(options.targetDir, 'node_modules');
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- composed from targetDir + known constant segments
+  const hasPlaywright = existsSync(join(modules, '@playwright', 'test'));
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- composed from targetDir + known constant segments
+  const hasPraman = existsSync(join(modules, 'playwright-praman'));
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- composed from targetDir + known constant segments
+  const hasDotenv = existsSync(join(modules, 'dotenv'));
+
+  const missing: string[] = [];
+  if (!hasPlaywright) missing.push('@playwright/test');
+  if (!hasPraman) missing.push('playwright-praman');
+  if (!hasDotenv) missing.push('dotenv');
+
+  if (missing.length > 0) {
+    try {
+      // eslint-disable-next-line sonarjs/os-command -- intentional: missing[] contains only hardcoded package names
+      execSync(`npm install ${missing.join(' ')}`, {
+        cwd: options.targetDir,
+        stdio: 'inherit',
+      });
+      logSuccess(`Installed: ${missing.join(', ')}`);
+    } catch {
+      logError('Failed to install packages. Run npm install manually.');
+      return false;
+    }
+  } else {
+    logSuccess('All packages already installed');
+  }
+
+  // Always ensure Chromium browser is installed
+  try {
+    // eslint-disable-next-line sonarjs/no-os-command-from-path -- intentional: Playwright CLI browser install via npx
+    execSync('npx playwright install chromium', { cwd: options.targetDir, stdio: 'inherit' });
+    logSuccess('Chromium browser ready');
+  } catch {
+    logWarn('Failed to install Chromium. Run: npx playwright install chromium');
+  }
+
+  return true;
 }
 
 /**
@@ -132,9 +189,10 @@ export function parseInitArgs(argv: readonly string[]): InitOptions {
  *
  * Steps:
  * 1. Validate environment (Node.js, npm)
- * 2. Detect IDE (VS Code, Cursor, Claude Code, JetBrains)
- * 3. Generate configuration files
- * 4. Print next steps
+ * 2. Install package (if not already installed)
+ * 3. Detect IDE (VS Code, Cursor, Claude Code, JetBrains)
+ * 4. Generate configuration files
+ * 5. Print next steps
  *
  * @param args - Raw CLI arguments (after the `init` subcommand).
  *
@@ -180,8 +238,14 @@ export async function runInit(args: readonly string[]): Promise<void> {
     return;
   }
 
-  // ── Step 2: Detect IDEs ──────────────────────────────────────────────────
-  logStep(2, TOTAL_STEPS, 'Detecting IDEs');
+  // ── Step 2: Install package ───────────────────────────────────────────────
+  logStep(2, TOTAL_STEPS, 'Installing package');
+  if (!installPackageIfNeeded(options)) {
+    return;
+  }
+
+  // ── Step 3: Detect IDEs ──────────────────────────────────────────────────
+  logStep(3, TOTAL_STEPS, 'Detecting IDEs');
   const detection = detectIDEs(options.targetDir);
   const labels = getIDELabels(detection);
 
@@ -193,8 +257,8 @@ export async function runInit(args: readonly string[]): Promise<void> {
     logWarn('No IDEs detected');
   }
 
-  // ── Step 3: Scaffold project ─────────────────────────────────────────────
-  logStep(3, TOTAL_STEPS, 'Scaffolding project');
+  // ── Step 4: Scaffold project ─────────────────────────────────────────────
+  logStep(4, TOTAL_STEPS, 'Scaffolding project');
   const result = await scaffoldProject({
     targetDir: options.targetDir,
     force: options.force,
@@ -210,16 +274,12 @@ export async function runInit(args: readonly string[]): Promise<void> {
     return;
   }
 
-  // ── Step 4: Next steps ───────────────────────────────────────────────────
-  logStep(4, TOTAL_STEPS, 'Done!');
+  // ── Step 5: Next steps ───────────────────────────────────────────────────
+  logStep(5, TOTAL_STEPS, 'Done!');
   logSection('Next Steps');
-
-  if (!options.skipInstall) {
-    logSuccess('Run: npm install');
-  }
-
-  logSuccess('Run: npx playwright install');
-  logSuccess('Run: npx playwright test --ui');
+  logSuccess('1. Copy .env.example to .env and fill in SAP credentials');
+  logSuccess('2. Run tests: npx playwright test --project=chromium --headed');
+  logWarn('Auth setup (tests/auth.setup.ts) runs automatically before tests');
 
   // IDE-specific appendable instructions
   printIDESetupInstructions(detection);
