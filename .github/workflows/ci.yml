@@ -84,6 +84,15 @@ jobs:
         with:
           name: dist
           path: dist/
+      - name: Package Windows install zip
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: Compress-Archive -Path dist\*, package.json, README.md -DestinationPath playwright-praman-windows.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: matrix.os == 'windows-latest'
+        with:
+          name: playwright-praman-windows
+          path: playwright-praman-windows.zip
 
   integration-tests:
     name: Integration Tests (PW ${{ matrix.playwright-version }})
