@@ -39,7 +39,7 @@ const config: KnipConfig = {
     // MCP server used by Claude Code tooling, not by project code
     '@ui5/mcp-server',
   ],
-  ignoreBinaries: ['docusaurus'],
+  ignoreBinaries: ['docusaurus', 'playwright-praman'],
   rules: {
     unlisted: 'off',
     unresolved: 'off',
