@@ -21,7 +21,6 @@
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import process from 'node:process';
 
 import type { IDEDetection } from './ide-detector.js';
 import { detectIDEs, getIDELabels } from './ide-detector.js';
@@ -35,8 +34,11 @@ import { getVersion } from './version.js';
  *
  * @example
  * ```typescript
- * const opts: InitOptions = parseInitArgs(['--force', '--target', '/tmp/project']);
- * // { targetDir: '/tmp/project', force: true, skipInstall: false }
+ * const opts: InitOptions = {
+ *   targetDir: '/tmp/project',
+ *   force: true,
+ *   skipInstall: false,
+ * };
  * ```
  */
 export interface InitOptions {
@@ -145,42 +147,6 @@ function installPackageIfNeeded(options: InitOptions): boolean {
 }
 
 /**
- * Parses CLI arguments for the `init` command.
- *
- * @param argv - The raw argument array (after the `init` subcommand).
- * @returns Parsed {@link InitOptions} with defaults applied.
- *
- * @example
- * ```typescript
- * const opts = parseInitArgs(['--force', '--target', '/tmp/my-project']);
- * // { targetDir: '/tmp/my-project', force: true, skipInstall: false }
- * ```
- */
-export function parseInitArgs(argv: readonly string[]): InitOptions {
-  let targetDir = process.cwd();
-  let force = false;
-  let skipInstall = false;
-
-  for (let index = 0; index < argv.length; index++) {
-    // eslint-disable-next-line security/detect-object-injection -- index is a controlled loop variable
-    const arg = argv[index];
-    if (arg === '--force') {
-      force = true;
-    } else if (arg === '--skip-install') {
-      skipInstall = true;
-    } else if (arg === '--target') {
-      const next = argv[index + 1];
-      if (next !== undefined && !next.startsWith('--')) {
-        targetDir = next;
-        index++;
-      }
-    }
-  }
-
-  return { targetDir, force, skipInstall };
-}
-
-/**
  * Runs the Praman project initializer.
  *
  * @remarks
@@ -194,20 +160,15 @@ export function parseInitArgs(argv: readonly string[]): InitOptions {
  * 4. Generate configuration files
  * 5. Print next steps
  *
- * @param args - Raw CLI arguments (after the `init` subcommand).
+ * @param options - Parsed init options from the Commander action handler.
  *
  * @example
  * ```typescript
- * // npx playwright-praman init
- * await runInit([]);
- *
- * // npx playwright-praman init --skip-install --target /tmp/project
- * await runInit(['--skip-install', '--target', '/tmp/project']);
+ * await runInit({ targetDir: process.cwd(), force: false, skipInstall: false });
+ * await runInit({ targetDir: '/tmp/project', force: true, skipInstall: true });
  * ```
  */
-export async function runInit(args: readonly string[]): Promise<void> {
-  const options = parseInitArgs(args);
-
+export async function runInit(options: InitOptions): Promise<void> {
   // ── Banner ──────────────────────────────────────────────────────────────────
   logBanner('Praman Init', getVersion());
 

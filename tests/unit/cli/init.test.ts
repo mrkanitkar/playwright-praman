@@ -23,6 +23,7 @@ import process from 'node:process';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { IDEDetection } from '../../../src/cli/ide-detector.js';
+import type { InitOptions } from '../../../src/cli/init.js';
 import type { ScaffoldResult } from '../../../src/cli/scaffolder.js';
 import type { CheckResult, ValidationReport } from '../../../src/cli/validator.js';
 
@@ -131,15 +132,20 @@ function setupHappyPath(): void {
   );
 }
 
+/** Safe non-tmp test path to avoid sonarjs/publicly-writable-directories. */
+const TEST_DIR = '/home/testuser/test-dir';
+
+/** Default InitOptions for tests (matches Commander defaults). */
+const DEFAULT_OPTS: InitOptions = {
+  targetDir: process.cwd(),
+  force: false,
+  skipInstall: false,
+};
+
 // ── Lazy import ─────────────────────────────────────────────────────────────
 
 async function loadInit(): Promise<{
-  runInit: (args: readonly string[]) => Promise<void>;
-  parseInitArgs: (argv: readonly string[]) => {
-    readonly targetDir: string;
-    readonly force: boolean;
-    readonly skipInstall: boolean;
-  };
+  runInit: (options: InitOptions) => Promise<void>;
 }> {
   return import('../../../src/cli/init.js');
 }
@@ -152,95 +158,12 @@ describe('cli/init', () => {
     setupHappyPath();
   });
 
-  // ── parseInitArgs ───────────────────────────────────────────────────────
-
-  describe('parseInitArgs', () => {
-    it('returns default values when no arguments are provided', async () => {
-      const { parseInitArgs } = await loadInit();
-      const result = parseInitArgs([]);
-
-      expect(result).toStrictEqual({
-        targetDir: process.cwd(),
-        force: false,
-        skipInstall: false,
-      });
-    });
-
-    it('parses --force flag', async () => {
-      const { parseInitArgs } = await loadInit();
-      const result = parseInitArgs(['--force']);
-
-      expect(result.force).toBe(true);
-    });
-
-    it('parses --skip-install flag', async () => {
-      const { parseInitArgs } = await loadInit();
-      const result = parseInitArgs(['--skip-install']);
-
-      expect(result.skipInstall).toBe(true);
-    });
-
-    it('parses --target with a directory value', async () => {
-      const { parseInitArgs } = await loadInit();
-      const result = parseInitArgs(['--target', '/home/testuser/my-project']);
-
-      expect(result.targetDir).toBe('/home/testuser/my-project');
-    });
-
-    it('ignores --target when no value follows', async () => {
-      const { parseInitArgs } = await loadInit();
-      const result = parseInitArgs(['--target']);
-
-      expect(result.targetDir).toBe(process.cwd());
-    });
-
-    it('ignores --target when value starts with --', async () => {
-      const { parseInitArgs } = await loadInit();
-      const result = parseInitArgs(['--target', '--force']);
-
-      expect(result.targetDir).toBe(process.cwd());
-      expect(result.force).toBe(true);
-    });
-
-    it('parses all flags together', async () => {
-      const { parseInitArgs } = await loadInit();
-      const result = parseInitArgs([
-        '--force',
-        '--skip-install',
-        '--target',
-        '/home/testuser/test-project',
-      ]);
-
-      expect(result).toStrictEqual({
-        targetDir: '/home/testuser/test-project',
-        force: true,
-        skipInstall: true,
-      });
-    });
-
-    it('handles flags in any order', async () => {
-      const { parseInitArgs } = await loadInit();
-      const result = parseInitArgs([
-        '--target',
-        '/home/testuser/test-project',
-        '--skip-install',
-        '--force',
-      ]);
-
-      expect(result).toStrictEqual({
-        targetDir: '/home/testuser/test-project',
-        force: true,
-        skipInstall: true,
-      });
-    });
-  });
-
   // ── runInit: banner ──────────────────────────────────────────────────────
 
   describe('banner', () => {
     it('calls logBanner with Praman Init title and version', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogBanner).toHaveBeenCalledOnce();
       expect(mockedLogBanner).toHaveBeenCalledWith('Praman Init', '1.0.0');
@@ -250,7 +173,7 @@ describe('cli/init', () => {
       mockedGetVersion.mockReturnValue('2.5.0');
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogBanner).toHaveBeenCalledWith('Praman Init', '2.5.0');
     });
@@ -261,14 +184,14 @@ describe('cli/init', () => {
   describe('validation', () => {
     it('calls validate to run environment checks', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedValidate).toHaveBeenCalledOnce();
     });
 
     it('displays logStep for validation step', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogStep).toHaveBeenCalledWith(1, 5, 'Validating environment');
     });
@@ -279,7 +202,7 @@ describe('cli/init', () => {
       );
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogSuccess).toHaveBeenCalledWith('Node.js version: v20.11.0');
     });
@@ -294,7 +217,7 @@ describe('cli/init', () => {
       );
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogWarn).toHaveBeenCalledWith('SAP_CLOUD_BASE_URL: not set');
     });
@@ -309,7 +232,7 @@ describe('cli/init', () => {
       );
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogError).toHaveBeenCalledWith('@playwright/test: not installed');
     });
@@ -323,7 +246,7 @@ describe('cli/init', () => {
       );
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogError).toHaveBeenCalledWith(
         'Critical environment check failed. Cannot continue.',
@@ -340,7 +263,7 @@ describe('cli/init', () => {
       );
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogError).toHaveBeenCalledWith(
         'Critical environment check failed. Cannot continue.',
@@ -358,7 +281,7 @@ describe('cli/init', () => {
       );
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedScaffoldProject).toHaveBeenCalledOnce();
     });
@@ -369,7 +292,7 @@ describe('cli/init', () => {
   describe('package install', () => {
     it('displays logStep for install step', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogStep).toHaveBeenCalledWith(2, 5, 'Installing package');
     });
@@ -378,7 +301,7 @@ describe('cli/init', () => {
       mockExistsSync.mockReturnValue(true);
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogSuccess).toHaveBeenCalledWith('All packages already installed');
     });
@@ -387,7 +310,7 @@ describe('cli/init', () => {
       mockExistsSync.mockReturnValue(false);
 
       const { runInit } = await loadInit();
-      await runInit(['--skip-install']);
+      await runInit({ ...DEFAULT_OPTS, skipInstall: true });
 
       expect(mockedLogWarn).toHaveBeenCalledWith('Skipped package install (--skip-install)');
     });
@@ -396,7 +319,7 @@ describe('cli/init', () => {
       mockExistsSync.mockReturnValue(false);
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockExecSync).toHaveBeenCalledWith(
         'npm install @playwright/test playwright-praman dotenv',
@@ -408,7 +331,7 @@ describe('cli/init', () => {
       mockExistsSync.mockReturnValue(true);
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockExecSync).toHaveBeenCalledWith(
         'npx playwright install chromium',
@@ -423,7 +346,7 @@ describe('cli/init', () => {
       });
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogError).toHaveBeenCalledWith(
         'Failed to install packages. Run npm install manually.',
@@ -437,14 +360,14 @@ describe('cli/init', () => {
   describe('IDE detection', () => {
     it('calls detectIDEs with targetDir', async () => {
       const { runInit } = await loadInit();
-      await runInit(['--target', '/home/testuser/test-dir']);
+      await runInit({ ...DEFAULT_OPTS, targetDir: TEST_DIR });
 
-      expect(mockedDetectIDEs).toHaveBeenCalledWith('/home/testuser/test-dir');
+      expect(mockedDetectIDEs).toHaveBeenCalledWith(TEST_DIR);
     });
 
     it('displays logStep for IDE detection step', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogStep).toHaveBeenCalledWith(3, 5, 'Detecting IDEs');
     });
@@ -454,7 +377,7 @@ describe('cli/init', () => {
       mockedGetIDELabels.mockReturnValue(['VS Code', 'Claude Code']);
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogSuccess).toHaveBeenCalledWith('Detected: VS Code');
       expect(mockedLogSuccess).toHaveBeenCalledWith('Detected: Claude Code');
@@ -465,7 +388,7 @@ describe('cli/init', () => {
       mockedGetIDELabels.mockReturnValue([]);
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogWarn).toHaveBeenCalledWith('No IDEs detected');
     });
@@ -476,7 +399,7 @@ describe('cli/init', () => {
   describe('scaffolding', () => {
     it('calls scaffoldProject with targetDir, force, and detection', async () => {
       const { runInit } = await loadInit();
-      await runInit(['--force', '--target', '/home/testuser/scaffold-test']);
+      await runInit({ ...DEFAULT_OPTS, targetDir: '/home/testuser/scaffold-test', force: true });
 
       expect(mockedScaffoldProject).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -488,7 +411,7 @@ describe('cli/init', () => {
 
     it('displays logStep for scaffolding step', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogStep).toHaveBeenCalledWith(4, 5, 'Scaffolding project');
     });
@@ -499,7 +422,7 @@ describe('cli/init', () => {
       );
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogSuccess).toHaveBeenCalledWith('Created: playwright.config.ts');
       expect(mockedLogSuccess).toHaveBeenCalledWith('Created: praman.config.ts');
@@ -509,7 +432,7 @@ describe('cli/init', () => {
       mockedScaffoldProject.mockResolvedValue(makeFailureResult('directory-exists'));
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogError).toHaveBeenCalledWith('Scaffold failed: directory-exists');
       // Should not reach next steps section
@@ -518,7 +441,7 @@ describe('cli/init', () => {
 
     it('passes force=false by default', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedScaffoldProject).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -534,21 +457,21 @@ describe('cli/init', () => {
   describe('next steps', () => {
     it('displays logStep for done step', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogStep).toHaveBeenCalledWith(5, 5, 'Done!');
     });
 
     it('calls logSection with Next Steps', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogSection).toHaveBeenCalledWith('Next Steps');
     });
 
     it('shows env setup step', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogSuccess).toHaveBeenCalledWith(
         '1. Copy .env.example to .env and fill in SAP credentials',
@@ -557,7 +480,7 @@ describe('cli/init', () => {
 
     it('shows test run step', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogSuccess).toHaveBeenCalledWith(
         '2. Run tests: npx playwright test --project=chromium --headed',
@@ -566,7 +489,7 @@ describe('cli/init', () => {
 
     it('shows auth setup warning', async () => {
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(mockedLogWarn).toHaveBeenCalledWith(
         'Auth setup (tests/auth.setup.ts) runs automatically before tests',
@@ -590,7 +513,7 @@ describe('cli/init', () => {
       });
 
       const { runInit } = await loadInit();
-      await runInit([]);
+      await runInit(DEFAULT_OPTS);
 
       expect(callOrder).toStrictEqual([
         'banner',

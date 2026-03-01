@@ -15,6 +15,9 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  FORCE_COLOR: 1
+
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -50,6 +53,7 @@ jobs:
   deploy-docs:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: build-docs
     environment:
       name: github-pages

@@ -9,6 +9,13 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_COLOR: 1
+
+concurrency:
+  group: repomix
+  cancel-in-progress: true
+
 jobs:
   repomix:
     name: Generate Repomix Context

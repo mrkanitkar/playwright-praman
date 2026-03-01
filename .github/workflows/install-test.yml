@@ -1,0 +1,116 @@
+name: Install Matrix
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1' # Weekly Monday 6am UTC
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: 1
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  package-manager-test:
+    name: Install (${{ matrix.pm }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        pm: [npm, yarn, pnpm]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm pack
+      - name: Create test project
+        shell: bash
+        run: mkdir test-project && cd test-project && npm init -y
+      - name: Install with ${{ matrix.pm }}
+        shell: bash
+        run: |
+          cd test-project
+          if [ "${{ matrix.pm }}" = "npm" ]; then
+            npm install ../playwright-praman-*.tgz @playwright/test
+          elif [ "${{ matrix.pm }}" = "yarn" ]; then
+            npm install -g yarn
+            yarn add ../playwright-praman-*.tgz @playwright/test
+          elif [ "${{ matrix.pm }}" = "pnpm" ]; then
+            npm install -g pnpm
+            pnpm add ../playwright-praman-*.tgz @playwright/test
+          fi
+      - name: CJS require test
+        shell: bash
+        run: cd test-project && node -e "require('playwright-praman')"
+      - name: ESM import test
+        shell: bash
+        run: cd test-project && node --input-type=module -e "import('playwright-praman').then(m => console.log('OK', Object.keys(m).length))"
+      - name: CLI smoke test
+        shell: bash
+        run: cd test-project && npx playwright-praman --version
+
+  monorepo-test:
+    name: Monorepo (npm workspaces)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci && npm run build && npm pack
+      - name: Setup monorepo
+        shell: bash
+        run: |
+          mkdir -p mono-root/packages/app
+          cd mono-root
+          echo '{"private":true,"workspaces":["packages/*"]}' > package.json
+          cd packages/app
+          npm init -y
+      - name: Install in workspace
+        shell: bash
+        run: |
+          cd mono-root
+          npm install ./packages/app
+          cd packages/app
+          npm install ../../../playwright-praman-*.tgz @playwright/test
+      - name: Verify resolution
+        shell: bash
+        run: cd mono-root/packages/app && node -e "require('playwright-praman')"
+
+  peer-dep-warning-test:
+    name: Peer Dep Warning
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci && npm run build && npm pack
+      - name: Install WITHOUT @playwright/test
+        shell: bash
+        run: |
+          mkdir test-no-pw && cd test-no-pw
+          npm init -y
+          npm install ../playwright-praman-*.tgz 2>&1 | tee install-output.txt
+      - name: Verify peer dep warning
+        shell: bash
+        run: |
+          cd test-no-pw
+          grep -qi "peer dep\|WARN\|missing" install-output.txt || echo "WARNING: No peer dep warning detected"

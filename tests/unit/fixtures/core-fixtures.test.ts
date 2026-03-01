@@ -479,6 +479,65 @@ describe('core-fixtures worker-scoped fixture definitions', () => {
     });
   });
 
+  describe('PRAMAN_SKIP_VERSION_CHECK integration', () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('calls assertMinVersion when PRAMAN_SKIP_VERSION_CHECK is not set', async () => {
+      const fn = extractFixtureFn(fixtures['playwrightCompat']);
+      await runFixture(fn, {});
+
+      expect(mockAssertMinVersion).toHaveBeenCalledWith('1.57.0');
+    });
+
+    it('skips assertMinVersion when PRAMAN_SKIP_VERSION_CHECK is "true"', async () => {
+      vi.stubEnv('PRAMAN_SKIP_VERSION_CHECK', 'true');
+
+      const fn = extractFixtureFn(fixtures['playwrightCompat']);
+      await runFixture(fn, {});
+
+      expect(mockAssertMinVersion).not.toHaveBeenCalled();
+    });
+
+    it('skips assertMinVersion when PRAMAN_SKIP_VERSION_CHECK is "1"', async () => {
+      vi.stubEnv('PRAMAN_SKIP_VERSION_CHECK', '1');
+
+      const fn = extractFixtureFn(fixtures['playwrightCompat']);
+      await runFixture(fn, {});
+
+      expect(mockAssertMinVersion).not.toHaveBeenCalled();
+    });
+
+    it('does NOT skip when PRAMAN_SKIP_VERSION_CHECK is "false"', async () => {
+      vi.stubEnv('PRAMAN_SKIP_VERSION_CHECK', 'false');
+
+      const fn = extractFixtureFn(fixtures['playwrightCompat']);
+      await runFixture(fn, {});
+
+      expect(mockAssertMinVersion).toHaveBeenCalledWith('1.57.0');
+    });
+
+    it('does NOT skip when PRAMAN_SKIP_VERSION_CHECK is empty string', async () => {
+      vi.stubEnv('PRAMAN_SKIP_VERSION_CHECK', '');
+
+      const fn = extractFixtureFn(fixtures['playwrightCompat']);
+      await runFixture(fn, {});
+
+      expect(mockAssertMinVersion).toHaveBeenCalledWith('1.57.0');
+    });
+
+    it('still returns feature flags when version check is skipped', async () => {
+      vi.stubEnv('PRAMAN_SKIP_VERSION_CHECK', 'true');
+
+      const fn = extractFixtureFn(fixtures['playwrightCompat']);
+      const features = await runFixture<PlaywrightFeatures>(fn, {});
+
+      expect(mockGetPlaywrightFeatures).toHaveBeenCalledOnce();
+      expect(features).toBe(mockFeatures);
+    });
+  });
+
   describe('selectorRegistration fixture', () => {
     it('registers ui5 selector engine with playwright.selectors', async () => {
       const fn = extractFixtureFn(fixtures['selectorRegistration']);

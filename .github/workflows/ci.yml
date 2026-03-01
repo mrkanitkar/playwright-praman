@@ -11,8 +11,11 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_COLOR: 1
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -32,12 +35,21 @@ jobs:
       - run: npx cspell "src/**/*.ts" "docs/**/*.md" --no-progress
       - run: npx knip
       - run: npx markdownlint-cli2 "**/*.md" "#node_modules" "#docs/build" "#docs/node_modules"
+      - name: Verify clean tree
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::Working tree is dirty after lint — commit generated files"
+            git status --short
+            git diff
+            exit 1
+          fi
 
   unit-tests:
     name: Unit Tests (${{ matrix.os }}, Node ${{ matrix.node-version }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [20, 22, 24]
@@ -51,16 +63,18 @@ jobs:
       - run: npm run build
       - run: npm run test:unit -- --coverage
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: always()
+        if: ${{ !cancelled() }}
         with:
           name: coverage-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: coverage/
+          retention-days: 30
 
   build:
     name: Build + Bundle Size (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
@@ -84,6 +98,7 @@ jobs:
         with:
           name: dist
           path: dist/
+          retention-days: 7
       - name: Package Windows install zip
         if: matrix.os == 'windows-latest'
         shell: pwsh
@@ -93,6 +108,7 @@ jobs:
         with:
           name: playwright-praman-windows
           path: playwright-praman-windows.zip
+          retention-days: 7
 
   integration-tests:
     name: Integration Tests (PW ${{ matrix.playwright-version }})
@@ -100,6 +116,7 @@ jobs:
     timeout-minutes: 30
     needs: [quality, build]
     strategy:
+      fail-fast: false
       matrix:
         playwright-version: ['1.57.0', '1.58.2']
     env:
@@ -138,10 +155,11 @@ jobs:
       - run: npm run test:integration
         if: steps.check-creds.outputs.skip == 'false'
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always() && steps.check-creds.outputs.skip == 'false'
+        if: ${{ !cancelled() && steps.check-creds.outputs.skip == 'false' }}
         with:
           name: playwright-report-pw-${{ matrix.playwright-version }}
           path: playwright-report/
+          retention-days: 14
 
   security:
     name: Security Scan
@@ -198,7 +216,8 @@ jobs:
         env:
           PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
+        if: ${{ !cancelled() }}
         with:
           name: azure-playwright-report
           path: playwright-report/
+          retention-days: 14

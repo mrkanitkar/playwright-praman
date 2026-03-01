@@ -54,15 +54,15 @@ Is the element on the page?
 
 ### Quick Reference
 
-| Scenario | API | Example |
-| --- | --- | --- |
-| UI5 Button, Input, Table, Dialog | `ui5.control()`, `ui5.press()`, `ui5.fill()` | `await ui5.press({ controlType: 'sap.m.Button', properties: { text: 'Save' } })` |
-| UI5 SmartField / SmartTable | `ui5.control()` + proxy methods | `const table = await smartTable.getTable()` |
-| Controls inside dialogs | `ui5.control()` with `searchOpenDialogs: true` | `await ui5.control({ id: 'myDialog--field', searchOpenDialogs: true })` |
-| SAP login form (HTML) | `page.locator()`, `page.fill()` | `await page.locator('#sap-user').fill(username)` |
-| IDP redirect (IAS, Azure AD) | `page.locator()`, `page.fill()` | `await page.locator('input[name="email"]').fill(email)` |
-| FLP space tabs | `page.getByText()` | `await page.getByText('My Space', { exact: true }).click()` |
-| Page title verification | `expect(page).toHaveTitle()` | `await expect(page).toHaveTitle(/Home/)` |
+| Scenario                         | API                                            | Example                                                                          |
+| -------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------- |
+| UI5 Button, Input, Table, Dialog | `ui5.control()`, `ui5.press()`, `ui5.fill()`   | `await ui5.press({ controlType: 'sap.m.Button', properties: { text: 'Save' } })` |
+| UI5 SmartField / SmartTable      | `ui5.control()` + proxy methods                | `const table = await smartTable.getTable()`                                      |
+| Controls inside dialogs          | `ui5.control()` with `searchOpenDialogs: true` | `await ui5.control({ id: 'myDialog--field', searchOpenDialogs: true })`          |
+| SAP login form (HTML)            | `page.locator()`, `page.fill()`                | `await page.locator('#sap-user').fill(username)`                                 |
+| IDP redirect (IAS, Azure AD)     | `page.locator()`, `page.fill()`                | `await page.locator('input[name="email"]').fill(email)`                          |
+| FLP space tabs                   | `page.getByText()`                             | `await page.getByText('My Space', { exact: true }).click()`                      |
+| Page title verification          | `expect(page).toHaveTitle()`                   | `await expect(page).toHaveTitle(/Home/)`                                         |
 
 ## Install
 
@@ -195,14 +195,14 @@ test('AI-assisted test discovery', async ({ pramanAI, page }) => {
 
 Runnable example files are in the [`examples/`](./examples/) directory:
 
-| Example | Description |
-| --- | --- |
-| [`basic-test.spec.ts`](./examples/basic-test.spec.ts) | Minimal UI5 control discovery test |
-| [`hybrid-login.spec.ts`](./examples/hybrid-login.spec.ts) | Playwright native login + Praman UI5 app test (auto-fallback) |
-| [`table-operations.spec.ts`](./examples/table-operations.spec.ts) | Table `getRows()`, OData binding, `getContextByIndex()` |
-| [`dialog-handling.spec.ts`](./examples/dialog-handling.spec.ts) | `searchOpenDialogs`, dialog open/close, value help |
-| [`auth-setup.ts`](./examples/auth-setup.ts) | Complete SAP authentication setup (OnPrem, BTP, Office 365) |
-| [`bom-e2e-praman-gold-standard.spec.ts`](./examples/bom-e2e-praman-gold-standard.spec.ts) | Full BOM end-to-end test (gold standard reference) |
+| Example                                                                                   | Description                                                   |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [`basic-test.spec.ts`](./examples/basic-test.spec.ts)                                     | Minimal UI5 control discovery test                            |
+| [`hybrid-login.spec.ts`](./examples/hybrid-login.spec.ts)                                 | Playwright native login + Praman UI5 app test (auto-fallback) |
+| [`table-operations.spec.ts`](./examples/table-operations.spec.ts)                         | Table `getRows()`, OData binding, `getContextByIndex()`       |
+| [`dialog-handling.spec.ts`](./examples/dialog-handling.spec.ts)                           | `searchOpenDialogs`, dialog open/close, value help            |
+| [`auth-setup.ts`](./examples/auth-setup.ts)                                               | Complete SAP authentication setup (OnPrem, BTP, Office 365)   |
+| [`bom-e2e-praman-gold-standard.spec.ts`](./examples/bom-e2e-praman-gold-standard.spec.ts) | Full BOM end-to-end test (gold standard reference)            |
 
 ```bash
 # Run a specific example
@@ -269,14 +269,14 @@ npm run ci             # lint + typecheck + test + build
 
 Praman publishes its documentation in the [llmstxt.org](https://llmstxt.org) standard. AI agents and RAG pipelines can fetch these files directly:
 
-| File | Content |
-| --- | --- |
-| [`llms.txt`](https://mrkanitkar.github.io/playwright-praman/llms.txt) | Link index — all docs with descriptions |
-| [`llms-full.txt`](https://mrkanitkar.github.io/playwright-praman/llms-full.txt) | Complete documentation in a single file |
-| [`llms-quickstart.txt`](https://mrkanitkar.github.io/playwright-praman/llms-quickstart.txt) | Setup, fixtures, selectors, matchers |
-| [`llms-sap-testing.txt`](https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt) | Auth, FLP, OData, Fiori Elements, cookbook |
-| [`llms-migration.txt`](https://mrkanitkar.github.io/playwright-praman/llms-migration.txt) | Migration from Playwright, wdi5, Tosca |
-| [`llms-architecture.txt`](https://mrkanitkar.github.io/playwright-praman/llms-architecture.txt) | Architecture, bridge, proxy, ADRs |
+| File                                                                                            | Content                                    |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| [`llms.txt`](https://mrkanitkar.github.io/playwright-praman/llms.txt)                           | Link index — all docs with descriptions    |
+| [`llms-full.txt`](https://mrkanitkar.github.io/playwright-praman/llms-full.txt)                 | Complete documentation in a single file    |
+| [`llms-quickstart.txt`](https://mrkanitkar.github.io/playwright-praman/llms-quickstart.txt)     | Setup, fixtures, selectors, matchers       |
+| [`llms-sap-testing.txt`](https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt)   | Auth, FLP, OData, Fiori Elements, cookbook |
+| [`llms-migration.txt`](https://mrkanitkar.github.io/playwright-praman/llms-migration.txt)       | Migration from Playwright, wdi5, Tosca     |
+| [`llms-architecture.txt`](https://mrkanitkar.github.io/playwright-praman/llms-architecture.txt) | Architecture, bridge, proxy, ADRs          |
 
 Add to your agent instructions (CLAUDE.md, `.cursorrules`, `copilot-instructions.md`):
 
@@ -383,6 +383,56 @@ export default defineConfig({
   ],
 });
 ```
+
+## CI/CD Setup
+
+### GitHub Actions
+
+```yaml
+name: SAP UI5 Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+```
+
+### Azure DevOps
+
+```yaml
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+  - script: npm ci
+  - script: npx playwright install --with-deps chromium
+  - script: npx playwright test
+```
+
+### Environment Variables
+
+| Variable                    | Required | Description                                    |
+| --------------------------- | -------- | ---------------------------------------------- |
+| `SAP_CLOUD_BASE_URL`        | Yes      | SAP BTP or on-premise base URL                 |
+| `SAP_CLOUD_USERNAME`        | Yes      | SAP login username                             |
+| `SAP_CLOUD_PASSWORD`        | Yes      | SAP login password                             |
+| `SAP_CLIENT`                | No       | SAP client number                              |
+| `PRAMAN_SKIP_VERSION_CHECK` | No       | Set to `true` to skip Playwright version check |
 
 ## Changelog
 

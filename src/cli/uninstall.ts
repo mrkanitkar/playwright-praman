@@ -15,6 +15,9 @@
  * Protected files (`.env`, `tests/`, `node_modules/`, `package.json`) are NEVER removed.
  * Optionally removes Playwright browsers with `--remove-browsers`.
  *
+ * This file exceeds 300 LOC (~373 lines) due to the scaffolded file manifest
+ * and multiple helper functions. A follow-up decomposition is planned.
+ *
  * @module cli/uninstall
  */
 
@@ -175,42 +178,6 @@ const CATEGORY_LABELS: Readonly<Record<FileEntry['category'], string>> = {
   skill: 'Skill Files',
   seed: 'Seed Tests',
 };
-
-/**
- * Parses CLI arguments into {@link UninstallOptions}.
- *
- * @param argv - Raw CLI argument array (e.g., `process.argv.slice(2)`).
- * @returns Parsed options with defaults applied.
- *
- * @example
- * ```typescript
- * const opts = parseUninstallArgs(['--confirm', '--keep-config']);
- * // opts.confirm === true, opts.keepConfig === true
- * ```
- */
-export function parseUninstallArgs(argv: readonly string[]): UninstallOptions {
-  let targetDir = process.cwd();
-  let confirm = false;
-  let keepConfig = false;
-  let keepAgents = false;
-  let removeBrowsers = false;
-
-  const flagSet = new Set(argv);
-  confirm = flagSet.has('--confirm');
-  keepConfig = flagSet.has('--keep-config');
-  keepAgents = flagSet.has('--keep-agents');
-  removeBrowsers = flagSet.has('--remove-browsers');
-
-  const targetIndex = argv.indexOf('--target');
-  if (targetIndex !== -1) {
-    const next = argv[targetIndex + 1];
-    if (next !== undefined) {
-      targetDir = next;
-    }
-  }
-
-  return { targetDir, confirm, keepConfig, keepAgents, removeBrowsers };
-}
 
 /**
  * Returns the list of scaffolded files that exist in the target directory.
