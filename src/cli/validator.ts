@@ -14,11 +14,14 @@
  * Runs environment checks before init/doctor commands execute.
  * Returns a structured report with pass/fail/warn status per check.
  *
+ * This file exceeds 300 LOC (~324 lines) due to eight self-contained check
+ * functions with individual TSDoc. A follow-up decomposition is planned.
+ *
  * @module cli/validator
  */
 
 import { execSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
 
@@ -105,6 +108,39 @@ function checkNpmAvailable(): CheckResult {
   }
 }
 
+/** Minimum Playwright version required by Praman. Must match peerDependencies. */
+const MIN_PLAYWRIGHT_VERSION = '1.57.0';
+const PW_VERSION_CHECK_NAME = 'Playwright version';
+
+/**
+ * Compares two semantic version strings numerically.
+ *
+ * @remarks
+ * Self-contained in CLI module. Does not import from `#core/utils`
+ * because CLI runs independently before project configuration.
+ *
+ * @param version - The version to check.
+ * @param minimum - The minimum required version.
+ * @returns `true` if version is greater than or equal to minimum.
+ *
+ * @example
+ * ```typescript
+ * isVersionAtLeast('1.58.2', '1.57.0'); // true
+ * isVersionAtLeast('1.56.0', '1.57.0'); // false
+ * ```
+ */
+function isVersionAtLeast(version: string, minimum: string): boolean {
+  const parse = (v: string): readonly [number, number, number] => {
+    const parts = v.split('.').map(Number);
+    return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0];
+  };
+  const [vMajor, vMinor, vPatch] = parse(version);
+  const [mMajor, mMinor, mPatch] = parse(minimum);
+  if (vMajor !== mMajor) return vMajor > mMajor;
+  if (vMinor !== mMinor) return vMinor > mMinor;
+  return vPatch >= mPatch;
+}
+
 /**
  * Checks that `@playwright/test` is installed in the project's `node_modules`.
  *
@@ -124,6 +160,59 @@ function checkPlaywrightInstalled(): CheckResult {
     message: 'not installed',
     suggestion: 'npm install -D @playwright/test',
   };
+}
+
+/**
+ * Checks the installed `@playwright/test` version meets the minimum requirement.
+ *
+ * @remarks
+ * Reads `node_modules/@playwright/test/package.json` from disk and validates
+ * the version string against {@link MIN_PLAYWRIGHT_VERSION}.
+ * Returns `warn` (not `fail`) when the version cannot be read, to avoid
+ * blocking users when the package.json is temporarily inaccessible.
+ *
+ * @example
+ * ```typescript
+ * const result = checkPlaywrightVersion();
+ * // { name: 'Playwright version', status: 'pass', message: 'v1.58.2' }
+ * ```
+ */
+function checkPlaywrightVersion(): CheckResult {
+  const pkgPath = join(process.cwd(), 'node_modules', '@playwright', 'test', 'package.json');
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path constructed from cwd() + fixed segments
+    const content = readFileSync(pkgPath, 'utf8');
+    const pkg: { version?: string } = JSON.parse(content) as { version?: string };
+    const version = pkg.version;
+    if (version === undefined || version.length === 0) {
+      return {
+        name: PW_VERSION_CHECK_NAME,
+        status: 'warn',
+        message: 'Could not determine @playwright/test version',
+        suggestion: 'Run: npm install @playwright/test@latest',
+      };
+    }
+    if (isVersionAtLeast(version, MIN_PLAYWRIGHT_VERSION)) {
+      return {
+        name: PW_VERSION_CHECK_NAME,
+        status: 'pass',
+        message: `v${version}`,
+      };
+    }
+    return {
+      name: PW_VERSION_CHECK_NAME,
+      status: 'fail',
+      message: `v${version} (requires >=${MIN_PLAYWRIGHT_VERSION})`,
+      suggestion: 'Run: npm install @playwright/test@latest',
+    };
+  } catch {
+    return {
+      name: PW_VERSION_CHECK_NAME,
+      status: 'warn',
+      message: 'Could not read @playwright/test version',
+      suggestion: 'Run: npm install @playwright/test',
+    };
+  }
 }
 
 /**
@@ -220,6 +309,7 @@ export function validate(): ValidationReport {
     checkNodeVersion(),
     checkNpmAvailable(),
     checkPlaywrightInstalled(),
+    checkPlaywrightVersion(),
     checkSapBaseUrl(),
     checkSapUsername(),
     checkPlaywrightConfig(),

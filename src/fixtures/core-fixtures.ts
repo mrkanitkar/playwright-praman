@@ -44,6 +44,8 @@
  * @module fixtures
  */
 
+import process from 'node:process';
+
 import { expect, test as base } from '@playwright/test';
 import type { Frame } from '@playwright/test';
 import type { Logger } from 'pino';
@@ -187,7 +189,12 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
   playwrightCompat: [
     // eslint-disable-next-line no-empty-pattern -- Playwright fixture pattern: ({}, use) is required when no deps
     async ({}, use) => {
-      assertMinVersion(MIN_PLAYWRIGHT_VERSION);
+      const skipCheck =
+        process.env['PRAMAN_SKIP_VERSION_CHECK'] === 'true' ||
+        process.env['PRAMAN_SKIP_VERSION_CHECK'] === '1';
+      if (!skipCheck) {
+        assertMinVersion(MIN_PLAYWRIGHT_VERSION);
+      }
       const features = getPlaywrightFeatures();
       await use(features);
     },

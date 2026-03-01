@@ -17,6 +17,13 @@ permissions:
   pull-requests: write
   id-token: write
 
+env:
+  FORCE_COLOR: 1
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release-please:
     name: Release Please
@@ -36,7 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created || github.event.inputs.publish == 'true' }}
+    # Guard: update org/repo if this repository is ever renamed or transferred
+    if: github.repository == 'mrkanitkar/playwright-praman' && (needs.release-please.outputs.release_created || github.event.inputs.publish == 'true')
     environment:
       name: npm
       url: https://www.npmjs.com/package/playwright-praman
@@ -49,6 +57,14 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
+      - name: Verify clean tree
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::Working tree is dirty after build — do not publish with uncommitted changes"
+            git status --short
+            git diff
+            exit 1
+          fi
       - name: Validate export map
         run: npm run check:exports
       - run: npm run generate:sbom -- --ignore-npm-errors

@@ -19,7 +19,6 @@
  */
 
 import { join } from 'node:path';
-import process from 'node:process';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -70,8 +69,7 @@ vi.mock('../../../src/cli/logger.js', () => ({
 
 const { logStep, logSuccess, logWarn, logSection } = await import('../../../src/cli/logger.js');
 
-const { parseUninstallArgs, getScaffoldedFiles, runUninstall } =
-  await import('../../../src/cli/uninstall.js');
+const { getScaffoldedFiles, runUninstall } = await import('../../../src/cli/uninstall.js');
 
 /** Safe non-tmp test path to avoid sonarjs/publicly-writable-directories. */
 const TEST_DIR = join('/home', 'testuser', 'project');
@@ -93,72 +91,6 @@ describe('cli/uninstall', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  // ── parseUninstallArgs ──────────────────────────────────────────────────
-
-  describe('parseUninstallArgs', () => {
-    it('returns defaults when no arguments are provided', () => {
-      const opts = parseUninstallArgs([]);
-
-      expect(opts.confirm).toBe(false);
-      expect(opts.keepConfig).toBe(false);
-      expect(opts.keepAgents).toBe(false);
-      expect(opts.removeBrowsers).toBe(false);
-    });
-
-    it('sets confirm to true with --confirm flag', () => {
-      const opts = parseUninstallArgs(['--confirm']);
-
-      expect(opts.confirm).toBe(true);
-    });
-
-    it('sets keepConfig to true with --keep-config flag', () => {
-      const opts = parseUninstallArgs(['--keep-config']);
-
-      expect(opts.keepConfig).toBe(true);
-    });
-
-    it('sets keepAgents to true with --keep-agents flag', () => {
-      const opts = parseUninstallArgs(['--keep-agents']);
-
-      expect(opts.keepAgents).toBe(true);
-    });
-
-    it('sets removeBrowsers to true with --remove-browsers flag', () => {
-      const opts = parseUninstallArgs(['--remove-browsers']);
-
-      expect(opts.removeBrowsers).toBe(true);
-    });
-
-    it('sets targetDir with --target flag', () => {
-      const opts = parseUninstallArgs(['--target', TEST_DIR]);
-
-      expect(opts.targetDir).toBe(TEST_DIR);
-    });
-
-    it('handles multiple flags combined', () => {
-      const opts = parseUninstallArgs([
-        '--confirm',
-        '--keep-config',
-        '--keep-agents',
-        '--remove-browsers',
-        '--target',
-        TEST_DIR,
-      ]);
-
-      expect(opts.confirm).toBe(true);
-      expect(opts.keepConfig).toBe(true);
-      expect(opts.keepAgents).toBe(true);
-      expect(opts.removeBrowsers).toBe(true);
-      expect(opts.targetDir).toBe(TEST_DIR);
-    });
-
-    it('uses process.cwd() as default targetDir', () => {
-      const opts = parseUninstallArgs([]);
-
-      expect(opts.targetDir).toBe(process.cwd());
-    });
   });
 
   // ── getScaffoldedFiles ──────────────────────────────────────────────────

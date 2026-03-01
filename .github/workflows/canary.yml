@@ -1,0 +1,51 @@
+# .github/workflows/canary.yml
+name: Canary Publish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  FORCE_COLOR: 1
+
+concurrency:
+  group: canary
+  cancel-in-progress: false
+
+jobs:
+  canary-publish:
+    name: Publish @next to npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Guard: update org/repo if this repository is ever renamed or transferred
+    if: github.repository == 'mrkanitkar/playwright-praman'
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/playwright-praman
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run build
+      - name: Validate export map
+        run: npm run check:exports
+      - name: Stamp canary version
+        run: npm version prerelease --preid=alpha --no-git-tag-version
+      - name: Verify clean tree (only version bump expected)
+        run: |
+          CHANGED=$(git diff --name-only)
+          if [ "$CHANGED" != "package.json" ] && [ "$CHANGED" != $'package.json\npackage-lock.json' ]; then
+            echo "::error::Unexpected changes after version stamp"
+            git diff --stat
+            exit 1
+          fi
+      - run: npm publish --provenance --access public --tag next
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

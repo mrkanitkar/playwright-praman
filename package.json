@@ -92,7 +92,8 @@
       "import": "./dist/reporters/index.js",
       "require": "./dist/reporters/index.cjs",
       "default": "./dist/reporters/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "bin": {
     "playwright-praman": "./dist/cli/index.cjs"
@@ -170,6 +171,7 @@
     "@ui5/mcp-server": "0.2.6",
     "@vitest/coverage-v8": "4.0.18",
     "@vitest/ui": "4.0.18",
+    "commander": "14.0.3",
     "cspell": "9.6.4",
     "dotenv": "^17.0.0",
     "eslint": "9.39.2",

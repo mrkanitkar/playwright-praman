@@ -29,14 +29,16 @@ vi.mock('node:child_process', () => ({
 
 vi.mock('node:fs', () => ({
   existsSync: vi.fn(),
+  readFileSync: vi.fn(),
 }));
 
 const { execSync } = await import('node:child_process');
-const { existsSync } = await import('node:fs');
+const { existsSync, readFileSync } = await import('node:fs');
 const { default: process } = await import('node:process');
 
 const mockedExecSync = vi.mocked(execSync);
 const mockedExistsSync = vi.mocked(existsSync);
+const mockedReadFileSync = vi.mocked(readFileSync);
 
 /**
  * Retrieves a named check from the report's check list.
@@ -175,6 +177,94 @@ describe('cli/validator', () => {
     });
   });
 
+  // ── checkPlaywrightVersion ──────────────────────────────────────────────────
+
+  describe('Playwright version check', () => {
+    it('passes when @playwright/test version is exactly 1.57.0', () => {
+      mockedExistsSync.mockImplementation((filePath) => {
+        return String(filePath).includes('@playwright');
+      });
+      mockedReadFileSync.mockReturnValue(JSON.stringify({ version: '1.57.0' }));
+
+      const report = validate();
+      const check = getCheck(report.checks, 'Playwright version');
+
+      expect(check?.status).toBe('pass');
+      expect(check?.message).toBe('v1.57.0');
+    });
+
+    it('passes when @playwright/test version is above minimum (1.58.2)', () => {
+      mockedReadFileSync.mockReturnValue(JSON.stringify({ version: '1.58.2' }));
+
+      const report = validate();
+      const check = getCheck(report.checks, 'Playwright version');
+
+      expect(check?.status).toBe('pass');
+      expect(check?.message).toBe('v1.58.2');
+    });
+
+    it('fails when @playwright/test version is below minimum (1.56.0)', () => {
+      mockedReadFileSync.mockReturnValue(JSON.stringify({ version: '1.56.0' }));
+
+      const report = validate();
+      const check = getCheck(report.checks, 'Playwright version');
+
+      expect(check?.status).toBe('fail');
+      expect(check?.message).toContain('requires >=1.57.0');
+      expect(check?.suggestion).toContain('npm install');
+    });
+
+    it('fails when @playwright/test version is very old (1.20.0)', () => {
+      mockedReadFileSync.mockReturnValue(JSON.stringify({ version: '1.20.0' }));
+
+      const report = validate();
+      const check = getCheck(report.checks, 'Playwright version');
+
+      expect(check?.status).toBe('fail');
+    });
+
+    it('warns when @playwright/test package.json cannot be read', () => {
+      mockedReadFileSync.mockImplementation(() => {
+        throw new Error('ENOENT');
+      });
+
+      const report = validate();
+      const check = getCheck(report.checks, 'Playwright version');
+
+      expect(check?.status).toBe('warn');
+      expect(check?.message).toContain('Could not read');
+    });
+
+    it('warns when @playwright/test package.json has no version field', () => {
+      mockedReadFileSync.mockReturnValue(JSON.stringify({}));
+
+      const report = validate();
+      const check = getCheck(report.checks, 'Playwright version');
+
+      expect(check?.status).toBe('warn');
+      expect(check?.message).toContain('Could not determine');
+    });
+
+    it('warns when @playwright/test package.json has empty version', () => {
+      mockedReadFileSync.mockReturnValue(JSON.stringify({ version: '' }));
+
+      const report = validate();
+      const check = getCheck(report.checks, 'Playwright version');
+
+      expect(check?.status).toBe('warn');
+    });
+
+    it('handles malformed version string gracefully', () => {
+      mockedReadFileSync.mockReturnValue(JSON.stringify({ version: 'not-a-version' }));
+
+      const report = validate();
+      const check = getCheck(report.checks, 'Playwright version');
+
+      // parse('not-a-version') => [NaN, NaN, NaN], comparison returns false => fail
+      expect(check?.status).toBe('fail');
+    });
+  });
+
   // ── checkSapBaseUrl ─────────────────────────────────────────────────────────
 
   describe('SAP_CLOUD_BASE_URL check', () => {
@@ -282,10 +372,10 @@ describe('cli/validator', () => {
   // ── validate() — structured report ─────────────────────────────────────────
 
   describe('validate() structured report', () => {
-    it('returns a report with exactly 7 checks', () => {
+    it('returns a report with exactly 8 checks', () => {
       const report = validate();
 
-      expect(report.checks).toHaveLength(7);
+      expect(report.checks).toHaveLength(8);
     });
 
     it('report contains passed, failed, and warnings counts', () => {
@@ -306,12 +396,13 @@ describe('cli/validator', () => {
       vi.spyOn(process.versions, 'node', 'get').mockReturnValue('20.0.0');
       mockedExecSync.mockReturnValue('10.0.0\n');
       mockedExistsSync.mockReturnValue(true);
+      mockedReadFileSync.mockReturnValue(JSON.stringify({ version: '1.58.2' }));
       vi.stubEnv('SAP_CLOUD_BASE_URL', 'https://example.com');
       vi.stubEnv('SAP_CLOUD_USERNAME', 'admin');
 
       const report = validate();
 
-      expect(report.passed).toBe(7);
+      expect(report.passed).toBe(8);
       expect(report.failed).toBe(0);
       expect(report.warnings).toBe(0);
     });
