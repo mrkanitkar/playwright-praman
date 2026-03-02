@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -55,7 +55,7 @@ jobs:
         node-version: [20, 22, 24]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
@@ -79,7 +79,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -139,7 +139,7 @@ jobs:
           fi
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         if: steps.check-creds.outputs.skip == 'false'
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         if: steps.check-creds.outputs.skip == 'false'
         with:
           node-version-file: '.nvmrc'
@@ -170,7 +170,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -183,7 +183,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -204,7 +204,7 @@ jobs:
     needs: [quality, build]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
