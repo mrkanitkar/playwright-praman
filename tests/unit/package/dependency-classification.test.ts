@@ -12,7 +12,7 @@
  *
  * @remarks
  * Verifies that production dependencies do not include dev-only packages,
- * optional dependencies use semver ranges (not exact pins), and
+ * optional peer dependencies are correctly declared, and
  * dev-only packages are correctly placed in devDependencies.
  */
 import { readFileSync } from 'node:fs';
@@ -26,7 +26,8 @@ const pkgPath = join(dirName, '../../../package.json');
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as {
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
-  optionalDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  peerDependenciesMeta?: Record<string, { optional?: boolean }>;
 };
 
 describe('package.json dependency classification', () => {
@@ -48,11 +49,25 @@ describe('package.json dependency classification', () => {
     expect(pkg.devDependencies?.['zod-to-json-schema']).toBeDefined();
   });
 
-  // ── Optional dependencies must use semver ranges (not exact pins) ────
-  it('openai in optionalDependencies uses a semver range (^)', () => {
-    const openaiVersion = pkg.optionalDependencies?.['openai'];
-    expect(openaiVersion).toBeDefined();
-    expect(openaiVersion).toMatch(/^\^/);
+  // ── AI/OTel SDKs must be optional peerDependencies (not optionalDependencies) ──
+  it('openai is an optional peerDependency', () => {
+    expect(pkg.peerDependencies?.['openai']).toBeDefined();
+    expect(pkg.peerDependenciesMeta?.['openai']?.optional).toBe(true);
+  });
+
+  it('@opentelemetry/api is an optional peerDependency', () => {
+    expect(pkg.peerDependencies?.['@opentelemetry/api']).toBeDefined();
+    expect(pkg.peerDependenciesMeta?.['@opentelemetry/api']?.optional).toBe(true);
+  });
+
+  it('@opentelemetry/sdk-node is an optional peerDependency', () => {
+    expect(pkg.peerDependencies?.['@opentelemetry/sdk-node']).toBeDefined();
+    expect(pkg.peerDependenciesMeta?.['@opentelemetry/sdk-node']?.optional).toBe(true);
+  });
+
+  it('@anthropic-ai/sdk is an optional peerDependency', () => {
+    expect(pkg.peerDependencies?.['@anthropic-ai/sdk']).toBeDefined();
+    expect(pkg.peerDependenciesMeta?.['@anthropic-ai/sdk']?.optional).toBe(true);
   });
 
   it('dotenv in devDependencies uses a semver range (^)', () => {
@@ -67,9 +82,8 @@ describe('package.json dependency classification', () => {
     expect(zodVersion).toMatch(/^\^/);
   });
 
-  // ── opentelemetry still in optionalDependencies ──────────────────────
-  it('optionalDependencies still contains @opentelemetry packages', () => {
-    const apiVersion = pkg.optionalDependencies?.['@opentelemetry/api'];
-    expect(apiVersion).toBeDefined();
+  // ── No optionalDependencies field (moved to peerDependencies) ────────
+  it('does NOT have an optionalDependencies field', () => {
+    expect((pkg as Record<string, unknown>)['optionalDependencies']).toBeUndefined();
   });
 });

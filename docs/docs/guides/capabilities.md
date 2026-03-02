@@ -103,7 +103,7 @@ Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visibl
 ## Configuration & Extensibility
 
 - **Zod-validated config** with environment variable overrides
-- **14 error classes, 58 error codes** with `retryable` flag and `suggestions[]`
+- **14 error classes, 60 error codes** with `retryable` flag and `suggestions[]`
 - **Structured logging** with secret redaction
 - **OpenTelemetry integration** for distributed tracing
 - **Playwright step decoration** for rich HTML reports

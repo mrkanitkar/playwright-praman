@@ -23,12 +23,12 @@ export default function Notice(): ReactNode {
 
           <div style={{
             display: 'flex', alignItems: 'flex-start', gap: '1rem',
-            padding: '1.25rem', background: '#f0fdfa', borderRadius: 10,
-            border: '2px solid #0d948830', marginTop: '1.5rem',
+            padding: '1.25rem', background: '#edf4fa', borderRadius: 10,
+            border: '2px solid rgba(0,112,173,0.19)', marginTop: '1.5rem',
           }}>
             <div style={{
               width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
-              background: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'var(--ifm-color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#fff', fontSize: '1.1rem', fontWeight: 800,
             }}>
               w5
@@ -37,7 +37,7 @@ export default function Notice(): ReactNode {
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.3rem' }}>
                 wdi5{' '}
                 <a href="https://github.com/ui5-community/wdi5" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: '0.88rem', fontWeight: 600, color: '#0d9488' }}>
+                  style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--ifm-color-primary)' }}>
                   github.com/ui5-community/wdi5
                 </a>
               </div>

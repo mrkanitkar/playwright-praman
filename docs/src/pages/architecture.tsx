@@ -23,8 +23,10 @@ const steps = [
   { num: '08', label: 'Pull in SAP Cloud ALM', desc: 'Sync test results to ALM for governance & monitoring' },
 ];
 
-/* ── Styles ────────────────────────────────────────────── */
-const TEAL = '#0d9488';
+/* ── Theme tokens — aligned with custom.css central theme ─ */
+const PRIMARY = 'var(--ifm-color-primary)';         // #0070ad in light, #4aa9d5 in dark
+const PRIMARY_HEX = '#0070ad';                       // for hex-alpha ops (boxShadow, SVG)
+const SURFACE_PRIMARY = '#edf4fa';                   // light-blue tinted surface (was #f0fdfa teal)
 
 /* ── Full Architecture Section ─────────────────────────── */
 function ArchitectureFlow(): ReactNode {
@@ -40,7 +42,7 @@ function ArchitectureFlow(): ReactNode {
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes flowDash { to { stroke-dashoffset: -24; } }
-        @keyframes pulseNode { 0%,100% { box-shadow: 0 0 0 0 rgba(13,148,136,0.3); } 50% { box-shadow: 0 0 0 8px rgba(13,148,136,0); } }
+        @keyframes pulseNode { 0%,100% { box-shadow: 0 0 0 0 rgba(0,112,173,0.3); } 50% { box-shadow: 0 0 0 8px rgba(0,112,173,0); } }
         @keyframes dropDown { to { stroke-dashoffset: -16; } }
       `}</style>
 
@@ -50,9 +52,9 @@ function ArchitectureFlow(): ReactNode {
       </div>
       <div style={{ display: 'flex' }}>
         {activatePhases.map((p, i) => {
-          const bg = p.highlight ? TEAL : '#f1f5f9';
+          const bg = p.highlight ? PRIMARY : '#f1f5f9';
           const fg = p.highlight ? '#fff' : '#334155';
-          const arrow = p.highlight ? TEAL : '#cbd5e1';
+          const arrow = p.highlight ? PRIMARY : '#cbd5e1';
           return (
             <div key={i} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div style={{
@@ -80,7 +82,7 @@ function ArchitectureFlow(): ReactNode {
         }}>
           <svg width="100%" height="100%" viewBox="0 0 2 56" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible' }}>
             <line x1="1" y1="0" x2="1" y2="56"
-              stroke={TEAL} strokeWidth="3" strokeDasharray="6 4"
+              stroke={PRIMARY} strokeWidth="3" strokeDasharray="6 4"
               style={{ animation: 'dropDown 0.8s linear infinite' }} />
           </svg>
           {/* Arrow at bottom */}
@@ -88,7 +90,7 @@ function ArchitectureFlow(): ReactNode {
             position: 'absolute', bottom: -4, left: '50%', transform: 'translateX(-50%)',
             width: 0, height: 0,
             borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
-            borderTop: `8px solid ${TEAL}`,
+            borderTop: `8px solid ${PRIMARY}`,
           }} />
         </div>
 
@@ -98,7 +100,7 @@ function ArchitectureFlow(): ReactNode {
         }}>
           <svg width="100%" height="100%" viewBox="0 0 2 56" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible' }}>
             <line x1="1" y1="0" x2="1" y2="56"
-              stroke={TEAL} strokeWidth="3" strokeDasharray="6 4"
+              stroke={PRIMARY} strokeWidth="3" strokeDasharray="6 4"
               style={{ animation: 'dropDown 0.8s linear infinite' }} />
           </svg>
           {/* Arrow at bottom */}
@@ -106,7 +108,7 @@ function ArchitectureFlow(): ReactNode {
             position: 'absolute', bottom: -4, left: '50%', transform: 'translateX(-50%)',
             width: 0, height: 0,
             borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
-            borderTop: `8px solid ${TEAL}`,
+            borderTop: `8px solid ${PRIMARY}`,
           }} />
         </div>
 
@@ -114,13 +116,13 @@ function ArchitectureFlow(): ReactNode {
 
       {/* ── Row 2: Praman Pipeline (full width, with header bar) ── */}
       <div style={{
-        border: `2px solid ${TEAL}`, borderRadius: 12,
+        border: `2px solid ${PRIMARY}`, borderRadius: 12,
         overflow: 'hidden',
-        boxShadow: `0 4px 16px ${TEAL}20`,
+        boxShadow: `0 4px 16px rgba(0,112,173,0.12)`,
       }}>
         {/* Full-width header bar */}
         <div style={{
-          background: TEAL, color: '#fff',
+          background: PRIMARY, color: '#fff',
           padding: '0.5rem 1rem',
           fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
           textAlign: 'center',
@@ -145,7 +147,7 @@ function ArchitectureFlow(): ReactNode {
                 <div style={{
                   width: isActive ? 42 : 32, height: isActive ? 42 : 32,
                   borderRadius: '50%', margin: '0 auto 0.4rem',
-                  background: TEAL,
+                  background: PRIMARY,
                   color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: isActive ? '0.75rem' : '0.62rem', fontWeight: 700,
@@ -171,13 +173,13 @@ function ArchitectureFlow(): ReactNode {
                 <div style={{ display: 'flex', alignItems: 'center', height: 42, paddingTop: '0.4rem', flexShrink: 0 }}>
                   <svg width="18" height="10" style={{ overflow: 'visible' }}>
                     <line x1="0" y1="5" x2="12" y2="5"
-                      stroke={TEAL}
+                      stroke={PRIMARY}
                       strokeWidth="2"
                       strokeDasharray={isActive ? '5 3' : 'none'}
                       style={{
                         animation: isActive ? 'flowDash 0.8s linear infinite' : 'none',
                       }} />
-                    <polygon points="12,1.5 18,5 12,8.5" fill={TEAL} />
+                    <polygon points="12,1.5 18,5 12,8.5" fill={PRIMARY} />
                   </svg>
                 </div>
               )}
@@ -190,11 +192,11 @@ function ArchitectureFlow(): ReactNode {
       {/* ── Detail card ── */}
       <div key={active} style={{
         marginTop: '1rem', padding: '0.8rem 1rem',
-        background: '#f0fdfa', borderRadius: 8,
-        borderLeft: `4px solid ${TEAL}`,
+        background: SURFACE_PRIMARY, borderRadius: 8,
+        borderLeft: `4px solid ${PRIMARY}`,
         animation: 'fadeIn 0.3s ease-out both',
       }}>
-        <div style={{ fontSize: '0.58rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: TEAL, marginBottom: '0.2rem' }}>
+        <div style={{ fontSize: '0.58rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: PRIMARY, marginBottom: '0.2rem' }}>
           Step {active + 1} of {steps.length}
         </div>
         <div style={{ fontSize: '0.92rem', fontWeight: 600, color: '#0f172a', marginBottom: '0.15rem' }}>
@@ -231,7 +233,7 @@ interface FlowMessage {
 const lanes: FlowLane[] = [
   { id: 'seed', label: 'Seed File', color: AMBER, icon: 'S' },
   { id: 'mcp', label: 'Playwright MCP', color: INDIGO, icon: 'P' },
-  { id: 'planner', label: 'Praman SAP Planner', color: TEAL, icon: 'A' },
+  { id: 'planner', label: 'Praman SAP Planner', color: PRIMARY, icon: 'A' },
   { id: 'fiori', label: 'SAP Fiori / OData', color: '#e11d48', icon: 'F' },
   { id: 'output', label: 'Test Artifacts', color: SLATE, icon: 'T' },
 ];
@@ -344,7 +346,7 @@ function E2EFlow(): ReactNode {
       {/* Active message detail card */}
       <div key={activeMsg} style={{
         marginTop: '1rem', padding: '0.8rem 1rem',
-        background: '#f0fdfa', borderRadius: 8,
+        background: SURFACE_PRIMARY, borderRadius: 8,
         borderLeft: `4px solid ${lanes[messages[activeMsg].from].color}`,
         animation: 'fadeIn 0.3s ease-out both',
       }}>
@@ -352,11 +354,11 @@ function E2EFlow(): ReactNode {
           <span style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             width: 20, height: 20, borderRadius: '50%',
-            background: TEAL, color: '#fff', fontSize: '0.6rem', fontWeight: 700,
+            background: PRIMARY, color: '#fff', fontSize: '0.6rem', fontWeight: 700,
           }}>
             {activeMsg + 1}
           </span>
-          <span style={{ fontSize: '0.58rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: TEAL }}>
+          <span style={{ fontSize: '0.58rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: PRIMARY }}>
             {lanes[messages[activeMsg].from].label} {'\u2192'} {lanes[messages[activeMsg].to].label}
           </span>
         </div>
@@ -391,7 +393,7 @@ interface SeqMsg {
 
 const actors: SeqActor[] = [
   { id: 'test', label: 'Test Code', sub: 'bom-e2e.spec.ts', color: '#6366f1' },
-  { id: 'fixture', label: 'Fixtures', sub: 'ui5, sapAuth, odata', color: '#0d9488' },
+  { id: 'fixture', label: 'Fixtures', sub: 'ui5, sapAuth, odata', color: PRIMARY_HEX },
   { id: 'bridge', label: 'UI5 Bridge', sub: 'window.__praman_bridge', color: '#f59e0b' },
   { id: 'ui5', label: 'UI5 Runtime', sub: 'sap.ui.getCore()', color: '#e11d48' },
   { id: 'proxy', label: 'Control Proxy', sub: 'UI5ControlProxy', color: '#8b5cf6' },
@@ -621,15 +623,15 @@ function InternalOrchestration(): ReactNode {
 
 /* Shared doc styles */
 const docSection: React.CSSProperties = { marginBottom: '3rem' };
-const docH3: React.CSSProperties = { fontSize: '1.45rem', fontWeight: 800, color: '#020617', marginBottom: '0.75rem', borderBottom: '3px solid #0d9488', paddingBottom: '0.5rem' };
+const docH3: React.CSSProperties = { fontSize: '1.45rem', fontWeight: 800, color: '#020617', marginBottom: '0.75rem', borderBottom: '3px solid var(--ifm-color-primary)', paddingBottom: '0.5rem' };
 const docH4: React.CSSProperties = { fontSize: '1.12rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem', marginTop: '1.25rem' };
 const docP: React.CSSProperties = { fontSize: '0.95rem', color: '#1e293b', lineHeight: 1.7, marginBottom: '0.75rem' };
 const docCode: React.CSSProperties = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: '0.86rem', background: '#e2e8f0', padding: '0.15rem 0.45rem', borderRadius: 4, color: '#020617', fontWeight: 600 };
 const docTable: React.CSSProperties = { width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', marginBottom: '1rem' };
-const docTh: React.CSSProperties = { textAlign: 'left', padding: '0.6rem 0.75rem', background: '#f0fdfa', borderBottom: `3px solid ${TEAL}`, fontWeight: 800, color: '#020617', fontSize: '0.88rem' };
+const docTh: React.CSSProperties = { textAlign: 'left', padding: '0.6rem 0.75rem', background: SURFACE_PRIMARY, borderBottom: `3px solid ${PRIMARY}`, fontWeight: 800, color: '#020617', fontSize: '0.88rem' };
 const docTd: React.CSSProperties = { padding: '0.55rem 0.75rem', borderBottom: '1px solid #e2e8f0', color: '#0f172a', verticalAlign: 'top', fontWeight: 500 };
-const metricCard: React.CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem', background: '#f0fdfa', borderRadius: 8, border: `2px solid ${TEAL}30` };
-const metricNum: React.CSSProperties = { fontSize: '2rem', fontWeight: 900, color: TEAL, lineHeight: 1 };
+const metricCard: React.CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem', background: SURFACE_PRIMARY, borderRadius: 8, border: '2px solid rgba(0,112,173,0.19)' };
+const metricNum: React.CSSProperties = { fontSize: '2rem', fontWeight: 900, color: PRIMARY, lineHeight: 1 };
 const metricLabel: React.CSSProperties = { fontSize: '0.78rem', fontWeight: 700, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '0.3rem', textAlign: 'center' };
 const layerBox = (color: string): React.CSSProperties => ({ border: `2px solid ${color}`, borderRadius: 10, padding: '1rem 1.2rem', marginBottom: '0.75rem', background: `${color}0a` });
 const layerTag = (color: string): React.CSSProperties => ({ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: 4, background: color, color: '#fff', fontSize: '0.74rem', fontWeight: 800, marginRight: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.04em' });
@@ -640,7 +642,7 @@ function LayerDiagram(): ReactNode {
   const layers = [
     { name: 'AI Layer', sub: 'ai/, intents/, vocabulary/', color: '#8b5cf6', modules: 'PramanAI, Intents, Vocabulary, AI Healing' },
     { name: 'Fixtures', sub: 'fixtures/, matchers/', color: '#6366f1', modules: '11 fixtures via mergeTests(), 10 custom matchers' },
-    { name: 'Typed Proxy', sub: 'proxy/', color: '#0d9488', modules: 'UI5ControlProxy, 8-step get trap, 13 built-in overrides' },
+    { name: 'Typed Proxy', sub: 'proxy/', color: PRIMARY_HEX, modules: 'UI5ControlProxy, 8-step get trap, 13 built-in overrides' },
     { name: 'Bridge Adapters', sub: 'bridge/, selectors/', color: '#f59e0b', modules: '10 browser scripts, 3 strategies, injection engine' },
     { name: 'Core Infrastructure', sub: 'core/, auth/, modules/', color: '#e11d48', modules: 'Errors, Config, Logging, Types, Selectors, Wait Helpers' },
   ];
@@ -715,7 +717,7 @@ function DataFlowDiagram(): ReactNode {
       {/* Row 1: Forward path */}
       <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.25rem' }}>
         {flowNode('Test Code', '#6366f1', 1)}{arrow}
-        {flowNode('Fixtures', '#0d9488', 2)}{arrow}
+        {flowNode('Fixtures', PRIMARY_HEX, 2)}{arrow}
         {flowNode('Bridge Injection', '#f59e0b', 3)}{arrow}
         {flowNode('Browser Context', '#e11d48', 4)}
       </div>
@@ -729,7 +731,7 @@ function DataFlowDiagram(): ReactNode {
       {downArrow}
       {/* Row 3: Return path */}
       <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.25rem' }}>
-        {flowNode('Return Handler', '#0d9488', 8)}{arrow}
+        {flowNode('Return Handler', PRIMARY_HEX, 8)}{arrow}
         {flowNode('Assertions', '#334155', 9)}{arrow}
         {flowNode('Report', '#6366f1', 10)}
       </div>
@@ -742,8 +744,8 @@ function ProxyGetTrapDiagram(): ReactNode {
   const steps = [
     { label: 'Symbol?', desc: 'toPrimitive \u2192 string, others \u2192 undefined', color: '#6366f1' },
     { label: 'Anti-thenable?', desc: 'then/catch/finally \u2192 undefined', color: '#6366f1' },
-    { label: 'Direct prop?', desc: 'id, controlType \u2192 local state', color: '#0d9488' },
-    { label: 'Built-in?', desc: '13 overrides (press, setValue, getId\u2026)', color: '#0d9488' },
+    { label: 'Direct prop?', desc: 'id, controlType \u2192 local state', color: PRIMARY_HEX },
+    { label: 'Built-in?', desc: '13 overrides (press, setValue, getId\u2026)', color: PRIMARY_HEX },
     { label: 'Blacklisted?', desc: 'throwIfBlacklisted \u2192 ControlError', color: '#e11d48' },
     { label: 'Dynamic forwarder', desc: 'getOrCreateForwarder(prop) \u2192 cached', color: '#f59e0b' },
     { label: 'page.evaluate()', desc: 'Execute method in browser via bridge', color: '#f59e0b' },
@@ -865,8 +867,8 @@ function TechnicalDocumentation(): ReactNode {
             </p>
           </div>
 
-          <div style={layerBox('#0d9488')}>
-            <div><span style={layerTag('#0d9488')}>Layer 3</span><strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>Typed Proxy</strong></div>
+          <div style={layerBox(PRIMARY_HEX)}>
+            <div><span style={layerTag(PRIMARY_HEX)}>Layer 3</span><strong style={{ color: '#0f172a', fontSize: '0.95rem' }}>Typed Proxy</strong></div>
             <p style={{ ...docP, marginTop: '0.4rem', marginBottom: 0 }}>
               ES <span style={docCode}>Proxy</span> with 8-step get trap resolution. 13 built-in method overrides
               (getId, getControlType, press, enterText, select, exec, getAggregation, toString, toJSON,
@@ -997,7 +999,7 @@ function TechnicalDocumentation(): ReactNode {
               const isChild = path.startsWith('  ');
               return (
                 <tr key={path} style={{ background: isChild ? '#f8fafc' : 'transparent' }}>
-                  <td style={{ ...docTd, fontWeight: isChild ? 500 : 700, color: isChild ? '#334155' : TEAL, paddingLeft: isChild ? '2rem' : '0.75rem' }}>
+                  <td style={{ ...docTd, fontWeight: isChild ? 500 : 700, color: isChild ? '#334155' : PRIMARY, paddingLeft: isChild ? '2rem' : '0.75rem' }}>
                     {isChild ? '\u2514\u2500 ' : ''}{path.trim()}
                   </td>
                   <td style={docTd}>{desc}</td>
@@ -1080,7 +1082,7 @@ function TechnicalDocumentation(): ReactNode {
             { method: 'retrieveMembers()', desc: 'Method names from prototype chain' },
           ].map((m) => (
             <div key={m.method} style={{ padding: '0.4rem 0.6rem', background: '#f8fafc', borderRadius: 6, border: '1px solid #e2e8f0' }}>
-              <span style={{ ...docCode, fontSize: '0.76rem', color: TEAL }}>{m.method}</span>
+              <span style={{ ...docCode, fontSize: '0.76rem', color: PRIMARY }}>{m.method}</span>
               <div style={{ fontSize: '0.82rem', color: '#1e293b', marginTop: '0.15rem' }}>{m.desc}</div>
             </div>
           ))}
@@ -1117,7 +1119,7 @@ function TechnicalDocumentation(): ReactNode {
               ['9', 'unknown', 'Instance check failed', 'Returns undefined with diagnostic logging'],
             ].map(([num, type, condition, action]) => (
               <tr key={type}>
-                <td style={{ ...docTd, fontWeight: 700, color: TEAL, textAlign: 'center' }}>{num}</td>
+                <td style={{ ...docTd, fontWeight: 700, color: PRIMARY, textAlign: 'center' }}>{num}</td>
                 <td style={{ ...docTd, fontWeight: 700 }}><span style={docCode}>{type}</span></td>
                 <td style={docTd}>{condition}</td>
                 <td style={docTd}>{action}</td>
@@ -1136,8 +1138,8 @@ function TechnicalDocumentation(): ReactNode {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {/* Tier 1 */}
-          <div style={{ border: '2px solid #0d9488', borderRadius: 10, overflow: 'hidden' }}>
-            <div style={{ background: '#0d9488', color: '#fff', padding: '0.5rem 0.75rem', fontSize: '0.78rem', fontWeight: 700 }}>
+          <div style={{ border: `2px solid ${PRIMARY_HEX}`, borderRadius: 10, overflow: 'hidden' }}>
+            <div style={{ background: PRIMARY_HEX, color: '#fff', padding: '0.5rem 0.75rem', fontSize: '0.78rem', fontWeight: 700 }}>
               Tier 1: bridge.getById() — Exact ID Match
             </div>
             <div style={{ padding: '0.75rem' }}>
@@ -1147,7 +1149,7 @@ function TechnicalDocumentation(): ReactNode {
               </p>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 {[
-                  { step: '1a', api: 'Element.getElementById(id)', ver: 'UI5 2.x', color: '#0d9488' },
+                  { step: '1a', api: 'Element.getElementById(id)', ver: 'UI5 2.x', color: PRIMARY_HEX },
                   { step: '1b', api: 'ElementRegistry.get(id)', ver: 'UI5 >= 1.120', color: '#0ea5e9' },
                   { step: '1c', api: 'sap.ui.getCore().byId(id)', ver: 'UI5 < 1.120 (legacy)', color: '#334155' },
                 ].map((f) => (
@@ -1520,7 +1522,7 @@ function TechnicalDocumentation(): ReactNode {
             { plugin: 'eslint-plugin-headers', scope: 'Apache-2.0 license headers', ver: 'v1.3.4' },
           ].map((p) => (
             <div key={p.plugin} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.6rem', background: '#f8fafc', borderRadius: 6, border: '1px solid #e2e8f0' }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: TEAL, flexShrink: 0 }} />
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: PRIMARY, flexShrink: 0 }} />
               <div>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0f172a' }}>{p.plugin}</div>
                 <div style={{ fontSize: '0.82rem', color: '#1e293b' }}>{p.scope} — {p.ver}</div>
@@ -1559,10 +1561,10 @@ function TechnicalDocumentation(): ReactNode {
             <tr>
               <td style={{ ...docTd, fontWeight: 700 }}>Tier 2</td>
               <td style={docTd}>Core infrastructure (src/core/)</td>
-              <td style={{ ...docTd, textAlign: 'center', fontWeight: 700, color: TEAL }}>95%</td>
-              <td style={{ ...docTd, textAlign: 'center', fontWeight: 700, color: TEAL }}>90%</td>
-              <td style={{ ...docTd, textAlign: 'center', fontWeight: 700, color: TEAL }}>95%</td>
-              <td style={{ ...docTd, textAlign: 'center', fontWeight: 700, color: TEAL }}>95%</td>
+              <td style={{ ...docTd, textAlign: 'center', fontWeight: 700, color: PRIMARY }}>95%</td>
+              <td style={{ ...docTd, textAlign: 'center', fontWeight: 700, color: PRIMARY }}>90%</td>
+              <td style={{ ...docTd, textAlign: 'center', fontWeight: 700, color: PRIMARY }}>95%</td>
+              <td style={{ ...docTd, textAlign: 'center', fontWeight: 700, color: PRIMARY }}>95%</td>
             </tr>
             <tr>
               <td style={{ ...docTd, fontWeight: 700 }}>Tier 3</td>
@@ -1667,7 +1669,7 @@ export default function Architecture(): ReactNode {
             }}>
               <div style={{
                 width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                background: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: PRIMARY_HEX, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: '#fff', fontSize: '1.1rem', fontWeight: 800,
               }}>
                 w5
@@ -1676,7 +1678,7 @@ export default function Architecture(): ReactNode {
                 <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.2rem' }}>
                   wdi5{' '}
                   <a href="https://github.com/ui5-community/wdi5" target="_blank" rel="noopener noreferrer"
-                    style={{ fontSize: '0.8rem', fontWeight: 500, color: TEAL }}>
+                    style={{ fontSize: '0.8rem', fontWeight: 500, color: PRIMARY }}>
                     github.com/ui5-community/wdi5
                   </a>
                 </div>
