@@ -100,6 +100,17 @@ const SECTIONS: Section[] = [
     ],
   },
   {
+    title: 'Cloud & CI/CD',
+    rows: [
+      { feature: 'Azure Playwright Workspaces',     native: C('check',   '✓ Full support'),                     praman: C('check',   '✓ Full support — all features work remotely') },
+      { feature: 'Cloud-hosted browsers',            native: C('check',   '✓ connectOptions'),                   praman: C('check',   '✓ Transparent — fixtures, proxy, bridge all work') },
+      { feature: 'GitHub Actions CI',                native: C('check',   '✓ Standard'),                         praman: C('check',   '✓ Pre-built workflow + Azure integration') },
+      { feature: 'Zero local machine pipeline',      native: C('check',   '✓ With GitHub Actions'),              praman: C('check',   '✓ GitHub + Azure = fully automated SAP testing') },
+      { feature: 'Scale to 100 parallel workers',    native: C('check',   '✓ Azure Workspaces limit'),           praman: C('check',   '✓ Per-app parallelism for SAP tests') },
+      { feature: 'SAP on-prem via exposeNetwork',    native: C('no',      '✗ Manual proxy config'),              praman: C('check',   '✓ Built-in exposeNetwork patterns') },
+    ],
+  },
+  {
     title: 'Performance',
     rows: [
       { feature: 'Test execution speed',          native: C('check',   '⚡ Fast — native browser'),  praman: C('check',  '⚡ Fast — Playwright-based') },
@@ -225,6 +236,11 @@ function FeatureGrid(): ReactNode {
       icon: '\u{1F9EA}',
       title: 'Agentic Test Generation',
       desc: 'Plan, generate, and heal tests with Praman SAP agents. Seed-based auth, live browser validation, 7 mandatory compliance rules.',
+    },
+    {
+      icon: '\u{2601}',
+      title: 'Azure Playwright Workspaces',
+      desc: 'Run SAP E2E tests at scale with cloud-hosted browsers. GitHub Actions + Azure = fully automated pipeline. No local machine required.',
     },
   ];
 

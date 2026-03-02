@@ -98,16 +98,18 @@ More examples in the [`examples/`](./examples/) directory.
 
 ## Documentation
 
-| Topic                         | Link                                                                                          |
-| ----------------------------- | --------------------------------------------------------------------------------------------- |
-| Full getting started guide    | [Getting Started](https://mrkanitkar.github.io/playwright-praman/docs/guides/getting-started) |
-| Configuration reference       | [Configuration](https://mrkanitkar.github.io/playwright-praman/docs/guides/configuration)     |
-| Authentication (6 strategies) | [Authentication](https://mrkanitkar.github.io/playwright-praman/docs/guides/authentication)   |
-| Agent & IDE setup             | [Agent Setup](https://mrkanitkar.github.io/playwright-praman/docs/guides/agent-setup)         |
-| Fixtures reference            | [Fixtures](https://mrkanitkar.github.io/playwright-praman/docs/guides/fixtures)               |
-| Error codes (60)              | [Errors](https://mrkanitkar.github.io/playwright-praman/docs/guides/errors)                   |
-| API reference                 | [API Docs](https://mrkanitkar.github.io/playwright-praman/docs/api/)                          |
-| LLM-friendly docs             | [llms.txt](https://mrkanitkar.github.io/playwright-praman/llms.txt)                           |
+| Topic                         | Link                                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Full getting started guide    | [Getting Started](https://mrkanitkar.github.io/playwright-praman/docs/guides/getting-started)           |
+| Configuration reference       | [Configuration](https://mrkanitkar.github.io/playwright-praman/docs/guides/configuration)               |
+| Authentication (6 strategies) | [Authentication](https://mrkanitkar.github.io/playwright-praman/docs/guides/authentication)             |
+| Agent & IDE setup             | [Agent Setup](https://mrkanitkar.github.io/playwright-praman/docs/guides/agent-setup)                   |
+| Fixtures reference            | [Fixtures](https://mrkanitkar.github.io/playwright-praman/docs/guides/fixtures)                         |
+| Error codes (60)              | [Errors](https://mrkanitkar.github.io/playwright-praman/docs/guides/errors)                             |
+| Azure Playwright Workspaces   | [Cloud Testing](https://mrkanitkar.github.io/playwright-praman/docs/guides/azure-playwright-workspaces) |
+| Docker & CI/CD                | [CI/CD Guide](https://mrkanitkar.github.io/playwright-praman/docs/guides/docker-cicd)                   |
+| API reference                 | [API Docs](https://mrkanitkar.github.io/playwright-praman/docs/api/)                                    |
+| LLM-friendly docs             | [llms.txt](https://mrkanitkar.github.io/playwright-praman/llms.txt)                                     |
 
 ## Sub-path Exports
 

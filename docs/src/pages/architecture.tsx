@@ -1586,6 +1586,248 @@ function TechnicalDocumentation(): ReactNode {
   );
 }
 
+/* ── Section 5: Cloud Testing Architecture ─────────────── */
+const AZURE_BLUE = '#0078d4';
+const GITHUB_BLACK = '#24292e';
+const SAP_GOLD = '#f0ab00';
+
+interface CloudNode {
+  id: string;
+  label: string;
+  sub: string;
+  color: string;
+  icon: string;
+}
+
+interface CloudStep {
+  num: number;
+  from: number;
+  to: number;
+  label: string;
+  detail: string;
+  protocol: string;
+}
+
+const cloudNodes: CloudNode[] = [
+  { id: 'github', label: 'GitHub Repository', sub: 'tests/, src/, configs', color: GITHUB_BLACK, icon: 'G' },
+  { id: 'runner', label: 'GitHub Actions Runner', sub: 'Node.js + playwright-praman', color: '#6366f1', icon: 'R' },
+  { id: 'azure', label: 'Azure Cloud Browsers', sub: 'Chromium / Firefox / WebKit', color: AZURE_BLUE, icon: 'A' },
+  { id: 'sap', label: 'SAP Cloud System', sub: 'BTP / S/4HANA / Fiori', color: SAP_GOLD, icon: 'S' },
+];
+
+const cloudSteps: CloudStep[] = [
+  { num: 1, from: 0, to: 1, label: 'Trigger CI', detail: 'Push, PR, schedule, or manual dispatch triggers GitHub Actions workflow', protocol: 'Git webhook' },
+  { num: 2, from: 1, to: 1, label: 'Install & Build', detail: 'npm ci installs playwright-praman, Playwright, @azure/playwright. Build artifacts downloaded.', protocol: 'npm registry' },
+  { num: 3, from: 1, to: 2, label: 'Connect Browsers', detail: 'createAzurePlaywrightConfig() sets connectOptions → WebSocket to Azure-managed browsers', protocol: 'WebSocket (Playwright Protocol)' },
+  { num: 4, from: 1, to: 2, label: 'Inject Bridge', detail: 'page.addInitScript() sends UI5 bridge code to remote browser. selectors.register() sends ui5= engine.', protocol: 'Playwright Protocol' },
+  { num: 5, from: 2, to: 3, label: 'Navigate to SAP', detail: 'Cloud browser loads SAP Fiori Launchpad. Auth via storageState cookies. UI5 Core loads.', protocol: 'HTTPS' },
+  { num: 6, from: 1, to: 2, label: 'Execute Tests', detail: 'Fixtures, proxy, page.evaluate() — all Praman features work transparently over remote connection', protocol: 'Playwright Protocol' },
+  { num: 7, from: 2, to: 1, label: 'Return Results', detail: 'Traces, screenshots, test results transferred back to runner. HTML report generated.', protocol: 'Playwright Protocol' },
+  { num: 8, from: 1, to: 0, label: 'Upload Artifacts', detail: 'HTML report, traces, screenshots uploaded as GitHub Actions artifacts for download', protocol: 'GitHub API' },
+];
+
+function CloudTestingArchitecture(): ReactNode {
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setActiveStep((p) => (p + 1) % cloudSteps.length), 3500);
+    return () => clearInterval(t);
+  }, []);
+
+  const nodeW = 180;
+  const nodeGap = 32;
+  const totalW = cloudNodes.length * nodeW + (cloudNodes.length - 1) * nodeGap;
+  const headerH = 88;
+  const msgH = 56;
+  const topPad = 20;
+  const svgH = headerH + topPad + cloudSteps.length * msgH + 40;
+
+  const nodeX = (i: number) => i * (nodeW + nodeGap) + nodeW / 2;
+
+  return (
+    <div>
+      {/* What runs where cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '2rem' }}>
+        {[
+          { label: 'GitHub Repo', where: 'Code Storage', items: ['Test scripts', 'Configs', 'Secrets'], color: GITHUB_BLACK, icon: 'G' },
+          { label: 'GitHub Runner', where: 'Test Execution', items: ['Node.js workers', 'playwright-praman', 'Fixtures & assertions'], color: '#6366f1', icon: 'R' },
+          { label: 'Azure Browsers', where: 'Browser Runtime', items: ['DOM rendering', 'page.evaluate()', 'UI5 bridge scripts'], color: AZURE_BLUE, icon: 'A' },
+          { label: 'SAP System', where: 'App Under Test', items: ['Fiori Launchpad', 'OData services', 'Business data'], color: SAP_GOLD, icon: 'S' },
+        ].map((n) => (
+          <div key={n.label} style={{
+            border: `2px solid ${n.color}30`, borderRadius: 10, padding: '1rem',
+            background: `${n.color}08`,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: '50%', background: n.color,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: '0.72rem', fontWeight: 800, flexShrink: 0,
+              }}>{n.icon}</div>
+              <div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a' }}>{n.label}</div>
+                <div style={{ fontSize: '0.72rem', fontWeight: 600, color: n.color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{n.where}</div>
+              </div>
+            </div>
+            <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.82rem', color: '#1e293b' }}>
+              {n.items.map((item) => <li key={item} style={{ marginBottom: '0.15rem' }}>{item}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      {/* Sequence diagram */}
+      <div style={{ overflowX: 'auto' }}>
+        <style>{`
+          @keyframes cloudFlow { to { stroke-dashoffset: -20; } }
+        `}</style>
+
+        <svg width={totalW} height={svgH} style={{ display: 'block', margin: '0 auto' }}>
+          {/* Node headers */}
+          {cloudNodes.map((n, i) => {
+            const x = nodeX(i);
+            return (
+              <g key={n.id}>
+                {/* Lifeline */}
+                <line x1={x} y1={headerH + 4} x2={x} y2={svgH - 10}
+                  stroke={n.color} strokeWidth="2" strokeDasharray="6 4" opacity="0.3" />
+                {/* Header box */}
+                <rect x={x - nodeW / 2 + 4} y={4} width={nodeW - 8} height={headerH - 8}
+                  rx="10" fill={n.color} opacity="0.1" stroke={n.color} strokeWidth="2" />
+                {/* Icon circle */}
+                <circle cx={x} cy={28} r={16} fill={n.color} />
+                <text x={x} y={33} textAnchor="middle" fill="#fff" fontSize="14" fontWeight="800">
+                  {n.icon}
+                </text>
+                {/* Labels */}
+                <text x={x} y={56} textAnchor="middle" fill="#0f172a" fontSize="12" fontWeight="700">
+                  {n.label}
+                </text>
+                <text x={x} y={70} textAnchor="middle" fill="#1e293b" fontSize="10" fontWeight="600">
+                  {n.sub}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Steps */}
+          {cloudSteps.map((s, i) => {
+            const y = headerH + topPad + i * msgH + msgH / 2;
+            const x1 = nodeX(s.from);
+            const x2 = nodeX(s.to);
+            const isActive = i === activeStep;
+            const isSelf = s.from === s.to;
+
+            if (isSelf) {
+              // Self-referencing arrow (loop)
+              const loopW = 40;
+              const loopH = 20;
+              return (
+                <g key={i}>
+                  <circle cx={14} cy={y} r={11} fill={cloudNodes[s.from].color} />
+                  <text x={14} y={y + 4} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="800">
+                    {s.num}
+                  </text>
+                  <path d={`M ${x1 + 8} ${y - 4} Q ${x1 + loopW} ${y - loopH} ${x1 + loopW} ${y} Q ${x1 + loopW} ${y + loopH} ${x1 + 8} ${y + 4}`}
+                    fill="none" stroke={cloudNodes[s.from].color} strokeWidth={2}
+                    strokeDasharray={isActive ? '8 4' : 'none'}
+                    style={{ animation: isActive ? 'cloudFlow 0.6s linear infinite' : 'none' }} />
+                  <polygon points={`${x1 + 8},${y + 4} ${x1 + 16},${y + 1} ${x1 + 14},${y + 10}`}
+                    fill={cloudNodes[s.from].color} />
+                  <text x={x1 + loopW + 8} y={y + 4} fill="#0f172a" fontSize="11" fontWeight="700">
+                    {s.label}
+                  </text>
+                  {isActive && (
+                    <rect x={x1 - 4} y={y - 22} width={loopW + nodeW / 2} height={34}
+                      rx={6} fill={cloudNodes[s.from].color} opacity="0.06" />
+                  )}
+                </g>
+              );
+            }
+
+            const dir = x2 > x1 ? 1 : -1;
+            const midX = (x1 + x2) / 2;
+
+            return (
+              <g key={i}>
+                <circle cx={14} cy={y} r={11} fill={cloudNodes[s.from].color} />
+                <text x={14} y={y + 4} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="800">
+                  {s.num}
+                </text>
+                <line x1={x1 + dir * 4} y1={y} x2={x2 - dir * 10} y2={y}
+                  stroke={cloudNodes[s.from].color} strokeWidth={2}
+                  strokeDasharray={isActive ? '8 4' : 'none'}
+                  style={{ animation: isActive ? 'cloudFlow 0.6s linear infinite' : 'none' }} />
+                <polygon
+                  points={`${x2 - dir * 2},${y} ${x2 - dir * 10},${y - 5} ${x2 - dir * 10},${y + 5}`}
+                  fill={cloudNodes[s.to].color} />
+                <text x={midX} y={y - 10} textAnchor="middle" fill="#0f172a" fontSize="11" fontWeight="700">
+                  {s.label}
+                </text>
+                {isActive && (
+                  <rect x={Math.min(x1, x2) - 4} y={y - 20} width={Math.abs(x2 - x1) + 8} height={30}
+                    rx={6} fill={cloudNodes[s.from].color} opacity="0.06" />
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* Active step detail card */}
+      <div key={activeStep} style={{
+        marginTop: '1rem', borderRadius: 10, overflow: 'hidden',
+        border: `2px solid ${cloudNodes[cloudSteps[activeStep].from].color}20`,
+        animation: 'fadeIn 0.3s ease-out both',
+      }}>
+        <div style={{
+          background: '#1e293b', padding: '0.5rem 1rem',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+          fontSize: '0.78rem', color: '#a5f3fc', lineHeight: 1.4,
+        }}>
+          <span style={{ color: '#67e8f9', marginRight: '0.5rem' }}>Protocol:</span>
+          {cloudSteps[activeStep].protocol}
+        </div>
+        <div style={{ padding: '0.8rem 1rem', background: '#f8fafc' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 22, height: 22, borderRadius: '50%',
+              background: cloudNodes[cloudSteps[activeStep].from].color,
+              color: '#fff', fontSize: '0.62rem', fontWeight: 700,
+            }}>
+              {cloudSteps[activeStep].num}
+            </span>
+            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a' }}>
+              {cloudSteps[activeStep].label}
+            </span>
+            <span style={{ fontSize: '0.8rem', color: '#334155', fontWeight: 600 }}>
+              {cloudNodes[cloudSteps[activeStep].from].label} {'\u2192'} {cloudNodes[cloudSteps[activeStep].to].label}
+            </span>
+          </div>
+          <div style={{ fontSize: '0.88rem', color: '#1e293b', lineHeight: 1.6 }}>
+            {cloudSteps[activeStep].detail}
+          </div>
+        </div>
+      </div>
+
+      {/* Link to full guide */}
+      <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+        <a href="/playwright-praman/docs/guides/azure-playwright-workspaces"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+            padding: '0.65rem 1.5rem', borderRadius: 8,
+            background: AZURE_BLUE, color: '#fff',
+            fontSize: '0.88rem', fontWeight: 700,
+            textDecoration: 'none',
+          }}>
+          Full Setup Guide {'\u2192'}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 /* ── Page ──────────────────────────────────────────────── */
 export default function Architecture(): ReactNode {
   return (
@@ -1648,6 +1890,21 @@ export default function Architecture(): ReactNode {
             </p>
           </div>
           <TechnicalDocumentation />
+        </section>
+
+        {/* ── Section 5: Cloud Testing Architecture ── */}
+        <section style={{ maxWidth: 1020, margin: '0 auto', padding: '3rem 2rem 5rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <p className="praman-section-label">Cloud Execution</p>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem' }}>
+              Azure Playwright Workspaces Integration
+            </h2>
+            <p style={{ fontSize: '0.95rem', color: '#1e293b', maxWidth: 720, margin: '0 auto' }}>
+              Run SAP E2E tests at scale with cloud-hosted browsers.
+              GitHub Actions runs your test code, Azure runs the browsers, SAP Cloud is tested end-to-end — no local machine required.
+            </p>
+          </div>
+          <CloudTestingArchitecture />
         </section>
 
         {/* ── Acknowledgments ── */}
