@@ -43,6 +43,9 @@ jobs:
       - name: Install Docusaurus deps
         working-directory: docs
         run: npm ci
+      - name: Clear Docusaurus cache
+        working-directory: docs
+        run: npx docusaurus clear
       - name: Build Docusaurus
         working-directory: docs
         run: npm run build

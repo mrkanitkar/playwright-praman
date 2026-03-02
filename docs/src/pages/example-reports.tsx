@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Layout from '@theme/Layout';
+import { useBaseUrlUtils } from '@docusaurus/useBaseUrl';
 
 /* ─── Report Data ─────────────────────────────────────────── */
 
@@ -808,6 +809,9 @@ function ReportGallery(): ReactNode {
     { title: 'How It Works', scope: 'Praman architecture & data flow', slug: 'how-it-works', icon: '\u2699\uFE0F' },
   ];
 
+  const { withBaseUrl } = useBaseUrlUtils();
+  const reportUrl = (slug: string) => withBaseUrl(`/example-reports/${slug}`);
+
   return (
     <section className="er-section" style={{ paddingBottom: 0 }}>
       {/* Important note */}
@@ -826,7 +830,7 @@ function ReportGallery(): ReactNode {
 
       {/* Full Dashboard banner */}
       <a
-        href="/playwright-praman/example-reports/dashboard"
+        href={reportUrl('dashboard')}
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -858,7 +862,7 @@ function ReportGallery(): ReactNode {
           return (
             <a
               key={r.slug}
-              href={isAnchor ? r.slug : `/playwright-praman/example-reports/${r.slug}`}
+              href={isAnchor ? r.slug : reportUrl(r.slug)}
               target={isAnchor ? undefined : '_blank'}
               rel={isAnchor ? undefined : 'noopener noreferrer'}
               style={{
@@ -890,6 +894,8 @@ function ReportGallery(): ReactNode {
 /* ─── Page ─────────────────────────────────────────────────── */
 
 export default function ExampleReports(): ReactNode {
+  const { withBaseUrl } = useBaseUrlUtils();
+
   return (
     <Layout title="Example Reports" description="Praman example reports — evidence-based SAP test reports for every stakeholder">
       <main className="er-page">
@@ -931,8 +937,8 @@ export default function ExampleReports(): ReactNode {
           <h2>Generate Your Own Reports</h2>
           <p>Every <code>npx playwright test</code> run with Praman produces these reports automatically.</p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/playwright-praman/docs" className="er-cta-btn er-cta-btn--primary">Get Started</a>
-            <a href="/playwright-praman/features" className="er-cta-btn er-cta-btn--outline">See All Features</a>
+            <a href={withBaseUrl('/docs')} className="er-cta-btn er-cta-btn--primary">Get Started</a>
+            <a href={withBaseUrl('/features')} className="er-cta-btn er-cta-btn--outline">See All Features</a>
           </div>
         </section>
       </main>
