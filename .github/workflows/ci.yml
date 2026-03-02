@@ -62,7 +62,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run test:unit -- --coverage
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: ${{ !cancelled() }}
         with:
           name: coverage-${{ matrix.os }}-node-${{ matrix.node-version }}
@@ -100,13 +100,13 @@ jobs:
       - name: Create npm tarball
         if: matrix.os == 'ubuntu-latest'
         run: npm pack
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         if: matrix.os == 'ubuntu-latest'
         with:
           name: dist
           path: dist/
           retention-days: 7
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         if: matrix.os == 'ubuntu-latest'
         with:
           name: npm-tarball
@@ -157,7 +157,7 @@ jobs:
         if: steps.check-creds.outputs.skip == 'false'
       - run: npm run test:integration
         if: steps.check-creds.outputs.skip == 'false'
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         if: ${{ !cancelled() && steps.check-creds.outputs.skip == 'false' }}
         with:
           name: playwright-report-pw-${{ matrix.playwright-version }}
@@ -218,7 +218,7 @@ jobs:
         run: npx playwright test --config=playwright.service.config.ts --workers=20
         env:
           PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         if: ${{ !cancelled() }}
         with:
           name: azure-playwright-report
