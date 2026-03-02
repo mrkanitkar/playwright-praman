@@ -1,0 +1,142 @@
+# SAP platform
+fiori
+sapui
+odata
+btp
+saml
+flp
+hana
+abap
+sess
+onprem
+ONPREM
+cfapps
+ondemand
+fiorilaunchpad
+NWBC
+WORKZONE
+workzone
+
+# SAP UI5 controls
+combobox
+webcomponent
+webcomponents
+smarttable
+smartfilterbar
+smartform
+smartfield
+filterbar
+uxap
+webc
+icontabfilter
+columnmenu
+valuehelpdialog
+smartvariants
+navpopover
+smartchart
+smartmultiinput
+xmlview
+Popin
+Labelable
+Longtext
+Pinnable
+Pollable
+Tickmarks
+Togglable
+Personalisation
+Personalizable
+Perso
+
+# SAP Shell
+ushell
+
+# SAP transaction codes & tables
+EKKO
+EKPO
+MINBE
+MAXBE
+BSTRF
+PLIFZ
+lifnr
+MATNR
+BUKRS
+BAPI
+BEHAV
+CBTA
+CUST
+Crcy
+ECATT
+FERT
+HALB
+MIGO
+MMBE
+PURCHASEORDER
+Purch
+purch
+STAD
+SWNC
+SAPWL
+STATREC
+EBICS
+tcodes
+PFCG
+ASRT
+IWFND
+MAINT
+
+# SAP Fiori / FLP
+floorplan
+floorplans
+Floorplans
+walkme
+
+# OData terms
+edmx
+Edmx
+innererror
+errordetails
+srvd
+resourceroots
+
+# SAP i18n test terms
+Sichern
+Enregistrer
+
+# SAP auth (Microsoft IDP)
+loginfmt
+KMSI
+Kmsi
+kmsi
+microsoftonline
+
+# Analytics / tracking (SAP context)
+pendo
+hotjar
+fullstory
+appdynamics
+qualtrics
+Qualtrics
+googletagmanager
+optimizely
+walkmeusercontent
+siteintercept
+papi
+
+# SAP example data
+Globex
+vendro
+Tricentis
+Veri
+
+# SAP Nygard
+Nygard's
+
+# Accessibility
+wcag
+WCAG
+
+# Azure regions (for Playwright Workspaces docs)
+eastus
+
+# ESLint plugins
+sonarjs

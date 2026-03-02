@@ -1,0 +1,51 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "useGitignore": true,
+  "cache": {
+    "useCache": true,
+    "cacheLocation": ".cspell/.cspellcache",
+    "cacheStrategy": "content"
+  },
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "./.cspell/project-words.txt",
+      "description": "Project-specific terminology (tools, packages, code terms)",
+      "addWords": true
+    },
+    {
+      "name": "sap-terms",
+      "path": "./.cspell/sap-terms.txt",
+      "description": "SAP, UI5, Fiori, OData, and Azure domain terms",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["project-words", "sap-terms"],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "*.lock",
+    "playwright-report",
+    ".auth",
+    "docs/build",
+    "docs/node_modules",
+    "*.tgz",
+    "*.snap",
+    ".cspell"
+  ],
+  "flagWords": ["whitelist", "slave"],
+  "suggestWords": ["allowlist", "denylist", "main", "replica"],
+  "overrides": [
+    {
+      "filename": "src/core/examples/**",
+      "words": ["master", "Master"]
+    },
+    {
+      "filename": "docs/documentation-standards.md",
+      "words": ["master", "Master"]
+    }
+  ]
+}

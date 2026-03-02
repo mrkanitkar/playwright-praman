@@ -1,0 +1,157 @@
+# Project & package names
+praman
+playwright-praman
+dhikraft
+zestest
+mrkanitkar
+maheshwar
+
+# Build & tooling
+tsup
+vitest
+docusaurus
+pino
+commitlint
+commitizen
+semver
+attw
+camelcase
+kebabcase
+nodenext
+wdio
+WDIO
+
+# Testing concepts
+hermetic
+pageobject
+recordreplay
+recordreply
+microbenchmarks
+Microbenchmarks
+wdi5
+INTERACTABLE
+interactable
+Aggs
+
+# Playwright / browser terms
+domcontentloaded
+framenavigated
+framesent
+framereceived
+connectionfailed
+navigations
+networkidle
+viewports
+PWDEBUG
+geolocation
+
+# TypeScript / code terms
+thenable
+serializable
+serialisable
+introspectable
+resumability
+appendable
+stringifying
+unparseable
+serializability
+
+# British English variants
+initialised
+optimised
+normalised
+initialisation
+initialise
+stabilise
+categorise
+categorisation
+summarising
+behaviour
+Behaviour
+
+# VS Code extension IDs
+dbaeumer
+yoavbls
+usernamehw
+errorlens
+eamodio
+kohler
+yzhang
+
+# Cursor / IDE
+cursorrc
+cursorrules
+opencode
+
+# CI / security
+cyclonedx
+sbom
+provenance
+blocklist
+deadcode
+healthcheck
+mdlint
+
+# Abbreviated identifiers (proxy API)
+ptest
+pstep
+pcontrol
+pclick
+pfill
+nocol
+cidx
+cval
+fitems
+fctrl
+vitems
+vtext
+vkey
+dlgs
+
+# Test management
+qtest
+QTEST
+testrail
+TESTRAIL
+
+# AI / LLM
+agentic
+llmstxt
+llms
+langgraph
+langchain
+Pydantic
+upvote
+embedder
+Embedder
+
+# Observability
+opentelemetry
+otel
+otlp
+
+# Auth / security tokens
+TESTUSER
+testuser
+JSESSIONID
+SESSIONID
+certuser
+
+# Legacy terminology (used in docs discussing these terms)
+blacklist
+blacklisted
+BLACKLIST
+Blacklist
+
+# Miscellaneous
+scaffolder
+checkmark
+workitem
+redaction
+endo
+apos
+tsyringe
+roundtrips
+myapp
+mycompany
+xyznonexistent
