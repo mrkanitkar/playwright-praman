@@ -40,8 +40,9 @@ jobs:
         run: npm version prerelease --preid=alpha --no-git-tag-version
       - name: Verify clean tree (only version bump expected)
         run: |
-          CHANGED=$(git diff --name-only)
-          if [ "$CHANGED" != "package.json" ] && [ "$CHANGED" != $'package.json\npackage-lock.json' ]; then
+          CHANGED=$(git diff --name-only | sort)
+          ALLOWED=$(printf 'package-lock.json\npackage.json')
+          if [ "$CHANGED" != "$ALLOWED" ] && [ "$CHANGED" != "package.json" ]; then
             echo "::error::Unexpected changes after version stamp"
             git diff --stat
             exit 1
