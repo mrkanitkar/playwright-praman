@@ -3,7 +3,7 @@ sidebar_position: 1
 title: Getting Started
 ---
 
-Get up and running with Praman in 4 steps.
+Get up and running with Praman in 5 steps.
 
 ## Prerequisites
 
@@ -217,6 +217,75 @@ A passing gold-standard test verifies your entire setup end-to-end:
 
 :::info Adapt the gold-standard test to your app
 The gold-standard test targets the "Maintain Bill Of Material" app. If your SAP system does not have this app, use it as a template: copy the file, change the tile name, control IDs, and test data to match your app. The patterns (auth, navigation, dialog handling, value help) are universal across SAP Fiori apps.
+:::
+
+## Step 5: Generate Tests from Your Business Process
+
+Now that your setup is verified, you can describe any business process or test case in plain language — Praman's AI agents will autonomously generate the test plan and production-ready Playwright test script for you.
+
+### How it works
+
+Run the coverage prompt in your AI agent (Claude Code, Copilot, Cursor):
+
+**Claude Code:**
+
+```bash
+/praman-sap-coverage
+```
+
+Then describe your business process or test case. For example:
+
+> "Test creating a purchase order: navigate to ME21N, enter vendor 1000, add material MAT-001 with quantity 10 in plant 1000, and verify the PO is posted successfully."
+
+Or describe it at a higher level:
+
+> "Test the complete Procure-to-Pay flow: create a purchase requisition, convert it to a purchase order, post goods receipt, and verify the invoice."
+
+### What happens next
+
+Praman's **plan → generate → heal** pipeline runs autonomously:
+
+| Phase        | Agent                  | What it does                                                                                                                     |
+| ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Plan**     | `praman-sap-planner`   | Explores your live SAP system, discovers UI5 controls, and produces a structured test plan with steps and expected results       |
+| **Generate** | `praman-sap-generator` | Converts the test plan into executable Playwright + Praman test code using typed control proxies — not brittle DOM selectors     |
+| **Heal**     | `praman-sap-healer`    | Validates the generated test against the live system, fixes any failures, and ensures compliance with Praman's 7 mandatory rules |
+
+The result is a production-ready `.spec.ts` file in your `tests/` directory — no manual test scripting required.
+
+### Example: from description to test
+
+**You enter:**
+
+> "Verify the BOM creation dialog: open Create BOM, select a material and plant via value help, choose Production usage, and submit."
+
+**Praman generates:**
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test.describe('BOM Creation', () => {
+  test('Create BOM with material and plant selection', async ({ ui5 }) => {
+    await test.step('Open Create BOM dialog', async () => {
+      await ui5.press({ controlType: 'sap.m.Button', properties: { text: 'Create BOM' } });
+      await ui5.waitForUI5();
+    });
+
+    await test.step('Select material via value help', async () => {
+      await ui5.press({ id: 'createBOMFragment--material-input-vhi', searchOpenDialogs: true });
+      // ... discovers and interacts with live controls
+    });
+
+    await test.step('Submit and verify', async () => {
+      await ui5.press({ id: 'createBOMFragment--OkBtn', searchOpenDialogs: true });
+      await ui5.waitForUI5();
+    });
+  });
+});
+```
+
+:::tip From business process to Playwright test — autonomously
+This is the core value of Praman: you describe **what** to test in business language, and the AI agents handle the **how** — discovering controls, generating code, and healing failures. No manual selector hunting, no brittle DOM queries, no test scripting.
 :::
 
 ---

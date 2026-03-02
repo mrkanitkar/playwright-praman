@@ -8,83 +8,112 @@
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)
 
-Praman extends [Playwright](https://playwright.dev/) with deep SAP UI5 awareness — typed control proxies,
-UI5 stability synchronization, Fiori Launchpad navigation, and AI-powered test generation.
-Write reliable end-to-end tests for SAP Fiori apps in minutes, not days.
+## What is Praman?
 
-## Why Praman?
+Enterprise Playwright plugin for SAP S/4HANA. Describe your business process — AI agents deliver production-ready test scripts.
 
-- **SAP-native control access** — interact with UI5 controls through the runtime registry, not fragile DOM selectors
-- **AI-powered test generation** — describe what to test in business terms, get production-ready Playwright tests
-- **Works with your IDE** — first-class support for Claude Code, GitHub Copilot, Cursor, VS Code, and Jules
-- **Typed control proxies** — full IntelliSense and autocomplete for SAP controls
-- **Zero lock-in** — standard Playwright underneath, mix Praman fixtures with native Playwright freely
+Praman extends [Playwright](https://playwright.dev/) with deep SAP UI5 awareness.
+It queries controls through the **runtime control registry** — not fragile DOM selectors —
+so tests survive UI5 upgrades, theme changes, and custom CSS without breaking.
 
-## Getting Started
+## When to Use?
 
-### Step 1: Install
+When your S/4HANA go-live depends on test quality, not test headcount. One platform — greenfield, brownfield, or bluefield.
+
+## AI-First Design
+
+Business analysts define the process. AI agents — Claude, Copilot, Jules — generate the tests. No scripting required.
+
+## Who is Praman for?
+
+- **CXOs & Program Leads** — go-live confidence backed by deployment evidence, not hope
+- **SAP test engineers** — reliable E2E tests for S/4HANA, Fiori, and BTP apps in minutes
+- **AI coding agents** (Claude Code, GitHub Copilot, Cursor, Jules) — generate tests from business descriptions
+- **QA teams** — migrating from Tosca, wdi5, or vanilla Playwright to a UI5-native solution
+
+## Key Capabilities
+
+| Capability                | Details                                                                          |
+| ------------------------- | -------------------------------------------------------------------------------- |
+| **61 UI5 control types**  | Covers `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc` |
+| **Typed control proxies** | Full IntelliSense and autocomplete for every SAP control                         |
+| **UI5 stability sync**    | Automatic waiting — no `page.waitForTimeout()` needed                            |
+| **FLP navigation**        | Navigate to any Fiori Launchpad app by semantic object + action                  |
+| **6 auth strategies**     | BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, Manual         |
+| **OData V2/V4**           | Mock, intercept, and assert OData requests                                       |
+| **Fiori Elements**        | Page-object helpers for List Report, Object Page, Overview Page                  |
+| **10 UI5 matchers**       | Playwright-native `expect()` extended with UI5-specific assertions               |
+| **AI test generation**    | Describe tests in business language, get production-ready Playwright code        |
+| **Cross-platform**        | Windows, macOS, Linux — Node.js 20+                                              |
+
+## Quick Start
+
+### Install
 
 ```bash
 npm install playwright-praman
 ```
 
-First install may take 1-2 minutes — npm resolves `@playwright/test` (peer dependency) plus 3 direct dependencies (`commander`, `pino`, `zod`) and 4 optional peer dependencies for AI and observability.
+Only 3 production dependencies: `commander` (MIT), `pino` (MIT), `zod` (MIT).
 
-### Step 2: Initialize Project
-
-First, initialize Playwright's agent loop for your IDE:
+### Initialize
 
 ```bash
 npx playwright init-agents --loop=vscode
-```
-
-Then, run the Praman initializer:
-
-```bash
 npx playwright-praman init
 ```
 
-This validates your environment, installs Chromium, detects your IDE, and scaffolds everything you need:
-`playwright.config.ts`, `praman.config.ts`, auth setup, gold-standard verification test, `.env.example`,
-and IDE-specific AI agent configs.
+The initializer validates your environment, installs Chromium, detects your IDE, and scaffolds:
+`playwright.config.ts`, `praman.config.ts`, auth setup, gold-standard verification test,
+`.env.example`, and IDE-specific AI agent configs.
 
-### Step 3: Configure SAP Credentials
+### Configure SAP Credentials
 
 ```bash
 cp .env.example .env
 ```
-
-Edit `.env` with your SAP system details:
 
 ```bash
 SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
 SAP_CLOUD_USERNAME=your-username
 SAP_CLOUD_PASSWORD=your-password
 SAP_AUTH_STRATEGY=btp-saml    # 'btp-saml' | 'basic' | 'office365'
-SAP_CLIENT=100                # OnPrem only
 ```
 
 > **Never commit `.env`** — it is already in `.gitignore`.
 
-### Step 4: Verify Setup
+### Verify Setup
 
 ```bash
 npx playwright test tests/bom-e2e-praman-gold-standard.spec.ts --reporter=line --headed --project=chromium
 ```
 
-Expected output:
+A passing test confirms: Playwright + Chromium installed, SAP credentials valid,
+auth session saved, and Praman fixtures interacting with live UI5 controls.
 
-```text
-Running 1 test using 1 worker
+### Generate Tests from Your Business Process
 
-  ✓  tests/bom-e2e-praman-gold-standard.spec.ts › BOM End-to-End Flow › Complete BOM Flow (60-120s)
+Once your setup is verified, describe your business process or test case in plain language — Praman's AI agents will autonomously generate the test plan and production-ready Playwright test script.
 
-  1 passed
+**Using Claude Code:**
+
+```bash
+/praman-sap-coverage
 ```
 
-A passing test confirms: Playwright + Chromium installed, SAP credentials valid, auth session saved, and Praman fixtures interacting with live UI5 controls.
+Then enter your business process, for example:
 
-## Quick Example
+> "Test creating a purchase order: navigate to ME21N, enter vendor 1000, add material MAT-001 with quantity 10 in plant 1000, and verify the PO is posted successfully."
+
+Praman's **plan → generate → heal** pipeline will:
+
+1. **Plan** — The SAP planner agent explores your live SAP system, discovers UI5 controls, and produces a structured test plan
+2. **Generate** — The generator converts the plan into executable Playwright + Praman test code using typed control proxies
+3. **Heal** — The healer validates the generated test, fixes any failures, and ensures compliance
+
+The result is a production-ready `.spec.ts` file — no manual test scripting required.
+
+## Example
 
 ```typescript
 import { test, expect } from 'playwright-praman';
@@ -104,20 +133,31 @@ test('SAP Fiori app test', async ({ ui5, ui5Navigation }) => {
 
 More examples in the [`examples/`](./examples/) directory.
 
-## Documentation
+## How Praman Works
 
-| Topic                         | Link                                                                               |
-| ----------------------------- | ---------------------------------------------------------------------------------- |
-| Full getting started guide    | [Getting Started](https://praman.zestest.in/docs/guides/getting-started)           |
-| Configuration reference       | [Configuration](https://praman.zestest.in/docs/guides/configuration)               |
-| Authentication (6 strategies) | [Authentication](https://praman.zestest.in/docs/guides/authentication)             |
-| Agent & IDE setup             | [Agent Setup](https://praman.zestest.in/docs/guides/agent-setup)                   |
-| Fixtures reference            | [Fixtures](https://praman.zestest.in/docs/guides/fixtures)                         |
-| Error codes (60)              | [Errors](https://praman.zestest.in/docs/guides/errors)                             |
-| Azure Playwright Workspaces   | [Cloud Testing](https://praman.zestest.in/docs/guides/azure-playwright-workspaces) |
-| Docker & CI/CD                | [CI/CD Guide](https://praman.zestest.in/docs/guides/docker-cicd)                   |
-| API reference                 | [API Docs](https://praman.zestest.in/docs/api/)                                    |
-| LLM-friendly docs             | [llms.txt](https://praman.zestest.in/llms.txt)                                     |
+Praman uses a **6-layer architecture**:
+
+1. **Core Infrastructure** — error system, logging (pino), config (zod), path helpers
+2. **Bridge Adapters** — inject JavaScript into the browser to query the UI5 runtime control registry
+3. **Typed Proxy** — TypeScript proxies for each UI5 control type with full IntelliSense
+4. **Fixtures** — Playwright test fixtures (`ui5`, `ui5Navigation`, `ui5Table`, `ui5Auth`, etc.)
+5. **AI Layer** — LLM integration for agentic test generation from business-language descriptions
+6. **Reporters** — Custom Playwright reporters for compliance evidence and OData trace
+
+Lower layers never import from higher layers. The bridge communicates with UI5's `sap.ui.getCore()` and OData model APIs directly in the browser context.
+
+## Praman vs Alternatives
+
+| Feature                         | Praman           | wdi5             | Vanilla Playwright | Tosca           |
+| ------------------------------- | ---------------- | ---------------- | ------------------ | --------------- |
+| UI5 control registry access     | Yes              | Yes              | No                 | Partial         |
+| Typed proxies with IntelliSense | Yes              | No               | N/A                | No              |
+| AI-powered test generation      | Yes              | No               | No                 | No              |
+| Playwright-native               | Yes              | Yes (adapter)    | Yes                | No              |
+| Open source                     | Yes (Apache-2.0) | Yes (Apache-2.0) | Yes (Apache-2.0)   | No (commercial) |
+| Fiori Elements helpers          | Yes              | Partial          | No                 | Partial         |
+| OData V2/V4 utilities           | Yes              | No               | No                 | Partial         |
+| Cross-platform CI/CD            | Yes              | Yes              | Yes                | Windows-only    |
 
 ## Sub-path Exports
 
@@ -129,6 +169,54 @@ More examples in the [`examples/`](./examples/) directory.
 | `playwright-praman/vocabulary` | SAP vocabulary, control mappings |
 | `playwright-praman/fe`         | SAP Fiori Elements helpers       |
 | `playwright-praman/reporters`  | Custom Playwright reporters      |
+
+## Documentation
+
+| Topic                         | Link                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| Full documentation            | [praman.zestest.in](https://praman.zestest.in)                           |
+| Getting started guide         | [Getting Started](https://praman.zestest.in/docs/guides/getting-started) |
+| Configuration reference       | [Configuration](https://praman.zestest.in/docs/guides/configuration)     |
+| Authentication (6 strategies) | [Authentication](https://praman.zestest.in/docs/guides/authentication)   |
+| Agent & IDE setup             | [Agent Setup](https://praman.zestest.in/docs/guides/agent-setup)         |
+| Fixtures reference            | [Fixtures](https://praman.zestest.in/docs/guides/fixtures)               |
+| Error codes (60)              | [Errors](https://praman.zestest.in/docs/guides/errors)                   |
+| API reference                 | [API Docs](https://praman.zestest.in/docs/api/)                          |
+| LLM-friendly docs             | [llms.txt](https://praman.zestest.in/llms.txt)                           |
+
+## Frequently Asked Questions
+
+### What SAP systems does Praman support?
+
+Praman supports SAP S/4HANA (on-premise and cloud), SAP BTP applications,
+SAP Fiori Launchpad, and any web application built with SAPUI5 or OpenUI5.
+It works with both SAP Fiori Elements and custom UI5 freestyle apps.
+
+### Do I need access to SAP source code?
+
+No. Praman interacts with UI5 controls through the public runtime API (`sap.ui.getCore()`).
+It queries the control registry at runtime, so you only need browser access to the application.
+
+### Can I use Praman with existing Playwright tests?
+
+Yes. Praman extends Playwright — it does not replace it. You can mix Praman fixtures
+(`ui5`, `ui5Navigation`, `ui5Table`) with native Playwright APIs
+(`page.click()`, `page.locator()`) in the same test file.
+
+### How does AI test generation work?
+
+Praman integrates with AI coding agents (Claude Code, GitHub Copilot, Cursor, Jules).
+You describe what to test in business language
+(e.g., "test creating a purchase order with approval workflow"),
+and the agent generates production-ready Playwright tests using Praman fixtures.
+The generated tests use typed control proxies — not brittle selectors.
+
+### How does Praman compare to wdi5?
+
+Both access the UI5 control registry. Praman adds typed control proxies with IntelliSense,
+AI-powered test generation, Fiori Elements page-object helpers,
+OData mock/intercept utilities, and 10 UI5-specific Playwright matchers.
+Praman is built from the ground up for Playwright (not adapted from WebDriverIO).
 
 ## Security
 

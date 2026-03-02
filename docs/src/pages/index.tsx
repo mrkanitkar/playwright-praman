@@ -411,27 +411,19 @@ function GlanceSection(): ReactNode {
         <div className="praman-info-card">
           <h4>What is Praman Plugin?</h4>
           <p>
-            Playwright + Praman, Better Together: Enterprise plugin that supercharges Playwright
-            with native SAP UI5 support, AI-first APIs, and autonomous testing capabilities for
-            modern SAP S/4HANA environments — covering 61 control types across 8 libraries with
-            typed, self-healing fixtures.
+            Enterprise Playwright plugin for SAP S/4HANA. Describe your business process — AI agents deliver production-ready test scripts.
           </p>
         </div>
         <div className="praman-info-card">
           <h4>When to Use?</h4>
           <p>
-            When you need Playwright&apos;s speed and reliability for SAP testing. Praman plugin
-            seamlessly extends Playwright&apos;s native capabilities with SAP-specific selectors,
-            authentication, and UI5-aware interactions across LTS 1.108 · 1.120 · 1.136 — greenfield,
-            brownfield, or bluefield.
+            When your S/4HANA go-live depends on test quality, not test headcount. One platform — greenfield, brownfield, or bluefield.
           </p>
         </div>
         <div className="praman-info-card">
           <h4>AI-First Design</h4>
           <p>
-            Built on Playwright&apos;s modern architecture with Praman enhancements for AI agent
-            support, capability discovery, and intent-level APIs that make SAP test automation
-            intelligent and autonomous — with native support for Claude, Copilot, and Jules.
+            Business analysts define the process. AI agents — Claude, Copilot, Jules — generate the tests. No scripting required.
           </p>
         </div>
       </div>
@@ -512,6 +504,12 @@ function AgentFlowSection(): ReactNode {
         <p className="praman-section-label">How it works</p>
         <h2 className="praman-section-title">From business process to Playwright test — autonomously</h2>
       </div>
+      <p style={{ textAlign: 'center', maxWidth: 700, margin: '0 auto 2rem', fontSize: '1.08rem', color: 'var(--praman-ink-secondary)', lineHeight: 1.7 }}>
+        Submit a Signavio flow, a test case description, or a business process in plain language.
+        Praman&apos;s AI agents connect to your live SAP system, discover every UI5 control,
+        generate a structured test plan, and deliver production-ready Playwright scripts —
+        covering SAP end-to-end quality from requirement to deployment evidence. No scripting. No selectors. No delays.
+      </p>
       <div className="praman-agent-flow-grid">
 
         {/* Panel 1: Signavio */}
@@ -760,7 +758,7 @@ function PitchGrid(): ReactNode {
         <div className="praman-pitch-cell">
           <div className="praman-pitch-step">What</div>
           <h3>Agentic AI Native Quality Automation</h3>
-          <p>Input Signavio flow or test case, connect to HANA using OData, check data availability and speak to UI5 elements and web components.</p>
+          <p>Submit a business process or test case — Praman&apos;s AI agents autonomously generate test plans, produce Playwright scripts, validate OData integrity, and interact with every UI5 control. From requirement to evidence in minutes, not sprints.</p>
         </div>
         <div className="praman-pitch-cell">
           <div className="praman-pitch-step">So What</div>
