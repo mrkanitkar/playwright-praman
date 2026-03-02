@@ -1,6 +1,6 @@
 {
   "name": "playwright-praman",
-  "version": "1.0.2-next.1",
+  "version": "1.0.2-next.2",
   "description": "AI-First SAP UI5 Test Automation Platform for Playwright",
   "author": {
     "name": "Maheshwar Kanitkar",
@@ -158,10 +158,18 @@
     "openai": ">=6.22.0"
   },
   "peerDependenciesMeta": {
-    "@anthropic-ai/sdk": { "optional": true },
-    "@opentelemetry/api": { "optional": true },
-    "@opentelemetry/sdk-node": { "optional": true },
-    "openai": { "optional": true }
+    "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "@opentelemetry/api": {
+      "optional": true
+    },
+    "@opentelemetry/sdk-node": {
+      "optional": true
+    },
+    "openai": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "0.78.0",
