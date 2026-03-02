@@ -1264,7 +1264,8 @@ function TechnicalDocumentation(): ReactNode {
             <h4 style={docH4}>Runtime Dependencies</h4>
             <table style={docTable}>
               <tbody>
-                <tr><td style={{ ...docTd, fontWeight: 700 }}>@playwright/test</td><td style={docTd}>{'>='}1.50.0 (peer)</td></tr>
+                <tr><td style={{ ...docTd, fontWeight: 700 }}>@playwright/test</td><td style={docTd}>{'>='}1.57.0 {'<'}2.0.0 (peer)</td></tr>
+                <tr><td style={{ ...docTd, fontWeight: 700 }}>commander</td><td style={docTd}>14.0.3 — CLI framework</td></tr>
                 <tr><td style={{ ...docTd, fontWeight: 700 }}>pino</td><td style={docTd}>10.3.1 — structured logging</td></tr>
                 <tr><td style={{ ...docTd, fontWeight: 700 }}>zod</td><td style={docTd}>4.3.6 — schema validation</td></tr>
               </tbody>
@@ -1272,10 +1273,10 @@ function TechnicalDocumentation(): ReactNode {
             <h4 style={docH4}>Optional AI Dependencies</h4>
             <table style={docTable}>
               <tbody>
-                <tr><td style={{ ...docTd, fontWeight: 700 }}>@anthropic-ai/sdk</td><td style={docTd}>^0.36.0</td></tr>
-                <tr><td style={{ ...docTd, fontWeight: 700 }}>openai</td><td style={docTd}>^6.22.0</td></tr>
-                <tr><td style={{ ...docTd, fontWeight: 700 }}>@opentelemetry/api</td><td style={docTd}>1.9.0</td></tr>
-                <tr><td style={{ ...docTd, fontWeight: 700 }}>@opentelemetry/sdk-node</td><td style={docTd}>0.212.0</td></tr>
+                <tr><td style={{ ...docTd, fontWeight: 700 }}>@anthropic-ai/sdk</td><td style={docTd}>{'>='}0.78.0 (optional peer)</td></tr>
+                <tr><td style={{ ...docTd, fontWeight: 700 }}>openai</td><td style={docTd}>{'>='}6.22.0 (optional peer)</td></tr>
+                <tr><td style={{ ...docTd, fontWeight: 700 }}>@opentelemetry/api</td><td style={docTd}>{'>='}1.9.0 (optional peer)</td></tr>
+                <tr><td style={{ ...docTd, fontWeight: 700 }}>@opentelemetry/sdk-node</td><td style={docTd}>{'>='}0.212.0 (optional peer)</td></tr>
               </tbody>
             </table>
           </div>
