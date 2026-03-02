@@ -108,7 +108,7 @@ export default tseslint.config(
         'error',
         {
           convertPath: {
-            'src/**/*.ts': ['^src/(.+)\\.ts$', 'dist/$1.cjs'],
+            'src/**/*.ts': ['^src/(.+)\\.ts$', 'dist/$1.js'],
           },
         },
       ],

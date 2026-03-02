@@ -11,7 +11,7 @@
  * Praman CLI entry point — imports the Commander program and executes it.
  *
  * @remarks
- * This is the bin entry point (`dist/cli/index.cjs`). It imports the
+ * This is the bin entry point (`dist/cli/index.js`). It imports the
  * program from `./program.js` and calls `.parse(process.argv)`.
  * Matches Playwright's pattern: `cli.js` imports program and calls parse.
  *
