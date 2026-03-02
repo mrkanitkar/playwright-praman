@@ -291,8 +291,8 @@ However, the `AGENTS.md` file itself does NOT contain matcher documentation. An 
 - `docs/docusaurus.config.ts` line 16: `baseUrl: '/playwright-praman/'`
 - Line 15: `url: 'https://mrkanitkar.github.io'`
 - Line 19: `projectName: 'playwright-praman'`
-- These match the GitHub Pages convention: `https://mrkanitkar.github.io/playwright-praman/`
-- The `robots.txt` sitemap URL also matches: `https://mrkanitkar.github.io/playwright-praman/sitemap.xml`
+- These match the GitHub Pages convention: `https://praman.zestest.in/`
+- The `robots.txt` sitemap URL also matches: `https://praman.zestest.in/sitemap.xml`
 
 **Recommendation:** ALREADY EXISTS (no issue). The baseUrl is correctly configured for GitHub Pages. Close this action.
 
@@ -421,7 +421,7 @@ However, the `AGENTS.md` file itself does NOT contain matcher documentation. An 
 **Priority:** P3 | **Verdict:** CONFIRMED (partially done)
 **Evidence:**
 
-- `docs/static/robots.txt` -- Already references `Sitemap: https://mrkanitkar.github.io/playwright-praman/sitemap.xml`.
+- `docs/static/robots.txt` -- Already references `Sitemap: https://praman.zestest.in/sitemap.xml`.
 - `docs/package.json` -- No explicit `@docusaurus/plugin-sitemap` dependency, but it is included by default in `@docusaurus/preset-classic`.
 - Verification that the sitemap is actually generated and submitted has not been documented.
 

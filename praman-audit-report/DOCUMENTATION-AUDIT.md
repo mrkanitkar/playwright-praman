@@ -240,7 +240,7 @@ AI discovery files are the machine-readable entry points that allow AI agents, L
 
 - robots.txt explicitly comments each llms-\*.txt file with its purpose -- helpful for AI crawlers
 - HTML head tags use `rel="alternate" type="text/plain"` for machine-discoverable LLM docs
-- Sitemap reference points to `https://mrkanitkar.github.io/playwright-praman/sitemap.xml`
+- Sitemap reference points to `https://praman.zestest.in/sitemap.xml`
 
 **Weaknesses:**
 
@@ -269,7 +269,7 @@ AI discovery files are the machine-readable entry points that allow AI agents, L
 
 ## 5.2 Docusaurus Documentation (10 Checks)
 
-The documentation site is deployed at `https://mrkanitkar.github.io/playwright-praman/` using Docusaurus v3 with TypeScript configuration.
+The documentation site is deployed at `https://praman.zestest.in/` using Docusaurus v3 with TypeScript configuration.
 
 ### 5.2.1 Site Infrastructure & Configuration
 

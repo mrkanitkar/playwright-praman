@@ -45,7 +45,7 @@
 
 - `debugging.md`: 313 lines, titled "Debugging & Troubleshooting", covers error codes, common issues, debug checklist. Confirmed.
 - `reporters.md`: 224 lines, contains `ComplianceReporter` and `ODataTraceReporter` config examples in `playwright.config.ts` format. Confirmed.
-- `docusaurus.config.ts` line 16: `baseUrl: '/playwright-praman/'` matches GitHub Pages convention for `mrkanitkar.github.io/playwright-praman/`. Confirmed.
+- `docusaurus.config.ts` line 16: `baseUrl: '/playwright-praman/'` matches GitHub Pages convention for `praman.zestest.in/`. Confirmed.
 
 ### Downgraded Actions (9 items -- Agent 1)
 

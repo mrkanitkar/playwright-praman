@@ -106,18 +106,18 @@ More examples in the [`examples/`](./examples/) directory.
 
 ## Documentation
 
-| Topic                         | Link                                                                                                    |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Full getting started guide    | [Getting Started](https://mrkanitkar.github.io/playwright-praman/docs/guides/getting-started)           |
-| Configuration reference       | [Configuration](https://mrkanitkar.github.io/playwright-praman/docs/guides/configuration)               |
-| Authentication (6 strategies) | [Authentication](https://mrkanitkar.github.io/playwright-praman/docs/guides/authentication)             |
-| Agent & IDE setup             | [Agent Setup](https://mrkanitkar.github.io/playwright-praman/docs/guides/agent-setup)                   |
-| Fixtures reference            | [Fixtures](https://mrkanitkar.github.io/playwright-praman/docs/guides/fixtures)                         |
-| Error codes (60)              | [Errors](https://mrkanitkar.github.io/playwright-praman/docs/guides/errors)                             |
-| Azure Playwright Workspaces   | [Cloud Testing](https://mrkanitkar.github.io/playwright-praman/docs/guides/azure-playwright-workspaces) |
-| Docker & CI/CD                | [CI/CD Guide](https://mrkanitkar.github.io/playwright-praman/docs/guides/docker-cicd)                   |
-| API reference                 | [API Docs](https://mrkanitkar.github.io/playwright-praman/docs/api/)                                    |
-| LLM-friendly docs             | [llms.txt](https://mrkanitkar.github.io/playwright-praman/llms.txt)                                     |
+| Topic                         | Link                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------- |
+| Full getting started guide    | [Getting Started](https://praman.zestest.in/docs/guides/getting-started)           |
+| Configuration reference       | [Configuration](https://praman.zestest.in/docs/guides/configuration)               |
+| Authentication (6 strategies) | [Authentication](https://praman.zestest.in/docs/guides/authentication)             |
+| Agent & IDE setup             | [Agent Setup](https://praman.zestest.in/docs/guides/agent-setup)                   |
+| Fixtures reference            | [Fixtures](https://praman.zestest.in/docs/guides/fixtures)                         |
+| Error codes (60)              | [Errors](https://praman.zestest.in/docs/guides/errors)                             |
+| Azure Playwright Workspaces   | [Cloud Testing](https://praman.zestest.in/docs/guides/azure-playwright-workspaces) |
+| Docker & CI/CD                | [CI/CD Guide](https://praman.zestest.in/docs/guides/docker-cicd)                   |
+| API reference                 | [API Docs](https://praman.zestest.in/docs/api/)                                    |
+| LLM-friendly docs             | [llms.txt](https://praman.zestest.in/llms.txt)                                     |
 
 ## Sub-path Exports
 

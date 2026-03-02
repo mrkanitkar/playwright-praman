@@ -80,7 +80,7 @@ Every error extends `PramanError` (base class at `src/core/errors/base.ts`). Con
 
 **Verdict: ✅**
 
-`llms.txt` (5,619 bytes) follows the llmstxt.org specification. Contains: project title, description block with tags, 13 documentation links under "Docs", 6 example links under "Examples", 2 API reference links, and 12 optional deep-dive links. All links point to hosted documentation at `mrkanitkar.github.io/playwright-praman/`.
+`llms.txt` (5,619 bytes) follows the llmstxt.org specification. Contains: project title, description block with tags, 13 documentation links under "Docs", 6 example links under "Examples", 2 API reference links, and 12 optional deep-dive links. All links point to hosted documentation at `praman.zestest.in/`.
 
 **Evidence:** `/Users/maheshwar/Documents/projects/mk1/llms.txt` (52 lines)
 
@@ -703,7 +703,7 @@ TypeDoc (0.28.17) and typedoc-plugin-markdown (4.10.0) in devDependencies. `npm 
 
 **Verdict: ✅**
 
-`docs/` directory with Docusaurus setup. `npm run docs:dev` and `npm run docs:build` in scripts. CI `docs-check` job builds Docusaurus with `--no-minify`. Homepage: `mrkanitkar.github.io/playwright-praman/`.
+`docs/` directory with Docusaurus setup. `npm run docs:dev` and `npm run docs:build` in scripts. CI `docs-check` job builds Docusaurus with `--no-minify`. Homepage: `praman.zestest.in/`.
 
 **Evidence:** `package.json:123-124`, `.github/workflows/ci.yml:150-167`
 
