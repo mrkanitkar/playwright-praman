@@ -33,7 +33,7 @@ const REPORT_META = {
   generated: '27 Feb 2026, 14:32 UTC',
   duration: '12m 38s',
   browser: 'Chromium 131',
-  executor: 'Praman v1.0 + Playwright 1.49',
+  executor: 'Praman v1.0 + Playwright 1.57',
 };
 
 const SUMMARY = {
