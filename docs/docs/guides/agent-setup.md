@@ -31,6 +31,7 @@ Praman does **not** auto-install Playwright browsers. Run `npx playwright instal
 Run in your project root:
 
 ```bash
+npx playwright init-agents --loop=vscode
 npx playwright-praman init
 ```
 

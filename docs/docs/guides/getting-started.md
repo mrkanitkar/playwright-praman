@@ -38,6 +38,14 @@ First install may take 1-2 minutes while npm resolves the Playwright peer depend
 
 ## Step 2: Initialize Your Project
 
+First, initialize Playwright's agent loop for your IDE:
+
+```bash
+npx playwright init-agents --loop=vscode
+```
+
+Then, run the Praman initializer:
+
 ```bash
 npx playwright-praman init
 ```

@@ -22,6 +22,7 @@ First install resolves Playwright and other dependencies — allow 1-2 minutes.
 **2. Initialize**
 
 ```bash
+npx playwright init-agents --loop=vscode
 npx playwright-praman init
 ```
 
