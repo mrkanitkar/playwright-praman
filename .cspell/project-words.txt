@@ -143,6 +143,17 @@ blacklisted
 BLACKLIST
 Blacklist
 
+# Testing frameworks & roles
+pytest
+xdist
+testng
+SDET
+
+# SAP / business terms
+Visio
+Signavio
+EBELN
+
 # Miscellaneous
 scaffolder
 checkmark
