@@ -111,12 +111,24 @@
       "Bash(npm uninstall @stackql/docusaurus-plugin-structured-data)",
       "WebFetch(domain:community.openai.com)",
       "WebFetch(domain:docs.inkeep.com)",
-      "WebFetch(domain:linkmyprompt.com)"
+      "WebFetch(domain:linkmyprompt.com)",
+      "Bash(gh workflow run CI --ref main)",
+      "Bash(npm publish --tag next)",
+      "Bash(for f in *.md)",
+      "Bash(do sed -i '' '/^sidebar_position:/d' \"$f\")",
+      "Bash(git pull --rebase origin main)",
+      "Bash(git restore --staged .)",
+      "Bash(gh workflow view \"Docs\" --yaml)",
+      "Bash(gh workflow view \"Repomix Context\" --yaml)",
+      "Bash(gh workflow run \"Repomix Context\")",
+      "Bash(# Check if CI is caching node_modules which might include stale webpack cache # Look for npm cache restore in CI gh run view 22591463825 --log)",
+      "Bash(# The answer has to be simpler. Let me compare LOCAL and CI npm ls for docusaurus # Maybe a different version of docusaurus-plugin-llms or other plugin is doing this cd /Users/maheshwar/Documents/projects/mk1/docs && npm ls)"
     ],
     "additionalDirectories": [
       "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",
       "/Users/maheshwar/Documents/projects/mk1/dist",
-      "/Users/maheshwar/Documents/projects/mk1"
+      "/Users/maheshwar/Documents/projects/mk1",
+      "/tmp"
     ]
   },
   "model": "claude-opus-4-6",

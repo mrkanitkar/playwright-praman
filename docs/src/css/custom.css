@@ -2514,9 +2514,9 @@ main div[style*="border-top"] {
 }
 
 .ask-ai-fab {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+  height: 44px;
+  padding: 0 1rem 0 0.75rem;
+  border-radius: 22px;
   border: none;
   background: var(--gradient-primary);
   color: #fff;
@@ -2524,8 +2524,15 @@ main div[style*="border-top"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.4rem;
   box-shadow: 0 4px 16px rgba(30, 60, 114, 0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ask-ai-fab-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 .ask-ai-fab:hover {
   transform: scale(1.08);
