@@ -11,9 +11,9 @@ const config: Config = {
     v4: true,
   },
 
-  // GitHub Pages: mrkanitkar.github.io/playwright-praman
-  url: 'https://mrkanitkar.github.io',
-  baseUrl: '/playwright-praman/',
+  // Custom domain: praman.zestest.in (CNAME in static/)
+  url: 'https://praman.zestest.in',
+  baseUrl: '/',
 
   organizationName: 'mrkanitkar',
   projectName: 'playwright-praman',
@@ -34,7 +34,7 @@ const config: Config = {
       attributes: {
         rel: 'alternate',
         type: 'text/plain',
-        href: '/playwright-praman/llms.txt',
+        href: '/llms.txt',
         title: 'LLM-friendly documentation index',
       },
     },
@@ -43,7 +43,7 @@ const config: Config = {
       attributes: {
         rel: 'alternate',
         type: 'text/plain',
-        href: '/playwright-praman/llms-full.txt',
+        href: '/llms-full.txt',
         title: 'LLM-friendly full documentation',
       },
     },
@@ -415,7 +415,7 @@ const config: Config = {
         },
         // ── Menu 7: TypeDoc API (standalone HTML) ──
         {
-          href: 'https://mrkanitkar.github.io/playwright-praman/api-html/index.html',
+          href: 'pathname:///api-html/index.html',
           position: 'left',
           label: 'TypeDoc API',
           target: '_self',
@@ -449,9 +449,9 @@ const config: Config = {
             { label: 'API Reference', to: '/docs/api' },
             {
               label: 'TypeDoc API',
-              href: 'https://mrkanitkar.github.io/playwright-praman/api-html/index.html',
+              href: 'pathname:///api-html/index.html',
             },
-            { label: 'llms.txt', href: 'https://mrkanitkar.github.io/playwright-praman/llms.txt' },
+            { label: 'llms.txt', href: 'pathname:///llms.txt' },
           ],
         },
         {

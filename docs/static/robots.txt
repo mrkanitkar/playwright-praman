@@ -10,4 +10,4 @@ Allow: /
 # llms-migration.txt     — migration from Playwright, wdi5, Tosca
 # llms-architecture.txt  — architecture, bridge, proxy, ADRs
 
-Sitemap: https://mrkanitkar.github.io/playwright-praman/sitemap.xml
+Sitemap: https://praman.zestest.in/sitemap.xml

@@ -85,5 +85,5 @@ All errors extend `PramanError` with: `code` (ERR\_\*), `message`, `attempted`, 
 ## Deep Reference
 
 - Full docs: `node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.md`
-- LLM docs: https://mrkanitkar.github.io/playwright-praman/llms-full.txt
+- LLM docs: https://praman.zestest.in/llms-full.txt
 - Examples: `node_modules/playwright-praman/examples/`

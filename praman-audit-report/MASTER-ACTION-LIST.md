@@ -155,7 +155,7 @@
 
 - **Source:** Part 5 (Documentation), GAP-I1
 - **Action:** Verify `baseUrl` matches deployment URL.
-- **Status:** **Done** -- Verified: `baseUrl: '/playwright-praman/'` correctly matches GitHub Pages URL `mrkanitkar.github.io/playwright-praman`. No changes needed.
+- **Status:** **Done** -- Verified: `baseUrl: '/playwright-praman/'` correctly matches GitHub Pages URL `praman.zestest.in`. No changes needed.
 
 ### ACT-020: Auto-generate OpenAI function-calling schemas from Zod
 
