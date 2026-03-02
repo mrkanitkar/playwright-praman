@@ -7,8 +7,6 @@ const config: KnipConfig = {
   //   src/vocabulary/index.ts, src/fe/index.ts, src/reporters/index.ts, src/cli/index.ts
   project: ['src/**/*.ts'],
   ignore: [
-    'src/**/*.d.ts',
-    'src/proxy/typed/*.generated.ts',
     'src/core/examples/**',
     'src/auth/index.ts',
     'src/auth/auth-setup.ts',
@@ -17,7 +15,6 @@ const config: KnipConfig = {
     'src/bridge/interaction-strategies/index.ts',
     'src/bridge/browser-scripts/*.ts',
     'src/core/compat/index.ts',
-    'src/core/compat/path-helpers.ts',
     'src/core/config/index.ts',
     'src/core/errors/index.ts',
     'src/core/index.ts',
@@ -38,6 +35,8 @@ const config: KnipConfig = {
     'release-please',
     // MCP server used by Claude Code tooling, not by project code
     '@ui5/mcp-server',
+    // Optional peer dep kept in devDeps for testing telemetry integration
+    '@opentelemetry/sdk-node',
   ],
   ignoreBinaries: ['docusaurus', 'playwright-praman'],
   rules: {
@@ -47,6 +46,9 @@ const config: KnipConfig = {
     // Barrel index files (in ignore list above) re-export these types, but knip
     // cannot trace re-exports through ignored files, so they appear as unused.
     types: 'off',
+    // @anthropic-ai/sdk and openai are intentionally optional peer dependencies.
+    // Code references them via dynamic import() with graceful fallbacks.
+    optionalPeerDependencies: 'off',
   },
 };
 
