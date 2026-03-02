@@ -9,7 +9,7 @@ title: Praman
 Praman extends Playwright with deep SAP UI5 awareness — typed control proxies, UI5 stability
 synchronization, FLP navigation, and AI-powered test generation.
 
-## Get Started in 4 Steps
+## Get Started in 5 Steps
 
 **1. Install**
 
@@ -41,7 +41,20 @@ cp .env.example .env
 npx playwright test tests/bom-e2e-praman-gold-standard.spec.ts --reporter=line --headed --project=chromium
 ```
 
-A passing test confirms your setup is complete. See the full [Getting Started](./guides/getting-started.md) guide for a detailed walkthrough.
+A passing test confirms your setup is complete.
+
+**5. Generate Tests from Your Business Process**
+
+Describe your business process or test case in plain language — Praman's AI agents autonomously generate the test plan and production-ready Playwright test script:
+
+```bash
+/praman-sap-coverage
+# Then enter: "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
+```
+
+The **plan → generate → heal** pipeline discovers live UI5 controls, generates typed Playwright tests, and self-heals failures — no manual test scripting required.
+
+See the full [Getting Started](./guides/getting-started.md) guide for a detailed walkthrough.
 
 ```typescript
 import { test, expect } from 'playwright-praman';
