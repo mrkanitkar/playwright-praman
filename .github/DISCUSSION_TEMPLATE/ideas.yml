@@ -1,41 +1,23 @@
-title: '[Idea] '
-labels: []
 body:
-  - type: markdown
+  - type: textarea
     attributes:
+      label: Goals
+      description: What should this feature achieve?
       value: |
-        Share your feature idea for Praman. The more context you provide, the better we can evaluate it.
-
-  - type: textarea
-    id: problem
-    attributes:
-      label: Problem or use case
-      description: What problem does this solve? What SAP testing scenario would benefit?
-      placeholder: When testing SAP Fiori apps, I often need to...
+        1.
+        2.
+        3.
     validations:
       required: true
-
   - type: textarea
-    id: solution
     attributes:
-      label: Proposed solution
-      description: How do you think this should work?
-      placeholder: It would be great if Praman could...
+      label: Background
+      description: Why is this needed? Are there current alternatives or workarounds?
     validations:
       required: true
-
   - type: textarea
-    id: alternatives
     attributes:
-      label: Alternatives considered
-      description: What workarounds or alternatives have you tried?
+      label: Proposal
+      description: How should this work? Are you interested in contributing?
     validations:
-      required: false
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Before submitting
-      options:
-        - label: I searched existing discussions and issues for this idea
-          required: true
+      required: true
