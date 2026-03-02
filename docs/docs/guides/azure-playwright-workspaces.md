@@ -188,7 +188,7 @@ For SAP BTP / S/4HANA Cloud (publicly accessible), no `exposeNetwork` is needed.
 Add to your `.env` file:
 
 ```bash
-PLAYWRIGHT_SERVICE_URL=wss://westeurope.api.playwright.microsoft.com/accounts/YOUR_WORKSPACE_ID/browsers
+PLAYWRIGHT_SERVICE_URL=wss://eastus.api.playwright.microsoft.com/accounts/YOUR_WORKSPACE_ID/browsers
 ```
 
 ### Step 5: Configure GitHub Secrets
