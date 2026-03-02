@@ -22,11 +22,11 @@
  */
 
 import { access, copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 
 import type { IDEDetection } from './ide-detector.js';
 import { logWarn } from './logger.js';
+import { getPackageRoot } from './version.js';
 import {
   scaffoldCopilotAgentFiles,
   scaffoldCopilotInstructions,
@@ -49,11 +49,10 @@ export type CopyIfMissingFn = (
  * Resolves a path relative to the package root at runtime.
  *
  * @remarks
- * The CLI bundle lives at `dist/cli/index.js`.
- * Two `..` hops from that file's directory reach the package root
- * where `agents/`, `seeds/`, and `docs/user-integration/` are installed.
- *
- * With tsup `shims: true`, `import.meta.url` is polyfilled in CJS output.
+ * Delegates to {@link getPackageRoot} which walks up from `import.meta.url`
+ * to find the `package.json` with `"name": "playwright-praman"`. This is
+ * resilient to tsup chunk splitting where the CJS `import.meta.url` shim
+ * may point to a chunk file instead of the CLI entry point.
  *
  * @param segments - Path segments relative to the package root.
  * @returns Absolute OS-native path.
@@ -65,7 +64,7 @@ export type CopyIfMissingFn = (
  * ```
  */
 function pkgPath(...segments: readonly string[]): string {
-  return resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', ...segments);
+  return join(getPackageRoot(), ...segments);
 }
 
 // ── File copy spec ────────────────────────────────────────────────────────────
@@ -200,10 +199,16 @@ async function copyIfMissing(
     }
   }
   try {
+    await access(srcPath);
+  } catch {
+    logWarn(`Scaffold source not found: ${srcPath}`);
+    return;
+  }
+  try {
     await copyFile(srcPath, destPath);
     created.push(destPath);
   } catch {
-    // Source file not present (partial install, npx usage) — skip silently
+    logWarn(`Failed to copy ${srcPath} → ${destPath}`);
   }
 }
 
@@ -235,10 +240,16 @@ async function copyOrBackupIfMissing(
     logWarn('Merge any custom settings from the backup into the new config');
   }
   try {
+    await access(srcPath);
+  } catch {
+    logWarn(`Scaffold source not found: ${srcPath}`);
+    return;
+  }
+  try {
     await copyFile(srcPath, destPath);
     created.push(destPath);
   } catch {
-    /* source not present — skip silently */
+    logWarn(`Failed to copy ${srcPath} → ${destPath}`);
   }
 }
 
@@ -265,7 +276,7 @@ async function scaffoldSkillFiles(
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- srcDir is resolved from package root + known constant path
     entries = await readdir(srcDir);
   } catch {
-    // Package skills directory not present (partial install) — skip silently
+    logWarn(`Skills source directory not found: ${srcDir}`);
     return;
   }
 

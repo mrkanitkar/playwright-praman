@@ -87,6 +87,10 @@ jobs:
       - run: npm run build
       - name: CJS smoke test
         run: node -e "const m = require('./dist/index.cjs'); if (!m.VERSION) throw new Error('CJS load failed')"
+      - name: ESM CLI smoke test
+        run: node dist/cli/index.js --version
+      - name: CJS CLI smoke test
+        run: node dist/cli/index.cjs --version
       - name: Bundle size check
         if: matrix.os == 'ubuntu-latest'
         run: npx size-limit

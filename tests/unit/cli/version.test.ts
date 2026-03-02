@@ -68,6 +68,10 @@ describe('cli/version', () => {
 
   describe('getVersion', () => {
     it('reads and returns the version from package.json', () => {
+      // Populate getPackageRoot cache first (uses readFileSync for walk-up search)
+      getPackageRoot();
+      vi.clearAllMocks();
+
       mockReadFileSync.mockReturnValue(JSON.stringify({ version: '2.3.4' }));
 
       const version = getVersion();
@@ -95,6 +99,10 @@ describe('cli/version', () => {
     });
 
     it('caches the result on subsequent calls', () => {
+      // Populate getPackageRoot cache first (uses readFileSync for walk-up search)
+      getPackageRoot();
+      vi.clearAllMocks();
+
       mockReadFileSync.mockReturnValue(JSON.stringify({ version: '1.2.3' }));
 
       const first = getVersion();
@@ -102,7 +110,7 @@ describe('cli/version', () => {
 
       expect(first).toBe('1.2.3');
       expect(second).toBe('1.2.3');
-      // readFileSync should only have been called once
+      // readFileSync should only have been called once (cached after first getVersion call)
       expect(mockReadFileSync).toHaveBeenCalledOnce();
     });
   });

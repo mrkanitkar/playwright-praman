@@ -22,6 +22,7 @@ import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import type { CopyIfMissingFn, PkgPathFn } from './ide-installer.js';
+import { logWarn } from './logger.js';
 
 // ── VS Code generated templates ───────────────────────────────────────────────
 
@@ -182,6 +183,7 @@ export async function scaffoldCopilotInstructions(
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- srcPath resolved from package root + known constant path
     appendContent = await readFile(srcPath, 'utf8');
   } catch {
+    logWarn(`Copilot instructions source not found: ${srcPath}`);
     return;
   }
 
