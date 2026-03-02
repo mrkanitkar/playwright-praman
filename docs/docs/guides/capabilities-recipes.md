@@ -1,5 +1,4 @@
 ---
-sidebar_position: 24
 title: 'Capabilities & Recipes Guide'
 ---
 

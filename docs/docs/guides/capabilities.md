@@ -1,5 +1,4 @@
 ---
-sidebar_position: 39
 title: Feature Inventory
 ---
 

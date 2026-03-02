@@ -1,5 +1,4 @@
 ---
-sidebar_position: 44
 title: 'Security Testing Patterns'
 ---
 

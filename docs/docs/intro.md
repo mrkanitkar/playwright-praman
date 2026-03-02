@@ -69,14 +69,24 @@ test('discover a UI5 control', async ({ ui5, ui5Navigation }) => {
 
 ## Documentation
 
+**Setup & Onboarding**
+
 - [Getting Started](./guides/getting-started.md) — install, configure, write your first test
-- [Configuration Reference](./guides/configuration.md) — all config options with defaults
 - [Authentication Guide](./guides/authentication.md) — 6 SAP auth strategies
-- [Selector Reference](./guides/selectors.md) — `UI5Selector` fields and examples
+- [Agent & IDE Setup](./guides/agent-setup.md) — AI agents, seed file, and IDE configs installed by `init`
+
+**Your Background** — start from what you already know:
+[From Playwright](./guides/migration-from-playwright.md) | [From Selenium](./guides/migration-from-selenium.md) | [From wdi5](./guides/migration-from-wdi5.md) | [From Tosca](./guides/migration-from-tosca.md) | [For Business Analysts](./guides/sap-business-analyst-guide.md)
+
+**Core References**
+
+- [Configuration Reference](./guides/configuration.md) — all config options with defaults
 - [Fixture Reference](./guides/fixtures.md) — all 12 fixture modules
+- [Selector Reference](./guides/selectors.md) — `UI5Selector` fields and examples
 - [Error Reference](./guides/errors.md) — 60 error codes with recovery suggestions
 - [Feature Inventory](./guides/capabilities.md) — complete feature overview
-- [Agent & IDE Setup](./guides/agent-setup.md) — AI agents, seed file, and IDE configs installed by `init`
+
+> **Not sure where to start?** Visit the [Personas](/personas) page to find your role-specific entry point.
 
 API documentation is auto-generated from source code TSDoc comments — see the **API Reference** in the navbar.
 

@@ -1,5 +1,4 @@
 ---
-sidebar_position: 54
 title: POST Upgrade Testing
 ---
 

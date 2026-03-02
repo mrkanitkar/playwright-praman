@@ -1,5 +1,4 @@
 ---
-sidebar_position: 46
 title: 'Architecture Overview'
 ---
 

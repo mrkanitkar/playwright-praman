@@ -1,5 +1,4 @@
 ---
-sidebar_position: 50
 title: 'Migration from Vanilla Playwright'
 ---
 

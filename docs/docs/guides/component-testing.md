@@ -1,5 +1,4 @@
 ---
-sidebar_position: 26
 title: Component Testing
 ---
 

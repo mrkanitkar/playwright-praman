@@ -1,5 +1,4 @@
 ---
-sidebar_position: 33
 title: Example Reports & Data Architecture
 ---
 

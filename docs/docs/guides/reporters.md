@@ -1,5 +1,4 @@
 ---
-sidebar_position: 32
 title: Reporters
 ---
 

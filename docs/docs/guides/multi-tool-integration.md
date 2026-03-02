@@ -1,5 +1,4 @@
 ---
-sidebar_position: 55
 title: Multi-Tool Integration
 ---
 

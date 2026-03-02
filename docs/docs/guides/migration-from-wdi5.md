@@ -1,5 +1,4 @@
 ---
-sidebar_position: 51
 title: 'Migration from wdi5'
 ---
 
