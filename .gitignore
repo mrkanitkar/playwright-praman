@@ -43,6 +43,12 @@ docs/static/api-html/
 # CSpell cache
 .cspell/.cspellcache
 
+# Tarballs
+*.tgz
+
+# Workspace files
+*.code-workspace
+
 # Generated
 skills/playwright-praman-sap-testing/SKILL.md
 src/proxy/typed/*.generated.ts
