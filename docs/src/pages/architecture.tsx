@@ -1813,7 +1813,7 @@ function CloudTestingArchitecture(): ReactNode {
 
       {/* Link to full guide */}
       <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-        <a href="/playwright-praman/docs/guides/azure-playwright-workspaces"
+        <a href="/docs/guides/azure-playwright-workspaces"
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
             padding: '0.65rem 1.5rem', borderRadius: 8,

@@ -26,7 +26,7 @@ export default function Disclaimer(): ReactNode {
           </p>
           <p>
             This software is provided {'"'}AS IS{'"'} under the Apache License 2.0, without warranty of
-            any kind. See the <a href="/playwright-praman/license">LICENSE</a> file for full terms.
+            any kind. See the <a href="/license">LICENSE</a> file for full terms.
           </p>
           <p>
             The authors do not guarantee any specific outcome, fitness for a particular purpose,

@@ -138,7 +138,7 @@ test(core): add config validation edge cases`}</pre>
         </Section>
 
         <Section title="License">
-          <p>By contributing, you agree that your contributions will be licensed under the <a href="/playwright-praman/license">Apache License 2.0</a>.</p>
+          <p>By contributing, you agree that your contributions will be licensed under the <a href="/license">Apache License 2.0</a>.</p>
         </Section>
       </main>
     </Layout>

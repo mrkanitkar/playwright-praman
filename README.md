@@ -7,7 +7,8 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)
-[![Repomix](https://img.shields.io/badge/Repomix-enabled-blue?logo=github)](https://github.com/yamadashy/repomix)
+[![Repomix](https://img.shields.io/badge/Repomix-context-blue?logo=github)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml)
+[![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20AI-First%20SAP%20UI5%20Test%20Automation%20platform%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fpraman.zestest.in%2Fllms-full.txt%0A%0AMy%20question%3A%20)
 
 ## What is Praman?
 
@@ -195,29 +196,18 @@ for decision matrices, fallback chain diagrams, and recommended configurations b
 
 ## Documentation
 
-| Topic                         | Link                                                                     |
-| ----------------------------- | ------------------------------------------------------------------------ |
-| Full documentation            | [praman.zestest.in](https://praman.zestest.in)                           |
-| Getting started guide         | [Getting Started](https://praman.zestest.in/docs/guides/getting-started) |
-| Configuration reference       | [Configuration](https://praman.zestest.in/docs/guides/configuration)     |
-| Authentication (6 strategies) | [Authentication](https://praman.zestest.in/docs/guides/authentication)   |
-| Agent & IDE setup             | [Agent Setup](https://praman.zestest.in/docs/guides/agent-setup)         |
-| Fixtures reference            | [Fixtures](https://praman.zestest.in/docs/guides/fixtures)               |
-| Error codes (60)              | [Errors](https://praman.zestest.in/docs/guides/errors)                   |
-| API reference                 | [API Docs](https://praman.zestest.in/docs/api/)                          |
-| LLM-friendly docs             | [llms.txt](https://praman.zestest.in/llms.txt)                           |
-
-### LLM-Friendly Documentation ([llms.txt](https://llmstxt.org/))
-
-Praman publishes machine-readable docs following the [llmstxt.org](https://llmstxt.org/) standard for AI agents and RAG pipelines:
-
-| Page                 | Description                                        | Link                                                                                          |
-| -------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| llms.txt             | Overview & doc index                               | [llms.txt](https://praman.zestest.in/llms.txt)                                               |
-| llms-full.txt        | Complete documentation in a single file            | [llms-full.txt](https://praman.zestest.in/llms-full.txt)                                     |
-| llms-quickstart.txt  | Quick-start guide for AI agents                    | [llms-quickstart.txt](https://praman.zestest.in/llms-quickstart.txt)                         |
-| llms-sap-testing.txt | SAP UI5 testing patterns & control cookbook         | [llms-sap-testing.txt](https://praman.zestest.in/llms-sap-testing.txt)                       |
-| llms-architecture.txt| Architecture deep-dive for code generation agents  | [llms-architecture.txt](https://praman.zestest.in/llms-architecture.txt)                     |
+| Topic                         | Link                                                                                               |
+| ----------------------------- | -------------------------------------------------------------------------------------------------- |
+| Full documentation            | [praman.zestest.in](https://praman.zestest.in)                                                     |
+| Getting started guide         | [Getting Started](https://praman.zestest.in/docs/guides/getting-started)                           |
+| Configuration reference       | [Configuration](https://praman.zestest.in/docs/guides/configuration)                               |
+| Authentication (6 strategies) | [Authentication](https://praman.zestest.in/docs/guides/authentication)                             |
+| Agent & IDE setup             | [Agent Setup](https://praman.zestest.in/docs/guides/agent-setup)                                   |
+| Fixtures reference            | [Fixtures](https://praman.zestest.in/docs/guides/fixtures)                                         |
+| Error codes (60)              | [Errors](https://praman.zestest.in/docs/guides/errors)                                             |
+| API reference                 | [API Docs](https://praman.zestest.in/docs/api/)                                                    |
+| LLM-friendly docs             | [llms.txt](https://praman.zestest.in/llms.txt)                                                     |
+| Repomix context (AI agents)   | [Download artifact](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml) |
 
 ## Frequently Asked Questions
 
