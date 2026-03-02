@@ -29,7 +29,7 @@ Business analysts define the process. AI agents — Claude, Copilot, Jules — g
 - **CXOs & Program Leads** — go-live confidence backed by deployment evidence, not hope
 - **SAP test engineers** — reliable E2E tests for S/4HANA, Fiori, and BTP apps in minutes
 - **AI coding agents** (Claude Code, GitHub Copilot, Cursor, Jules) — generate tests from business descriptions
-- **QA teams** — migrating from Tosca, wdi5, or vanilla Playwright to a UI5-native solution
+- **QA teams** — agentic AI power for Playwright, purpose-built for SAP UI5-native testing
 
 ## Key Capabilities
 
@@ -146,18 +146,40 @@ Praman uses a **6-layer architecture**:
 
 Lower layers never import from higher layers. The bridge communicates with UI5's `sap.ui.getCore()` and OData model APIs directly in the browser context.
 
-## Praman vs Alternatives
+## Discovery & Interaction Strategies
 
-| Feature                         | Praman           | wdi5             | Vanilla Playwright | Tosca           |
-| ------------------------------- | ---------------- | ---------------- | ------------------ | --------------- |
-| UI5 control registry access     | Yes              | Yes              | No                 | Partial         |
-| Typed proxies with IntelliSense | Yes              | No               | N/A                | No              |
-| AI-powered test generation      | Yes              | No               | No                 | No              |
-| Playwright-native               | Yes              | Yes (adapter)    | Yes                | No              |
-| Open source                     | Yes (Apache-2.0) | Yes (Apache-2.0) | Yes (Apache-2.0)   | No (commercial) |
-| Fiori Elements helpers          | Yes              | Partial          | No                 | Partial         |
-| OData V2/V4 utilities           | Yes              | No               | No                 | Partial         |
-| Cross-platform CI/CD            | Yes              | Yes              | Yes                | Windows-only    |
+Praman uses two configurable strategy systems — **discovery** (how controls are found) and **interaction** (how actions are performed). Both use priority chains with automatic fallbacks.
+
+### 3 Discovery Strategies
+
+| Strategy       | How It Works                                                    | Best For                         |
+| -------------- | --------------------------------------------------------------- | -------------------------------- |
+| `direct-id`    | Single ID lookup via `sap.ui.core.Element.registry`             | Known stable IDs — fastest path  |
+| `recordreplay` | SAP `RecordReplay` API (UI5 >= 1.94) with full selector support | Complex selectors, standard apps |
+| `registry`     | Full registry scan matching type, properties, bindings          | Dynamic controls, fallback       |
+
+Praman runs strategies in priority order and stops at the first match. ID-only selectors automatically promote `direct-id` to first position.
+
+### 3 Interaction Strategies
+
+| Strategy     | Approach                                                    | Best For                                      |
+| ------------ | ----------------------------------------------------------- | --------------------------------------------- |
+| `ui5-native` | Direct UI5 event firing (`firePress`, `setValue`) — default | Standard Fiori apps (broadest fallback)       |
+| `dom-first`  | DOM events first, UI5 fallback                              | Custom composites, Web Components, Shadow DOM |
+| `opa5`       | SAP `RecordReplay.interactWithControl()` (UI5 >= 1.94)      | SAP compliance audits, OPA5 migration         |
+
+Each strategy includes a built-in fallback chain — no single strategy needs to handle every control type alone.
+
+### Configuration
+
+```bash
+# Environment variables — override per test run
+PRAMAN_INTERACTION_STRATEGY=dom-first npx playwright test
+PRAMAN_DISCOVERY_STRATEGIES=direct-id,recordreplay,registry npx playwright test
+```
+
+See the full [Discovery & Interaction Strategies](https://praman.zestest.in/docs/guides/discovery-and-interaction) guide
+for decision matrices, fallback chain diagrams, and recommended configurations by app type.
 
 ## Sub-path Exports
 
@@ -216,7 +238,6 @@ The generated tests use typed control proxies — not brittle selectors.
 Both access the UI5 control registry. Praman adds typed control proxies with IntelliSense,
 AI-powered test generation, Fiori Elements page-object helpers,
 OData mock/intercept utilities, and 10 UI5-specific Playwright matchers.
-Praman is built from the ground up for Playwright (not adapted from WebDriverIO).
 
 ## Security
 
