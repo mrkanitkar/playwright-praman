@@ -95,7 +95,15 @@
       "Bash(gh search code \"cspell\" --repo microsoft/playwright --filename cspell -L 5)",
       "WebFetch(domain:cspell.org)",
       "Bash(git mv /Users/maheshwar/Documents/projects/mk1/.cspell.json /Users/maheshwar/Documents/projects/mk1/cspell.json)",
-      "Bash(npm version 1.0.2-next.2 --no-git-tag-version)"
+      "Bash(npm version 1.0.2-next.2 --no-git-tag-version)",
+      "Bash(gh workflow run docs.yml)",
+      "WebFetch(domain:filipmikina.com)",
+      "WebFetch(domain:praman.zestest.in)",
+      "Bash(gh pr diff 44 --name-only)",
+      "Bash(gh pr comment 44 --body \"@dependabot rebase\")",
+      "Bash(gh pr view 44 --json commits --jq '.commits[-1].committedDate')",
+      "Bash(gh pr view 44 --json comments --jq '.comments[-1] | {author: .author.login, body: .body, createdAt: .createdAt}')",
+      "Bash(gh pr checks 44)"
     ],
     "additionalDirectories": [
       "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",
