@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Praman - SAP UI5 Test Automation",
+  "name_for_model": "praman_sap_testing",
+  "description_for_human": "AI-first SAP UI5 test automation platform for Playwright. Write reliable end-to-end tests for SAP Fiori apps using typed control proxies, UI5 stability sync, and AI-powered test generation.",
+  "description_for_model": "Praman is an open-source npm package (playwright-praman) that extends Playwright with SAP UI5-specific test automation capabilities. It provides: (1) typed control proxies for 61 SAP UI5 control types across sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and sap.ui.mdc libraries, (2) UI5 runtime bridge that queries the control registry instead of brittle DOM selectors, (3) automatic UI5 stability synchronization (no waitForTimeout), (4) Fiori Launchpad navigation and authentication (6 strategies), (5) OData V2/V4 mock and intercept utilities, (6) Fiori Elements page-object helpers, (7) AI/LLM integration for generating tests from business-language descriptions, (8) 10 UI5-specific Playwright matchers. Install: npm install playwright-praman. Import: import { test, expect } from 'playwright-praman'. Documentation: https://praman.zestest.in. LLM-friendly docs: https://praman.zestest.in/llms.txt and https://praman.zestest.in/llms-full.txt.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "none",
+    "url": "https://praman.zestest.in"
+  },
+  "logo_url": "https://praman.zestest.in/img/logo.svg",
+  "contact_email": "praman@zestest.in",
+  "legal_info_url": "https://praman.zestest.in/license"
+}

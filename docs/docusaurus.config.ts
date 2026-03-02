@@ -3,7 +3,7 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'Praman',
+  title: 'playwright-praman',
   tagline: 'AI-First SAP UI5 Test Automation for Playwright',
   favicon: 'img/favicon.ico',
 
@@ -27,8 +27,9 @@ const config: Config = {
     },
   },
 
-  // ── HTML <head> tags for AI agent discoverability ──
+  // ── HTML <head> tags ──
   headTags: [
+    // AI agent discoverability (llmstxt.org standard)
     {
       tagName: 'link',
       attributes: {
@@ -46,6 +47,58 @@ const config: Config = {
         href: '/llms-full.txt',
         title: 'LLM-friendly full documentation',
       },
+    },
+
+    // JSON-LD: SoftwareApplication
+    {
+      tagName: 'script',
+      attributes: { type: 'application/ld+json' },
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'playwright-praman',
+        description:
+          'AI-First SAP UI5 Test Automation Platform for Playwright. ' +
+          'Enterprise-grade testing with agentic AI, typed proxies, and 32+ fixtures.',
+        url: 'https://praman.zestest.in',
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Windows, macOS, Linux',
+        programmingLanguage: 'TypeScript',
+        runtimePlatform: 'Node.js',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        license: 'https://opensource.org/licenses/Apache-2.0',
+        codeRepository: 'https://github.com/mrkanitkar/playwright-praman',
+        downloadUrl: 'https://www.npmjs.com/package/playwright-praman',
+        softwareRequirements: 'Playwright, Node.js >= 20',
+        author: {
+          '@type': 'Organization',
+          name: 'Zestest',
+          url: 'https://praman.zestest.in',
+        },
+      }),
+    },
+
+    // JSON-LD: WebSite (enables sitelinks search box in Google)
+    {
+      tagName: 'script',
+      attributes: { type: 'application/ld+json' },
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'playwright-praman',
+        url: 'https://praman.zestest.in',
+        description: 'AI-First SAP UI5 Test Automation Platform for Playwright',
+        inLanguage: 'en',
+        publisher: {
+          '@type': 'Organization',
+          name: 'Zestest',
+          url: 'https://praman.zestest.in',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://praman.zestest.in/img/logo.svg',
+          },
+        },
+      }),
     },
   ],
 
@@ -349,6 +402,9 @@ const config: Config = {
     metadata: [
       { name: 'keywords', content: 'praman, playwright, sap, ui5, testing, automation, fiori, ai' },
       { name: 'twitter:card', content: 'summary_large_image' },
+      // TODO: Replace with actual codes from Google Search Console and Bing Webmaster Tools
+      // { name: 'google-site-verification', content: 'YOUR_GOOGLE_VERIFICATION_CODE' },
+      // { name: 'msvalidate.01', content: 'YOUR_BING_VERIFICATION_CODE' },
     ],
     colorMode: {
       defaultMode: 'light',

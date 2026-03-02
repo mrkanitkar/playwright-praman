@@ -1,13 +1,102 @@
 User-agent: *
 Allow: /
 
+# =============================================================================
+# AI Crawler Allowlist
+# Explicitly welcome AI search and retrieval bots.
+# Training bots are also allowed — Praman is open-source (Apache-2.0).
+# =============================================================================
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic (Claude)
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Google AI
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Google-CloudVertexBot
+Allow: /
+
+User-agent: Gemini-Deep-Research
+Allow: /
+
+User-agent: Google-NotebookLM
+Allow: /
+
+# Apple
+User-agent: Applebot-Extended
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Meta
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+# Microsoft / Copilot
+User-agent: Bingbot
+Allow: /
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
+# ByteDance
+User-agent: Bytespider
+Allow: /
+
+# DeepSeek
+User-agent: DeepSeekBot
+Allow: /
+
+# Other AI crawlers
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# =============================================================================
 # LLM-friendly documentation (llmstxt.org standard)
 # AI agents: fetch these files for structured documentation context
-# llms.txt        — link index with descriptions
-# llms-full.txt   — complete documentation in a single file
-# llms-quickstart.txt    — setup, fixtures, selectors, matchers
-# llms-sap-testing.txt   — SAP auth, FLP, OData, Fiori Elements
-# llms-migration.txt     — migration from Playwright, wdi5, Tosca
-# llms-architecture.txt  — architecture, bridge, proxy, ADRs
+#
+# llms.txt              — link index with descriptions
+# llms-full.txt         — complete documentation in a single file
+# llms-quickstart.txt   — setup, fixtures, selectors, matchers
+# llms-sap-testing.txt  — SAP auth, FLP, OData, Fiori Elements
+# llms-migration.txt    — migration from Playwright, wdi5, Tosca
+# llms-architecture.txt — architecture, bridge, proxy, ADRs
+# =============================================================================
 
 Sitemap: https://praman.zestest.in/sitemap.xml

@@ -103,7 +103,15 @@
       "Bash(gh pr comment 44 --body \"@dependabot rebase\")",
       "Bash(gh pr view 44 --json commits --jq '.commits[-1].committedDate')",
       "Bash(gh pr view 44 --json comments --jq '.comments[-1] | {author: .author.login, body: .body, createdAt: .createdAt}')",
-      "Bash(gh pr checks 44)"
+      "Bash(gh pr checks 44)",
+      "WebFetch(domain:docusaurus.io)",
+      "WebFetch(domain:dev.to)",
+      "Bash(npm search docusaurus structured data)",
+      "Bash(du -sh /Users/maheshwar/Documents/projects/mk1/docs/build/llms*.txt)",
+      "Bash(npm uninstall @stackql/docusaurus-plugin-structured-data)",
+      "WebFetch(domain:community.openai.com)",
+      "WebFetch(domain:docs.inkeep.com)",
+      "WebFetch(domain:linkmyprompt.com)"
     ],
     "additionalDirectories": [
       "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",
