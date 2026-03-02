@@ -1,5 +1,4 @@
 ---
-sidebar_position: 23
 title: Gold Standard Test Pattern
 ---
 

@@ -1,5 +1,4 @@
 ---
-sidebar_position: 47
 title: 'Bridge Internals'
 ---
 

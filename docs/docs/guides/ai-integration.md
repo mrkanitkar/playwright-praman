@@ -1,5 +1,4 @@
 ---
-sidebar_position: 36
 title: 'AI Integration'
 ---
 

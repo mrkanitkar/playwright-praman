@@ -1,5 +1,4 @@
 ---
-sidebar_position: 1
 title: Capability Registry
 description: Machine-readable registry of all Praman capabilities, APIs, guarantees, and failure modes for SAP test engineers, QA leads, and AI agents.
 ---

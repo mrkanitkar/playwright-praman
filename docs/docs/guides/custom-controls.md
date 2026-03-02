@@ -1,5 +1,4 @@
 ---
-sidebar_position: 42
 title: 'Custom Control Extension'
 ---
 

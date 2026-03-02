@@ -1,5 +1,4 @@
 ---
-sidebar_position: 49
 title: Cloud ALM Integration
 ---
 

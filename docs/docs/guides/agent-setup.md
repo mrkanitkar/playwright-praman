@@ -1,5 +1,4 @@
 ---
-sidebar_position: 3
 title: Agent & IDE Setup
 ---
 
@@ -266,6 +265,240 @@ For Praman API and usage, fetch the appropriate llms.txt file:
 ```
 
 Agents with web access (Claude Code `WebFetch`, Copilot `@fetch`) can retrieve these at runtime. Agents without web access can use the locally built files from `docs/build/`.
+
+## IDE Configuration
+
+The sections below cover manual IDE configuration. If `init` already scaffolded your
+IDE files, use these as a reference for customization.
+
+### VS Code Extensions
+
+| Extension                | ID                         | Purpose                                        |
+| ------------------------ | -------------------------- | ---------------------------------------------- |
+| ESLint                   | `dbaeumer.vscode-eslint`   | Lint TypeScript with Praman's 11-plugin config |
+| Playwright Test          | `ms-playwright.playwright` | Run/debug tests, view traces                   |
+| TypeScript               | Built-in                   | TypeScript language support                    |
+| Vitest                   | `vitest.explorer`          | Run unit tests from sidebar                    |
+| Pretty TypeScript Errors | `yoavbls.pretty-ts-errors` | Readable type error messages                   |
+| Error Lens               | `usernamehw.errorlens`     | Inline error/warning display                   |
+| GitLens                  | `eamodio.gitlens`          | Git blame, history, compare                    |
+
+Install via CLI:
+
+```bash
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension ms-playwright.playwright
+code --install-extension vitest.explorer
+code --install-extension yoavbls.pretty-ts-errors
+code --install-extension usernamehw.errorlens
+```
+
+### VS Code Settings
+
+Create or update `.vscode/settings.json` in your test project:
+
+```json
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["typescript"],
+  "testing.defaultGutterClickAction": "debug",
+  "playwright.reuseBrowser": true,
+  "playwright.showTrace": true
+}
+```
+
+### Debugging Praman Tests
+
+Create `.vscode/launch.json`:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Current Test File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/playwright",
+      "args": ["test", "${relativeFile}", "--headed", "--workers=1"],
+      "console": "integratedTerminal",
+      "env": {
+        "PWDEBUG": "1",
+        "SAP_BASE_URL": "https://your-sap-system.example.com",
+        "SAP_USERNAME": "your-user",
+        "SAP_PASSWORD": "your-password"
+      }
+    },
+    {
+      "name": "Debug Specific Test",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/playwright",
+      "args": ["test", "${relativeFile}", "--headed", "--workers=1", "-g", "${selectedText}"],
+      "console": "integratedTerminal",
+      "env": {
+        "PWDEBUG": "1"
+      }
+    },
+    {
+      "name": "Debug Unit Tests (Vitest)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/vitest",
+      "args": ["run", "${relativeFile}"],
+      "console": "integratedTerminal"
+    }
+  ]
+}
+```
+
+### Playwright Inspector
+
+Set `PWDEBUG=1` to launch the Playwright Inspector:
+
+```bash
+PWDEBUG=1 npx playwright test tests/my-test.spec.ts --headed --workers=1
+```
+
+The Inspector lets you:
+
+- Step through test actions one at a time
+- Inspect the UI5 control tree in the browser
+- View selectors and their matches
+- Record new actions
+
+### Playwright Trace Viewer
+
+After a test run, open the trace:
+
+```bash
+npx playwright show-trace test-results/my-test/trace.zip
+```
+
+The Trace Viewer shows:
+
+- Action timeline with screenshots
+- Network requests (OData calls)
+- Console logs
+- DOM snapshots at each step
+
+### Environment Variables
+
+Create a `.env` file in your project root (add to `.gitignore`):
+
+```bash
+# .env
+SAP_BASE_URL=https://your-sap-system.example.com
+SAP_USERNAME=test-user
+SAP_PASSWORD=test-password
+SAP_CLIENT=100
+SAP_LANGUAGE=EN
+```
+
+Load `.env` in your Playwright config:
+
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+import { config } from 'dotenv';
+
+config(); // Load .env file
+
+export default defineConfig({
+  use: {
+    baseURL: process.env.SAP_BASE_URL,
+  },
+});
+```
+
+### Code Snippets
+
+Add Praman-specific code snippets to `.vscode/praman.code-snippets`:
+
+```json
+{
+  "Praman Test": {
+    "prefix": "ptest",
+    "scope": "typescript",
+    "body": [
+      "import { test, expect } from 'playwright-praman';",
+      "",
+      "test.describe('$1', () => {",
+      "  test('$2', async ({ ui5, ui5Navigation, ui5Matchers }) => {",
+      "    await test.step('$3', async () => {",
+      "      $0",
+      "    });",
+      "  });",
+      "});"
+    ],
+    "description": "Praman test with fixtures"
+  },
+  "Praman Step": {
+    "prefix": "pstep",
+    "scope": "typescript",
+    "body": ["await test.step('$1', async () => {", "  $0", "});"],
+    "description": "Praman test step"
+  },
+  "UI5 Control Selector": {
+    "prefix": "pcontrol",
+    "scope": "typescript",
+    "body": [
+      "const ${1:control} = await ui5.control({",
+      "  controlType: '${2:sap.m.Button}',",
+      "  ${3:properties: { text: '$4' \\}},",
+      "});"
+    ],
+    "description": "UI5 control selector"
+  },
+  "UI5 Click": {
+    "prefix": "pclick",
+    "scope": "typescript",
+    "body": [
+      "await ui5.click({",
+      "  controlType: '${1:sap.m.Button}',",
+      "  properties: { text: '$2' },",
+      "});"
+    ],
+    "description": "UI5 click action"
+  },
+  "UI5 Fill": {
+    "prefix": "pfill",
+    "scope": "typescript",
+    "body": [
+      "await ui5.fill(",
+      "  { controlType: '${1:sap.m.Input}', id: /${2:fieldId}/ },",
+      "  '${3:value}'",
+      ");"
+    ],
+    "description": "UI5 fill input"
+  }
+}
+```
+
+### JetBrains IDEs (WebStorm/IntelliJ)
+
+1. Go to **Settings > Plugins > Marketplace**, search for "Playwright" and install
+2. Go to **Run > Edit Configurations**, add a **Node.js** configuration:
+   - **JavaScript file**: `node_modules/.bin/playwright`
+   - **Application parameters**: `test tests/my-test.spec.ts --headed --workers=1`
+   - **Environment variables**: `PWDEBUG=1;SAP_BASE_URL=...`
+3. JetBrains IDEs resolve `tsconfig.json` paths automatically — no additional configuration needed
+
+### IDE Troubleshooting
+
+| Problem                                | Solution                                                          |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| ESLint not finding config              | Set `eslint.workingDirectories` in VS Code settings               |
+| Path aliases not resolving             | Verify `tsconfig.json` is in the project root                     |
+| Playwright extension not finding tests | Set `playwright.testMatch` pattern in settings                    |
+| Debugger not hitting breakpoints       | Use `--workers=1` to disable parallelism                          |
+| TypeScript errors in node_modules      | Add `"skipLibCheck": true` to tsconfig                            |
+| Slow IntelliSense                      | Exclude `node_modules`, `dist`, `test-results` in `tsconfig.json` |
 
 ## Cross-Platform Notes
 

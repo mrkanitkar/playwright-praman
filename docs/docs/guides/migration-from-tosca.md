@@ -1,5 +1,4 @@
 ---
-sidebar_position: 52
 title: 'From Tosca to Playwright-Praman'
 ---
 
@@ -7,11 +6,11 @@ A comprehensive guide for teams migrating from Tricentis Tosca to Playwright + P
 SAP Fiori and UI5 web application testing. Covers concept mapping, workflow changes, and
 practical code examples.
 
-## Why Migrate?
+## Quick Comparison
 
-| Factor             | Tosca                          | Playwright + Praman                          |
+| Aspect             | Tosca                          | Playwright + Praman                          |
 | ------------------ | ------------------------------ | -------------------------------------------- |
-| License cost       | Per-user commercial license    | Open source (Apache 2.0)                     |
+| Licensing          | Per-user commercial license    | Open source (Apache 2.0)                     |
 | SAP Fiori support  | Via SAP UI5 scan / engine      | Native UI5 control registry                  |
 | CI/CD integration  | Tosca CI adapter               | First-class CLI (`npx playwright test`)      |
 | Version control    | Tosca workspace                | Git (standard branching, PRs, diffs)         |

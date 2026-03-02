@@ -1,5 +1,4 @@
 ---
-sidebar_position: 56
 title: Glossary
 ---
 

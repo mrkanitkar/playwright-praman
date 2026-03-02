@@ -1,5 +1,4 @@
 ---
-sidebar_position: 38
 title: 'Vocabulary System'
 ---
 

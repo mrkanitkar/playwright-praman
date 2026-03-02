@@ -1,5 +1,4 @@
 ---
-sidebar_position: 53
 title: SAP Activate Alignment
 ---
 

@@ -1,5 +1,4 @@
 ---
-sidebar_position: 48
 title: Behavioral Equivalence
 ---
 

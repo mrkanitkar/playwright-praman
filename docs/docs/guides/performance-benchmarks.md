@@ -1,5 +1,4 @@
 ---
-sidebar_position: 35
 title: Performance Benchmarks
 ---
 
