@@ -1,33 +1,14 @@
-title: '[Show] '
-labels: []
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Show the community what you've built with Praman!
-
   - type: textarea
-    id: description
     attributes:
       label: What did you build?
-      description: Describe your SAP test automation project, integration, or workflow.
-      placeholder: I used Praman to automate...
+      description: Describe your project, integration, or workflow using Praman.
     validations:
       required: true
-
   - type: textarea
-    id: code
     attributes:
       label: Code or screenshots
       description: Share code snippets, screenshots, or links.
       render: typescript
     validations:
       required: false
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Confirmation
-      options:
-        - label: This is my own work or I have permission to share it
-          required: true
