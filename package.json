@@ -1,6 +1,6 @@
 {
   "name": "playwright-praman",
-  "version": "1.0.1",
+  "version": "1.0.2-next.0",
   "description": "AI-First SAP UI5 Test Automation Platform for Playwright",
   "author": {
     "name": "Maheshwar Kanitkar",
@@ -96,7 +96,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "playwright-praman": "./dist/cli/index.js"
+    "playwright-praman": "dist/cli/index.js"
   },
   "scripts": {
     "build": "tsup",
@@ -217,7 +217,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/mrkanitkar/playwright-praman.git"
+    "url": "git+https://github.com/mrkanitkar/playwright-praman.git"
   },
   "bugs": {
     "url": "https://github.com/mrkanitkar/playwright-praman/issues"
