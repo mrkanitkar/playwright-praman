@@ -7,6 +7,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)
+[![Repomix](https://img.shields.io/badge/Repomix-enabled-blue?logo=github)](https://github.com/yamadashy/repomix)
 
 ## What is Praman?
 
@@ -205,6 +206,18 @@ for decision matrices, fallback chain diagrams, and recommended configurations b
 | Error codes (60)              | [Errors](https://praman.zestest.in/docs/guides/errors)                   |
 | API reference                 | [API Docs](https://praman.zestest.in/docs/api/)                          |
 | LLM-friendly docs             | [llms.txt](https://praman.zestest.in/llms.txt)                           |
+
+### LLM-Friendly Documentation ([llms.txt](https://llmstxt.org/))
+
+Praman publishes machine-readable docs following the [llmstxt.org](https://llmstxt.org/) standard for AI agents and RAG pipelines:
+
+| Page                 | Description                                        | Link                                                                                          |
+| -------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| llms.txt             | Overview & doc index                               | [llms.txt](https://praman.zestest.in/llms.txt)                                               |
+| llms-full.txt        | Complete documentation in a single file            | [llms-full.txt](https://praman.zestest.in/llms-full.txt)                                     |
+| llms-quickstart.txt  | Quick-start guide for AI agents                    | [llms-quickstart.txt](https://praman.zestest.in/llms-quickstart.txt)                         |
+| llms-sap-testing.txt | SAP UI5 testing patterns & control cookbook         | [llms-sap-testing.txt](https://praman.zestest.in/llms-sap-testing.txt)                       |
+| llms-architecture.txt| Architecture deep-dive for code generation agents  | [llms-architecture.txt](https://praman.zestest.in/llms-architecture.txt)                     |
 
 ## Frequently Asked Questions
 
