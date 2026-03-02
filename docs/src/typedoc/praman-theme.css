@@ -1,6 +1,7 @@
 /**
- * Praman TypeDoc Theme Override — Teal + Amber Dual Accent
+ * Praman TypeDoc Theme Override — Corporate Blue + Amber Dual Accent
  * Overrides TypeDoc default theme CSS variables for brand consistency.
+ * Colors aligned with custom.css central theme (--ifm-color-primary: #0070ad).
  */
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -14,16 +15,16 @@
   --light-color-text: #0f172a;
   --light-color-contrast-text: #0f172a;
   --light-color-text-aside: #475569;
-  --light-color-link: #0d9488;
-  --light-color-focus-outline: #0d9488;
+  --light-color-link: #0070ad;
+  --light-color-focus-outline: #0070ad;
 
-  --light-color-ts-keyword: #0d9488;
-  --light-color-ts-function: #0b7e74;
-  --light-color-ts-class: #0d9488;
-  --light-color-ts-interface: #0f766e;
+  --light-color-ts-keyword: #0070ad;
+  --light-color-ts-function: #005b8c;
+  --light-color-ts-class: #0070ad;
+  --light-color-ts-interface: #1e3c72;
   --light-color-ts-property: #92400e;
-  --light-color-ts-method: #0d9488;
-  --light-color-ts-variable: #0b7e74;
+  --light-color-ts-method: #0070ad;
+  --light-color-ts-variable: #005b8c;
   --light-color-ts-type-alias: #b45309;
   --light-color-ts-enum: #92400e;
 }
@@ -37,16 +38,16 @@
   --dark-color-text: #f8fafc;
   --dark-color-contrast-text: #ffffff;
   --dark-color-text-aside: #94a3b8;
-  --dark-color-link: #2dd4bf;
-  --dark-color-focus-outline: #2dd4bf;
+  --dark-color-link: #4aa9d5;
+  --dark-color-focus-outline: #4aa9d5;
 
-  --dark-color-ts-keyword: #2dd4bf;
-  --dark-color-ts-function: #5eead4;
-  --dark-color-ts-class: #2dd4bf;
-  --dark-color-ts-interface: #14b8a6;
+  --dark-color-ts-keyword: #4aa9d5;
+  --dark-color-ts-function: #65b9e0;
+  --dark-color-ts-class: #4aa9d5;
+  --dark-color-ts-interface: #3a9ac8;
   --dark-color-ts-property: #fbbf24;
-  --dark-color-ts-method: #2dd4bf;
-  --dark-color-ts-variable: #5eead4;
+  --dark-color-ts-method: #4aa9d5;
+  --dark-color-ts-variable: #65b9e0;
   --dark-color-ts-type-alias: #f59e0b;
   --dark-color-ts-enum: #fbbf24;
 }

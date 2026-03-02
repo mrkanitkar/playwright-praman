@@ -83,7 +83,7 @@ export async function callAzureOpenAI(
   const { AzureOpenAI } = await import('openai').catch(() => {
     throw new AIError({
       code: 'ERR_AI_NOT_CONFIGURED',
-      message: 'openai package is not installed. Add it to optionalDependencies.',
+      message: 'openai package is not installed. Install it as a dependency.',
       attempted: 'Load openai package for Azure OpenAI provider',
       retryable: false,
       suggestions: ['Run: npm install openai'],
@@ -131,7 +131,7 @@ export async function callOpenAI(
   const { OpenAI } = await import('openai').catch(() => {
     throw new AIError({
       code: 'ERR_AI_NOT_CONFIGURED',
-      message: 'openai package is not installed. Add it to optionalDependencies.',
+      message: 'openai package is not installed. Install it as a dependency.',
       attempted: 'Load openai package for OpenAI provider',
       retryable: false,
       suggestions: ['Run: npm install openai'],
@@ -180,7 +180,7 @@ export async function callAnthropic(
   const { default: AnthropicClass } = (await import('@anthropic-ai/sdk').catch(() => {
     throw new AIError({
       code: 'ERR_AI_NOT_CONFIGURED',
-      message: '@anthropic-ai/sdk package is not installed. Add it to optionalDependencies.',
+      message: '@anthropic-ai/sdk package is not installed. Install it as a dependency.',
       attempted: 'Load @anthropic-ai/sdk package for Anthropic provider',
       retryable: false,
       suggestions: ['Run: npm install @anthropic-ai/sdk'],

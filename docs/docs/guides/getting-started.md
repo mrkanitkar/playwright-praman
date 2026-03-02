@@ -3,40 +3,88 @@ sidebar_position: 1
 title: Getting Started
 ---
 
-Get up and running with Praman in under 5 minutes.
+Get up and running with Praman in 4 steps.
 
 ## Prerequisites
 
 - **Node.js** >= 20
-- **Playwright** >= 1.57
 - Access to an SAP UI5 / Fiori application
+- SAP credentials (username, password, base URL)
 
-## Installation
+## Step 1: Install Praman
 
 ```bash
-npm install -D playwright-praman @playwright/test
-npx playwright install chromium
+npm install playwright-praman
 ```
 
-## Agent & IDE Setup (Required)
+### What gets installed
 
-After installing the package, run the `init` command to scaffold agent definitions, seed files, and IDE configuration. This step is **required** before proceeding — it sets up the AI agents, test seeds, and editor integrations that Praman depends on:
+Praman has 3 direct dependencies and 5 peer dependencies. npm resolves the full dependency tree during install.
+
+| Package                   | Type            | Purpose                                            |
+| ------------------------- | --------------- | -------------------------------------------------- |
+| `@playwright/test`        | Peer (required) | Playwright test runner (>=1.57.0)                  |
+| `commander`               | Dependency      | CLI framework for `npx playwright-praman` commands |
+| `pino`                    | Dependency      | Structured JSON logging                            |
+| `zod`                     | Dependency      | Configuration validation and type-safe schemas     |
+| `@anthropic-ai/sdk`       | Peer (optional) | AI test generation via Claude                      |
+| `openai`                  | Peer (optional) | AI test generation via OpenAI / Azure OpenAI       |
+| `@opentelemetry/api`      | Peer (optional) | Observability and distributed tracing              |
+| `@opentelemetry/sdk-node` | Peer (optional) | OpenTelemetry Node.js SDK                          |
+
+:::info Install time
+First install may take 1-2 minutes while npm resolves the Playwright peer dependency and its browser engine binaries. This is a one-time cost — subsequent installs use the npm cache.
+:::
+
+## Step 2: Initialize Your Project
 
 ```bash
 npx playwright-praman init
 ```
 
-`init` detects your IDE and installs the appropriate files:
+`init` performs 5 automated sub-steps:
 
-| IDE / Agent        | What gets installed                                                           |
-| ------------------ | ----------------------------------------------------------------------------- |
-| **Claude Code**    | `.claude/agents/` (planner, generator, healer), `.claude/prompts/`, seed file |
-| **GitHub Copilot** | `.github/agents/` (planner, generator, healer)                                |
-| **Cursor**         | `.cursor/rules/praman.mdc`                                                    |
-| **VS Code**        | `.vscode/settings.json`, extensions, code snippets                            |
-| **Jules**          | `.jules/praman-setup.md`                                                      |
+### 2a. Validate Environment
 
-After `init`, append the Praman instructions to your AI agent config:
+Checks that Node.js >= 20, npm is available, and `@playwright/test` >= 1.57 is present. Exits with clear error messages if any check fails.
+
+### 2b. Install Missing Packages
+
+Installs any missing packages (`@playwright/test`, `dotenv`) and runs `npx playwright install chromium` to download the browser binary.
+
+### 2c. Detect Your IDE
+
+Scans for IDE marker files in your project directory and installs the appropriate agent definitions, prompts, and configuration:
+
+| IDE / Agent        | Detection Signal                                       | What gets installed                                     |
+| ------------------ | ------------------------------------------------------ | ------------------------------------------------------- |
+| **VS Code**        | `.vscode/` or `TERM_PROGRAM=vscode`                    | Settings, extensions, code snippets                     |
+| **Claude Code**    | `CLAUDE.md`                                            | Agents (planner, generator, healer), prompts, seed file |
+| **Cursor**         | `.cursor/` or `.cursorrc`                              | `.cursor/rules/praman.mdc`                              |
+| **Jules**          | `.jules/`                                              | `.jules/praman-setup.md`                                |
+| **GitHub Copilot** | `.github/copilot-instructions.md` or `.github/agents/` | Copilot agent definitions                               |
+| **OpenCode**       | `.opencode/`                                           | OpenCode configuration                                  |
+
+### 2d. Scaffold Project Files
+
+Creates the full project structure — no manual file creation needed:
+
+| File                                         | Purpose                                                        |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| `playwright.config.ts`                       | Playwright config with `auth-setup` + `chromium` projects      |
+| `praman.config.ts`                           | Praman settings (timeouts, log level, interaction strategy)    |
+| `tsconfig.json`                              | TypeScript config with `module: "Node16"`                      |
+| `.gitignore`                                 | Excludes `.env`, `.auth/`, `test-results/`, `node_modules/`    |
+| `tests/auth.setup.ts`                        | SAP login — runs once before tests, saves session to `.auth/`  |
+| `tests/bom-e2e-praman-gold-standard.spec.ts` | Gold-standard verification test                                |
+| `specs/bom-create-complete.plan.md`          | AI-generated test plan (reference)                             |
+| `.env.example`                               | Environment variable template                                  |
+| IDE-specific files                           | Agent definitions, prompts, rules, snippets (per IDE detected) |
+| `skills/`                                    | Praman SAP testing skill files for AI agents                   |
+
+### 2e. Print Next Steps
+
+Displays IDE-specific instructions for appending Praman agent configurations:
 
 ```bash
 # Claude Code
@@ -49,97 +97,123 @@ cat node_modules/playwright-praman/docs/user-integration/copilot-instructions-ap
 cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable.mdc >> .cursorrules
 ```
 
+:::tip Re-running init
+`init` is safe to re-run — it skips files that already exist. Use `--force` to overwrite everything:
+
+```bash
+npx playwright-praman init --force
+```
+
+For detailed breakdown of every installed file, see the [Agent & IDE Setup](./agent-setup) guide.
+:::
+
+## Step 3: Configure SAP Credentials
+
+`init` created a `.env.example` file. Copy it and fill in your SAP credentials:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+
+```bash
+# Required — SAP system connection
+SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
+SAP_CLOUD_USERNAME=your-username
+SAP_CLOUD_PASSWORD=your-password
+
+# Authentication strategy
+SAP_AUTH_STRATEGY=btp-saml    # 'btp-saml' | 'basic' | 'office365'
+
+# Optional
+SAP_CLIENT=100                # SAP client number (OnPrem only)
+SAP_LANGUAGE=EN               # Display language (default: EN)
+```
+
 :::warning
-Do not skip this step. Without `init`, AI agents (Claude Code, Copilot, Cursor) will not have the Praman skill files, seed specs, or prompt definitions needed to plan, generate, and heal SAP tests.
+**Never commit `.env`** — it contains credentials. The `.gitignore` created by `init` already excludes it.
 :::
 
-:::tip
-For manual installation, re-running on existing projects, seed file details, and LLM-friendly documentation (llms.txt), see the full [Agent & IDE Setup](./agent-setup) guide.
+### Environment Variables Reference
+
+| Variable                    | Required | Description                                     |
+| --------------------------- | -------- | ----------------------------------------------- |
+| `SAP_CLOUD_BASE_URL`        | Yes      | SAP BTP or on-premise base URL                  |
+| `SAP_CLOUD_USERNAME`        | Yes      | SAP login username                              |
+| `SAP_CLOUD_PASSWORD`        | Yes      | SAP login password                              |
+| `SAP_AUTH_STRATEGY`         | Yes      | Auth strategy: `btp-saml`, `basic`, `office365` |
+| `SAP_CLIENT`                | No       | SAP client number (default: from system)        |
+| `SAP_LANGUAGE`              | No       | Display language (default: EN)                  |
+| `PRAMAN_LOG_LEVEL`          | No       | Log level: `debug`, `info`, `warn`, `error`     |
+| `PRAMAN_SKIP_VERSION_CHECK` | No       | Set `true` to skip Playwright version check     |
+
+For auth strategy details, see the [Authentication](./authentication) guide.
+
+## Step 4: Verify Your Setup
+
+Run the gold-standard BOM test to confirm everything is working:
+
+```bash
+npx playwright test tests/bom-e2e-praman-gold-standard.spec.ts --reporter=line --headed --project=chromium
+```
+
+### What this command does
+
+| Flag                 | Purpose                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| `--project=chromium` | Runs the `chromium` project, which depends on `auth-setup` (auth runs first automatically) |
+| `--headed`           | Opens a visible browser so you can watch the test interact with SAP                        |
+| `--reporter=line`    | Compact one-line-per-step output                                                           |
+
+The test will:
+
+1. Run `auth-setup` first — logs into SAP and saves session to `.auth/sap-session.json`
+2. Open the BOM (Bill of Material) Maintenance app via FLP tile navigation
+3. Open the Create BOM dialog and verify SmartField controls
+4. Exercise Material and Plant value help dialogs (OData-driven)
+5. Test BOM Usage dropdown (ComboBox with `setSelectedKey`)
+6. Fill the form, click Create, and handle the response gracefully
+
+### Expected output
+
+```text
+Running 1 test using 1 worker
+
+  ✓  tests/bom-e2e-praman-gold-standard.spec.ts:X:Y › BOM End-to-End Flow › Complete BOM Flow (60-120s)
+
+  1 passed
+```
+
+### What a passing test confirms
+
+A passing gold-standard test verifies your entire setup end-to-end:
+
+- Playwright is installed and Chromium browser is available
+- SAP credentials in `.env` are correct and authentication succeeds
+- Session storage (`storageState`) saves and restores auth state
+- Praman fixtures (`ui5.control()`, `ui5.press()`, `ui5.fill()`, `ui5.waitForUI5()`) interact with live UI5 controls
+- Dialog handling with `searchOpenDialogs: true` works
+- SmartField, ComboBox, and Value Help table controls are accessible
+- OData data binding (`getContextByIndex().getObject()`) returns entity data
+
+### Troubleshooting verification failures
+
+| Symptom                                        | Likely Cause                               | Fix                                                       |
+| ---------------------------------------------- | ------------------------------------------ | --------------------------------------------------------- |
+| `ERR_BRIDGE_TIMEOUT`                           | URL is not a UI5 app, or UI5 hasn't loaded | Verify `SAP_CLOUD_BASE_URL` points to the Fiori Launchpad |
+| Auth setup fails                               | Wrong credentials or auth strategy         | Check `.env` — try `SAP_AUTH_STRATEGY=basic` for OnPrem   |
+| `browserType.launch: Executable doesn't exist` | Chromium not installed                     | Run `npx playwright install chromium`                     |
+| Test times out at tile click                   | FLP space/tile name differs on your system | Edit `TEST_DATA` constants in the test file               |
+| `ERR_CONTROL_NOT_FOUND`                        | Control ID differs on your system          | Use `controlType` + `properties` instead of `id`          |
+
+:::info Adapt the gold-standard test to your app
+The gold-standard test targets the "Maintain Bill Of Material" app. If your SAP system does not have this app, use it as a template: copy the file, change the tile name, control IDs, and test data to match your app. The patterns (auth, navigation, dialog handling, value help) are universal across SAP Fiori apps.
 :::
 
-## Project Setup
+---
 
-### 1. Create Praman Configuration
-
-Create `praman.config.ts` in your project root:
-
-```typescript
-import { defineConfig } from 'playwright-praman';
-
-export default defineConfig({
-  logLevel: 'info',
-  ui5WaitTimeout: 30_000,
-  controlDiscoveryTimeout: 10_000,
-  interactionStrategy: 'ui5-native',
-});
-```
-
-### 2. Create Playwright Configuration
-
-Create or update `playwright.config.ts`:
-
-```typescript
-import { defineConfig, devices } from '@playwright/test';
-
-export default defineConfig({
-  testDir: './tests',
-  timeout: 60_000,
-  retries: 1,
-  use: {
-    baseURL: process.env.SAP_BASE_URL,
-    trace: 'on-first-retry',
-  },
-  projects: [
-    // Auth setup project -- runs first, saves session
-    {
-      name: 'auth',
-      testMatch: '**/auth-setup.ts',
-    },
-    // Main test project -- reuses saved session
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: '.auth/sap-session.json',
-        baseURL: process.env['SAP_BASE_URL'],
-      },
-      dependencies: ['auth'],
-    },
-  ],
-});
-```
-
-### 3. Set Up Authentication
-
-Copy the example auth setup into your project:
-
-```bash
-mkdir -p tests
-cp node_modules/playwright-praman/examples/auth-setup.ts tests/auth-setup.ts
-```
-
-Or create your own `tests/auth-setup.ts`. See the [Auth Setup example](../examples/auth-setup) for a complete reference covering OnPrem, BTP Cloud SAML, and Office 365 strategies.
-
-### 4. Environment Variables
-
-Create a `.env` file (never commit this):
-
-```bash
-SAP_BASE_URL=https://your-sap-system.example.com
-SAP_USERNAME=TEST_USER
-SAP_PASSWORD=SecurePassword123
-SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'
-SAP_CLIENT=100             # OnPrem only
-SAP_LANGUAGE=EN            # Optional, default EN
-```
-
-### 5. Add .auth to .gitignore
-
-```bash
-echo '.auth/' >> .gitignore
-```
-
-## Your First Test
+## Your First Custom Test
 
 Create `tests/purchase-order.spec.ts`:
 
@@ -660,16 +734,6 @@ npx playwright test --headed
 
 # Run with Playwright UI mode
 npx playwright test --ui
-```
-
-Expected output:
-
-```text
-Running 1 test using 1 worker
-
-  ✓  tests/purchase-order.spec.ts:3:1 › navigate to Purchase Order app (12s)
-
-  1 passed (14s)
 ```
 
 :::tip Why `ui5.control()` instead of `page.locator()`?

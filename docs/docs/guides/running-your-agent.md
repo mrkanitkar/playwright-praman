@@ -20,7 +20,7 @@ Before launching your agent, verify the following files exist in your project. A
 ```
 
 :::warning Missing agents?
-If these files don't exist, run `npx playwright-praman init` (see [Agent & IDE Setup](./getting-started#agent--ide-setup-required)).
+If these files don't exist, run `npx playwright-praman init` (see [Agent & IDE Setup](./agent-setup)).
 :::
 
 ### Skill Files
@@ -772,12 +772,10 @@ test.describe('BOM End-to-End Flow', () => {
       await bomUsageCtrl.fireChange({ value: TEST_DATA.bomUsageKey });
       await bomUsageCtrl.close();
       await ui5.waitForUI5();
-      test
-        .info()
-        .annotations.push({
-          type: 'info',
-          description: `BOM Usage: ${TEST_DATA.bomUsageKey} (Production)`,
-        });
+      test.info().annotations.push({
+        type: 'info',
+        description: `BOM Usage: ${TEST_DATA.bomUsageKey} (Production)`,
+      });
 
       // ── Pre-submission verification ────────────────────────────
       const finalMaterial =

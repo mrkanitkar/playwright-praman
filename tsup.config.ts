@@ -1,11 +1,7 @@
 import { defineConfig } from 'tsup';
 import pkg from './package.json' with { type: 'json' };
 
-const external = [
-  ...Object.keys(pkg.dependencies),
-  ...Object.keys(pkg.peerDependencies),
-  ...Object.keys(pkg.optionalDependencies),
-];
+const external = [...Object.keys(pkg.dependencies), ...Object.keys(pkg.peerDependencies)];
 
 export default defineConfig({
   entry: {
