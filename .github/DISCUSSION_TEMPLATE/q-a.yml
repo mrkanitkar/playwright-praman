@@ -1,0 +1,49 @@
+title: '[Q&A] '
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for using Praman! Before asking, please check:
+        - [Documentation](https://mrkanitkar.github.io/playwright-praman/)
+        - [Existing discussions](https://github.com/mrkanitkar/playwright-praman/discussions)
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What do you need help with?
+      placeholder: Describe your question clearly...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What are you trying to achieve? Include Praman version, Playwright version, and SAP system type if relevant.
+      placeholder: |
+        - Praman version: 1.0.x
+        - Playwright version: 1.5x.x
+        - SAP system: BTP / S/4HANA / ECC
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Code or config (if applicable)
+      description: Share relevant test code, config, or error messages.
+      render: typescript
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing discussions and issues
+          required: true
+        - label: I checked the documentation
+          required: true
