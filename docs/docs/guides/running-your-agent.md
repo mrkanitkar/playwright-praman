@@ -20,7 +20,7 @@ Before launching your agent, verify the following files exist in your project. A
 ```
 
 :::warning Missing agents?
-If these files don't exist, run `npx playwright-praman init` (see [Agent & IDE Setup](./agent-setup)).
+If these files don't exist, run `npx playwright init-agents --loop=vscode && npx playwright-praman init` (see [Agent & IDE Setup](./agent-setup)).
 :::
 
 ### Skill Files
