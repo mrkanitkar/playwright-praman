@@ -14,6 +14,10 @@ Get up and running with Praman in 5 steps.
 
 ```bash
 npm install playwright-praman
+# or
+yarn add playwright-praman
+# or
+pnpm add playwright-praman
 ```
 
 ### What gets installed
