@@ -7,6 +7,11 @@ This guide walks you from zero to a running test in minutes.
 
 ```bash
 npm install -D playwright-praman @playwright/test
+# or
+yarn add -D playwright-praman @playwright/test
+# or
+pnpm add -D playwright-praman @playwright/test
+
 npx playwright install chromium
 ```
 
@@ -76,10 +81,7 @@ Create `tests/purchase-order.spec.ts`:
 ```typescript
 import { test, expect } from 'playwright-praman';
 
-test('navigate to Purchase Order app and verify table', async ({
-  ui5,
-  ui5Navigation,
-}) => {
+test('navigate to Purchase Order app and verify table', async ({ ui5, ui5Navigation }) => {
   // Step 1: Navigate to the Fiori app
   await test.step('Open Purchase Order app', async () => {
     await ui5Navigation.navigateToApp('PurchaseOrder-manage');
@@ -176,11 +178,7 @@ const rowIndex = await ui5.table.findRowByValues('purchaseOrderTable', {
 await ui5.table.clickRow('purchaseOrderTable', rowIndex);
 
 // Get a specific cell value
-const vendor = await ui5.table.getCellByColumnName(
-  'purchaseOrderTable',
-  0,
-  'Vendor',
-);
+const vendor = await ui5.table.getCellByColumnName('purchaseOrderTable', 0, 'Vendor');
 ```
 
 ### Dialog Handling
@@ -276,18 +274,18 @@ Focus on **fixtures, assertions, and test.step()** for structured test flows.
 
 Key fixtures available in every test:
 
-| Fixture | Purpose |
-| --- | --- |
-| `ui5` | Core control discovery and interaction |
-| `ui5.table` | Table read, filter, sort, select |
-| `ui5.dialog` | Dialog lifecycle (wait, confirm, dismiss) |
-| `ui5.date` | DatePicker and TimePicker operations |
-| `ui5.odata` | OData model reads and HTTP operations |
-| `ui5Navigation` | FLP and in-app navigation |
-| `ui5Footer` | Footer toolbar buttons (Save, Edit, Cancel) |
-| `ui5Shell` | Shell header (Home, Notifications, User menu) |
-| `fe` | Fiori Elements List Report, Object Page, Table |
-| `intent` | Business intent APIs (procurement, sales, finance) |
+| Fixture         | Purpose                                            |
+| --------------- | -------------------------------------------------- |
+| `ui5`           | Core control discovery and interaction             |
+| `ui5.table`     | Table read, filter, sort, select                   |
+| `ui5.dialog`    | Dialog lifecycle (wait, confirm, dismiss)          |
+| `ui5.date`      | DatePicker and TimePicker operations               |
+| `ui5.odata`     | OData model reads and HTTP operations              |
+| `ui5Navigation` | FLP and in-app navigation                          |
+| `ui5Footer`     | Footer toolbar buttons (Save, Edit, Cancel)        |
+| `ui5Shell`      | Shell header (Home, Notifications, User menu)      |
+| `fe`            | Fiori Elements List Report, Object Page, Table     |
+| `intent`        | Business intent APIs (procurement, sales, finance) |
 
 Always wrap multi-step flows in `test.step()` for clear reporting:
 
@@ -348,12 +346,12 @@ See `docs/docs/guides/vocabulary-system.md` for term mappings and
 
 ## Further Reading
 
-| Topic | Documentation |
-| --- | --- |
-| Full API reference | `skills/playwright-praman-sap-testing/api-reference.md` |
-| Authentication strategies | `skills/playwright-praman-sap-testing/authentication.md` |
-| AI capabilities | `skills/playwright-praman-sap-testing/ai-capabilities.md` |
-| Architecture overview | `docs/docs/guides/architecture-overview.md` |
-| Vocabulary system | `docs/docs/guides/vocabulary-system.md` |
-| Error handling | `docs/docs/guides/errors.md` |
-| Documentation map | `DOCS-MAP.md` |
+| Topic                     | Documentation                                             |
+| ------------------------- | --------------------------------------------------------- |
+| Full API reference        | `skills/playwright-praman-sap-testing/api-reference.md`   |
+| Authentication strategies | `skills/playwright-praman-sap-testing/authentication.md`  |
+| AI capabilities           | `skills/playwright-praman-sap-testing/ai-capabilities.md` |
+| Architecture overview     | `docs/docs/guides/architecture-overview.md`               |
+| Vocabulary system         | `docs/docs/guides/vocabulary-system.md`                   |
+| Error handling            | `docs/docs/guides/errors.md`                              |
+| Documentation map         | `DOCS-MAP.md`                                             |

@@ -55,6 +55,10 @@ Business analysts define the process. AI agents — Claude, Copilot, Jules — g
 
 ```bash
 npm install playwright-praman
+# or
+yarn add playwright-praman
+# or
+pnpm add playwright-praman
 ```
 
 Only 3 production dependencies: `commander` (MIT), `pino` (MIT), `zod` (MIT).
