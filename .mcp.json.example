@@ -7,19 +7,11 @@
         "run-test-mcp-server"
       ]
     },
-    "sap-docs": {
-      "command": "node",
-      "args": ["/Users/maheshwar/Documents/projects/mcp-sap-docs/dist/src/server.js"],
-      "env": {
-        "MCP_VARIANT": "sap-docs"
-      },
-      "cwd": "/Users/maheshwar/Documents/projects/mcp-sap-docs"
-    },
     "ui5-mcp": {
       "command": "npx",
       "args": ["@ui5/mcp-server"],
       "env": {
-        "UI5_MCP_WORKSPACE": "/Users/maheshwar/Documents/projects/mk1"
+        "UI5_MCP_WORKSPACE": "/path/to/your/project"
       }
     },
     "sequential-thinking": {

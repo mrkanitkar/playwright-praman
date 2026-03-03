@@ -43,12 +43,6 @@ For multi-skill tasks, load primary + supporting skill(s). Example:
 - WC adapter implementation → `skills-tdd.md` + `skills-implementer.md` + `skills-sap-ui5-webcomponents-expert.md`
 - Bug fixes → `skills-tdd.md` + `skills-implementer.md`
 
-## Parity Verification Skill
-
-- Skill: `./parity-verify-skill/SKILL.md`
-- Old plugin: `/Users/maheshwar/Documents/projects/parity-verify-skill/dhikraft/dhikraft-2.5.0.tgz`
-- New plugin: `/Users/maheshwar/Documents/projects/parity-verify-skill/praman/playwright-praman-1.0.1.tgz`
-
 ## Rules
 
 1. TypeScript strict mode — no `any`, no `as unknown as T` shortcuts
