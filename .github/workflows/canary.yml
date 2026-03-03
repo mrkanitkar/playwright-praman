@@ -37,7 +37,21 @@ jobs:
       - name: Validate export map
         run: npm run check:exports
       - name: Stamp canary version
-        run: npm version prerelease --preid=alpha --no-git-tag-version
+        run: |
+          BASE=$(node -p "require('./package.json').version")
+          # Query npm for the latest published alpha of this base version
+          LATEST=$(npm view playwright-praman "versions" --json 2>/dev/null \
+            | node -p "
+                const versions = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+                const alphas = versions
+                  .filter(v => v.startsWith('${BASE}-alpha.'))
+                  .map(v => Number(v.split('-alpha.')[1]))
+                  .filter(n => Number.isFinite(n));
+                alphas.length ? Math.max(...alphas) : -1;
+              ")
+          NEXT=$((LATEST + 1))
+          npm version "${BASE}-alpha.${NEXT}" --no-git-tag-version
+          echo "📦 Canary version: ${BASE}-alpha.${NEXT}"
       - name: Verify clean tree (only version bump expected)
         run: |
           CHANGED=$(git diff --name-only | sort)
