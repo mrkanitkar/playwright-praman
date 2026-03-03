@@ -37,6 +37,8 @@ jobs:
       - name: Validate export map
         run: npm run check:exports
       - name: Stamp canary version
+        env:
+          FORCE_COLOR: 0
         run: |
           BASE=$(node -p "require('./package.json').version")
           # Query npm for the latest published alpha of this base version
