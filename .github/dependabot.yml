@@ -5,8 +5,7 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     open-pull-requests-limit: 10
     reviewers:
       - mrkanitkar
@@ -27,8 +26,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     reviewers:
       - mrkanitkar
     labels:
