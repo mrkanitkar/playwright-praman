@@ -57,6 +57,19 @@ license-report.json
 plans/
 mk2/
 
+# Research & development artifacts (not for public fork)
+jscpd-report/
+jscpd-wdi5-report/
+landing-previews/
+praman-audit-report/
+temp/
+scancode-results.json
+bom-create-validation-error.png
+
+# MCP server config (machine-specific paths — copy .mcp.json.example to .mcp.json)
+.mcp.json
+.mcp.json.bak
+
 # Strict TypeScript Project
 # WARNING: JavaScript files (.js, .jsx, .mjs, .cjs) are NOT allowed in src/
 # This is enforced by pre-commit hooks. Config files like eslint.config.mjs
