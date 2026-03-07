@@ -55,6 +55,7 @@ appendable
 stringifying
 unparseable
 serializability
+frontmatter
 
 # British English variants
 initialised
@@ -166,3 +167,4 @@ roundtrips
 myapp
 mycompany
 xyznonexistent
+gitignored

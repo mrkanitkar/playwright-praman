@@ -1,6 +1,6 @@
 # Skill File: SAP UI5 Domain Expert Agent
 
-## Praman v1.0 — AI-First SAP UI5 Test Automation Platform
+## Praman v1.0 — Agent-First SAP UI5 Test Automation Plugin
 
 | Property            | Value                                                 |
 | ------------------- | ----------------------------------------------------- |

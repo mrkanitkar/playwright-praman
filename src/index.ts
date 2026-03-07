@@ -8,7 +8,7 @@
  */
 
 /**
- * Praman v1.0 — AI-First SAP UI5 Test Automation Platform for Playwright.
+ * Praman v1.0 — Agent-First SAP UI5 Test Automation Plugin for Playwright.
  *
  * @remarks
  * Main entry exports test fixtures, configuration, error hierarchy,

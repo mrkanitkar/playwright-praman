@@ -27,3 +27,28 @@ v1.0:
   label: v1.0
   permalink: /v-1-0
   description: Praman v1.0 release — AI-first SAP UI5 test automation platform for Playwright.
+
+example-prompts:
+  label: Example Prompts
+  permalink: /example-prompts
+  description: Ready-to-use AI prompts for SAP UI5 test automation with Praman and Playwright.
+
+prompts:
+  label: Prompts
+  permalink: /prompts
+  description: Prompt engineering templates for AI-assisted SAP testing.
+
+sales-order:
+  label: Sales Order
+  permalink: /sales-order
+  description: SAP Sales Order (VA01/VA02) test automation prompts and guides.
+
+delivery:
+  label: Delivery
+  permalink: /delivery
+  description: SAP Outbound Delivery (VL01N/VL06O) test automation prompts and guides.
+
+billing:
+  label: Billing
+  permalink: /billing
+  description: SAP Billing Document (F0798/F0797) test automation prompts and guides.

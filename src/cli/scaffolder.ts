@@ -84,6 +84,7 @@ const GITIGNORE_TEMPLATE = `.env
 test-results/
 playwright-report/
 node_modules/
+praman-prompts/
 `;
 
 const PRAMAN_CONFIG_TEMPLATE = `import type { PramanConfig } from 'playwright-praman';

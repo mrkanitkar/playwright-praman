@@ -1,6 +1,6 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "name": "Praman — AI-First SAP UI5 Test Automation Platform",
+  "name": "Praman — Agent-First SAP UI5 Test Automation Plugin",
   "entryPoints": [
     "src/index.ts",
     "src/ai/index.ts",

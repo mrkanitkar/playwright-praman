@@ -108,7 +108,7 @@ If you are an AI agent helping a user **write SAP UI5 tests** with `playwright-p
 
 ### What is Praman?
 
-An AI-First SAP UI5 Test Automation Platform that **extends Playwright** with UI5-aware fixtures.
+An Agent-First SAP UI5 Test Automation Plugin that **extends Playwright** with UI5-aware fixtures.
 Install: `npm i -D playwright-praman`
 Import: `import { test, expect } from 'playwright-praman'`
 

@@ -152,7 +152,7 @@ async function main(): Promise<void> {
     // Header
     `# playwright-praman`,
     ``,
-    `> AI-First SAP UI5 Test Automation Platform for Playwright.`,
+    `> Agent-First SAP UI5 Test Automation Plugin for Playwright.`,
     `> Version: ${pkg.version} | License: Apache-2.0`,
     `> Install: npm install playwright-praman @playwright/test`,
     `> Import: import { test, expect } from 'playwright-praman'`,

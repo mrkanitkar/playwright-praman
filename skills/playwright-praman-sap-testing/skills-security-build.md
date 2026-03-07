@@ -1,14 +1,14 @@
 # Skill File: Security & Build Engineer Agent
 
-## Praman v1.0 — AI-First SAP UI5 Test Automation Platform
+## Praman v1.0 — Agent-First SAP UI5 Test Automation Plugin
 
-| Property | Value |
-|----------|-------|
-| **Role** | DevSecOps & Build Engineer |
-| **Skill ID** | PRAMAN-SKILL-SECURITY-BUILD-001 |
-| **Version** | 1.0.0 |
+| Property            | Value                                                 |
+| ------------------- | ----------------------------------------------------- |
+| **Role**            | DevSecOps & Build Engineer                            |
+| **Skill ID**        | PRAMAN-SKILL-SECURITY-BUILD-001                       |
+| **Version**         | 1.0.0                                                 |
 | **Authority Level** | Infrastructure — owns CI/CD, security, build, release |
-| **Parent Docs** | plan.md (D15), setup.md (full CI/CD config) |
+| **Parent Docs**     | plan.md (D15), setup.md (full CI/CD config)           |
 
 ---
 
@@ -46,27 +46,27 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: {
-    'index':               'src/index.ts',
-    'ai/index':            'src/ai/index.ts',
-    'intents/index':       'src/intents/index.ts',
-    'vocabulary/index':    'src/vocabulary/index.ts',
-    'fe/index':            'src/fe/index.ts',
-    'reporters/index':     'src/reporters/index.ts',
+    index: 'src/index.ts',
+    'ai/index': 'src/ai/index.ts',
+    'intents/index': 'src/intents/index.ts',
+    'vocabulary/index': 'src/vocabulary/index.ts',
+    'fe/index': 'src/fe/index.ts',
+    'reporters/index': 'src/reporters/index.ts',
   },
-  format: ['esm', 'cjs'],    // Dual ESM + CJS output
-  dts: true,                  // Generate .d.ts + .d.cts files
+  format: ['esm', 'cjs'], // Dual ESM + CJS output
+  dts: true, // Generate .d.ts + .d.cts files
   sourcemap: true,
   clean: true,
   target: 'node20',
-  splitting: true,            // Code splitting for shared modules
+  splitting: true, // Code splitting for shared modules
   treeshake: true,
-  cjsInterop: true,           // CJS default export interop
-  shims: true,                // import.meta.url shim for CJS
+  cjsInterop: true, // CJS default export interop
+  shims: true, // import.meta.url shim for CJS
   outDir: 'dist',
   external: [
-    '@playwright/test',       // Peer dependency — never bundle
-    'openai',                 // Optional dependency
-    '@opentelemetry/api',     // Optional dependency
+    '@playwright/test', // Peer dependency — never bundle
+    'openai', // Optional dependency
+    '@opentelemetry/api', // Optional dependency
     '@opentelemetry/sdk-node', // Optional dependency
   ],
   esbuildOptions(options) {
@@ -209,7 +209,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build
-      - run: npm run size-limit    # Bundle size check
+      - run: npm run size-limit # Bundle size check
       - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: dist
@@ -225,7 +225,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm audit --audit-level=high
-      - run: npx knip                # Dead code detection
+      - run: npx knip # Dead code detection
 ```
 
 ### 3.2 Release Pipeline (`release.yml`)
@@ -241,7 +241,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write    # Required for npm provenance
+  id-token: write # Required for npm provenance
 
 jobs:
   release-please:
@@ -303,8 +303,8 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
-      - run: npm run docs:api       # TypeDoc
-      - run: npm run docs:build     # Docusaurus
+      - run: npm run docs:api # TypeDoc
+      - run: npm run docs:build # Docusaurus
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: docs/build/
@@ -491,16 +491,47 @@ npx commitlint --edit $1
 export default {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    'scope-enum': [2, 'always', [
-      'core', 'config', 'errors', 'logging', 'telemetry', 'compat', 'types', 'utils',
-      'bridge', 'adapter', 'injection', 'strategy', 'scripts',
-      'proxy', 'typed', 'cache', 'discovery', 'object',
-      'selectors', 'matchers',
-      'fixtures', 'auth', 'navigation', 'table', 'odata',
-      'ai', 'intents', 'vocabulary',
-      'fe', 'reporters', 'cli',
-      'docs', 'ci', 'deps', 'release',
-    ]],
+    'scope-enum': [
+      2,
+      'always',
+      [
+        'core',
+        'config',
+        'errors',
+        'logging',
+        'telemetry',
+        'compat',
+        'types',
+        'utils',
+        'bridge',
+        'adapter',
+        'injection',
+        'strategy',
+        'scripts',
+        'proxy',
+        'typed',
+        'cache',
+        'discovery',
+        'object',
+        'selectors',
+        'matchers',
+        'fixtures',
+        'auth',
+        'navigation',
+        'table',
+        'odata',
+        'ai',
+        'intents',
+        'vocabulary',
+        'fe',
+        'reporters',
+        'cli',
+        'docs',
+        'ci',
+        'deps',
+        'release',
+      ],
+    ],
   },
 };
 ```
@@ -541,11 +572,11 @@ npm run test:unit
 
 ### 7.2 Version Bump Rules
 
-| Commit Prefix | Version Bump | Example |
-|---|---|---|
-| `feat:` | Minor (3.0.0 → 3.1.0) | `feat(proxy): add UI5Dialog typed proxy` |
-| `fix:` | Patch (3.0.0 → 3.0.1) | `fix(bridge): handle timeout in findControl` |
-| `feat!:` or `BREAKING CHANGE:` | Major (3.0.0 → 4.0.0) | `feat!: change config schema` |
+| Commit Prefix                  | Version Bump          | Example                                      |
+| ------------------------------ | --------------------- | -------------------------------------------- |
+| `feat:`                        | Minor (3.0.0 → 3.1.0) | `feat(proxy): add UI5Dialog typed proxy`     |
+| `fix:`                         | Patch (3.0.0 → 3.0.1) | `fix(bridge): handle timeout in findControl` |
+| `feat!:` or `BREAKING CHANGE:` | Major (3.0.0 → 4.0.0) | `feat!: change config schema`                |
 
 ---
 
@@ -578,12 +609,14 @@ npx knip --strict
   "version": "1.0.0",
   "license": "Apache-2.0",
   "type": "module",
-  "engines": { "node": ">=20" },      // BP-NODE
-  "files": ["dist", "LICENSE"],         // BP-NODE: only publish dist
-  "exports": { /* sub-path exports */ },
+  "engines": { "node": ">=20" }, // BP-NODE
+  "files": ["dist", "LICENSE"], // BP-NODE: only publish dist
+  "exports": {
+    /* sub-path exports */
+  },
   "peerDependencies": {
-    "@playwright/test": ">=1.57.0 <2.0.0"
-  }
+    "@playwright/test": ">=1.57.0 <2.0.0",
+  },
 }
 ```
 

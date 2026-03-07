@@ -7,6 +7,8 @@
  * See LICENSE and NOTICE files for details.
  */
 
+/* eslint-disable max-lines -- per-IDE copy specs + 6 scaffold functions exceed 300 LOC */
+
 /**
  * IDE-specific file installation for the Praman CLI `init` command.
  *
@@ -17,6 +19,9 @@
  *
  * Supports: Claude Code, VS Code, Cursor, Jules, OpenCode.
  * Cross-platform: uses `node:path` and `node:url` — no hardcoded separators.
+ *
+ * This file exceeds 300 LOC due to the per-IDE copy specs and multiple
+ * scaffold functions (skills, seeds, auth, examples, prompts).
  *
  * @module cli/ide-installer
  */
@@ -367,6 +372,42 @@ async function scaffoldExampleFiles(
   await copyIfMissing(pkgPath('.env.example'), join(targetDir, '.env.example'), force, created);
 }
 
+// ── Prompt files copy ─────────────────────────────────────────────────────────
+
+/**
+ * Copies the `prompts/` directory from the package into
+ * `praman-prompts/` in the user's project root.
+ *
+ * @remarks
+ * The `prompts/` directory MUST remain flat (no subdirectories).
+ * `copyIfMissing()` operates on files only — subdirectories would be silently skipped.
+ */
+async function scaffoldPromptFiles(
+  targetDir: string,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  const srcDir = pkgPath('prompts');
+  const destDir = join(targetDir, 'praman-prompts');
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- destDir composed from targetDir + known constant path
+  await mkdir(destDir, { recursive: true });
+
+  let entries: string[];
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- srcDir is resolved from package root + known constant path
+    entries = await readdir(srcDir);
+  } catch {
+    logWarn(`Prompts source directory not found: ${srcDir}`);
+    return;
+  }
+
+  for (const entry of entries) {
+    const srcPath = join(srcDir, entry);
+    const destPath = join(destDir, entry);
+    await copyIfMissing(srcPath, destPath, force, created);
+  }
+}
+
 // ── Main export ───────────────────────────────────────────────────────────────
 
 /**
@@ -462,6 +503,7 @@ export async function scaffoldIDEFiles(
     await scaffoldAuthSetupFile(targetDir, force, created);
     await scaffoldSkillFiles(targetDir, force, created);
     await scaffoldExampleFiles(targetDir, force, created);
+    await scaffoldPromptFiles(targetDir, force, created);
   }
 
   return created;

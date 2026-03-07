@@ -4,7 +4,7 @@ const DOCS_URL = 'https://praman.dev';
 const LLMS_TXT = `${DOCS_URL}/llms-full.txt`;
 
 const CONTEXT_PREFIX =
-  'I am reading the Praman documentation — an AI-First SAP UI5 Test Automation platform for Playwright. ' +
+  'I am reading the Praman documentation — an Agent-First SAP UI5 Test Automation Plugin for Playwright. ' +
   `For full documentation context, read: ${LLMS_TXT}\n\n` +
   'Current page: ';
 

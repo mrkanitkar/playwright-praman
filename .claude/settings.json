@@ -158,7 +158,7 @@
   "effort": "high",
   "permissionMode": "plan",
   "verbose": true,
-  "systemPrompt": "You are an expert AI coding assistant working on Praman v1.0, an AI-First SAP UI5 Test Automation Platform for Playwright. Follow all instructions in CLAUDE.md, AGENTS.md, and the relevant skill files from skills/playwright-praman-sap-testing/. Use TSDoc (NOT JSDoc), follow TDD practices, and ensure all modules are ≤300 LOC. TypeScript strict mode, no `any`, ESM only.",
+  "systemPrompt": "You are an expert AI coding assistant working on Praman v1.0, an Agent-First SAP UI5 Test Automation Plugin for Playwright. Follow all instructions in CLAUDE.md, AGENTS.md, and the relevant skill files from skills/playwright-praman-sap-testing/. Use TSDoc (NOT JSDoc), follow TDD practices, and ensure all modules are ≤300 LOC. TypeScript strict mode, no `any`, ESM only.",
   "lspServers": {
     "typescript": {
       "command": "vtsls",

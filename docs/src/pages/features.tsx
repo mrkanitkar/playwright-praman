@@ -179,7 +179,7 @@ function FeatureGrid(): ReactNode {
   const features = [
     {
       icon: '\u{1F916}',
-      title: 'AI-First Architecture',
+      title: 'Agent-First Architecture',
       desc: 'SKILL.md entry points let any AI agent — Copilot, Claude, Jules — discover capabilities, generate tests, and verify compliance autonomously.',
     },
     {

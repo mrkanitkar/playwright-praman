@@ -190,6 +190,35 @@ describe('cli/uninstall', () => {
 
       expect(paths).toContain('.gitignore');
     });
+
+    it('includes praman-prompts/ directory in prompt category', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const promptEntry = files.find((f) => f.relativePath === 'praman-prompts/');
+
+      expect(promptEntry).toBeDefined();
+      expect(promptEntry?.category).toBe('prompt');
+    });
+
+    it('prompt category is not filtered by keepConfig or keepAgents', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const filesKeepConfig = getScaffoldedFiles(TEST_DIR, { ...baseOptions, keepConfig: true });
+      const filesKeepAgents = getScaffoldedFiles(TEST_DIR, { ...baseOptions, keepAgents: true });
+
+      expect(filesKeepConfig.some((f) => f.category === 'prompt')).toBe(true);
+      expect(filesKeepAgents.some((f) => f.category === 'prompt')).toBe(true);
+    });
+
+    it('includes prompt category when all categories listed', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const categories = new Set(files.map((f) => f.category));
+
+      expect(categories.has('prompt')).toBe(true);
+    });
   });
 
   // ── runUninstall ────────────────────────────────────────────────────────
