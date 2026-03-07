@@ -1,5 +1,11 @@
 ---
 title: Navigation
+description: '9 FLP navigation methods for Praman. Navigate SAP Fiori Launchpad apps by semantic object and action, with BTP WorkZone support.'
+keywords:
+  - sap fiori launchpad automation
+  - playwright sap fiori launchpad navigation
+  - sap flp navigation testing
+  - sap btp workzone testing
 ---
 
 Praman provides 9 navigation functions via the `ui5Navigation` fixture, plus BTP WorkZone

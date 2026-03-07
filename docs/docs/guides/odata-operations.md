@@ -1,5 +1,11 @@
 ---
 title: OData Operations
+description: 'OData V2 and V4 testing with Praman. Browser-side model operations and Node-side HTTP CRUD for SAP OData services.'
+keywords:
+  - sap odata testing
+  - playwright odata interceptor sap
+  - sap odata v4 mock testing playwright
+  - sap odata crud testing
 ---
 
 Praman provides two approaches to OData data access: **model operations** (browser-side, via

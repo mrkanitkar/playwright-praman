@@ -4,6 +4,8 @@
 
 [![CI](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/playwright-praman)](https://www.npmjs.com/package/playwright-praman)
+[![npm downloads](https://img.shields.io/npm/dw/playwright-praman)](https://www.npmjs.com/package/playwright-praman)
+[![GitHub stars](https://img.shields.io/github/stars/mrkanitkar/playwright-praman)](https://github.com/mrkanitkar/playwright-praman)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)

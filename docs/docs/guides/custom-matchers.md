@@ -1,5 +1,11 @@
 ---
 title: Custom Matchers
+description: '10 UI5-specific Playwright matchers: toHaveUI5Text, toBeUI5Visible, toBeUI5Enabled, and more. Extend expect() for SAP testing.'
+keywords:
+  - playwright custom matchers
+  - sap ui5 assertions
+  - playwright expect sap
+  - sap ui5 test automation
 ---
 
 Praman extends Playwright's `expect()` with 10 UI5-specific matchers that query control state

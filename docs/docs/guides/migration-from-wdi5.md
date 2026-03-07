@@ -1,5 +1,11 @@
 ---
 title: 'Migration from wdi5'
+description: 'Step-by-step guide to migrate from wdi5 to Praman. Complete API mapping from browser.asControl() to ui5.control() with Playwright.'
+keywords:
+  - wdi5 alternative
+  - wdi5 vs playwright
+  - migrate wdi5 tests to playwright
+  - sap test framework comparison
 ---
 
 Migrate your wdi5 test suite to Playwright-Praman with minimal friction. This guide maps every

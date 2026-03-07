@@ -1,5 +1,11 @@
 ---
 title: Configuration Reference
+description: 'Complete Praman configuration reference. Zod-validated config schema with defaults for SAP UI5 test automation, auth strategies, and bridge settings.'
+keywords:
+  - praman configuration
+  - playwright sap config
+  - sap ui5 test automation setup
+  - playwright-praman
 ---
 
 Praman uses a Zod-validated configuration system. All fields have defaults — an empty `{}` is valid.

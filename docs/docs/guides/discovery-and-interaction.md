@@ -1,5 +1,11 @@
 ---
 title: Discovery and Interaction Strategies
+description: 'Praman discovery and interaction strategies: direct-id, recordreplay, registry lookup. 3 interaction modes: ui5-native, dom-first, opa5.'
+keywords:
+  - sap ui5 control discovery
+  - sap ui5 stability synchronization
+  - playwright sap interaction modes
+  - sap ui5 test automation
 ---
 
 # Discovery and Interaction Strategies

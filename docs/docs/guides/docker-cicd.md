@@ -1,5 +1,11 @@
 ---
 title: 'Docker & CI/CD'
+description: 'Run Praman SAP UI5 tests in Docker and CI/CD. Container setup, 3-OS GitHub Actions matrix, and quality gate configuration.'
+keywords:
+  - playwright sap docker ci cd
+  - sap ui5 test automation ci cd
+  - playwright sap github actions
+  - sap regression testing automation
 ---
 
 # Docker & CI/CD

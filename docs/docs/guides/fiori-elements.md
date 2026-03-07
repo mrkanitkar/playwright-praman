@@ -1,5 +1,11 @@
 ---
 title: 'Fiori Elements Testing'
+description: 'Test SAP Fiori Elements apps with Praman. Page-object helpers for List Report, Object Page, Overview Page, and FE Table operations.'
+keywords:
+  - sap fiori elements testing
+  - sap fiori test automation
+  - sap fiori elements list report testing
+  - playwright sap fiori
 ---
 
 # Fiori Elements Testing
