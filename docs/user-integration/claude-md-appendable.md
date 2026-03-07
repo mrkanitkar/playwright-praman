@@ -18,8 +18,8 @@ Use **Praman fixtures for UI5 controls** and **Playwright native for everything 
 ### Setup Steps
 
 ```bash
-# 1. Initialize Playwright agents for Claude Code
-npx playwright init-agents --loop=claude --prompts
+# 1. Initialize Praman (detects Claude Code and installs agents)
+npx playwright-praman init
 
 # 2. Copy Praman SAP agents
 cp node_modules/playwright-praman/agents/claude/*.md .claude/agents/

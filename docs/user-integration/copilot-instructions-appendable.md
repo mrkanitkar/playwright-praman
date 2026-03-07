@@ -14,8 +14,8 @@ Use **Praman fixtures for UI5 controls** and **Playwright native for everything 
 ### Setup
 
 ```bash
-# 1. Initialize Playwright agents for Copilot
-npx playwright init-agents --loop=copilot
+# 1. Initialize Praman (detects Copilot and installs agents)
+npx playwright-praman init
 
 # 2. Copy Praman SAP agents
 cp node_modules/playwright-praman/agents/copilot/*.agent.md .github/agents/
