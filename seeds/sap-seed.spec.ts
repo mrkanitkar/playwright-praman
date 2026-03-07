@@ -71,7 +71,8 @@ test.describe('SAP Agent Seed', () => {
         document.querySelector('input[name="j_username"]') !== null ||
         document.querySelector('#USERNAME_FIELD') !== null ||
         document.querySelector('#logOnForm') !== null ||
-        location.href.includes('accounts.sap.com')
+        location.hostname === 'accounts.sap.com' ||
+        location.hostname.endsWith('.accounts.sap.com')
       );
     });
 
