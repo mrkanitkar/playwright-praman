@@ -3,8 +3,8 @@
 # Run after deploying the docs site: bash docs/scripts/submit-indexnow.sh
 
 INDEXNOW_KEY="8ab3a51431dc4d69acaabf3f97ad90d2"
-HOST="mrkanitkar.github.io"
-BASE_URL="https://${HOST}/playwright-praman"
+HOST="praman.dev"
+BASE_URL="https://${HOST}"
 
 curl -s -X POST "https://api.indexnow.org/indexnow" \
   -H "Content-Type: application/json" \

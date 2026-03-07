@@ -5,7 +5,7 @@
   "author": {
     "name": "Maheshwar Kanitkar",
     "email": "support@zestest.in",
-    "url": "https://mrkanitkar.github.io/playwright-praman/"
+    "url": "https://praman.dev"
   },
   "license": "Apache-2.0",
   "type": "module",
@@ -225,9 +225,26 @@
     "playwright",
     "sap",
     "ui5",
+    "sapui5",
+    "fiori",
     "testing",
     "automation",
-    "fiori",
+    "SAP Testing",
+    "SAP E2E Testing",
+    "SAP Automation",
+    "SAP UI5 Testing",
+    "SAP Fiori Testing",
+    "SAP Cloud ALM",
+    "SAP S/4HANA",
+    "S/4HANA",
+    "S/4HANA migration",
+    "SAP Activate",
+    "SAP upgrade testing",
+    "Fiori Elements",
+    "regression testing",
+    "continuous testing",
+    "ERP testing",
+    "e2e",
     "ai-first",
     "enterprise"
   ],
@@ -238,5 +255,5 @@
   "bugs": {
     "url": "https://github.com/mrkanitkar/playwright-praman/issues"
   },
-  "homepage": "https://mrkanitkar.github.io/playwright-praman/"
+  "homepage": "https://praman.dev"
 }

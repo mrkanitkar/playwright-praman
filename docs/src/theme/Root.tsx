@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-const DOCS_URL = 'https://mrkanitkar.github.io/playwright-praman';
+const DOCS_URL = 'https://praman.dev';
 const LLMS_TXT = `${DOCS_URL}/llms-full.txt`;
 
 const CONTEXT_PREFIX =
@@ -56,6 +56,8 @@ function PerplexityIcon() {
   );
 }
 
+const PROVIDER_ICONS = [<ChatGptIcon key="chatgpt" />, <PerplexityIcon key="perplexity" />];
+
 function AskAiButton() {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -73,20 +75,16 @@ function AskAiButton() {
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+    if (!isOpen) return;
+    document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, handleClickOutside]);
 
   const handleProviderClick = (provider: AiProvider) => {
-    const currentPage = typeof window !== 'undefined' ? window.location.href : DOCS_URL;
-    const prompt = CONTEXT_PREFIX + currentPage + '\n\nMy question: ';
+    const prompt = CONTEXT_PREFIX + window.location.href + '\n\nMy question: ';
     window.open(provider.buildUrl(prompt), '_blank', 'noopener,noreferrer');
     setIsOpen(false);
   };
-
-  const providerIcons = [<ChatGptIcon key="chatgpt" />, <PerplexityIcon key="perplexity" />];
 
   return (
     <div className="ask-ai-container">
@@ -101,7 +99,7 @@ function AskAiButton() {
                 onClick={() => handleProviderClick(provider)}
                 style={{ '--provider-color': provider.color } as React.CSSProperties}
               >
-                <span className="ask-ai-provider-icon">{providerIcons[i]}</span>
+                <span className="ask-ai-provider-icon">{PROVIDER_ICONS[i]}</span>
                 <span className="ask-ai-provider-name">{provider.name}</span>
                 <span className="ask-ai-provider-arrow">&#8599;</span>
               </button>
