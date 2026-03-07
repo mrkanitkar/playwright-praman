@@ -55,6 +55,7 @@ src/proxy/typed/*.generated.ts
 *.sbom.json
 license-report.json
 plans/
+seo/
 mk2/
 
 # Research & development artifacts (not for public fork)
