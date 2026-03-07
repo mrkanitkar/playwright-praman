@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4](https://github.com/mrkanitkar/playwright-praman/compare/v1.0.3...v1.0.4) (2026-03-07)
+
+
+### Bug Fixes
+
+* **ci:** ignore auto-generated CHANGELOG.md in markdownlint ([a65c1b9](https://github.com/mrkanitkar/playwright-praman/commit/a65c1b994e34ee05bec8279e552ba0c2be505163))
+* **security:** harden regex anchoring, XSS escaping, and hostname checks ([3c1cbe9](https://github.com/mrkanitkar/playwright-praman/commit/3c1cbe95f22c4d03a5b5326d36db41ee1850e322))
+
 ## [1.0.3](https://github.com/mrkanitkar/playwright-praman/compare/v1.0.2...v1.0.3) (2026-03-07)
 
 
