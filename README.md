@@ -81,18 +81,94 @@ The result is a **production-ready `.spec.ts` file** — no manual test scriptin
 
 ## Example
 
+### Prompt Template — AI Agent Test Generation
+
+Describe your SAP business process as a prompt. Praman's AI agents (Claude Code, Copilot, Cursor, Jules) turn it into a production-ready test script.
+
+```text
+Goal: Create SAP test case and test script
+
+1. Use praman SAP planner agent:
+   .github/agents/praman-sap-planner.agent.md
+
+2. Login using credentials in .env file and use Chrome in headed mode.
+   Do not use sub-agents.
+
+3. Ensure you use UI5 query and capture UI5 methods at each step.
+   Use UI5 methods for all control interactions.
+
+4. Use seed file: tests/seeds/sap-seed.spec.ts
+
+5. Here is the test case:
+
+   Login to SAP and ensure you are on the landing page.
+
+   Step 1: Navigate to Maintain Bill of Material app and click Create BOM
+     - expect: Create BOM dialog opens with all fields visible
+
+   Step 2: Select Material via Value Help — pick a valid material
+     - expect: Material field is populated with selected material
+
+   Step 3: Select Plant via Value Help — pick plant matching the material
+     - expect: Plant field is populated with selected plant
+
+   Step 4: Select BOM Usage "Production (1)" from dropdown
+     - expect: BOM Usage field shows "Production (1)"
+
+   Step 5: Verify all required fields are filled before submission
+     - expect: Material field has a value
+     - expect: BOM Usage field has value "Production (1)"
+     - expect: Valid From date is set
+     - expect: Create BOM button is enabled
+
+   Step 6: Click "Create BOM" submit button in dialog footer
+     - expect: If valid combination — dialog closes, BOM created,
+       user returns to list report
+     - expect: If invalid combination — error message dialog appears
+
+   Step 7: If error occurs, close error dialog and cancel
+     - expect: Error dialog closes
+     - expect: Create BOM dialog closes
+     - expect: User returns to list report
+
+Output:
+  - Test plan: specs/
+  - Test script: tests/e2e/sap-cloud/
+```
+
+The agent explores your live SAP system, discovers UI5 controls via `sap.ui.getCore()`, and generates a `.spec.ts` file using Praman fixtures — no manual scripting required.
+
+### Generated Test (What You Get)
+
 ```typescript
 import { test, expect } from 'playwright-praman';
 
-test('SAP Fiori app test', async ({ ui5, ui5Navigation }) => {
-  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
-
-  await test.step('Find and verify Create button', async () => {
-    const btn = await ui5.control({
-      controlType: 'sap.m.Button',
-      properties: { text: 'Create' },
+test.describe('Maintain BOM — Create Flow', () => {
+  test('Create BOM end-to-end', async ({ page, ui5, ui5Navigation }) => {
+    await test.step('Step 1: Navigate to app', async () => {
+      await ui5Navigation.navigateToTile('Maintain Bill of Material');
+      await ui5.waitForUI5();
     });
-    expect(await btn.getText()).toBe('Create');
+
+    await test.step('Step 2: Open Create BOM dialog', async () => {
+      const createBtn = await ui5.control({
+        controlType: 'sap.m.Button',
+        properties: { text: 'Create' },
+      });
+      await createBtn.press();
+      await ui5.waitForUI5();
+    });
+
+    await test.step('Step 3: Fill Material via Value Help', async () => {
+      const materialField = await ui5.control({
+        id: 'materialInput',
+        searchOpenDialogs: true,
+      });
+      await materialField.setValue('MAT-001');
+      await materialField.fireChange({ value: 'MAT-001' });
+      await ui5.waitForUI5();
+      expect(await materialField.getValue()).toBeTruthy();
+    });
   });
 });
 ```
