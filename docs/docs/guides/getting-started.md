@@ -111,59 +111,218 @@ For auth strategy details, see the [Authentication](./authentication) guide.
 
 ## Step 2: Generate Tests with AI Agents
 
-Describe your business process in plain language — Praman's AI agents do the rest:
+Submit a Signavio flow, a test case description, or a business process in plain language.
+Praman's AI agents connect to your live SAP system, discover every UI5 control, generate a structured test plan, and deliver production-ready Playwright scripts — covering SAP end-to-end quality from requirement to deployment evidence. No scripting. No selectors. No coding.
 
-**Claude Code:**
+### Prompt template
+
+Copy and paste this into your AI agent (Claude Code, Copilot, Cursor, Jules), replacing the test case with your business process:
+
+```text
+Goal: Create SAP test case and test script
+
+1. Use praman SAP planner agent:
+   .github/agents/praman-sap-planner.agent.md
+
+2. Login using credentials in .env file and use Chrome in headed mode.
+   Do not use sub-agents.
+
+3. Ensure you use UI5 query and capture UI5 methods at each step.
+   Use UI5 methods for all control interactions.
+
+4. Use seed file: tests/seeds/sap-seed.spec.ts
+
+5. Here is the test case:
+
+   Login to SAP and ensure you are on the landing page.
+
+   Step 1: Navigate to Maintain Bill of Material app and click Create BOM
+     - expect: Create BOM dialog opens with all fields visible
+
+   Step 2: Select Material via Value Help — pick a valid material
+     - expect: Material field is populated with selected material
+
+   Step 3: Select Plant via Value Help — pick plant matching the material
+     - expect: Plant field is populated with selected plant
+
+   Step 4: Select BOM Usage "Production (1)" from dropdown
+     - expect: BOM Usage field shows "Production (1)"
+
+   Step 5: Verify all required fields are filled before submission
+     - expect: Material field has a value
+     - expect: BOM Usage field has value "Production (1)"
+     - expect: Valid From date is set
+     - expect: Create BOM button is enabled
+
+   Step 6: Click "Create BOM" submit button in dialog footer
+     - expect: If valid combination — dialog closes, BOM created,
+       user returns to list report
+     - expect: If invalid combination — error message dialog appears
+
+   Step 7: If error occurs, close error dialog and cancel
+     - expect: Error dialog closes
+     - expect: Create BOM dialog closes
+     - expect: User returns to list report
+
+Output:
+  - Test plan: specs/
+  - Test script: tests/e2e/sap-cloud/
+```
+
+**Claude Code shortcut** — run the full pipeline with a single slash command:
 
 ```bash
 /praman-sap-coverage
-# Then enter: "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
 ```
 
 **GitHub Copilot / Cursor / Jules:** Use the agent definitions installed by `init` (see [Agent & IDE Setup](./agent-setup)).
 
 ### The plan → generate → heal pipeline
 
-Praman runs 3 agents autonomously:
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│                     Your prompt (business process)                  │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  1. PLANNER                                                          │
+│  Connects to live SAP system → discovers UI5 controls via            │
+│  sap.ui.getCore() → maps SmartFields, Value Helps, OData bindings   │
+│  → produces structured test plan (specs/*.plan.md)                   │
+└──────────────────────────────┬───────────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  2. GENERATOR                                                        │
+│  Reads test plan → generates Playwright + Praman test code           │
+│  → typed control proxies (not DOM selectors) → test.step() pattern   │
+│  → outputs tests/e2e/{app}/*.spec.ts                                 │
+└──────────────────────────────┬───────────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  3. HEALER                                                           │
+│  Runs generated test → captures failures → fixes selectors, timing,  │
+│  dialog handling → re-runs → repeats until green                     │
+└──────────────────────────────┬───────────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  ✔ Production-ready .spec.ts — no manual scripting required          │
+└──────────────────────────────────────────────────────────────────────┘
+```
 
-| Agent         | What it does                                                                                                                 |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Planner**   | Explores your live SAP system, discovers UI5 controls, and produces a structured test plan with steps and expected results   |
-| **Generator** | Converts the test plan into executable Playwright + Praman test code using typed control proxies — not brittle DOM selectors |
-| **Healer**    | Runs the generated test against the live system, fixes any failures, and ensures compliance — repeats until green            |
+### Output: test plan
 
-The result is a **production-ready `.spec.ts` file** in your `tests/` directory — no manual test scripting required.
+The planner agent explores your live SAP system and produces a structured test plan:
 
-### Example: from description to test
+<details>
+<summary>specs/bom-create.plan.md (click to expand)</summary>
 
-**You enter:**
+```markdown
+# Maintain Bill of Material — Test Plan
 
-> "Verify the BOM creation dialog: open Create BOM, select a material and plant via value help, choose Production usage, and submit."
+## Application Overview
 
-**Praman generates:**
+SAP S/4HANA Cloud — Maintain Bill of Material (Version 2)
+Fiori Elements V4 List Report with Create BOM dialog
+UI5 Version: 1.142.4 | OData: V2 | Smart Controls
+
+## Test Scenario: Complete BOM Creation Flow
+
+### Steps
+
+1. Navigate to Maintain BOM app from FLP
+   - expect: List Report loads with filter bar and "Create BOM" button
+
+2. Click "Create BOM" button
+   - expect: Dialog opens with Material (required), Plant, BOM Usage (required),
+     Alternative BOM, Change Number, Valid From (pre-filled)
+
+3. Select Material via Value Help
+   - expect: "Select: Material" dialog opens with Material and Description columns
+   - expect: Material field populated after row selection
+
+4. Select Plant via Value Help
+   - expect: "Select: Plant" dialog opens with Plant, Plant Name columns
+   - expect: Plant field populated after row selection
+
+5. Select BOM Usage "Production (1)" from dropdown
+   - expect: BOM Usage field shows "Production (1)"
+
+6. Verify all required fields and submit
+   - expect: Material, BOM Usage, Valid From all have values
+   - expect: Create BOM button is enabled
+
+7. Handle result
+   - expect: Success → dialog closes, user returns to list report
+   - expect: Error → error dialog appears, close and cancel gracefully
+```
+
+</details>
+
+### Output: generated test script
+
+The generator converts the plan into a production-ready `.spec.ts` using Praman fixtures:
 
 ```typescript
 import { test, expect } from 'playwright-praman';
 
-test.describe('BOM Creation', () => {
-  test('Create BOM with material and plant selection', async ({ ui5 }) => {
-    await test.step('Open Create BOM dialog', async () => {
-      await ui5.press({ controlType: 'sap.m.Button', properties: { text: 'Create BOM' } });
+const IDS = {
+  materialField: 'createBOMFragment--material',
+  materialInput: 'createBOMFragment--material-input',
+  materialVHIcon: 'createBOMFragment--material-input-vhi',
+  bomUsageCombo: 'createBOMFragment--variantUsage-comboBoxEdit',
+  okBtn: 'createBOMFragment--OkBtn',
+  cancelBtn: 'createBOMFragment--CancelBtn',
+} as const;
+
+test.describe('BOM Creation — Complete Flow', () => {
+  test('Create BOM end-to-end', async ({ page, ui5, ui5Navigation }) => {
+    await test.step('Step 1: Navigate to app', async () => {
+      await ui5Navigation.navigateToTile('Maintain Bill Of Material');
       await ui5.waitForUI5();
     });
 
-    await test.step('Select material via value help', async () => {
-      await ui5.press({ id: 'createBOMFragment--material-input-vhi', searchOpenDialogs: true });
-      // ... discovers and interacts with live controls
+    await test.step('Step 2: Open Create BOM dialog', async () => {
+      await ui5.press({
+        controlType: 'sap.m.Button',
+        properties: { text: 'Create BOM' },
+      });
+      await ui5.waitForUI5();
+      const materialField = await ui5.control({
+        id: IDS.materialField,
+        searchOpenDialogs: true,
+      });
+      expect(await materialField.getRequired()).toBe(true);
     });
 
-    await test.step('Submit and verify', async () => {
-      await ui5.press({ id: 'createBOMFragment--OkBtn', searchOpenDialogs: true });
+    await test.step('Step 3: Select Material via Value Help', async () => {
+      await ui5.press({ id: IDS.materialVHIcon, searchOpenDialogs: true });
+      // Agent discovers table structure, selects first valid row
+      await ui5.waitForUI5();
+    });
+
+    await test.step('Step 4: Select BOM Usage', async () => {
+      const combo = await ui5.control({
+        id: IDS.bomUsageCombo,
+        searchOpenDialogs: true,
+      });
+      await combo.setSelectedKey('1'); // Production
+      await combo.fireChange({ value: '1' });
+      await ui5.waitForUI5();
+    });
+
+    await test.step('Step 5: Submit and verify', async () => {
+      await ui5.press({ id: IDS.okBtn, searchOpenDialogs: true });
       await ui5.waitForUI5();
     });
   });
 });
 ```
+
+**Key patterns** — every generated test uses `ui5.control()` with typed proxies (not DOM selectors), `searchOpenDialogs: true` for dialog controls, `setValue()` + `fireChange()` + `waitForUI5()` for inputs, and `test.step()` for structured reporting.
 
 :::tip From business process to Playwright test — autonomously
 This is the core value of Praman: you describe **what** to test in business language, and the AI agents handle the **how** — discovering controls, generating code, and healing failures. No manual selector hunting, no brittle DOM queries, no test scripting.
@@ -215,6 +374,9 @@ The gold-standard test targets the "Maintain Bill Of Material" app. If your SAP 
 
 ---
 
+<details>
+<summary>Optional: Your First Custom Test (manual approach)</summary>
+
 ## Your First Custom Test
 
 Create `tests/purchase-order.spec.ts`:
@@ -251,6 +413,8 @@ test('navigate to Purchase Order app and verify table', async ({ ui5, ui5Navigat
   });
 });
 ```
+
+</details>
 
 ## Real-World Example: BOM End-to-End Test
 
