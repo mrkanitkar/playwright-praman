@@ -123,16 +123,33 @@
   height: 72px;
 }
 
+.navbar__brand {
+  flex-shrink: 0;
+  margin-right: 0.75rem;
+}
+
+.navbar__logo img {
+  height: 32px;
+  width: auto;
+}
+
 .navbar__title {
   font-weight: 700;
   font-size: 1.25rem;
   color: var(--ifm-color-primary);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.navbar__items {
+  flex-wrap: nowrap;
 }
 
 .navbar__item.navbar__link {
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   font-weight: 500;
+  padding: 0 0.5rem;
+  white-space: nowrap;
 }
 
 /* GitHub icon in navbar */
