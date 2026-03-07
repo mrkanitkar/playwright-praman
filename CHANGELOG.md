@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.3](https://github.com/mrkanitkar/playwright-praman/compare/v1.0.2...v1.0.3) (2026-03-07)
+
+
+### Bug Fixes
+
+* **ci:** auto-increment canary alpha version from npm ([c8f3dc2](https://github.com/mrkanitkar/playwright-praman/commit/c8f3dc2216cf539c4a2be0f4d6a3e8a3ea3b3448))
+* **ci:** disable FORCE_COLOR for canary version stamp ([71e307e](https://github.com/mrkanitkar/playwright-praman/commit/71e307eb2d7bde18cca16f44f40865648204bfbb))
+
 ## [1.0.1] - 2026-02-23
 
 ### Added
