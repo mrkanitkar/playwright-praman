@@ -6,6 +6,7 @@ export default function ExecutiveDashboardPage() {
   return (
     <Layout title="Executive Dashboard" description="S/4HANA Steering Committee Quality Report">
       <div style={{ padding: "20px", maxWidth: 1100, margin: "0 auto" }}>
+        <h1 className="sr-only">Executive Dashboard</h1>
         <ExecutiveDashboard />
       </div>
     </Layout>

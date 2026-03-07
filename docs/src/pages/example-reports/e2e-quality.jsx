@@ -6,6 +6,7 @@ export default function E2EQualityPage() {
   return (
     <Layout title="E2E Quality" description="S/4HANA End-to-End Cross-System Quality Report">
       <div style={{ padding: "20px", maxWidth: 1100, margin: "0 auto" }}>
+        <h1 className="sr-only">E2E Quality</h1>
         <E2EQuality />
       </div>
     </Layout>
