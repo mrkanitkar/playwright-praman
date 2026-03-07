@@ -184,7 +184,7 @@
     "@microsoft/eslint-plugin-sdl": "1.1.0",
     "@playwright/test": "1.58.2",
     "@size-limit/file": "12.0.0",
-    "@ui5/mcp-server": "0.2.6",
+    "@ui5/mcp-server": "0.2.8",
     "@vitest/coverage-v8": "4.0.18",
     "@vitest/ui": "4.0.18",
     "cspell": "9.6.4",
