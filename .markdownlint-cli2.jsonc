@@ -25,6 +25,7 @@
     "api-reports/**",
     "docs/api/**",
     "playwright-report/**",
-    "seo/**"
+    "seo/**",
+    "CHANGELOG.md"
   ]
 }
