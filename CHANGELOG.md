@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.1...v1.1.2) (2026-03-07)
+
+
+### Bug Fixes
+
+* **build:** disable chunk splitting to resolve Socket.dev obfuscation alert ([bdbc93e](https://github.com/mrkanitkar/playwright-praman/commit/bdbc93e30e68f875367a14d5f8d98f8c908b7d90))
+
 ## [1.1.1](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.0...v1.1.1) (2026-03-07)
 
 
