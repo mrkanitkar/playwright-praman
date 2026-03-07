@@ -1,0 +1,187 @@
+{
+  "_comment": "JSON-LD templates for embedding in the Docusaurus site. The SoftwareApplication and WebSite schemas are already in docusaurus.config.ts headTags. Below are additional schemas to add.",
+
+  "FAQPage": {
+    "_comment": "Add to a dedicated FAQ page or embed in the homepage. Triggers Google FAQ rich results.",
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What SAP systems does Praman support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Praman supports SAP S/4HANA (on-premise and cloud), SAP BTP applications, SAP Fiori Launchpad, and any web application built with SAPUI5 or OpenUI5. It works with both SAP Fiori Elements and custom UI5 freestyle apps."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need access to SAP source code to use Praman?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Praman interacts with UI5 controls through the public runtime API (sap.ui.getCore()). It queries the control registry at runtime, so you only need browser access to the application."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use Praman with existing Playwright tests?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Praman extends Playwright — it does not replace it. You can mix Praman fixtures (ui5, ui5Navigation, ui5Table) with native Playwright APIs (page.click(), page.locator()) in the same test file."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Praman compare to wdi5?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Both access the UI5 control registry. Praman is built on Playwright (faster, modern), while wdi5 uses WebdriverIO. Praman adds typed control proxies with full IntelliSense, AI-powered test generation, Fiori Elements page-object helpers, OData V2/V4 mock/intercept utilities, and 10 UI5-specific Playwright matchers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does AI test generation work in Praman?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Praman integrates with AI coding agents (Claude Code, GitHub Copilot, Cursor, Jules). You describe what to test in business language, and the agent generates production-ready Playwright tests using Praman fixtures with typed control proxies — not brittle selectors."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What authentication methods does Praman support for SAP?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Praman supports 6 authentication strategies: BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, and Manual login. Authentication is handled in seed tests and sessions are reused across test runs."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How many SAP UI5 controls does Praman support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Praman supports 61 UI5 control types across 8 SAP libraries: sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, sap.ui.mdc, sap.ui.unified, and sap.ui.core. Each control type has a fully typed proxy with IntelliSense."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Praman free and open source?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Praman is licensed under Apache-2.0 and is completely free. It has only 3 production dependencies (commander, pino, zod), all MIT-licensed. The source code is available on GitHub."
+        }
+      }
+    ]
+  },
+
+  "TechArticle_template": {
+    "_comment": "Use this template for blog posts and guide pages. Add as a <script type='application/ld+json'> tag. Replace placeholders with actual values.",
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "ARTICLE_TITLE",
+    "description": "ARTICLE_DESCRIPTION",
+    "url": "https://praman.dev/ARTICLE_PATH",
+    "datePublished": "YYYY-MM-DD",
+    "dateModified": "YYYY-MM-DD",
+    "author": {
+      "@type": "Organization",
+      "name": "Zestest",
+      "url": "https://praman.dev"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Zestest",
+      "url": "https://praman.dev",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://praman.dev/img/logo.svg"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://praman.dev/ARTICLE_PATH"
+    },
+    "proficiencyLevel": "Beginner",
+    "dependencies": "Node.js >= 20, Playwright, SAP UI5 application access",
+    "about": {
+      "@type": "SoftwareApplication",
+      "name": "playwright-praman"
+    }
+  },
+
+  "BreadcrumbList_template": {
+    "_comment": "Docusaurus generates breadcrumbs automatically, but adding JSON-LD BreadcrumbList can improve rich results. Apply to guide pages.",
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Praman",
+        "item": "https://praman.dev/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://praman.dev/docs/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "PAGE_TITLE",
+        "item": "https://praman.dev/docs/PAGE_PATH"
+      }
+    ]
+  },
+
+  "HowTo_GettingStarted": {
+    "_comment": "Add to the Getting Started page. Triggers Google HowTo rich results with step-by-step display.",
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Set Up SAP UI5 Test Automation with Praman and Playwright",
+    "description": "Get up and running with Praman in 5 steps: install, initialize, configure credentials, verify, and generate tests.",
+    "totalTime": "PT10M",
+    "tool": [
+      {
+        "@type": "HowToTool",
+        "name": "Node.js 20+"
+      },
+      {
+        "@type": "HowToTool",
+        "name": "SAP system access (browser)"
+      }
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Install Praman",
+        "text": "Run: npm install playwright-praman @playwright/test",
+        "position": 1
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Initialize project",
+        "text": "Run: npx playwright-praman init — scaffolds config files, auth setup, and verification test.",
+        "position": 2
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Configure SAP credentials",
+        "text": "Copy .env.example to .env and set SAP_CLOUD_BASE_URL, SAP_CLOUD_USERNAME, SAP_CLOUD_PASSWORD, and SAP_AUTH_STRATEGY.",
+        "position": 3
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Verify setup",
+        "text": "Run: npx playwright test tests/bom-e2e-praman-gold-standard.spec.ts --headed — a passing test confirms full setup.",
+        "position": 4
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Generate tests with AI",
+        "text": "Use /praman-sap-coverage in Claude Code or describe your business process — AI agents generate production-ready test scripts.",
+        "position": 5
+      }
+    ]
+  }
+}

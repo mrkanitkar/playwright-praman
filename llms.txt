@@ -7,45 +7,45 @@
 
 ## Docs
 
-- [Getting Started](https://mrkanitkar.github.io/playwright-praman/docs/guides/getting-started): Installation, project setup, first test in under 5 minutes
-- [Configuration Reference](https://mrkanitkar.github.io/playwright-praman/docs/guides/configuration): Zod-validated config schema with defaults — empty `{}` is valid
-- [Fixture Reference](https://mrkanitkar.github.io/playwright-praman/docs/guides/fixtures): 14 fixtures — ui5, sapAuth, ui5Navigation, fe, pramanAI, intent, and more
-- [Selector Reference](https://mrkanitkar.github.io/playwright-praman/docs/guides/selectors): UI5Selector fields — controlType, id, properties, bindingPath, ancestor, descendant
-- [Control Interactions](https://mrkanitkar.github.io/playwright-praman/docs/guides/control-interactions): click, fill, press, select, check, clear, getText, getProperty, enterText
-- [Custom Matchers](https://mrkanitkar.github.io/playwright-praman/docs/guides/custom-matchers): 10 UI5-specific expect matchers — toHaveUI5Text, toBeUI5Visible, toBeUI5Enabled
-- [Authentication Guide](https://mrkanitkar.github.io/playwright-praman/docs/guides/authentication): 6 auth strategies — on-prem, BTP SAML, Office 365, API, certificate, multi-tenant
-- [Navigation](https://mrkanitkar.github.io/playwright-praman/docs/guides/navigation): 9 FLP navigation methods plus BTP WorkZone dual-frame support
-- [Error Reference](https://mrkanitkar.github.io/playwright-praman/docs/guides/errors): 14 error classes, 58 error codes with retryable flags and suggestions[]
-- [OData Operations](https://mrkanitkar.github.io/playwright-praman/docs/guides/odata-operations): Model operations (browser-side) and HTTP CRUD (node-side)
-- [Fiori Elements Testing](https://mrkanitkar.github.io/playwright-praman/docs/guides/fiori-elements): List Report, Object Page, FE Table, FE List helpers
-- [SAP Control Cookbook](https://mrkanitkar.github.io/playwright-praman/docs/guides/sap-control-cookbook): Recipes for common SAP UI5 controls in Praman tests
-- [AI Integration](https://mrkanitkar.github.io/playwright-praman/docs/guides/ai-integration): LLM service, page discovery, agentic handler, capability registry
+- [Getting Started](https://praman.dev/docs/guides/getting-started): Installation, project setup, first test in under 5 minutes
+- [Configuration Reference](https://praman.dev/docs/guides/configuration): Zod-validated config schema with defaults — empty `{}` is valid
+- [Fixture Reference](https://praman.dev/docs/guides/fixtures): 14 fixtures — ui5, sapAuth, ui5Navigation, fe, pramanAI, intent, and more
+- [Selector Reference](https://praman.dev/docs/guides/selectors): UI5Selector fields — controlType, id, properties, bindingPath, ancestor, descendant
+- [Control Interactions](https://praman.dev/docs/guides/control-interactions): click, fill, press, select, check, clear, getText, getProperty, enterText
+- [Custom Matchers](https://praman.dev/docs/guides/custom-matchers): 10 UI5-specific expect matchers — toHaveUI5Text, toBeUI5Visible, toBeUI5Enabled
+- [Authentication Guide](https://praman.dev/docs/guides/authentication): 6 auth strategies — on-prem, BTP SAML, Office 365, API, certificate, multi-tenant
+- [Navigation](https://praman.dev/docs/guides/navigation): 9 FLP navigation methods plus BTP WorkZone dual-frame support
+- [Error Reference](https://praman.dev/docs/guides/errors): 14 error classes, 58 error codes with retryable flags and suggestions[]
+- [OData Operations](https://praman.dev/docs/guides/odata-operations): Model operations (browser-side) and HTTP CRUD (node-side)
+- [Fiori Elements Testing](https://praman.dev/docs/guides/fiori-elements): List Report, Object Page, FE Table, FE List helpers
+- [SAP Control Cookbook](https://praman.dev/docs/guides/sap-control-cookbook): Recipes for common SAP UI5 controls in Praman tests
+- [AI Integration](https://praman.dev/docs/guides/ai-integration): LLM service, page discovery, agentic handler, capability registry
 
 ## Examples
 
-- [Basic Test](https://mrkanitkar.github.io/playwright-praman/docs/examples/basic-test): Control discovery by type and property, verification, press
-- [Auth Setup](https://mrkanitkar.github.io/playwright-praman/docs/examples/auth-setup): OnPrem, BTP Cloud SAML, and Office 365 authentication examples
-- [Dialog Handling](https://mrkanitkar.github.io/playwright-praman/docs/examples/dialog-handling): Open, interact with, and close SAP UI5 dialogs
-- [Table Operations](https://mrkanitkar.github.io/playwright-praman/docs/examples/table-operations): SmartTable discovery, row reading, OData binding data
-- [Gold Standard BOM](https://mrkanitkar.github.io/playwright-praman/docs/examples/gold-standard-bom): Complete BOM maintenance E2E test — the Praman gold standard
-- [Hybrid Login](https://mrkanitkar.github.io/playwright-praman/docs/examples/hybrid-login): Playwright native for login + Praman for UI5 — auto-fallback pattern
+- [Basic Test](https://praman.dev/docs/examples/basic-test): Control discovery by type and property, verification, press
+- [Auth Setup](https://praman.dev/docs/examples/auth-setup): OnPrem, BTP Cloud SAML, and Office 365 authentication examples
+- [Dialog Handling](https://praman.dev/docs/examples/dialog-handling): Open, interact with, and close SAP UI5 dialogs
+- [Table Operations](https://praman.dev/docs/examples/table-operations): SmartTable discovery, row reading, OData binding data
+- [Gold Standard BOM](https://praman.dev/docs/examples/gold-standard-bom): Complete BOM maintenance E2E test — the Praman gold standard
+- [Hybrid Login](https://praman.dev/docs/examples/hybrid-login): Playwright native for login + Praman for UI5 — auto-fallback pattern
 
 ## API
 
-- [Full API Reference](https://mrkanitkar.github.io/playwright-praman/docs/api/): TypeDoc-generated API documentation for all 6 sub-path exports
-- [llms-full.txt](https://mrkanitkar.github.io/playwright-praman/llms-full.txt): Complete documentation with inline API signatures
+- [Full API Reference](https://praman.dev/docs/api/): TypeDoc-generated API documentation for all 6 sub-path exports
+- [llms-full.txt](https://praman.dev/llms-full.txt): Complete documentation with inline API signatures
 
 ## Optional
 
-- [Architecture Overview](https://mrkanitkar.github.io/playwright-praman/docs/guides/architecture-overview): 5-layer architecture — Core, Bridge, Proxy, Fixtures, AI
-- [Bridge Internals](https://mrkanitkar.github.io/playwright-praman/docs/guides/bridge-internals): UI5 bridge injection and browser-side script details
-- [Control Proxy](https://mrkanitkar.github.io/playwright-praman/docs/guides/control-proxy): JavaScript Proxy pattern for UI5 control method forwarding
-- [Interaction Strategies](https://mrkanitkar.github.io/playwright-praman/docs/guides/interaction-strategies): ui5-native, dom-first, opa5 — swappable strategies
-- [Intent API](https://mrkanitkar.github.io/playwright-praman/docs/guides/intent-api): Business-oriented test operations for SAP S/4HANA modules
-- [Vocabulary System](https://mrkanitkar.github.io/playwright-praman/docs/guides/vocabulary-system): SAP business term resolution with fuzzy matching
-- [Capabilities & Recipes](https://mrkanitkar.github.io/playwright-praman/docs/guides/capabilities-recipes): 179 capabilities registry for AI agent introspection
-- [Reporters](https://mrkanitkar.github.io/playwright-praman/docs/guides/reporters): ComplianceReporter and ODataTraceReporter
-- [Docker & CI/CD](https://mrkanitkar.github.io/playwright-praman/docs/guides/docker-cicd): Container setup, 3-OS CI matrix, quality gates
-- [Migration from wdi5](https://mrkanitkar.github.io/playwright-praman/docs/guides/migration-from-wdi5): wdi5 to Praman API mapping and migration checklist
-- [Migration from Playwright](https://mrkanitkar.github.io/playwright-praman/docs/guides/migration-from-playwright): Layer Praman on top of existing Playwright tests
-- [Migration from Tosca](https://mrkanitkar.github.io/playwright-praman/docs/guides/migration-from-tosca): Tosca to Praman migration guide
+- [Architecture Overview](https://praman.dev/docs/guides/architecture-overview): 5-layer architecture — Core, Bridge, Proxy, Fixtures, AI
+- [Bridge Internals](https://praman.dev/docs/guides/bridge-internals): UI5 bridge injection and browser-side script details
+- [Control Proxy](https://praman.dev/docs/guides/control-proxy): JavaScript Proxy pattern for UI5 control method forwarding
+- [Interaction Strategies](https://praman.dev/docs/guides/interaction-strategies): ui5-native, dom-first, opa5 — swappable strategies
+- [Intent API](https://praman.dev/docs/guides/intent-api): Business-oriented test operations for SAP S/4HANA modules
+- [Vocabulary System](https://praman.dev/docs/guides/vocabulary-system): SAP business term resolution with fuzzy matching
+- [Capabilities & Recipes](https://praman.dev/docs/guides/capabilities-recipes): 179 capabilities registry for AI agent introspection
+- [Reporters](https://praman.dev/docs/guides/reporters): ComplianceReporter and ODataTraceReporter
+- [Docker & CI/CD](https://praman.dev/docs/guides/docker-cicd): Container setup, 3-OS CI matrix, quality gates
+- [Migration from wdi5](https://praman.dev/docs/guides/migration-from-wdi5): wdi5 to Praman API mapping and migration checklist
+- [Migration from Playwright](https://praman.dev/docs/guides/migration-from-playwright): Layer Praman on top of existing Playwright tests
+- [Migration from Tosca](https://praman.dev/docs/guides/migration-from-tosca): Tosca to Praman migration guide

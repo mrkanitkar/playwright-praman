@@ -11,9 +11,9 @@ const config: Config = {
     v4: true,
   },
 
-  // GitHub Pages: mrkanitkar.github.io/playwright-praman
-  url: 'https://mrkanitkar.github.io',
-  baseUrl: '/playwright-praman/',
+  // Custom domain: praman.dev (Cloudflare DNS → GitHub Pages)
+  url: 'https://praman.dev',
+  baseUrl: '/',
 
   organizationName: 'mrkanitkar',
   projectName: 'playwright-praman',
@@ -60,7 +60,7 @@ const config: Config = {
         description:
           'AI-First SAP UI5 Test Automation Platform for Playwright. ' +
           'Enterprise-grade testing with agentic AI, typed proxies, and 32+ fixtures.',
-        url: 'https://mrkanitkar.github.io/playwright-praman',
+        url: 'https://praman.dev',
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'Windows, macOS, Linux',
         programmingLanguage: 'TypeScript',
@@ -73,7 +73,7 @@ const config: Config = {
         author: {
           '@type': 'Organization',
           name: 'Zestest',
-          url: 'https://mrkanitkar.github.io/playwright-praman',
+          url: 'https://praman.dev',
         },
       }),
     },
@@ -86,16 +86,16 @@ const config: Config = {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         name: 'playwright-praman',
-        url: 'https://mrkanitkar.github.io/playwright-praman',
+        url: 'https://praman.dev',
         description: 'AI-First SAP UI5 Test Automation Platform for Playwright',
         inLanguage: 'en',
         publisher: {
           '@type': 'Organization',
           name: 'Zestest',
-          url: 'https://mrkanitkar.github.io/playwright-praman',
+          url: 'https://praman.dev',
           logo: {
             '@type': 'ImageObject',
-            url: 'https://mrkanitkar.github.io/playwright-praman/img/logo.svg',
+            url: 'https://praman.dev/img/logo.svg',
           },
         },
       }),

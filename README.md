@@ -9,7 +9,7 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)
 [![Repomix](https://img.shields.io/badge/Repomix-context-blue?logo=github)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml)
 [![Socket Badge](https://badge.socket.dev/npm/package/playwright-praman/1.0.2)](https://socket.dev/npm/package/playwright-praman/overview/1.0.2)
-[![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20AI-First%20SAP%20UI5%20Test%20Automation%20platform%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fmrkanitkar.github.io%2Fplaywright-praman%2Fllms-full.txt%0A%0AMy%20question%3A%20)
+[![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20AI-First%20SAP%20UI5%20Test%20Automation%20platform%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fpraman.dev%2Fllms-full.txt%0A%0AMy%20question%3A%20)
 
 ## What is Praman?
 
@@ -185,7 +185,7 @@ PRAMAN_INTERACTION_STRATEGY=dom-first npx playwright test
 PRAMAN_DISCOVERY_STRATEGIES=direct-id,recordreplay,registry npx playwright test
 ```
 
-See the full [Discovery & Interaction Strategies](https://mrkanitkar.github.io/playwright-praman/docs/guides/discovery-and-interaction) guide
+See the full [Discovery & Interaction Strategies](https://praman.dev/docs/guides/discovery-and-interaction) guide
 for decision matrices, fallback chain diagrams, and recommended configurations by app type.
 
 ## Sub-path Exports
@@ -203,15 +203,15 @@ for decision matrices, fallback chain diagrams, and recommended configurations b
 
 | Topic                         | Link                                                                                               |
 | ----------------------------- | -------------------------------------------------------------------------------------------------- |
-| Full documentation            | [mrkanitkar.github.io/playwright-praman](https://mrkanitkar.github.io/playwright-praman)           |
-| Getting started guide         | [Getting Started](https://mrkanitkar.github.io/playwright-praman/docs/guides/getting-started)      |
-| Configuration reference       | [Configuration](https://mrkanitkar.github.io/playwright-praman/docs/guides/configuration)          |
-| Authentication (6 strategies) | [Authentication](https://mrkanitkar.github.io/playwright-praman/docs/guides/authentication)        |
-| Agent & IDE setup             | [Agent Setup](https://mrkanitkar.github.io/playwright-praman/docs/guides/agent-setup)              |
-| Fixtures reference            | [Fixtures](https://mrkanitkar.github.io/playwright-praman/docs/guides/fixtures)                    |
-| Error codes (60)              | [Errors](https://mrkanitkar.github.io/playwright-praman/docs/guides/errors)                        |
-| API reference                 | [API Docs](https://mrkanitkar.github.io/playwright-praman/docs/api/)                               |
-| LLM-friendly docs             | [llms.txt](https://mrkanitkar.github.io/playwright-praman/llms.txt)                                |
+| Full documentation            | [praman.dev](https://praman.dev)                                                                   |
+| Getting started guide         | [Getting Started](https://praman.dev/docs/guides/getting-started)                                  |
+| Configuration reference       | [Configuration](https://praman.dev/docs/guides/configuration)                                      |
+| Authentication (6 strategies) | [Authentication](https://praman.dev/docs/guides/authentication)                                    |
+| Agent & IDE setup             | [Agent Setup](https://praman.dev/docs/guides/agent-setup)                                          |
+| Fixtures reference            | [Fixtures](https://praman.dev/docs/guides/fixtures)                                                |
+| Error codes (60)              | [Errors](https://praman.dev/docs/guides/errors)                                                    |
+| API reference                 | [API Docs](https://praman.dev/docs/api/)                                                           |
+| LLM-friendly docs             | [llms.txt](https://praman.dev/llms.txt)                                                            |
 | Repomix context (AI agents)   | [Download artifact](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml) |
 
 ## Frequently Asked Questions

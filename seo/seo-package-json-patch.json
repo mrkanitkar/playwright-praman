@@ -1,0 +1,35 @@
+{
+  "_comment": "Merge these fields into package.json. Run: npm publish after applying.",
+
+  "description": "AI-First SAP UI5 Test Automation Platform for Playwright — typed control proxies, AI test generation, 61 UI5 controls, OData V2/V4, Fiori Elements, 6 auth strategies, 10 custom matchers",
+
+  "keywords": [
+    "playwright",
+    "playwright-plugin",
+    "sap",
+    "sap-testing",
+    "ui5",
+    "sapui5",
+    "fiori",
+    "fiori-elements",
+    "s4hana",
+    "SAP S/4HANA",
+    "odata",
+    "testing",
+    "test-automation",
+    "e2e",
+    "e2e-testing",
+    "ai-first",
+    "ai-testing",
+    "test-generation",
+    "enterprise",
+    "SAP Cloud ALM",
+    "regression-testing",
+    "SAP Activate",
+    "btp",
+    "wdi5-alternative",
+    "ERP testing"
+  ],
+
+  "homepage": "https://praman.dev"
+}

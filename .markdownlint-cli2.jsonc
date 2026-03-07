@@ -24,6 +24,7 @@
     "llms*.txt",
     "api-reports/**",
     "docs/api/**",
-    "playwright-report/**"
+    "playwright-report/**",
+    "seo/**"
   ]
 }

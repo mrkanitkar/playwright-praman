@@ -98,6 +98,7 @@
       "Bash(npm version 1.0.2-next.2 --no-git-tag-version)",
       "Bash(gh workflow run docs.yml)",
       "WebFetch(domain:filipmikina.com)",
+      "WebFetch(domain:praman.dev)",
       "WebFetch(domain:mrkanitkar.github.io)",
       "Bash(gh pr diff 44 --name-only)",
       "Bash(gh pr comment 44 --body \"@dependabot rebase\")",
