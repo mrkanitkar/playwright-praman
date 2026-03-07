@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.0...v1.2.0) (2026-03-07)
+## [1.1.1](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.0...v1.1.1) (2026-03-07)
 
 
 ### Features
