@@ -154,6 +154,11 @@ SDET
 Visio
 Signavio
 EBELN
+SOGE
+SAPGUI
+Outb
+Sxxxxxxxx
+readymade
 
 # Miscellaneous
 scaffolder
