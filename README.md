@@ -10,7 +10,7 @@
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)
 [![Repomix](https://img.shields.io/badge/Repomix-context-blue?logo=github)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml)
-[![Socket Badge](https://badge.socket.dev/npm/package/playwright-praman/1.0.5)](https://socket.dev/npm/package/playwright-praman/overview/1.0.5)
+[![Socket Badge](https://badge.socket.dev/npm/package/playwright-praman)](https://socket.dev/npm/package/playwright-praman)
 [![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20AI-First%20SAP%20UI5%20Test%20Automation%20platform%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fpraman.dev%2Fllms-full.txt%0A%0AMy%20question%3A%20)
 
 ## What is Praman?
