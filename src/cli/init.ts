@@ -240,6 +240,7 @@ export async function runInit(options: InitOptions): Promise<void> {
   logSection('Next Steps');
   logSuccess('1. Copy .env.example to .env and fill in SAP credentials');
   logSuccess('2. Run tests: npx playwright test --project=chromium --headed');
+  logSuccess('3. Browse readymade prompts in praman-prompts/ folder');
   logWarn('Auth setup (tests/auth.setup.ts) runs automatically before tests');
 
   // IDE-specific appendable instructions

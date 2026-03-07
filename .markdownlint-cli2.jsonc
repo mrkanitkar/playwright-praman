@@ -10,6 +10,7 @@
     ".github/skills/**",
     "agents/**",
     "skills/**",
+    "prompts/**",
     "docs/mcp-sap-docs-setup.md",
     "docs/capabilities.md",
     "docs/docs/**",

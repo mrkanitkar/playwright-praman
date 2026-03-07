@@ -2,7 +2,7 @@
 
 ## Project: Praman v1.0
 
-AI-First SAP UI5 Test Automation Platform for Playwright.
+Agent-First SAP UI5 Test Automation Plugin for Playwright.
 Single npm package `playwright-praman` with sub-path exports.
 
 ## Build Output (Dual ESM + CJS)

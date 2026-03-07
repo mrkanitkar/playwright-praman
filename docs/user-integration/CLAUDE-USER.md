@@ -6,7 +6,7 @@ A standalone guide for using Claude Code to generate SAP UI5 tests with `playwri
 
 ## What is Praman?
 
-An AI-First SAP UI5 Test Automation Platform for Playwright.
+An Agent-First SAP UI5 Test Automation Plugin for Playwright.
 Single import: `import { test, expect } from 'playwright-praman'`
 All UI5 interactions via fixtures — no class imports, no raw selectors.
 

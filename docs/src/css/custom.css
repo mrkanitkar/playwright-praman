@@ -447,6 +447,29 @@ div[class*='announcementBar'] {
   margin-bottom: 8px;
 }
 
+/* When to Use list inside info card */
+.praman-when-to-use-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0 0;
+}
+
+.praman-when-to-use-list li {
+  color: var(--primary-text);
+  font-size: 0.95em;
+  line-height: 1.7;
+  padding: 4px 0 4px 1.2em;
+  position: relative;
+}
+
+.praman-when-to-use-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--capgemini-blue);
+  font-weight: 700;
+}
+
 /* Exact dhikraft .summary-card p: 0.98em, margin 8px 0 0 */
 .praman-info-card p {
   color: var(--primary-text);
@@ -1513,6 +1536,14 @@ main div[style*="border-top"] {
 
 [data-theme='dark'] .praman-info-card p {
   color: var(--praman-ink-secondary);
+}
+
+[data-theme='dark'] .praman-when-to-use-list li {
+  color: var(--praman-ink-secondary);
+}
+
+[data-theme='dark'] .praman-when-to-use-list li::before {
+  color: var(--ifm-color-primary-light);
 }
 
 [data-theme='dark'] .praman-report-card-title {

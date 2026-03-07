@@ -420,12 +420,17 @@ function GlanceSection(): ReactNode {
         </div>
         <div className="praman-info-card">
           <h4>When to Use?</h4>
-          <p>
-            When your S/4HANA go-live depends on test quality, not test headcount. One platform — greenfield, brownfield, or bluefield.
-          </p>
+          <ul className="praman-when-to-use-list">
+            <li><strong>SAP RISE &amp; Public Cloud migration</strong> — validate every Fiori app before and after cutover</li>
+            <li><strong>Frequent upgrade cycles</strong> — quarterly UI5 patches, feature packs, and S/4HANA updates need continuous regression</li>
+            <li><strong>No documentation</strong> — AI agents discover controls from your live system, no specs required</li>
+            <li><strong>Cost reduction</strong> — replace manual test scripting with autonomous agent-generated tests</li>
+            <li><strong>Agentic automation</strong> — build a complete plan → generate → heal pipeline with zero human scripting</li>
+            <li><strong>Greenfield, brownfield, or bluefield</strong> — one plugin covers every S/4HANA deployment model</li>
+          </ul>
         </div>
         <div className="praman-info-card">
-          <h4>AI-First Design</h4>
+          <h4>Agent-First Design</h4>
           <p>
             Business analysts define the process. AI agents — Claude, Copilot, Jules — generate the tests. No scripting required.
           </p>
@@ -788,7 +793,7 @@ function Capabilities(): ReactNode {
         <li>
           <div className="icon">&#x1F916;</div>
           <div>
-            <h3>AI-First Architecture</h3>
+            <h3>Agent-First Architecture</h3>
             <p>SKILL.md entry points, capabilities.list() discovery, compliance verification. Built for Copilot, Claude, and Jules.</p>
           </div>
         </li>
@@ -900,8 +905,8 @@ function CTA(): ReactNode {
 export default function Home(): ReactNode {
   return (
     <Layout
-      title="AI-First SAP UI5 Test Automation"
-      description="Praman — AI-First SAP UI5 Test Automation Platform for Playwright. Enterprise-grade testing with agentic AI, typed proxies, and 32+ fixtures."
+      title="Agent-First SAP UI5 Test Automation"
+      description="Praman — Agent-First SAP UI5 Test Automation Plugin for Playwright. Enterprise-grade testing with agentic AI, typed proxies, and 32+ fixtures."
     >
       <main>
         <HeroCarousel />

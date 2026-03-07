@@ -4,7 +4,7 @@ slug: /
 title: Praman
 ---
 
-**AI-First SAP UI5 Test Automation Plugin for Playwright.**
+**Agent-First SAP UI5 Test Automation Plugin for Playwright.**
 
 Praman extends Playwright with deep SAP UI5 awareness — typed control proxies, UI5 stability
 synchronization, FLP navigation, and AI-powered test generation.

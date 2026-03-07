@@ -66,7 +66,7 @@ export interface FileEntry {
   /** Path relative to the project root. */
   readonly relativePath: string;
   /** Category of the scaffolded file. */
-  readonly category: 'agent' | 'ide' | 'skill' | 'seed' | 'config';
+  readonly category: 'agent' | 'ide' | 'skill' | 'seed' | 'config' | 'prompt';
   /** Human-readable label for display. */
   readonly label: string;
 }
@@ -151,6 +151,13 @@ const SCAFFOLDED_MANIFEST: readonly FileEntry[] = [
     label: 'Praman skill files',
   },
 
+  // prompt — entire directory handled via removeDirectory
+  {
+    relativePath: 'praman-prompts/',
+    category: 'prompt',
+    label: 'Praman prompt files',
+  },
+
   // seed
   { relativePath: 'tests/seeds/sap-seed.spec.ts', category: 'seed', label: 'SAP seed file' },
   { relativePath: 'tests/auth.setup.ts', category: 'seed', label: 'SAP auth setup' },
@@ -177,6 +184,7 @@ const CATEGORY_LABELS: Readonly<Record<FileEntry['category'], string>> = {
   ide: 'IDE Settings',
   skill: 'Skill Files',
   seed: 'Seed Tests',
+  prompt: 'Prompt Files',
 };
 
 /**

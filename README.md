@@ -1,6 +1,6 @@
 # playwright-praman
 
-> AI-First SAP UI5 Test Automation Platform for Playwright
+> Agent-First SAP UI5 Test Automation Plugin for Playwright
 
 [![CI](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/playwright-praman)](https://www.npmjs.com/package/playwright-praman)
@@ -11,7 +11,7 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)
 [![Repomix](https://img.shields.io/badge/Repomix-context-blue?logo=github)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml)
 [![Socket Badge](https://badge.socket.dev/npm/package/playwright-praman)](https://socket.dev/npm/package/playwright-praman)
-[![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20AI-First%20SAP%20UI5%20Test%20Automation%20platform%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fpraman.dev%2Fllms-full.txt%0A%0AMy%20question%3A%20)
+[![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20Agent-First%20SAP%20UI5%20Test%20Automation%20Plugin%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fpraman.dev%2Fllms-full.txt%0A%0AMy%20question%3A%20)
 
 ## What is Praman?
 
@@ -23,9 +23,14 @@ so tests survive UI5 upgrades, theme changes, and custom CSS without breaking.
 
 ## When to Use?
 
-When your S/4HANA go-live depends on test quality, not test headcount. One platform — greenfield, brownfield, or bluefield.
+- **SAP RISE & Public Cloud migration** — validate every Fiori app before and after cutover
+- **Frequent upgrade cycles** — quarterly UI5 patches, feature packs, and S/4HANA updates need continuous regression
+- **No documentation** — AI agents discover controls from your live system, no specs required
+- **Cost reduction** — replace manual test scripting with autonomous agent-generated tests
+- **Agentic automation** — build a complete plan → generate → heal pipeline with zero human scripting
+- **Greenfield, brownfield, or bluefield** — one plugin covers every S/4HANA deployment model
 
-## AI-First Design
+## Agent-First Design
 
 Business analysts define the process. AI agents — Claude, Copilot, Jules — generate the tests. No scripting required.
 
@@ -138,7 +143,35 @@ Output:
 
 The agent explores your live SAP system, discovers UI5 controls via `sap.ui.getCore()`, and generates a `.spec.ts` file using Praman fixtures — no manual scripting required.
 
-### Generated Test (What You Get)
+### What You Get
+
+The pipeline produces two artifacts:
+
+1. **Test plan** (`specs/*.plan.md`) — structured Markdown with app overview, discovered controls, step-by-step scenarios, and expected outcomes
+2. **Test script** (`tests/e2e/*.spec.ts`) — production-ready Playwright + Praman code generated from the plan
+
+#### Sample Test Plan (excerpt)
+
+```markdown
+# BOM Create Flow — Test Plan
+
+## Application Overview
+
+SAP S/4HANA Cloud - Maintain Bill of Material (Version 2).
+Fiori Elements V4 List Report with Create BOM dialog.
+UI5 Version: 1.142.4. Controls use MDC field types.
+
+## Test Scenarios
+
+### 1. Navigate to Maintain BOM app from FLP
+
+1. Click on 'Maintain Bill Of Material (Version 2)' tile
+   - expect: Page navigates to #MaterialBOM-maintainMaterialBOM
+   - expect: Filter bar is visible with fields: Material, Plant, BOM Usage
+   - expect: 'Create BOM' button is visible and enabled
+```
+
+#### Sample Test Script
 
 ```typescript
 import { test, expect } from 'playwright-praman';

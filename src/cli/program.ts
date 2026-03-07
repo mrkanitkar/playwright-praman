@@ -61,7 +61,7 @@ export function createProgram(): Command {
 
   prog
     .name('playwright-praman')
-    .description('AI-First SAP UI5 Test Automation for Playwright')
+    .description('Agent-First SAP UI5 Test Automation Plugin for Playwright')
     .version(getVersion(), '-v, --version')
     .showHelpAfterError(true);
 

@@ -60,7 +60,7 @@ function printHeader(): void {
   console.log('');
   console.log('┌─────────────────────────────────────────────┐');
   console.log('│  Praman v1.0 — IDE & Agent Setup             │');
-  console.log('│  AI-First SAP UI5 Test Automation Platform   │');
+  console.log('│  Agent-First SAP UI5 Test Automation Plugin   │');
   console.log('└─────────────────────────────────────────────┘');
   console.log('');
 }

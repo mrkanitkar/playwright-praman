@@ -1,14 +1,14 @@
 # Skill File: Principal Architect Agent
 
-## Praman v1.0 — AI-First SAP UI5 Test Automation Platform
+## Praman v1.0 — Agent-First SAP UI5 Test Automation Plugin
 
-| Property | Value |
-|----------|-------|
-| **Role** | Principal Architect |
-| **Skill ID** | PRAMAN-SKILL-ARCHITECT-001 |
-| **Version** | 1.0.0 |
+| Property            | Value                                                              |
+| ------------------- | ------------------------------------------------------------------ |
+| **Role**            | Principal Architect                                                |
+| **Skill ID**        | PRAMAN-SKILL-ARCHITECT-001                                         |
+| **Version**         | 1.0.0                                                              |
 | **Authority Level** | Highest — Defines module boundaries, interfaces, and API contracts |
-| **Parent Docs** | plan.md (D1–D29), setup.md, skills-team-overview.md |
+| **Parent Docs**     | plan.md (D1–D29), setup.md, skills-team-overview.md                |
 
 ---
 
@@ -90,20 +90,20 @@ FORBIDDEN:
 
 ### 2.3 Design Decisions You Must Enforce
 
-| Decision | What It Means | How to Enforce |
-|----------|--------------|----------------|
-| D1 | Single package with sub-path exports | Reject any proposal for monorepo, workspace, or separate npm packages |
-| D2 | Internal fixture composition, lazy loading | Fixtures use `test.extend()` chain; dynamic `import()` for optional fixtures |
-| D3 | Version-negotiated bridge adapters | `BridgeAdapter` interface is the ONLY contract between Layer 2 and Layer 3 |
-| D4 | Hybrid typed proxy (20 typed + dynamic) | Typed interfaces extend a base; unknown controls use dynamic Proxy |
-| D7 | Zod-validated config, Readonly output | `Readonly<PramanConfig>` — never expose mutable config |
-| D8 | Unified error hierarchy with codes | Every public API must throw a `PramanError` subclass, never raw `Error` |
-| D16 | Single unified proxy handler | Reject any double-proxy pattern. One Proxy per control instance. |
-| D17 | Bidirectional proxy conversion | `proxy-converter.ts` handles Control ↔ Object. Both directions must work. |
-| D19 | Centralized API resolver | `__praman_getById()` is the ONLY way to resolve a UI5 control by ID in browser context |
-| D27 | Module ≤300 LOC guideline | Warning, not blocking. Document exceptions for browser scripts and proxy modules. |
-| D28 | Auth via project dependencies | No `globalSetup` for auth. Must use Playwright's `setup` project pattern. |
-| D29 | Enhanced error model + AI envelope | Errors: `code`, `attempted`, `retryable`, `details`, `suggestions[]`. AI: `{ status, data, metadata }` |
+| Decision | What It Means                              | How to Enforce                                                                                         |
+| -------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| D1       | Single package with sub-path exports       | Reject any proposal for monorepo, workspace, or separate npm packages                                  |
+| D2       | Internal fixture composition, lazy loading | Fixtures use `test.extend()` chain; dynamic `import()` for optional fixtures                           |
+| D3       | Version-negotiated bridge adapters         | `BridgeAdapter` interface is the ONLY contract between Layer 2 and Layer 3                             |
+| D4       | Hybrid typed proxy (20 typed + dynamic)    | Typed interfaces extend a base; unknown controls use dynamic Proxy                                     |
+| D7       | Zod-validated config, Readonly output      | `Readonly<PramanConfig>` — never expose mutable config                                                 |
+| D8       | Unified error hierarchy with codes         | Every public API must throw a `PramanError` subclass, never raw `Error`                                |
+| D16      | Single unified proxy handler               | Reject any double-proxy pattern. One Proxy per control instance.                                       |
+| D17      | Bidirectional proxy conversion             | `proxy-converter.ts` handles Control ↔ Object. Both directions must work.                              |
+| D19      | Centralized API resolver                   | `__praman_getById()` is the ONLY way to resolve a UI5 control by ID in browser context                 |
+| D27      | Module ≤300 LOC guideline                  | Warning, not blocking. Document exceptions for browser scripts and proxy modules.                      |
+| D28      | Auth via project dependencies              | No `globalSetup` for auth. Must use Playwright's `setup` project pattern.                              |
+| D29      | Enhanced error model + AI envelope         | Errors: `code`, `attempted`, `retryable`, `details`, `suggestions[]`. AI: `{ status, data, metadata }` |
 
 ---
 
@@ -126,7 +126,7 @@ export interface IBridgeAdapter { ... }  // No I-prefix
 
 Every interface you define MUST follow this pattern:
 
-```typescript
+````typescript
 /**
  * Adapts UI5 control interactions to the browser bridge.
  *
@@ -167,13 +167,13 @@ export interface BridgeAdapter {
   /** Clean up browser-side resources */
   dispose(): Promise<void>;
 }
-```
+````
 
 ### 3.3 Type-Only Files
 
 As Architect, you create type-only files (no runtime code):
 
-```typescript
+````typescript
 // src/core/types/selectors.ts — CANONICAL selector definition
 // Used by: Layer 2 (bridge), Layer 3 (proxy), Layer 4 (AI)
 
@@ -214,7 +214,7 @@ export interface UI5Selector {
   /** Skip UI5 stability wait for this specific selector (D23) */
   readonly skipStabilityWait?: boolean;
 }
-```
+````
 
 ---
 
@@ -284,16 +284,16 @@ import { complianceReporter } from 'playwright-praman/reporters';
 
 ### 5.2 Naming Conventions (ENFORCE)
 
-| Category | Convention | Example |
-|----------|-----------|---------|
-| Files | kebab-case | `bridge-adapter.ts`, `ui5-button.ts` |
-| Types/Interfaces | PascalCase | `BridgeAdapter`, `UI5Selector` |
-| Functions | camelCase | `findControl()`, `createProxy()` |
-| Constants | UPPER_CASE | `DEFAULT_TIMEOUT`, `MAX_RETRIES` |
-| Error codes | ERR\_ prefix + UPPER\_CASE | `ERR_BRIDGE_TIMEOUT`, `ERR_CONTROL_NOT_FOUND` |
-| Config keys | camelCase | `controlDiscoveryTimeout`, `interactionStrategy` |
-| Env vars | PREFIX\_ + UPPER\_CASE | `PRAMAN_LOG_LEVEL`, `SAP_CLOUD_BASE_URL` |
-| Fixture names | camelCase | `ui5`, `navigation`, `sapAuth` |
+| Category         | Convention                | Example                                          |
+| ---------------- | ------------------------- | ------------------------------------------------ |
+| Files            | kebab-case                | `bridge-adapter.ts`, `ui5-button.ts`             |
+| Types/Interfaces | PascalCase                | `BridgeAdapter`, `UI5Selector`                   |
+| Functions        | camelCase                 | `findControl()`, `createProxy()`                 |
+| Constants        | UPPER_CASE                | `DEFAULT_TIMEOUT`, `MAX_RETRIES`                 |
+| Error codes      | ERR\_ prefix + UPPER_CASE | `ERR_BRIDGE_TIMEOUT`, `ERR_CONTROL_NOT_FOUND`    |
+| Config keys      | camelCase                 | `controlDiscoveryTimeout`, `interactionStrategy` |
+| Env vars         | PREFIX\_ + UPPER_CASE     | `PRAMAN_LOG_LEVEL`, `SAP_CLOUD_BASE_URL`         |
+| Fixture names    | camelCase                 | `ui5`, `navigation`, `sapAuth`                   |
 
 ---
 
@@ -337,16 +337,17 @@ When you need to create a new design decision beyond D29:
 ```markdown
 ### D[XX] — [Title]
 
-| Property | Value |
-|----------|-------|
-| **Status** | Proposed / Accepted / Rejected |
-| **Context** | Why this decision is needed |
-| **Decision** | What was decided |
-| **Alternatives** | What was considered and rejected |
-| **Consequences** | Impact on architecture, other decisions |
-| **Best Practice** | BP-[SOURCE]: reference if applicable |
+| Property          | Value                                   |
+| ----------------- | --------------------------------------- |
+| **Status**        | Proposed / Accepted / Rejected          |
+| **Context**       | Why this decision is needed             |
+| **Decision**      | What was decided                        |
+| **Alternatives**  | What was considered and rejected        |
+| **Consequences**  | Impact on architecture, other decisions |
+| **Best Practice** | BP-[SOURCE]: reference if applicable    |
 
 **Code Impact**:
+
 - Files affected: [list]
 - Interfaces changed: [list]
 - Migration required: [yes/no]
@@ -356,31 +357,31 @@ When you need to create a new design decision beyond D29:
 
 ## 8. Phase Ownership
 
-| Phase | Your Deliverables |
-|-------|-------------------|
-| Phase 0 | plan.md finalization, directory scaffolding, CI setup, CONTRIBUTING.md |
+| Phase   | Your Deliverables                                                         |
+| ------- | ------------------------------------------------------------------------- |
+| Phase 0 | plan.md finalization, directory scaffolding, CI setup, CONTRIBUTING.md    |
 | Phase 1 | Interface files for core/ (error hierarchy, config types, selector types) |
-| Phase 2 | BridgeAdapter interface, InteractionStrategy interface, proxy interfaces |
-| Phase 3 | Fixture type definitions, auth strategy interface |
-| Phase 4 | FE interface (ListReportPage, ObjectPage) |
-| Phase 5 | AI capability/recipe registry interfaces, AI response envelope type |
-| Phase 6 | Review documentation architecture, SKILL.md structure |
-| Phase 7 | Final architecture compliance audit, certification readiness |
+| Phase 2 | BridgeAdapter interface, InteractionStrategy interface, proxy interfaces  |
+| Phase 3 | Fixture type definitions, auth strategy interface                         |
+| Phase 4 | FE interface (ListReportPage, ObjectPage)                                 |
+| Phase 5 | AI capability/recipe registry interfaces, AI response envelope type       |
+| Phase 6 | Review documentation architecture, SKILL.md structure                     |
+| Phase 7 | Final architecture compliance audit, certification readiness              |
 
 ---
 
 ## 9. Anti-Patterns to Reject
 
-| Anti-Pattern | Why It's Wrong | Correct Pattern |
-|-------------|---------------|-----------------|
-| God object (file > 500 LOC) | Unreadable, untestable | Split by SRP, ≤300 LOC |
-| Cross-layer import | Breaks dependency direction | Add interface at boundary layer |
-| Shared mutable state | Race conditions, unpredictable | `Readonly<>`, function parameters |
-| `any` type | Defeats TypeScript purpose | `unknown` + type guard or Zod |
-| Barrel file re-exporting internals | Leaks implementation details | Export only public API |
-| Copy-paste from v2.5.0 | Against Core Principle 6 | Rewrite to best practices |
-| Double-proxy | Redundant interception (D16) | Single unified Proxy handler |
-| Duplicated API resolution | DRY violation (D19) | Use `__praman_getById()` |
+| Anti-Pattern                       | Why It's Wrong                 | Correct Pattern                   |
+| ---------------------------------- | ------------------------------ | --------------------------------- |
+| God object (file > 500 LOC)        | Unreadable, untestable         | Split by SRP, ≤300 LOC            |
+| Cross-layer import                 | Breaks dependency direction    | Add interface at boundary layer   |
+| Shared mutable state               | Race conditions, unpredictable | `Readonly<>`, function parameters |
+| `any` type                         | Defeats TypeScript purpose     | `unknown` + type guard or Zod     |
+| Barrel file re-exporting internals | Leaks implementation details   | Export only public API            |
+| Copy-paste from v2.5.0             | Against Core Principle 6       | Rewrite to best practices         |
+| Double-proxy                       | Redundant interception (D16)   | Single unified Proxy handler      |
+| Duplicated API resolution          | DRY violation (D19)            | Use `__praman_getById()`          |
 
 ---
 
