@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.0.4...v1.1.0) (2026-03-07)
+
+
+### Features
+
+* **docs:** add SEO badges, keywords, FAQ schema, config ([5fc93bb](https://github.com/mrkanitkar/playwright-praman/commit/5fc93bbbc708f92b1e4254944fe4aecb794b7c3c))
+
+
+### Bug Fixes
+
+* **docs:** resolve Bing SEO scan issues and update footer copyright ([c831ac3](https://github.com/mrkanitkar/playwright-praman/commit/c831ac3e5151da95eba0222d601f5c4e4e2ef62b))
+* **docs:** revert manual version bump, let release-please manage ([8d47917](https://github.com/mrkanitkar/playwright-praman/commit/8d47917b4ad5707d5411a932c9b2fb2004deab8e))
+
 ## [1.0.4](https://github.com/mrkanitkar/playwright-praman/compare/v1.0.3...v1.0.4) (2026-03-07)
 
 
