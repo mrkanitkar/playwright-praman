@@ -94,13 +94,13 @@ API documentation is auto-generated from source code TSDoc comments — see the 
 
 Praman publishes documentation in the [llmstxt.org](https://llmstxt.org) standard for AI agents, RAG pipelines, and LLM tools:
 
-| File                                                                       | Content                                    |
-| -------------------------------------------------------------------------- | ------------------------------------------ |
-| [`llms.txt`](https://praman.zestest.in/llms.txt)                           | Link index — all docs with descriptions    |
-| [`llms-full.txt`](https://praman.zestest.in/llms-full.txt)                 | Complete documentation in a single file    |
-| [`llms-quickstart.txt`](https://praman.zestest.in/llms-quickstart.txt)     | Setup, fixtures, selectors, matchers       |
-| [`llms-sap-testing.txt`](https://praman.zestest.in/llms-sap-testing.txt)   | Auth, FLP, OData, Fiori Elements, cookbook |
-| [`llms-migration.txt`](https://praman.zestest.in/llms-migration.txt)       | Migration from Playwright, wdi5, Tosca     |
-| [`llms-architecture.txt`](https://praman.zestest.in/llms-architecture.txt) | Architecture, bridge, proxy, ADRs          |
+| File                                                                                            | Content                                    |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| [`llms.txt`](https://mrkanitkar.github.io/playwright-praman/llms.txt)                           | Link index — all docs with descriptions    |
+| [`llms-full.txt`](https://mrkanitkar.github.io/playwright-praman/llms-full.txt)                 | Complete documentation in a single file    |
+| [`llms-quickstart.txt`](https://mrkanitkar.github.io/playwright-praman/llms-quickstart.txt)     | Setup, fixtures, selectors, matchers       |
+| [`llms-sap-testing.txt`](https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt)   | Auth, FLP, OData, Fiori Elements, cookbook |
+| [`llms-migration.txt`](https://mrkanitkar.github.io/playwright-praman/llms-migration.txt)       | Migration from Playwright, wdi5, Tosca     |
+| [`llms-architecture.txt`](https://mrkanitkar.github.io/playwright-praman/llms-architecture.txt) | Architecture, bridge, proxy, ADRs          |
 
 These files are regenerated on every build and deployed alongside the site.

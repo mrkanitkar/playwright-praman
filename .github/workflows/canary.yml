@@ -3,6 +3,7 @@ name: Canary Publish
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -41,19 +42,24 @@ jobs:
           FORCE_COLOR: 0
         run: |
           BASE=$(node -p "require('./package.json').version")
-          # Query npm for the latest published alpha of this base version
-          LATEST=$(npm view playwright-praman "versions" --json 2>/dev/null \
+          # Bump patch to get the next unreleased version (e.g. 1.0.2 → 1.0.3)
+          # so that next > latest in semver, matching Playwright's convention
+          NEXT_BASE=$(node -p "const [maj,min,pat]='${BASE}'.split('.'); \`\${maj}.\${min}.\${Number(pat)+1}\`")
+          # Query npm for existing alphas of that next patch version
+          LATEST=$(npm view playwright-praman versions --json 2>/dev/null \
             | node -p "
-                const versions = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+                const raw = require('fs').readFileSync('/dev/stdin','utf8');
+                const parsed = JSON.parse(raw);
+                const versions = Array.isArray(parsed) ? parsed : [parsed];
                 const alphas = versions
-                  .filter(v => v.startsWith('${BASE}-alpha.'))
+                  .filter(v => v.startsWith('${NEXT_BASE}-alpha.'))
                   .map(v => Number(v.split('-alpha.')[1]))
                   .filter(n => Number.isFinite(n));
                 alphas.length ? Math.max(...alphas) : -1;
               ")
           NEXT=$((LATEST + 1))
-          npm version "${BASE}-alpha.${NEXT}" --no-git-tag-version
-          echo "📦 Canary version: ${BASE}-alpha.${NEXT}"
+          npm version "${NEXT_BASE}-alpha.${NEXT}" --no-git-tag-version
+          echo "📦 Canary version: ${NEXT_BASE}-alpha.${NEXT}"
       - name: Verify clean tree (only version bump expected)
         run: |
           CHANGED=$(git diff --name-only | sort)

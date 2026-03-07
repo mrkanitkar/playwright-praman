@@ -312,12 +312,12 @@ Praman throws typed `PramanError` subclasses. When you encounter errors:
 
 For deeper context, point Claude to these documentation files:
 
-| File                                                                   | Content                        |
-| ---------------------------------------------------------------------- | ------------------------------ |
-| `node_modules/playwright-praman/llms.txt`                              | Link index with descriptions   |
-| `node_modules/playwright-praman/llms-full.txt`                         | Complete docs in a single file |
-| [llms-full.txt (web)](https://praman.zestest.in/llms-full.txt)         | Same content, hosted           |
-| [llms-sap-testing.txt](https://praman.zestest.in/llms-sap-testing.txt) | SAP auth, FLP, OData, Fiori    |
+| File                                                                                        | Content                        |
+| ------------------------------------------------------------------------------------------- | ------------------------------ |
+| `node_modules/playwright-praman/llms.txt`                                                   | Link index with descriptions   |
+| `node_modules/playwright-praman/llms-full.txt`                                              | Complete docs in a single file |
+| [llms-full.txt (web)](https://mrkanitkar.github.io/playwright-praman/llms-full.txt)         | Same content, hosted           |
+| [llms-sap-testing.txt](https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt) | SAP auth, FLP, OData, Fiori    |
 
 ## Skill & Reference Files
 
