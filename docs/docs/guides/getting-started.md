@@ -1,5 +1,12 @@
 ---
 title: Getting Started
+description: 'Get started with Praman in 5 minutes. Install the Playwright plugin, configure SAP credentials, and run your first SAP UI5 end-to-end test.'
+keywords:
+  - playwright sap testing
+  - sap ui5 test automation
+  - playwright sap ui5 getting started tutorial
+  - sap ui5 e2e testing
+  - playwright-praman
 ---
 
 Get up and running with Praman in 5 steps.

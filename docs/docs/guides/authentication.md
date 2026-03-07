@@ -1,5 +1,11 @@
 ---
 title: Authentication Guide
+description: '6 SAP authentication strategies for Playwright tests: BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, and Manual login.'
+keywords:
+  - sap authentication playwright
+  - sap btp saml authentication playwright
+  - sap btp test automation
+  - sap fiori login automation
 ---
 
 Praman supports 6 pluggable authentication strategies for SAP systems.

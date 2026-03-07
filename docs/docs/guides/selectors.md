@@ -1,5 +1,11 @@
 ---
 title: Selector Reference
+description: 'UI5Selector reference for Praman. Find SAP UI5 controls by controlType, id, properties, bindingPath, ancestor, and descendant selectors.'
+keywords:
+  - playwright custom selector sap ui5
+  - sap ui5 control selector
+  - praman selectors
+  - sap ui5 test automation
 ---
 
 Selectors are the primary way to find UI5 controls on a page. Praman uses `UI5Selector` objects

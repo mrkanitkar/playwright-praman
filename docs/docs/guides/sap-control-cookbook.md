@@ -1,5 +1,11 @@
 ---
 title: SAP Control Cookbook
+description: 'Recipes for testing common SAP UI5 controls with Praman: SmartTable, SmartField, DatePicker, Dialog, ComboBox, Tree, and more.'
+keywords:
+  - sap ui5 control testing
+  - sap ui5 smarttable testing automation
+  - sap ui5 dialog testing playwright
+  - sap ui5 typed control proxy
 ---
 
 A practical reference for interacting with the most common SAP UI5 controls in Praman tests.

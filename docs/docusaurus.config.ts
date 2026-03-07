@@ -3,7 +3,8 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'playwright-praman',
+  title: 'Praman',
+  titleDelimiter: '|',
   tagline: 'AI-First SAP UI5 Test Automation for Playwright',
   favicon: 'img/favicon.ico',
 
@@ -98,6 +99,82 @@ const config: Config = {
             url: 'https://praman.dev/img/logo.svg',
           },
         },
+      }),
+    },
+
+    // JSON-LD: FAQPage (triggers Google FAQ rich results)
+    {
+      tagName: 'script',
+      attributes: { type: 'application/ld+json' },
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'What SAP systems does Praman support?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Praman supports SAP S/4HANA (on-premise and cloud), SAP BTP applications, SAP Fiori Launchpad, and any web application built with SAPUI5 or OpenUI5. It works with both SAP Fiori Elements and custom UI5 freestyle apps.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Do I need access to SAP source code to use Praman?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'No. Praman interacts with UI5 controls through the public runtime API (sap.ui.getCore()). It queries the control registry at runtime, so you only need browser access to the application.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Can I use Praman with existing Playwright tests?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes. Praman extends Playwright — it does not replace it. You can mix Praman fixtures (ui5, ui5Navigation, ui5Table) with native Playwright APIs (page.click(), page.locator()) in the same test file.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'How does Praman compare to wdi5?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Both access the UI5 control registry. Praman is built on Playwright (faster, modern), while wdi5 uses WebdriverIO. Praman adds typed control proxies with full IntelliSense, AI-powered test generation, Fiori Elements page-object helpers, OData V2/V4 mock/intercept utilities, and 10 UI5-specific Playwright matchers.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'How does AI test generation work in Praman?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Praman integrates with AI coding agents (Claude Code, GitHub Copilot, Cursor, Jules). You describe what to test in business language, and the agent generates production-ready Playwright tests using Praman fixtures with typed control proxies — not brittle selectors.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'What authentication methods does Praman support for SAP?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Praman supports 6 authentication strategies: BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, and Manual login. Authentication is handled in seed tests and sessions are reused across test runs.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'How many SAP UI5 controls does Praman support?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Praman supports 61 UI5 control types across 8 SAP libraries: sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, sap.ui.mdc, sap.ui.unified, and sap.ui.core. Each control type has a fully typed proxy with IntelliSense.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Is Praman free and open source?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes. Praman is licensed under Apache-2.0 and is completely free. It has only 3 production dependencies (commander, pino, zod), all MIT-licensed. The source code is available on GitHub.',
+            },
+          },
+        ],
       }),
     },
   ],
@@ -381,7 +458,8 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          showLastUpdateTime: false,
+          editUrl: 'https://github.com/mrkanitkar/playwright-praman/edit/main/docs/',
+          showLastUpdateTime: true,
           showLastUpdateAuthor: false,
           lastVersion: 'current',
           versions: {
@@ -398,6 +476,19 @@ const config: Config = {
             'Updates, releases, and guides for Praman — AI-first SAP UI5 test automation for Playwright',
           postsPerPage: 10,
           tags: 'tags.yml',
+          feedOptions: {
+            type: 'all',
+            title: 'Praman Blog',
+            description:
+              'Updates, releases, and guides for Praman — AI-first SAP UI5 test automation for Playwright',
+            copyright: `Copyright (c) ZesTest 2025-2030`,
+          },
+        },
+        sitemap: {
+          lastmod: 'date',
+          changefreq: 'weekly',
+          priority: 0.5,
+          filename: 'sitemap.xml',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -407,10 +498,27 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/praman-social-card.png',
+    image: 'img/docusaurus-social-card.jpg',
     metadata: [
-      { name: 'keywords', content: 'praman, playwright, sap, ui5, testing, automation, fiori, ai' },
+      {
+        name: 'keywords',
+        content:
+          'praman, playwright, sap, ui5, testing, automation, fiori, ai, S/4HANA, SAP testing, test automation',
+      },
+      {
+        name: 'robots',
+        content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+      },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'playwright-praman' },
       { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: 'AI-First SAP UI5 Test Automation | playwright-praman' },
+      {
+        name: 'twitter:description',
+        content:
+          'Enterprise Playwright plugin for SAP S/4HANA. AI agents deliver production-ready test scripts. 61 UI5 controls, typed proxies, OData support.',
+      },
+      { name: 'author', content: 'Maheshwar Kanitkar' },
       // Ownership verified via DNS (Cloudflare CNAME) — no meta tags needed
     ],
     colorMode: {

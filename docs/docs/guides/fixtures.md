@@ -1,5 +1,11 @@
 ---
 title: Fixture Reference
+description: 'Reference for all 21 Praman Playwright fixtures: ui5, sapAuth, ui5Navigation, ui5Table, fe, odata, pramanAI, and more. Destructure and test.'
+keywords:
+  - playwright fixtures sap testing
+  - praman fixtures
+  - playwright sap plugin
+  - sap ui5 test automation
 ---
 
 Praman provides 12 fixture modules merged into a single `test` object via Playwright's `mergeTests()`.

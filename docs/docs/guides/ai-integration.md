@@ -1,5 +1,11 @@
 ---
 title: 'AI Integration'
+description: 'AI-powered SAP test generation with Praman. LLM service integration, page discovery, agentic test handler, and capability registry.'
+keywords:
+  - ai sap testing
+  - ai test generation playwright
+  - ai powered sap test generation
+  - sap test automation ai
 ---
 
 # AI Integration
