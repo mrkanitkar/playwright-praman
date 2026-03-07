@@ -9,52 +9,31 @@ title: Praman
 Praman extends Playwright with deep SAP UI5 awareness — typed control proxies, UI5 stability
 synchronization, FLP navigation, and AI-powered test generation.
 
-## Get Started in 5 Steps
-
-**1. Install**
+## Get Started
 
 ```bash
 npm install playwright-praman
-```
-
-First install resolves Playwright and other dependencies — allow 1-2 minutes.
-
-**2. Initialize**
-
-```bash
-npx playwright init-agents --loop=vscode
 npx playwright-praman init
 ```
 
-Validates your environment, installs Chromium, detects your IDE, and scaffolds config files, auth setup, and a gold-standard verification test.
-
-**3. Configure SAP Credentials**
-
-```bash
-cp .env.example .env
-# Edit .env with your SAP_CLOUD_BASE_URL, SAP_CLOUD_USERNAME, SAP_CLOUD_PASSWORD
-```
-
-**4. Verify**
-
-```bash
-npx playwright test tests/bom-e2e-praman-gold-standard.spec.ts --reporter=line --headed --project=chromium
-```
-
-A passing test confirms your setup is complete.
-
-**5. Generate Tests from Your Business Process**
-
-Describe your business process or test case in plain language — Praman's AI agents autonomously generate the test plan and production-ready Playwright test script:
+That's it. `init` handles everything — Chromium, configs, SAP credentials, IDE detection, and AI agent installation. Then generate tests:
 
 ```bash
 /praman-sap-coverage
 # Then enter: "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
 ```
 
-The **plan → generate → heal** pipeline discovers live UI5 controls, generates typed Playwright tests, and self-heals failures — no manual test scripting required.
+The **plan → generate → heal** pipeline runs 3 agents autonomously:
 
-See the full [Getting Started](./guides/getting-started.md) guide for a detailed walkthrough.
+| Agent         | What it does                                                                |
+| ------------- | --------------------------------------------------------------------------- |
+| **Planner**   | Explores your live SAP system, discovers UI5 controls, produces a test plan |
+| **Generator** | Converts the plan into Playwright + Praman code with typed control proxies  |
+| **Healer**    | Runs the test, fixes failures, ensures compliance — repeats until green     |
+
+The result is a production-ready `.spec.ts` file — no manual test scripting required.
+
+See the full [Getting Started](./guides/getting-started.md) guide for details and [Running Your Agent](./guides/running-your-agent.md) for prompt templates.
 
 ```typescript
 import { test, expect } from 'playwright-praman';

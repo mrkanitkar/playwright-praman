@@ -53,74 +53,31 @@ Business analysts define the process. AI agents — Claude, Copilot, Jules — g
 
 ## Quick Start
 
-### Install
-
 ```bash
 npm install playwright-praman
-# or
-yarn add playwright-praman
-# or
-pnpm add playwright-praman
-```
-
-Only 3 production dependencies: `commander` (MIT), `pino` (MIT), `zod` (MIT).
-
-### Initialize
-
-```bash
-npx playwright init-agents --loop=vscode
 npx playwright-praman init
 ```
 
-The initializer validates your environment, installs Chromium, detects your IDE, and scaffolds:
-`playwright.config.ts`, `praman.config.ts`, auth setup, gold-standard verification test,
-`.env.example`, and IDE-specific AI agent configs.
+That's it. `init` validates your environment, installs Chromium, scaffolds all config files, prompts for SAP credentials, detects your IDE, and installs AI agent definitions — everything is ready to go.
 
-### Configure SAP Credentials
+### Generate Tests with AI Agents
 
-```bash
-cp .env.example .env
-```
-
-```bash
-SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
-SAP_CLOUD_USERNAME=your-username
-SAP_CLOUD_PASSWORD=your-password
-SAP_AUTH_STRATEGY=btp-saml    # 'btp-saml' | 'basic' | 'office365'
-```
-
-> **Never commit `.env`** — it is already in `.gitignore`.
-
-### Verify Setup
-
-```bash
-npx playwright test tests/bom-e2e-praman-gold-standard.spec.ts --reporter=line --headed --project=chromium
-```
-
-A passing test confirms: Playwright + Chromium installed, SAP credentials valid,
-auth session saved, and Praman fixtures interacting with live UI5 controls.
-
-### Generate Tests from Your Business Process
-
-Once your setup is verified, describe your business process or test case in plain language — Praman's AI agents will autonomously generate the test plan and production-ready Playwright test script.
-
-**Using Claude Code:**
+Describe your business process — Praman's **plan → generate → heal** pipeline does the rest:
 
 ```bash
 /praman-sap-coverage
+# Then enter: "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
 ```
 
-Then enter your business process, for example:
+| Agent         | What it does                                                                  |
+| ------------- | ----------------------------------------------------------------------------- |
+| **Planner**   | Explores your live SAP system, discovers UI5 controls, produces a test plan   |
+| **Generator** | Converts the plan into executable Playwright + Praman code with typed proxies |
+| **Healer**    | Runs the test, fixes failures, ensures compliance — repeats until green       |
 
-> "Test creating a purchase order: navigate to ME21N, enter vendor 1000, add material MAT-001 with quantity 10 in plant 1000, and verify the PO is posted successfully."
+The result is a **production-ready `.spec.ts` file** — no manual test scripting required. Works with Claude Code, GitHub Copilot, Cursor, and Jules.
 
-Praman's **plan → generate → heal** pipeline will:
-
-1. **Plan** — The SAP planner agent explores your live SAP system, discovers UI5 controls, and produces a structured test plan
-2. **Generate** — The generator converts the plan into executable Playwright + Praman test code using typed control proxies
-3. **Heal** — The healer validates the generated test, fixes any failures, and ensures compliance
-
-The result is a production-ready `.spec.ts` file — no manual test scripting required.
+> See the full [Getting Started](https://praman.dev/docs/guides/getting-started) guide and [Running Your Agent](https://praman.dev/docs/guides/running-your-agent) walkthrough.
 
 ## Example
 
