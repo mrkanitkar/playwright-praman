@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-const DOCS_URL = 'https://praman.zestest.in';
+const DOCS_URL = 'https://mrkanitkar.github.io/playwright-praman';
 const LLMS_TXT = `${DOCS_URL}/llms-full.txt`;
 
 const CONTEXT_PREFIX =

@@ -259,9 +259,9 @@ Add to your agent instructions (CLAUDE.md, `.cursorrules`, copilot-instructions.
 
 For Praman API and usage, fetch the appropriate llms.txt file:
 
-- General: https://praman.zestest.in/llms-full.txt
-- SAP testing: https://praman.zestest.in/llms-sap-testing.txt
-- Quick start: https://praman.zestest.in/llms-quickstart.txt
+- General: https://mrkanitkar.github.io/playwright-praman/llms-full.txt
+- SAP testing: https://mrkanitkar.github.io/playwright-praman/llms-sap-testing.txt
+- Quick start: https://mrkanitkar.github.io/playwright-praman/llms-quickstart.txt
 ```
 
 Agents with web access (Claude Code `WebFetch`, Copilot `@fetch`) can retrieve these at runtime. Agents without web access can use the locally built files from `docs/build/`.

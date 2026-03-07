@@ -5,7 +5,7 @@
   "author": {
     "name": "Maheshwar Kanitkar",
     "email": "support@zestest.in",
-    "url": "https://praman.zestest.in/"
+    "url": "https://mrkanitkar.github.io/playwright-praman/"
   },
   "license": "Apache-2.0",
   "type": "module",
@@ -238,5 +238,5 @@
   "bugs": {
     "url": "https://github.com/mrkanitkar/playwright-praman/issues"
   },
-  "homepage": "https://praman.zestest.in/"
+  "homepage": "https://mrkanitkar.github.io/playwright-praman/"
 }
