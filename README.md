@@ -203,7 +203,7 @@ for decision matrices, fallback chain diagrams, and recommended configurations b
 
 | Topic                         | Link                                                                                               |
 | ----------------------------- | -------------------------------------------------------------------------------------------------- |
-| Full documentation            | [praman.zestest.in](https://mrkanitkar.github.io/playwright-praman)                                |
+| Full documentation            | [mrkanitkar.github.io/playwright-praman](https://mrkanitkar.github.io/playwright-praman)           |
 | Getting started guide         | [Getting Started](https://mrkanitkar.github.io/playwright-praman/docs/guides/getting-started)      |
 | Configuration reference       | [Configuration](https://mrkanitkar.github.io/playwright-praman/docs/guides/configuration)          |
 | Authentication (6 strategies) | [Authentication](https://mrkanitkar.github.io/playwright-praman/docs/guides/authentication)        |
