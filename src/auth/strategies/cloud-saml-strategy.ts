@@ -37,10 +37,10 @@ const STRATEGY_NAME = 'cloud-saml';
  * Used by {@link isCloudUrl} to auto-detect cloud systems.
  */
 const CLOUD_URL_PATTERNS: readonly RegExp[] = [
-  /\.cloud\.sap/i,
-  /\.s4hana\.cloud\.sap/i,
-  /\.hana\.ondemand\.com/i,
-  /\.cfapps\..*\.hana\.ondemand\.com/i,
+  /\.cloud\.sap(?:[/?#]|$)/iu,
+  /\.s4hana\.cloud\.sap(?:[/?#]|$)/iu,
+  /\.hana\.ondemand\.com(?:[/?#]|$)/iu,
+  /\.cfapps\..*\.hana\.ondemand\.com(?:[/?#]|$)/iu,
 ];
 
 /** IAS email/username field selector chain (classic + modern IAS forms). */

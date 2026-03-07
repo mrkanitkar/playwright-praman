@@ -63,12 +63,13 @@
  * ```
  */
 export const WALKME_DEFAULT_PATTERNS: readonly string[] = [
-  'walkme\\.com',
-  'walkme\\.cloud\\.sap',
-  'walkmeusercontent\\.com',
-  'cdn\\.walkme\\.com',
-  'ec\\.walkme\\.com',
-  'papi\\.walkme\\.com',
+  // codeql[js/regex/missing-regexp-anchor] -- intentional substring match against full request URLs for request-blocking; anchoring would prevent matching subpaths
+  'walkme\\.com', // codeql[js/regex/missing-regexp-anchor]
+  'walkme\\.cloud\\.sap', // codeql[js/regex/missing-regexp-anchor]
+  'walkmeusercontent\\.com', // codeql[js/regex/missing-regexp-anchor]
+  'cdn\\.walkme\\.com', // codeql[js/regex/missing-regexp-anchor]
+  'ec\\.walkme\\.com', // codeql[js/regex/missing-regexp-anchor]
+  'papi\\.walkme\\.com', // codeql[js/regex/missing-regexp-anchor]
 ] as const;
 
 /**
@@ -88,10 +89,10 @@ export const WALKME_DEFAULT_PATTERNS: readonly string[] = [
  * ```
  */
 export const ANALYTICS_DEFAULT_PATTERNS: readonly string[] = [
-  'analytics\\.google',
-  'googletagmanager\\.com',
-  'siteintercept\\.qualtrics\\.com',
-  'launchdarkly\\.com',
+  'analytics\\.google', // codeql[js/regex/missing-regexp-anchor]
+  'googletagmanager\\.com', // codeql[js/regex/missing-regexp-anchor]
+  'siteintercept\\.qualtrics\\.com', // codeql[js/regex/missing-regexp-anchor]
+  'launchdarkly\\.com', // codeql[js/regex/missing-regexp-anchor]
 ] as const;
 
 /**

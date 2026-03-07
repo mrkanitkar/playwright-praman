@@ -122,8 +122,14 @@ const GRID_VARIANTS: readonly string[] = [
 function iife(body: string, fallback: string): string {
   return `(function(){try{${body}}catch(e){return ${fallback};}})()`;
 }
+function escStr(s: string): string {
+  return JSON.stringify(s)
+    .replaceAll('<', '\\u003C')
+    .replaceAll('>', '\\u003E')
+    .replaceAll('/', '\\u002F');
+}
 function ctrl(id: string, fb: string): string {
-  return `var c=sap.ui.getCore().byId(${JSON.stringify(id)});if(!c)return ${fb};`;
+  return `var c=sap.ui.getCore().byId(${escStr(id)});if(!c)return ${fb};`;
 }
 function br(isGrid: boolean, g: string, r: string): string {
   return isGrid ? g : r;

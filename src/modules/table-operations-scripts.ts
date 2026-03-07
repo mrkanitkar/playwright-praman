@@ -23,9 +23,26 @@ function iife(body: string, fallback: string): string {
   return `(function(){try{${body}}catch(e){console.error("[praman] Table operation error:",e.message);return ${fallback};}})()`;
 }
 
+/**
+ * Serializes a string for safe inline embedding in generated JS code.
+ *
+ * @remarks
+ * `JSON.stringify` alone does not escape `\u003C` (`<`), `\u003E` (`>`), or
+ * `\u002F` (`/`), which can cause `</script>` sequences to break out of a
+ * `<script>` block if the generated code is ever embedded in HTML.
+ * Unicode-escaping these characters is safe: the JS engine treats them
+ * identically to the literal characters at runtime.
+ */
+function escStr(s: string): string {
+  return JSON.stringify(s)
+    .replaceAll('<', '\\u003C')
+    .replaceAll('>', '\\u003E')
+    .replaceAll('/', '\\u002F');
+}
+
 /** Generates `sap.ui.getCore().byId(id)` guard with fallback. */
 function ctrl(id: string, fb: string): string {
-  return `var c=sap.ui.getCore().byId(${JSON.stringify(id)});if(!c)return ${fb};`;
+  return `var c=sap.ui.getCore().byId(${escStr(id)});if(!c)return ${fb};`;
 }
 
 /** Selects grid or responsive branch. */
