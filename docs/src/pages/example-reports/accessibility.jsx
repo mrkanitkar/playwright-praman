@@ -6,6 +6,7 @@ export default function AccessibilityPage() {
   return (
     <Layout title="Accessibility Report" description="S/4HANA WCAG 2.1 AA Accessibility Audit">
       <div style={{ padding: "20px", maxWidth: 1100, margin: "0 auto" }}>
+        <h1 className="sr-only">Accessibility Report</h1>
         <AccessibilityReport />
       </div>
     </Layout>

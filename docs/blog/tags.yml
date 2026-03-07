@@ -1,24 +1,29 @@
 praman:
   label: Praman
   permalink: /praman
-  description: Praman platform updates
+  description: Praman platform updates, new features, and roadmap announcements for SAP UI5 test automation.
 
 playwright:
   label: Playwright
   permalink: /playwright
-  description: Playwright integration
+  description: Playwright integration guides and tips for SAP UI5 end-to-end testing with Praman.
 
 sap-ui5:
   label: SAP UI5
   permalink: /sap-ui5
-  description: SAP UI5 testing
+  description: SAP UI5 testing strategies, control recipes, and Fiori automation patterns with Praman.
 
 ai:
   label: AI
   permalink: /ai
-  description: AI-first test automation
+  description: AI-powered test generation, agentic workflows, and LLM integration for SAP UI5 testing.
 
 release:
   label: Release
   permalink: /release
-  description: Release notes
+  description: Praman release notes, changelogs, and version upgrade guides.
+
+v1.0:
+  label: v1.0
+  permalink: /v-1-0
+  description: Praman v1.0 release — AI-first SAP UI5 test automation platform for Playwright.

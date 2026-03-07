@@ -6,6 +6,7 @@ export default function HowItWorksPage() {
   return (
     <Layout title="How It Works" description="How Praman Generates Quality Intelligence">
       <div style={{ padding: "20px", maxWidth: 1100, margin: "0 auto" }}>
+        <h1 className="sr-only">How It Works</h1>
         <HowItWorks />
       </div>
     </Layout>

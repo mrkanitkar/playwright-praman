@@ -6,6 +6,7 @@ export default function GlobalImpactPage() {
   return (
     <Layout title="Global Impact" description="S/4HANA Geographic Impact & Network Simulation">
       <div style={{ padding: "20px", maxWidth: 1100, margin: "0 auto" }}>
+        <h1 className="sr-only">Global Impact</h1>
         <GeoImpact />
       </div>
     </Layout>

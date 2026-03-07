@@ -394,8 +394,10 @@ const config: Config = {
         blog: {
           showReadingTime: true,
           blogTitle: 'Praman Blog',
-          blogDescription: 'Updates, releases, and guides for Praman',
+          blogDescription:
+            'Updates, releases, and guides for Praman — AI-first SAP UI5 test automation for Playwright',
           postsPerPage: 10,
+          tags: 'tags.yml',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -409,21 +411,11 @@ const config: Config = {
     metadata: [
       { name: 'keywords', content: 'praman, playwright, sap, ui5, testing, automation, fiori, ai' },
       { name: 'twitter:card', content: 'summary_large_image' },
-      // TODO: Replace with actual codes from Google Search Console and Bing Webmaster Tools
-      // { name: 'google-site-verification', content: 'YOUR_GOOGLE_VERIFICATION_CODE' },
-      // { name: 'msvalidate.01', content: 'YOUR_BING_VERIFICATION_CODE' },
+      // Ownership verified via DNS (Cloudflare CNAME) — no meta tags needed
     ],
     colorMode: {
       defaultMode: 'light',
       respectPrefersColorScheme: true,
-    },
-    announcementBar: {
-      id: 'v1_launch',
-      content:
-        '🚀 Praman v1.0 is under active development. <a href="/docs">Read the docs</a> to get started.',
-      backgroundColor: '#1e3c72',
-      textColor: '#ffffff',
-      isCloseable: true,
     },
     navbar: {
       title: 'Praman',
@@ -556,7 +548,7 @@ const config: Config = {
         width: 50,
         height: 50,
       },
-      copyright: `Crafted with Prudence. Powered by Purpose. | Playwright + Praman — Better Together<br/>Copyright © ${new Date().getFullYear()} Zestest. Built with Docusaurus.`,
+      copyright: `Crafted with Prudence. Powered by Purpose. | Playwright + Praman — Better Together<br/>Copyright (c) ZesTest 2025-2030. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

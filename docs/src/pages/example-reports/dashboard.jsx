@@ -5,6 +5,7 @@ import FullDashboard from "@site/src/components/reports/FullDashboard";
 export default function DashboardPage() {
   return (
     <Layout title="S/4HANA Quality Dashboard" description="Full S/4HANA Transformation Quality Dashboard with all 12 reports">
+      <h1 className="sr-only">S/4HANA Quality Dashboard</h1>
       <FullDashboard />
     </Layout>
   );
