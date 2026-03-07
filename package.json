@@ -1,6 +1,6 @@
 {
   "name": "playwright-praman",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Agent-First SAP UI5 Test Automation Plugin for Playwright",
   "author": {
     "name": "Maheshwar Kanitkar",
