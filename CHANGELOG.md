@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.1](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.0...v1.1.1) (2026-03-07)
+
+
+### Features
+
+* **docs:** simplify onboarding to 2 commands, elevate AI agent pipeline ([c325010](https://github.com/mrkanitkar/playwright-praman/commit/c3250109cf8221b95b094c4d7681094ca46d3e0c))
+* **prompts:** add prompt factory with two SAP prompts and disclaimers ([92e3c68](https://github.com/mrkanitkar/playwright-praman/commit/92e3c68b6c12c2cdfc8d6a85a9886f8bf1c57671))
+
+
+### Bug Fixes
+
+* **ci:** add SAP domain words to cspell dictionary ([9089051](https://github.com/mrkanitkar/playwright-praman/commit/9089051f516a02e7461faa9488048a6fe19df476))
+* **ci:** inline upload-pages-artifact for SHA-pinning compliance ([68b89b5](https://github.com/mrkanitkar/playwright-praman/commit/68b89b588799ce51cef9bd27ec507bcd940df513))
+
 ## [1.1.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.0.4...v1.1.0) (2026-03-07)
 
 
