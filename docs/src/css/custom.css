@@ -123,6 +123,14 @@
   height: 72px;
 }
 
+/* backdrop-filter on .navbar creates a new CSS containing block (per spec),
+   which traps the position:fixed .navbar-sidebar inside the 72px nav.
+   Force full-viewport height + solid background so the mobile drawer works. */
+.navbar-sidebar {
+  height: 100dvh;
+  background-color: var(--ifm-background-color);
+}
+
 .navbar__brand {
   flex-shrink: 0;
   margin-right: 0.75rem;
