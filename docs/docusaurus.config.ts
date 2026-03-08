@@ -30,6 +30,15 @@ const config: Config = {
 
   // ── HTML <head> tags ──
   headTags: [
+    // SVG favicon for modern browsers (sharper than .ico)
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        type: 'image/svg+xml',
+        href: '/img/favicon.svg',
+      },
+    },
     // AI agent discoverability (llmstxt.org standard)
     {
       tagName: 'link',
