@@ -329,6 +329,16 @@ function HeroCarousel(): ReactNode {
       onMouseEnter={() => { setPaused(true); }}
       onMouseLeave={() => { setPaused(false); }}
     >
+      {/* Persistent H1 — always visible to crawlers and users */}
+      <div className="praman-hero-persistent">
+        <h1 className="praman-hero-h1">
+          Playwright-Praman — Agent-First SAP UI5 Test Automation Plugin for Playwright
+        </h1>
+        <p className="praman-hero-tagline">
+          Enterprise Playwright plugin for SAP S/4HANA test automation. 61 UI5 controls, 21
+          fixtures, 199 typed interfaces, 4,092 methods. Free and open source.
+        </p>
+      </div>
       <div className="praman-carousel-inner">
         {SLIDES.map((s, i) => {
           const { Visual } = s;

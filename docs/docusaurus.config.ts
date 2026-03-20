@@ -498,6 +498,36 @@ const config: Config = {
           changefreq: 'weekly',
           priority: 0.5,
           filename: 'sitemap.xml',
+          async createSitemapItems(params) {
+            const { defaultCreateSitemapItems, ...rest } = params;
+            const items = await defaultCreateSitemapItems(rest);
+            return items.map((item) => {
+              const url = item.url;
+              if (url.endsWith('/praman.dev/') || url.endsWith('/praman.dev')) {
+                return { ...item, priority: 1.0, changefreq: 'daily' };
+              }
+              if (/\/(docs|architecture|features|personas|blog)\/?$/.test(url)) {
+                return { ...item, priority: 0.9, changefreq: 'weekly' };
+              }
+              if (
+                /\/docs\/guides\/(getting-started|configuration|fixtures|selectors|authentication|agent-setup)\/?$/.test(
+                  url,
+                )
+              ) {
+                return { ...item, priority: 0.8, changefreq: 'weekly' };
+              }
+              if (/\/docs\/guides\//.test(url)) {
+                return { ...item, priority: 0.7 };
+              }
+              if (/\/blog\//.test(url)) {
+                return { ...item, priority: 0.6 };
+              }
+              if (/\/docs\/api\//.test(url)) {
+                return { ...item, priority: 0.3 };
+              }
+              return item;
+            });
+          },
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -507,12 +537,17 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/praman-social-card.png',
     metadata: [
+      {
+        name: 'description',
+        content:
+          'Enterprise Playwright plugin for SAP S/4HANA test automation. AI agents generate production-ready scripts. 61 UI5 controls, typed proxies, OData V2/V4, Fiori Elements. Free & open source.',
+      },
       {
         name: 'keywords',
         content:
-          'praman, playwright, sap, ui5, testing, automation, fiori, ai, S/4HANA, SAP testing, test automation',
+          'praman, playwright-praman, playwright, sap, ui5, sapui5, testing, automation, fiori, ai, S/4HANA, SAP testing, test automation, playwright plugin, sap test automation, fiori elements testing, odata testing, wdi5 alternative',
       },
       {
         name: 'robots',
@@ -520,15 +555,27 @@ const config: Config = {
       },
       { property: 'og:type', content: 'website' },
       { property: 'og:site_name', content: 'playwright-praman' },
+      {
+        property: 'og:title',
+        content: 'Praman — Agent-First SAP UI5 Test Automation for Playwright',
+      },
+      {
+        property: 'og:description',
+        content:
+          'Enterprise Playwright plugin for SAP S/4HANA. AI agents deliver production-ready test scripts. 61 UI5 controls, typed proxies, OData support.',
+      },
+      { property: 'og:url', content: 'https://praman.dev' },
       { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: 'Agent-First SAP UI5 Test Automation | playwright-praman' },
+      {
+        name: 'twitter:title',
+        content: 'Praman — Agent-First SAP UI5 Test Automation | playwright-praman',
+      },
       {
         name: 'twitter:description',
         content:
           'Enterprise Playwright plugin for SAP S/4HANA. AI agents deliver production-ready test scripts. 61 UI5 controls, typed proxies, OData support.',
       },
       { name: 'author', content: 'Maheshwar Kanitkar' },
-      // Ownership verified via DNS (Cloudflare CNAME) — no meta tags needed
     ],
     colorMode: {
       defaultMode: 'light',

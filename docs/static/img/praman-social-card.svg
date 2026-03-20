@@ -1,0 +1,48 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3c72"/>
+      <stop offset="100%" stop-color="#2a5298"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd700"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Seal logo (scaled from logo.svg) -->
+  <g transform="translate(100, 165) scale(1.5)">
+    <path d="M100 8 L112 38 L140 18 L135 50 L168 42 L148 70 L180 76 L155 96 L180 118 L148 124 L168 152 L135 144 L140 176 L112 156 L100 186 L88 156 L60 176 L65 144 L32 152 L52 124 L20 118 L45 96 L20 76 L52 70 L32 42 L65 50 L60 18 L88 38 Z"
+          fill="rgba(255,255,255,0.08)"/>
+    <circle cx="100" cy="97" r="58" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.15)" stroke-width="2.5"/>
+    <polyline points="72,97 92,120 132,74"
+             fill="none" stroke="url(#gold)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Title -->
+  <text x="480" y="220" fill="white" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="-1">playwright-praman</text>
+
+  <!-- Tagline -->
+  <text x="480" y="290" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400">Agent-First SAP UI5 Test Automation</text>
+  <text x="480" y="335" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400">Plugin for Playwright</text>
+
+  <!-- Stats pills -->
+  <g transform="translate(480, 390)">
+    <rect x="0" y="0" width="160" height="40" rx="20" fill="rgba(255,215,0,0.15)" stroke="rgba(255,215,0,0.5)" stroke-width="1"/>
+    <text x="80" y="26" text-anchor="middle" fill="#ffd700" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600">61 UI5 Controls</text>
+
+    <rect x="180" y="0" width="140" height="40" rx="20" fill="rgba(255,215,0,0.15)" stroke="rgba(255,215,0,0.5)" stroke-width="1"/>
+    <text x="250" y="26" text-anchor="middle" fill="#ffd700" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600">21 Fixtures</text>
+
+    <rect x="340" y="0" width="180" height="40" rx="20" fill="rgba(255,215,0,0.15)" stroke="rgba(255,215,0,0.5)" stroke-width="1"/>
+    <text x="430" y="26" text-anchor="middle" fill="#ffd700" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600">4,092 Methods</text>
+  </g>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="580" width="1200" height="50" fill="rgba(0,0,0,0.2)"/>
+  <text x="60" y="612" fill="rgba(255,255,255,0.6)" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20">praman.dev</text>
+  <text x="1140" y="612" text-anchor="end" fill="rgba(255,255,255,0.6)" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20">Free &amp; Open Source · Apache-2.0</text>
+</svg>
