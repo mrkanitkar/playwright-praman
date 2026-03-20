@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 slug: /
-title: Praman
+title: Playwright-Praman — SAP UI5 Test Automation Plugin
 ---
 
 **Agent-First SAP UI5 Test Automation Plugin for Playwright.**

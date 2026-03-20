@@ -915,7 +915,7 @@ function CTA(): ReactNode {
 export default function Home(): ReactNode {
   return (
     <Layout
-      title="Agent-First SAP UI5 Test Automation"
+      title="Playwright-Praman — SAP UI5 Test Automation Plugin"
       description="Praman — Agent-First SAP UI5 Test Automation Plugin for Playwright. Enterprise-grade testing with agentic AI, typed proxies, and 32+ fixtures."
     >
       <main>
