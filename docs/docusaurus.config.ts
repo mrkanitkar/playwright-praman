@@ -39,6 +39,14 @@ const config: Config = {
         href: '/img/favicon.svg',
       },
     },
+    // IndexNow — instant indexing for Bing, Yandex, DuckDuckGo
+    {
+      tagName: 'meta',
+      attributes: {
+        name: 'indexnow-key',
+        content: '09108a83dd0eab0bd47638c90ac5fb12',
+      },
+    },
     // AI agent discoverability (llmstxt.org standard)
     {
       tagName: 'link',
