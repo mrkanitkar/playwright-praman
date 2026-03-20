@@ -224,6 +224,32 @@ div[class*='announcementBar'] {
 
 /* ── Hero Carousel ─────────────────────────────────────────── */
 
+/* Persistent H1 — always visible to crawlers, compact for users */
+.praman-hero-persistent {
+  text-align: center;
+  padding: 2rem 2rem 0;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.praman-hero-h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.praman-hero-tagline {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.6;
+}
+
 /* Outer wrapper: provides the gradient background */
 .praman-carousel {
   position: relative;
