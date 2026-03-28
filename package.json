@@ -1,7 +1,7 @@
 {
   "name": "playwright-praman",
   "version": "1.1.2",
-  "description": "Agent-First SAP UI5 Test Automation Plugin for Playwright",
+  "description": "Playwright plugin for SAP S/4HANA, Fiori & UI5 test automation — AI test generation, 61 typed control proxies, OData V2/V4, Fiori Elements, 6 auth strategies",
   "author": {
     "name": "Maheshwar Kanitkar",
     "email": "support@zestest.in",
@@ -241,17 +241,20 @@
     "automation",
     "e2e",
     "e2e-testing",
-    "end-to-end",
     "regression",
+    "regression-testing",
     "ai",
     "ai-testing",
     "ai-first",
     "agentic",
     "wdi5",
+    "sap-testing",
+    "sap-automation",
+    "sap-fiori",
+    "sap-e2e-testing",
+    "test-generation",
     "enterprise",
-    "erp",
-    "typed-proxy",
-    "control-registry"
+    "erp"
   ],
   "repository": {
     "type": "git",
