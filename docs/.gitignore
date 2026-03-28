@@ -8,6 +8,9 @@
 .docusaurus
 .cache-loader
 
+# TypeDoc duplicate output (macOS creates "X 2" copies on re-runs)
+docs/api/*\ *
+
 # Misc
 .DS_Store
 .env.local

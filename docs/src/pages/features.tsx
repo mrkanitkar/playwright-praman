@@ -292,11 +292,11 @@ function Numbers(): ReactNode {
 
 export default function Features(): ReactNode {
   return (
-    <Layout title="Features" description="Praman features — AI-first SAP UI5 test automation capabilities">
+    <Layout title="SAP Testing Features — 61 UI5 Controls, OData, Fiori Elements, AI Codegen" description="Complete SAP test automation features: 61 UI5 control types, OData V2/V4, Fiori Elements helpers, SAP login automation, AI test generation, SAP-native locators. Free open-source Playwright plugin.">
       <main>
         <section style={{ padding: '6rem 2rem 2rem', textAlign: 'center', maxWidth: 800, margin: '0 auto' }}>
           <p className="praman-section-label">Features</p>
-          <h1 className="hero__title" style={{ fontSize: '2.8rem' }}>Everything You Need for SAP Testing</h1>
+          <h1 className="hero__title" style={{ fontSize: '2.8rem' }}>SAP Test Automation Features — Playwright Plugin for S/4HANA &amp; Fiori</h1>
           <p className="hero__subtitle">
             From AI-powered test generation to enterprise observability — built for
             teams migrating to S/4HANA.

@@ -191,6 +191,38 @@ const config: Config = {
               text: 'Yes. Praman is licensed under Apache-2.0 and is completely free. It has only 3 production dependencies (commander, pino, zod), all MIT-licensed. The source code is available on GitHub.',
             },
           },
+          {
+            '@type': 'Question',
+            name: 'How does Praman compare to Playwright-SAP?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Both extend Playwright for SAP testing. Praman provides 61 typed UI5 control proxies with IntelliSense, AI-powered test generation via coding agents, OData V2/V4 testing utilities, Fiori Elements page-object helpers, 6 SAP auth strategies, and 10 custom matchers. Playwright-SAP provides SAP-aware locators (getByRoleUI5, locateSID) and auto-login helpers. Praman is a deeper plugin with fixtures and AI; Playwright-SAP is a lighter locator extension.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Is Praman an alternative to Tricentis Tosca for SAP testing?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes. Praman is a free, open-source alternative to Tricentis Tosca and Worksoft for SAP S/4HANA testing. It uses Playwright (78,000+ GitHub stars) as its engine and adds AI-powered test generation, typed UI5 proxies, and SAP-specific fixtures. Unlike Tricentis, there are no license costs, no vendor lock-in, and tests are standard TypeScript.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Does Praman support SAP S/4HANA migration testing?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes. Praman is designed for SAP RISE, public cloud, and on-premise S/4HANA migration testing. It supports greenfield, brownfield, and bluefield deployment models. Features include behavioral equivalence testing (ECC vs S/4HANA), data integrity validation, business flow performance heatmaps, and compliance reporting for migration cutover.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Can Praman test SAP Fiori Launchpad and Fiori Elements apps?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Yes. Praman provides dedicated fixtures for SAP Fiori Launchpad navigation (9 methods including semantic object routing and BTP WorkZone support) and Fiori Elements page-object helpers for List Report, Object Page, and Overview Page. It handles tile navigation, intent-based routing, and FLP shell interactions natively.',
+            },
+          },
         ],
       }),
     },
@@ -224,8 +256,15 @@ const config: Config = {
         excludePrivate: true,
         excludeProtected: true,
         excludeInternal: true,
+        // SEO: disable "Defined in: src/...ts:NN" lines — they become garbage
+        // meta descriptions ("Defined in107") because Docusaurus uses the first
+        // paragraph as <meta name="description"> when no frontmatter description exists.
+        disableSources: true,
       },
     ],
+
+    // SEO fix: patch TypeDoc descriptions before docs plugin reads them
+    './src/plugins/fix-typedoc-seo.ts',
 
     // LLM-friendly docs — generates llms.txt following llmstxt.org standard
     [
@@ -509,32 +548,48 @@ const config: Config = {
           async createSitemapItems(params) {
             const { defaultCreateSitemapItems, ...rest } = params;
             const items = await defaultCreateSitemapItems(rest);
-            return items.map((item) => {
-              const url = item.url;
-              if (url.endsWith('/praman.dev/') || url.endsWith('/praman.dev')) {
-                return { ...item, priority: 1.0, changefreq: 'daily' };
-              }
-              if (/\/(docs|architecture|features|personas|blog)\/?$/.test(url)) {
-                return { ...item, priority: 0.9, changefreq: 'weekly' };
-              }
-              if (
-                /\/docs\/guides\/(getting-started|configuration|fixtures|selectors|authentication|agent-setup)\/?$/.test(
-                  url,
-                )
-              ) {
-                return { ...item, priority: 0.8, changefreq: 'weekly' };
-              }
-              if (/\/docs\/guides\//.test(url)) {
-                return { ...item, priority: 0.7 };
-              }
-              if (/\/blog\//.test(url)) {
-                return { ...item, priority: 0.6 };
-              }
-              if (/\/docs\/api\//.test(url)) {
-                return { ...item, priority: 0.3 };
-              }
-              return item;
-            });
+
+            // ── SEO: Filter out low-value pages that waste crawl budget ──
+            // Blog tag/archive/author aggregation pages are near-empty
+            const excludePatterns = [
+              /\/blog\/tags\//, // individual tag pages (thin aggregation)
+              /\/blog\/tags\/?$/, // tag index
+              /\/blog\/authors\/?$/, // authors index
+              /\/blog\/archive\/?$/, // archive page
+            ];
+
+            return items
+              .filter((item) => !excludePatterns.some((re) => re.test(item.url)))
+              .map((item) => {
+                const url = item.url;
+                if (url.endsWith('/praman.dev/') || url.endsWith('/praman.dev')) {
+                  return { ...item, priority: 1.0, changefreq: 'daily' };
+                }
+                if (/\/(docs|architecture|features|personas|blog)\/?$/.test(url)) {
+                  return { ...item, priority: 0.9, changefreq: 'weekly' };
+                }
+                if (
+                  /\/docs\/guides\/(getting-started|configuration|fixtures|selectors|authentication|agent-setup)\/?$/.test(
+                    url,
+                  )
+                ) {
+                  return { ...item, priority: 0.8, changefreq: 'weekly' };
+                }
+                if (/\/docs\/guides\//.test(url)) {
+                  return { ...item, priority: 0.7 };
+                }
+                if (/\/blog\//.test(url)) {
+                  return { ...item, priority: 0.6 };
+                }
+                // API module index pages get higher priority than leaf pages
+                if (/\/docs\/api\/(index|ai|fe|intents|reporters|vocabulary)\/?$/.test(url)) {
+                  return { ...item, priority: 0.5 };
+                }
+                if (/\/docs\/api\//.test(url)) {
+                  return { ...item, priority: 0.3 };
+                }
+                return item;
+              });
           },
         },
         theme: {
@@ -550,39 +605,34 @@ const config: Config = {
       {
         name: 'description',
         content:
-          'Enterprise Playwright plugin for SAP S/4HANA test automation. AI agents generate production-ready scripts. 61 UI5 controls, typed proxies, OData V2/V4, Fiori Elements. Free & open source.',
+          'Playwright SAP testing plugin for S/4HANA, Fiori, and UI5. AI agents generate end-to-end tests. ' +
+          '61 controls, OData, Fiori Elements, SAP login automation. Free open-source alternative to Tricentis & wdi5.',
       },
       {
         name: 'keywords',
         content:
-          'praman, playwright-praman, playwright, sap, ui5, sapui5, testing, automation, fiori, ai, S/4HANA, SAP testing, test automation, playwright plugin, sap test automation, fiori elements testing, odata testing, wdi5 alternative',
+          'praman, playwright-praman, playwright sap, sap testing, sap test automation, ' +
+          'sap ui5 testing, sapui5 test automation, sap fiori testing, fiori launchpad testing, ' +
+          'sap s/4hana testing, s4hana migration testing, sap rise testing, sap btp testing, ' +
+          'playwright plugin sap, sap e2e testing, end-to-end testing sap, ' +
+          'sap odata testing, fiori elements testing, sap webgui testing, ' +
+          'ai sap test generation, agentic testing sap, ai test automation sap, ' +
+          'wdi5 alternative, tricentis alternative, tosca alternative, worksoft alternative, ' +
+          'selenium to playwright sap, sap test automation open source, free sap testing tool, ' +
+          'sap ui5 locators, sap codegen, sap login automation, flake-free sap testing, ' +
+          'typed ui5 proxies, sap control proxy, playwright fixtures sap',
       },
       {
         name: 'robots',
         content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
       },
+      // og:type and og:site_name are truly global — keep them
       { property: 'og:type', content: 'website' },
       { property: 'og:site_name', content: 'playwright-praman' },
-      {
-        property: 'og:title',
-        content: 'Praman — Agent-First SAP UI5 Test Automation for Playwright',
-      },
-      {
-        property: 'og:description',
-        content:
-          'Enterprise Playwright plugin for SAP S/4HANA. AI agents deliver production-ready test scripts. 61 UI5 controls, typed proxies, OData support.',
-      },
-      { property: 'og:url', content: 'https://praman.dev' },
+      // NOTE: og:title, og:description, og:url are auto-generated per-page by Docusaurus.
+      // Do NOT set them globally — it creates duplicate meta tags and prevents
+      // per-page values from being used by Google and social platforms.
       { name: 'twitter:card', content: 'summary_large_image' },
-      {
-        name: 'twitter:title',
-        content: 'Praman — Agent-First SAP UI5 Test Automation | playwright-praman',
-      },
-      {
-        name: 'twitter:description',
-        content:
-          'Enterprise Playwright plugin for SAP S/4HANA. AI agents deliver production-ready test scripts. 61 UI5 controls, typed proxies, OData support.',
-      },
       { name: 'author', content: 'Maheshwar Kanitkar' },
     ],
     colorMode: {

@@ -1831,7 +1831,7 @@ function CloudTestingArchitecture(): ReactNode {
 /* ── Page ──────────────────────────────────────────────── */
 export default function Architecture(): ReactNode {
   return (
-    <Layout title="Architecture" description="Approach for SAP S/4 HANA Test Automation">
+    <Layout title="SAP Test Automation Architecture — 6-Layer Playwright Plugin Design" description="Praman architecture: 6-layer design for SAP S/4HANA test automation. Core → Bridge → Proxy → Fixtures → AI. TypeScript, typed UI5 proxies, OData, enterprise observability.">
       <main>
         <section style={{ padding: '6rem 2rem 2rem', textAlign: 'center', maxWidth: 800, margin: '0 auto' }}>
           <p className="praman-section-label">Architecture</p>
