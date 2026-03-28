@@ -236,7 +236,7 @@ function QuickStartGuides(): ReactNode {
 
 export default function Personas(): ReactNode {
   return (
-    <Layout title="Personas" description="Who uses Praman — from SAP Program Managers to AI Engineers">
+    <Layout title="Who Uses Praman — SAP Testers, AI Agents, Business Analysts" description="Three entry points for SAP test automation: AI agents generate tests via SKILL.md, test engineers use typed Playwright fixtures, business analysts validate OData outcomes.">
       <main>
         <section style={{ padding: '6rem 2rem 2rem', textAlign: 'center', maxWidth: 800, margin: '0 auto' }}>
           <p className="praman-section-label">Personas</p>

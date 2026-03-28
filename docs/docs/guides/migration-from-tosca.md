@@ -1,5 +1,6 @@
 ---
 title: 'From Tosca to Playwright-Praman'
+description: 'Migrate from Tricentis Tosca to Playwright + Praman for SAP Fiori and UI5 testing. Concept mapping, workflow changes, and step-by-step migration path.'
 ---
 
 A comprehensive guide for teams migrating from Tricentis Tosca to Playwright + Praman for

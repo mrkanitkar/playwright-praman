@@ -1,5 +1,6 @@
 ---
 title: 'For SAP Business Analysts'
+description: 'SAP business analysts can define test scenarios in business language. Praman AI agents generate Playwright tests for Purchase-to-Pay, Order-to-Cash, and other SAP processes.'
 ---
 
 You know SAP business processes inside out. You can walk through a Purchase-to-Pay cycle
