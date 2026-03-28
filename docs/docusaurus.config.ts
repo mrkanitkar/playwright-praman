@@ -605,8 +605,8 @@ const config: Config = {
       {
         name: 'description',
         content:
-          'Playwright SAP testing plugin for S/4HANA, Fiori, and UI5. AI agents generate end-to-end tests. ' +
-          '61 controls, OData, Fiori Elements, SAP login automation. Free open-source alternative to Tricentis & wdi5.',
+          'AI agents generate production-ready Playwright tests for SAP S/4HANA, Fiori & UI5. ' +
+          '61 controls, OData, Fiori Elements. Open-source SAP test automation plugin.',
       },
       {
         name: 'keywords',
