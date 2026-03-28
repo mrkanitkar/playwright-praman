@@ -101,6 +101,9 @@ function extractDescriptionFromMarkdown(
 
 function patchMarkdownDescription(content: string, description: string): string {
   const escaped = description.replace(/"/g, '\\"');
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const lastUpdate = `last_update:\n  date: ${today}`;
+
   if (content.startsWith('---')) {
     const endIdx = content.indexOf('---', 3);
     if (endIdx !== -1) {
@@ -110,10 +113,14 @@ function patchMarkdownDescription(content: string, description: string): string 
       } else {
         fm += `\ndescription: "${escaped}"`;
       }
+      // Add last_update if not already present
+      if (!/^last_update:/m.test(fm)) {
+        fm += `\n${lastUpdate}`;
+      }
       return `---\n${fm}\n---${content.slice(endIdx + 3)}`;
     }
   }
-  return `---\ndescription: "${escaped}"\n---\n\n${content}`;
+  return `---\ndescription: "${escaped}"\n${lastUpdate}\n---\n\n${content}`;
 }
 
 /** Checks if a description looks like garbage (signature, "Defined in", too short) */
