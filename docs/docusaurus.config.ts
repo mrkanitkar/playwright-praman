@@ -549,6 +549,13 @@ const config: Config = {
             const { defaultCreateSitemapItems, ...rest } = params;
             const items = await defaultCreateSitemapItems(rest);
 
+            // ── SEO: Ensure every URL has a lastmod (Google crawl signal) ──
+            // TypeDoc-generated API pages lack git history, so inject build date
+            const today = new Date().toISOString().split('T')[0];
+            const withLastmod = items.map((item) =>
+              item.lastmod ? item : { ...item, lastmod: today },
+            );
+
             // ── SEO: Filter out low-value pages that waste crawl budget ──
             // Blog tag/archive/author aggregation pages are near-empty
             const excludePatterns = [
@@ -558,7 +565,7 @@ const config: Config = {
               /\/blog\/archive\/?$/, // archive page
             ];
 
-            return items
+            return withLastmod
               .filter((item) => !excludePatterns.some((re) => re.test(item.url)))
               .map((item) => {
                 const url = item.url;
