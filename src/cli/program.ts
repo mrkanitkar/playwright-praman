@@ -33,6 +33,8 @@ import process from 'node:process';
 import { Command } from 'commander';
 
 import { runDoctor } from './doctor.js';
+import type { InitAgentsOptions } from './init-agents.js';
+import { isValidLoop, runInitAgents } from './init-agents.js';
 import type { InitOptions } from './init.js';
 import { runInit } from './init.js';
 import { logError } from './logger.js';
@@ -56,6 +58,9 @@ import { getVersion } from './version.js';
  * await program.parseAsync(['node', 'praman', 'init', '--force']);
  * ```
  */
+const TARGET_DIR_OPTION = '--target <dir>' as const;
+const TARGET_DIR_DESC = 'Target directory' as const;
+
 export function createProgram(): Command {
   const prog = new Command();
 
@@ -70,7 +75,7 @@ export function createProgram(): Command {
     .description('Scaffold a new Praman project')
     .option('--force', 'Overwrite existing files', false)
     .option('--skip-install', 'Skip npm install step', false)
-    .option('--target <dir>', 'Target directory', process.cwd())
+    .option(TARGET_DIR_OPTION, TARGET_DIR_DESC, process.cwd())
     .addHelpText(
       'afterAll',
       `
@@ -87,6 +92,47 @@ Examples:
           skipInstall: opts.skipInstall,
         };
         await runInit(initOpts);
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
+
+  prog
+    .command('init-agents')
+    .description('Install AI agent definitions for a specific IDE')
+    .option(
+      '--loop <ide>',
+      'IDE target (vscode|claude|cursor|jules|opencode|copilot|detect)',
+      'detect',
+    )
+    .option('--force', 'Overwrite existing agent files', false)
+    .option(TARGET_DIR_OPTION, TARGET_DIR_DESC, process.cwd())
+    .addHelpText(
+      'afterAll',
+      `
+Examples:
+  $ npx playwright-praman init-agents --loop=vscode
+  $ npx playwright-praman init-agents --loop=claude
+  $ npx playwright-praman init-agents --loop=opencode
+  $ npx playwright-praman init-agents --loop=cursor
+  $ npx playwright-praman init-agents              # auto-detect`,
+    )
+    .action(async (opts: { loop: string; force: boolean; target: string }) => {
+      try {
+        if (!isValidLoop(opts.loop)) {
+          logError(
+            `Invalid --loop value: "${opts.loop}". Valid: vscode, claude, cursor, jules, opencode, copilot, detect`,
+          );
+          process.exitCode = 1;
+          return;
+        }
+        const agentOpts: InitAgentsOptions = {
+          targetDir: opts.target,
+          loop: opts.loop,
+          force: opts.force,
+        };
+        await runInitAgents(agentOpts);
       } catch (error: unknown) {
         logError(error instanceof Error ? error.message : String(error));
         process.exitCode = 1;
@@ -118,7 +164,7 @@ Examples:
     .option('--keep-config', 'Keep config files', false)
     .option('--keep-agents', 'Keep agent files', false)
     .option('--remove-browsers', 'Also remove Playwright browsers', false)
-    .option('--target <dir>', 'Target directory', process.cwd())
+    .option(TARGET_DIR_OPTION, TARGET_DIR_DESC, process.cwd())
     .addHelpText(
       'afterAll',
       `
