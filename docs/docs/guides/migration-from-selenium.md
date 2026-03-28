@@ -1,5 +1,6 @@
 ---
 title: 'From Selenium WebDriver'
+description: 'Migrate from Selenium WebDriver to Playwright + Praman for SAP testing. Maps every Selenium concept (drivers, waits, locators, POM) to Playwright equivalents.'
 ---
 
 Migrating from Selenium WebDriver (Java, Python, C#, or JavaScript) to Playwright + Praman for

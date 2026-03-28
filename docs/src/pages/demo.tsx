@@ -117,7 +117,7 @@ function CTASection(): ReactNode {
 
 export default function Demo(): ReactNode {
   return (
-    <Layout title="Demo" description="See Praman in action — from install to evidence">
+    <Layout title="SAP Test Automation Demo — Install to Evidence in 4 Steps" description="See Praman in action: install, configure SAP S/4HANA, generate Playwright tests with AI agents, run with compliance reports and evidence.">
       <main>
         <section style={{ padding: '6rem 2rem 2rem', textAlign: 'center', maxWidth: 800, margin: '0 auto' }}>
           <p className="praman-section-label">Demo</p>

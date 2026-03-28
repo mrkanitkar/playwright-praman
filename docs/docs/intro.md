@@ -1,13 +1,14 @@
 ---
 sidebar_position: 1
 slug: /
-title: Playwright-Praman — SAP UI5 Test Automation Plugin
+title: Playwright Plugin for SAP Testing — Praman Documentation
+description: 'Complete documentation for Praman — the open-source Playwright plugin for SAP S/4HANA, Fiori, and UI5 test automation. 61 controls, OData, AI test generation, 6 auth strategies.'
 ---
 
-**Agent-First SAP UI5 Test Automation Plugin for Playwright.**
+**Open-source Playwright plugin for SAP S/4HANA, Fiori, and UI5 test automation.**
 
 Praman extends Playwright with deep SAP UI5 awareness — typed control proxies, UI5 stability
-synchronization, FLP navigation, and AI-powered test generation.
+synchronization, FLP navigation, OData testing, and AI-powered test generation.
 
 ## Get Started
 
