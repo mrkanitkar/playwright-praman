@@ -351,11 +351,7 @@ function HeroCarousel(): ReactNode {
               <div className="praman-carousel-content">
                 <div className="praman-carousel-text">
                   <span className="praman-carousel-badge">{s.badge}</span>
-                  {i === 0 ? (
-                    <h1 className="praman-carousel-title">{s.title}</h1>
-                  ) : (
-                    <h2 className="praman-carousel-title">{s.title}</h2>
-                  )}
+                  <h2 className="praman-carousel-title">{s.title}</h2>
                   <p className="praman-carousel-subtitle">{s.subtitle}</p>
                   <div className="praman-pills">
                     {s.tags.map((tag, j) => (
