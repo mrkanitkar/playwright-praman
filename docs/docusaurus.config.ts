@@ -568,6 +568,9 @@ const config: Config = {
                 if (/\/(docs|architecture|features|personas|blog)\/?$/.test(url)) {
                   return { ...item, priority: 0.9, changefreq: 'weekly' };
                 }
+                if (/\/(demo|example-reports)\/?$/.test(url)) {
+                  return { ...item, priority: 0.7, changefreq: 'weekly' };
+                }
                 if (
                   /\/docs\/guides\/(getting-started|configuration|fixtures|selectors|authentication|agent-setup)\/?$/.test(
                     url,
@@ -587,6 +590,10 @@ const config: Config = {
                 }
                 if (/\/docs\/api\//.test(url)) {
                   return { ...item, priority: 0.3 };
+                }
+                // Legal/boilerplate pages — lowest priority
+                if (/\/(code-of-conduct|disclaimer|license|notice|contributing)\/?$/.test(url)) {
+                  return { ...item, priority: 0.1 };
                 }
                 return item;
               });
