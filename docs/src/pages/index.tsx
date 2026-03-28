@@ -242,8 +242,8 @@ const SLIDES: CarouselSlide[] = [
   {
     id: 'agentic',
     badge: 'Open Source · Agentic-First',
-    title: 'Transform your SAP to S/4HANA with Quality, not hope.',
-    subtitle: 'Autonomous agentic testing for SAP S/4HANA. Built on Playwright. Powered by AI.',
+    title: 'SAP Test Automation with Playwright — Powered by AI Agents',
+    subtitle: 'End-to-end testing for SAP S/4HANA, Fiori Launchpad, and UI5 apps. Open source, flake-free, CI-ready.',
     tags: ['Your Environment', 'Any Agent', 'Any LLM'],
     primaryCta: { label: 'Get Started', to: '/docs' },
     secondaryCta: { label: 'API Reference', to: '/docs/api' },
@@ -272,8 +272,8 @@ const SLIDES: CarouselSlide[] = [
   {
     id: 'playwright',
     badge: 'Playwright Native',
-    title: 'Playwright speed. SAP precision. Zero compromise.',
-    subtitle: 'Extends @playwright/test with SAP-specific selectors, auth, and UI5-aware interactions. Parallel execution, auto-wait, trace viewer — unchanged.',
+    title: 'Playwright speed. SAP-native locators. Zero compromise.',
+    subtitle: 'Extends @playwright/test with SAP UI5 locators, SAP login automation, and codegen. Parallel execution, auto-wait, trace viewer — unchanged.',
     tags: ['Greenfield', 'Brownfield', 'Bluefield'],
     primaryCta: { label: 'Get Started', to: '/docs' },
     secondaryCta: { label: 'Documentation', to: '/docs' },
@@ -292,8 +292,8 @@ const SLIDES: CarouselSlide[] = [
   {
     id: 'enterprise',
     badge: 'Enterprise Ready',
-    title: 'Deploy with evidence, not hope.',
-    subtitle: 'OpenTelemetry tracing, pino structured logging, compliance reporters, defect video, SBOM, and CodeQL security scanning. CISO-approved from day one.',
+    title: 'Free &amp; open-source SAP testing. No vendor lock-in.',
+    subtitle: 'OpenTelemetry tracing, compliance reporters, defect video, SBOM, CodeQL scanning. CISO-approved alternative to Tricentis, Worksoft, and Tosca.',
     tags: ['CISO-Approved', 'Cross-Platform', 'Zero Lock-in'],
     primaryCta: { label: 'Get Started', to: '/docs' },
     secondaryCta: { label: 'Contributing', to: '/contributing' },
@@ -332,11 +332,11 @@ function HeroCarousel(): ReactNode {
       {/* Persistent H1 — always visible to crawlers and users */}
       <div className="praman-hero-persistent">
         <h1 className="praman-hero-h1">
-          Playwright-Praman — Agent-First SAP UI5 Test Automation Plugin for Playwright
+          Playwright SAP Testing Plugin — AI-Powered Test Automation for SAP S/4HANA, Fiori &amp; UI5
         </h1>
         <p className="praman-hero-tagline">
-          Enterprise Playwright plugin for SAP S/4HANA test automation. 61 UI5 controls, 21
-          fixtures, 199 typed interfaces, 4,092 methods. Free and open source.
+          Open-source Playwright plugin for SAP end-to-end testing. AI agents generate production-ready scripts.
+          61 UI5 controls, OData, Fiori Elements, SAP login automation. Free alternative to Tricentis &amp; wdi5.
         </p>
       </div>
       <div className="praman-carousel-inner">
@@ -425,7 +425,9 @@ function GlanceSection(): ReactNode {
         <div className="praman-info-card">
           <h4>What is Praman Plugin?</h4>
           <p>
-            Enterprise Playwright plugin for SAP S/4HANA. Describe your business process — AI agents deliver production-ready test scripts.
+            Open-source Playwright plugin for SAP S/4HANA end-to-end testing and automation.
+            Describe your business process — AI agents deliver production-ready test scripts.
+            Free alternative to Tricentis Tosca, Worksoft, and SAP CBTA with zero vendor lock-in.
           </p>
         </div>
         <div className="praman-info-card">
@@ -434,9 +436,10 @@ function GlanceSection(): ReactNode {
             <li><strong>SAP RISE &amp; Public Cloud migration</strong> — validate every Fiori app before and after cutover</li>
             <li><strong>Frequent upgrade cycles</strong> — quarterly UI5 patches, feature packs, and S/4HANA updates need continuous regression</li>
             <li><strong>No documentation</strong> — AI agents discover controls from your live system, no specs required</li>
-            <li><strong>Cost reduction</strong> — replace manual test scripting with autonomous agent-generated tests</li>
+            <li><strong>Cost reduction</strong> — free open-source alternative to Tricentis, Worksoft, and paid SAP testing tools</li>
             <li><strong>Agentic automation</strong> — build a complete plan → generate → heal pipeline with zero human scripting</li>
             <li><strong>Greenfield, brownfield, or bluefield</strong> — one plugin covers every S/4HANA deployment model</li>
+            <li><strong>Fiori Launchpad &amp; WebGUI</strong> — SAP-native locators for UI5, Fiori Elements, and SAP GUI for HTML</li>
           </ul>
         </div>
         <div className="praman-info-card">
@@ -915,8 +918,8 @@ function CTA(): ReactNode {
 export default function Home(): ReactNode {
   return (
     <Layout
-      title="Playwright-Praman — SAP UI5 Test Automation Plugin"
-      description="Praman — Agent-First SAP UI5 Test Automation Plugin for Playwright. Enterprise-grade testing with agentic AI, typed proxies, and 32+ fixtures."
+      title="Playwright SAP Testing Plugin — AI-Powered SAP S/4HANA Test Automation"
+      description="Open-source Playwright plugin for SAP testing. AI agents generate end-to-end tests for S/4HANA, Fiori, UI5. Free alternative to Tricentis &amp; wdi5. 61 controls, OData, SAP login automation."
     >
       <main>
         <HeroCarousel />
