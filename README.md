@@ -67,6 +67,18 @@ npx playwright-praman init
 
 That's it. `init` validates your environment, installs Chromium, scaffolds all config files, prompts for SAP credentials, detects your IDE, and installs AI agent definitions — everything is ready to go.
 
+### Install Agents for a Specific IDE
+
+Already have a project? Install only agent definitions — mirrors Playwright's `init-agents`:
+
+```bash
+npx playwright-praman init-agents --loop=vscode
+npx playwright-praman init-agents --loop=claude
+npx playwright-praman init-agents --loop=cursor
+```
+
+See the full [Agent & IDE Setup](https://praman.dev/docs/guides/agent-setup) guide for all options.
+
 ### Generate Tests with AI Agents
 
 Describe your business process — Praman's **plan → generate → heal** pipeline does the rest:
@@ -326,14 +338,6 @@ Both access the UI5 control registry. Praman is built on Playwright (faster, par
 while wdi5 uses WebdriverIO. Praman adds typed control proxies with IntelliSense,
 AI-powered test generation, Fiori Elements page-object helpers,
 OData V2/V4 mock/intercept utilities, and 10 UI5-specific Playwright matchers.
-
-### How does Praman compare to Playwright-SAP?
-
-Both extend Playwright for SAP testing. Praman provides 61 typed UI5 control proxies with
-IntelliSense, AI-powered test generation via coding agents, OData V2/V4 testing utilities,
-Fiori Elements page-object helpers, 6 SAP auth strategies, and 10 custom matchers.
-Playwright-SAP provides SAP-aware locators (`getByRoleUI5`, `locateSID`) and auto-login helpers.
-Praman is a deeper plugin with typed fixtures and AI; Playwright-SAP is a lighter locator extension.
 
 ## Support
 

@@ -103,6 +103,42 @@ After `init`, append the Praman section to your `.github/copilot-instructions.md
 cat node_modules/playwright-praman/docs/user-integration/copilot-instructions-appendable.md >> .github/copilot-instructions.md
 ```
 
+## Install Agents Only (`init-agents`)
+
+If you already have a Praman project and just need to install or update agent definitions
+for a specific IDE, use `init-agents` instead of the full `init`:
+
+```bash
+npx playwright-praman init-agents --loop=vscode
+npx playwright-praman init-agents --loop=claude
+npx playwright-praman init-agents --loop=opencode
+npx playwright-praman init-agents --loop=cursor
+npx playwright-praman init-agents --loop=jules
+npx playwright-praman init-agents --loop=copilot
+```
+
+This mirrors Playwright's own `npx playwright init-agents --loop=<ide>` command.
+
+| Flag             | Description                                                                                  |
+| ---------------- | -------------------------------------------------------------------------------------------- |
+| `--loop=<ide>`   | Target IDE: `vscode`, `claude`, `cursor`, `jules`, `opencode`, `copilot`, or `detect` (auto) |
+| `--force`        | Overwrite existing agent files                                                               |
+| `--target <dir>` | Target directory (default: current directory)                                                |
+
+**What it does:**
+
+- Installs only agent definitions, seed files, skills, and prompts for the specified IDE
+- Skips environment validation, npm install, and config scaffolding
+- Safe to re-run — skips existing files unless `--force` is used
+- Auto-detects IDEs when no `--loop` is specified
+
+**When to use `init-agents` instead of `init`:**
+
+- You switched IDEs (e.g., started using Claude Code after initial setup)
+- You want to add agents for a second IDE without re-scaffolding
+- After a Praman upgrade, to get updated agent definitions
+- In CI/CD pipelines that only need agent files
+
 ## Re-running on an Existing Project
 
 `init` can be run in an existing project. When the project directory already exists,
