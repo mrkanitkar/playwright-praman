@@ -12,6 +12,8 @@
 [![Repomix](https://img.shields.io/badge/Repomix-context-blue?logo=github)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml)
 [![Socket Badge](https://badge.socket.dev/npm/package/playwright-praman)](https://socket.dev/npm/package/playwright-praman)
 [![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20Agent-First%20SAP%20UI5%20Test%20Automation%20Plugin%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fpraman.dev%2Fllms-full.txt%0A%0AMy%20question%3A%20)
+[![npm trends](https://img.shields.io/npm/dm/playwright-praman?label=monthly%20downloads)](https://npmtrends.com/playwright-praman-vs-playwright-sap-vs-wdio-ui5-service)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/playwright-praman)](https://bundlephobia.com/package/playwright-praman)
 
 ## What is Praman?
 
@@ -282,6 +284,15 @@ for decision matrices, fallback chain diagrams, and recommended configurations b
 | LLM-friendly docs             | [llms.txt](https://praman.dev/llms.txt)                                                            |
 | Repomix context (AI agents)   | [Download artifact](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml) |
 
+## Migrating to Praman
+
+Already using another SAP testing tool? Step-by-step migration guides:
+
+- [**From wdi5**](https://praman.dev/docs/guides/migration-from-wdi5) — API mapping from `browser.asControl()` to `ui5.control()`, selector conversion, fixture equivalents
+- [**From Tricentis Tosca**](https://praman.dev/docs/guides/migration-from-tosca) — module-to-fixture mapping, open-source cost comparison
+- [**From Selenium WebDriver**](https://praman.dev/docs/guides/migration-from-selenium) — WebDriver to Playwright patterns, locator strategy migration
+- [**From raw Playwright**](https://praman.dev/docs/guides/migration-from-playwright) — add UI5 awareness to existing Playwright tests
+
 ## Frequently Asked Questions
 
 ### What SAP systems does Praman support?
@@ -311,9 +322,22 @@ The generated tests use typed control proxies — not brittle selectors.
 
 ### How does Praman compare to wdi5?
 
-Both access the UI5 control registry. Praman adds typed control proxies with IntelliSense,
+Both access the UI5 control registry. Praman is built on Playwright (faster, parallel, modern tooling),
+while wdi5 uses WebdriverIO. Praman adds typed control proxies with IntelliSense,
 AI-powered test generation, Fiori Elements page-object helpers,
-OData mock/intercept utilities, and 10 UI5-specific Playwright matchers.
+OData V2/V4 mock/intercept utilities, and 10 UI5-specific Playwright matchers.
+
+### How does Praman compare to Playwright-SAP?
+
+Both extend Playwright for SAP testing. Praman provides 61 typed UI5 control proxies with
+IntelliSense, AI-powered test generation via coding agents, OData V2/V4 testing utilities,
+Fiori Elements page-object helpers, 6 SAP auth strategies, and 10 custom matchers.
+Playwright-SAP provides SAP-aware locators (`getByRoleUI5`, `locateSID`) and auto-login helpers.
+Praman is a deeper plugin with typed fixtures and AI; Playwright-SAP is a lighter locator extension.
+
+## Support
+
+If Praman saves you time, please [star the repo](https://github.com/mrkanitkar/playwright-praman) — it helps others discover the project.
 
 ## Security
 
