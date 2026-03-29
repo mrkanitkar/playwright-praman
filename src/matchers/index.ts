@@ -27,3 +27,13 @@ export {
 export type { MatcherOptions, MatcherResult } from './ui5-matchers.js';
 export type { MatcherPage, UI5BindingInfo } from './matcher-utils.js';
 export { checkUI5CellText, checkUI5RowCount, checkUI5SelectedRows } from './table-matchers.js';
+
+// ── Custom matcher registration API ──────────────────────────────────
+export {
+  createUI5Matcher,
+  getRegisteredMatcherCount,
+  getRegisteredMatchers,
+  isMatcherRegistryFrozen,
+  registerUI5Matcher,
+} from './matcher-registry.js';
+export type { MatcherCheckFn, MatcherRegistryEntry, UI5MatcherFn } from './matcher-registry.js';

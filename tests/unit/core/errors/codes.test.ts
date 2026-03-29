@@ -125,8 +125,8 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 60 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(60);
+  it('has exactly 65 error codes', () => {
+    expect(Object.keys(ErrorCode)).toHaveLength(65);
   });
 
   // ── Immutability test ────────────────────────────────────────────────
@@ -174,6 +174,7 @@ describe('ErrorCode', () => {
     expectTypeOf<'ERR_BRIDGE_TIMEOUT'>().toExtend<ErrorCodePattern>();
     expectTypeOf<'ERR_AI_LLM_CALL_FAILED'>().toExtend<ErrorCodePattern>();
     expectTypeOf<'ERR_FLP_SHELL_NOT_FOUND'>().toExtend<ErrorCodePattern>();
+    expectTypeOf<'ERR_MATCHER_DUPLICATE'>().toExtend<ErrorCodePattern>();
   });
 
   it('ErrorCodePattern rejects invalid formats', () => {

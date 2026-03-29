@@ -43,7 +43,9 @@ export interface PluginErrorOptions extends Omit<PramanErrorOptions, 'code' | 'r
   readonly code?:
     | typeof ErrorCode.ERR_PLUGIN_LOAD
     | typeof ErrorCode.ERR_PLUGIN_INIT
-    | typeof ErrorCode.ERR_PLUGIN_INCOMPATIBLE;
+    | typeof ErrorCode.ERR_PLUGIN_INCOMPATIBLE
+    | typeof ErrorCode.ERR_PLUGIN_EXTENSION_DUPLICATE
+    | typeof ErrorCode.ERR_PLUGIN_EXTENSION_INVALID;
   readonly retryable?: boolean;
   readonly pluginName: string;
   readonly pluginVersion?: string;

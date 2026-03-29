@@ -15,8 +15,13 @@
  * This file provides the type signatures so `expect(control).toHaveUI5Text('Save')`
  * compiles without TypeScript errors.
  *
+ * To add type declarations for custom matchers registered via
+ * `registerUI5Matcher()`, create a `.d.ts` file in your project with
+ * a matching module augmentation:
+ *
  * @example
  * ```typescript
+ * // Built-in matcher usage:
  * import { test, expect } from 'playwright-praman';
  *
  * test('verify button text', async ({ ui5 }) => {
@@ -25,6 +30,16 @@
  *   await expect(btn).toBeUI5Enabled();
  *   await expect(btn).toHaveUI5Property('type', 'Emphasized');
  * });
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Custom matcher type augmentation (e.g., in custom-matchers.d.ts):
+ * declare module '@playwright/test' {
+ *   interface Matchers<R> {
+ *     toHaveUI5Icon(expected: string, options?: { timeout?: number }): Promise<R>;
+ *   }
+ * }
  * ```
  *
  * @module matchers

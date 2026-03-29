@@ -112,6 +112,8 @@ export const ErrorCode = Object.freeze({
   ERR_PLUGIN_LOAD: 'ERR_PLUGIN_LOAD',
   ERR_PLUGIN_INIT: 'ERR_PLUGIN_INIT',
   ERR_PLUGIN_INCOMPATIBLE: 'ERR_PLUGIN_INCOMPATIBLE',
+  ERR_PLUGIN_EXTENSION_DUPLICATE: 'ERR_PLUGIN_EXTENSION_DUPLICATE',
+  ERR_PLUGIN_EXTENSION_INVALID: 'ERR_PLUGIN_EXTENSION_INVALID',
 
   // ── Vocabulary errors ──────────────────────────────────────────────
   ERR_VOCAB_TERM_NOT_FOUND: 'ERR_VOCAB_TERM_NOT_FOUND',
@@ -131,6 +133,11 @@ export const ErrorCode = Object.freeze({
   ERR_FLP_API_UNAVAILABLE: 'ERR_FLP_API_UNAVAILABLE',
   ERR_FLP_INVALID_USER: 'ERR_FLP_INVALID_USER',
   ERR_FLP_OPERATION_TIMEOUT: 'ERR_FLP_OPERATION_TIMEOUT',
+
+  // ── Matcher errors ──────────────────────────────────────────────────
+  ERR_MATCHER_DUPLICATE: 'ERR_MATCHER_DUPLICATE',
+  ERR_MATCHER_INVALID: 'ERR_MATCHER_INVALID',
+  ERR_MATCHER_FROZEN: 'ERR_MATCHER_FROZEN',
 } as const);
 
 /**
@@ -167,7 +174,8 @@ export type ErrorCategory =
   | 'PLUGIN'
   | 'VOCAB'
   | 'INTENT'
-  | 'FLP';
+  | 'FLP'
+  | 'MATCHER';
 
 /**
  * Template literal type enforcing the `ERR_<CATEGORY>_<REASON>` format.
