@@ -92,6 +92,8 @@ Describe your business process — Praman's **plan → generate → heal** pipel
 
 The result is a **production-ready `.spec.ts` file** — no manual scripting required. Works with Claude Code, GitHub Copilot, Cursor, and Jules.
 
+Agents connect to your live SAP system via **seed files** (`tests/seeds/sap-seed.spec.ts`) — these handle authentication and keep the browser open so agents can discover UI5 controls at runtime.
+
 Need agents for a different IDE? Mirrors Playwright's `init-agents`:
 
 ```bash
