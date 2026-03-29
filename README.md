@@ -129,6 +129,20 @@ test('open Fiori app', async ({ page, ui5 }) => {
 npx playwright test --project=chromium --headed
 ```
 
+Destructure any fixture you need:
+
+| Fixture         | What it gives you                                  |
+| --------------- | -------------------------------------------------- |
+| `ui5`           | Control discovery, interaction, `waitForUI5()`     |
+| `ui5Navigation` | FLP tile/intent navigation, `navigateToApp()`      |
+| `sapAuth`       | SAP login with 6 auth strategies                   |
+| `fe`            | Fiori Elements helpers (List Report, Object Page)  |
+| `ui5.table`     | Table rows, cells, sort, filter, export            |
+| `ui5.dialog`    | Dialog open/close, confirm/dismiss                 |
+| `ui5.odata`     | OData model access, `waitForODataLoad()`           |
+| `pramanAI`      | AI agent integration for test generation           |
+| `intent`        | SAP domain actions (create PO, post invoice, etc.) |
+
 > See the [Fixture Reference](https://praman.dev/docs/guides/fixtures) and [Selector Reference](https://praman.dev/docs/guides/selectors) for the full API.
 
 ## Example
