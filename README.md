@@ -65,7 +65,35 @@ npm install playwright-praman
 npx playwright-praman init
 ```
 
-That's it. `init` validates your environment, installs Chromium, scaffolds all config files, prompts for SAP credentials, detects your IDE, and installs AI agent definitions — everything is ready to go.
+That's it. `init` validates your environment, installs Chromium, scaffolds all config files, detects your IDE, and installs AI agent definitions.
+
+### Run Your First Test
+
+```bash
+# Set your SAP credentials
+cp .env.example .env
+# Edit .env with your SAP_CLOUD_BASE_URL, SAP_CLOUD_USERNAME, SAP_CLOUD_PASSWORD
+
+# Run in headed mode to watch it
+npx playwright test --project=chromium --headed
+```
+
+Or write a test manually:
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('open Fiori Launchpad', async ({ page, ui5 }) => {
+  await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
+  await ui5.waitForUI5();
+
+  const tile = await ui5.control({
+    controlType: 'sap.m.GenericTile',
+    properties: { header: 'My App' },
+  });
+  expect(await tile.getControlType()).toBe('sap.m.GenericTile');
+});
+```
 
 ### Install Agents for a Specific IDE
 
