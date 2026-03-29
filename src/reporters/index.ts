@@ -41,3 +41,12 @@ export type {
   ODataTraceReport,
   ODataTraceReporterOptions,
 } from './odata-trace-reporter.js';
+
+// ── Control Tree Reporter ───────────────────────────────────────────────────
+
+export { ControlTreeReporter } from './control-tree-reporter.js';
+export type {
+  ControlTreeReport,
+  ControlTreeReporterOptions,
+  ControlTreeTestEntry,
+} from './control-tree-reporter.js';

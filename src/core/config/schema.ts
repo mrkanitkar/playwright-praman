@@ -115,6 +115,19 @@ export type InteractionStrategyName = z.infer<typeof interactionStrategyEnum>;
  */
 export type DiscoveryStrategyName = z.infer<typeof discoveryStrategyEnum>;
 
+// ── OData tracing sub-schema ─────────────────────────────────────────
+const odataTracingSchema = z.object({
+  enabled: z.boolean().default(false),
+  urlPatterns: z.array(z.string()).default([]),
+});
+
+// ── Control tree capture sub-schema ──────────────────────────────────
+const controlTreeCaptureSchema = z.object({
+  enabled: z.boolean().default(true),
+  maxDepth: z.number().int().positive().default(10),
+  maxControls: z.number().int().positive().default(5_000),
+});
+
 // ── OPA5 sub-schema (D7) ────────────────────────────────────────────
 const opa5Schema = z.object({
   interactionTimeout: z.number().int().positive().default(5_000),
@@ -155,6 +168,8 @@ export const PramanConfigSchema = z
     telemetry: telemetrySchema.optional(),
     selectors: selectorsSchema.optional(),
     opa5: opa5Schema.optional(),
+    odataTracing: odataTracingSchema.optional(),
+    controlTreeCapture: controlTreeCaptureSchema.optional(),
   })
   .strict();
 

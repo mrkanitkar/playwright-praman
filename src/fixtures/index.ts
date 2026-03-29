@@ -35,12 +35,14 @@ import { expect, mergeTests } from '@playwright/test';
 
 import { aiTest } from './ai-fixtures.js';
 import { authTest } from './auth-fixtures.js';
+import { controlTreeTest } from './control-tree-fixtures.js';
 import { feTest } from './fe-fixtures.js';
 import { flpLocksTest } from './flp-locks-fixtures.js';
 import { flpSettingsTest } from './flp-settings-fixtures.js';
 import { intentTest } from './intent-fixtures.js';
 import { moduleTest } from './module-fixtures.js';
 import { navTest } from './nav-fixtures.js';
+import { odataTraceTest } from './odata-trace-fixtures.js';
 import { shellFooterTest } from './shell-footer-fixtures.js';
 import { stabilityTest } from './stability-fixtures.js';
 import { testDataTest } from './test-data-fixtures.js';
@@ -71,6 +73,7 @@ export const test = mergeTests(
   authTest,
   navTest,
   stabilityTest,
+  controlTreeTest,
   feTest,
   aiTest,
   intentTest,
@@ -78,6 +81,7 @@ export const test = mergeTests(
   flpLocksTest,
   flpSettingsTest,
   testDataTest,
+  odataTraceTest,
 );
 
 export { expect };
@@ -118,3 +122,9 @@ export type { FLPSettingsFixtures } from './flp-settings-fixtures.js';
 
 export { testDataTest } from './test-data-fixtures.js';
 export type { TestDataFixtures } from './test-data-fixtures.js';
+
+export { odataTraceTest } from './odata-trace-fixtures.js';
+export type { ODataTraceFixtures } from './odata-trace-fixtures.js';
+
+export { controlTreeTest } from './control-tree-fixtures.js';
+export type { ControlTreeFixtures } from './control-tree-fixtures.js';

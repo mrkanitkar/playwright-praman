@@ -509,6 +509,47 @@ while wdi5 uses WebdriverIO. Praman adds typed control proxies with IntelliSense
 AI-powered test generation, Fiori Elements page-object helpers,
 OData V2/V4 mock/intercept utilities, and 10 UI5-specific Playwright matchers.
 
+## OData Performance Tracing
+
+Praman can automatically capture OData network requests during test execution and produce a performance report — no manual instrumentation needed.
+
+### Enable tracing
+
+```typescript
+// praman.config.ts
+import { defineConfig } from 'playwright-praman';
+
+export default defineConfig({
+  odataTracing: { enabled: true },
+});
+```
+
+### Add the reporter
+
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [['list'], ['playwright-praman/reporters', { outputDir: 'test-results' }]],
+});
+```
+
+The reporter writes `odata-trace.json` with per-entity-set stats (total calls, avg/max duration, error count, method breakdown) and individual request traces.
+
+### Custom URL patterns
+
+By default, Praman matches `/sap/opu/odata/`, `/sap/opu/odata4/`, `/odata/v2/`, and `/odata/v4/`. Add custom patterns for non-standard service paths:
+
+```typescript
+odataTracing: {
+  enabled: true,
+  urlPatterns: ['/my-custom-service/'],
+},
+```
+
+> **Note:** Auto-tracing captures browser-level traffic (XHR/fetch from the SAP Fiori app). Node-level `page.request.*` API calls are not intercepted.
+
 ## Error Codes Quick Reference
 
 Every Praman error includes a machine-readable `code`, human-readable `message`, `attempted` action, `retryable` flag, and `suggestions[]` array. 14 error classes, 67 error codes.

@@ -57,20 +57,22 @@ function createMockPage(value?: unknown): MatcherPage {
  * @returns A MatcherCheckFn.
  */
 function createSimpleCheck(returnPass: boolean): MatcherCheckFn<[string]> {
-  // eslint-disable-next-line @typescript-eslint/require-await -- Sync mock returning a result object
   return async (
     _page,
     controlId,
     expected,
-  ): Promise<{ pass: boolean; message: () => string; actual: unknown; expected: unknown }> => ({
-    pass: returnPass,
-    message: () =>
-      returnPass
-        ? `Expected '${controlId}' not to match '${expected}'`
-        : `Expected '${controlId}' to match '${expected}'`,
-    actual: returnPass ? expected : 'other',
-    expected,
-  });
+  ): Promise<{ pass: boolean; message: () => string; actual: unknown; expected: unknown }> => {
+    await Promise.resolve();
+    return {
+      pass: returnPass,
+      message: () =>
+        returnPass
+          ? `Expected '${controlId}' not to match '${expected}'`
+          : `Expected '${controlId}' to match '${expected}'`,
+      actual: returnPass ? expected : 'other',
+      expected,
+    };
+  };
 }
 
 describe('matcher-registry', () => {

@@ -36,7 +36,7 @@
  * - Control (9): not found, visibility, enabled, interactable, not ui5, property, aggregation, method, interaction failed
  * - Auth (4): failure, timeout, session expired, invalid strategy
  * - Navigation (3): tile not found, route failed, timeout
- * - OData (3): request failed, parse, CSRF token
+ * - OData (4): request failed, parse, CSRF token, trace
  * - Selector (3): invalid, ambiguous, parse
  * - Timeout (3): UI5 stability, control discovery, generic operation
  * - AI (11): provider unavailable, invalid response, token limit, rate limited, not configured, llm call failed, response parse failed, context build failed, step interpret failed, invalid request, capability not found
@@ -84,6 +84,7 @@ export const ErrorCode = Object.freeze({
   ERR_ODATA_REQUEST_FAILED: 'ERR_ODATA_REQUEST_FAILED',
   ERR_ODATA_PARSE: 'ERR_ODATA_PARSE',
   ERR_ODATA_CSRF: 'ERR_ODATA_CSRF',
+  ERR_ODATA_TRACE: 'ERR_ODATA_TRACE',
 
   // ── Selector errors ────────────────────────────────────────────────
   ERR_SELECTOR_INVALID: 'ERR_SELECTOR_INVALID',
