@@ -50,6 +50,7 @@ import { expect, test as base } from '@playwright/test';
 import type { Frame } from '@playwright/test';
 import type { Logger } from 'pino';
 
+import { getRegisteredMatchers } from '../matchers/matcher-registry.js';
 import {
   checkUI5CellText,
   checkUI5RowCount,
@@ -221,6 +222,7 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
   matcherRegistration: [
     // eslint-disable-next-line no-empty-pattern -- Playwright fixture pattern: ({}, use) is required when no deps
     async ({}, use) => {
+      // Built-in matchers
       expect.extend({
         toHaveUI5Text: checkUI5Text,
         toBeUI5Visible: checkUI5Visible,
@@ -233,6 +235,13 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
         toHaveUI5Binding: checkUI5Binding,
         toBeUI5ControlType: checkUI5ControlType,
       });
+
+      // User-registered custom matchers (freezes the registry)
+      const customMatchers = getRegisteredMatchers();
+      if (Object.keys(customMatchers).length > 0) {
+        expect.extend(customMatchers);
+      }
+
       await use();
     },
     { scope: 'worker', auto: true },

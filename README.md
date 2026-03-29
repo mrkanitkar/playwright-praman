@@ -317,16 +317,137 @@ PRAMAN_DISCOVERY_STRATEGIES=direct-id,recordreplay,registry npx playwright test
 See the full [Discovery & Interaction Strategies](https://praman.dev/docs/guides/discovery-and-interaction) guide
 for decision matrices, fallback chain diagrams, and recommended configurations by app type.
 
+## Vocabulary System
+
+Use the vocabulary system when your tests need to reference SAP fields
+by **business name** instead of hard-coded selectors.
+The vocabulary resolves natural-language terms like "vendor", "supplier",
+or "LIFNR" to the correct UI5 selector — with fuzzy matching,
+synonym resolution, and cross-domain search across 6 SAP modules.
+
+**When to use:** AI agents generating tests from business descriptions,
+tests that must survive field-label changes across SAP upgrades,
+or any scenario where you want selector resolution decoupled from test logic.
+
+```typescript
+import { createVocabularyService } from 'playwright-praman/vocabulary';
+import type { VocabularyService, SAPDomain } from 'playwright-praman/vocabulary';
+
+const vocabulary: VocabularyService = createVocabularyService();
+await vocabulary.loadDomain('procurement');
+
+// Search by business term — returns ranked results with confidence scores
+const results = await vocabulary.search('vendor');
+// → [{ term: 'supplier', confidence: 0.9, domain: 'procurement', sapField: 'LIFNR', selector: {...} }]
+
+// Resolve a term directly to a UI5 selector (returns undefined if ambiguous)
+const selector = await vocabulary.getFieldSelector('supplier', 'procurement');
+
+// Autocomplete for AI agent prompts
+const suggestions = await vocabulary.getSuggestions('ven', 5);
+// → ['vendor', 'vendor invoice', 'vendor master']
+```
+
+### Bundled SAP Domains
+
+| Domain          | SAP Module | Coverage                                |
+| --------------- | ---------- | --------------------------------------- |
+| `procurement`   | MM         | Vendors, purchase orders, goods receipt |
+| `sales`         | SD         | Customers, sales orders, deliveries     |
+| `finance`       | FI         | GL accounts, AP invoices, AR payments   |
+| `manufacturing` | PP         | Production orders, BOMs, routings       |
+| `warehouse`     | WM/EWM     | Storage locations, picking, transfers   |
+| `quality`       | QM         | Inspection lots, results, certificates  |
+
+> Guide: [Vocabulary System](https://praman.dev/docs/guides/vocabulary-system) · [Vocabulary Discovery Examples](https://praman.dev/docs/examples/vocabulary-discovery)
+
+## Intent API
+
+Use the intent API when you want to express test steps as **business operations**
+rather than individual control interactions. Instead of filling 5 fields and
+clicking Save, call `intent.procurement.createPurchaseOrder(data)` — the intent
+handles navigation, field filling, vocabulary resolution, confirmation,
+and save validation.
+
+**When to use:** AI-generated tests, cross-module business flows, tests that
+should read like requirements documents, or when you need structured result
+metadata (duration, steps executed, SAP module) for reporting.
+
+### Via Fixture (recommended)
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('create purchase order', async ({ intent }) => {
+  const result = await intent.procurement.createPurchaseOrder({
+    vendor: '100001',
+    material: 'MAT-001',
+    quantity: 10,
+    plant: '1000',
+  });
+
+  expect(result.status).toBe('success');
+  expect(result.metadata.sapModule).toBe('MM');
+  expect(result.metadata.stepsExecuted).toContain('save');
+});
+```
+
+### Core Wrappers (building blocks)
+
+Core wrappers are the low-level functions that domain intents compose. Use them directly when you need fine-grained control or are building a custom domain flow:
+
+| Wrapper             | Purpose                                              |
+| ------------------- | ---------------------------------------------------- |
+| `fillField`         | Fill input with vocabulary term resolution           |
+| `clickButton`       | Click button by text label                           |
+| `selectOption`      | Select dropdown option with vocabulary lookup        |
+| `assertField`       | Assert field value matches expected text             |
+| `navigateAndSearch` | FLP navigation + vocabulary-driven search            |
+| `confirmAndWait`    | Click OK/Confirm and wait for UI5 stability          |
+| `waitForSave`       | Wait for save completion (replaces `waitForTimeout`) |
+
+### Domain Namespaces
+
+| Namespace       | SAP Module | Operations                                            |
+| --------------- | ---------- | ----------------------------------------------------- |
+| `procurement`   | MM         | Create/search PO, goods receipt, invoice verification |
+| `sales`         | SD         | Create/search SO, delivery, billing                   |
+| `finance`       | FI         | Journal entry, vendor invoice, payment, GL posting    |
+| `manufacturing` | PP         | Production order, confirmation, BOM maintenance       |
+| `masterData`    | Cross      | Vendor, customer, material master create/search       |
+
+### IntentResult Envelope
+
+Every intent function returns an `IntentResult<T>` with status, error details, and execution metadata — designed for both human reporting and AI agent self-healing:
+
+```typescript
+interface IntentResult<T = void> {
+  readonly status: 'success' | 'error' | 'partial';
+  readonly data?: T;
+  readonly error?: { readonly code: string; readonly message: string };
+  readonly metadata: {
+    readonly duration: number;
+    readonly retryable: boolean;
+    readonly suggestions: string[];
+    readonly intentName: string;
+    readonly sapModule: string;
+    readonly stepsExecuted: string[];
+  };
+}
+```
+
+> Guide: [Intent API](https://praman.dev/docs/guides/intent-api) · [Intent Examples](https://praman.dev/docs/examples/intent-api)
+
 ## Sub-path Exports
 
-| Export                         | Description                      |
-| ------------------------------ | -------------------------------- |
-| `playwright-praman`            | Core fixtures, proxy, bridge     |
-| `playwright-praman/ai`         | AI/LLM service, agentic handler  |
-| `playwright-praman/intents`    | Intent wrappers, registries      |
-| `playwright-praman/vocabulary` | SAP vocabulary, control mappings |
-| `playwright-praman/fe`         | SAP Fiori Elements helpers       |
-| `playwright-praman/reporters`  | Custom Playwright reporters      |
+| Export                         | Description                                                                  |
+| ------------------------------ | ---------------------------------------------------------------------------- |
+| `playwright-praman`            | Core fixtures (`ui5`, `ui5Navigation`, `sapAuth`, `fe`), typed proxy, bridge |
+| `playwright-praman/ai`         | AI/LLM service for agentic test generation and self-healing                  |
+| `playwright-praman/intents`    | Business-level SAP operations — core wrappers + 5 domain namespaces          |
+| `playwright-praman/vocabulary` | SAP business term → UI5 selector resolution with fuzzy matching (6 domains)  |
+| `playwright-praman/fe`         | Fiori Elements page-object helpers (List Report, Object Page, Overview Page) |
+| `playwright-praman/reporters`  | Custom Playwright reporters for compliance evidence and OData trace          |
 
 ## Documentation
 
@@ -338,6 +459,8 @@ for decision matrices, fallback chain diagrams, and recommended configurations b
 | Authentication (6 strategies) | [Authentication](https://praman.dev/docs/guides/authentication)                                    |
 | Agent & IDE setup             | [Agent Setup](https://praman.dev/docs/guides/agent-setup)                                          |
 | Fixtures reference            | [Fixtures](https://praman.dev/docs/guides/fixtures)                                                |
+| Vocabulary system             | [Vocabulary](https://praman.dev/docs/guides/vocabulary-system)                                     |
+| Intent API                    | [Intents](https://praman.dev/docs/guides/intent-api)                                               |
 | Error codes (67)              | [Errors](https://praman.dev/docs/guides/errors)                                                    |
 | API reference                 | [API Docs](https://praman.dev/docs/api/)                                                           |
 | LLM-friendly docs             | [llms.txt](https://praman.dev/llms.txt)                                                            |

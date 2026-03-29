@@ -109,6 +109,8 @@ import { createInteractionStrategy } from '#bridge/interaction-strategies/strate
 import { createLogger } from '#core/logging/index.js';
 import { withStep } from '#core/utils/step-decorator.js';
 import { waitForUI5Stable } from '#core/utils/wait-helpers.js';
+import { getExtensions } from '#extensions/extension-registry.js';
+import type { ExtensionContext } from '#extensions/extension-types.js';
 
 /**
  * Creates the table sub-namespace fixture object.
@@ -362,6 +364,14 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       date: withStability(createDateFixture(page as never), guard, 'date'),
       odata: withStability(createODataFixture(page as never), guard, 'odata'),
     }) as ExtendedUI5Handler;
+
+    // Apply registered custom extensions as sub-namespaces
+    const extensionContext: ExtensionContext = { page, handler, config: pramanConfig };
+    for (const ext of getExtensions()) {
+      const methods = ext.factory(extensionContext);
+      const wrapped = withStability(methods, guard, ext.name);
+      Object.assign(extended, { [ext.name]: wrapped });
+    }
 
     try {
       await use(extended);

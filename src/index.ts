@@ -235,5 +235,17 @@ export {
 } from './modules/odata-http.js';
 export type { ODataHttpOptions, ODataHttpResult, ODataQueryOptions } from './modules/odata-http.js';
 
+// ── Custom Matcher Registration ─────────────────────────────────────
+export { createUI5Matcher, registerUI5Matcher } from './matchers/index.js';
+export type { MatcherCheckFn, MatcherResult, UI5MatcherFn } from './matchers/index.js';
+
+// ── Matcher Utilities (for custom matcher authors) ──────────────────
+export { getControlProperty, getControlAggregation } from './matchers/matcher-utils.js';
+export type { MatcherPage } from './matchers/matcher-utils.js';
+
+// ── Extensions ───────────────────────────────────────────────────────
+export { extendUI5Handler } from './extensions/index.js';
+export type { ExtensionContext, ExtensionFactory } from './extensions/index.js';
+
 // ── Version ──────────────────────────────────────────────────────────
 export { PACKAGE_NAME, VERSION } from './version.js';
