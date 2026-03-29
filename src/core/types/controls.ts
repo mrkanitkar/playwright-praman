@@ -15,7 +15,7 @@
  *   npx tsx scripts/generate-typed-proxies.ts
  *
  * Source: SAP UI5 API (v1.136.0)
- * Generated: 2026-02-17
+ * Generated: 2026-03-29
  * Controls: 199
  *
  * All control methods return `Promise<T>` — resolved via bridge adapter.
@@ -38,7 +38,7 @@
  * async function logControl(control: UI5ControlBase): Promise<void> {
  *   const id = await control.getId();
  *   const type = await control.getControlType();
- *   logger.info(`${type}#${id}`);
+ *   console.log(`${type}#${id}`);
  * }
  * ```
  */
@@ -73,39 +73,17 @@ export interface UI5ControlBase {
   isBound(propertyName: string): Promise<boolean>;
   /** Returns the named model, or the default model if no name given. */
   getModel(name?: string): Promise<unknown>;
-
-  /**
-   * Dynamic method access — the proxy forwards any UI5 method call to the bridge.
-   *
-   * @remarks
-   * UI5 controls have hundreds of methods (getters, setters, actions) that vary
-   * by control type. The runtime Proxy intercepts property access and routes it
-   * through `page.evaluate()`. This index signature allows TypeScript to accept
-   * any method call without requiring explicit type narrowing.
-   *
-   * `any` is required here because the Proxy returns heterogeneous types per
-   * property: `string` for id/controlType, `undefined` for anti-thenable,
-   * and `(...args) => Promise` for dynamic methods. No single non-`any` type
-   * can express this while remaining compatible with the typed members above.
-   *
-   * @example
-   * ```typescript
-   * const button = await ui5.control({ id: 'btn1' });
-   * await button.press();           // sap.m.Button method
-   * await button.getText();         // sap.m.Button method
-   * const table = await ui5.control({ id: 'tbl1' });
-   * const rows = await table.getRows();  // sap.ui.table.Table method
-   * ```
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Proxy returns heterogeneous types per property
-  [method: string]: any;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
 // sap.m
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.m.Button */
+/**
+ * Typed proxy interface for `sap.m.Button` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Button | sap.m.Button API Reference}
+ */
 export interface UI5Button extends UI5ControlBase {
   readonly controlType: 'sap.m.Button';
   getActiveIcon(): Promise<string>;
@@ -127,7 +105,11 @@ export interface UI5Button extends UI5ControlBase {
   press(): Promise<void>;
 }
 
-/** sap.m.Input */
+/**
+ * Typed proxy interface for `sap.m.Input` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Input | sap.m.Input API Reference}
+ */
 export interface UI5Input extends UI5ControlBase {
   readonly controlType: 'sap.m.Input';
   cancelPendingSuggest(): Promise<void>;
@@ -192,7 +174,11 @@ export interface UI5Input extends UI5ControlBase {
   updateSuggestionItems(): Promise<void>;
 }
 
-/** sap.m.CheckBox */
+/**
+ * Typed proxy interface for `sap.m.CheckBox` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.CheckBox | sap.m.CheckBox API Reference}
+ */
 export interface UI5CheckBox extends UI5ControlBase {
   readonly controlType: 'sap.m.CheckBox';
   getActiveHandling(): Promise<boolean>;
@@ -225,7 +211,11 @@ export interface UI5CheckBox extends UI5ControlBase {
   setWrapping(bWrapping: boolean): Promise<void>;
 }
 
-/** sap.m.RadioButton */
+/**
+ * Typed proxy interface for `sap.m.RadioButton` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.RadioButton | sap.m.RadioButton API Reference}
+ */
 export interface UI5RadioButton extends UI5ControlBase {
   readonly controlType: 'sap.m.RadioButton';
   getActiveHandling(): Promise<boolean>;
@@ -254,7 +244,11 @@ export interface UI5RadioButton extends UI5ControlBase {
   setWrappingType(sWrappingType: string): Promise<void>;
 }
 
-/** sap.m.ComboBox */
+/**
+ * Typed proxy interface for `sap.m.ComboBox` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ComboBox | sap.m.ComboBox API Reference}
+ */
 export interface UI5ComboBox extends UI5ControlBase {
   readonly controlType: 'sap.m.ComboBox';
   getFilterSecondaryValues(): Promise<boolean>;
@@ -267,7 +261,11 @@ export interface UI5ComboBox extends UI5ControlBase {
   setSelectedKey(sKey: string): Promise<void>;
 }
 
-/** sap.m.MultiComboBox */
+/**
+ * Typed proxy interface for `sap.m.MultiComboBox` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MultiComboBox | sap.m.MultiComboBox API Reference}
+ */
 export interface UI5MultiComboBox extends UI5ControlBase {
   readonly controlType: 'sap.m.MultiComboBox';
   getSelectedItems(): Promise<readonly UI5ControlBase[]>;
@@ -279,7 +277,11 @@ export interface UI5MultiComboBox extends UI5ControlBase {
   setShowSelectAll(bShowSelectAll: boolean): Promise<void>;
 }
 
-/** sap.m.Select */
+/**
+ * Typed proxy interface for `sap.m.Select` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Select | sap.m.Select API Reference}
+ */
 export interface UI5Select extends UI5ControlBase {
   readonly controlType: 'sap.m.Select';
   close(): Promise<void>;
@@ -335,7 +337,11 @@ export interface UI5Select extends UI5ControlBase {
   setWrapItemsText(bWrap: boolean): Promise<void>;
 }
 
-/** sap.m.TextArea */
+/**
+ * Typed proxy interface for `sap.m.TextArea` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.TextArea | sap.m.TextArea API Reference}
+ */
 export interface UI5TextArea extends UI5ControlBase {
   readonly controlType: 'sap.m.TextArea';
   getCols(): Promise<number>;
@@ -358,7 +364,11 @@ export interface UI5TextArea extends UI5ControlBase {
   setWrapping(sWrapping: string): Promise<void>;
 }
 
-/** sap.m.DatePicker */
+/**
+ * Typed proxy interface for `sap.m.DatePicker` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.DatePicker | sap.m.DatePicker API Reference}
+ */
 export interface UI5DatePicker extends UI5ControlBase {
   readonly controlType: 'sap.m.DatePicker';
   getCalendarWeekNumbering(): Promise<unknown>;
@@ -391,7 +401,11 @@ export interface UI5DatePicker extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.DateTimePicker */
+/**
+ * Typed proxy interface for `sap.m.DateTimePicker` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.DateTimePicker | sap.m.DateTimePicker API Reference}
+ */
 export interface UI5DateTimePicker extends UI5ControlBase {
   readonly controlType: 'sap.m.DateTimePicker';
   getDateValue(): Promise<unknown>;
@@ -410,7 +424,11 @@ export interface UI5DateTimePicker extends UI5ControlBase {
   setTimezone(sTimezone: string): Promise<void>;
 }
 
-/** sap.m.SearchField */
+/**
+ * Typed proxy interface for `sap.m.SearchField` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SearchField | sap.m.SearchField API Reference}
+ */
 export interface UI5SearchField extends UI5ControlBase {
   readonly controlType: 'sap.m.SearchField';
   getEnabled(): Promise<boolean>;
@@ -433,7 +451,11 @@ export interface UI5SearchField extends UI5ControlBase {
   suggest(bShow?: boolean): Promise<void>;
 }
 
-/** sap.m.MultiInput */
+/**
+ * Typed proxy interface for `sap.m.MultiInput` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MultiInput | sap.m.MultiInput API Reference}
+ */
 export interface UI5MultiInput extends UI5ControlBase {
   readonly controlType: 'sap.m.MultiInput';
   getMaxTokens(): Promise<number>;
@@ -446,7 +468,11 @@ export interface UI5MultiInput extends UI5ControlBase {
   setTokens(aTokens: readonly UI5ControlBase[]): Promise<void>;
 }
 
-/** sap.m.Switch */
+/**
+ * Typed proxy interface for `sap.m.Switch` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Switch | sap.m.Switch API Reference}
+ */
 export interface UI5Switch extends UI5ControlBase {
   readonly controlType: 'sap.m.Switch';
   getCustomTextOff(): Promise<string>;
@@ -463,7 +489,11 @@ export interface UI5Switch extends UI5ControlBase {
   setType(sType: string): Promise<void>;
 }
 
-/** sap.m.StepInput */
+/**
+ * Typed proxy interface for `sap.m.StepInput` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.StepInput | sap.m.StepInput API Reference}
+ */
 export interface UI5StepInput extends UI5ControlBase {
   readonly controlType: 'sap.m.StepInput';
   getDescription(): Promise<string>;
@@ -503,7 +533,11 @@ export interface UI5StepInput extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.SegmentedButton */
+/**
+ * Typed proxy interface for `sap.m.SegmentedButton` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SegmentedButton | sap.m.SegmentedButton API Reference}
+ */
 export interface UI5SegmentedButton extends UI5ControlBase {
   readonly controlType: 'sap.m.SegmentedButton';
   createButton(
@@ -524,7 +558,11 @@ export interface UI5SegmentedButton extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.Slider */
+/**
+ * Typed proxy interface for `sap.m.Slider` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Slider | sap.m.Slider API Reference}
+ */
 export interface UI5Slider extends UI5ControlBase {
   readonly controlType: 'sap.m.Slider';
   getCustomTooltips(): Promise<readonly UI5ControlBase[]>;
@@ -558,7 +596,11 @@ export interface UI5Slider extends UI5ControlBase {
   stepUp(iStep?: number): Promise<void>;
 }
 
-/** sap.m.ToggleButton */
+/**
+ * Typed proxy interface for `sap.m.ToggleButton` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ToggleButton | sap.m.ToggleButton API Reference}
+ */
 export interface UI5ToggleButton extends UI5ControlBase {
   readonly controlType: 'sap.m.ToggleButton';
   getPressed(): Promise<boolean>;
@@ -566,7 +608,11 @@ export interface UI5ToggleButton extends UI5ControlBase {
   press(): Promise<void>;
 }
 
-/** sap.m.MenuButton */
+/**
+ * Typed proxy interface for `sap.m.MenuButton` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MenuButton | sap.m.MenuButton API Reference}
+ */
 export interface UI5MenuButton extends UI5ControlBase {
   readonly controlType: 'sap.m.MenuButton';
   getActiveIcon(): Promise<string>;
@@ -591,13 +637,21 @@ export interface UI5MenuButton extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.SplitButton */
+/**
+ * Typed proxy interface for `sap.m.SplitButton` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SplitButton | sap.m.SplitButton API Reference}
+ */
 export interface UI5SplitButton extends UI5ControlBase {
   readonly controlType: 'sap.m.SplitButton';
   setArrowState(bIsDown: boolean): Promise<void>;
 }
 
-/** sap.m.TimePicker */
+/**
+ * Typed proxy interface for `sap.m.TimePicker` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.TimePicker | sap.m.TimePicker API Reference}
+ */
 export interface UI5TimePicker extends UI5ControlBase {
   readonly controlType: 'sap.m.TimePicker';
   getDateValue(): Promise<unknown>;
@@ -631,7 +685,11 @@ export interface UI5TimePicker extends UI5ControlBase {
   setSupport2400(bSupport2400: boolean): Promise<void>;
 }
 
-/** sap.m.RangeSlider */
+/**
+ * Typed proxy interface for `sap.m.RangeSlider` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.RangeSlider | sap.m.RangeSlider API Reference}
+ */
 export interface UI5RangeSlider extends UI5ControlBase {
   readonly controlType: 'sap.m.RangeSlider';
   getRange(): Promise<readonly number[]>;
@@ -640,7 +698,11 @@ export interface UI5RangeSlider extends UI5ControlBase {
   setValue2(fValue2: number): Promise<void>;
 }
 
-/** sap.m.Token */
+/**
+ * Typed proxy interface for `sap.m.Token` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Token | sap.m.Token API Reference}
+ */
 export interface UI5Token extends UI5ControlBase {
   readonly controlType: 'sap.m.Token';
   getEditable(): Promise<boolean>;
@@ -653,7 +715,11 @@ export interface UI5Token extends UI5ControlBase {
   setText(sText: string): Promise<void>;
 }
 
-/** sap.m.MaskInput */
+/**
+ * Typed proxy interface for `sap.m.MaskInput` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MaskInput | sap.m.MaskInput API Reference}
+ */
 export interface UI5MaskInput extends UI5ControlBase {
   readonly controlType: 'sap.m.MaskInput';
   getMask(): Promise<string>;
@@ -665,7 +731,11 @@ export interface UI5MaskInput extends UI5ControlBase {
   setShowClearIcon(bShowClearIcon: boolean): Promise<void>;
 }
 
-/** sap.m.upload.UploadSet */
+/**
+ * Typed proxy interface for `sap.m.upload.UploadSet` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.upload.UploadSet | sap.m.upload.UploadSet API Reference}
+ */
 export interface UI5UploadSet extends UI5ControlBase {
   readonly controlType: 'sap.m.upload.UploadSet';
   getCloudFilePickerButtonText(): Promise<string>;
@@ -730,7 +800,11 @@ export interface UI5UploadSet extends UI5ControlBase {
   uploadItem(): Promise<void>;
 }
 
-/** sap.m.RadioButtonGroup */
+/**
+ * Typed proxy interface for `sap.m.RadioButtonGroup` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.RadioButtonGroup | sap.m.RadioButtonGroup API Reference}
+ */
 export interface UI5RadioButtonGroup extends UI5ControlBase {
   readonly controlType: 'sap.m.RadioButtonGroup';
   getButtons(): Promise<readonly UI5ControlBase[]>;
@@ -751,7 +825,11 @@ export interface UI5RadioButtonGroup extends UI5ControlBase {
   updateButtons(): Promise<void>;
 }
 
-/** sap.m.Text */
+/**
+ * Typed proxy interface for `sap.m.Text` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Text | sap.m.Text API Reference}
+ */
 export interface UI5Text extends UI5ControlBase {
   readonly controlType: 'sap.m.Text';
   getEmptyIndicatorMode(): Promise<string>;
@@ -773,7 +851,11 @@ export interface UI5Text extends UI5ControlBase {
   setWrappingType(sWrappingType: string): Promise<void>;
 }
 
-/** sap.m.Label */
+/**
+ * Typed proxy interface for `sap.m.Label` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Label | sap.m.Label API Reference}
+ */
 export interface UI5Label extends UI5ControlBase {
   readonly controlType: 'sap.m.Label';
   getDesign(): Promise<string>;
@@ -802,7 +884,11 @@ export interface UI5Label extends UI5ControlBase {
   setWrappingType(sWrappingType: string): Promise<void>;
 }
 
-/** sap.m.Title */
+/**
+ * Typed proxy interface for `sap.m.Title` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Title | sap.m.Title API Reference}
+ */
 export interface UI5Title extends UI5ControlBase {
   readonly controlType: 'sap.m.Title';
   getContent(): Promise<UI5ControlBase | null>;
@@ -825,7 +911,11 @@ export interface UI5Title extends UI5ControlBase {
   setWrappingType(sWrappingType: string): Promise<void>;
 }
 
-/** sap.m.Link */
+/**
+ * Typed proxy interface for `sap.m.Link` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Link | sap.m.Link API Reference}
+ */
 export interface UI5Link extends UI5ControlBase {
   readonly controlType: 'sap.m.Link';
   getEmphasized(): Promise<boolean>;
@@ -862,7 +952,11 @@ export interface UI5Link extends UI5ControlBase {
   press(): Promise<void>;
 }
 
-/** sap.m.Image */
+/**
+ * Typed proxy interface for `sap.m.Image` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Image | sap.m.Image API Reference}
+ */
 export interface UI5Image extends UI5ControlBase {
   readonly controlType: 'sap.m.Image';
   getActiveSrc(): Promise<string>;
@@ -896,7 +990,11 @@ export interface UI5Image extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.FormattedText */
+/**
+ * Typed proxy interface for `sap.m.FormattedText` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.FormattedText | sap.m.FormattedText API Reference}
+ */
 export interface UI5FormattedText extends UI5ControlBase {
   readonly controlType: 'sap.m.FormattedText';
   getControls(): Promise<readonly UI5ControlBase[]>;
@@ -916,7 +1014,11 @@ export interface UI5FormattedText extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.Avatar */
+/**
+ * Typed proxy interface for `sap.m.Avatar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Avatar | sap.m.Avatar API Reference}
+ */
 export interface UI5Avatar extends UI5ControlBase {
   readonly controlType: 'sap.m.Avatar';
   getActive(): Promise<boolean>;
@@ -957,7 +1059,11 @@ export interface UI5Avatar extends UI5ControlBase {
   setSrc(sSrc: string): Promise<void>;
 }
 
-/** sap.m.ObjectStatus */
+/**
+ * Typed proxy interface for `sap.m.ObjectStatus` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ObjectStatus | sap.m.ObjectStatus API Reference}
+ */
 export interface UI5ObjectStatus extends UI5ControlBase {
   readonly controlType: 'sap.m.ObjectStatus';
   getActive(): Promise<boolean>;
@@ -980,7 +1086,11 @@ export interface UI5ObjectStatus extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.ObjectNumber */
+/**
+ * Typed proxy interface for `sap.m.ObjectNumber` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ObjectNumber | sap.m.ObjectNumber API Reference}
+ */
 export interface UI5ObjectNumber extends UI5ControlBase {
   readonly controlType: 'sap.m.ObjectNumber';
   getActive(): Promise<boolean>;
@@ -1003,7 +1113,11 @@ export interface UI5ObjectNumber extends UI5ControlBase {
   setUnit(sUnit: string): Promise<void>;
 }
 
-/** sap.m.ProgressIndicator */
+/**
+ * Typed proxy interface for `sap.m.ProgressIndicator` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ProgressIndicator | sap.m.ProgressIndicator API Reference}
+ */
 export interface UI5ProgressIndicator extends UI5ControlBase {
   readonly controlType: 'sap.m.ProgressIndicator';
   getDisplayAnimation(): Promise<boolean>;
@@ -1024,7 +1138,11 @@ export interface UI5ProgressIndicator extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.RatingIndicator */
+/**
+ * Typed proxy interface for `sap.m.RatingIndicator` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.RatingIndicator | sap.m.RatingIndicator API Reference}
+ */
 export interface UI5RatingIndicator extends UI5ControlBase {
   readonly controlType: 'sap.m.RatingIndicator';
   getDisplayOnly(): Promise<boolean>;
@@ -1051,7 +1169,11 @@ export interface UI5RatingIndicator extends UI5ControlBase {
   setVisualMode(sVisualMode: string): Promise<void>;
 }
 
-/** sap.m.BusyIndicator */
+/**
+ * Typed proxy interface for `sap.m.BusyIndicator` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.BusyIndicator | sap.m.BusyIndicator API Reference}
+ */
 export interface UI5BusyIndicator extends UI5ControlBase {
   readonly controlType: 'sap.m.BusyIndicator';
   getCustomIcon(): Promise<string>;
@@ -1070,7 +1192,11 @@ export interface UI5BusyIndicator extends UI5ControlBase {
   setText(sText: string): Promise<void>;
 }
 
-/** sap.m.MessageStrip */
+/**
+ * Typed proxy interface for `sap.m.MessageStrip` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MessageStrip | sap.m.MessageStrip API Reference}
+ */
 export interface UI5MessageStrip extends UI5ControlBase {
   readonly controlType: 'sap.m.MessageStrip';
   close(): Promise<void>;
@@ -1091,7 +1217,11 @@ export interface UI5MessageStrip extends UI5ControlBase {
   setType(sType: unknown): Promise<void>;
 }
 
-/** sap.m.GenericTile */
+/**
+ * Typed proxy interface for `sap.m.GenericTile` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.GenericTile | sap.m.GenericTile API Reference}
+ */
 export interface UI5GenericTile extends UI5ControlBase {
   readonly controlType: 'sap.m.GenericTile';
   getActionButtons(): Promise<readonly UI5ControlBase[]>;
@@ -1160,7 +1290,11 @@ export interface UI5GenericTile extends UI5ControlBase {
   press(): Promise<void>;
 }
 
-/** sap.m.NumericContent */
+/**
+ * Typed proxy interface for `sap.m.NumericContent` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.NumericContent | sap.m.NumericContent API Reference}
+ */
 export interface UI5NumericContent extends UI5ControlBase {
   readonly controlType: 'sap.m.NumericContent';
   getAdaptiveFontSize(): Promise<boolean>;
@@ -1193,7 +1327,11 @@ export interface UI5NumericContent extends UI5ControlBase {
   setWithMargin(bWithMargin: boolean): Promise<void>;
 }
 
-/** sap.m.FeedListItem */
+/**
+ * Typed proxy interface for `sap.m.FeedListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.FeedListItem | sap.m.FeedListItem API Reference}
+ */
 export interface UI5FeedListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.FeedListItem';
   getActions(): Promise<readonly UI5ControlBase[]>;
@@ -1236,7 +1374,11 @@ export interface UI5FeedListItem extends UI5ControlBase {
   setType(type: string): Promise<void>;
 }
 
-/** sap.m.ObjectIdentifier */
+/**
+ * Typed proxy interface for `sap.m.ObjectIdentifier` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ObjectIdentifier | sap.m.ObjectIdentifier API Reference}
+ */
 export interface UI5ObjectIdentifier extends UI5ControlBase {
   readonly controlType: 'sap.m.ObjectIdentifier';
   getEmptyIndicatorMode(): Promise<string>;
@@ -1251,7 +1393,11 @@ export interface UI5ObjectIdentifier extends UI5ControlBase {
   setTitleActive(bValue: boolean): Promise<void>;
 }
 
-/** sap.m.ObjectAttribute */
+/**
+ * Typed proxy interface for `sap.m.ObjectAttribute` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ObjectAttribute | sap.m.ObjectAttribute API Reference}
+ */
 export interface UI5ObjectAttribute extends UI5ControlBase {
   readonly controlType: 'sap.m.ObjectAttribute';
   getActive(): Promise<boolean>;
@@ -1266,14 +1412,22 @@ export interface UI5ObjectAttribute extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.List */
+/**
+ * Typed proxy interface for `sap.m.List` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.List | sap.m.List API Reference}
+ */
 export interface UI5List extends UI5ControlBase {
   readonly controlType: 'sap.m.List';
   getBackgroundDesign(): Promise<string>;
   setBackgroundDesign(sBackgroundDesign: string): Promise<void>;
 }
 
-/** sap.m.Table */
+/**
+ * Typed proxy interface for `sap.m.Table` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Table | sap.m.Table API Reference}
+ */
 export interface UI5Table extends UI5ControlBase {
   readonly controlType: 'sap.m.Table';
   focus(oFocusInfo?: unknown): Promise<void>;
@@ -1296,7 +1450,11 @@ export interface UI5Table extends UI5ControlBase {
   setShowOverlay(bShowOverlay: boolean): Promise<void>;
 }
 
-/** sap.m.ColumnListItem */
+/**
+ * Typed proxy interface for `sap.m.ColumnListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ColumnListItem | sap.m.ColumnListItem API Reference}
+ */
 export interface UI5ColumnListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.ColumnListItem';
   getCells(): Promise<readonly UI5ControlBase[]>;
@@ -1304,7 +1462,11 @@ export interface UI5ColumnListItem extends UI5ControlBase {
   setVAlign(sVAlign: string): Promise<void>;
 }
 
-/** sap.m.StandardListItem */
+/**
+ * Typed proxy interface for `sap.m.StandardListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.StandardListItem | sap.m.StandardListItem API Reference}
+ */
 export interface UI5StandardListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.StandardListItem';
   getActiveIcon(): Promise<string>;
@@ -1337,7 +1499,11 @@ export interface UI5StandardListItem extends UI5ControlBase {
   setWrapping(bWrapping: boolean): Promise<void>;
 }
 
-/** sap.m.ObjectListItem */
+/**
+ * Typed proxy interface for `sap.m.ObjectListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ObjectListItem | sap.m.ObjectListItem API Reference}
+ */
 export interface UI5ObjectListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.ObjectListItem';
   getActiveIcon(): Promise<string>;
@@ -1368,7 +1534,11 @@ export interface UI5ObjectListItem extends UI5ControlBase {
   setTitleTextDirection(sTitleTextDirection: string): Promise<void>;
 }
 
-/** sap.m.Tree */
+/**
+ * Typed proxy interface for `sap.m.Tree` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Tree | sap.m.Tree API Reference}
+ */
 export interface UI5Tree extends UI5ControlBase {
   readonly controlType: 'sap.m.Tree';
   collapse(vParam: number | readonly number[]): Promise<void>;
@@ -1377,7 +1547,11 @@ export interface UI5Tree extends UI5ControlBase {
   expandToLevel(iLevel: number): Promise<void>;
 }
 
-/** sap.m.SelectList */
+/**
+ * Typed proxy interface for `sap.m.SelectList` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SelectList | sap.m.SelectList API Reference}
+ */
 export interface UI5SelectList extends UI5ControlBase {
   readonly controlType: 'sap.m.SelectList';
   getEnabled(): Promise<boolean>;
@@ -1402,7 +1576,11 @@ export interface UI5SelectList extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.ListBase */
+/**
+ * Typed proxy interface for `sap.m.ListBase` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ListBase | sap.m.ListBase API Reference}
+ */
 export interface UI5ListBase extends UI5ControlBase {
   readonly controlType: 'sap.m.ListBase';
   getContextMenu(): Promise<UI5ControlBase | null>;
@@ -1479,7 +1657,11 @@ export interface UI5ListBase extends UI5ControlBase {
   swipeOut(): Promise<void>;
 }
 
-/** sap.m.Dialog */
+/**
+ * Typed proxy interface for `sap.m.Dialog` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Dialog | sap.m.Dialog API Reference}
+ */
 export interface UI5Dialog extends UI5ControlBase {
   readonly controlType: 'sap.m.Dialog';
   getBeginButton(): Promise<UI5ControlBase | null>;
@@ -1531,7 +1713,11 @@ export interface UI5Dialog extends UI5ControlBase {
   close(): Promise<void>;
 }
 
-/** sap.m.Popover */
+/**
+ * Typed proxy interface for `sap.m.Popover` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Popover | sap.m.Popover API Reference}
+ */
 export interface UI5Popover extends UI5ControlBase {
   readonly controlType: 'sap.m.Popover';
   getBeginButton(): Promise<UI5ControlBase | null>;
@@ -1580,7 +1766,11 @@ export interface UI5Popover extends UI5ControlBase {
   close(): Promise<void>;
 }
 
-/** sap.m.ResponsivePopover */
+/**
+ * Typed proxy interface for `sap.m.ResponsivePopover` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ResponsivePopover | sap.m.ResponsivePopover API Reference}
+ */
 export interface UI5ResponsivePopover extends UI5ControlBase {
   readonly controlType: 'sap.m.ResponsivePopover';
   getBeginButton(): Promise<UI5ControlBase | null>;
@@ -1631,7 +1821,11 @@ export interface UI5ResponsivePopover extends UI5ControlBase {
   close(): Promise<void>;
 }
 
-/** sap.m.MessagePopover */
+/**
+ * Typed proxy interface for `sap.m.MessagePopover` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MessagePopover | sap.m.MessagePopover API Reference}
+ */
 export interface UI5MessagePopover extends UI5ControlBase {
   readonly controlType: 'sap.m.MessagePopover';
   close(): Promise<void>;
@@ -1654,7 +1848,11 @@ export interface UI5MessagePopover extends UI5ControlBase {
   isOpen(): Promise<boolean>;
 }
 
-/** sap.m.ActionSheet */
+/**
+ * Typed proxy interface for `sap.m.ActionSheet` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ActionSheet | sap.m.ActionSheet API Reference}
+ */
 export interface UI5ActionSheet extends UI5ControlBase {
   readonly controlType: 'sap.m.ActionSheet';
   close(): Promise<void>;
@@ -1671,7 +1869,11 @@ export interface UI5ActionSheet extends UI5ControlBase {
   isOpen(): Promise<boolean>;
 }
 
-/** sap.m.ViewSettingsDialog */
+/**
+ * Typed proxy interface for `sap.m.ViewSettingsDialog` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ViewSettingsDialog | sap.m.ViewSettingsDialog API Reference}
+ */
 export interface UI5ViewSettingsDialog extends UI5ControlBase {
   readonly controlType: 'sap.m.ViewSettingsDialog';
   clearFilters(): Promise<void>;
@@ -1704,7 +1906,11 @@ export interface UI5ViewSettingsDialog extends UI5ControlBase {
   setTitleAlignment(sTitleAlignment: string): Promise<void>;
 }
 
-/** sap.m.IconTabBar */
+/**
+ * Typed proxy interface for `sap.m.IconTabBar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.IconTabBar | sap.m.IconTabBar API Reference}
+ */
 export interface UI5IconTabBar extends UI5ControlBase {
   readonly controlType: 'sap.m.IconTabBar';
   getApplyContentPadding(): Promise<boolean>;
@@ -1739,7 +1945,11 @@ export interface UI5IconTabBar extends UI5ControlBase {
   setUpperCase(bUpperCase: boolean): Promise<void>;
 }
 
-/** sap.m.IconTabFilter */
+/**
+ * Typed proxy interface for `sap.m.IconTabFilter` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.IconTabFilter | sap.m.IconTabFilter API Reference}
+ */
 export interface UI5IconTabFilter extends UI5ControlBase {
   readonly controlType: 'sap.m.IconTabFilter';
   getContent(): Promise<readonly UI5ControlBase[]>;
@@ -1758,7 +1968,11 @@ export interface UI5IconTabFilter extends UI5ControlBase {
   setShowAll(bShowAll: boolean): Promise<void>;
 }
 
-/** sap.m.TabContainer */
+/**
+ * Typed proxy interface for `sap.m.TabContainer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.TabContainer | sap.m.TabContainer API Reference}
+ */
 export interface UI5TabContainer extends UI5ControlBase {
   readonly controlType: 'sap.m.TabContainer';
   getAddButton(): Promise<UI5ControlBase>;
@@ -1772,7 +1986,11 @@ export interface UI5TabContainer extends UI5ControlBase {
   setShowAddNewButton(bShowAddNewButton: boolean): Promise<void>;
 }
 
-/** sap.m.Breadcrumbs */
+/**
+ * Typed proxy interface for `sap.m.Breadcrumbs` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Breadcrumbs | sap.m.Breadcrumbs API Reference}
+ */
 export interface UI5Breadcrumbs extends UI5ControlBase {
   readonly controlType: 'sap.m.Breadcrumbs';
   getCurrentLocation(): Promise<UI5ControlBase | null>;
@@ -1784,7 +2002,11 @@ export interface UI5Breadcrumbs extends UI5ControlBase {
   setSeparatorStyle(sSeparatorStyle: string): Promise<void>;
 }
 
-/** sap.m.OverflowToolbar */
+/**
+ * Typed proxy interface for `sap.m.OverflowToolbar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.OverflowToolbar | sap.m.OverflowToolbar API Reference}
+ */
 export interface UI5OverflowToolbar extends UI5ControlBase {
   readonly controlType: 'sap.m.OverflowToolbar';
   closeOverflow(): Promise<void>;
@@ -1792,7 +2014,11 @@ export interface UI5OverflowToolbar extends UI5ControlBase {
   setAsyncMode(bValue: boolean): Promise<void>;
 }
 
-/** sap.m.Toolbar */
+/**
+ * Typed proxy interface for `sap.m.Toolbar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Toolbar | sap.m.Toolbar API Reference}
+ */
 export interface UI5Toolbar extends UI5ControlBase {
   readonly controlType: 'sap.m.Toolbar';
   getActive(): Promise<boolean>;
@@ -1810,7 +2036,11 @@ export interface UI5Toolbar extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.Bar */
+/**
+ * Typed proxy interface for `sap.m.Bar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Bar | sap.m.Bar API Reference}
+ */
 export interface UI5Bar extends UI5ControlBase {
   readonly controlType: 'sap.m.Bar';
   getContentLeft(): Promise<readonly UI5ControlBase[]>;
@@ -1822,7 +2052,11 @@ export interface UI5Bar extends UI5ControlBase {
   setTitleAlignment(sTitleAlignment: string): Promise<void>;
 }
 
-/** sap.m.Wizard */
+/**
+ * Typed proxy interface for `sap.m.Wizard` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Wizard | sap.m.Wizard API Reference}
+ */
 export interface UI5Wizard extends UI5ControlBase {
   readonly controlType: 'sap.m.Wizard';
   discardProgress(oStep: UI5ControlBase, bPreserveNextStep: boolean): Promise<void>;
@@ -1853,7 +2087,11 @@ export interface UI5Wizard extends UI5ControlBase {
   validateStep(oStep: UI5ControlBase): Promise<void>;
 }
 
-/** sap.m.WizardStep */
+/**
+ * Typed proxy interface for `sap.m.WizardStep` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.WizardStep | sap.m.WizardStep API Reference}
+ */
 export interface UI5WizardStep extends UI5ControlBase {
   readonly controlType: 'sap.m.WizardStep';
   getContent(): Promise<readonly UI5ControlBase[]>;
@@ -1870,7 +2108,11 @@ export interface UI5WizardStep extends UI5ControlBase {
   setValidated(bValidated: boolean): Promise<void>;
 }
 
-/** sap.m.Menu */
+/**
+ * Typed proxy interface for `sap.m.Menu` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Menu | sap.m.Menu API Reference}
+ */
 export interface UI5Menu extends UI5ControlBase {
   readonly controlType: 'sap.m.Menu';
   close(): Promise<void>;
@@ -1889,7 +2131,11 @@ export interface UI5Menu extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.MenuItem */
+/**
+ * Typed proxy interface for `sap.m.MenuItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MenuItem | sap.m.MenuItem API Reference}
+ */
 export interface UI5MenuItem extends UI5ControlBase {
   readonly controlType: 'sap.m.MenuItem';
   getEndContent(): Promise<readonly UI5ControlBase[]>;
@@ -1903,7 +2149,11 @@ export interface UI5MenuItem extends UI5ControlBase {
   setStartsSection(bStartsSection: boolean): Promise<void>;
 }
 
-/** sap.m.Page */
+/**
+ * Typed proxy interface for `sap.m.Page` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Page | sap.m.Page API Reference}
+ */
 export interface UI5Page extends UI5ControlBase {
   readonly controlType: 'sap.m.Page';
   getBackgroundDesign(): Promise<string>;
@@ -1948,7 +2198,11 @@ export interface UI5Page extends UI5ControlBase {
   setTitleLevel(sTitleLevel: string): Promise<void>;
 }
 
-/** sap.m.Panel */
+/**
+ * Typed proxy interface for `sap.m.Panel` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Panel | sap.m.Panel API Reference}
+ */
 export interface UI5Panel extends UI5ControlBase {
   readonly controlType: 'sap.m.Panel';
   getBackgroundDesign(): Promise<string>;
@@ -1974,7 +2228,11 @@ export interface UI5Panel extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.ScrollContainer */
+/**
+ * Typed proxy interface for `sap.m.ScrollContainer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ScrollContainer | sap.m.ScrollContainer API Reference}
+ */
 export interface UI5ScrollContainer extends UI5ControlBase {
   readonly controlType: 'sap.m.ScrollContainer';
   getContent(): Promise<readonly UI5ControlBase[]>;
@@ -1992,7 +2250,11 @@ export interface UI5ScrollContainer extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.FlexBox */
+/**
+ * Typed proxy interface for `sap.m.FlexBox` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.FlexBox | sap.m.FlexBox API Reference}
+ */
 export interface UI5FlexBox extends UI5ControlBase {
   readonly controlType: 'sap.m.FlexBox';
   getAlignContent(): Promise<string>;
@@ -2026,19 +2288,31 @@ export interface UI5FlexBox extends UI5ControlBase {
   setWrap(sWrap: string): Promise<void>;
 }
 
-/** sap.m.HBox */
+/**
+ * Typed proxy interface for `sap.m.HBox` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.HBox | sap.m.HBox API Reference}
+ */
 export interface UI5HBox extends UI5ControlBase {
   readonly controlType: 'sap.m.HBox';
 }
 
-/** sap.m.VBox */
+/**
+ * Typed proxy interface for `sap.m.VBox` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.VBox | sap.m.VBox API Reference}
+ */
 export interface UI5VBox extends UI5ControlBase {
   readonly controlType: 'sap.m.VBox';
   getDirection(): Promise<string>;
   setDirection(sDirection: string): Promise<void>;
 }
 
-/** sap.m.Carousel */
+/**
+ * Typed proxy interface for `sap.m.Carousel` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Carousel | sap.m.Carousel API Reference}
+ */
 export interface UI5Carousel extends UI5ControlBase {
   readonly controlType: 'sap.m.Carousel';
   getActivePage(): Promise<string | null>;
@@ -2068,7 +2342,11 @@ export interface UI5Carousel extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.SplitContainer */
+/**
+ * Typed proxy interface for `sap.m.SplitContainer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SplitContainer | sap.m.SplitContainer API Reference}
+ */
 export interface UI5SplitContainer extends UI5ControlBase {
   readonly controlType: 'sap.m.SplitContainer';
   backDetail(backData?: unknown, transitionParameters?: unknown): Promise<void>;
@@ -2130,7 +2408,11 @@ export interface UI5SplitContainer extends UI5ControlBase {
   ): Promise<void>;
 }
 
-/** sap.m.DateRangeSelection */
+/**
+ * Typed proxy interface for `sap.m.DateRangeSelection` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.DateRangeSelection | sap.m.DateRangeSelection API Reference}
+ */
 export interface UI5DateRangeSelection extends UI5ControlBase {
   readonly controlType: 'sap.m.DateRangeSelection';
   getDateValue(): Promise<unknown>;
@@ -2148,7 +2430,11 @@ export interface UI5DateRangeSelection extends UI5ControlBase {
   setValueFormat(sValueFormat: string): Promise<void>;
 }
 
-/** sap.m.NotificationListItem */
+/**
+ * Typed proxy interface for `sap.m.NotificationListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.NotificationListItem | sap.m.NotificationListItem API Reference}
+ */
 export interface UI5NotificationListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.NotificationListItem';
   getAuthorAvatarColor(): Promise<string>;
@@ -2171,7 +2457,11 @@ export interface UI5NotificationListItem extends UI5ControlBase {
   setTruncate(bTruncate: boolean): Promise<void>;
 }
 
-/** sap.m.PlanningCalendar */
+/**
+ * Typed proxy interface for `sap.m.PlanningCalendar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.PlanningCalendar | sap.m.PlanningCalendar API Reference}
+ */
 export interface UI5PlanningCalendar extends UI5ControlBase {
   readonly controlType: 'sap.m.PlanningCalendar';
   getAppointmentHeight(): Promise<string>;
@@ -2241,7 +2531,11 @@ export interface UI5PlanningCalendar extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.SinglePlanningCalendar */
+/**
+ * Typed proxy interface for `sap.m.SinglePlanningCalendar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SinglePlanningCalendar | sap.m.SinglePlanningCalendar API Reference}
+ */
 export interface UI5SinglePlanningCalendar extends UI5ControlBase {
   readonly controlType: 'sap.m.SinglePlanningCalendar';
   getActions(): Promise<readonly UI5ControlBase[]>;
@@ -2285,7 +2579,11 @@ export interface UI5SinglePlanningCalendar extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.MessageItem */
+/**
+ * Typed proxy interface for `sap.m.MessageItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MessageItem | sap.m.MessageItem API Reference}
+ */
 export interface UI5MessageItem extends UI5ControlBase {
   readonly controlType: 'sap.m.MessageItem';
   getActiveTitle(): Promise<boolean>;
@@ -2310,7 +2608,11 @@ export interface UI5MessageItem extends UI5ControlBase {
   setType(sType: unknown): Promise<void>;
 }
 
-/** sap.m.MessageView */
+/**
+ * Typed proxy interface for `sap.m.MessageView` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.MessageView | sap.m.MessageView API Reference}
+ */
 export interface UI5MessageView extends UI5ControlBase {
   readonly controlType: 'sap.m.MessageView';
   getAsyncDescriptionHandler(): Promise<unknown>;
@@ -2327,7 +2629,11 @@ export interface UI5MessageView extends UI5ControlBase {
   setShowDetailsPageHeader(bShowDetailsPageHeader: boolean): Promise<void>;
 }
 
-/** sap.m.NavContainer */
+/**
+ * Typed proxy interface for `sap.m.NavContainer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.NavContainer | sap.m.NavContainer API Reference}
+ */
 export interface UI5NavContainer extends UI5ControlBase {
   readonly controlType: 'sap.m.NavContainer';
   back(backData?: unknown, oTransitionParameters?: unknown): Promise<void>;
@@ -2356,14 +2662,22 @@ export interface UI5NavContainer extends UI5ControlBase {
   ): Promise<void>;
 }
 
-/** sap.m.SplitApp */
+/**
+ * Typed proxy interface for `sap.m.SplitApp` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SplitApp | sap.m.SplitApp API Reference}
+ */
 export interface UI5SplitApp extends UI5ControlBase {
   readonly controlType: 'sap.m.SplitApp';
   getHomeIcon(): Promise<unknown>;
   setHomeIcon(oHomeIcon: unknown): Promise<void>;
 }
 
-/** sap.m.Shell */
+/**
+ * Typed proxy interface for `sap.m.Shell` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Shell | sap.m.Shell API Reference}
+ */
 export interface UI5Shell extends UI5ControlBase {
   readonly controlType: 'sap.m.Shell';
   getApp(): Promise<UI5ControlBase | null>;
@@ -2391,7 +2705,11 @@ export interface UI5Shell extends UI5ControlBase {
   setTitleLevel(sTitleLevel: string): Promise<void>;
 }
 
-/** sap.m.App */
+/**
+ * Typed proxy interface for `sap.m.App` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.App | sap.m.App API Reference}
+ */
 export interface UI5App extends UI5ControlBase {
   readonly controlType: 'sap.m.App';
   getBackgroundColor(): Promise<string>;
@@ -2410,7 +2728,11 @@ export interface UI5App extends UI5ControlBase {
   setMobileWebAppCapable(bMobileWebAppCapable: boolean): Promise<void>;
 }
 
-/** sap.m.Column */
+/**
+ * Typed proxy interface for `sap.m.Column` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Column | sap.m.Column API Reference}
+ */
 export interface UI5Column extends UI5ControlBase {
   readonly controlType: 'sap.m.Column';
   getAutoPopinWidth(): Promise<number>;
@@ -2445,7 +2767,11 @@ export interface UI5Column extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.StandardTreeItem */
+/**
+ * Typed proxy interface for `sap.m.StandardTreeItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.StandardTreeItem | sap.m.StandardTreeItem API Reference}
+ */
 export interface UI5StandardTreeItem extends UI5ControlBase {
   readonly controlType: 'sap.m.StandardTreeItem';
   getIcon(): Promise<string>;
@@ -2454,7 +2780,11 @@ export interface UI5StandardTreeItem extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.CustomListItem */
+/**
+ * Typed proxy interface for `sap.m.CustomListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.CustomListItem | sap.m.CustomListItem API Reference}
+ */
 export interface UI5CustomListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.CustomListItem';
   getAccDescription(): Promise<string>;
@@ -2462,7 +2792,11 @@ export interface UI5CustomListItem extends UI5ControlBase {
   setAccDescription(sAccDescription: string): Promise<void>;
 }
 
-/** sap.m.GroupHeaderListItem */
+/**
+ * Typed proxy interface for `sap.m.GroupHeaderListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.GroupHeaderListItem | sap.m.GroupHeaderListItem API Reference}
+ */
 export interface UI5GroupHeaderListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.GroupHeaderListItem';
   getCount(): Promise<string>;
@@ -2473,7 +2807,11 @@ export interface UI5GroupHeaderListItem extends UI5ControlBase {
   setTitleTextDirection(sTitleTextDirection: string): Promise<void>;
 }
 
-/** sap.m.InputListItem */
+/**
+ * Typed proxy interface for `sap.m.InputListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.InputListItem | sap.m.InputListItem API Reference}
+ */
 export interface UI5InputListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.InputListItem';
   getContent(): Promise<readonly UI5ControlBase[]>;
@@ -2485,7 +2823,11 @@ export interface UI5InputListItem extends UI5ControlBase {
   setLabelTextDirection(sLabelTextDirection: string): Promise<void>;
 }
 
-/** sap.m.DisplayListItem */
+/**
+ * Typed proxy interface for `sap.m.DisplayListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.DisplayListItem | sap.m.DisplayListItem API Reference}
+ */
 export interface UI5DisplayListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.DisplayListItem';
   getLabel(): Promise<string>;
@@ -2496,14 +2838,22 @@ export interface UI5DisplayListItem extends UI5ControlBase {
   setValueTextDirection(sValueTextDirection: string): Promise<void>;
 }
 
-/** sap.m.ActionListItem */
+/**
+ * Typed proxy interface for `sap.m.ActionListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ActionListItem | sap.m.ActionListItem API Reference}
+ */
 export interface UI5ActionListItem extends UI5ControlBase {
   readonly controlType: 'sap.m.ActionListItem';
   getText(): Promise<string>;
   setText(sText: string): Promise<void>;
 }
 
-/** sap.m.Tokenizer */
+/**
+ * Typed proxy interface for `sap.m.Tokenizer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.Tokenizer | sap.m.Tokenizer API Reference}
+ */
 export interface UI5Tokenizer extends UI5ControlBase {
   readonly controlType: 'sap.m.Tokenizer';
   getEditable(): Promise<boolean>;
@@ -2527,7 +2877,11 @@ export interface UI5Tokenizer extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.SelectDialog */
+/**
+ * Typed proxy interface for `sap.m.SelectDialog` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SelectDialog | sap.m.SelectDialog API Reference}
+ */
 export interface UI5SelectDialog extends UI5ControlBase {
   readonly controlType: 'sap.m.SelectDialog';
   clearSelection(): Promise<void>;
@@ -2564,7 +2918,11 @@ export interface UI5SelectDialog extends UI5ControlBase {
   isOpen(): Promise<boolean>;
 }
 
-/** sap.m.TableSelectDialog */
+/**
+ * Typed proxy interface for `sap.m.TableSelectDialog` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.TableSelectDialog | sap.m.TableSelectDialog API Reference}
+ */
 export interface UI5TableSelectDialog extends UI5ControlBase {
   readonly controlType: 'sap.m.TableSelectDialog';
   getColumns(): Promise<readonly UI5ControlBase[]>;
@@ -2601,7 +2959,11 @@ export interface UI5TableSelectDialog extends UI5ControlBase {
   isOpen(): Promise<boolean>;
 }
 
-/** sap.m.BusyDialog */
+/**
+ * Typed proxy interface for `sap.m.BusyDialog` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.BusyDialog | sap.m.BusyDialog API Reference}
+ */
 export interface UI5BusyDialog extends UI5ControlBase {
   readonly controlType: 'sap.m.BusyDialog';
   getCancelButtonText(): Promise<string>;
@@ -2629,7 +2991,11 @@ export interface UI5BusyDialog extends UI5ControlBase {
   close(): Promise<void>;
 }
 
-/** sap.m.UploadCollection */
+/**
+ * Typed proxy interface for `sap.m.UploadCollection` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.UploadCollection | sap.m.UploadCollection API Reference}
+ */
 export interface UI5UploadCollection extends UI5ControlBase {
   readonly controlType: 'sap.m.UploadCollection';
   downloadItem(uploadCollectionItem: UI5ControlBase, askForLocation: boolean): Promise<boolean>;
@@ -2682,7 +3048,11 @@ export interface UI5UploadCollection extends UI5ControlBase {
   upload(): Promise<void>;
 }
 
-/** sap.m.ObjectHeader */
+/**
+ * Typed proxy interface for `sap.m.ObjectHeader` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ObjectHeader | sap.m.ObjectHeader API Reference}
+ */
 export interface UI5ObjectHeader extends UI5ControlBase {
   readonly controlType: 'sap.m.ObjectHeader';
   getAdditionalNumbers(): Promise<readonly UI5ControlBase[]>;
@@ -2745,7 +3115,11 @@ export interface UI5ObjectHeader extends UI5ControlBase {
   setTitleTextDirection(sTitleTextDirection: string): Promise<void>;
 }
 
-/** sap.m.ObjectMarker */
+/**
+ * Typed proxy interface for `sap.m.ObjectMarker` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ObjectMarker | sap.m.ObjectMarker API Reference}
+ */
 export interface UI5ObjectMarker extends UI5ControlBase {
   readonly controlType: 'sap.m.ObjectMarker';
   getAdditionalInfo(): Promise<string>;
@@ -2758,7 +3132,11 @@ export interface UI5ObjectMarker extends UI5ControlBase {
   setVisibility(sVisibility: string): Promise<void>;
 }
 
-/** sap.m.DraftIndicator */
+/**
+ * Typed proxy interface for `sap.m.DraftIndicator` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.DraftIndicator | sap.m.DraftIndicator API Reference}
+ */
 export interface UI5DraftIndicator extends UI5ControlBase {
   readonly controlType: 'sap.m.DraftIndicator';
   clearDraftState(): Promise<void>;
@@ -2770,7 +3148,11 @@ export interface UI5DraftIndicator extends UI5ControlBase {
   showDraftSaving(): Promise<void>;
 }
 
-/** sap.m.HeaderContainer */
+/**
+ * Typed proxy interface for `sap.m.HeaderContainer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.HeaderContainer | sap.m.HeaderContainer API Reference}
+ */
 export interface UI5HeaderContainer extends UI5ControlBase {
   readonly controlType: 'sap.m.HeaderContainer';
   getBackgroundDesign(): Promise<string>;
@@ -2798,14 +3180,22 @@ export interface UI5HeaderContainer extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.IconTabSeparator */
+/**
+ * Typed proxy interface for `sap.m.IconTabSeparator` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.IconTabSeparator | sap.m.IconTabSeparator API Reference}
+ */
 export interface UI5IconTabSeparator extends UI5ControlBase {
   readonly controlType: 'sap.m.IconTabSeparator';
   getIcon(): Promise<string>;
   setIcon(sIcon: string): Promise<void>;
 }
 
-/** sap.m.TabContainerItem */
+/**
+ * Typed proxy interface for `sap.m.TabContainerItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.TabContainerItem | sap.m.TabContainerItem API Reference}
+ */
 export interface UI5TabContainerItem extends UI5ControlBase {
   readonly controlType: 'sap.m.TabContainerItem';
   getAdditionalText(): Promise<string>;
@@ -2823,7 +3213,11 @@ export interface UI5TabContainerItem extends UI5ControlBase {
   setName(sName: string): Promise<void>;
 }
 
-/** sap.m.FacetFilter */
+/**
+ * Typed proxy interface for `sap.m.FacetFilter` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.FacetFilter | sap.m.FacetFilter API Reference}
+ */
 export interface UI5FacetFilter extends UI5ControlBase {
   readonly controlType: 'sap.m.FacetFilter';
   getLists(): Promise<readonly UI5ControlBase[]>;
@@ -2842,7 +3236,11 @@ export interface UI5FacetFilter extends UI5ControlBase {
   setType(sType: string): Promise<void>;
 }
 
-/** sap.m.FacetFilterList */
+/**
+ * Typed proxy interface for `sap.m.FacetFilterList` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.FacetFilterList | sap.m.FacetFilterList API Reference}
+ */
 export interface UI5FacetFilterList extends UI5ControlBase {
   readonly controlType: 'sap.m.FacetFilterList';
   getActive(): Promise<boolean>;
@@ -2870,7 +3268,11 @@ export interface UI5FacetFilterList extends UI5ControlBase {
   setWordWrap(bWordWrap: boolean): Promise<void>;
 }
 
-/** sap.m.PDFViewer */
+/**
+ * Typed proxy interface for `sap.m.PDFViewer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.PDFViewer | sap.m.PDFViewer API Reference}
+ */
 export interface UI5PDFViewer extends UI5ControlBase {
   readonly controlType: 'sap.m.PDFViewer';
   downloadPDF(): Promise<void>;
@@ -2896,7 +3298,11 @@ export interface UI5PDFViewer extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.ColorPalettePopover */
+/**
+ * Typed proxy interface for `sap.m.ColorPalettePopover` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ColorPalettePopover | sap.m.ColorPalettePopover API Reference}
+ */
 export interface UI5ColorPalettePopover extends UI5ControlBase {
   readonly controlType: 'sap.m.ColorPalettePopover';
   close(): Promise<UI5ControlBase>;
@@ -2918,7 +3324,11 @@ export interface UI5ColorPalettePopover extends UI5ControlBase {
   setShowRecentColorsSection(bShowRecentColorsSection: boolean): Promise<void>;
 }
 
-/** sap.m.SlideTile */
+/**
+ * Typed proxy interface for `sap.m.SlideTile` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SlideTile | sap.m.SlideTile API Reference}
+ */
 export interface UI5SlideTile extends UI5ControlBase {
   readonly controlType: 'sap.m.SlideTile';
   getDisplayTime(): Promise<number>;
@@ -2936,7 +3346,11 @@ export interface UI5SlideTile extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.LightBox */
+/**
+ * Typed proxy interface for `sap.m.LightBox` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.LightBox | sap.m.LightBox API Reference}
+ */
 export interface UI5LightBox extends UI5ControlBase {
   readonly controlType: 'sap.m.LightBox';
   getImageContent(): Promise<readonly UI5ControlBase[]>;
@@ -2945,7 +3359,11 @@ export interface UI5LightBox extends UI5ControlBase {
   close(): Promise<void>;
 }
 
-/** sap.m.VariantManagement */
+/**
+ * Typed proxy interface for `sap.m.VariantManagement` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.VariantManagement | sap.m.VariantManagement API Reference}
+ */
 export interface UI5VariantManagement extends UI5ControlBase {
   readonly controlType: 'sap.m.VariantManagement';
   getCreationAllowed(): Promise<boolean>;
@@ -2987,7 +3405,11 @@ export interface UI5VariantManagement extends UI5ControlBase {
   press(): Promise<void>;
 }
 
-/** sap.m.ColorPalette */
+/**
+ * Typed proxy interface for `sap.m.ColorPalette` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ColorPalette | sap.m.ColorPalette API Reference}
+ */
 export interface UI5ColorPalette extends UI5ControlBase {
   readonly controlType: 'sap.m.ColorPalette';
   getColors(): Promise<readonly string[]>;
@@ -2997,7 +3419,11 @@ export interface UI5ColorPalette extends UI5ControlBase {
   setSelectedColor(sSelectedColor: string): Promise<void>;
 }
 
-/** sap.m.DynamicDateRange */
+/**
+ * Typed proxy interface for `sap.m.DynamicDateRange` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.DynamicDateRange | sap.m.DynamicDateRange API Reference}
+ */
 export interface UI5DynamicDateRange extends UI5ControlBase {
   readonly controlType: 'sap.m.DynamicDateRange';
   getCalendarWeekNumbering(): Promise<unknown>;
@@ -3039,7 +3465,11 @@ export interface UI5DynamicDateRange extends UI5ControlBase {
   toDates(oValue: string): Promise<readonly string[]>;
 }
 
-/** sap.m.FeedInput */
+/**
+ * Typed proxy interface for `sap.m.FeedInput` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.FeedInput | sap.m.FeedInput API Reference}
+ */
 export interface UI5FeedInput extends UI5ControlBase {
   readonly controlType: 'sap.m.FeedInput';
   getButtonTooltip(): Promise<string>;
@@ -3072,7 +3502,11 @@ export interface UI5FeedInput extends UI5ControlBase {
   setValue(sValue: string): Promise<void>;
 }
 
-/** sap.m.ExpandableText */
+/**
+ * Typed proxy interface for `sap.m.ExpandableText` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ExpandableText | sap.m.ExpandableText API Reference}
+ */
 export interface UI5ExpandableText extends UI5ControlBase {
   readonly controlType: 'sap.m.ExpandableText';
   getEmptyIndicatorMode(): Promise<string>;
@@ -3092,7 +3526,11 @@ export interface UI5ExpandableText extends UI5ControlBase {
   setWrappingType(sWrappingType: string): Promise<void>;
 }
 
-/** sap.m.QuickView */
+/**
+ * Typed proxy interface for `sap.m.QuickView` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.QuickView | sap.m.QuickView API Reference}
+ */
 export interface UI5QuickView extends UI5ControlBase {
   readonly controlType: 'sap.m.QuickView';
   getPlacement(): Promise<string>;
@@ -3104,14 +3542,22 @@ export interface UI5QuickView extends UI5ControlBase {
   close(): Promise<void>;
 }
 
-/** sap.m.QuickViewCard */
+/**
+ * Typed proxy interface for `sap.m.QuickViewCard` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.QuickViewCard | sap.m.QuickViewCard API Reference}
+ */
 export interface UI5QuickViewCard extends UI5ControlBase {
   readonly controlType: 'sap.m.QuickViewCard';
   getShowVerticalScrollBar(): Promise<boolean>;
   setShowVerticalScrollBar(bShowVerticalScrollBar: boolean): Promise<void>;
 }
 
-/** sap.m.QuickViewPage */
+/**
+ * Typed proxy interface for `sap.m.QuickViewPage` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.QuickViewPage | sap.m.QuickViewPage API Reference}
+ */
 export interface UI5QuickViewPage extends UI5ControlBase {
   readonly controlType: 'sap.m.QuickViewPage';
   getAvatar(): Promise<UI5ControlBase | null>;
@@ -3129,7 +3575,11 @@ export interface UI5QuickViewPage extends UI5ControlBase {
   setTitleUrl(sTitleUrl: string): Promise<void>;
 }
 
-/** sap.m.IllustratedMessage */
+/**
+ * Typed proxy interface for `sap.m.IllustratedMessage` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.IllustratedMessage | sap.m.IllustratedMessage API Reference}
+ */
 export interface UI5IllustratedMessage extends UI5ControlBase {
   readonly controlType: 'sap.m.IllustratedMessage';
   getAdditionalContent(): Promise<readonly UI5ControlBase[]>;
@@ -3155,20 +3605,32 @@ export interface UI5IllustratedMessage extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.ToolbarSpacer */
+/**
+ * Typed proxy interface for `sap.m.ToolbarSpacer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ToolbarSpacer | sap.m.ToolbarSpacer API Reference}
+ */
 export interface UI5ToolbarSpacer extends UI5ControlBase {
   readonly controlType: 'sap.m.ToolbarSpacer';
   getWidth(): Promise<string>;
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.m.ToolbarSeparator */
+/**
+ * Typed proxy interface for `sap.m.ToolbarSeparator` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.ToolbarSeparator | sap.m.ToolbarSeparator API Reference}
+ */
 export interface UI5ToolbarSeparator extends UI5ControlBase {
   readonly controlType: 'sap.m.ToolbarSeparator';
   getOverflowToolbarConfig(): Promise<string>;
 }
 
-/** sap.m.TileContent */
+/**
+ * Typed proxy interface for `sap.m.TileContent` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.TileContent | sap.m.TileContent API Reference}
+ */
 export interface UI5TileContent extends UI5ControlBase {
   readonly controlType: 'sap.m.TileContent';
   getContent(): Promise<UI5ControlBase | null>;
@@ -3191,7 +3653,11 @@ export interface UI5TileContent extends UI5ControlBase {
   setUnit(sUnit: string): Promise<void>;
 }
 
-/** sap.m.NotificationListGroup */
+/**
+ * Typed proxy interface for `sap.m.NotificationListGroup` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.NotificationListGroup | sap.m.NotificationListGroup API Reference}
+ */
 export interface UI5NotificationListGroup extends UI5ControlBase {
   readonly controlType: 'sap.m.NotificationListGroup';
   getAutoPriority(): Promise<boolean>;
@@ -3207,7 +3673,11 @@ export interface UI5NotificationListGroup extends UI5ControlBase {
   setShowItemsCounter(bShowItemsCounter: boolean): Promise<void>;
 }
 
-/** sap.m.SelectionDetails */
+/**
+ * Typed proxy interface for `sap.m.SelectionDetails` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.SelectionDetails | sap.m.SelectionDetails API Reference}
+ */
 export interface UI5SelectionDetails extends UI5ControlBase {
   readonly controlType: 'sap.m.SelectionDetails';
   getActionGroups(): Promise<readonly UI5ControlBase[]>;
@@ -3215,7 +3685,11 @@ export interface UI5SelectionDetails extends UI5ControlBase {
   getItems(): Promise<readonly UI5ControlBase[]>;
 }
 
-/** sap.m.IconTabHeader */
+/**
+ * Typed proxy interface for `sap.m.IconTabHeader` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.IconTabHeader | sap.m.IconTabHeader API Reference}
+ */
 export interface UI5IconTabHeader extends UI5ControlBase {
   readonly controlType: 'sap.m.IconTabHeader';
   getAriaTexts(): Promise<unknown>;
@@ -3237,7 +3711,11 @@ export interface UI5IconTabHeader extends UI5ControlBase {
   setTabsOverflowMode(sTabsOverflowMode: string): Promise<void>;
 }
 
-/** sap.m.p13n.Popup */
+/**
+ * Typed proxy interface for `sap.m.p13n.Popup` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.p13n.Popup | sap.m.p13n.Popup API Reference}
+ */
 export interface UI5P13nPopup extends UI5ControlBase {
   readonly controlType: 'sap.m.p13n.Popup';
   getAdditionalButtons(): Promise<readonly UI5ControlBase[]>;
@@ -3254,7 +3732,11 @@ export interface UI5P13nPopup extends UI5ControlBase {
   close(): Promise<void>;
 }
 
-/** sap.m.p13n.SelectionPanel */
+/**
+ * Typed proxy interface for `sap.m.p13n.SelectionPanel` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.p13n.SelectionPanel | sap.m.p13n.SelectionPanel API Reference}
+ */
 export interface UI5P13nSelectionPanel extends UI5ControlBase {
   readonly controlType: 'sap.m.p13n.SelectionPanel';
   getActiveColumn(): Promise<string>;
@@ -3274,14 +3756,22 @@ export interface UI5P13nSelectionPanel extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.p13n.SortPanel */
+/**
+ * Typed proxy interface for `sap.m.p13n.SortPanel` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.p13n.SortPanel | sap.m.p13n.SortPanel API Reference}
+ */
 export interface UI5P13nSortPanel extends UI5ControlBase {
   readonly controlType: 'sap.m.p13n.SortPanel';
   getTitle(): Promise<string>;
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.p13n.GroupPanel */
+/**
+ * Typed proxy interface for `sap.m.p13n.GroupPanel` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.p13n.GroupPanel | sap.m.p13n.GroupPanel API Reference}
+ */
 export interface UI5P13nGroupPanel extends UI5ControlBase {
   readonly controlType: 'sap.m.p13n.GroupPanel';
   getEnableShowField(): Promise<boolean>;
@@ -3290,7 +3780,11 @@ export interface UI5P13nGroupPanel extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.m.table.columnmenu.Menu */
+/**
+ * Typed proxy interface for `sap.m.table.columnmenu.Menu` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.m.table.columnmenu.Menu | sap.m.table.columnmenu.Menu API Reference}
+ */
 export interface UI5ColumnMenu extends UI5ControlBase {
   readonly controlType: 'sap.m.table.columnmenu.Menu';
   getItems(): Promise<readonly UI5ControlBase[]>;
@@ -3306,7 +3800,11 @@ export interface UI5ColumnMenu extends UI5ControlBase {
 // sap.ui.table
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.ui.table.Table */
+/**
+ * Typed proxy interface for `sap.ui.table.Table` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.table.Table | sap.ui.table.Table API Reference}
+ */
 export interface UI5GridTable extends UI5ControlBase {
   readonly controlType: 'sap.ui.table.Table';
   clearSelection(): Promise<void>;
@@ -3376,7 +3874,11 @@ export interface UI5GridTable extends UI5ControlBase {
   sort(oColumn?: UI5ControlBase, sSortOrder?: string, bAdd?: boolean): Promise<void>;
 }
 
-/** sap.ui.table.TreeTable */
+/**
+ * Typed proxy interface for `sap.ui.table.TreeTable` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.table.TreeTable | sap.ui.table.TreeTable API Reference}
+ */
 export interface UI5TreeTable extends UI5ControlBase {
   readonly controlType: 'sap.ui.table.TreeTable';
   collapse(vRowIndex: number | readonly number[]): Promise<void>;
@@ -3395,7 +3897,11 @@ export interface UI5TreeTable extends UI5ControlBase {
   setUseGroupMode(bUseGroupMode: boolean): Promise<void>;
 }
 
-/** sap.ui.table.AnalyticalTable */
+/**
+ * Typed proxy interface for `sap.ui.table.AnalyticalTable` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.table.AnalyticalTable | sap.ui.table.AnalyticalTable API Reference}
+ */
 export interface UI5AnalyticalTable extends UI5ControlBase {
   readonly controlType: 'sap.ui.table.AnalyticalTable';
   collapse(vRowIndex: number | readonly number[]): Promise<void>;
@@ -3412,7 +3918,11 @@ export interface UI5AnalyticalTable extends UI5ControlBase {
   setSelectionInterval(iFromIndex: number, iToIndex: number): Promise<void>;
 }
 
-/** sap.ui.table.Column */
+/**
+ * Typed proxy interface for `sap.ui.table.Column` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.table.Column | sap.ui.table.Column API Reference}
+ */
 export interface UI5TableColumn extends UI5ControlBase {
   readonly controlType: 'sap.ui.table.Column';
   autoResize(): Promise<void>;
@@ -3459,7 +3969,11 @@ export interface UI5TableColumn extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.table.Row */
+/**
+ * Typed proxy interface for `sap.ui.table.Row` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.table.Row | sap.ui.table.Row API Reference}
+ */
 export interface UI5TableRow extends UI5ControlBase {
   readonly controlType: 'sap.ui.table.Row';
   getCells(): Promise<readonly UI5ControlBase[]>;
@@ -3470,7 +3984,11 @@ export interface UI5TableRow extends UI5ControlBase {
 // sap.f
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.f.DynamicPage */
+/**
+ * Typed proxy interface for `sap.f.DynamicPage` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.DynamicPage | sap.f.DynamicPage API Reference}
+ */
 export interface UI5DynamicPage extends UI5ControlBase {
   readonly controlType: 'sap.f.DynamicPage';
   getBackgroundDesign(): Promise<string>;
@@ -3502,7 +4020,11 @@ export interface UI5DynamicPage extends UI5ControlBase {
   setToggleHeaderOnTitleClick(bToggleHeaderOnTitleClick: boolean): Promise<void>;
 }
 
-/** sap.f.DynamicPageTitle */
+/**
+ * Typed proxy interface for `sap.f.DynamicPageTitle` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.DynamicPageTitle | sap.f.DynamicPageTitle API Reference}
+ */
 export interface UI5DynamicPageTitle extends UI5ControlBase {
   readonly controlType: 'sap.f.DynamicPageTitle';
   getActions(): Promise<readonly UI5ControlBase[]>;
@@ -3526,7 +4048,11 @@ export interface UI5DynamicPageTitle extends UI5ControlBase {
   setSnappedTitleOnMobile(oSnappedTitleOnMobile: UI5ControlBase): Promise<void>;
 }
 
-/** sap.f.DynamicPageHeader */
+/**
+ * Typed proxy interface for `sap.f.DynamicPageHeader` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.DynamicPageHeader | sap.f.DynamicPageHeader API Reference}
+ */
 export interface UI5DynamicPageHeader extends UI5ControlBase {
   readonly controlType: 'sap.f.DynamicPageHeader';
   getBackgroundDesign(): Promise<string>;
@@ -3536,7 +4062,11 @@ export interface UI5DynamicPageHeader extends UI5ControlBase {
   setPinnable(bPinnable: boolean): Promise<void>;
 }
 
-/** sap.f.FlexibleColumnLayout */
+/**
+ * Typed proxy interface for `sap.f.FlexibleColumnLayout` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.FlexibleColumnLayout | sap.f.FlexibleColumnLayout API Reference}
+ */
 export interface UI5FlexibleColumnLayout extends UI5ControlBase {
   readonly controlType: 'sap.f.FlexibleColumnLayout';
   backToPage(sPageId: string): Promise<void>;
@@ -3578,7 +4108,11 @@ export interface UI5FlexibleColumnLayout extends UI5ControlBase {
   toMidColumnPage(sPageId: string, sTransitionName?: string): Promise<void>;
 }
 
-/** sap.f.Card */
+/**
+ * Typed proxy interface for `sap.f.Card` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.Card | sap.f.Card API Reference}
+ */
 export interface UI5FCard extends UI5ControlBase {
   readonly controlType: 'sap.f.Card';
   getContent(): Promise<UI5ControlBase | null>;
@@ -3589,12 +4123,20 @@ export interface UI5FCard extends UI5ControlBase {
   setHeaderPosition(sHeaderPosition: string): Promise<void>;
 }
 
-/** sap.f.Avatar */
+/**
+ * Typed proxy interface for `sap.f.Avatar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.Avatar | sap.f.Avatar API Reference}
+ */
 export interface UI5FAvatar extends UI5ControlBase {
   readonly controlType: 'sap.f.Avatar';
 }
 
-/** sap.f.GridContainer */
+/**
+ * Typed proxy interface for `sap.f.GridContainer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.GridContainer | sap.f.GridContainer API Reference}
+ */
 export interface UI5GridContainer extends UI5ControlBase {
   readonly controlType: 'sap.f.GridContainer';
   focusItem(iIndex: number): Promise<void>;
@@ -3627,7 +4169,11 @@ export interface UI5GridContainer extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.f.ShellBar */
+/**
+ * Typed proxy interface for `sap.f.ShellBar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.ShellBar | sap.f.ShellBar API Reference}
+ */
 export interface UI5ShellBar extends UI5ControlBase {
   readonly controlType: 'sap.f.ShellBar';
   getAdditionalContent(): Promise<readonly UI5ControlBase[]>;
@@ -3661,7 +4207,11 @@ export interface UI5ShellBar extends UI5ControlBase {
   setTitle(sTitle: string): Promise<void>;
 }
 
-/** sap.f.ProductSwitch */
+/**
+ * Typed proxy interface for `sap.f.ProductSwitch` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.ProductSwitch | sap.f.ProductSwitch API Reference}
+ */
 export interface UI5ProductSwitch extends UI5ControlBase {
   readonly controlType: 'sap.f.ProductSwitch';
   getItems(): Promise<readonly UI5ControlBase[]>;
@@ -3669,7 +4219,11 @@ export interface UI5ProductSwitch extends UI5ControlBase {
   setSelectedItem(vItem: string | UI5ControlBase | null): Promise<void>;
 }
 
-/** sap.f.semantic.SemanticPage */
+/**
+ * Typed proxy interface for `sap.f.semantic.SemanticPage` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.f.semantic.SemanticPage | sap.f.semantic.SemanticPage API Reference}
+ */
 export interface UI5FSemanticPage extends UI5ControlBase {
   readonly controlType: 'sap.f.semantic.SemanticPage';
   getAddAction(): Promise<UI5ControlBase | null>;
@@ -3756,7 +4310,11 @@ export interface UI5FSemanticPage extends UI5ControlBase {
 // sap.uxap
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.uxap.ObjectPageLayout */
+/**
+ * Typed proxy interface for `sap.uxap.ObjectPageLayout` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.uxap.ObjectPageLayout | sap.uxap.ObjectPageLayout API Reference}
+ */
 export interface UI5ObjectPageLayout extends UI5ControlBase {
   readonly controlType: 'sap.uxap.ObjectPageLayout';
   getAlwaysShowContentHeader(): Promise<boolean>;
@@ -3818,7 +4376,11 @@ export interface UI5ObjectPageLayout extends UI5ControlBase {
   setUseTwoColumnsForLargeScreen(bUseTwoColumnsForLargeScreen: boolean): Promise<void>;
 }
 
-/** sap.uxap.ObjectPageSection */
+/**
+ * Typed proxy interface for `sap.uxap.ObjectPageSection` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.uxap.ObjectPageSection | sap.uxap.ObjectPageSection API Reference}
+ */
 export interface UI5ObjectPageSection extends UI5ControlBase {
   readonly controlType: 'sap.uxap.ObjectPageSection';
   getAnchorBarButtonColor(): Promise<string>;
@@ -3836,7 +4398,11 @@ export interface UI5ObjectPageSection extends UI5ControlBase {
   setWrapTitle(bWrapTitle: boolean): Promise<void>;
 }
 
-/** sap.uxap.ObjectPageSubSection */
+/**
+ * Typed proxy interface for `sap.uxap.ObjectPageSubSection` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.uxap.ObjectPageSubSection | sap.uxap.ObjectPageSubSection API Reference}
+ */
 export interface UI5ObjectPageSubSection extends UI5ControlBase {
   readonly controlType: 'sap.uxap.ObjectPageSubSection';
   getActions(): Promise<readonly UI5ControlBase[]>;
@@ -3850,7 +4416,11 @@ export interface UI5ObjectPageSubSection extends UI5ControlBase {
   setTitleUppercase(bTitleUppercase: boolean): Promise<void>;
 }
 
-/** sap.uxap.ObjectPageHeader */
+/**
+ * Typed proxy interface for `sap.uxap.ObjectPageHeader` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.uxap.ObjectPageHeader | sap.uxap.ObjectPageHeader API Reference}
+ */
 export interface UI5ObjectPageHeader extends UI5ControlBase {
   readonly controlType: 'sap.uxap.ObjectPageHeader';
   getActions(): Promise<readonly UI5ControlBase[]>;
@@ -3900,12 +4470,20 @@ export interface UI5ObjectPageHeader extends UI5ControlBase {
   setTitleSelectorTooltip(vTitleSelectorTooltip: UI5ControlBase | string): Promise<void>;
 }
 
-/** sap.uxap.ObjectPageDynamicHeaderTitle */
+/**
+ * Typed proxy interface for `sap.uxap.ObjectPageDynamicHeaderTitle` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.uxap.ObjectPageDynamicHeaderTitle | sap.uxap.ObjectPageDynamicHeaderTitle API Reference}
+ */
 export interface UI5ObjectPageDynamicHeaderTitle extends UI5ControlBase {
   readonly controlType: 'sap.uxap.ObjectPageDynamicHeaderTitle';
 }
 
-/** sap.uxap.AnchorBar */
+/**
+ * Typed proxy interface for `sap.uxap.AnchorBar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.uxap.AnchorBar | sap.uxap.AnchorBar API Reference}
+ */
 export interface UI5AnchorBar extends UI5ControlBase {
   readonly controlType: 'sap.uxap.AnchorBar';
   getBackgroundDesign(): Promise<string>;
@@ -3925,7 +4503,11 @@ export interface UI5AnchorBar extends UI5ControlBase {
 // sap.ui.layout
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.ui.layout.form.SimpleForm */
+/**
+ * Typed proxy interface for `sap.ui.layout.form.SimpleForm` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.form.SimpleForm | sap.ui.layout.form.SimpleForm API Reference}
+ */
 export interface UI5SimpleForm extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.form.SimpleForm';
   getAdjustLabelSpan(): Promise<boolean>;
@@ -3977,7 +4559,11 @@ export interface UI5SimpleForm extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.layout.Grid */
+/**
+ * Typed proxy interface for `sap.ui.layout.Grid` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.Grid | sap.ui.layout.Grid API Reference}
+ */
 export interface UI5Grid extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.Grid';
   getContainerQuery(): Promise<boolean>;
@@ -3997,7 +4583,11 @@ export interface UI5Grid extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.layout.Splitter */
+/**
+ * Typed proxy interface for `sap.ui.layout.Splitter` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.Splitter | sap.ui.layout.Splitter API Reference}
+ */
 export interface UI5Splitter extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.Splitter';
   getContentAreas(): Promise<readonly UI5ControlBase[]>;
@@ -4011,7 +4601,11 @@ export interface UI5Splitter extends UI5ControlBase {
   triggerResize(forceDirectly?: boolean): Promise<void>;
 }
 
-/** sap.ui.layout.ResponsiveSplitter */
+/**
+ * Typed proxy interface for `sap.ui.layout.ResponsiveSplitter` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.ResponsiveSplitter | sap.ui.layout.ResponsiveSplitter API Reference}
+ */
 export interface UI5ResponsiveSplitter extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.ResponsiveSplitter';
   getDefaultPane(): Promise<string | null>;
@@ -4024,7 +4618,11 @@ export interface UI5ResponsiveSplitter extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.layout.form.Form */
+/**
+ * Typed proxy interface for `sap.ui.layout.form.Form` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.form.Form | sap.ui.layout.form.Form API Reference}
+ */
 export interface UI5Form extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.form.Form';
   getEditable(): Promise<boolean>;
@@ -4040,7 +4638,11 @@ export interface UI5Form extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.layout.form.FormContainer */
+/**
+ * Typed proxy interface for `sap.ui.layout.form.FormContainer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.form.FormContainer | sap.ui.layout.form.FormContainer API Reference}
+ */
 export interface UI5FormContainer extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.form.FormContainer';
   getExpandable(): Promise<boolean>;
@@ -4055,7 +4657,11 @@ export interface UI5FormContainer extends UI5ControlBase {
   setToolbar(oToolbar: UI5ControlBase): Promise<void>;
 }
 
-/** sap.ui.layout.form.FormElement */
+/**
+ * Typed proxy interface for `sap.ui.layout.form.FormElement` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.form.FormElement | sap.ui.layout.form.FormElement API Reference}
+ */
 export interface UI5FormElement extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.form.FormElement';
   getFields(): Promise<readonly UI5ControlBase[]>;
@@ -4065,7 +4671,11 @@ export interface UI5FormElement extends UI5ControlBase {
   setLabel(vLabel: UI5ControlBase | string): Promise<void>;
 }
 
-/** sap.ui.layout.VerticalLayout */
+/**
+ * Typed proxy interface for `sap.ui.layout.VerticalLayout` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.VerticalLayout | sap.ui.layout.VerticalLayout API Reference}
+ */
 export interface UI5VerticalLayout extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.VerticalLayout';
   getContent(): Promise<readonly UI5ControlBase[]>;
@@ -4075,7 +4685,11 @@ export interface UI5VerticalLayout extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.layout.HorizontalLayout */
+/**
+ * Typed proxy interface for `sap.ui.layout.HorizontalLayout` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.HorizontalLayout | sap.ui.layout.HorizontalLayout API Reference}
+ */
 export interface UI5HorizontalLayout extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.HorizontalLayout';
   getAllowWrapping(): Promise<boolean>;
@@ -4083,7 +4697,11 @@ export interface UI5HorizontalLayout extends UI5ControlBase {
   setAllowWrapping(bAllowWrapping: boolean): Promise<void>;
 }
 
-/** sap.ui.layout.BlockLayout */
+/**
+ * Typed proxy interface for `sap.ui.layout.BlockLayout` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.BlockLayout | sap.ui.layout.BlockLayout API Reference}
+ */
 export interface UI5BlockLayout extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.BlockLayout';
   getBackground(): Promise<string>;
@@ -4093,7 +4711,11 @@ export interface UI5BlockLayout extends UI5ControlBase {
   setKeepFontSize(bKeepFontSize: boolean): Promise<void>;
 }
 
-/** sap.ui.layout.BlockLayoutRow */
+/**
+ * Typed proxy interface for `sap.ui.layout.BlockLayoutRow` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.BlockLayoutRow | sap.ui.layout.BlockLayoutRow API Reference}
+ */
 export interface UI5BlockLayoutRow extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.BlockLayoutRow';
   getAccentCells(): Promise<readonly string[]>;
@@ -4104,7 +4726,11 @@ export interface UI5BlockLayoutRow extends UI5ControlBase {
   setScrollable(bScrollable: boolean): Promise<void>;
 }
 
-/** sap.ui.layout.BlockLayoutCell */
+/**
+ * Typed proxy interface for `sap.ui.layout.BlockLayoutCell` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.BlockLayoutCell | sap.ui.layout.BlockLayoutCell API Reference}
+ */
 export interface UI5BlockLayoutCell extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.BlockLayoutCell';
   getBackgroundColorSet(): Promise<string>;
@@ -4124,7 +4750,11 @@ export interface UI5BlockLayoutCell extends UI5ControlBase {
   setWidth(iWidth: number): Promise<void>;
 }
 
-/** sap.ui.layout.DynamicSideContent */
+/**
+ * Typed proxy interface for `sap.ui.layout.DynamicSideContent` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.layout.DynamicSideContent | sap.ui.layout.DynamicSideContent API Reference}
+ */
 export interface UI5DynamicSideContent extends UI5ControlBase {
   readonly controlType: 'sap.ui.layout.DynamicSideContent';
   getContainerQuery(): Promise<boolean>;
@@ -4160,7 +4790,11 @@ export interface UI5DynamicSideContent extends UI5ControlBase {
 // sap.ui.core
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.ui.core.Icon */
+/**
+ * Typed proxy interface for `sap.ui.core.Icon` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.core.Icon | sap.ui.core.Icon API Reference}
+ */
 export interface UI5Icon extends UI5ControlBase {
   readonly controlType: 'sap.ui.core.Icon';
   getActiveBackgroundColor(): Promise<string>;
@@ -4193,7 +4827,11 @@ export interface UI5Icon extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.core.Item */
+/**
+ * Typed proxy interface for `sap.ui.core.Item` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.core.Item | sap.ui.core.Item API Reference}
+ */
 export interface UI5Item extends UI5ControlBase {
   readonly controlType: 'sap.ui.core.Item';
   getEnabled(): Promise<boolean>;
@@ -4204,7 +4842,11 @@ export interface UI5Item extends UI5ControlBase {
   setText(sText: string): Promise<void>;
 }
 
-/** sap.ui.core.ListItem */
+/**
+ * Typed proxy interface for `sap.ui.core.ListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.core.ListItem | sap.ui.core.ListItem API Reference}
+ */
 export interface UI5ListItem extends UI5ControlBase {
   readonly controlType: 'sap.ui.core.ListItem';
   getAdditionalText(): Promise<string>;
@@ -4213,7 +4855,11 @@ export interface UI5ListItem extends UI5ControlBase {
   setIcon(sIcon: string): Promise<void>;
 }
 
-/** sap.ui.core.HTML */
+/**
+ * Typed proxy interface for `sap.ui.core.HTML` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.core.HTML | sap.ui.core.HTML API Reference}
+ */
 export interface UI5HTML extends UI5ControlBase {
   readonly controlType: 'sap.ui.core.HTML';
   getContent(): Promise<string>;
@@ -4225,7 +4871,11 @@ export interface UI5HTML extends UI5ControlBase {
   setSanitizeContent(bSanitizeContent: boolean): Promise<void>;
 }
 
-/** sap.ui.core.ComponentContainer */
+/**
+ * Typed proxy interface for `sap.ui.core.ComponentContainer` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.core.ComponentContainer | sap.ui.core.ComponentContainer API Reference}
+ */
 export interface UI5ComponentContainer extends UI5ControlBase {
   readonly controlType: 'sap.ui.core.ComponentContainer';
   getAsync(): Promise<boolean>;
@@ -4260,7 +4910,11 @@ export interface UI5ComponentContainer extends UI5ControlBase {
 // sap.ui.comp
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.ui.comp.smarttable.SmartTable */
+/**
+ * Typed proxy interface for `sap.ui.comp.smarttable.SmartTable` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smarttable.SmartTable | sap.ui.comp.smarttable.SmartTable API Reference}
+ */
 export interface UI5SmartTable extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smarttable.SmartTable';
   applyVariant(sContext: string): Promise<void>;
@@ -4367,7 +5021,11 @@ export interface UI5SmartTable extends UI5ControlBase {
   updateTableHeaderState(): Promise<void>;
 }
 
-/** sap.ui.comp.smartfield.SmartField */
+/**
+ * Typed proxy interface for `sap.ui.comp.smartfield.SmartField` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smartfield.SmartField | sap.ui.comp.smartfield.SmartField API Reference}
+ */
 export interface UI5SmartField extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smartfield.SmartField';
   checkValuesValidity(oSettings?: unknown): Promise<unknown>;
@@ -4449,7 +5107,11 @@ export interface UI5SmartField extends UI5ControlBase {
   setWrapping(bWrapping: boolean): Promise<void>;
 }
 
-/** sap.ui.comp.smartfilterbar.SmartFilterBar */
+/**
+ * Typed proxy interface for `sap.ui.comp.smartfilterbar.SmartFilterBar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smartfilterbar.SmartFilterBar | sap.ui.comp.smartfilterbar.SmartFilterBar API Reference}
+ */
 export interface UI5SmartFilterBar extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smartfilterbar.SmartFilterBar';
   applyVariant(): Promise<void>;
@@ -4498,7 +5160,11 @@ export interface UI5SmartFilterBar extends UI5ControlBase {
   verifySearchAllowed(): Promise<string>;
 }
 
-/** sap.ui.comp.smartform.SmartForm */
+/**
+ * Typed proxy interface for `sap.ui.comp.smartform.SmartForm` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smartform.SmartForm | sap.ui.comp.smartform.SmartForm API Reference}
+ */
 export interface UI5SmartForm extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smartform.SmartForm';
   check(vSettings?: unknown): Promise<unknown>;
@@ -4540,7 +5206,11 @@ export interface UI5SmartForm extends UI5ControlBase {
   setValidationMode(sValidationMode: string): Promise<void>;
 }
 
-/** sap.ui.comp.smartform.Group */
+/**
+ * Typed proxy interface for `sap.ui.comp.smartform.Group` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smartform.Group | sap.ui.comp.smartform.Group API Reference}
+ */
 export interface UI5SmartFormGroup extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smartform.Group';
   getGroupElements(): Promise<readonly UI5ControlBase[]>;
@@ -4548,7 +5218,11 @@ export interface UI5SmartFormGroup extends UI5ControlBase {
   setTitle(vTitle: UI5ControlBase | string): Promise<void>;
 }
 
-/** sap.ui.comp.smartform.GroupElement */
+/**
+ * Typed proxy interface for `sap.ui.comp.smartform.GroupElement` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smartform.GroupElement | sap.ui.comp.smartform.GroupElement API Reference}
+ */
 export interface UI5SmartFormGroupElement extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smartform.GroupElement';
   getElementForLabel(): Promise<number>;
@@ -4559,7 +5233,11 @@ export interface UI5SmartFormGroupElement extends UI5ControlBase {
   setElementForLabel(iElementForLabel: number): Promise<void>;
 }
 
-/** sap.ui.comp.valuehelpdialog.ValueHelpDialog */
+/**
+ * Typed proxy interface for `sap.ui.comp.valuehelpdialog.ValueHelpDialog` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.valuehelpdialog.ValueHelpDialog | sap.ui.comp.valuehelpdialog.ValueHelpDialog API Reference}
+ */
 export interface UI5ValueHelpDialog extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.valuehelpdialog.ValueHelpDialog';
   getBasicSearchText(): Promise<string>;
@@ -4597,7 +5275,11 @@ export interface UI5ValueHelpDialog extends UI5ControlBase {
   update(): Promise<void>;
 }
 
-/** sap.ui.comp.smartvariants.SmartVariantManagement */
+/**
+ * Typed proxy interface for `sap.ui.comp.smartvariants.SmartVariantManagement` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smartvariants.SmartVariantManagement | sap.ui.comp.smartvariants.SmartVariantManagement API Reference}
+ */
 export interface UI5SmartVariantManagement extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smartvariants.SmartVariantManagement';
   clearVariantSelection(): Promise<void>;
@@ -4615,7 +5297,11 @@ export interface UI5SmartVariantManagement extends UI5ControlBase {
   setPersistencyKey(sPersistencyKey: string): Promise<void>;
 }
 
-/** sap.ui.comp.filterbar.FilterBar */
+/**
+ * Typed proxy interface for `sap.ui.comp.filterbar.FilterBar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.filterbar.FilterBar | sap.ui.comp.filterbar.FilterBar API Reference}
+ */
 export interface UI5FilterBar extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.filterbar.FilterBar';
   applyVariant(sContext: string, bInitial: boolean): Promise<void>;
@@ -4692,7 +5378,11 @@ export interface UI5FilterBar extends UI5ControlBase {
   showFilterDialog(): Promise<void>;
 }
 
-/** sap.ui.comp.navpopover.SmartLink */
+/**
+ * Typed proxy interface for `sap.ui.comp.navpopover.SmartLink` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.navpopover.SmartLink | sap.ui.comp.navpopover.SmartLink API Reference}
+ */
 export interface UI5SmartLink extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.navpopover.SmartLink';
   getAdditionalSemanticObjects(): Promise<readonly string[]>;
@@ -4732,7 +5422,11 @@ export interface UI5SmartLink extends UI5ControlBase {
   setWrapping(bWrapping: boolean): Promise<void>;
 }
 
-/** sap.ui.comp.smartchart.SmartChart */
+/**
+ * Typed proxy interface for `sap.ui.comp.smartchart.SmartChart` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smartchart.SmartChart | sap.ui.comp.smartchart.SmartChart API Reference}
+ */
 export interface UI5SmartChart extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smartchart.SmartChart';
   applyVariant(oVariantJSON: string, sContext: string): Promise<void>;
@@ -4814,7 +5508,11 @@ export interface UI5SmartChart extends UI5ControlBase {
   setUseVariantManagement(bUseVariantManagement: boolean): Promise<void>;
 }
 
-/** sap.ui.comp.smartmultiinput.SmartMultiInput */
+/**
+ * Typed proxy interface for `sap.ui.comp.smartmultiinput.SmartMultiInput` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.comp.smartmultiinput.SmartMultiInput | sap.ui.comp.smartmultiinput.SmartMultiInput API Reference}
+ */
 export interface UI5SmartMultiInput extends UI5ControlBase {
   readonly controlType: 'sap.ui.comp.smartmultiinput.SmartMultiInput';
   checkClientError(): Promise<boolean>;
@@ -4841,7 +5539,11 @@ export interface UI5SmartMultiInput extends UI5ControlBase {
 // sap.ui.mdc
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.ui.mdc.Table */
+/**
+ * Typed proxy interface for `sap.ui.mdc.Table` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.mdc.Table | sap.ui.mdc.Table API Reference}
+ */
 export interface UI5MdcTable extends UI5ControlBase {
   readonly controlType: 'sap.ui.mdc.Table';
   clearSelection(): Promise<void>;
@@ -4911,7 +5613,11 @@ export interface UI5MdcTable extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.mdc.FilterBar */
+/**
+ * Typed proxy interface for `sap.ui.mdc.FilterBar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.mdc.FilterBar | sap.ui.mdc.FilterBar API Reference}
+ */
 export interface UI5MdcFilterBar extends UI5ControlBase {
   readonly controlType: 'sap.ui.mdc.FilterBar';
   getCurrentState(): Promise<string>;
@@ -4923,7 +5629,11 @@ export interface UI5MdcFilterBar extends UI5ControlBase {
   setShowClearButton(bShowClearButton: boolean): Promise<void>;
 }
 
-/** sap.ui.mdc.Field */
+/**
+ * Typed proxy interface for `sap.ui.mdc.Field` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.mdc.Field | sap.ui.mdc.Field API Reference}
+ */
 export interface UI5MdcField extends UI5ControlBase {
   readonly controlType: 'sap.ui.mdc.Field';
   getAdditionalValue(): Promise<unknown>;
@@ -4932,7 +5642,11 @@ export interface UI5MdcField extends UI5ControlBase {
   setValue(oValue: unknown): Promise<void>;
 }
 
-/** sap.ui.mdc.ValueHelp */
+/**
+ * Typed proxy interface for `sap.ui.mdc.ValueHelp` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.mdc.ValueHelp | sap.ui.mdc.ValueHelp API Reference}
+ */
 export interface UI5MdcValueHelp extends UI5ControlBase {
   readonly controlType: 'sap.ui.mdc.ValueHelp';
   getDelegate(): Promise<unknown>;
@@ -4945,7 +5659,11 @@ export interface UI5MdcValueHelp extends UI5ControlBase {
   setValidateInput(bValidateInput: boolean): Promise<void>;
 }
 
-/** sap.ui.mdc.Chart */
+/**
+ * Typed proxy interface for `sap.ui.mdc.Chart` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.mdc.Chart | sap.ui.mdc.Chart API Reference}
+ */
 export interface UI5MdcChart extends UI5ControlBase {
   readonly controlType: 'sap.ui.mdc.Chart';
   getActions(): Promise<readonly UI5ControlBase[]>;
@@ -4993,7 +5711,11 @@ export interface UI5MdcChart extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.mdc.MultiValueField */
+/**
+ * Typed proxy interface for `sap.ui.mdc.MultiValueField` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.mdc.MultiValueField | sap.ui.mdc.MultiValueField API Reference}
+ */
 export interface UI5MdcMultiValueField extends UI5ControlBase {
   readonly controlType: 'sap.ui.mdc.MultiValueField';
   getDelegate(): Promise<unknown>;
@@ -5001,7 +5723,11 @@ export interface UI5MdcMultiValueField extends UI5ControlBase {
   setDelegate(oDelegate: unknown): Promise<void>;
 }
 
-/** sap.ui.mdc.FilterField */
+/**
+ * Typed proxy interface for `sap.ui.mdc.FilterField` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.mdc.FilterField | sap.ui.mdc.FilterField API Reference}
+ */
 export interface UI5MdcFilterField extends UI5ControlBase {
   readonly controlType: 'sap.ui.mdc.FilterField';
   getAdditionalDataType(): Promise<unknown>;
@@ -5018,7 +5744,11 @@ export interface UI5MdcFilterField extends UI5ControlBase {
 // sap.tnt
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.tnt.SideNavigation */
+/**
+ * Typed proxy interface for `sap.tnt.SideNavigation` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.tnt.SideNavigation | sap.tnt.SideNavigation API Reference}
+ */
 export interface UI5SideNavigation extends UI5ControlBase {
   readonly controlType: 'sap.tnt.SideNavigation';
   getAriaLabel(): Promise<string>;
@@ -5039,7 +5769,11 @@ export interface UI5SideNavigation extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.tnt.NavigationListItem */
+/**
+ * Typed proxy interface for `sap.tnt.NavigationListItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.tnt.NavigationListItem | sap.tnt.NavigationListItem API Reference}
+ */
 export interface UI5NavigationListItem extends UI5ControlBase {
   readonly controlType: 'sap.tnt.NavigationListItem';
   getDesign(): Promise<string>;
@@ -5055,7 +5789,11 @@ export interface UI5NavigationListItem extends UI5ControlBase {
   setTarget(sTarget: string): Promise<void>;
 }
 
-/** sap.tnt.ToolPage */
+/**
+ * Typed proxy interface for `sap.tnt.ToolPage` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.tnt.ToolPage | sap.tnt.ToolPage API Reference}
+ */
 export interface UI5ToolPage extends UI5ControlBase {
   readonly controlType: 'sap.tnt.ToolPage';
   getContentBackgroundDesign(): Promise<string>;
@@ -5072,12 +5810,20 @@ export interface UI5ToolPage extends UI5ControlBase {
   toggleSideContentMode(): Promise<void>;
 }
 
-/** sap.tnt.ToolHeader */
+/**
+ * Typed proxy interface for `sap.tnt.ToolHeader` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.tnt.ToolHeader | sap.tnt.ToolHeader API Reference}
+ */
 export interface UI5ToolHeader extends UI5ControlBase {
   readonly controlType: 'sap.tnt.ToolHeader';
 }
 
-/** sap.tnt.NavigationList */
+/**
+ * Typed proxy interface for `sap.tnt.NavigationList` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.tnt.NavigationList | sap.tnt.NavigationList API Reference}
+ */
 export interface UI5NavigationList extends UI5ControlBase {
   readonly controlType: 'sap.tnt.NavigationList';
   getExpanded(): Promise<boolean>;
@@ -5091,7 +5837,11 @@ export interface UI5NavigationList extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.tnt.InfoLabel */
+/**
+ * Typed proxy interface for `sap.tnt.InfoLabel` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.tnt.InfoLabel | sap.tnt.InfoLabel API Reference}
+ */
 export interface UI5InfoLabel extends UI5ControlBase {
   readonly controlType: 'sap.tnt.InfoLabel';
   getColorScheme(): Promise<number>;
@@ -5112,7 +5862,11 @@ export interface UI5InfoLabel extends UI5ControlBase {
 // sap.ui.unified
 // ═══════════════════════════════════════════════════════════════════════
 
-/** sap.ui.unified.Calendar */
+/**
+ * Typed proxy interface for `sap.ui.unified.Calendar` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.unified.Calendar | sap.ui.unified.Calendar API Reference}
+ */
 export interface UI5Calendar extends UI5ControlBase {
   readonly controlType: 'sap.ui.unified.Calendar';
   displayDate(): Promise<void>;
@@ -5152,7 +5906,11 @@ export interface UI5Calendar extends UI5ControlBase {
   setWidth(sWidth: string): Promise<void>;
 }
 
-/** sap.ui.unified.FileUploader */
+/**
+ * Typed proxy interface for `sap.ui.unified.FileUploader` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.unified.FileUploader | sap.ui.unified.FileUploader API Reference}
+ */
 export interface UI5FileUploader extends UI5ControlBase {
   readonly controlType: 'sap.ui.unified.FileUploader';
   abort(sHeaderParameterName: string, sHeaderParameterValue: string): Promise<void>;
@@ -5222,7 +5980,11 @@ export interface UI5FileUploader extends UI5ControlBase {
   upload(bPreProcessFiles?: boolean): Promise<void>;
 }
 
-/** sap.ui.unified.ShellHeadItem */
+/**
+ * Typed proxy interface for `sap.ui.unified.ShellHeadItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.unified.ShellHeadItem | sap.ui.unified.ShellHeadItem API Reference}
+ */
 export interface UI5ShellHeadItem extends UI5ControlBase {
   readonly controlType: 'sap.ui.unified.ShellHeadItem';
   getIcon(): Promise<string>;
@@ -5235,7 +5997,11 @@ export interface UI5ShellHeadItem extends UI5ControlBase {
   setToggleEnabled(bToggleEnabled: boolean): Promise<void>;
 }
 
-/** sap.ui.unified.Menu */
+/**
+ * Typed proxy interface for `sap.ui.unified.Menu` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.unified.Menu | sap.ui.unified.Menu API Reference}
+ */
 export interface UI5UnifiedMenu extends UI5ControlBase {
   readonly controlType: 'sap.ui.unified.Menu';
   getEnabled(): Promise<boolean>;
@@ -5260,7 +6026,11 @@ export interface UI5UnifiedMenu extends UI5ControlBase {
   close(): Promise<void>;
 }
 
-/** sap.ui.unified.MenuItem */
+/**
+ * Typed proxy interface for `sap.ui.unified.MenuItem` controls.
+ *
+ * @see {@link https://ui5.sap.com/#/api/sap.ui.unified.MenuItem | sap.ui.unified.MenuItem API Reference}
+ */
 export interface UI5UnifiedMenuItem extends UI5ControlBase {
   readonly controlType: 'sap.ui.unified.MenuItem';
   getEndContent(): Promise<readonly UI5ControlBase[]>;

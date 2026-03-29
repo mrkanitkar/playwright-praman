@@ -117,6 +117,7 @@ export const CapabilityEntrySchema = z.object({
   /** Whether this is an async method. */
   async: z.boolean().optional(),
 });
+/** A single capability entry inferred from `CapabilityEntrySchema`. */
 export type CapabilityEntry = z.infer<typeof CapabilityEntrySchema>;
 
 /**

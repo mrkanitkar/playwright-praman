@@ -100,7 +100,7 @@ export interface ProxyMethodCall {
  * Response envelope from browser-side FE script execution.
  *
  * @remarks
- * Returned by {@link FE_EMPTY_QUEUE_SCRIPT} after OPA5 queue execution.
+ * Returned by `FE_EMPTY_QUEUE_SCRIPT` after OPA5 queue execution.
  * Contains success/error status, optional assertion logs, and a message.
  *
  * @example
@@ -136,13 +136,21 @@ export interface FETestLibraryResponse {
  * ```
  */
 export interface ObjectPageFixture {
+  /** Navigates to a section by its title or ID. */
   readonly navigateToSection: (sectionTitleOrId: string) => Promise<void>;
+  /** Returns all field key-value pairs from a section. */
   readonly getSectionData: (sectionTitleOrId: string) => Promise<Readonly<Record<string, unknown>>>;
+  /** Clicks a button by its display text. */
   readonly clickButton: (buttonName: string) => Promise<void>;
+  /** Clicks the Edit button on the Object Page footer. */
   readonly clickEdit: () => Promise<void>;
+  /** Clicks the Save button on the Object Page footer. */
   readonly clickSave: () => Promise<void>;
+  /** Returns all sections with their title and ID. */
   readonly getSections: () => Promise<readonly { readonly title: string; readonly id: string }[]>;
+  /** Returns the Object Page header title text. */
   readonly getHeaderTitle: () => Promise<string>;
+  /** Returns whether the Object Page is in edit mode. */
   readonly isInEditMode: () => Promise<boolean>;
 }
 
@@ -165,37 +173,60 @@ export interface ObjectPageFixture {
  * ```
  */
 export interface FioriElementsFixture {
+  /** List Report operations — filter bar, search, variant management. */
   readonly listReport: {
+    /** Returns the List Report table ID. */
     readonly getTable: () => Promise<string>;
+    /** Returns the filter bar ID. */
     readonly getFilterBar: () => Promise<string>;
+    /** Sets a filter field to a value and triggers the filter. */
     readonly setFilter: (fieldName: string, value: string) => Promise<void>;
+    /** Clicks the Search/Go button on the filter bar. */
     readonly search: () => Promise<void>;
+    /** Clears all active filters. */
     readonly clearFilters: () => Promise<void>;
+    /** Navigates to a table row by its index. */
     readonly navigateToItem: (rowIndex: number) => Promise<void>;
+    /** Returns all available variant names. */
     readonly getVariants: () => Promise<readonly string[]>;
+    /** Selects a variant by name. */
     readonly selectVariant: (name: string) => Promise<void>;
+    /** Returns the current value of a filter field. */
     readonly getFilterValue: (fieldName: string) => Promise<string>;
   };
+  /** Object Page operations. */
   readonly objectPage: ObjectPageFixture;
+  /** FE table helper operations. */
   readonly table: {
+    /** Returns the number of rows in a table. */
     readonly getRowCount: (tableId: string) => Promise<number>;
+    /** Returns a cell value by row index and column name. */
     readonly getCellValue: (
       tableId: string,
       rowIndex: number,
       columnName: string,
     ) => Promise<string>;
+    /** Finds a row index matching the given column-value pairs. */
     readonly findRow: (
       tableId: string,
       values: Readonly<Record<string, string>>,
     ) => Promise<number>;
+    /** Clicks a table row by index. */
     readonly clickRow: (tableId: string, rowIndex: number) => Promise<void>;
+    /** Returns all column names for a table. */
     readonly getColumnNames: (tableId: string) => Promise<readonly string[]>;
   };
+  /** FE list helper operations. */
   readonly list: {
+    /** Returns the number of items in a list. */
     readonly getItemCount: (listId: string) => Promise<number>;
+    /** Returns the title text of a list item by index. */
     readonly getItemTitle: (listId: string, index: number) => Promise<string>;
+    /** Finds a list item index by its title text. */
     readonly findItemByTitle: (listId: string, title: string) => Promise<number>;
+    /** Clicks a list item by index. */
     readonly clickItem: (listId: string, index: number) => Promise<void>;
+    /** Selects or deselects a list item by index. */
     readonly selectItem: (listId: string, index: number, selected: boolean) => Promise<void>;
   };
 }

@@ -37,6 +37,7 @@ import { ControlError } from '#core/errors/control-error.js';
  * ```
  */
 export interface MatcherPage {
+  /** Executes a script in the browser context and returns the result. */
   evaluate<TResult>(script: string, arg?: unknown): Promise<TResult>;
 }
 

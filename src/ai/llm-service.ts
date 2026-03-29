@@ -107,7 +107,7 @@ export interface LlmService {
  * Create an {@link LlmService} from the Praman configuration.
  *
  * @remarks
- * Reads `config.ai.provider` to select the provider. Throws {@link AIError}
+ * Reads `config.ai.provider` to select the provider. Throws `AIError`
  * with `code: 'ERR_AI_NOT_CONFIGURED'` when `config.ai` is absent.
  *
  * Provider packages are loaded lazily on first call to `complete()` or
@@ -115,7 +115,7 @@ export interface LlmService {
  * if the package is not installed.
  *
  * @param config - Validated Praman configuration (Readonly)
- * @throws {@link AIError} when `config.ai` is undefined
+ * @throws `AIError` when `config.ai` is undefined
  *
  * @example
  * ```typescript

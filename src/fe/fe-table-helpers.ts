@@ -82,7 +82,9 @@ const COLUMN_NOT_FOUND_SUGGESTIONS = [
  * ```
  */
 export interface FETablePage {
+  /** Executes a script in the browser context and returns the result. */
   evaluate<TResult>(pageFunction: string, arg?: unknown): Promise<TResult>;
+  /** Waits until a browser-side predicate returns a truthy value. */
   waitForFunction(
     pageFunction: string,
     arg?: unknown,

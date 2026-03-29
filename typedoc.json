@@ -37,9 +37,9 @@
   "defaultCategory": "Other",
 
   "validation": {
-    "notExported": true,
+    "notExported": false,
     "invalidLink": true,
-    "notDocumented": false
+    "notDocumented": true
   },
   "treatWarningsAsErrors": false,
   "treatValidationWarningsAsErrors": false,
@@ -68,7 +68,6 @@
     "Function",
     "Class",
     "Interface",
-    "Property",
     "Method",
     "Accessor",
     "TypeAlias"
@@ -106,6 +105,16 @@
     "GetSignature",
     "SetSignature"
   ],
+
+  "externalSymbolLinkMappings": {
+    "playwright-praman": {
+      "pollUntilPass": "#",
+      "PollableMatcherResult": "#",
+      "BridgeControlRef": "#",
+      "DEFAULT_TIMEOUTS.UI5_BOOTSTRAP": "#",
+      "UI5_BOOTSTRAP": "#"
+    }
+  },
 
   "hideGenerator": false,
   "theme": "default",

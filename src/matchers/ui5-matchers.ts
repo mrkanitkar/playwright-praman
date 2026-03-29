@@ -58,6 +58,7 @@ import type { MatcherPage, PollableMatcherResult } from './matcher-utils.js';
  */
 export interface MatcherResult {
   readonly pass: boolean;
+  /** Returns a human-readable description of the match outcome. */
   readonly message: () => string;
   readonly actual?: unknown;
   readonly expected?: unknown;

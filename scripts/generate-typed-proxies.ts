@@ -938,7 +938,13 @@ function generateInterface(
   const overrideNames = new Set(overrides.map((o) => o.split('(')[0]));
 
   const lines: string[] = [];
-  lines.push(`/** ${controlName} */`);
+  lines.push(`/**`);
+  lines.push(` * Typed proxy interface for \`${controlName}\` controls.`);
+  lines.push(` *`);
+  lines.push(
+    ` * @see {@link https://ui5.sap.com/#/api/${controlName} | ${controlName} API Reference}`,
+  );
+  lines.push(` */`);
   lines.push(`export interface ${ifName} extends UI5ControlBase {`);
   lines.push(`  readonly controlType: '${controlName}';`);
 
@@ -965,6 +971,15 @@ function assembleFile(
   const sections: string[] = [];
 
   // File header
+  sections.push(`/**`);
+  sections.push(` * @license`);
+  sections.push(` * Copyright (c) ZesTest 2025-2030. All Rights Reserved.`);
+  sections.push(` * SPDX-License-Identifier: Apache-2.0`);
+  sections.push(` *`);
+  sections.push(` * This file may contain AI-assisted code.`);
+  sections.push(` * See LICENSE and NOTICE files for details.`);
+  sections.push(` */`);
+  sections.push(``);
   sections.push(
     `/* eslint-disable max-lines, sonarjs/use-type-alias -- Auto-generated: ${interfaces.length}+ control interfaces */`,
   );

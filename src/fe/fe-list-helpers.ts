@@ -59,6 +59,7 @@ const INDEX_OOB_SUGGESTIONS = [
  * ```
  */
 export interface FEListPage {
+  /** Executes a script in the browser context and returns the result. */
   evaluate<TResult>(pageFunction: string, arg?: unknown): Promise<TResult>;
 }
 

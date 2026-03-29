@@ -98,7 +98,9 @@ interface MockLocatorShape {
 }
 
 /** Creates a mock Playwright Locator with configurable overrides. */
-function createMockLocator(overrides?: Partial<Record<string, unknown>>): Locator & MockLocatorShape {
+function createMockLocator(
+  overrides?: Partial<Record<string, unknown>>,
+): Locator & MockLocatorShape {
   const base: MockLocatorShape = {
     click: vi.fn().mockResolvedValue(undefined),
     textContent: vi.fn().mockResolvedValue('text'),
@@ -181,7 +183,7 @@ describe('auto-fallback', () => {
       const locator = createMockLocator();
       const shim = createLocatorShim(locator, { id: 'myBtn' });
 
-      await (shim['press'] as () => Promise<void>)();
+      await shim.press();
 
       expect(locator.click).toHaveBeenCalledOnce();
     });
@@ -190,7 +192,7 @@ describe('auto-fallback', () => {
       const locator = createMockLocator({ textContent: vi.fn().mockResolvedValue('Hello') });
       const shim = createLocatorShim(locator, { id: 'myLabel' });
 
-      const text = await (shim['getText'] as () => Promise<string>)();
+      const text = await shim.getText();
 
       expect(locator.textContent).toHaveBeenCalledOnce();
       expect(text).toBe('Hello');
@@ -200,7 +202,7 @@ describe('auto-fallback', () => {
       const locator = createMockLocator({ inputValue: vi.fn().mockResolvedValue('myVal') });
       const shim = createLocatorShim(locator, { id: 'myInput' });
 
-      const val = await (shim['getValue'] as () => Promise<string>)();
+      const val = await shim.getValue();
 
       expect(locator.inputValue).toHaveBeenCalledOnce();
       expect(val).toBe('myVal');
@@ -356,7 +358,7 @@ describe('auto-fallback', () => {
       const locator = createMockLocator({ textContent: vi.fn().mockResolvedValue(null) });
       const shim = createLocatorShim(locator, { id: 'myEl' });
 
-      const text = await (shim['getText'] as () => Promise<string>)();
+      const text = await shim.getText();
 
       expect(text).toBe('');
     });
