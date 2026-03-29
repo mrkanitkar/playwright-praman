@@ -49,6 +49,7 @@ const SENSITIVE_KEYS: ReadonlySet<string> = new Set([
 
 /** Known PRAMAN_* env var names to check for active overrides. */
 const KNOWN_ENV_VARS: readonly string[] = [
+  // Top-level
   'PRAMAN_LOG_LEVEL',
   'PRAMAN_UI5_WAIT_TIMEOUT',
   'PRAMAN_CONTROL_DISCOVERY_TIMEOUT',
@@ -57,6 +58,28 @@ const KNOWN_ENV_VARS: readonly string[] = [
   'PRAMAN_SKIP_STABILITY_WAIT',
   'PRAMAN_PREFER_VISIBLE',
   'PRAMAN_DEBUG',
+  // auth section
+  'PRAMAN_AUTH_BASE_URL',
+  'PRAMAN_AUTH_STRATEGY',
+  'PRAMAN_AUTH_USERNAME',
+  'PRAMAN_AUTH_PASSWORD',
+  'PRAMAN_AUTH_CLIENT',
+  'PRAMAN_AUTH_LANGUAGE',
+  // ai section
+  'PRAMAN_AI_PROVIDER',
+  'PRAMAN_AI_API_KEY',
+  'PRAMAN_AI_MODEL',
+  'PRAMAN_AI_TEMPERATURE',
+  'PRAMAN_AI_ENDPOINT',
+  'PRAMAN_AI_DEPLOYMENT',
+  'PRAMAN_AI_API_VERSION',
+  'PRAMAN_AI_ANTHROPIC_API_KEY',
+  // telemetry section
+  'PRAMAN_TELEMETRY_ENABLED',
+  'PRAMAN_TELEMETRY_ENDPOINT',
+  'PRAMAN_TELEMETRY_SERVICE_NAME',
+  // odataTracing section
+  'PRAMAN_ODATA_TRACING_ENABLED',
 ];
 
 /**

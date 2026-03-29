@@ -158,6 +158,21 @@ describe('config-show', () => {
       expect(result).toContainEqual(['PRAMAN_LOG_LEVEL', 'debug']);
       expect(result).toContainEqual(['PRAMAN_DEBUG', 'true']);
     });
+
+    it('detects nested PRAMAN_ env vars (auth, ai, telemetry)', async () => {
+      vi.stubEnv('PRAMAN_AUTH_BASE_URL', 'https://sap.example.com');
+      vi.stubEnv('PRAMAN_AI_PROVIDER', 'openai');
+      vi.stubEnv('PRAMAN_TELEMETRY_ENABLED', 'true');
+      vi.stubEnv('PRAMAN_ODATA_TRACING_ENABLED', 'true');
+
+      const { detectActiveEnvVars } = await import('../../../src/cli/config-show.js');
+
+      const result = detectActiveEnvVars();
+      expect(result).toContainEqual(['PRAMAN_AUTH_BASE_URL', 'https://sap.example.com']);
+      expect(result).toContainEqual(['PRAMAN_AI_PROVIDER', 'openai']);
+      expect(result).toContainEqual(['PRAMAN_TELEMETRY_ENABLED', 'true']);
+      expect(result).toContainEqual(['PRAMAN_ODATA_TRACING_ENABLED', 'true']);
+    });
   });
 
   // ── runConfigShow (JSON mode) ─────────────────────────────────────────

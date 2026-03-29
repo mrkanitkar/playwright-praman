@@ -175,9 +175,9 @@ describe('loadConfig', () => {
     // Set an invalid env var to cause first parse to fail
     vi.stubEnv('PRAMAN_LOG_LEVEL', 'invalid-level');
     // Pass invalid overrides to cause fallback parse to also fail
-    await expect(
-      loadConfig({ overrides: { logLevel: 'also-invalid' as 'info' } }),
-    ).rejects.toThrow(ConfigError);
+    await expect(loadConfig({ overrides: { logLevel: 'also-invalid' as 'info' } })).rejects.toThrow(
+      ConfigError,
+    );
   });
 
   it('ConfigError includes validation errors and suggestions', async () => {
@@ -202,6 +202,103 @@ describe('loadConfig', () => {
     });
     expect(config.logLevel).toBe('debug');
     expect(Object.isFrozen(config)).toBe(true);
+  });
+
+  // ── Nested env var overrides (auth, ai, telemetry, odataTracing) ────
+  it('overrides auth fields from PRAMAN_AUTH_* env vars', async () => {
+    vi.stubEnv('PRAMAN_AUTH_BASE_URL', 'https://sap.example.com');
+    vi.stubEnv('PRAMAN_AUTH_STRATEGY', 'basic');
+    vi.stubEnv('PRAMAN_AUTH_USERNAME', 'admin');
+    vi.stubEnv('PRAMAN_AUTH_PASSWORD', 'secret');
+    vi.stubEnv('PRAMAN_AUTH_CLIENT', '100');
+    vi.stubEnv('PRAMAN_AUTH_LANGUAGE', 'DE');
+    const config = await loadConfig();
+    expect(config.auth).toMatchObject({
+      baseUrl: 'https://sap.example.com',
+      strategy: 'basic',
+      username: 'admin',
+      // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+      password: 'secret',
+      client: '100',
+      language: 'DE',
+    });
+  });
+
+  it('overrides ai fields from PRAMAN_AI_* env vars', async () => {
+    vi.stubEnv('PRAMAN_AI_PROVIDER', 'openai');
+    vi.stubEnv('PRAMAN_AI_API_KEY', 'sk-test-key');
+    vi.stubEnv('PRAMAN_AI_MODEL', 'gpt-4o');
+    vi.stubEnv('PRAMAN_AI_TEMPERATURE', '0.7');
+    const config = await loadConfig();
+    expect(config.ai).toMatchObject({
+      provider: 'openai',
+      apiKey: 'sk-test-key',
+      model: 'gpt-4o',
+      temperature: 0.7,
+    });
+  });
+
+  it('overrides telemetry fields from PRAMAN_TELEMETRY_* env vars', async () => {
+    vi.stubEnv('PRAMAN_TELEMETRY_ENABLED', 'true');
+    vi.stubEnv('PRAMAN_TELEMETRY_ENDPOINT', 'https://otel:4318');
+    vi.stubEnv('PRAMAN_TELEMETRY_SERVICE_NAME', 'my-tests');
+    const config = await loadConfig();
+    expect(config.telemetry).toMatchObject({
+      openTelemetry: true,
+      endpoint: 'https://otel:4318',
+      serviceName: 'my-tests',
+    });
+  });
+
+  it('overrides odataTracing.enabled from PRAMAN_ODATA_TRACING_ENABLED', async () => {
+    vi.stubEnv('PRAMAN_ODATA_TRACING_ENABLED', 'true');
+    const config = await loadConfig();
+    expect(config.odataTracing).toMatchObject({ enabled: true });
+  });
+
+  it('parses PRAMAN_AI_TEMPERATURE as number', async () => {
+    vi.stubEnv('PRAMAN_AI_PROVIDER', 'openai');
+    vi.stubEnv('PRAMAN_AI_API_KEY', 'sk-key');
+    vi.stubEnv('PRAMAN_AI_TEMPERATURE', '0.3');
+    const config = await loadConfig();
+    expect(config.ai?.temperature).toBe(0.3);
+  });
+
+  it('ignores non-numeric PRAMAN_AI_TEMPERATURE', async () => {
+    vi.stubEnv('PRAMAN_AI_PROVIDER', 'openai');
+    vi.stubEnv('PRAMAN_AI_API_KEY', 'sk-key');
+    vi.stubEnv('PRAMAN_AI_TEMPERATURE', 'hot');
+    const config = await loadConfig();
+    // temperature should not be set to the invalid value
+    expect(config.ai?.temperature).not.toBe('hot');
+  });
+
+  it('deep-merges nested env vars without clobbering inline overrides', async () => {
+    vi.stubEnv('PRAMAN_AUTH_USERNAME', 'env-user');
+    const config = await loadConfig({
+      overrides: {
+        auth: {
+          baseUrl: 'https://inline.example.com',
+          strategy: 'basic',
+          // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+          password: 'inline-pw',
+        },
+      },
+    });
+    // Env var wins for username
+    expect(config.auth?.username).toBe('env-user');
+    // Inline overrides preserved for fields not in env
+    expect(config.auth?.baseUrl).toBe('https://inline.example.com');
+    expect(config.auth?.strategy).toBe('basic');
+    expect(config.auth?.password).toBe('inline-pw');
+  });
+
+  it('falls back gracefully when nested env vars cause validation failure', async () => {
+    // auth.baseUrl is required as a URL — set username without baseUrl
+    vi.stubEnv('PRAMAN_AUTH_USERNAME', 'just-user');
+    // Should fall back to overrides-only (no auth section) without throwing
+    const config = await loadConfig({ overrides: { logLevel: 'debug' } });
+    expect(config.logLevel).toBe('debug');
   });
 });
 

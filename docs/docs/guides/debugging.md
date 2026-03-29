@@ -328,6 +328,32 @@ SAP_AUTH_STRATEGY=basic       # 'basic' | 'btp-saml' | 'office365'
 SAP_CLIENT=100                # optional, OnPrem only
 SAP_LANGUAGE=EN               # optional, default: EN
 PRAMAN_LOG_LEVEL=info         # optional: 'error' | 'warn' | 'info' | 'debug' | 'trace'
+
+# ── Praman auth config overrides ────────────────────────────────────
+# PRAMAN_AUTH_BASE_URL=https://your-sap-system.example.com
+# PRAMAN_AUTH_STRATEGY=basic
+# PRAMAN_AUTH_USERNAME=your-username
+# PRAMAN_AUTH_PASSWORD=your-password
+# PRAMAN_AUTH_CLIENT=100
+# PRAMAN_AUTH_LANGUAGE=EN
+
+# ── Praman AI config overrides ──────────────────────────────────────
+# PRAMAN_AI_PROVIDER=openai          # 'openai' | 'azure' | 'anthropic'
+# PRAMAN_AI_API_KEY=sk-...
+# PRAMAN_AI_MODEL=gpt-4o
+# PRAMAN_AI_TEMPERATURE=0.3
+# PRAMAN_AI_ENDPOINT=https://your-azure.openai.azure.com
+# PRAMAN_AI_DEPLOYMENT=your-deployment
+# PRAMAN_AI_API_VERSION=2024-02-01
+# PRAMAN_AI_ANTHROPIC_API_KEY=sk-ant-...
+
+# ── Praman telemetry overrides ──────────────────────────────────────
+# PRAMAN_TELEMETRY_ENABLED=true
+# PRAMAN_TELEMETRY_ENDPOINT=http://localhost:4318
+# PRAMAN_TELEMETRY_SERVICE_NAME=praman-tests
+
+# ── Praman OData tracing ───────────────────────────────────────────
+# PRAMAN_ODATA_TRACING_ENABLED=true
 ```
 
 ### Loading .env files
