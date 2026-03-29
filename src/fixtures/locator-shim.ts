@@ -41,6 +41,22 @@ import type { UI5Selector } from '#core/types/selectors.js';
 const DOM_ELEMENT_TYPE = 'dom-element';
 
 /**
+ * Extended UI5ControlBase interface for locator shims.
+ *
+ * @remarks
+ * Adds common interaction methods that Playwright locators can fulfil
+ * without a real UI5 control: `press()`, `getText()`, `getValue()`.
+ */
+export interface LocatorShimControl extends UI5ControlBase {
+  /** Clicks the element (delegates to `locator.click()`). */
+  press(): Promise<void>;
+  /** Returns the text content (delegates to `locator.textContent()`). */
+  getText(): Promise<string>;
+  /** Returns the input value (delegates to `locator.inputValue()`). */
+  getValue(): Promise<string>;
+}
+
+/**
  * Creates a ControlError for UI5-only operations on a non-UI5 element.
  *
  * @param methodName - The UI5 method that was called.
@@ -90,7 +106,7 @@ function extractId(selector: UI5Selector): string {
  * await shim.getText();    // delegates to locator.textContent()
  * ```
  */
-export function createLocatorShim(locator: Locator, selector: UI5Selector): UI5ControlBase {
+export function createLocatorShim(locator: Locator, selector: UI5Selector): LocatorShimControl {
   const id = extractId(selector);
 
   /* eslint-disable @typescript-eslint/require-await -- interface conformance: UI5ControlBase methods return Promise */
@@ -145,5 +161,5 @@ export function createLocatorShim(locator: Locator, selector: UI5Selector): UI5C
       throw createNotUI5Error('getModel', selector);
     },
     /* eslint-enable @typescript-eslint/require-await */
-  } satisfies UI5ControlBase;
+  } satisfies LocatorShimControl;
 }

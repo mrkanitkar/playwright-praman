@@ -34,6 +34,7 @@ export const RecipePrioritySchema = z.enum([
   'advanced',
   'deprecated',
 ]);
+/** Priority level for recipe adoption, inferred from `RecipePrioritySchema`. */
 export type RecipePriority = z.infer<typeof RecipePrioritySchema>;
 
 /**
@@ -75,6 +76,7 @@ export const RecipeEntrySchema = z.object({
   /** Ready-to-use TypeScript code pattern. */
   pattern: z.string().min(1),
 });
+/** A single recipe entry inferred from `RecipeEntrySchema`. */
 export type RecipeEntry = z.infer<typeof RecipeEntrySchema>;
 
 /**

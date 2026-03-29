@@ -46,8 +46,13 @@ import { ErrorCode } from '#core/errors/codes.js';
  * ```
  */
 export interface FETestLibraryPage {
+  /** Executes a script in the browser context and returns the result. */
   evaluate<TResult>(pageFunction: string, arg?: unknown): Promise<TResult>;
-  locator(selector: string): { count(): Promise<number> };
+  /** Returns a locator for the given CSS selector, with a `count()` method. */
+  locator(selector: string): {
+    /** Returns the number of elements matching the selector. */
+    count(): Promise<number>;
+  };
 }
 
 /**
