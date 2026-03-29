@@ -159,6 +159,109 @@ praman.proxy.findControl (control discovery)
 praman.auth.login (authentication)
 ```
 
+## OData Request Tracing
+
+Praman includes automatic OData network request capture that feeds the `ODataTraceReporter`. When enabled, every browser-level OData request (XHR/fetch) is recorded with method, URL, status code, duration, and response size — no manual instrumentation needed.
+
+### Enable automatic tracing
+
+```typescript
+// praman.config.ts
+export default {
+  odataTracing: {
+    enabled: true,
+    // Optional: add custom URL patterns beyond the defaults
+    urlPatterns: ['/my-custom-service/'],
+  },
+};
+```
+
+Default URL patterns: `/sap/opu/odata/`, `/sap/opu/odata4/`, `/odata/v2/`, `/odata/v4/`.
+
+### Add the reporter
+
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [['list'], ['playwright-praman/reporters', { outputDir: 'test-results' }]],
+});
+```
+
+After the test run, find `test-results/odata-trace.json` containing:
+
+- **Per-entity-set stats**: total calls, avg/max duration, error count, method breakdown
+- **Individual traces**: every captured request with full metadata
+
+### Reading the report
+
+```json
+{
+  "totalRequests": 42,
+  "totalDuration": 6300,
+  "entityStats": [
+    {
+      "entitySet": "A_Product",
+      "totalCalls": 30,
+      "avgDuration": 120,
+      "maxDuration": 450,
+      "errorCount": 0,
+      "byMethod": { "GET": 28, "POST": 2 }
+    }
+  ]
+}
+```
+
+Use this to identify slow entity sets, excessive request counts, or high error rates.
+
+### Manual tracing (advanced)
+
+If you need to trace requests in specific tests without enabling the auto-fixture globally, attach trace data manually:
+
+```typescript
+import { test } from 'playwright-praman';
+
+test('trace OData calls', async ({ page }, testInfo) => {
+  const traces: { method: string; url: string; statusCode: number; duration: number }[] = [];
+  const pending = new Map<object, number>();
+
+  page.on('request', (req) => {
+    if (req.url().includes('/sap/opu/odata/')) {
+      pending.set(req, Date.now());
+    }
+  });
+
+  page.on('response', (resp) => {
+    const start = pending.get(resp.request());
+    if (start !== undefined) {
+      pending.delete(resp.request());
+      traces.push({
+        method: resp.request().method(),
+        url: resp.request().url(),
+        statusCode: resp.status(),
+        duration: Date.now() - start,
+      });
+    }
+  });
+
+  // ... your test steps ...
+
+  await testInfo.attach('odata-trace', {
+    contentType: 'application/json',
+    body: Buffer.from(JSON.stringify(traces)),
+  });
+});
+```
+
+:::tip
+The auto-fixture does exactly this for you. Prefer `odataTracing: { enabled: true }` over manual tracing.
+:::
+
+### Scope limitation
+
+Auto-tracing captures **browser-level traffic** (XHR/fetch from the SAP Fiori app running in the browser). Node-level `page.request.*` API calls (used by `ui5.odata.createEntity()`, `ui5.odata.queryEntities()`, etc.) operate outside the browser and are not captured by the auto-fixture.
+
 ## Error Introspection: toUserMessage() and toAIContext()
 
 Every `PramanError` provides two introspection methods:
@@ -210,6 +313,67 @@ Full serialization for logging and persistence:
 const serialized = error.toJSON();
 // Includes all fields from toAIContext() plus stack trace
 ```
+
+## Environment Variables
+
+Praman and its examples rely on environment variables for SAP system credentials. Set them before running tests:
+
+```bash
+# .env or .env.test (gitignored — never commit credentials)
+SAP_BASE_URL=https://your-sap-system.example.com
+SAP_CLOUD_BASE_URL=https://your-sap-system.example.com   # alias used by seed files
+SAP_CLOUD_USERNAME=your-username
+SAP_CLOUD_PASSWORD=your-password
+SAP_AUTH_STRATEGY=basic       # 'basic' | 'btp-saml' | 'office365'
+SAP_CLIENT=100                # optional, OnPrem only
+SAP_LANGUAGE=EN               # optional, default: EN
+PRAMAN_LOG_LEVEL=info         # optional: 'error' | 'warn' | 'info' | 'debug' | 'trace'
+```
+
+### Loading .env files
+
+Playwright does not load `.env` files automatically. Use one of these approaches:
+
+```bash
+# Option 1: dotenv-cli (recommended)
+npm install -D dotenv-cli
+npx dotenv -e .env -- npx playwright test
+
+# Option 2: export in shell
+export SAP_BASE_URL=https://your-sap-system.example.com
+export SAP_CLOUD_USERNAME=testuser
+export SAP_CLOUD_PASSWORD=secret
+npx playwright test
+
+# Option 3: inline (CI / one-off)
+SAP_BASE_URL=https://host SAP_CLOUD_USERNAME=user SAP_CLOUD_PASSWORD=pw npx playwright test
+```
+
+### CI/CD secrets
+
+In GitHub Actions, store credentials as repository secrets and pass them as environment variables:
+
+```yaml
+env:
+  SAP_BASE_URL: ${{ secrets.SAP_BASE_URL }}
+  SAP_CLOUD_USERNAME: ${{ secrets.SAP_CLOUD_USERNAME }}
+  SAP_CLOUD_PASSWORD: ${{ secrets.SAP_CLOUD_PASSWORD }}
+```
+
+See the [Docker & CI/CD guide](./docker-cicd.md) for full pipeline examples.
+
+## Troubleshooting Quick Reference
+
+| Symptom                    | Error Code                 | Likely Cause                                       | Jump To                                                        |
+| -------------------------- | -------------------------- | -------------------------------------------------- | -------------------------------------------------------------- |
+| Bridge timeout on startup  | `ERR_BRIDGE_TIMEOUT`       | Page is not a UI5 app, or UI5 loading slowly       | [Bridge Injection Timeout](#bridge-injection-timeout)          |
+| Control not found          | `ERR_CONTROL_NOT_FOUND`    | Wrong ID, control not rendered, wrong frame        | [Control Not Found](#control-not-found)                        |
+| Stale object reference     | `ERR_BRIDGE_EXECUTION`     | Navigation invalidated the object map              | [Stale Object Reference](#stale-object-reference)              |
+| Test hangs indefinitely    | `ERR_TIMEOUT_UI5_STABLE`   | Third-party scripts (WalkMe) block stability       | [Stability Wait Hanging](#stability-wait-hanging)              |
+| Login fails                | `ERR_AUTH_FAILED`          | Wrong credentials, expired session, wrong strategy | [Auth Failures](#auth-failures)                                |
+| ReferenceError in evaluate | —                          | Helper function not serialized into browser        | [page.evaluate() ReferenceError](#pageevaluate-referenceerror) |
+| OData 403/404              | `ERR_ODATA_REQUEST_FAILED` | Missing CSRF token, wrong service URL              | [OData Request Tracing](#odata-request-tracing)                |
+| Empty env var errors       | —                          | `.env` not loaded or variable not set              | [Environment Variables](#environment-variables)                |
 
 ## Common Issues and Resolutions
 

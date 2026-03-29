@@ -71,6 +71,40 @@ bom-create-validation-error.png
 .mcp.json
 .mcp.json.bak
 
+# Playwright local tooling state
+.playwright-cli/
+.playwright-mcp/
+
+# Screenshots & generated images
+*.png
+*.html
+!docs/**/*.html
+
+# Test screenshots
+test-screenshots/
+
+# Scratch / temp files
+sap_template_tc*.csv
+
+# Blog & social media drafts
+blog-*.md
+linkedin-*.md
+
+# DX audit & analysis artifacts
+dx-audit-report.md
+prompts/
+
+# Claude agent prompts & skills (local authoring)
+.claude/prompts/
+.claude/skills/
+
+# Docs analysis (local research)
+docs/dx-comparison-*.md
+docs/implementation-plan-*.md
+docs/playwright-cli-*.md
+docs/review-implementation-plan-*.md
+docs/typescript-*-compatibility-report.md
+
 # Strict TypeScript Project
 # WARNING: JavaScript files (.js, .jsx, .mjs, .cjs) are NOT allowed in src/
 # This is enforced by pre-commit hooks. Config files like eslint.config.mjs

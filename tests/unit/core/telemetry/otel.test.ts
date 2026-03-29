@@ -14,10 +14,24 @@
  * Verifies NoOpTracer implementation, lazy initialization, and that
  * disabled telemetry returns NoOpTracer immediately with zero overhead.
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { PramanConfigSchema } from '#core/config/schema.js';
 import { getNoOpTracer, initTelemetry } from '#core/telemetry/otel.js';
+
+const mockWarn = vi.fn();
+
+vi.mock('#core/logging/index.js', () => ({
+  createLogger: vi.fn(() => ({
+    warn: mockWarn,
+    info: vi.fn(),
+    debug: vi.fn(),
+    error: vi.fn(),
+    child: vi.fn(),
+  })),
+  createRootLogger: vi.fn(),
+  resetDefaultLogger: vi.fn(),
+}));
 
 describe('initTelemetry', () => {
   it('returns NoOpTracer when telemetry is disabled', async () => {
@@ -32,6 +46,32 @@ describe('initTelemetry', () => {
     expect(typeof tracer.withSpan).toBe('function');
     expect(typeof tracer.recordException).toBe('function');
     expect(typeof tracer.shutdown).toBe('function');
+  });
+
+  it('returns NoOpTracer and logs warning when openTelemetry is enabled', async () => {
+    mockWarn.mockClear();
+    const config = PramanConfigSchema.parse({
+      telemetry: { openTelemetry: true },
+    });
+
+    const tracer = await initTelemetry(config);
+
+    // Should still return a valid NoOpTracer
+    expect(typeof tracer.startSpan).toBe('function');
+    expect(typeof tracer.withSpan).toBe('function');
+
+    // Should have logged a Phase 1 warning
+    expect(mockWarn).toHaveBeenCalledOnce();
+    expect(mockWarn.mock.calls[0]?.[0]).toContain('Phase 1');
+  });
+
+  it('does not log warning when telemetry section is absent', async () => {
+    mockWarn.mockClear();
+    const config = PramanConfigSchema.parse({});
+
+    await initTelemetry(config);
+
+    expect(mockWarn).not.toHaveBeenCalled();
   });
 });
 

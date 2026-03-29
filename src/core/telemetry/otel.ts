@@ -32,6 +32,7 @@
  */
 
 import type { PramanConfig } from '#core/config/schema.js';
+import { createLogger } from '#core/logging/index.js';
 
 /**
  * Wrapper around an OpenTelemetry span for instrumented operations.
@@ -160,10 +161,14 @@ const NO_OP_TRACER: TracerWrapper = {
  * const tracer = await initTelemetry(config);
  * ```
  */
-export async function initTelemetry(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Phase 2 (M2) will use config for real OTel SDK init
-  config: Readonly<PramanConfig>,
-): Promise<TracerWrapper> {
+export async function initTelemetry(config: Readonly<PramanConfig>): Promise<TracerWrapper> {
+  if (config.telemetry?.openTelemetry === true) {
+    const log = createLogger('telemetry');
+    log.warn(
+      'OpenTelemetry enabled in config but real tracing is not yet available (Phase 1). ' +
+        'A NoOpTracer will be used. Real OTel SDK integration is tracked as M2.',
+    );
+  }
   // Phase 1: Always return NoOpTracer regardless of config.
   // Phase 2 (M2): Check config.telemetry?.openTelemetry and initialize real OTel SDK.
   await Promise.resolve();

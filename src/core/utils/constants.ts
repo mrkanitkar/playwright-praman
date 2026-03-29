@@ -150,3 +150,32 @@ export const DEFAULT_TIMEOUTS = Object.freeze({
   POLLING_INTERVAL: 100,
   CACHE_TTL: 5_000,
 } as const);
+
+/**
+ * Substring patterns matching common SAP OData service URL paths.
+ *
+ * @remarks
+ * Used by the OData trace fixture to identify OData network requests.
+ * Unlike the regex-based ignore patterns above, these are plain substring
+ * patterns checked via `String.includes()`. They cover:
+ * - SAP Gateway OData V2: `/sap/opu/odata/`
+ * - SAP Gateway OData V4: `/sap/opu/odata4/`
+ * - Generic CAP/CDS OData V2: `/odata/v2/`
+ * - Generic CAP/CDS OData V4: `/odata/v4/`
+ *
+ * Users can add additional patterns via the `odataTracing.urlPatterns`
+ * config option.
+ *
+ * @example
+ * ```typescript
+ * import { ODATA_DEFAULT_URL_PATTERNS } from '#core/utils/constants.js';
+ *
+ * const isOData = ODATA_DEFAULT_URL_PATTERNS.some((p) => url.includes(p));
+ * ```
+ */
+export const ODATA_DEFAULT_URL_PATTERNS: readonly string[] = [
+  '/sap/opu/odata/',
+  '/sap/opu/odata4/',
+  '/odata/v2/',
+  '/odata/v4/',
+] as const;

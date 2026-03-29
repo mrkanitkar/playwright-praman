@@ -22,6 +22,7 @@ import {
   ANALYTICS_DEFAULT_PATTERNS,
   DEFAULT_IGNORE_PATTERNS,
   DEFAULT_TIMEOUTS,
+  ODATA_DEFAULT_URL_PATTERNS,
   WALKME_DEFAULT_PATTERNS,
 } from '#core/utils/constants.js';
 
@@ -58,6 +59,45 @@ describe('DEFAULT_TIMEOUTS', () => {
       expect(value).toBeGreaterThan(0);
       expect(Number.isInteger(value)).toBe(true);
     }
+  });
+});
+
+describe('ODATA_DEFAULT_URL_PATTERNS', () => {
+  it('is a non-empty readonly array', () => {
+    expect(Array.isArray(ODATA_DEFAULT_URL_PATTERNS)).toBe(true);
+    expect(ODATA_DEFAULT_URL_PATTERNS.length).toBeGreaterThan(0);
+  });
+
+  it('has exactly 4 default patterns', () => {
+    expect(ODATA_DEFAULT_URL_PATTERNS).toHaveLength(4);
+  });
+
+  it('includes SAP OData V2 path', () => {
+    expect(ODATA_DEFAULT_URL_PATTERNS).toContain('/sap/opu/odata/');
+  });
+
+  it('includes SAP OData V4 path', () => {
+    expect(ODATA_DEFAULT_URL_PATTERNS).toContain('/sap/opu/odata4/');
+  });
+
+  it('includes generic OData V2 path', () => {
+    expect(ODATA_DEFAULT_URL_PATTERNS).toContain('/odata/v2/');
+  });
+
+  it('includes generic OData V4 path', () => {
+    expect(ODATA_DEFAULT_URL_PATTERNS).toContain('/odata/v4/');
+  });
+
+  it('matches SAP OData URLs via substring', () => {
+    const url = 'https://host.sap.com/sap/opu/odata/sap/API_PRODUCT/Products';
+    const matched = ODATA_DEFAULT_URL_PATTERNS.some((p) => url.includes(p));
+    expect(matched).toBe(true);
+  });
+
+  it('does not match non-OData URLs', () => {
+    const url = 'https://host.sap.com/sap/bc/ui5_ui5/some-app/index.html';
+    const matched = ODATA_DEFAULT_URL_PATTERNS.some((p) => url.includes(p));
+    expect(matched).toBe(false);
   });
 });
 
