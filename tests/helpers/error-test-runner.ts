@@ -125,6 +125,8 @@ export function runBaseErrorTests(
     expect(json).toHaveProperty('suggestions');
     expect(json).toHaveProperty('timestamp');
     expect(json).toHaveProperty('stack');
+    expect(json).toHaveProperty('docsUrl');
+    expect(json.docsUrl).toContain('https://praman.dev/docs/guides/errors#');
   });
 
   it('toAIContext() includes all fields except stack and name', () => {
@@ -138,6 +140,7 @@ export function runBaseErrorTests(
     expect(ctx).toHaveProperty('details');
     expect(ctx).toHaveProperty('suggestions');
     expect(ctx).toHaveProperty('timestamp');
+    expect(ctx).toHaveProperty('docsUrl');
     expect(ctx).not.toHaveProperty('stack');
     expect(ctx).not.toHaveProperty('name');
   });
@@ -149,6 +152,7 @@ export function runBaseErrorTests(
     expect(msg).toContain('Attempted:');
     expect(msg).toContain('Severity:');
     expect(msg).toContain('Retryable:');
+    expect(msg).toContain('Docs: https://praman.dev/docs/guides/errors#');
   });
 
   it('properties are readonly', () => {

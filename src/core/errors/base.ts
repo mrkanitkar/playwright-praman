@@ -36,6 +36,32 @@
 
 import type { ErrorCode } from './codes.js';
 
+/** Base URL for the Praman error reference documentation. */
+const DOCS_BASE = 'https://praman.dev/docs/guides/errors';
+
+/**
+ * Derives the docs URL for an error code from its category prefix.
+ *
+ * @remarks
+ * Maps `ERR_CONTROL_NOT_FOUND` → `#control-errors`, `ERR_AUTH_FAILED` → `#auth-errors`, etc.
+ * Anchors match Docusaurus auto-generated headings in the error reference guide.
+ *
+ * @param code - Machine-readable error code (e.g., `'ERR_CONTROL_NOT_FOUND'`).
+ * @returns Full URL to the relevant error category section.
+ *
+ * @example
+ * ```typescript
+ * getErrorDocsUrl('ERR_CONTROL_NOT_FOUND');
+ * // → 'https://praman.dev/docs/guides/errors#control-errors'
+ * ```
+ */
+function getErrorDocsUrl(code: string): string {
+  // ERR_CONTROL_NOT_FOUND → split by '_' → ['ERR', 'CONTROL', ...] → 'CONTROL' → 'control'
+  // All error codes follow ERR_<CATEGORY>_<REASON> — extract category via split
+  const category = code.split('_').slice(1, 2).join('').toLowerCase();
+  return `${DOCS_BASE}#${category}-errors`;
+}
+
 /**
  * Options for constructing a PramanError.
  */
@@ -64,6 +90,8 @@ export interface SerializedPramanError {
   readonly suggestions: readonly string[];
   readonly timestamp: string;
   readonly stack: string | undefined;
+  /** URL to the relevant error category in the Praman docs. */
+  readonly docsUrl: string;
 }
 
 /**
@@ -78,6 +106,8 @@ export interface AIErrorContext {
   readonly details: Readonly<Record<string, unknown>>;
   readonly suggestions: readonly string[];
   readonly timestamp: string;
+  /** URL to the relevant error category in the Praman docs. */
+  readonly docsUrl: string;
 }
 
 /**
@@ -164,6 +194,7 @@ export class PramanError extends Error {
       suggestions: this.suggestions,
       timestamp: this.timestamp,
       stack: this.stack,
+      docsUrl: getErrorDocsUrl(this.code),
     };
   }
 
@@ -203,6 +234,9 @@ export class PramanError extends Error {
       }
     }
 
+    lines.push('');
+    lines.push(`  Docs: ${getErrorDocsUrl(this.code)}`);
+
     return lines.join('\n');
   }
 
@@ -231,6 +265,7 @@ export class PramanError extends Error {
       details: this.details,
       suggestions: this.suggestions,
       timestamp: this.timestamp,
+      docsUrl: getErrorDocsUrl(this.code),
     };
   }
 }
