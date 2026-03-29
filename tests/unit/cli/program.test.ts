@@ -43,6 +43,10 @@ vi.mock('../../../src/cli/uninstall.js', () => ({
   runUninstall: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../../../src/cli/config-show.js', () => ({
+  runConfigShow: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock('../../../src/cli/version.js', () => ({
   getVersion: vi.fn().mockReturnValue('1.0.0'),
 }));
@@ -60,11 +64,13 @@ vi.mock('../../../src/cli/logger.js', () => ({
 const { runInit } = await import('../../../src/cli/init.js');
 const { runDoctor } = await import('../../../src/cli/doctor.js');
 const { runUninstall } = await import('../../../src/cli/uninstall.js');
+const { runConfigShow } = await import('../../../src/cli/config-show.js');
 const { logError } = await import('../../../src/cli/logger.js');
 
 const mockedRunInit = vi.mocked(runInit);
 const mockedRunDoctor = vi.mocked(runDoctor);
 const mockedRunUninstall = vi.mocked(runUninstall);
+const mockedRunConfigShow = vi.mocked(runConfigShow);
 const mockedLogError = vi.mocked(logError);
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -256,6 +262,45 @@ describe('cli/program (Commander.js)', () => {
     });
   });
 
+  // ── config command ───────────────────────────────────────────────────
+
+  describe('config command', () => {
+    it('routes "config" to runConfigShow with default options', async () => {
+      await prog.parseAsync(['config'], { from: 'user' });
+
+      expect(mockedRunConfigShow).toHaveBeenCalledOnce();
+      expect(mockedRunConfigShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          json: false,
+          showSecrets: false,
+        }),
+      );
+    });
+
+    it('passes --json flag', async () => {
+      await prog.parseAsync(['config', '--json'], { from: 'user' });
+
+      expect(mockedRunConfigShow).toHaveBeenCalledWith(expect.objectContaining({ json: true }));
+    });
+
+    it('passes --show-secrets flag', async () => {
+      await prog.parseAsync(['config', '--show-secrets'], { from: 'user' });
+
+      expect(mockedRunConfigShow).toHaveBeenCalledWith(
+        expect.objectContaining({ showSecrets: true }),
+      );
+    });
+
+    it('passes both --json and --show-secrets', async () => {
+      await prog.parseAsync(['config', '--json', '--show-secrets'], { from: 'user' });
+
+      expect(mockedRunConfigShow).toHaveBeenCalledWith({
+        json: true,
+        showSecrets: true,
+      });
+    });
+  });
+
   // ── --version flag ──────────────────────────────────────────────────────
 
   describe('--version flag', () => {
@@ -293,6 +338,7 @@ describe('cli/program (Commander.js)', () => {
       expect(stdoutCapture).toContain('init');
       expect(stdoutCapture).toContain('doctor');
       expect(stdoutCapture).toContain('uninstall');
+      expect(stdoutCapture).toContain('config');
     });
 
     it('handles -h shorthand', async () => {
@@ -332,6 +378,7 @@ describe('cli/program (Commander.js)', () => {
       expect(stderrCapture).toContain('init');
       expect(stderrCapture).toContain('doctor');
       expect(stderrCapture).toContain('uninstall');
+      expect(stderrCapture).toContain('config');
     });
   });
 
@@ -387,28 +434,40 @@ describe('cli/program (Commander.js)', () => {
   // ── subcommand isolation ──────────────────────────────────────────────
 
   describe('subcommand isolation', () => {
-    it('init does not invoke doctor or uninstall', async () => {
+    it('init does not invoke doctor, uninstall, or config', async () => {
       await prog.parseAsync(['init'], { from: 'user' });
 
       expect(mockedRunInit).toHaveBeenCalledOnce();
       expect(mockedRunDoctor).not.toHaveBeenCalled();
       expect(mockedRunUninstall).not.toHaveBeenCalled();
+      expect(mockedRunConfigShow).not.toHaveBeenCalled();
     });
 
-    it('doctor does not invoke init or uninstall', async () => {
+    it('doctor does not invoke init, uninstall, or config', async () => {
       await prog.parseAsync(['doctor'], { from: 'user' });
 
       expect(mockedRunDoctor).toHaveBeenCalledOnce();
       expect(mockedRunInit).not.toHaveBeenCalled();
       expect(mockedRunUninstall).not.toHaveBeenCalled();
+      expect(mockedRunConfigShow).not.toHaveBeenCalled();
     });
 
-    it('uninstall does not invoke init or doctor', async () => {
+    it('uninstall does not invoke init, doctor, or config', async () => {
       await prog.parseAsync(['uninstall'], { from: 'user' });
 
       expect(mockedRunUninstall).toHaveBeenCalledOnce();
       expect(mockedRunInit).not.toHaveBeenCalled();
       expect(mockedRunDoctor).not.toHaveBeenCalled();
+      expect(mockedRunConfigShow).not.toHaveBeenCalled();
+    });
+
+    it('config does not invoke init, doctor, or uninstall', async () => {
+      await prog.parseAsync(['config'], { from: 'user' });
+
+      expect(mockedRunConfigShow).toHaveBeenCalledOnce();
+      expect(mockedRunInit).not.toHaveBeenCalled();
+      expect(mockedRunDoctor).not.toHaveBeenCalled();
+      expect(mockedRunUninstall).not.toHaveBeenCalled();
     });
   });
 });

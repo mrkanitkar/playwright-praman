@@ -32,6 +32,8 @@ import process from 'node:process';
 
 import { Command } from 'commander';
 
+import type { ConfigShowOptions } from './config-show.js';
+import { runConfigShow } from './config-show.js';
 import { runDoctor } from './doctor.js';
 import type { InitAgentsOptions } from './init-agents.js';
 import { isValidLoop, runInitAgents } from './init-agents.js';
@@ -196,6 +198,32 @@ Examples:
         }
       },
     );
+
+  prog
+    .command('config')
+    .description('Display the resolved Praman configuration')
+    .option('--json', 'Output as raw JSON', false)
+    .option('--show-secrets', 'Show sensitive values without redaction', false)
+    .addHelpText(
+      'afterAll',
+      `
+Examples:
+  $ npx playwright-praman config
+  $ npx playwright-praman config --json
+  $ PRAMAN_LOG_LEVEL=debug npx playwright-praman config`,
+    )
+    .action(async (opts: { json: boolean; showSecrets: boolean }) => {
+      try {
+        const configOpts: ConfigShowOptions = {
+          json: opts.json,
+          showSecrets: opts.showSecrets,
+        };
+        await runConfigShow(configOpts);
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
 
   return prog;
 }
