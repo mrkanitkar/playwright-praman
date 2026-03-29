@@ -63,7 +63,7 @@ test('discover a UI5 control', async ({ ui5, ui5Navigation }) => {
 - [Configuration Reference](./guides/configuration.md) — all config options with defaults
 - [Fixture Reference](./guides/fixtures.md) — all 12 fixture modules
 - [Selector Reference](./guides/selectors.md) — `UI5Selector` fields and examples
-- [Error Reference](./guides/errors.md) — 60 error codes with recovery suggestions
+- [Error Reference](./guides/errors.md) — 67 error codes with recovery suggestions
 - [Feature Inventory](./guides/capabilities.md) — complete feature overview
 
 > **Not sure where to start?** Visit the [Personas](/personas) page to find your role-specific entry point.

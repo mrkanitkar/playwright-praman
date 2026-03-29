@@ -77,7 +77,7 @@ const config: Config = {
         name: 'playwright-praman',
         description:
           'Agent-First SAP UI5 Test Automation Plugin for Playwright. ' +
-          'Enterprise-grade testing with agentic AI, typed proxies, and 32+ fixtures.',
+          'Enterprise-grade testing with agentic AI, typed proxies, and 21 fixtures.',
         url: 'https://praman.dev',
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'Windows, macOS, Linux',

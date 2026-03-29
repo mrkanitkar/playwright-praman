@@ -9,7 +9,7 @@ Ground-up rewrite — NO copy-paste from v2.5.0.
 ## Architecture (read plan.md for full details)
 
 - Single npm package with sub-path exports
-- 5-layer: Core Infrastructure → Bridge Adapters → Typed Proxy → Fixtures → AI
+- 6-layer: Core Infrastructure → Bridge Adapters → Typed Proxy → Fixtures → AI → Reporters
 - Layer dependency: lower layers NEVER import from higher layers
 
 ## Agent Skills

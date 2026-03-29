@@ -839,7 +839,7 @@ function TechnicalDocumentation(): ReactNode {
       <div style={docSection}>
         <h3 style={docH3}>Core Architecture Layers</h3>
         <p style={docP}>
-          Praman follows a strict 5-layer architecture. Lower layers never import from higher layers.
+          Praman follows a strict 6-layer architecture. Lower layers never import from higher layers.
           Each layer has a well-defined responsibility and communicates only with its adjacent layers.
         </p>
         <LayerDiagram />
@@ -916,7 +916,7 @@ function TechnicalDocumentation(): ReactNode {
             {[
               ['Strict TypeScript', 'No `any`, no `as unknown as T`. 551 types, exactOptionalPropertyTypes, verbatimModuleSyntax', 'typescript-eslint strict type-checked'],
               ['Immutable Config', 'Readonly<PramanConfig> — never mutated at runtime', 'TypeScript compiler + code review'],
-              ['Structured Errors', '13 error classes with code, attempted, retryable, suggestions[]', 'PramanError base class enforcement'],
+              ['Structured Errors', '14 error classes with code, attempted, retryable, suggestions[]', 'PramanError base class enforcement'],
               ['No console.log', 'Pino structured logging only', 'ESLint rule + code review'],
               ['No page.waitForTimeout()', 'Smart waits: waitForUI5Stable(), briefDOMSettle()', 'eslint-plugin-playwright ban list'],
               ['ESM-first', 'import/export only, node: prefix, .js extensions', 'eslint-plugin-n, eslint-plugin-import-x'],
@@ -980,7 +980,7 @@ function TechnicalDocumentation(): ReactNode {
               ['src/cli/', 'CLI tooling'],
               ['src/core/', 'Foundation: errors, config, logging, types'],
               ['  core/constants/', 'Control types (61), timeouts, defaults'],
-              ['  core/errors/', '13 error classes + base + codes'],
+              ['  core/errors/', '14 error classes, 67 error codes'],
               ['  core/logging/', 'Pino structured logger'],
               ['  core/types/', '551 type definitions'],
               ['  core/utils/', 'Wait helpers, path helpers, compat'],
@@ -1886,7 +1886,7 @@ export default function Architecture(): ReactNode {
             </h2>
             <p style={{ fontSize: '0.95rem', color: '#1e293b', maxWidth: 720, margin: '0 auto' }}>
               Comprehensive technical documentation verified against source code.
-              180 source files, 551 type definitions, 5-layer architecture — every number counted, not estimated.
+              180 source files, 551 type definitions, 6-layer architecture — every number counted, not estimated.
             </p>
           </div>
           <TechnicalDocumentation />
