@@ -65,49 +65,17 @@ npm install playwright-praman
 npx playwright-praman init
 ```
 
-That's it. `init` validates your environment, installs Chromium, scaffolds all config files, detects your IDE, and installs AI agent definitions.
-
-### Run Your First Test
+That's it. `init` validates your environment, installs Chromium, scaffolds config files, detects your IDE, and installs AI agent definitions.
 
 ```bash
 # Set your SAP credentials
 cp .env.example .env
 # Edit .env with your SAP_CLOUD_BASE_URL, SAP_CLOUD_USERNAME, SAP_CLOUD_PASSWORD
-
-# Run in headed mode to watch it
-npx playwright test --project=chromium --headed
 ```
 
-Or write a test manually:
+Two paths to get started — choose your workflow:
 
-```typescript
-import { test, expect } from 'playwright-praman';
-
-test('open Fiori Launchpad', async ({ page, ui5 }) => {
-  await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
-  await ui5.waitForUI5();
-
-  const tile = await ui5.control({
-    controlType: 'sap.m.GenericTile',
-    properties: { header: 'My App' },
-  });
-  expect(await tile.getControlType()).toBe('sap.m.GenericTile');
-});
-```
-
-### Install Agents for a Specific IDE
-
-Already have a project? Install only agent definitions — mirrors Playwright's `init-agents`:
-
-```bash
-npx playwright-praman init-agents --loop=vscode
-npx playwright-praman init-agents --loop=claude
-npx playwright-praman init-agents --loop=cursor
-```
-
-See the full [Agent & IDE Setup](https://praman.dev/docs/guides/agent-setup) guide for all options.
-
-### Generate Tests with AI Agents
+### Path A: Generate Tests with AI Agents (recommended)
 
 Describe your business process — Praman's **plan → generate → heal** pipeline does the rest:
 
@@ -122,9 +90,44 @@ Describe your business process — Praman's **plan → generate → heal** pipel
 | **Generator** | Converts the plan into executable Playwright + Praman code with typed proxies |
 | **Healer**    | Runs the test, fixes failures, ensures compliance — repeats until green       |
 
-The result is a **production-ready `.spec.ts` file** — no manual test scripting required. Works with Claude Code, GitHub Copilot, Cursor, and Jules.
+The result is a **production-ready `.spec.ts` file** — no manual scripting required. Works with Claude Code, GitHub Copilot, Cursor, and Jules.
 
-> See the full [Getting Started](https://praman.dev/docs/guides/getting-started) guide and [Running Your Agent](https://praman.dev/docs/guides/running-your-agent) walkthrough.
+Need agents for a different IDE? Mirrors Playwright's `init-agents`:
+
+```bash
+npx playwright-praman init-agents --loop=vscode
+npx playwright-praman init-agents --loop=claude
+npx playwright-praman init-agents --loop=cursor
+```
+
+> Guides: [Getting Started](https://praman.dev/docs/guides/getting-started)
+> · [Agent & IDE Setup](https://praman.dev/docs/guides/agent-setup)
+> · [Running Your Agent](https://praman.dev/docs/guides/running-your-agent)
+
+### Path B: Write Tests Manually
+
+Prefer writing tests by hand? Use Praman fixtures directly:
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('open Fiori app', async ({ page, ui5 }) => {
+  await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
+  await ui5.waitForUI5();
+
+  const tile = await ui5.control({
+    controlType: 'sap.m.GenericTile',
+    properties: { header: 'My App' },
+  });
+  expect(await tile.getControlType()).toBe('sap.m.GenericTile');
+});
+```
+
+```bash
+npx playwright test --project=chromium --headed
+```
+
+> See the [Fixture Reference](https://praman.dev/docs/guides/fixtures) and [Selector Reference](https://praman.dev/docs/guides/selectors) for the full API.
 
 ## Example
 
