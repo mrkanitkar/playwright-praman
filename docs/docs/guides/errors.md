@@ -1,6 +1,6 @@
 ---
 title: Error Reference
-description: 'Complete Praman error reference: 14 error classes, 58 error codes with retryable flags and actionable suggestions for SAP UI5 testing.'
+description: 'Complete Praman error reference: 14 error classes, 67 error codes with retryable flags and actionable suggestions for SAP UI5 testing.'
 keywords:
   - praman error codes
   - sap ui5 test debugging

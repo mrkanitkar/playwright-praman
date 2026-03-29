@@ -4,9 +4,9 @@ title: 'Architecture Overview'
 
 # Architecture Overview
 
-Praman v1.0 ships as a single npm package (`playwright-praman`) with sub-path exports, organized into a strict 5-layer architecture where lower layers never import from higher layers.
+Praman v1.0 ships as a single npm package (`playwright-praman`) with sub-path exports, organized into a strict 6-layer architecture where lower layers never import from higher layers.
 
-## 5-Layer Architecture
+## 6-Layer Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -158,7 +158,7 @@ The predecessor plugin (v2.5.0) suffered from monolithic files:
 | File                   | LOC   | Problem                                  |
 | ---------------------- | ----- | ---------------------------------------- |
 | `ui5-handler.ts`       | 2,318 | God object handling all UI5 operations   |
-| `plugin-fixtures.ts`   | 2,263 | All 32 fixtures in one file              |
+| `plugin-fixtures.ts`   | 2,263 | All 21 fixtures in one file              |
 | `ui5-control-proxy.ts` | 1,829 | Double-proxy with redundant interception |
 
 Praman v1.0 decomposes these into focused modules following SRP (Single Responsibility Principle):

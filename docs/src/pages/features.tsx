@@ -94,7 +94,7 @@ const SECTIONS: Section[] = [
     rows: [
       { feature: 'Setup CLI',                 native: C('no',      '✗'),                praman: C('check',   '✓ npx playwright-praman init') },
       { feature: 'Doctor / diagnostics CLI',  native: C('no',      '✗'),                praman: C('check',   '✓ npx playwright-praman doctor') },
-      { feature: 'Structured error codes',    native: C('partial', '⚠ JS Error only'),  praman: C('check',   '✓ 14 classes, 56 codes, suggestions[]') },
+      { feature: 'Structured error codes',    native: C('partial', '⚠ JS Error only'),  praman: C('check',   '✓ 14 classes, 67 codes, suggestions[]') },
       { feature: 'API documentation',         native: C('check',   '✓ Full docs'),      praman: C('check',   '✓ TSDoc + API Extractor') },
       { feature: 'Playwright fixture pattern',native: C('check',   '✓ test.extend()'),  praman: C('check',   '✓ 21 fixtures, 5 auto-fixtures') },
     ],
