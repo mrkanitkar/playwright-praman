@@ -62,6 +62,15 @@ const aiSchema = z.object({
 });
 
 // ── Telemetry sub-schema ─────────────────────────────────────────────
+
+/**
+ * Telemetry configuration sub-schema.
+ *
+ * @remarks
+ * Phase 1: All telemetry operations use a NoOpTracer regardless of configuration.
+ * Setting `openTelemetry: true` will log a warning but produce no trace data.
+ * Real OTel SDK integration (Phase 2) is tracked as milestone M2.
+ */
 const telemetrySchema = z.object({
   openTelemetry: z.boolean().default(false),
   exporter: z.enum(['otlp', 'azure-monitor', 'jaeger']).default('otlp'),
