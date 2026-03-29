@@ -94,16 +94,34 @@ cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable
 <details>
 <summary>Environment variables reference</summary>
 
-| Variable                    | Required | Description                                     |
-| --------------------------- | -------- | ----------------------------------------------- |
-| `SAP_CLOUD_BASE_URL`        | Yes      | SAP BTP or on-premise base URL                  |
-| `SAP_CLOUD_USERNAME`        | Yes      | SAP login username                              |
-| `SAP_CLOUD_PASSWORD`        | Yes      | SAP login password                              |
-| `SAP_AUTH_STRATEGY`         | Yes      | Auth strategy: `btp-saml`, `basic`, `office365` |
-| `SAP_CLIENT`                | No       | SAP client number (default: from system)        |
-| `SAP_LANGUAGE`              | No       | Display language (default: EN)                  |
-| `PRAMAN_LOG_LEVEL`          | No       | Log level: `debug`, `info`, `warn`, `error`     |
-| `PRAMAN_SKIP_VERSION_CHECK` | No       | Set `true` to skip Playwright version check     |
+| Variable                        | Required | Description                                     |
+| ------------------------------- | -------- | ----------------------------------------------- |
+| `SAP_CLOUD_BASE_URL`            | Yes      | SAP BTP or on-premise base URL                  |
+| `SAP_CLOUD_USERNAME`            | Yes      | SAP login username                              |
+| `SAP_CLOUD_PASSWORD`            | Yes      | SAP login password                              |
+| `SAP_AUTH_STRATEGY`             | Yes      | Auth strategy: `btp-saml`, `basic`, `office365` |
+| `SAP_CLIENT`                    | No       | SAP client number (default: from system)        |
+| `SAP_LANGUAGE`                  | No       | Display language (default: EN)                  |
+| `PRAMAN_LOG_LEVEL`              | No       | Log level: `debug`, `info`, `warn`, `error`     |
+| `PRAMAN_SKIP_VERSION_CHECK`     | No       | Set `true` to skip Playwright version check     |
+| `PRAMAN_AUTH_BASE_URL`          | No       | SAP base URL for Praman auth config             |
+| `PRAMAN_AUTH_STRATEGY`          | No       | Auth strategy override (`basic`, `btp-saml`)    |
+| `PRAMAN_AUTH_USERNAME`          | No       | Auth username override                          |
+| `PRAMAN_AUTH_PASSWORD`          | No       | Auth password override                          |
+| `PRAMAN_AUTH_CLIENT`            | No       | SAP client override                             |
+| `PRAMAN_AUTH_LANGUAGE`          | No       | Language override                               |
+| `PRAMAN_AI_PROVIDER`            | No       | AI provider: `openai`, `azure`, `anthropic`     |
+| `PRAMAN_AI_API_KEY`             | No       | AI provider API key                             |
+| `PRAMAN_AI_MODEL`               | No       | AI model name                                   |
+| `PRAMAN_AI_TEMPERATURE`         | No       | AI temperature (number, e.g. `0.3`)             |
+| `PRAMAN_AI_ENDPOINT`            | No       | AI endpoint URL (Azure OpenAI)                  |
+| `PRAMAN_AI_DEPLOYMENT`          | No       | Azure OpenAI deployment name                    |
+| `PRAMAN_AI_API_VERSION`         | No       | Azure OpenAI API version                        |
+| `PRAMAN_AI_ANTHROPIC_API_KEY`   | No       | Anthropic API key (Claude models)               |
+| `PRAMAN_TELEMETRY_ENABLED`      | No       | Enable OpenTelemetry (`true`/`false`)           |
+| `PRAMAN_TELEMETRY_ENDPOINT`     | No       | OTel collector endpoint                         |
+| `PRAMAN_TELEMETRY_SERVICE_NAME` | No       | OTel service name                               |
+| `PRAMAN_ODATA_TRACING_ENABLED`  | No       | Enable OData request tracing (`true`/`false`)   |
 
 For auth strategy details, see the [Authentication](./authentication) guide.
 

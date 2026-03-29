@@ -52,11 +52,19 @@ export interface LoadConfigOptions {
   readonly overrides?: PramanConfigInput;
 }
 
-/** Env var name to config field mapping. */
+/** Env var name to top-level config field mapping. */
 interface EnvMapping {
   readonly envVar: string;
   readonly configKey: string;
   readonly type: 'string' | 'number' | 'boolean' | 'string-array';
+}
+
+/** Env var name to nested config path mapping (depth = 2). */
+interface NestedEnvMapping {
+  readonly envVar: string;
+  readonly section: string;
+  readonly field: string;
+  readonly type: 'string' | 'number' | 'boolean';
 }
 
 const ENV_MAPPINGS: readonly EnvMapping[] = [
@@ -77,8 +85,96 @@ const ENV_MAPPINGS: readonly EnvMapping[] = [
   { envVar: 'PRAMAN_PREFER_VISIBLE', configKey: 'preferVisibleControls', type: 'boolean' },
 ];
 
+const NESTED_ENV_MAPPINGS: readonly NestedEnvMapping[] = [
+  // auth section
+  { envVar: 'PRAMAN_AUTH_BASE_URL', section: 'auth', field: 'baseUrl', type: 'string' },
+  { envVar: 'PRAMAN_AUTH_STRATEGY', section: 'auth', field: 'strategy', type: 'string' },
+  { envVar: 'PRAMAN_AUTH_USERNAME', section: 'auth', field: 'username', type: 'string' },
+  { envVar: 'PRAMAN_AUTH_PASSWORD', section: 'auth', field: 'password', type: 'string' },
+  { envVar: 'PRAMAN_AUTH_CLIENT', section: 'auth', field: 'client', type: 'string' },
+  { envVar: 'PRAMAN_AUTH_LANGUAGE', section: 'auth', field: 'language', type: 'string' },
+  // ai section
+  { envVar: 'PRAMAN_AI_PROVIDER', section: 'ai', field: 'provider', type: 'string' },
+  { envVar: 'PRAMAN_AI_API_KEY', section: 'ai', field: 'apiKey', type: 'string' },
+  { envVar: 'PRAMAN_AI_MODEL', section: 'ai', field: 'model', type: 'string' },
+  { envVar: 'PRAMAN_AI_TEMPERATURE', section: 'ai', field: 'temperature', type: 'number' },
+  { envVar: 'PRAMAN_AI_ENDPOINT', section: 'ai', field: 'endpoint', type: 'string' },
+  { envVar: 'PRAMAN_AI_DEPLOYMENT', section: 'ai', field: 'deployment', type: 'string' },
+  { envVar: 'PRAMAN_AI_API_VERSION', section: 'ai', field: 'apiVersion', type: 'string' },
+  {
+    envVar: 'PRAMAN_AI_ANTHROPIC_API_KEY',
+    section: 'ai',
+    field: 'anthropicApiKey',
+    type: 'string',
+  },
+  // telemetry section
+  {
+    envVar: 'PRAMAN_TELEMETRY_ENABLED',
+    section: 'telemetry',
+    field: 'openTelemetry',
+    type: 'boolean',
+  },
+  { envVar: 'PRAMAN_TELEMETRY_ENDPOINT', section: 'telemetry', field: 'endpoint', type: 'string' },
+  {
+    envVar: 'PRAMAN_TELEMETRY_SERVICE_NAME',
+    section: 'telemetry',
+    field: 'serviceName',
+    type: 'string',
+  },
+  // odataTracing section
+  {
+    envVar: 'PRAMAN_ODATA_TRACING_ENABLED',
+    section: 'odataTracing',
+    field: 'enabled',
+    type: 'boolean',
+  },
+];
+
 /**
- * Reads env vars and returns a partial config object.
+ * Parses an env var string value to a typed value based on the mapping type.
+ *
+ * @param value - Raw env var string.
+ * @param type - Target type: 'string', 'number', or 'boolean'.
+ * @returns Parsed value, or `undefined` if parsing fails (e.g. non-numeric number).
+ */
+function parseNestedEnvValue(value: string, type: 'string' | 'number' | 'boolean'): unknown {
+  switch (type) {
+    case 'number': {
+      const num = Number(value);
+      return Number.isNaN(num) ? undefined : num;
+    }
+    case 'boolean':
+      return value === 'true';
+    case 'string':
+      return value;
+    default:
+      return assertNever(type);
+  }
+}
+
+/**
+ * Reads nested env vars (auth.*, ai.*, telemetry.*, odataTracing.*)
+ * and merges them into the config object.
+ */
+function readNestedEnvOverrides(envConfig: Record<string, unknown>): void {
+  for (const mapping of NESTED_ENV_MAPPINGS) {
+    const value = process.env[mapping.envVar];
+    if (value === undefined) continue;
+
+    const parsed = parseNestedEnvValue(value, mapping.type);
+    if (parsed === undefined) continue;
+
+    const existing = envConfig[mapping.section];
+    if (existing !== null && typeof existing === 'object' && !Array.isArray(existing)) {
+      (existing as Record<string, unknown>)[mapping.field] = parsed;
+    } else {
+      envConfig[mapping.section] = { [mapping.field]: parsed };
+    }
+  }
+}
+
+/**
+ * Reads flat env vars and returns a partial config object.
  *
  * @returns Partial config from env vars (only defined vars included).
  */
@@ -124,7 +220,50 @@ function readEnvOverrides(): Record<string, unknown> {
     envConfig['logLevel'] = 'debug';
   }
 
+  readNestedEnvOverrides(envConfig);
+
   return envConfig;
+}
+
+/**
+ * Deep-merges two config objects at depth 2 (section.field level).
+ * Values in `over` take precedence. Only merges plain objects — arrays
+ * and primitives are replaced wholesale.
+ *
+ * @param base - Base config (inline overrides).
+ * @param over - Override config (env vars).
+ * @returns Merged config.
+ */
+function deepMergeConfig(
+  base: Record<string, unknown>,
+  over: Record<string, unknown>,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = { ...base };
+
+  for (const [key, overVal] of Object.entries(over)) {
+    // eslint-disable-next-line security/detect-object-injection -- safe: key comes from Object.entries on trusted config
+    const baseVal = result[key];
+    if (
+      overVal !== null &&
+      typeof overVal === 'object' &&
+      !Array.isArray(overVal) &&
+      baseVal !== null &&
+      typeof baseVal === 'object' &&
+      !Array.isArray(baseVal)
+    ) {
+      // Merge nested section: base section fields + env override fields
+      // eslint-disable-next-line security/detect-object-injection -- safe: key comes from Object.entries on trusted config
+      result[key] = {
+        ...(baseVal as Record<string, unknown>),
+        ...(overVal as Record<string, unknown>),
+      };
+    } else {
+      // eslint-disable-next-line security/detect-object-injection -- safe: key comes from Object.entries on trusted config
+      result[key] = overVal;
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -142,11 +281,13 @@ function readEnvOverrides(): Record<string, unknown> {
 export async function loadConfig(options?: LoadConfigOptions): Promise<Readonly<PramanConfig>> {
   const envOverrides = readEnvOverrides();
 
-  // Merge: defaults ← inline overrides ← env overrides
-  const merged = {
-    ...(options?.overrides ?? {}),
-    ...envOverrides,
-  };
+  // Deep-merge: defaults ← inline overrides ← env overrides
+  // Nested sections (auth, ai, telemetry, etc.) are merged per-field,
+  // so env vars don't clobber entire sections from inline overrides.
+  const merged = deepMergeConfig(
+    (options?.overrides ?? {}) as Record<string, unknown>,
+    envOverrides,
+  );
 
   // Validate with Zod — safeParse to handle invalid env values gracefully
   const result = PramanConfigSchema.safeParse(merged);
@@ -177,7 +318,9 @@ export async function loadConfig(options?: LoadConfigOptions): Promise<Readonly<
     attempted: 'Validate merged configuration (overrides + env vars)',
     validationErrors: result.error.issues.map(
       (issue): ValidationIssue => ({
-        path: issue.path.map((segment) => (typeof segment === 'symbol' ? String(segment) : segment)),
+        path: issue.path.map((segment) =>
+          typeof segment === 'symbol' ? String(segment) : segment,
+        ),
         message: issue.message,
         code: issue.code,
       }),
