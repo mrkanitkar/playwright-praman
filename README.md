@@ -338,7 +338,7 @@ for decision matrices, fallback chain diagrams, and recommended configurations b
 | Authentication (6 strategies) | [Authentication](https://praman.dev/docs/guides/authentication)                                    |
 | Agent & IDE setup             | [Agent Setup](https://praman.dev/docs/guides/agent-setup)                                          |
 | Fixtures reference            | [Fixtures](https://praman.dev/docs/guides/fixtures)                                                |
-| Error codes (60)              | [Errors](https://praman.dev/docs/guides/errors)                                                    |
+| Error codes (67)              | [Errors](https://praman.dev/docs/guides/errors)                                                    |
 | API reference                 | [API Docs](https://praman.dev/docs/api/)                                                           |
 | LLM-friendly docs             | [llms.txt](https://praman.dev/llms.txt)                                                            |
 | Repomix context (AI agents)   | [Download artifact](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml) |
@@ -385,6 +385,24 @@ Both access the UI5 control registry. Praman is built on Playwright (faster, par
 while wdi5 uses WebdriverIO. Praman adds typed control proxies with IntelliSense,
 AI-powered test generation, Fiori Elements page-object helpers,
 OData V2/V4 mock/intercept utilities, and 10 UI5-specific Playwright matchers.
+
+## Error Codes Quick Reference
+
+Every Praman error includes a machine-readable `code`, human-readable `message`, `attempted` action, `retryable` flag, and `suggestions[]` array. 14 error classes, 67 error codes.
+
+| Prefix           | Domain          | Common cause                                         |
+| ---------------- | --------------- | ---------------------------------------------------- |
+| `ERR_CONTROL_*`  | UI5 controls    | Control not found, not visible, not enabled          |
+| `ERR_BRIDGE_*`   | Bridge adapter  | UI5 not loaded, CSP policy, iframe isolation         |
+| `ERR_AUTH_*`     | Authentication  | Wrong credentials, session expired, strategy invalid |
+| `ERR_NAV_*`      | FLP navigation  | Tile not found, route failed, timeout                |
+| `ERR_ODATA_*`    | OData requests  | 403/404 response, CSRF token, parse error            |
+| `ERR_SELECTOR_*` | Selector engine | Invalid syntax, ambiguous match                      |
+| `ERR_TIMEOUT_*`  | Timeouts        | UI5 stability, control discovery, operation          |
+| `ERR_CONFIG_*`   | Configuration   | Invalid value, missing file, parse error             |
+| `ERR_AI_*`       | AI/LLM          | Provider unavailable, token limit, rate limited      |
+
+All errors extend `PramanError` with `.toUserMessage()` for terminal output and `.toAIContext()` for agent self-healing. See the full [Error Reference](https://praman.dev/docs/guides/errors).
 
 ## Support
 
