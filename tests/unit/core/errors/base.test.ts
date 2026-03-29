@@ -160,6 +160,7 @@ describe('PramanError', () => {
         suggestions: ['Fix syntax'],
         timestamp: error.timestamp,
         stack: error.stack,
+        docsUrl: 'https://praman.dev/docs/guides/errors#config-errors',
       });
     });
 
@@ -239,6 +240,26 @@ describe('PramanError', () => {
       const msg = error.toUserMessage();
       expect(msg).not.toContain('Details:');
     });
+
+    it('includes docs URL derived from error code category', () => {
+      const error = new PramanError(SAMPLE_OPTIONS);
+      const msg = error.toUserMessage();
+      expect(msg).toContain('Docs: https://praman.dev/docs/guides/errors#config-errors');
+    });
+
+    it('derives correct docs URL for different error categories', () => {
+      const controlError = new PramanError({
+        ...SAMPLE_OPTIONS,
+        code: 'ERR_CONTROL_NOT_FOUND' as ErrorCode,
+      });
+      expect(controlError.toUserMessage()).toContain('#control-errors');
+
+      const bridgeError = new PramanError({
+        ...SAMPLE_OPTIONS,
+        code: 'ERR_BRIDGE_TIMEOUT' as ErrorCode,
+      });
+      expect(bridgeError.toUserMessage()).toContain('#bridge-errors');
+    });
   });
 
   // ── toAIContext() ────────────────────────────────────────────────────
@@ -261,6 +282,7 @@ describe('PramanError', () => {
         details: { configPath: '/app/config.ts' },
         suggestions: ['Fix it'],
         timestamp: error.timestamp,
+        docsUrl: 'https://praman.dev/docs/guides/errors#config-errors',
       });
     });
 
