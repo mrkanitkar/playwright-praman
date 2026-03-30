@@ -5,6 +5,7 @@ dhikraft
 zestest
 mrkanitkar
 maheshwar
+Kanitkar
 
 # Build & tooling
 tsup
