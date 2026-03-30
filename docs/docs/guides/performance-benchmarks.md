@@ -64,10 +64,11 @@ describe('proxy creation', () => {
     'create proxy from discovery result',
     () => {
       createControlProxy({
-        controlId: '__xmlview0--saveBtn',
+        id: '__xmlview0--saveBtn',
         controlType: 'sap.m.Button',
-        properties: { text: 'Save', enabled: true },
-        domRef: '#__xmlview0--saveBtn',
+        methods: ['getText', 'getEnabled', 'firePress'],
+        page: mockPage,
+        interactionStrategy: defaultStrategy,
       });
     },
     {
@@ -81,10 +82,11 @@ describe('proxy creation', () => {
     'create proxy with method blacklist lookup',
     () => {
       createControlProxy({
-        controlId: '__xmlview0--mainTable',
+        id: '__xmlview0--mainTable',
         controlType: 'sap.m.Table',
-        properties: { mode: 'SingleSelectLeft' },
-        domRef: '#__xmlview0--mainTable',
+        methods: ['getItems', 'getMode', 'getSelectedItem'],
+        page: mockPage,
+        interactionStrategy: defaultStrategy,
       });
     },
     {

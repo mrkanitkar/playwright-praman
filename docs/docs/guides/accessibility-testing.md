@@ -23,7 +23,7 @@ import AxeBuilder from '@axe-core/playwright';
 test.describe('Accessibility - Purchase Order List', () => {
   test('list report page has no critical a11y violations', async ({ ui5Navigation, page }) => {
     await test.step('navigate to list report', async () => {
-      await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
     });
 
     await test.step('run axe accessibility scan', async () => {
@@ -104,7 +104,8 @@ test('verify input field accessibility attributes', async ({ ui5, page }) => {
     });
 
     // Get the DOM element to check ARIA attributes
-    const locator = await companyCode.getLocator();
+    const companyCodeId = await companyCode.getProperty('id');
+    const locator = page.locator(`#${companyCodeId}`);
     await expect(locator).toHaveAttribute('aria-required', 'true');
     await expect(locator).toHaveAttribute('role', 'textbox');
   });
@@ -118,7 +119,8 @@ test('verify input field accessibility attributes', async ({ ui5, page }) => {
       properties: { valueState: 'Error' },
     });
 
-    const locator = await errorInput.getLocator();
+    const errorInputId = await errorInput.getProperty('id');
+    const locator = page.locator(`#${errorInputId}`);
     await expect(locator).toHaveAttribute('aria-invalid', 'true');
   });
 });
@@ -135,7 +137,8 @@ test('keyboard navigation through form fields', async ({ ui5, page }) => {
       controlType: 'sap.m.Input',
       id: /supplierInput/,
     });
-    const locator = await firstInput.getLocator();
+    const firstInputId = await firstInput.getProperty('id');
+    const locator = page.locator(`#${firstInputId}`);
 
     // Focus and tab
     await locator.focus();
@@ -169,7 +172,8 @@ test('keyboard navigation through form fields', async ({ ui5, page }) => {
       controlType: 'sap.m.Button',
       properties: { text: 'Save' },
     });
-    const locator = await saveButton.getLocator();
+    const saveButtonId = await saveButton.getProperty('id');
+    const locator = page.locator(`#${saveButtonId}`);
     await locator.focus();
     await page.keyboard.press('Enter');
   });
@@ -208,7 +212,7 @@ Usage in tests:
 import { assertAccessible } from './helpers/a11y-helper';
 
 test('PO creation form is accessible', async ({ ui5Navigation, page }) => {
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
+  await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
   await assertAccessible(page, 'PO creation form');
 });
 ```

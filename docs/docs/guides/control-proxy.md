@@ -87,7 +87,7 @@ These methods have dedicated implementations with proper event firing and fallba
 Praman blocks 71 static methods and 2 dynamic rules to prevent dangerous operations:
 
 ```typescript
-// These throw ControlError with code 'ERR_METHOD_BLACKLISTED':
+// These throw ControlError with code 'ERR_CONTROL_METHOD':
 await button.destroy(); // Lifecycle method
 await button.rerender(); // Rendering internal
 await button.setParent(other); // Tree manipulation

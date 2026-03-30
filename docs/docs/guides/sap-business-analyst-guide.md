@@ -141,20 +141,20 @@ alongside your change documentation.
 This table maps common SAP transactions to their Fiori equivalents and shows how Praman
 tests interact with each.
 
-| SAP TCode | Description              | Fiori App / Intent                     | Praman Test Approach                          |
-| --------- | ------------------------ | -------------------------------------- | --------------------------------------------- |
-| ME21N     | Create Purchase Order    | `PurchaseOrder-create`                 | `ui5Navigation` + `feObjectPage.fillField()`  |
-| ME23N     | Display Purchase Order   | `PurchaseOrder-display`                | `feListReport` search + detail verification   |
-| VA01      | Create Sales Order       | `SalesOrder-create`                    | `ui5Navigation` + `feObjectPage.fillField()`  |
-| VA03      | Display Sales Order      | `SalesOrder-display`                   | `feListReport` search + field assertions      |
-| FB60      | Enter Vendor Invoice     | `SupplierInvoice-create`               | `ui5.fill()` for SmartFields + post action    |
-| FBL1N     | Vendor Line Items        | `SupplierLineItem-analyzeJournalEntry` | `feListReport` filters + row count assertions |
-| CO01      | Create Production Order  | `ProductionOrder-create`               | `ui5Navigation` + header/operation fill       |
-| MM01      | Create Material Master   | `Material-create`                      | Multi-tab navigation + field fill per view    |
-| MIGO      | Goods Movement           | `GoodsReceipt-create`                  | PO reference + item verification + post       |
-| VL01N     | Create Outbound Delivery | `OutboundDelivery-create`              | SO reference + picking quantity + post GI     |
-| MIRO      | Invoice Verification     | `SupplierInvoice-verify`               | PO reference + amount match + post            |
-| F-28      | Incoming Payment         | `IncomingPayment-post`                 | Customer + invoice reference + clearing       |
+| SAP TCode | Description              | Fiori App / Intent                     | Praman Test Approach                           |
+| --------- | ------------------------ | -------------------------------------- | ---------------------------------------------- |
+| ME21N     | Create Purchase Order    | `PurchaseOrder-create`                 | `ui5Navigation` + `ui5.fill()` on object page  |
+| ME23N     | Display Purchase Order   | `PurchaseOrder-display`                | `fe.listReport.search()` + detail verification |
+| VA01      | Create Sales Order       | `SalesOrder-create`                    | `ui5Navigation` + `ui5.fill()` on object page  |
+| VA03      | Display Sales Order      | `SalesOrder-display`                   | `fe.listReport.search()` + field assertions    |
+| FB60      | Enter Vendor Invoice     | `SupplierInvoice-create`               | `ui5.fill()` for SmartFields + post action     |
+| FBL1N     | Vendor Line Items        | `SupplierLineItem-analyzeJournalEntry` | `fe.listReport` filters + row count assertions |
+| CO01      | Create Production Order  | `ProductionOrder-create`               | `ui5Navigation` + header/operation fill        |
+| MM01      | Create Material Master   | `Material-create`                      | Multi-tab navigation + field fill per view     |
+| MIGO      | Goods Movement           | `GoodsReceipt-create`                  | PO reference + item verification + post        |
+| VL01N     | Create Outbound Delivery | `OutboundDelivery-create`              | SO reference + picking quantity + post GI      |
+| MIRO      | Invoice Verification     | `SupplierInvoice-verify`               | PO reference + amount match + post             |
+| F-28      | Incoming Payment         | `IncomingPayment-post`                 | Customer + invoice reference + clearing        |
 
 For the full mapping reference, see the [Transaction Mapping](./transaction-mapping) guide.
 

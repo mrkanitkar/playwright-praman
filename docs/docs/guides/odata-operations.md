@@ -54,13 +54,13 @@ const count = await ui5.odata.getEntityCount('/PurchaseOrders');
 expect(count).toBeGreaterThan(0);
 ```
 
-### waitForODataLoad
+### waitForLoad
 
-Polls the model until data is available at the given path. Useful after navigation when
+Polls the model until data is available. Useful after navigation when
 OData requests are still in flight.
 
 ```typescript
-await ui5.odata.waitForODataLoad('/PurchaseOrders');
+await ui5.odata.waitForLoad();
 // Data is now available
 const orders = await ui5.odata.getModelData('/PurchaseOrders');
 ```
@@ -210,7 +210,7 @@ test('verify OData model state after form edit', async ({ ui5, ui5Navigation }) 
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
 
   // Wait for initial data load
-  await ui5.odata.waitForODataLoad('/PurchaseOrders');
+  await ui5.odata.waitForLoad();
 
   // Read model data
   const orders = await ui5.odata.getModelData('/PurchaseOrders');

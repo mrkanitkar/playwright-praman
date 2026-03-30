@@ -32,17 +32,14 @@ test('all fixtures available', async ({ ui5, sapAuth, ui5Navigation }) => {
 
 ## The Fixture Module Chain
 
-Praman merges 12 fixture modules in a specific order:
+Praman merges 13 fixture modules in a specific order:
 
 ```
-coreTest          → ui5, pramanConfig, pramanLogger, rootLogger, tracer
-stabilityTest     → ui5Stability, requestInterceptor (auto)
-selectorTest      → selectorRegistration (auto)
-matcherTest       → matcherRegistration (auto)
-compatTest        → playwrightCompat (auto)
-navTest           → ui5Navigation, btpWorkZone
-authTest          → sapAuth
 moduleTest        → ui5.table, ui5.dialog, ui5.date, ui5.odata
+authTest          → sapAuth
+navTest           → ui5Navigation, btpWorkZone
+stabilityTest     → ui5Stability, requestInterceptor (auto)
+controlTreeTest   → controlTreeCapture (auto)
 feTest            → fe (listReport, objectPage, table, list)
 aiTest            → pramanAI
 intentTest        → intent (procurement, sales, finance, manufacturing, masterData)
@@ -50,7 +47,14 @@ shellFooterTest   → ui5Shell, ui5Footer
 flpLocksTest      → flpLocks
 flpSettingsTest   → flpSettings
 testDataTest      → testData
+odataTraceTest    → odataTraceCapture (auto)
 ```
+
+:::info[Auto-fixtures inside coreTest]
+`selectorRegistration`, `matcherRegistration`, and `playwrightCompat` are
+**auto-fixtures inside `coreTest`**, not separate fixture modules. They are
+registered automatically when `coreTest` is loaded.
+:::
 
 The order matters: later modules can depend on fixtures defined by earlier modules. For example,
 `navTest` depends on `ui5` from `coreTest`, and `authTest` depends on `pramanConfig`.
@@ -168,7 +172,7 @@ on both.
 
 ## Auto-Fixtures
 
-Five fixtures are marked with `{ auto: 'on' }` or `{ auto: true }` and fire without being
+Seven fixtures are marked with `{ auto: 'on' }` or `{ auto: true }` and fire without being
 requested in the test signature:
 
 ```typescript
@@ -178,6 +182,8 @@ requested in the test signature:
 // - matcherRegistration (worker) — registers 10 custom matchers
 // - requestInterceptor (test) — blocks WalkMe/analytics scripts
 // - ui5Stability (test) — auto-waits for UI5 stability after navigation
+// - odataTraceCapture (test) — captures OData requests for tracing
+// - controlTreeCapture (test) — captures control tree snapshots
 ```
 
 You never destructure these — they just work.

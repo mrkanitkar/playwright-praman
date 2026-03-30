@@ -83,7 +83,7 @@ The **plan-generate-heal** pipeline explores your live SAP system, discovers con
 
 ### 5. Enterprise Coverage
 
-- **61 UI5 control types** across `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc`
+- **199 UI5 control types** across `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc`
 - **6 auth strategies** — BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, Manual
 - **OData V2/V4** — mock, intercept, and assert OData requests
 - **Fiori Elements** — List Report, Object Page, Overview Page helpers

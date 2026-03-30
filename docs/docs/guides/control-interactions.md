@@ -84,8 +84,11 @@ expect(label).toBe('Purchase Order Details');
 Reads any property from a UI5 control by name.
 
 ```typescript
-const enabled = await ui5.getProperty({ id: 'saveBtn' }, 'enabled');
-const visible = await ui5.getProperty({ id: 'statusText' }, 'visible');
+const btn = await ui5.control({ id: 'saveBtn' });
+const enabled = await btn.getProperty('enabled');
+
+const status = await ui5.control({ id: 'statusText' });
+const visible = await status.getProperty('visible');
 ```
 
 ### waitForUI5

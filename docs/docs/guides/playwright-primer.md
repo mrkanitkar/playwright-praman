@@ -180,7 +180,7 @@ test('using fixtures', async ({ ui5, ui5Navigation, sapAuth }) => {
 });
 ```
 
-You request fixtures by name in the test function signature. Praman provides 12 fixture modules:
+You request fixtures by name in the test function signature. Praman provides 13 fixture modules:
 
 | Fixture         | What It Does                                          |
 | --------------- | ----------------------------------------------------- |
@@ -380,7 +380,10 @@ await ui5Navigation.navigateToApp('PurchaseOrder-manage');
 await ui5Navigation.navigateToTile('Create Purchase Order');
 
 // Navigate with parameters
-await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', { plant: '1000' });
+await ui5Navigation.navigateToIntent(
+  { semanticObject: 'PurchaseOrder', action: 'create' },
+  { plant: '1000' },
+);
 
 // Go home
 await ui5Navigation.navigateToHome();

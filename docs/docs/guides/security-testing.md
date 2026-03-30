@@ -94,11 +94,11 @@ test.describe('Admin-only features', () => {
     await page.goto('/app#/orders/12345');
     await ui5.waitForUI5();
 
-    const deleteButton = await ui5.findControls({
+    const deleteButtons = await ui5.controls({
       controlType: 'sap.m.Button',
       properties: { text: 'Delete' },
     });
-    expect(deleteButton).toHaveLength(0);
+    expect(deleteButtons).toHaveLength(0);
   });
 });
 

@@ -12,11 +12,11 @@ the equivalent concept in SAP Tosca, and the equivalent in wdi5.
 A verification that checks whether the application state matches expectations. Praman uses
 Playwright's `expect()` and custom SAP-specific matchers.
 
-| Framework  | Term / API                             |
-| ---------- | -------------------------------------- |
-| **Praman** | `expect()`, `ui5Matchers.toHaveText()` |
-| **Tosca**  | Verify module, TBox verification       |
-| **wdi5**   | `expect()` (Jasmine/Mocha)             |
+| Framework  | Term / API                        |
+| ---------- | --------------------------------- |
+| **Praman** | `expect(control).toHaveUI5Text()` |
+| **Tosca**  | Verify module, TBox verification  |
+| **wdi5**   | `expect()` (Jasmine/Mocha)        |
 
 ### Auto-Waiting
 
@@ -86,11 +86,11 @@ not their DOM representation.
 A Playwright concept for dependency injection in tests. Fixtures provide reusable setup/teardown
 logic and are declared in the test function signature.
 
-| Framework  | Term / API                                   |
-| ---------- | -------------------------------------------- |
-| **Praman** | `ui5`, `ui5Navigation`, `feListReport`, etc. |
-| **Tosca**  | Test Configuration Parameters                |
-| **wdi5**   | Not available (uses `before`/`after` hooks)  |
+| Framework  | Term / API                                  |
+| ---------- | ------------------------------------------- |
+| **Praman** | `ui5`, `ui5Navigation`, `fe`, etc.          |
+| **Tosca**  | Test Configuration Parameters               |
+| **wdi5**   | Not available (uses `before`/`after` hooks) |
 
 ## H
 
@@ -126,11 +126,11 @@ wants to accomplish.
 A Playwright object that represents a way to find element(s) on the page. Locators are lazy
 and auto-waiting. Praman converts UI5 selectors to locators internally.
 
-| Framework  | Term / API                           |
-| ---------- | ------------------------------------ |
-| **Praman** | `control.getLocator()`, internal use |
-| **Tosca**  | Scan result reference                |
-| **wdi5**   | WebDriverIO element                  |
+| Framework  | Term / API                                 |
+| ---------- | ------------------------------------------ |
+| **Praman** | `page.locator('#controlId')`, internal use |
+| **Tosca**  | Scan result reference                      |
+| **wdi5**   | WebDriverIO element                        |
 
 ## M
 
@@ -263,7 +263,7 @@ and isolated state. SAP tests typically use `workers: 1` for stateful processes.
 | Fill input   | `ui5.fill()`                       | Set module         | `element.setValue()`    |
 | Navigate     | `ui5Navigation.navigateToIntent()` | Navigation module  | `wdi5.goTo()`           |
 | Wait for UI5 | Automatic                          | Implicit sync      | `wdi5.waitForUI5()`     |
-| Verify text  | `ui5Matchers.toHaveText()`         | Verify module      | `expect().toHaveText()` |
+| Verify text  | `expect(ctrl).toHaveUI5Text()`     | Verify module      | `expect().toHaveText()` |
 | Auth setup   | Setup project + `storageState`     | Session management | Cookie injection        |
 | Run tests    | `npx playwright test`              | Tosca Commander    | `npx wdio run`          |
 | Debug        | `PWDEBUG=1`, trace viewer          | Tosca debug mode   | `--inspect` flag        |

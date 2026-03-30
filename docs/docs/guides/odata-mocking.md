@@ -62,13 +62,13 @@ test.describe('Purchase Order List (Mocked)', () => {
     });
   });
 
-  test('display purchase orders from mock', async ({ ui5, ui5Navigation, ui5Matchers }) => {
-    await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+  test('display purchase orders from mock', async ({ ui5, ui5Navigation }) => {
+    await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
     const table = await ui5.control({
       controlType: 'sap.ui.comp.smarttable.SmartTable',
     });
-    await ui5Matchers.toHaveRowCount(table, 2);
+    await expect(table).toHaveUI5RowCount(2);
   });
 });
 ```
@@ -170,7 +170,7 @@ test('handles OData error gracefully', async ({ ui5, ui5Navigation, page }) => {
     });
   });
 
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+  await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
   // Verify the app shows an error message
   const errorDialog = await ui5.control({

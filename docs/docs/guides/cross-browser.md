@@ -120,11 +120,12 @@ await ui5.click({
 ### Scroll Behavior
 
 ```typescript
-// Scrolling can differ across browsers. Use UI5 control methods:
-await ui5.scrollToControl({
+// Scrolling can differ across browsers. Use the control proxy method:
+const inputField = await ui5.control({
   controlType: 'sap.m.Input',
   id: /lastFieldOnPage/,
 });
+await inputField.scrollIntoView();
 
 // For tables with virtual scrolling:
 const table = await ui5.control({
@@ -156,14 +157,15 @@ test('touch gestures (WebKit only)', async ({ ui5, browserName }) => {
 ### Browser-Specific Assertions
 
 ```typescript
-test('table rendering across browsers', async ({ ui5, ui5Matchers, browserName }) => {
+test('table rendering across browsers', async ({ ui5, browserName }) => {
   const table = await ui5.control({ controlType: 'sap.m.Table' });
 
   // Common assertion — works on all browsers
-  await ui5Matchers.toHaveRowCount(table, 10);
+  await expect(table).toHaveUI5RowCount(10);
 
-  // Browser-specific screenshot comparison
-  const locator = await table.getLocator();
+  // Browser-specific screenshot comparison using page.locator()
+  const tableId = await table.getProperty('id');
+  const locator = page.locator(`#${tableId}`);
   await expect(locator).toHaveScreenshot(`table-${browserName}.png`, {
     maxDiffPixelRatio: browserName === 'webkit' ? 0.02 : 0.01,
   });
@@ -212,17 +214,17 @@ test('list report adapts to mobile viewport', async ({ ui5, page, isMobile }) =>
   await test.step('verify responsive table mode', async () => {
     if (isMobile) {
       // On mobile, SmartTable switches to responsive mode
-      const mTable = await ui5.controlOrNull({
+      const mTable = await ui5.control({
         controlType: 'sap.m.Table',
       });
-      expect(mTable).not.toBeNull();
+      expect(mTable).toBeTruthy();
     } else {
       // On desktop, SmartTable may use grid table
-      const gridTable = await ui5.controlOrNull({
+      const gridTable = await ui5.control({
         controlType: 'sap.ui.table.Table',
       });
       // Grid table OR responsive table depending on config
-      expect(gridTable).not.toBeNull();
+      expect(gridTable).toBeTruthy();
     }
   });
 });

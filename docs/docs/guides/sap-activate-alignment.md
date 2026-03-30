@@ -31,12 +31,14 @@ import { test, expect } from 'playwright-praman';
 
 test('SAP system connectivity check', async ({ ui5, ui5Navigation, page }) => {
   await test.step('access Fiori Launchpad', async () => {
-    await ui5Navigation.navigateToIntent('#Shell-home');
+    await ui5Navigation.navigateToIntent({ semanticObject: 'Shell', action: 'home' });
     await expect(page).toHaveURL(/fiorilaunchpad/);
   });
 
   await test.step('verify UI5 runtime is available', async () => {
-    const isUI5 = await ui5.isUI5Available();
+    const isUI5 = await page.evaluate(
+      () => typeof sap !== 'undefined' && typeof sap.ui !== 'undefined',
+    );
     expect(isUI5).toBe(true);
   });
 
@@ -101,14 +103,9 @@ These tests verify that standard SAP processes work with your specific configura
 import { test, expect } from 'playwright-praman';
 
 test.describe('Fit-to-Standard: Procurement', () => {
-  test('standard PO creation workflow matches requirements', async ({
-    ui5,
-    ui5Navigation,
-    feObjectPage,
-    ui5Matchers,
-  }) => {
+  test('standard PO creation workflow matches requirements', async ({ ui5, ui5Navigation, fe }) => {
     await test.step('verify PO creation app is accessible', async () => {
-      await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
     });
 
     await test.step('verify required fields match spec', async () => {
@@ -133,10 +130,14 @@ test.describe('Fit-to-Standard: Procurement', () => {
 
     await test.step('verify approval workflow triggers', async () => {
       // Create PO above threshold to trigger approval
-      await feObjectPage.fillField('Supplier', '100001');
-      await feObjectPage.fillField('NetPrice', '50000');
-      await feObjectPage.clickSave();
-      await ui5Matchers.toHaveMessageStrip('Success', /created/);
+      await ui5.fill({ id: /Supplier/ }, '100001');
+      await ui5.fill({ id: /NetPrice/ }, '50000');
+      await fe.objectPage.clickSave();
+      const messageStrip = await ui5.control({
+        controlType: 'sap.m.MessageStrip',
+        properties: { type: 'Success' },
+      });
+      await expect(messageStrip).toHaveUI5Text(/created/);
       // Verify status indicates approval required
     });
   });
@@ -153,18 +154,18 @@ const orgUnits = [
 ];
 
 for (const org of orgUnits) {
-  test(`fit-to-standard: PO creation for ${org.name}`, async ({
-    ui5Navigation,
-    feObjectPage,
-    ui5Matchers,
-  }) => {
-    await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
-    await feObjectPage.fillField('CompanyCode', org.companyCode);
-    await feObjectPage.fillField('PurchasingOrganization', org.purchOrg);
-    await feObjectPage.fillField('Plant', org.plant);
-    await feObjectPage.fillField('Supplier', '100001');
-    await feObjectPage.clickSave();
-    await ui5Matchers.toHaveMessageStrip('Success', /created/);
+  test(`fit-to-standard: PO creation for ${org.name}`, async ({ ui5, ui5Navigation, fe }) => {
+    await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
+    await ui5.fill({ id: /CompanyCode/ }, org.companyCode);
+    await ui5.fill({ id: /PurchasingOrganization/ }, org.purchOrg);
+    await ui5.fill({ id: /Plant/ }, org.plant);
+    await ui5.fill({ id: /Supplier/ }, '100001');
+    await fe.objectPage.clickSave();
+    const messageStrip = await ui5.control({
+      controlType: 'sap.m.MessageStrip',
+      properties: { type: 'Success' },
+    });
+    await expect(messageStrip).toHaveUI5Text(/created/);
   });
 }
 ```
@@ -179,29 +180,27 @@ String tests connect multiple processes in sequence, validating the data flow be
 
 ```typescript
 test.describe('String Test: Procure-to-Pay', () => {
-  test('P2P: Purchase Requisition to Payment', async ({
-    ui5Navigation,
-    feObjectPage,
-    feListReport,
-    ui5Matchers,
-  }) => {
+  test('P2P: Purchase Requisition to Payment', async ({ ui5Navigation, fe }) => {
     await test.step('1. Create Purchase Requisition', async () => {
-      await ui5Navigation.navigateToIntent('#PurchaseRequisition-create');
+      await ui5Navigation.navigateToIntent({
+        semanticObject: 'PurchaseRequisition',
+        action: 'create',
+      });
       // Fill and save PR
     });
 
     await test.step('2. Convert PR to Purchase Order', async () => {
-      await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
       // Reference the PR
     });
 
     await test.step('3. Post Goods Receipt', async () => {
-      await ui5Navigation.navigateToIntent('#GoodsReceipt-create');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'GoodsReceipt', action: 'create' });
       // Post GR against PO
     });
 
     await test.step('4. Enter Invoice', async () => {
-      await ui5Navigation.navigateToIntent('#SupplierInvoice-create');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'SupplierInvoice', action: 'create' });
       // Enter and post invoice
     });
 
@@ -250,7 +249,7 @@ See [Business Process Examples](./business-process-examples.md) for complete run
 test('page load performance baseline', async ({ ui5Navigation, page }) => {
   const startTime = Date.now();
 
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+  await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
   const loadTime = Date.now() - startTime;
 
@@ -299,11 +298,11 @@ jobs:
 
 ## Phase-to-Praman Mapping Summary
 
-| Phase    | Praman Feature                            | Key Config                      |
-| -------- | ----------------------------------------- | ------------------------------- |
-| Discover | `ui5.isUI5Available()`, control discovery | Basic `playwright.config.ts`    |
-| Prepare  | Auth setup, config, project structure     | `praman.config.ts`, CI pipeline |
-| Explore  | Fit-to-standard tests, org validation     | Data-driven test loops          |
-| Realize  | String tests, integration flows           | `workers: 1`, `test.step()`     |
-| Deploy   | Regression packs, performance baselines   | `retries: 2`, trace on retry    |
-| Run      | Scheduled smoke tests, monitoring         | Cron-triggered CI, alerts       |
+| Phase    | Praman Feature                           | Key Config                      |
+| -------- | ---------------------------------------- | ------------------------------- |
+| Discover | UI5 runtime detection, control discovery | Basic `playwright.config.ts`    |
+| Prepare  | Auth setup, config, project structure    | `praman.config.ts`, CI pipeline |
+| Explore  | Fit-to-standard tests, org validation    | Data-driven test loops          |
+| Realize  | String tests, integration flows          | `workers: 1`, `test.step()`     |
+| Deploy   | Regression packs, performance baselines  | `retries: 2`, trace on retry    |
+| Run      | Scheduled smoke tests, monitoring        | Cron-triggered CI, alerts       |

@@ -186,7 +186,13 @@ For custom assertions beyond the 10 built-in matchers, use `expect.poll()` with 
 ```typescript
 // Poll until the control value matches
 await expect
-  .poll(async () => ui5.getProperty({ id: 'vendorInput' }, 'value'), { timeout: 10_000 })
+  .poll(
+    async () => {
+      const input = await ui5.control({ id: 'vendorInput' });
+      return input.getProperty('value');
+    },
+    { timeout: 10_000 },
+  )
   .toBe('100001');
 
 // Poll for table row count

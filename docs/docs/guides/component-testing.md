@@ -194,9 +194,9 @@ test.describe('Purchase Order List Component (Offline)', () => {
     await page.goto('/test/component/index.html');
   });
 
-  test('displays purchase orders from mock data', async ({ ui5, ui5Matchers }) => {
+  test('displays purchase orders from mock data', async ({ ui5 }) => {
     const table = await ui5.control({ controlType: 'sap.m.Table' });
-    await ui5Matchers.toHaveRowCount(table, 2);
+    await expect(table).toHaveUI5RowCount(2);
   });
 });
 ```

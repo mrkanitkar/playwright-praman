@@ -8,7 +8,7 @@ keywords:
   - sap ui5 test automation
 ---
 
-Praman provides 12 fixture modules merged into a single `test` object via Playwright's `mergeTests()`.
+Praman provides 13 fixture modules merged into a single `test` object via Playwright's `mergeTests()`.
 
 ## Import
 
@@ -98,7 +98,10 @@ test('sub-namespaces', async ({ ui5 }) => {
 test('navigation', async ({ ui5Navigation }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
   await ui5Navigation.navigateToTile('Create Purchase Order');
-  await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', { plant: '1000' });
+  await ui5Navigation.navigateToIntent(
+    { semanticObject: 'PurchaseOrder', action: 'create' },
+    { plant: '1000' },
+  );
   await ui5Navigation.navigateToHome();
   await ui5Navigation.navigateBack();
 
@@ -111,7 +114,7 @@ test('navigation', async ({ ui5Navigation }) => {
 ```typescript
 test('auth control', async ({ sapAuth, page }) => {
   await sapAuth.login(page, { url, username, password, strategy: 'basic' });
-  expect(sapAuth.isAuthenticated()).toBe(true);
+  expect(await sapAuth.isAuthenticated(page)).toBe(true);
   // Auto-logout on teardown
 });
 ```

@@ -71,16 +71,13 @@ If you manage `TestDataHandler` manually (outside fixtures), call `cleanup()` ex
 
 ## Data Isolation Across Parallel Workers
 
-When running tests in parallel with multiple Playwright workers, each worker gets its own `testData` instance with an isolated `baseDir`. This prevents file collisions:
+When running tests in parallel with multiple Playwright workers, each worker gets its own `testData` instance with an isolated `baseDir`. This prevents file collisions.
 
-```typescript
-// praman.config.ts
-export default {
-  testData: {
-    baseDir: './test-data', // Each worker appends its workerIndex
-  },
-};
-```
+:::warning[Not a config option]
+`baseDir` is **not** a Praman config option. The `TestDataHandler` receives `baseDir`
+via its constructor (handled internally by the fixture). Each worker automatically
+appends its `workerIndex` to the base directory to ensure isolation.
+:::
 
 Use `{{uuid}}` tokens in entity identifiers to avoid collisions at the SAP backend level as well. Two parallel workers creating a purchase order with the same ID will cause OData conflicts.
 

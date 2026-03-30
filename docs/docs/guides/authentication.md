@@ -27,37 +27,30 @@ The recommended pattern uses Playwright's **setup projects** to authenticate onc
 
 ### 1. Auth Setup File
 
-Create `tests/auth-setup.ts` (or use Praman's built-in `src/auth/auth-setup.ts`):
+Create `tests/auth-setup.ts` using the `sapAuth` fixture (provided by `playwright-praman`):
 
 ```typescript
 import { join } from 'node:path';
-import { test as setup } from '@playwright/test';
+import { test as setup } from 'playwright-praman';
 
 const authFile = join(process.cwd(), '.auth', 'sap-session.json');
 
-setup('SAP authentication', async ({ page, context }) => {
-  const { SAPAuthHandler } = await import('playwright-praman/auth');
-  const { createAuthStrategy } = await import('playwright-praman/auth');
-
-  const strategy = createAuthStrategy({
-    url: process.env.SAP_BASE_URL ?? '',
-    username: process.env.SAP_ONPREM_USERNAME ?? '',
-    password: process.env.SAP_ONPREM_PASSWORD ?? '',
-    strategy: 'onprem',
-  });
-
-  const handler = new SAPAuthHandler({ strategy });
-  await handler.login(page, {
-    url: process.env.SAP_BASE_URL ?? '',
-    username: process.env.SAP_ONPREM_USERNAME ?? '',
-    password: process.env.SAP_ONPREM_PASSWORD ?? '',
-    client: process.env.SAP_CLIENT,
-    language: process.env.SAP_LANGUAGE,
-  });
+setup('SAP authentication', async ({ sapAuth, page, context }) => {
+  // sapAuth is auto-configured from praman config and environment variables.
+  // The fixture resolves the correct strategy based on SAP_ACTIVE_SYSTEM
+  // and SAP_AUTH_STRATEGY env vars.
+  await sapAuth.login(page);
 
   await context.storageState({ path: authFile });
 });
 ```
+
+:::info[No direct auth imports]
+`SAPAuthHandler` and `createAuthStrategy` are **not** public exports.
+The `playwright-praman/auth` sub-path does **not** exist.
+All authentication is done through the `sapAuth` fixture, which reads
+credentials and strategy from the Praman config / environment variables.
+:::
 
 ### 2. Playwright Config
 
@@ -141,6 +134,8 @@ For tests that need explicit auth control:
 import { test, expect } from 'playwright-praman';
 
 test('explicit auth', async ({ sapAuth, page }) => {
+  // sapAuth.login() uses credentials from praman config / env vars.
+  // Pass overrides only when needed:
   await sapAuth.login(page, {
     url: 'https://sapserver.example.com',
     username: 'TESTUSER',
@@ -148,14 +143,30 @@ test('explicit auth', async ({ sapAuth, page }) => {
     strategy: 'onprem',
   });
 
-  expect(sapAuth.isAuthenticated()).toBe(true);
+  // isAuthenticated() requires the page parameter
+  expect(await sapAuth.isAuthenticated(page)).toBe(true);
 
   const session = sapAuth.getSessionInfo();
-  expect(session.user).toBe('TESTUSER');
+  // SessionInfo has: authenticatedAt, strategyName, isValid
+  expect(session.isValid).toBe(true);
+  expect(session.strategyName).toBe('onprem');
 
   // Auto-logout on fixture teardown
 });
 ```
+
+:::tip[Strategy name mapping]
+The config schema names map to runtime strategy names as follows:
+
+| Config Value  | Runtime `strategyName` |
+| ------------- | ---------------------- |
+| `'basic'`     | `'onprem'`             |
+| `'btp-saml'`  | `'cloud-saml'`         |
+| `'office365'` | `'office365'`          |
+| `'custom'`    | User-provided name     |
+
+When checking `session.strategyName`, use the **runtime** name (right column).
+:::
 
 ## Session Expiry
 
@@ -168,7 +179,7 @@ BTP WorkZone renders apps inside nested iframes. The `btpWorkZone` fixture handl
 
 ```typescript
 test('WorkZone app', async ({ btpWorkZone, ui5 }) => {
-  const workspace = btpWorkZone.getWorkspaceFrame();
+  const appFrame = btpWorkZone.getAppFrameForEval();
   // All operations route through the correct frame
 });
 ```

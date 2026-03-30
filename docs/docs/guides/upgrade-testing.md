@@ -94,7 +94,7 @@ Verify the UI5 version after upgrade:
 ```typescript
 test('verify UI5 version after upgrade', async ({ ui5, page }) => {
   await test.step('check UI5 version', async () => {
-    const version = await ui5.getUI5Version();
+    const version = await page.evaluate(() => sap.ui.version);
     expect(version).toMatch(/^1\.\d+\.\d+$/);
 
     // Verify minimum expected version after upgrade
@@ -112,28 +112,28 @@ After major upgrades, controls may be replaced or removed:
 ```typescript
 test.describe('Post-Upgrade Control Validation', () => {
   test('verify critical controls still exist', async ({ ui5, ui5Navigation }) => {
-    await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+    await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
     await test.step('SmartFilterBar exists', async () => {
-      const filterBar = await ui5.controlOrNull({
+      const filterBar = await ui5.control({
         controlType: 'sap.ui.comp.smartfilterbar.SmartFilterBar',
       });
-      expect(filterBar).not.toBeNull();
+      expect(filterBar).toBeTruthy();
     });
 
     await test.step('SmartTable exists', async () => {
-      const table = await ui5.controlOrNull({
+      const table = await ui5.control({
         controlType: 'sap.ui.comp.smarttable.SmartTable',
       });
-      expect(table).not.toBeNull();
+      expect(table).toBeTruthy();
     });
 
     await test.step('toolbar actions exist', async () => {
-      const createBtn = await ui5.controlOrNull({
+      const createBtn = await ui5.control({
         controlType: 'sap.m.Button',
         properties: { text: 'Create' },
       });
-      expect(createBtn).not.toBeNull();
+      expect(createBtn).toBeTruthy();
     });
   });
 });
@@ -144,12 +144,8 @@ test.describe('Post-Upgrade Control Validation', () => {
 Compare default values and field behavior pre/post upgrade:
 
 ```typescript
-test('verify default values unchanged after upgrade', async ({
-  ui5,
-  ui5Navigation,
-  feObjectPage,
-}) => {
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
+test('verify default values unchanged after upgrade', async ({ ui5, ui5Navigation }) => {
+  await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
 
   await test.step('company code defaults correctly', async () => {
     const field = await ui5.control({
@@ -179,11 +175,11 @@ test('page load time within acceptable range post-upgrade', async ({ ui5Navigati
 
   for (let i = 0; i < 3; i++) {
     const start = Date.now();
-    await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+    await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
     measurements.push(Date.now() - start);
 
     // Navigate away before next measurement
-    await ui5Navigation.navigateToIntent('#Shell-home');
+    await ui5Navigation.navigateToIntent({ semanticObject: 'Shell', action: 'home' });
   }
 
   const avgLoadTime = measurements.reduce((a, b) => a + b, 0) / measurements.length;
@@ -258,7 +254,7 @@ export default defineConfig({
 ## Upgrade Testing Checklist
 
 - [ ] Save pre-upgrade baseline (test results + screenshots)
-- [ ] Document current UI5 version: `ui5.getUI5Version()`
+- [ ] Document current UI5 version: `await page.evaluate(() => sap.ui.version)`
 - [ ] Run smoke tests first (auth, navigation, basic CRUD)
 - [ ] Run full regression suite
 - [ ] Compare visual snapshots (see [Visual Regression](./visual-regression.md))

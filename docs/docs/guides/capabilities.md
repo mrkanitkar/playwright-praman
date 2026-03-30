@@ -77,7 +77,7 @@ Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visibl
 
 ## Fixtures & Test Abstractions
 
-- **12 fixture modules** merged via `mergeTests()`
+- **13 fixture modules** merged via `mergeTests()`
 - **6 authentication strategies**: basic, BTP SAML, Office 365, API, certificate, multi-tenant
 - **9 FLP navigation functions**: app, tile, intent, hash, home, back, forward, search, getCurrentHash
 - **FLP shell & footer** interaction
@@ -102,7 +102,7 @@ Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visibl
 ## Configuration & Extensibility
 
 - **Zod-validated config** with environment variable overrides
-- **14 error classes, 67 error codes** with `retryable` flag and `suggestions[]`
+- **14 error classes, 66 error codes** with `retryable` flag and `suggestions[]`
 - **Structured logging** with secret redaction
 - **OpenTelemetry integration** for distributed tracing
 - **Playwright step decoration** for rich HTML reports
