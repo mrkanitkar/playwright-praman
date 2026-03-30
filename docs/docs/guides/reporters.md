@@ -2,9 +2,10 @@
 title: Reporters
 ---
 
-Praman ships two custom Playwright reporters: **ComplianceReporter** for measuring Praman
-adoption across your test suite, and **ODataTraceReporter** for capturing OData HTTP request
-performance data.
+Praman ships three custom Playwright reporters: **ComplianceReporter** for measuring Praman
+adoption across your test suite, **ODataTraceReporter** for capturing OData HTTP request
+performance data, and **ControlTreeReporter** for recording UI5 control tree snapshots during
+test runs.
 
 ## ComplianceReporter
 

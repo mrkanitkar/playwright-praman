@@ -271,7 +271,10 @@ test('after auth', async ({ ui5Navigation }) => {
 test('navigation', async ({ ui5Navigation }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
   await ui5Navigation.navigateToTile('Create Purchase Order');
-  await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', { plant: '1000' });
+  await ui5Navigation.navigateToIntent(
+    { semanticObject: 'PurchaseOrder', action: 'create' },
+    { plant: '1000' },
+  );
   await ui5Navigation.navigateToHome();
   await ui5Navigation.navigateBack();
 });

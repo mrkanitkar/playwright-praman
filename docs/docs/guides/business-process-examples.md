@@ -14,12 +14,9 @@ Journal Entries, and cross-process P2P flows.
 import { test, expect } from 'playwright-praman';
 
 test.describe('Purchase Order Creation (ME21N)', () => {
-  test('create standard purchase order', async ({ ui5, ui5Navigation, ui5Matchers }) => {
+  test('create standard purchase order', async ({ ui5, ui5Navigation }) => {
     await test.step('navigate to Create Purchase Order app', async () => {
-      await ui5Navigation.navigateToApp('MM-PUR-PO', {
-        semanticObject: 'PurchaseOrder',
-        action: 'create',
-      });
+      await ui5Navigation.navigateToApp('PurchaseOrder-create');
     });
 
     await test.step('fill header data', async () => {
@@ -41,7 +38,7 @@ test.describe('Purchase Order Creation (ME21N)', () => {
         controlType: 'sap.m.MessageStrip',
         properties: { type: 'Success' },
       });
-      await ui5Matchers.toHaveText(messageStrip, /Purchase Order \d+ created/);
+      await expect(messageStrip).toHaveUI5Text(/Purchase Order \d+ created/);
     });
   });
 });
@@ -53,41 +50,36 @@ test.describe('Purchase Order Creation (ME21N)', () => {
 import { test, expect } from 'playwright-praman';
 
 test.describe('Manage Purchase Orders (Fiori Elements)', () => {
-  test('create PO via Fiori Elements object page', async ({
-    ui5,
-    ui5Navigation,
-    ui5Matchers,
-    feListReport,
-    feObjectPage,
-  }) => {
+  test('create PO via Fiori Elements object page', async ({ ui5, ui5Navigation, fe }) => {
     await test.step('navigate to list report', async () => {
-      await ui5Navigation.navigateToApp('MM-PUR-PO', {
-        semanticObject: 'PurchaseOrder',
-        action: 'manage',
-      });
+      await ui5Navigation.navigateToApp('PurchaseOrder-manage');
     });
 
     await test.step('create new entry', async () => {
-      await feListReport.clickCreate();
+      await fe.listReport.clickButton('Create');
     });
 
     await test.step('fill header fields', async () => {
-      await feObjectPage.fillField('Supplier', '100001');
-      await feObjectPage.fillField('PurchasingOrganization', '1000');
-      await feObjectPage.fillField('CompanyCode', '1000');
-      await feObjectPage.fillField('PurchasingGroup', '001');
+      await ui5.fill({ id: /Supplier/ }, '100001');
+      await ui5.fill({ id: /PurchasingOrganization/ }, '1000');
+      await ui5.fill({ id: /CompanyCode/ }, '1000');
+      await ui5.fill({ id: /PurchasingGroup/ }, '001');
     });
 
     await test.step('add line item via table', async () => {
-      await feObjectPage.clickSectionCreate('Items');
-      await feObjectPage.fillField('Material', 'MAT-001');
-      await feObjectPage.fillField('OrderQuantity', '100');
-      await feObjectPage.fillField('Plant', '1000');
+      await fe.objectPage.clickButton('Create');
+      await ui5.fill({ id: /Material/ }, 'MAT-001');
+      await ui5.fill({ id: /OrderQuantity/ }, '100');
+      await ui5.fill({ id: /Plant/ }, '1000');
     });
 
     await test.step('save and verify', async () => {
-      await feObjectPage.clickSave();
-      await ui5Matchers.toHaveMessageStrip('Success', /Purchase Order \d+ created/);
+      await fe.objectPage.clickSave();
+      const messageStrip = await ui5.control({
+        controlType: 'sap.m.MessageStrip',
+        properties: { type: 'Success' },
+      });
+      await expect(messageStrip).toHaveUI5Text(/Purchase Order \d+ created/);
     });
   });
 });
@@ -101,12 +93,9 @@ test.describe('Manage Purchase Orders (Fiori Elements)', () => {
 import { test, expect } from 'playwright-praman';
 
 test.describe('Sales Order Creation (VA01)', () => {
-  test('create standard sales order', async ({ ui5, ui5Navigation, ui5Matchers }) => {
+  test('create standard sales order', async ({ ui5, ui5Navigation }) => {
     await test.step('navigate to Create Sales Order app', async () => {
-      await ui5Navigation.navigateToApp('SD-SLS-SO', {
-        semanticObject: 'SalesOrder',
-        action: 'create',
-      });
+      await ui5Navigation.navigateToApp('SalesOrder-create');
     });
 
     await test.step('fill order type and org data', async () => {
@@ -131,7 +120,7 @@ test.describe('Sales Order Creation (VA01)', () => {
         controlType: 'sap.m.MessageStrip',
         properties: { type: 'Success' },
       });
-      await ui5Matchers.toHaveText(message, /Sales Order \d+ created/);
+      await expect(message).toHaveUI5Text(/Sales Order \d+ created/);
     });
   });
 });
@@ -143,36 +132,32 @@ test.describe('Sales Order Creation (VA01)', () => {
 import { test, expect } from 'playwright-praman';
 
 test.describe('Manage Sales Orders (Fiori Elements)', () => {
-  test('create sales order via object page', async ({
-    ui5Navigation,
-    ui5Matchers,
-    feListReport,
-    feObjectPage,
-  }) => {
+  test('create sales order via object page', async ({ ui5, ui5Navigation, fe }) => {
     await test.step('open app and create', async () => {
-      await ui5Navigation.navigateToApp('SD-SLS-SO', {
-        semanticObject: 'SalesOrder',
-        action: 'manage',
-      });
-      await feListReport.clickCreate();
+      await ui5Navigation.navigateToApp('SalesOrder-manage');
+      await fe.listReport.clickButton('Create');
     });
 
     await test.step('fill header', async () => {
-      await feObjectPage.fillField('SalesOrderType', 'OR');
-      await feObjectPage.fillField('SoldToParty', 'CUST-001');
-      await feObjectPage.fillField('SalesOrganization', '1000');
-      await feObjectPage.fillField('DistributionChannel', '10');
+      await ui5.fill({ id: /SalesOrderType/ }, 'OR');
+      await ui5.fill({ id: /SoldToParty/ }, 'CUST-001');
+      await ui5.fill({ id: /SalesOrganization/ }, '1000');
+      await ui5.fill({ id: /DistributionChannel/ }, '10');
     });
 
     await test.step('add line items', async () => {
-      await feObjectPage.clickSectionCreate('Items');
-      await feObjectPage.fillField('Material', 'MAT-100');
-      await feObjectPage.fillField('RequestedQuantity', '50');
+      await fe.objectPage.clickButton('Create');
+      await ui5.fill({ id: /Material/ }, 'MAT-100');
+      await ui5.fill({ id: /RequestedQuantity/ }, '50');
     });
 
     await test.step('save and capture order number', async () => {
-      await feObjectPage.clickSave();
-      await ui5Matchers.toHaveMessageStrip('Success', /Sales Order \d+ created/);
+      await fe.objectPage.clickSave();
+      const messageStrip = await ui5.control({
+        controlType: 'sap.m.MessageStrip',
+        properties: { type: 'Success' },
+      });
+      await expect(messageStrip).toHaveUI5Text(/Sales Order \d+ created/);
     });
   });
 });
@@ -186,12 +171,9 @@ test.describe('Manage Sales Orders (Fiori Elements)', () => {
 import { test, expect } from 'playwright-praman';
 
 test.describe('Journal Entry (FB50)', () => {
-  test('post G/L account journal entry', async ({ ui5, ui5Navigation, ui5Matchers }) => {
+  test('post G/L account journal entry', async ({ ui5, ui5Navigation }) => {
     await test.step('navigate to Post Journal Entry', async () => {
-      await ui5Navigation.navigateToApp('FI-GL', {
-        semanticObject: 'JournalEntry',
-        action: 'create',
-      });
+      await ui5Navigation.navigateToApp('JournalEntry-create');
     });
 
     await test.step('fill document header', async () => {
@@ -224,7 +206,7 @@ test.describe('Journal Entry (FB50)', () => {
         controlType: 'sap.m.MessageStrip',
         properties: { type: 'Success' },
       });
-      await ui5Matchers.toHaveText(message, /Document \d+ posted/);
+      await expect(message).toHaveUI5Text(/Document \d+ posted/);
     });
   });
 });
@@ -236,9 +218,9 @@ test.describe('Journal Entry (FB50)', () => {
 import { test, expect } from 'playwright-praman';
 
 test.describe('Post Journal Entries Fiori (F0718)', () => {
-  test('create and post journal entry', async ({ ui5, ui5Navigation, ui5Matchers }) => {
+  test('create and post journal entry', async ({ ui5, ui5Navigation }) => {
     await test.step('navigate to Post Journal Entries', async () => {
-      await ui5Navigation.navigateToIntent('#JournalEntry-create');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'JournalEntry', action: 'create' });
     });
 
     await test.step('fill header and line items', async () => {
@@ -274,7 +256,11 @@ test.describe('Post Journal Entries Fiori (F0718)', () => {
 
     await test.step('post document', async () => {
       await ui5.click({ controlType: 'sap.m.Button', properties: { text: 'Post' } });
-      await ui5Matchers.toHaveMessageStrip('Success', /Document \d+ posted/);
+      const message = await ui5.control({
+        controlType: 'sap.m.MessageStrip',
+        properties: { type: 'Success' },
+      });
+      await expect(message).toHaveUI5Text(/Document \d+ posted/);
     });
   });
 });
@@ -293,25 +279,19 @@ test.describe('Purchase-to-Pay E2E Flow', () => {
   let grDocNumber: string;
   let invoiceNumber: string;
 
-  test('complete P2P cycle', async ({
-    ui5,
-    ui5Navigation,
-    ui5Matchers,
-    feListReport,
-    feObjectPage,
-  }) => {
+  test('complete P2P cycle', async ({ ui5, ui5Navigation, fe }) => {
     await test.step('Step 1: Create Purchase Order', async () => {
-      await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
-      await feObjectPage.fillField('Supplier', '100001');
-      await feObjectPage.fillField('PurchasingOrganization', '1000');
-      await feObjectPage.fillField('CompanyCode', '1000');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
+      await ui5.fill({ id: /Supplier/ }, '100001');
+      await ui5.fill({ id: /PurchasingOrganization/ }, '1000');
+      await ui5.fill({ id: /CompanyCode/ }, '1000');
 
-      await feObjectPage.clickSectionCreate('Items');
-      await feObjectPage.fillField('Material', 'MAT-001');
-      await feObjectPage.fillField('OrderQuantity', '10');
-      await feObjectPage.fillField('Plant', '1000');
+      await fe.objectPage.clickButton('Create');
+      await ui5.fill({ id: /Material/ }, 'MAT-001');
+      await ui5.fill({ id: /OrderQuantity/ }, '10');
+      await ui5.fill({ id: /Plant/ }, '1000');
 
-      await feObjectPage.clickSave();
+      await fe.objectPage.clickSave();
       const successMsg = await ui5.control({
         controlType: 'sap.m.MessageStrip',
         properties: { type: 'Success' },
@@ -323,13 +303,13 @@ test.describe('Purchase-to-Pay E2E Flow', () => {
     });
 
     await test.step('Step 2: Post Goods Receipt (MIGO)', async () => {
-      await ui5Navigation.navigateToIntent('#GoodsReceipt-create');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'GoodsReceipt', action: 'create' });
       await ui5.fill({ controlType: 'sap.m.Input', id: /poNumberInput/ }, poNumber);
       await ui5.click({ controlType: 'sap.m.Button', properties: { text: 'Load' } });
 
       // Verify items auto-populated
       const table = await ui5.control({ controlType: 'sap.m.Table', id: /itemsTable/ });
-      await ui5Matchers.toHaveRowCount(table, 1);
+      await expect(table).toHaveUI5RowCount(1);
 
       await ui5.click({ controlType: 'sap.m.Button', properties: { text: 'Post' } });
       const grMsg = await ui5.control({
@@ -343,7 +323,7 @@ test.describe('Purchase-to-Pay E2E Flow', () => {
     });
 
     await test.step('Step 3: Create Invoice (MIRO)', async () => {
-      await ui5Navigation.navigateToIntent('#SupplierInvoice-create');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'SupplierInvoice', action: 'create' });
       await ui5.fill({ controlType: 'sap.m.Input', id: /poReferenceInput/ }, poNumber);
       await ui5.fill({ controlType: 'sap.m.Input', id: /invoiceAmountInput/ }, '5000.00');
       await ui5.fill({ controlType: 'sap.m.DatePicker', id: /invoiceDatePicker/ }, '2025-02-01');
@@ -360,24 +340,24 @@ test.describe('Purchase-to-Pay E2E Flow', () => {
     });
 
     await test.step('Step 4: Verify Payment Run (F110)', async () => {
-      await ui5Navigation.navigateToApp('FI-AP', {
-        semanticObject: 'PaymentRun',
-        action: 'display',
-      });
-      await feListReport.setFilterValues({ Supplier: '100001', Status: 'Paid' });
-      await feListReport.clickGo();
-      await feListReport.expectRowCount({ min: 1 });
+      await ui5Navigation.navigateToApp('PaymentRun-display');
+      await fe.listReport.setFilter('Supplier', '100001');
+      await fe.listReport.setFilter('Status', 'Paid');
+      await fe.listReport.search();
     });
 
     await test.step('Step 5: Verify complete document flow', async () => {
-      await ui5Navigation.navigateToIntent(`#PurchaseOrder-display?PurchaseOrder=${poNumber}`);
+      await ui5Navigation.navigateToIntent(
+        { semanticObject: 'PurchaseOrder', action: 'display' },
+        { PurchaseOrder: poNumber },
+      );
       await ui5.click({
         controlType: 'sap.m.IconTabFilter',
         properties: { key: 'documentFlow' },
       });
 
       const flowTable = await ui5.control({ controlType: 'sap.m.Table', id: /docFlowTable/ });
-      await ui5Matchers.toHaveRowCount(flowTable, { min: 3 }); // PO + GR + Invoice
+      await expect(flowTable).toHaveUI5RowCount(3); // PO + GR + Invoice
     });
   });
 });

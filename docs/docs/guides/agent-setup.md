@@ -464,7 +464,7 @@ Add Praman-specific code snippets to `.vscode/praman.code-snippets`:
       "import { test, expect } from 'playwright-praman';",
       "",
       "test.describe('$1', () => {",
-      "  test('$2', async ({ ui5, ui5Navigation, ui5Matchers }) => {",
+      "  test('$2', async ({ ui5, ui5Navigation }) => {",
       "    await test.step('$3', async () => {",
       "      $0",
       "    });",

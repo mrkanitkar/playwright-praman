@@ -1,7 +1,7 @@
 {
   "name": "playwright-praman",
   "version": "1.1.2",
-  "description": "Playwright plugin for SAP S/4HANA, Fiori & UI5 test automation — AI test generation, 61 typed control proxies, OData V2/V4, Fiori Elements, 6 auth strategies",
+  "description": "Playwright plugin for SAP S/4HANA, Fiori & UI5 test automation — AI test generation, 199 typed control proxies, OData V2/V4, Fiori Elements, 6 auth strategies",
   "author": {
     "name": "Maheshwar Kanitkar",
     "email": "support@zestest.in",

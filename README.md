@@ -47,7 +47,7 @@ Business analysts define the process. AI agents — Claude, Copilot, Jules — g
 
 | Capability                | Details                                                                          |
 | ------------------------- | -------------------------------------------------------------------------------- |
-| **61 UI5 control types**  | Covers `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc` |
+| **199 UI5 control types** | Covers `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc` |
 | **Typed control proxies** | Full IntelliSense and autocomplete for every SAP control                         |
 | **UI5 stability sync**    | Automatic waiting — no `page.waitForTimeout()` needed                            |
 | **FLP navigation**        | Navigate to any Fiori Launchpad app by semantic object + action                  |
@@ -142,6 +142,10 @@ Destructure any fixture you need:
 | `ui5.odata`     | OData model access, `waitForODataLoad()`           |
 | `pramanAI`      | AI agent integration for test generation           |
 | `intent`        | SAP domain actions (create PO, post invoice, etc.) |
+| `testData`      | Test data generation with UUID/timestamp support   |
+| `controlTree`   | UI5 control tree inspection and discovery          |
+| `shellFooter`   | FLP shell bar and footer interaction               |
+| `flpLocks`      | SM12 lock management with auto-cleanup             |
 
 > See the [Fixture Reference](https://praman.dev/docs/guides/fixtures) and [Selector Reference](https://praman.dev/docs/guides/selectors) for the full API.
 
@@ -552,7 +556,7 @@ odataTracing: {
 
 ## Error Codes Quick Reference
 
-Every Praman error includes a machine-readable `code`, human-readable `message`, `attempted` action, `retryable` flag, and `suggestions[]` array. 14 error classes, 67 error codes.
+Every Praman error includes a machine-readable `code`, human-readable `message`, `attempted` action, `retryable` flag, and `suggestions[]` array. 14 error classes, 66 error codes.
 
 | Prefix           | Domain          | Common cause                                         |
 | ---------------- | --------------- | ---------------------------------------------------- |

@@ -372,7 +372,7 @@ const multiInput = await ui5.control({
 // Add tokens by typing
 await ui5.fill({ controlType: 'sap.m.MultiInput', id: /materialMultiInput/ }, 'MAT-001');
 // Press Enter to confirm token (use keyboard interaction)
-await multiInput.pressKey('Enter');
+await page.keyboard.press('Enter');
 
 // Open value help dialog
 await ui5.click({

@@ -92,10 +92,18 @@ export default {
 import { createLlmService } from 'playwright-praman/ai';
 
 const llm = createLlmService(config);
-const response = await llm.complete([
-  { role: 'system', content: 'You are a test generator...' },
-  { role: 'user', content: 'Generate a test for the login page' },
-]);
+
+// complete() takes a single string prompt and an optional Zod schema:
+const response = await llm.complete('Generate a test for the login page', schema);
+
+// For multi-turn conversations, use chat() with a messages array:
+const chatResponse = await llm.chat(
+  [
+    { role: 'system', content: 'You are a test generator...' },
+    { role: 'user', content: 'Generate a test for the login page' },
+  ],
+  schema,
+);
 ```
 
 ## AgenticCheckpoint
@@ -120,7 +128,12 @@ The `AgenticHandler` serializes progress automatically:
 ```typescript
 import { AgenticHandler } from 'playwright-praman/ai';
 
-const handler = new AgenticHandler(llmService, capabilityRegistry, recipeRegistry, page);
+// Constructor: new AgenticHandler(llm, contextBuilder, capabilityRegistry, recipeRegistry?)
+// - llm: an LlmService instance
+// - contextBuilder: a function that builds page context for LLM prompts
+// - capabilityRegistry: the CapabilityRegistry instance
+// - recipeRegistry: optional RecipeRegistry instance
+const handler = new AgenticHandler(llmService, contextBuilder, capabilityRegistry, recipeRegistry);
 
 // generateTest returns AiResponse<AiGeneratedTest> with checkpoint data
 const result = await handler.generateTest('Test the purchase order creation flow');

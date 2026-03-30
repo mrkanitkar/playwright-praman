@@ -42,48 +42,41 @@ test.describe('Purchase Order Approval Flow', () => {
 
   test.beforeEach(async ({ ui5Navigation }) => {
     await test.step('navigate to Fiori Launchpad home', async () => {
-      await ui5Navigation.navigateToIntent('#Shell-home');
+      await ui5Navigation.navigateToIntent({ semanticObject: 'Shell', action: 'home' });
     });
   });
 
-  test('create and approve purchase order', async ({
-    ui5,
-    ui5Navigation,
-    ui5Matchers,
-    feListReport,
-    feObjectPage,
-    page,
-  }) => {
+  test('create and approve purchase order', async ({ ui5, ui5Navigation, fe, page }) => {
     // ── Step 1: Create Purchase Order ──
     await test.step('create purchase order', async () => {
       await test.step('navigate to PO creation', async () => {
-        await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
+        await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
       });
 
       await test.step('fill header data', async () => {
-        await feObjectPage.fillField('Supplier', '100001');
-        await feObjectPage.fillField('PurchasingOrganization', '1000');
-        await feObjectPage.fillField('CompanyCode', '1000');
-        await feObjectPage.fillField('PurchasingGroup', '001');
+        await ui5.fill({ id: /Supplier/ }, '100001');
+        await ui5.fill({ id: /PurchasingOrganization/ }, '1000');
+        await ui5.fill({ id: /CompanyCode/ }, '1000');
+        await ui5.fill({ id: /PurchasingGroup/ }, '001');
       });
 
       await test.step('add line item', async () => {
-        await feObjectPage.clickSectionCreate('Items');
-        await feObjectPage.fillField('Material', 'MAT-APPROVE-001');
-        await feObjectPage.fillField('OrderQuantity', '500');
-        await feObjectPage.fillField('Plant', '1000');
-        await feObjectPage.fillField('NetPrice', '10000.00');
+        await fe.objectPage.clickButton('Create');
+        await ui5.fill({ id: /Material/ }, 'MAT-APPROVE-001');
+        await ui5.fill({ id: /OrderQuantity/ }, '500');
+        await ui5.fill({ id: /Plant/ }, '1000');
+        await ui5.fill({ id: /NetPrice/ }, '10000.00');
       });
 
       await test.step('save and capture PO number', async () => {
-        await feObjectPage.clickSave();
+        await fe.objectPage.clickSave();
 
         // Assert success message
         const messageStrip = await ui5.control({
           controlType: 'sap.m.MessageStrip',
           properties: { type: 'Success' },
         });
-        await ui5Matchers.toHaveText(messageStrip, /Purchase Order (\d+) created/);
+        await expect(messageStrip).toHaveUI5Text(/Purchase Order (\d+) created/);
 
         // Capture PO number for subsequent steps and cleanup
         const text = await messageStrip.getText();
@@ -97,7 +90,8 @@ test.describe('Purchase Order Approval Flow', () => {
     await test.step('verify PO status requires approval', async () => {
       await test.step('navigate to PO display', async () => {
         await ui5Navigation.navigateToIntent(
-          `#PurchaseOrder-display?PurchaseOrder=${createdPONumber}`,
+          { semanticObject: 'PurchaseOrder', action: 'display' },
+          { PurchaseOrder: createdPONumber },
         );
       });
 
@@ -106,7 +100,7 @@ test.describe('Purchase Order Approval Flow', () => {
           controlType: 'sap.m.ObjectStatus',
           id: /overallStatusText/,
         });
-        await ui5Matchers.toHaveText(statusField, 'Awaiting Approval');
+        await expect(statusField).toHaveUI5Text('Awaiting Approval');
       });
 
       await test.step('verify workflow section exists', async () => {
@@ -118,22 +112,23 @@ test.describe('Purchase Order Approval Flow', () => {
           controlType: 'sap.m.Table',
           id: /workflowItemsTable/,
         });
-        await ui5Matchers.toHaveRowCount(workflowTable, { min: 1 });
+        await expect(workflowTable).toHaveUI5RowCount(1);
       });
     });
 
     // ── Step 3: Approve the Purchase Order ──
     await test.step('approve the purchase order', async () => {
       await test.step('navigate to approval inbox', async () => {
-        await ui5Navigation.navigateToIntent('#WorkflowTask-displayInbox');
+        await ui5Navigation.navigateToIntent({
+          semanticObject: 'WorkflowTask',
+          action: 'displayInbox',
+        });
       });
 
       await test.step('find and open PO approval task', async () => {
         // Filter for our specific PO
-        await feListReport.setFilterValues({
-          TaskTitle: `Purchase Order ${createdPONumber}`,
-        });
-        await feListReport.clickGo();
+        await fe.listReport.setFilter('TaskTitle', `Purchase Order ${createdPONumber}`);
+        await fe.listReport.search();
 
         // Click the task row
         await ui5.click({
@@ -158,21 +153,26 @@ test.describe('Purchase Order Approval Flow', () => {
       });
 
       await test.step('verify approval success', async () => {
-        await ui5Matchers.toHaveMessageStrip('Success', /approved/i);
+        const successMsg = await ui5.control({
+          controlType: 'sap.m.MessageStrip',
+          properties: { type: 'Success' },
+        });
+        await expect(successMsg).toHaveUI5Text(/approved/i);
       });
     });
 
     // ── Step 4: Verify Final Status ──
     await test.step('verify PO is approved', async () => {
       await ui5Navigation.navigateToIntent(
-        `#PurchaseOrder-display?PurchaseOrder=${createdPONumber}`,
+        { semanticObject: 'PurchaseOrder', action: 'display' },
+        { PurchaseOrder: createdPONumber },
       );
 
       const statusField = await ui5.control({
         controlType: 'sap.m.ObjectStatus',
         id: /overallStatusText/,
       });
-      await ui5Matchers.toHaveText(statusField, 'Approved');
+      await expect(statusField).toHaveUI5Text('Approved');
     });
   });
 
@@ -240,13 +240,13 @@ await ui5.control({
 ### 3. Assertion Patterns
 
 ```typescript
-// Use custom matchers for SAP-specific assertions
-await ui5Matchers.toHaveText(control, 'Expected Text');
-await ui5Matchers.toHaveText(control, /partial match/);
-await ui5Matchers.toHaveProperty(control, 'enabled', true);
-await ui5Matchers.toHaveRowCount(table, 5);
-await ui5Matchers.toHaveRowCount(table, { min: 1 });
-await ui5Matchers.toHaveMessageStrip('Success', /created/);
+// Use custom matchers for SAP-specific assertions (registered via expect.extend())
+await expect(control).toHaveUI5Text('Expected Text');
+await expect(control).toHaveUI5Text(/partial match/);
+await expect(control).toHaveUI5Property('enabled', true);
+await expect(table).toHaveUI5RowCount(5);
+await expect(control).toBeUI5Visible();
+await expect(control).toBeUI5Enabled();
 
 // For standard Playwright assertions on the page
 await expect(page).toHaveURL(/PurchaseOrder/);
@@ -258,11 +258,16 @@ await expect(page).toHaveTitle(/SAP/);
 ```typescript
 await test.step('handle potential error dialogs', async () => {
   // Check for and dismiss error popups before proceeding
-  const errorDialog = await ui5.controlOrNull({
-    controlType: 'sap.m.Dialog',
-    properties: { type: 'Message' },
-    searchOpenDialogs: true,
-  });
+  let errorDialog;
+  try {
+    errorDialog = await ui5.control({
+      controlType: 'sap.m.Dialog',
+      properties: { type: 'Message' },
+      searchOpenDialogs: true,
+    });
+  } catch {
+    errorDialog = null;
+  }
 
   if (errorDialog) {
     const errorText = await errorDialog.getProperty('content');
@@ -280,7 +285,7 @@ await test.step('handle potential error dialogs', async () => {
     });
 
     // Fail with actionable message
-    expect.fail(`SAP error dialog appeared: ${JSON.stringify(errorText)}`);
+    throw new Error(`SAP error dialog appeared: ${JSON.stringify(errorText)}`);
   }
 });
 ```
@@ -297,18 +302,18 @@ const testData = [
 ];
 
 for (const data of testData) {
-  test(`create PO for supplier ${data.supplier}`, async ({
-    ui5Navigation,
-    feObjectPage,
-    ui5Matchers,
-  }) => {
-    await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
-    await feObjectPage.fillField('Supplier', data.supplier);
-    await feObjectPage.fillField('Material', data.material);
-    await feObjectPage.fillField('OrderQuantity', data.quantity);
-    await feObjectPage.fillField('Plant', data.plant);
-    await feObjectPage.clickSave();
-    await ui5Matchers.toHaveMessageStrip('Success', /created/);
+  test(`create PO for supplier ${data.supplier}`, async ({ ui5, ui5Navigation, fe }) => {
+    await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
+    await ui5.fill({ id: /Supplier/ }, data.supplier);
+    await ui5.fill({ id: /Material/ }, data.material);
+    await ui5.fill({ id: /OrderQuantity/ }, data.quantity);
+    await ui5.fill({ id: /Plant/ }, data.plant);
+    await fe.objectPage.clickSave();
+    const messageStrip = await ui5.control({
+      controlType: 'sap.m.MessageStrip',
+      properties: { type: 'Success' },
+    });
+    await expect(messageStrip).toHaveUI5Text(/created/);
   });
 }
 ```

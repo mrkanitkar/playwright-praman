@@ -32,7 +32,7 @@
   <!-- Stats pills -->
   <g transform="translate(480, 390)">
     <rect x="0" y="0" width="160" height="40" rx="20" fill="rgba(255,215,0,0.15)" stroke="rgba(255,215,0,0.5)" stroke-width="1"/>
-    <text x="80" y="26" text-anchor="middle" fill="#ffd700" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600">61 UI5 Controls</text>
+    <text x="80" y="26" text-anchor="middle" fill="#ffd700" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600">199 UI5 Controls</text>
 
     <rect x="180" y="0" width="140" height="40" rx="20" fill="rgba(255,215,0,0.15)" stroke="rgba(255,215,0,0.5)" stroke-width="1"/>
     <text x="250" y="26" text-anchor="middle" fill="#ffd700" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" font-weight="600">21 Fixtures</text>

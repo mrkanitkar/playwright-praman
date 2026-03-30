@@ -374,17 +374,17 @@ Navigate between SAP Fiori Launchpad apps by hash, tile, intent, or search.
 
 **APIs:**
 
-| API                                              | Description               |
-| ------------------------------------------------ | ------------------------- |
-| `ui5Navigation.navigateToApp(appId)`             | Navigate by semantic hash |
-| `ui5Navigation.navigateToTile(title)`            | Click FLP tile by title   |
-| `ui5Navigation.navigateToIntent(intent, params)` | Semantic object + action  |
-| `ui5Navigation.navigateToHash(hash)`             | Direct hash navigation    |
-| `ui5Navigation.navigateToHome()`                 | Return to FLP home        |
-| `ui5Navigation.navigateBack()`                   | Browser history back      |
-| `ui5Navigation.navigateForward()`                | Browser history forward   |
-| `ui5Navigation.searchAndOpenApp(title)`          | Shell search bar + open   |
-| `ui5Navigation.getCurrentHash()`                 | Read current URL hash     |
+| API                                               | Description                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------- |
+| `ui5Navigation.navigateToApp(appId)`              | Navigate by semantic hash                                       |
+| `ui5Navigation.navigateToTile(title)`             | Click FLP tile by title                                         |
+| `ui5Navigation.navigateToIntent(intent, params?)` | Semantic object + action (`intent: { semanticObject, action }`) |
+| `ui5Navigation.navigateToHash(hash)`              | Direct hash navigation                                          |
+| `ui5Navigation.navigateToHome()`                  | Return to FLP home                                              |
+| `ui5Navigation.navigateBack()`                    | Browser history back                                            |
+| `ui5Navigation.navigateForward()`                 | Browser history forward                                         |
+| `ui5Navigation.searchAndOpenApp(title)`           | Shell search bar + open                                         |
+| `ui5Navigation.getCurrentHash()`                  | Read current URL hash                                           |
 
 **Failures:**
 
@@ -1439,7 +1439,7 @@ Alphabetical list of every public API mapped to its capability ID. AI agents use
 | `VocabularyError`          | UI5-DX-004    |
 | `waitForDialog`            | UI5-DLG-001   |
 | `waitForDialogClosed`      | UI5-DLG-001   |
-| `waitForODataLoad`         | UI5-DATA-001  |
+| `waitForLoad`              | UI5-DATA-001  |
 | `waitForSave`              | UI5-INT-001   |
 | `waitForTableData`         | UI5-TBL-001   |
 | `waitForUI5Bootstrap`      | UI5-WAIT-001  |
@@ -1511,8 +1511,8 @@ For each common failure, the resolution and associated capability. AI agents use
 | Bridge not injected                          | UI5-WAIT-001  | Bridge auto-injects on first use; if page navigated, injection resets automatically                            |
 | WalkMe interfering with tests                | UI5-WAIT-002  | Verify stability fixture is active; add WalkMe URL pattern to `ignoreAutoWaitUrls` config                      |
 | Dialog button not found                      | UI5-DLG-001   | Check button text matches exactly; use `getButtons()` to list available buttons first                          |
-| Table has no rows                            | UI5-TBL-001   | Use `waitForData()` or `waitForODataLoad()` before reading table; verify filter criteria                       |
-| OData model path has no data                 | UI5-DATA-001  | Verify the path matches bound entities; use `waitForODataLoad()` after navigation                              |
+| Table has no rows                            | UI5-TBL-001   | Use `waitForData()` or `waitForLoad()` before reading table; verify filter criteria                            |
+| OData model path has no data                 | UI5-DATA-001  | Verify the path matches bound entities; use `waitForLoad()` after navigation                                   |
 | CSRF token expired                           | UI5-DATA-002  | Fetch a new token via `fetchCSRFToken()` before the write operation                                            |
 | Authentication failed                        | UI5-AUTH-001  | Verify credentials; check if strategy matches system type (on-prem vs cloud)                                   |
 | SM12_SRV service unavailable                 | UI5-FLP-001   | Activate the SM12_SRV OData service in SAP (transaction `/IWFND/MAINT_SERVICE`)                                |

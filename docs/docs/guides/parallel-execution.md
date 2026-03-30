@@ -60,11 +60,11 @@ Strategies to avoid lock conflicts:
 ```typescript
 import { test } from 'playwright-praman';
 
-test('edit order assigned to this worker', async ({ ui5 }, testInfo) => {
+test('edit order assigned to this worker', async ({ ui5, page }, testInfo) => {
   const orderPool = ['ORD-001', 'ORD-002', 'ORD-003', 'ORD-004'];
   const myOrder = orderPool[testInfo.workerIndex % orderPool.length];
 
-  await ui5.navigate(`/app#/Orders/${myOrder}`);
+  await page.goto(`/app#/Orders/${myOrder}`);
   await ui5.waitForUI5();
 });
 ```

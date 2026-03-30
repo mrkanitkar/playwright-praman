@@ -31,7 +31,7 @@ test.describe('OData CRUD Operations', () => {
     });
 
     await test.step('Wait for OData model to load', async () => {
-      await ui5.odata.waitForODataLoad('/PurchaseOrders');
+      await ui5.odata.waitForLoad();
     });
 
     await test.step('Read entity collection from model', async () => {
@@ -124,7 +124,7 @@ test.describe('OData CRUD Operations', () => {
     await test.step('Navigate to Purchase Order detail', async () => {
       await ui5Navigation.navigateToApp('PurchaseOrder-manage');
       await ui5.waitForUI5();
-      await ui5.odata.waitForODataLoad('/PurchaseOrders');
+      await ui5.odata.waitForLoad();
 
       await ui5.press({
         controlType: 'sap.m.ColumnListItem',
@@ -174,7 +174,7 @@ test.describe('OData CRUD Operations', () => {
 - **`ui5.odata.getModelData(path)`** -- reads from the browser-side UI5 OData model (no extra HTTP requests)
 - **`ui5.odata.getModelProperty(path)`** -- reads a single property value from the model
 - **`ui5.odata.getEntityCount(path)`** -- counts entities loaded in the model
-- **`ui5.odata.waitForODataLoad(path)`** -- polls until data is available (15s default timeout)
+- **`ui5.odata.waitForLoad()`** -- polls until OData data is available (15s default timeout)
 - **`ui5.odata.queryEntities(url, set, opts)`** -- HTTP GET with `$filter`, `$select`, `$expand`, `$orderby`, `$top`
 - **`ui5.odata.createEntity(url, set, data)`** -- HTTP POST with automatic CSRF token
 - **`ui5.odata.updateEntity(url, set, key, data)`** -- HTTP PATCH with CSRF token

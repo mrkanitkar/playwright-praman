@@ -16,7 +16,7 @@ import { test, expect } from 'playwright-praman';
 
 test.describe('Visual Regression - Purchase Order List', () => {
   test('list report matches baseline', async ({ ui5Navigation, page }) => {
-    await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+    await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
     await expect(page).toHaveScreenshot('po-list-report.png', {
       maxDiffPixelRatio: 0.01,
@@ -30,13 +30,14 @@ test.describe('Visual Regression - Purchase Order List', () => {
 Capture just a specific control instead of the full page:
 
 ```typescript
-test('smart table matches baseline', async ({ ui5, ui5Navigation }) => {
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+test('smart table matches baseline', async ({ ui5, ui5Navigation, page }) => {
+  await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
   const table = await ui5.control({
     controlType: 'sap.ui.comp.smarttable.SmartTable',
   });
-  const locator = await table.getLocator();
+  const tableId = await table.getProperty('id');
+  const locator = page.locator(`#${tableId}`);
 
   await expect(locator).toHaveScreenshot('po-smart-table.png', {
     maxDiffPixelRatio: 0.01,
@@ -53,7 +54,10 @@ test runs. Mask these areas to prevent false positives.
 
 ```typescript
 test('object page with masked dynamic content', async ({ ui5Navigation, page }) => {
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-display?PurchaseOrder=4500000001');
+  await ui5Navigation.navigateToIntent(
+    { semanticObject: 'PurchaseOrder', action: 'display' },
+    { PurchaseOrder: '4500000001' },
+  );
 
   await expect(page).toHaveScreenshot('po-object-page.png', {
     mask: [
@@ -71,9 +75,12 @@ test('object page with masked dynamic content', async ({ ui5Navigation, page }) 
 
 ```typescript
 test('form with masked values', async ({ ui5, ui5Navigation, page }) => {
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-display?PurchaseOrder=4500000001');
+  await ui5Navigation.navigateToIntent(
+    { semanticObject: 'PurchaseOrder', action: 'display' },
+    { PurchaseOrder: '4500000001' },
+  );
 
-  // Get locators for dynamic fields
+  // Get locators for dynamic fields via their DOM IDs
   const dateField = await ui5.control({
     controlType: 'sap.m.DatePicker',
     id: /creationDate/,
@@ -82,9 +89,11 @@ test('form with masked values', async ({ ui5, ui5Navigation, page }) => {
     controlType: 'sap.m.Text',
     id: /createdByText/,
   });
+  const dateId = await dateField.getProperty('id');
+  const userId = await userField.getProperty('id');
 
   await expect(page).toHaveScreenshot('po-form.png', {
-    mask: [await dateField.getLocator(), await userField.getLocator()],
+    mask: [page.locator(`#${dateId}`), page.locator(`#${userId}`)],
   });
 });
 ```
@@ -129,7 +138,7 @@ test.beforeEach(async ({ page }) => {
 
 test('list report in configured theme', async ({ ui5Navigation, page }) => {
   const theme = test.info().project.metadata.theme ?? 'sap_horizon';
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+  await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
   await expect(page).toHaveScreenshot(`po-list-${theme}.png`, {
     maxDiffPixelRatio: 0.01,
@@ -146,7 +155,7 @@ compliance:
 test('high contrast black theme renders correctly', async ({ ui5Navigation, page }) => {
   // Apply high contrast theme
   await page.goto(`${process.env.SAP_BASE_URL}?sap-ui-theme=sap_horizon_hcb`);
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+  await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
   await expect(page).toHaveScreenshot('po-list-hcb.png', {
     maxDiffPixelRatio: 0.02, // Slightly higher tolerance for HC themes
@@ -172,7 +181,7 @@ const locales = [
 for (const locale of locales) {
   test(`list report renders correctly in ${locale.name}`, async ({ ui5Navigation, page }) => {
     await page.goto(`${process.env.SAP_BASE_URL}?sap-language=${locale.code}`);
-    await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+    await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
     await expect(page).toHaveScreenshot(`po-list-${locale.code}.png`, {
       maxDiffPixelRatio: 0.02,
@@ -186,7 +195,7 @@ for (const locale of locales) {
 ```typescript
 test('RTL layout renders correctly for Arabic', async ({ ui5Navigation, page }) => {
   await page.goto(`${process.env.SAP_BASE_URL}?sap-language=ar`);
-  await ui5Navigation.navigateToIntent('#PurchaseOrder-manage');
+  await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
   // Verify RTL direction is applied
   const dir = await page.getAttribute('html', 'dir');

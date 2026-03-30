@@ -12,14 +12,11 @@ rather than transaction codes. This table helps you translate your existing SAP 
 into Fiori-native test navigation.
 
 ```typescript
-// Navigate by semantic object + action
-await ui5Navigation.navigateToApp('MM-PUR-PO', {
-  semanticObject: 'PurchaseOrder',
-  action: 'create',
-});
+// Navigate by app semantic hash
+await ui5Navigation.navigateToApp('PurchaseOrder-create');
 
-// Navigate by intent hash
-await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
+// Navigate by intent (semantic object + action)
+await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
 ```
 
 ## Materials Management (MM)
@@ -114,34 +111,32 @@ await ui5Navigation.navigateToIntent('#PurchaseOrder-create');
 
 ## Praman Navigation Patterns
 
-### By Transaction Code (Convenience Wrapper)
+### By App Semantic Hash
 
 ```typescript
-// Praman resolves the TCode to its Fiori intent internally
-await ui5Navigation.navigateToTransaction('ME21N');
+// Navigate by semantic object-action string
+await ui5Navigation.navigateToApp('PurchaseOrder-create');
 ```
 
-### By Semantic Object and Action
+### By Intent (Semantic Object + Action)
 
 ```typescript
-await ui5Navigation.navigateToApp('MM-PUR-PO', {
-  semanticObject: 'PurchaseOrder',
-  action: 'create',
-});
+await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
 ```
 
-### By Intent Hash with Parameters
+### By Intent with Parameters
 
 ```typescript
-await ui5Navigation.navigateToIntent('#PurchaseOrder-display?PurchaseOrder=4500000001');
+await ui5Navigation.navigateToIntent(
+  { semanticObject: 'PurchaseOrder', action: 'display' },
+  { PurchaseOrder: '4500000001' },
+);
 ```
 
-### By Fiori App ID
+### By Hash (Deep Link)
 
 ```typescript
-await ui5Navigation.navigateToFioriApp('F0842', {
-  params: { PurchaseOrder: '4500000001' },
-});
+await ui5Navigation.navigateToHash("PurchaseOrder-display&/PurchaseOrders('4500000001')");
 ```
 
 ## Tips
@@ -152,4 +147,4 @@ await ui5Navigation.navigateToFioriApp('F0842', {
   admin console for custom intent mappings.
 - **Transaction wrappers** (SAP GUI in Fiori) use the TCode directly but are rendered inside
   the FLP shell — same navigation pattern applies.
-- Use `ui5Navigation.getCurrentIntent()` to verify you landed on the correct app after navigation.
+- Use `ui5Navigation.getCurrentHash()` to verify you landed on the correct app after navigation.

@@ -2,7 +2,7 @@
 sidebar_position: 1
 slug: /
 title: Playwright Plugin for SAP Testing — Praman Documentation
-description: 'Complete documentation for Praman — the open-source Playwright plugin for SAP S/4HANA, Fiori, and UI5 test automation. 61 controls, OData, AI test generation, 6 auth strategies.'
+description: 'Complete documentation for Praman — the open-source Playwright plugin for SAP S/4HANA, Fiori, and UI5 test automation. 199 controls, OData, AI test generation, 6 auth strategies.'
 ---
 
 **Open-source Playwright plugin for SAP S/4HANA, Fiori, and UI5 test automation.**
@@ -61,9 +61,9 @@ test('discover a UI5 control', async ({ ui5, ui5Navigation }) => {
 **Core References**
 
 - [Configuration Reference](./guides/configuration.md) — all config options with defaults
-- [Fixture Reference](./guides/fixtures.md) — all 12 fixture modules
+- [Fixture Reference](./guides/fixtures.md) — all 13 fixture modules
 - [Selector Reference](./guides/selectors.md) — `UI5Selector` fields and examples
-- [Error Reference](./guides/errors.md) — 67 error codes with recovery suggestions
+- [Error Reference](./guides/errors.md) — 66 error codes with recovery suggestions
 - [Feature Inventory](./guides/capabilities.md) — complete feature overview
 
 > **Not sure where to start?** Visit the [Personas](/personas) page to find your role-specific entry point.

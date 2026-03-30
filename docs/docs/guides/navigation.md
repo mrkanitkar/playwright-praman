@@ -54,13 +54,13 @@ method for parameterized navigation.
 
 ```typescript
 // Basic intent
-await ui5Navigation.navigateToIntent('PurchaseOrder', 'create');
+await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
 
 // With parameters
-await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', {
-  plant: '1000',
-  purchOrg: '1000',
-});
+await ui5Navigation.navigateToIntent(
+  { semanticObject: 'PurchaseOrder', action: 'create' },
+  { plant: '1000', purchOrg: '1000' },
+);
 
 // Produces hash: #PurchaseOrder-create?plant=1000&purchOrg=1000
 ```
@@ -137,9 +137,10 @@ test('open purchase order', async ({ ui5Navigation }) => {
 
 ```typescript
 test('open specific purchase order', async ({ ui5Navigation }) => {
-  await ui5Navigation.navigateToIntent('PurchaseOrder', 'display', {
-    PurchaseOrder: '4500000001',
-  });
+  await ui5Navigation.navigateToIntent(
+    { semanticObject: 'PurchaseOrder', action: 'display' },
+    { PurchaseOrder: '4500000001' },
+  );
 });
 ```
 
@@ -188,7 +189,7 @@ import { test } from 'playwright-praman';
 
 test('WorkZone navigation', async ({ btpWorkZone, ui5, page }) => {
   // The manager detects the frame structure automatically
-  const workspace = btpWorkZone.getWorkspaceFrame();
+  const appFrame = btpWorkZone.getAppFrameForEval();
 
   // UI5 operations automatically target the correct frame
   await ui5.click({ id: 'saveBtn' });
