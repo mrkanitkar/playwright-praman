@@ -160,11 +160,15 @@ Outb
 Sxxxxxxxx
 readymade
 
+# Font names
+Segoe
+
 # Miscellaneous
 scaffolder
 checkmark
 workitem
 redaction
+unredacted
 endo
 apos
 tsyringe
