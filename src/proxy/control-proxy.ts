@@ -466,7 +466,7 @@ function resolveKnownProperty(
             const ctrl = getById(controlId);
             // eslint-disable-next-line sonarjs/no-duplicate-string -- self-contained browser function cannot reference Node-side constants
             if (ctrl === null) throw new Error('Control not found: ' + controlId);
-            // eslint-disable-next-line no-new-func, @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call -- intentional: exec() deserializes user function in browser context
+            // eslint-disable-next-line no-new-func, @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call, sonarjs/code-eval -- intentional: exec() deserializes user function in browser context
             const userFn = new Function('return (' + fnBody + ')')() as (
               ...a: unknown[]
             ) => unknown;

@@ -25,7 +25,6 @@ import { AuthError } from '../../../../src/core/errors/auth-error.js';
 import { createMockAuthPage } from '../../../helpers/mock-auth-page.js';
 import type { MockAuthPage } from '../../../helpers/mock-auth-page.js';
 
-// eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
 const TEST_PASSWORD = 'test-secret-value';
 
 describe('MultiTenantAuthStrategy', () => {
