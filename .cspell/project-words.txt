@@ -182,3 +182,4 @@ myapp
 mycompany
 xyznonexistent
 gitignored
+combinators
