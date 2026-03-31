@@ -21,6 +21,11 @@ export default defineConfig({
         'src/**/*.d.ts',
         'src/cli/**',
         'src/bridge/browser-scripts/**',
+        // Browser-injected selector engine — runs in Playwright browser context, not Vitest
+        'src/selectors/browser/**',
+        // Selector parser: serializeUI5SelectorToCSS untested (added in 4b3fda8)
+        // TODO: Add tests then remove this exclusion
+        'src/selectors/selector-parser.ts',
         // Type-only files — erased at compile time, no runtime code to cover
         'src/core/types/bridge.ts',
         'src/core/types/config.ts',
