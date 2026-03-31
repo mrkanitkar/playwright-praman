@@ -92,7 +92,7 @@ export function parseViewport(viewport: string): { width: number; height: number
  * copyToClipboard("ui5=sap.m.Button[text='Save']");
  * ```
  */
-export function copyToClipboard(text: string): void {
+function copyToClipboard(text: string): void {
   try {
     const safe = text.replaceAll("'", "'\\''");
     if (process.platform === 'darwin') {
@@ -244,7 +244,7 @@ export function printReport(meta: ControlMetaResult, selectors: readonly string[
 }
 
 /** Prints the keyboard shortcut help. */
-export function printHelp(): void {
+function printHelp(): void {
   logDivider('Keyboard Shortcuts');
   logRaw('');
   logRaw('  t   Show full UI5 control tree');

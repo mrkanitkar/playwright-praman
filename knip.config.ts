@@ -30,6 +30,8 @@ const config: KnipConfig = {
     'src/modules/index.ts',
     'src/proxy/index.ts',
     'src/selectors/index.ts',
+    // Browser-injected script — loaded via file path, not imported as a module
+    'src/selectors/browser/ui5-engine.ts',
   ],
   ignoreDependencies: [
     'pino-pretty',

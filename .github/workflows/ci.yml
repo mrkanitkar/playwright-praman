@@ -61,7 +61,16 @@ jobs:
           cache: 'npm'
       - name: Align npm version
         if: matrix.node-version == 22
-        run: npm i -g npm@11
+        shell: bash
+        run: |
+          npm i -g npm@11 2>/dev/null || {
+            echo "::warning::npm self-upgrade failed — using direct download"
+            curl -fsSL https://registry.npmjs.org/npm/-/npm-11.0.0.tgz -o "$RUNNER_TEMP/npm.tgz"
+            mkdir -p "$RUNNER_TEMP/npm-pkg"
+            tar -xzf "$RUNNER_TEMP/npm.tgz" -C "$RUNNER_TEMP/npm-pkg"
+            node "$RUNNER_TEMP/npm-pkg/package/bin/npm-cli.js" install -g npm@11
+          }
+          echo "npm: $(npm --version)"
       - run: npm ci
       - run: npm run build
       - run: npm run test:unit -- --coverage
