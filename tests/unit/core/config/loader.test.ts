@@ -217,7 +217,7 @@ describe('loadConfig', () => {
       baseUrl: 'https://sap.example.com',
       strategy: 'basic',
       username: 'admin',
-      // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+
       password: 'secret',
       client: '100',
       language: 'DE',
@@ -280,7 +280,7 @@ describe('loadConfig', () => {
         auth: {
           baseUrl: 'https://inline.example.com',
           strategy: 'basic',
-          // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+
           password: 'inline-pw',
         },
       },

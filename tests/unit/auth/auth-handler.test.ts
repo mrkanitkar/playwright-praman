@@ -28,7 +28,6 @@ vi.mock('#core/utils/retry.js', () => ({
   retry: vi.fn(),
 }));
 
-// eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
 const TEST_PASSWORD = 'test-secret-value';
 
 /**
@@ -279,7 +278,7 @@ describe('SAPAuthHandler', () => {
         expect.objectContaining({
           url: 'https://cloud.sap.example.com',
           username: 'cloud-user',
-          // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+
           password: 'cloud-pass',
           client: '200',
           language: 'DE',
@@ -304,7 +303,7 @@ describe('SAPAuthHandler', () => {
         expect.objectContaining({
           url: 'https://onprem.sap.example.com',
           username: 'onprem-user',
-          // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+
           password: 'onprem-pass',
           client: '100',
           language: 'EN',
@@ -324,7 +323,7 @@ describe('SAPAuthHandler', () => {
         expect.objectContaining({
           url: 'https://onprem.sap.example.com',
           username: 'onprem-user',
-          // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
+
           password: 'onprem-pass',
         }),
       );

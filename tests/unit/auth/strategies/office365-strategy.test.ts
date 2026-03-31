@@ -38,7 +38,7 @@ describe('Office365AuthStrategy', () => {
     config = {
       url: 'https://sap.example.com',
       username: 'user@company.com',
-      password: 'secret-test-123', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+      password: 'secret-test-123',
       timeout: 5000,
     };
   });
@@ -192,7 +192,7 @@ describe('Office365AuthStrategy', () => {
       const noTimeoutConfig: Readonly<SAPAuthConfig> = {
         url: 'https://sap.example.com',
         username: 'user@company.com',
-        password: 'secret-test', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+        password: 'secret-test',
       };
 
       await strategy.authenticate(page, noTimeoutConfig);

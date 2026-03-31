@@ -37,7 +37,7 @@ describe('APIAuthStrategy', () => {
     config = {
       url: 'https://sap.example.com',
       username: 'admin',
-      password: 'secret-test-123', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+      password: 'secret-test-123',
       client: '100',
       timeout: 5000,
     };
@@ -235,7 +235,7 @@ describe('APIAuthStrategy', () => {
       const noEndpointConfig: Readonly<SAPAuthConfig> = {
         url: 'https://sap.example.com',
         username: 'admin',
-        password: 'secret-test', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+        password: 'secret-test',
       };
 
       page.evaluate.mockResolvedValueOnce({
@@ -300,7 +300,7 @@ describe('APIAuthStrategy', () => {
       const noTimeoutConfig: Readonly<SAPAuthConfig> = {
         url: 'https://sap.example.com',
         username: 'admin',
-        password: 'secret-test', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+        password: 'secret-test',
       };
 
       page.evaluate.mockResolvedValueOnce({
@@ -319,7 +319,7 @@ describe('APIAuthStrategy', () => {
       const noClientConfig: Readonly<SAPAuthConfig> = {
         url: 'https://sap.example.com',
         username: 'admin',
-        password: 'secret-test', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+        password: 'secret-test',
       };
 
       page.evaluate.mockResolvedValueOnce({
@@ -433,7 +433,7 @@ describe('APIAuthStrategy', () => {
         const noClientConfig: Readonly<SAPAuthConfig> = {
           url: 'https://sap.example.com',
           username: 'admin',
-          password: 'secret-test', // eslint-disable-line sonarjs/no-hardcoded-passwords -- test fixture
+          password: 'secret-test',
         };
 
         await strategy.authenticate(cbPage, noClientConfig);

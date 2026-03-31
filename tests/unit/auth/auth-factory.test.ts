@@ -32,7 +32,6 @@ import { Office365AuthStrategy } from '../../../src/auth/strategies/office365-st
 import { OnPremAuthStrategy } from '../../../src/auth/strategies/onprem-strategy.js';
 import { AuthError } from '../../../src/core/errors/auth-error.js';
 
-// eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test fixtures use known values
 const TEST_PASSWORD = 'test-secret-value';
 
 /**

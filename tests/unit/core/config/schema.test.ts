@@ -62,7 +62,7 @@ describe('PramanConfigSchema', () => {
           strategy: 'btp-saml',
           baseUrl: 'https://sap.example.com',
           username: 'user',
-          // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- test fixture
+
           password: 'test-credential',
           client: '200',
           language: 'DE',
