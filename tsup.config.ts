@@ -18,7 +18,12 @@ export default defineConfig({
   },
   format: ['esm', 'cjs'],
   tsconfig: 'tsconfig.build.json',
-  dts: true,
+  dts: {
+    // tsup's DTS rollup plugin injects `baseUrl: "."` unconditionally (rollup.js:6837).
+    // TS 6.0 deprecated baseUrl, causing DTS build failure. This silences the
+    // deprecation until tsup releases a fix. Our own tsconfigs have no baseUrl.
+    compilerOptions: { ignoreDeprecations: '6.0' },
+  },
   sourcemap: true,
   clean: true,
   target: 'node20',
