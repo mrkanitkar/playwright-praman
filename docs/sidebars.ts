@@ -53,6 +53,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'guides/control-interactions',
         'guides/selectors',
+        'guides/locator-selector-syntax',
         'guides/navigation',
         'guides/typed-controls',
         'guides/discovery-and-interaction',

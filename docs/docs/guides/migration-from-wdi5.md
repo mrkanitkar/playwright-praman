@@ -17,7 +17,7 @@ wdi5 API to its Praman equivalent and highlights features that are new in Praman
 | ------------------ | ------------------------------------- | ----------------------------------------------- |
 | Test runner        | WebdriverIO                           | Playwright                                      |
 | UI5 bridge         | `browser.asControl()`                 | `ui5.control()`                                 |
-| Selector engine    | wdi5 selector object                  | `UI5Selector` object                            |
+| Selector engine    | wdi5 selector object                  | `UI5Selector` object + CSS locator syntax       |
 | Async model        | WDIO auto-sync (deprecated) / `async` | Always `async/await`                            |
 | Parallel execution | Limited (WDIO workers)                | Native Playwright workers                       |
 | Auth management    | Manual login scripts                  | 6 built-in strategies + setup projects          |
@@ -80,6 +80,27 @@ const value = await input.getValue();
 await ui5.fill({ id: 'nameInput' }, 'John Doe');
 ```
 
+## CSS-Style Locator Selectors
+
+Praman also supports a CSS-like syntax for finding controls with `page.locator('ui5=...')`.
+This has no wdi5 equivalent — it's an additional way to write selectors when you need
+structural queries, label matching, or positional selection:
+
+```typescript
+// Find a button by text
+await page.locator("ui5=sap.m.Button[text='Save']").click();
+
+// Find an input by its associated label
+await page.locator('ui5=sap.m.Input:labeled("Vendor")').fill('100001');
+
+// Find the first input inside a form
+await page.locator('ui5=sap.ui.layout.form.SimpleForm sap.m.Input:first-child').click();
+```
+
+This returns a standard Playwright `Locator`, so you can chain `.click()`, `.fill()`,
+and use it with `expect()`. See [Finding Controls with Locators](/docs/guides/locator-selector-syntax)
+for the full syntax reference.
+
 ## Selector Field Mapping
 
 The selector object structure is similar, with a few naming adjustments and additions.
@@ -99,35 +120,28 @@ The selector object structure is similar, with a few naming adjustments and addi
 | `searchOpenDialogs` | `searchOpenDialogs`        | `boolean`                 | Identical. Search inside open dialogs.       |
 | `labelFor`          | --                         | --                        | **Not available in Praman.** See note below. |
 
-:::caution labelFor Selector
+:::tip labelFor Selector
 
 wdi5 supports a `labelFor` selector field that matches controls by their associated `sap.m.Label`.
-Praman does not currently support `labelFor`. Use one of these alternatives:
+In Praman, use the `:labeled()` pseudo-class with
+[CSS locator syntax](/docs/guides/locator-selector-syntax):
 
 ```typescript
-// Option 1: Match by properties directly
-const input = await ui5.control({
-  controlType: 'sap.m.Input',
-  properties: { placeholder: 'Enter vendor name' },
+// wdi5
+const input = await browser.asControl({
+  selector: { controlType: 'sap.m.Input', labelFor: { text: 'Vendor Name' } },
 });
 
-// Option 2: Match by binding path
-const input = await ui5.control({
-  controlType: 'sap.m.Input',
-  bindingPath: { value: '/Vendor/Name' },
-});
+// Praman — use :labeled() with page.locator()
+const input = page.locator('ui5=sap.m.Input:labeled("Vendor Name")');
+await input.fill('100001');
+```
 
-// Option 3: Use ancestor to scope to a form group
-const input = await ui5.control({
-  controlType: 'sap.m.Input',
-  ancestor: {
-    controlType: 'sap.ui.layout.form.FormElement',
-    descendant: {
-      controlType: 'sap.m.Label',
-      properties: { text: 'Vendor Name' },
-    },
-  },
-});
+`:labeled()` checks both the label's `labelFor` association and the control's `ariaLabelledBy`
+association. You can also combine it with other selectors:
+
+```typescript
+page.locator("ui5=sap.m.Input:labeled('Vendor Name')[required='true']");
 ```
 
 :::
