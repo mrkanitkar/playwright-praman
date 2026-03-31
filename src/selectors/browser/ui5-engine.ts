@@ -105,7 +105,10 @@ const parseCss = createParser({
     },
     pseudoClasses: {
       definitions: {
-        Selector: ['has'],
+        Selector: ['has', 'not'],
+        Formula: ['nth-child', 'nth-of-type'],
+        NoArgument: ['first-child', 'last-child', 'only-child'],
+        String: ['labeled'],
       },
       unknown: 'reject',
     },
@@ -143,6 +146,7 @@ function isXPathSelector(selector: string): boolean {
  * @param useSubclass - Current subclass flag (mutated via return)
  * @returns Updated [tagName, predicates, useSubclass]
  */
+// eslint-disable-next-line sonarjs/cognitive-complexity -- flat switch/if chain for each CSS pseudo-class type
 function processRuleItem(
   item: AstRule['items'][number],
   tagName: string,
@@ -166,6 +170,41 @@ function processRuleItem(
       if (item.name === 'has' && item.argument?.type === 'Selector') {
         const innerXPath = selectorToXPath(item.argument);
         return [tagName, `${predicates}[.${innerXPath}]`, useSubclass];
+      }
+      if (item.name === 'not' && item.argument?.type === 'Selector') {
+        const innerTests = item.argument.rules.map((r) => ruleToSelfTest(r)).join(' or ');
+        return [tagName, `${predicates}[not(${innerTests})]`, useSubclass];
+      }
+      if (item.name === 'labeled' && item.argument?.type === 'String') {
+        const raw = item.argument.value;
+        // css-selector-parser includes outer quotes in String values — strip them
+        const stripped =
+          (raw.startsWith("'") && raw.endsWith("'")) || (raw.startsWith('"') && raw.endsWith('"'))
+            ? raw.slice(1, -1)
+            : raw;
+        const labelText = escapeXPathString(stripped);
+        return [tagName, `${predicates}[ui5:labeled-by(.,'${labelText}')]`, useSubclass];
+      }
+      if (item.name === 'first-child') {
+        return [tagName, `${predicates}[not(preceding-sibling::*)]`, useSubclass];
+      }
+      if (item.name === 'last-child') {
+        return [tagName, `${predicates}[not(following-sibling::*)]`, useSubclass];
+      }
+      if (item.name === 'only-child') {
+        return [
+          tagName,
+          `${predicates}[not(preceding-sibling::*) and not(following-sibling::*)]`,
+          useSubclass,
+        ];
+      }
+      if (
+        (item.name === 'nth-child' || item.name === 'nth-of-type') &&
+        item.argument?.type === 'Formula'
+      ) {
+        const { a, b } = item.argument as { a: number; b: number };
+        const posPred = formulaToXPathPredicate(a, b);
+        return [tagName, `${predicates}${posPred}`, useSubclass];
       }
       return [tagName, predicates, useSubclass];
     }
@@ -238,7 +277,21 @@ function nestedRuleToXPath(rule: AstRule): string {
   }
 
   const combinator = rule.combinator ?? ' ';
-  const axis = combinator === '>' ? '/' : '//';
+  let axis: string;
+  switch (combinator) {
+    case '>':
+      axis = '/';
+      break;
+    case '+':
+      axis = '/following-sibling::*[1]/self::';
+      break;
+    case '~':
+      axis = '/following-sibling::';
+      break;
+    default:
+      axis = '//';
+      break;
+  }
   let step = buildStep(axis, tagName, predicates, useSubclass);
 
   if (rule.nestedRule !== undefined) {
@@ -321,6 +374,65 @@ function escapeXPathString(value: string): string {
     return value;
   }
   return value.replaceAll("'", '&#39;');
+}
+
+/**
+ * Converts a parsed CSS AST rule to an XPath self-axis test for `:not()` predicates.
+ *
+ * @remarks
+ * Unlike {@link ruleToXPath} which produces descendant `//` axes, this produces
+ * `self::` tests that check the element itself — matching CSS `:not()` semantics.
+ *
+ * @param rule - The parsed CSS AST rule
+ * @returns An XPath self-axis expression
+ */
+function ruleToSelfTest(rule: AstRule): string {
+  let tagName = '*';
+  let predicates = '';
+  let useSubclass = false;
+
+  for (const item of rule.items) {
+    [tagName, predicates, useSubclass] = processRuleItem(item, tagName, predicates, useSubclass);
+  }
+
+  if (useSubclass) {
+    return `self::*[ui5:subclass-of(.,'${escapeXPathString(tagName)}')]${predicates}`;
+  }
+  if (tagName === '*') {
+    return `self::*${predicates}`;
+  }
+  return `self::${tagName}${predicates}`;
+}
+
+/**
+ * Converts CSS `An+B` formula parameters to an XPath position predicate.
+ *
+ * @remarks
+ * Uses `count(preceding-sibling::*)+1` instead of `position()` to match
+ * CSS `:nth-child()` semantics, which count among ALL siblings regardless of type.
+ *
+ * @param a - The multiplier of `n`
+ * @param b - The constant offset
+ * @returns An XPath predicate string, or empty string if the formula matches all
+ */
+function formulaToXPathPredicate(a: number, b: number): string {
+  const pos = 'count(preceding-sibling::*)+1';
+  if (a === 0) {
+    return `[${pos}=${String(b)}]`;
+  }
+  if (a === 1 && b === 0) {
+    return '';
+  }
+  if (a === 2 && b === 0) {
+    return `[(${pos}) mod 2=0]`;
+  }
+  if (a === 2 && b === 1) {
+    return `[(${pos}) mod 2=1]`;
+  }
+  if (b === 0) {
+    return `[(${pos}) mod ${String(a)}=0]`;
+  }
+  return `[((${pos})-${String(b)}) mod ${String(a)}=0 and (${pos})>=${String(b)}]`;
 }
 
 /**
@@ -465,6 +577,66 @@ function checkSubclassOf(element: Element, typeName: string): boolean {
 }
 
 /**
+ * Checks if a UI5 control has a label with the given text.
+ *
+ * @remarks
+ * Uses two strategies:
+ * 1. Find `sap.m.Label` controls whose `labelFor` association matches target control's ID
+ * 2. Check target control's `ariaLabelledBy` association for labels with matching text
+ *
+ * @param element - XML element with an `id` attribute
+ * @param labelText - Expected label text
+ * @returns `true` if a matching label association is found
+ */
+// eslint-disable-next-line sonarjs/cognitive-complexity -- two-strategy label resolution with null-safety checks
+function checkLabeledBy(element: Element, labelText: string): boolean {
+  const id = element.getAttribute('id') ?? '';
+  const ctrl = controlMap.get(id);
+  if (ctrl === undefined) return false;
+
+  const registry = getRegistry();
+  if (registry === null) return false;
+
+  // Strategy 1: Find sap.m.Label with matching text whose labelFor → this control's ID
+  const allControls = registry.all();
+  for (const candidate of Object.values(allControls)) {
+    try {
+      if (!candidate.isA('sap.m.Label')) continue;
+      const rawText: unknown = candidate.getProperty('text');
+      const text =
+        rawText === null || rawText === undefined ? '' : String(rawText as string | number);
+      if (text !== labelText) continue;
+      const labelFor = candidate.getAssociation?.('labelFor');
+      if (labelFor === id) return true;
+    } catch {
+      continue;
+    }
+  }
+
+  // Strategy 2: Check ariaLabelledBy association on the target control
+  try {
+    const ariaLabelledBy = ctrl.getAssociation?.('ariaLabelledBy');
+    if (ariaLabelledBy !== null && ariaLabelledBy !== undefined) {
+      const labelIds = Array.isArray(ariaLabelledBy) ? ariaLabelledBy : [ariaLabelledBy];
+      for (const labelId of labelIds) {
+        const label = controlMap.get(String(labelId as string | number));
+        if (label === undefined) continue;
+        const rawLabelText: unknown = label.getProperty('text');
+        const text =
+          rawLabelText === null || rawLabelText === undefined
+            ? ''
+            : String(rawLabelText as string | number);
+        if (text === labelText) return true;
+      }
+    }
+  } catch {
+    // ariaLabelledBy not available on this control
+  }
+
+  return false;
+}
+
+/**
  * Registers custom UI5 XPath functions with fontoxpath.
  *
  * @remarks
@@ -474,6 +646,7 @@ function checkSubclassOf(element: Element, typeName: string): boolean {
  * Registered functions:
  * - `ui5:property(element, name)` — Reads a property value from the UI5 control
  * - `ui5:subclass-of(element, type)` — Checks if control isA(type) via metadata chain
+ * - `ui5:labeled-by(element, text)` — Checks if control has a label with given text
  * - `ui5:debug-xml(element)` — Throws an error displaying the element's XML (debugging aid)
  */
 function registerUi5Functions(): void {
@@ -504,6 +677,20 @@ function registerUi5Functions(): void {
     (_ctx: unknown, element: Element, typeName: string) => {
       try {
         return checkSubclassOf(element, typeName);
+      } catch {
+        return false;
+      }
+    },
+  );
+
+  // ui5:labeled-by(element, text) — check if control has a label with given text
+  registerCustomXPathFunction(
+    { ...ns, localName: 'labeled-by' },
+    ['element()', 'xs:string'],
+    'xs:boolean',
+    (_ctx: unknown, element: Element, labelText: string) => {
+      try {
+        return checkLabeledBy(element, labelText);
       } catch {
         return false;
       }
@@ -665,4 +852,5 @@ const ui5Engine: SelectorEngine = {
   },
 };
 
+export { cssToXPath };
 export default ui5Engine;
