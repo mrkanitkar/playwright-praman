@@ -313,7 +313,7 @@ export async function setDatePickerValue(
   await page.evaluate<{ error?: string; success?: boolean; value?: string }>(setScript, undefined);
 
   if (options?.skipStabilityWait !== true) {
-    await page.evaluate<undefined>(
+    await page.evaluate(
       `new Promise(function(resolve) { setTimeout(resolve, ${String(DEFAULT_TIMEOUTS.DOM_SETTLE)}); })`,
       undefined,
     );
@@ -407,7 +407,7 @@ export async function setDateRangeSelection(
   await page.evaluate<{ error?: string; success?: boolean }>(script, undefined);
 
   if (options?.skipStabilityWait !== true) {
-    await page.evaluate<undefined>(
+    await page.evaluate(
       `new Promise(function(resolve) { setTimeout(resolve, ${String(DEFAULT_TIMEOUTS.DOM_SETTLE)}); })`,
       undefined,
     );
@@ -565,7 +565,7 @@ export async function setTimePickerValue(
   await page.evaluate<{ error?: string; success?: boolean }>(script, undefined);
 
   if (options?.skipStabilityWait !== true) {
-    await page.evaluate<undefined>(
+    await page.evaluate(
       `new Promise(function(resolve) { setTimeout(resolve, ${String(DEFAULT_TIMEOUTS.DOM_SETTLE)}); })`,
       undefined,
     );
