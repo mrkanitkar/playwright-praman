@@ -433,6 +433,15 @@ function formulaToXPathPredicate(a: number, b: number): string {
   if (b === 0) {
     return `[(${pos}) mod ${String(a)}=0]`;
   }
+  if (a < 0) {
+    // :nth-child(-n+3) → a=-1, b=3 → matches positions 1,2,3 (pos <= b)
+    // :nth-child(-2n+6) → a=-2, b=6 → matches positions 6,4,2 (pos <= b and (b-pos) mod |a| = 0)
+    const absA = Math.abs(a);
+    if (absA === 1) {
+      return `[(${pos})<=${String(b)}]`;
+    }
+    return `[(${pos})<=${String(b)} and (${String(b)}-(${pos})) mod ${String(absA)}=0]`;
+  }
   return `[((${pos})-${String(b)}) mod ${String(a)}=0 and (${pos})>=${String(b)}]`;
 }
 
@@ -482,7 +491,7 @@ function createTreeModelNodes(element: Element, registry: Ui5Registry): TreeMode
     } else if (child.hasAttribute('data-sap-ui-area')) {
       const areaId = child.getAttribute('id') ?? `area-${String(nodes.length)}`;
       const childNodes = createTreeModelNodes(child, registry);
-      nodes.push({ id: areaId, controlType: 'ui5-area', children: childNodes });
+      nodes.push({ id: areaId, controlType: 'sap-ui-area', children: childNodes });
     } else {
       nodes.push(...createTreeModelNodes(child, registry));
     }
@@ -598,7 +607,7 @@ function readUi5PropertyNative(element: Element, propName: string): unknown[] {
   if (ctrl === undefined) return [];
   const val: unknown = ctrl.getProperty(propName);
   if (val === null || val === undefined) return [];
-  if (Array.isArray(val)) return val.map(String);
+  if (Array.isArray(val)) return val as unknown[];
   if (typeof val === 'object') return [JSON.stringify(val)];
   return [val];
 }

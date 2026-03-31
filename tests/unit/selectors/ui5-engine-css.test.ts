@@ -171,6 +171,17 @@ describe('cssToXPath — positional pseudo-classes', () => {
     // :nth-child(n) matches all — should not add a restrictive predicate
     expect(xpath).toBe('//sap.m.Button');
   });
+
+  it('converts :nth-child(-n+3) to first 3 children', () => {
+    const xpath = cssToXPath('sap.m.Button:nth-child(-n+3)');
+    expect(xpath).toContain('<=3');
+  });
+
+  it('converts :nth-child(-2n+6) to even positions up to 6', () => {
+    const xpath = cssToXPath('sap.m.Button:nth-child(-2n+6)');
+    expect(xpath).toContain('<=6');
+    expect(xpath).toContain('mod 2=0');
+  });
 });
 
 // ── GAP 4: Sibling combinators ──────────────────────────────────────────
