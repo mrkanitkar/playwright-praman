@@ -11,6 +11,12 @@ keywords:
 Selectors are the primary way to find UI5 controls on a page. Praman uses `UI5Selector` objects
 that query the UI5 runtime's control registry — not the DOM.
 
+:::info Locator Syntax
+You can also find controls using CSS-style syntax with `page.locator('ui5=...')`.
+This returns a standard Playwright `Locator` and supports combinators, label matching,
+and positional pseudo-classes. See [Finding Controls with Locators](./locator-selector-syntax.md).
+:::
+
 ## UI5Selector Fields
 
 | Field               | Type                      | Description                                                                                                                                                                   |
@@ -130,12 +136,30 @@ const dialogButton = await ui5.control({
 
 ## Selector String Format
 
-Praman registers a `ui5=` custom selector engine with Playwright, enabling usage in `page.locator()`:
+Praman registers a `ui5=` custom selector engine with Playwright, enabling usage in
+`page.locator()`. Two formats are supported:
+
+### JSON Format
+
+Pass a `UI5Selector` object as a JSON string:
 
 ```typescript
 const locator = page.locator('ui5={"controlType":"sap.m.Button","properties":{"text":"Save"}}');
 await locator.click();
 ```
+
+### CSS Format
+
+Use CSS-like syntax to match controls by type, ID, and properties:
+
+```typescript
+page.locator("ui5=sap.m.Button[text='Save']");
+page.locator('ui5=sap.m.Input:labeled("Vendor")');
+page.locator('ui5=sap.m.InputBase::subclass');
+```
+
+For the complete CSS and XPath syntax reference, see
+[Finding Controls with Locators](./locator-selector-syntax.md).
 
 ## Control Type Cheat Sheet
 
