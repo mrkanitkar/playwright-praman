@@ -32,7 +32,10 @@
         "prompts",
         "telemetry",
         "types",
-        "security"
+        "security",
+        "deps",
+        "release",
+        "adapter"
       ]
     ],
     "subject-max-length": [2, "always", 72],
