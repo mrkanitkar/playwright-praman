@@ -141,3 +141,34 @@ export function logTable(rows: readonly (readonly [string, string])[]): void {
 export function logBanner(title: string, version: string): void {
   console.log(`\n${BOLD}${CYAN}${title}${RESET} ${version}\n`);
 }
+
+/**
+ * Logs a plain line with no prefix or color transformation.
+ *
+ * @param message - The raw message to output.
+ *
+ * @example
+ * ```typescript
+ * logRaw('  ID:   __button0--save');
+ * ```
+ */
+export function logRaw(message: string): void {
+  console.log(message);
+}
+
+/**
+ * Logs a bold divider line with an optional centered title.
+ *
+ * @param title - The title to embed in the divider bar.
+ *
+ * @example
+ * ```typescript
+ * logDivider('Clicked: sap.m.Button');
+ * // Output: ━━━ Clicked: sap.m.Button ━━━━━━━━━━━━━━━━━━━
+ * ```
+ */
+export function logDivider(title: string): void {
+  const bar = `━━━ ${title} `;
+  const pad = '━'.repeat(Math.max(0, 60 - bar.length));
+  console.log(`\n${BOLD}${CYAN}${bar}${pad}${RESET}`);
+}
