@@ -212,12 +212,12 @@ The UI5 Diagnostics tool and Praman inspector complement each other. Use UI5 Dia
 
 The inspector builds on existing Praman bridge APIs:
 
-1. **Bridge injection** ([src/bridge/injection.ts](../../src/bridge/injection.ts)): The same `injectBridge()` function used by the test fixtures injects `window.__praman_bridge` into the page.
+1. **Bridge injection** (`src/bridge/injection.ts`): The same `injectBridge()` function used by the test fixtures injects `window.__praman_bridge` into the page.
 
-2. **Control inspection** ([src/bridge/browser-scripts/inspect-control.ts](../../src/bridge/browser-scripts/inspect-control.ts)): The `createInspectControlScript()` function retrieves full metadata (properties, aggregations, bindings) for any control by ID.
+2. **Control inspection** (`src/bridge/browser-scripts/inspect-control.ts`): The `createInspectControlScript()` function retrieves full metadata (properties, aggregations, bindings) for any control by ID.
 
-3. **Control tree** ([src/bridge/browser-scripts/control-tree.ts](../../src/bridge/browser-scripts/control-tree.ts)): The `createControlTreeScript()` function serializes the entire UI5 control registry into a hierarchical JSON tree.
+3. **Control tree** (`src/bridge/browser-scripts/control-tree.ts`): The `createControlTreeScript()` function serializes the entire UI5 control registry into a hierarchical JSON tree.
 
 4. **Click overlay**: A browser-side IIFE intercepts all clicks, resolves the DOM element to its closest UI5 control using `sap.ui.core.Element.closestTo()` (with fallback to registry walk), highlights the element, and sends the control ID back to Node via `console.log`.
 
-5. **Selector builder** ([src/cli/inspect-commands.ts](../../src/cli/inspect-commands.ts)): The `buildSelectors()` function generates ranked selector candidates from the control metadata — checking key string properties first, then stable IDs, then multi-property combinations.
+5. **Selector builder** (`src/cli/inspect-commands.ts`): The `buildSelectors()` function generates ranked selector candidates from the control metadata — checking key string properties first, then stable IDs, then multi-property combinations.
