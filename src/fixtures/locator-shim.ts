@@ -160,6 +160,9 @@ export function createLocatorShim(locator: Locator, selector: UI5Selector): Loca
     async getModel(): Promise<unknown> {
       throw createNotUI5Error('getModel', selector);
     },
+    async toLocator(): Promise<Locator> {
+      return locator;
+    },
     /* eslint-enable @typescript-eslint/require-await */
   } satisfies LocatorShimControl;
 }

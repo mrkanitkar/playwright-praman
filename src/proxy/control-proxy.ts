@@ -50,7 +50,7 @@
  * @module proxy
  */
 
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import { UI5Object } from './ui5-object.js';
 
@@ -394,6 +394,41 @@ function resolveKnownProperty(
       return async () => state.controlType;
     case 'getAggregation':
       return getOrCreateForwarder('getAggregation');
+    case 'toLocator':
+      return async (): Promise<Locator> => {
+        const domId = await state.page.evaluate(
+          /* v8 ignore start -- browser-context function: runs in Chromium, not Node.js */
+          ({ controlId, bridgeNs }) => {
+            const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
+            if (bridge === undefined) return null;
+            const getById = bridge['getById'] as
+              | ((id: string) => Record<string, unknown> | null)
+              | undefined;
+            if (getById === undefined) return null;
+            const ctrl = getById(controlId);
+            if (ctrl === null) return null;
+            const getDomRef = ctrl['getDomRef'] as (() => HTMLElement | null) | undefined;
+            if (getDomRef === undefined) return null;
+            const domRef = getDomRef.call(ctrl);
+            return domRef?.id ?? null;
+          },
+          /* v8 ignore stop */
+          { controlId: state.id, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
+        );
+        if (domId === null) {
+          throw new ControlError({
+            code: 'ERR_CONTROL_NO_DOM_REF',
+            message: `Control ${state.controlType}#${state.id} has no DOM reference`,
+            attempted: 'Convert control proxy to Playwright locator',
+            retryable: false,
+            suggestions: [
+              'Ensure the control is rendered and visible',
+              'Wait for UI5 stability before calling toLocator()',
+            ],
+          });
+        }
+        return state.page.locator(`#${CSS.escape(domId)}`);
+      };
     case 'toString':
     case 'toJSON':
       return () => proxyToString(state);
@@ -693,7 +728,11 @@ export function createControlProxy(state: ControlProxyState): UI5ControlBase {
   const forwarderCache = new Map<string, (...args: unknown[]) => unknown>();
 
   /** Wraps a non-PramanError into a structured BridgeError for page.evaluate failures. */
-  function wrapEvaluateError(error: unknown, methodName: string, retriesExhausted: boolean): BridgeError {
+  function wrapEvaluateError(
+    error: unknown,
+    methodName: string,
+    retriesExhausted: boolean,
+  ): BridgeError {
     return new BridgeError({
       code: 'ERR_BRIDGE_EXECUTION',
       message: `page.evaluate() failed for ${methodName} on ${state.controlType}#${state.id}: ${error instanceof Error ? error.message : String(error)}`,
@@ -746,7 +785,10 @@ export function createControlProxy(state: ControlProxyState): UI5ControlBase {
           attempted: `Execute ${methodName}() with retry`,
           retryable: false,
           cause: lastError,
-          suggestions: ['The execution context was repeatedly destroyed', 'Consider reloading the page'],
+          suggestions: [
+            'The execution context was repeatedly destroyed',
+            'Consider reloading the page',
+          ],
         })
       : lastError;
   }

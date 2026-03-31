@@ -77,6 +77,7 @@ interface MinimalConfig {
   skipStabilityWait: boolean;
   preferVisibleControls: boolean;
   ignoreAutoWaitUrls: string[];
+  defaultMatchSubclasses: boolean;
 }
 
 function makeMinimalConfig(
@@ -91,6 +92,7 @@ function makeMinimalConfig(
     skipStabilityWait: false,
     preferVisibleControls: true,
     ignoreAutoWaitUrls: [] as string[],
+    defaultMatchSubclasses: false,
   };
 }
 

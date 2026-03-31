@@ -17,7 +17,6 @@ export {
   isUI5SelectorString,
   parseUI5Selector,
   serializeUI5Selector,
+  serializeUI5SelectorToCSS,
   validateUI5Selector,
 } from './selector-parser.js';
-export type { UI5SelectorEngineScript } from './ui5-selector-engine.js';
-export { createUI5SelectorEngineScript } from './ui5-selector-engine.js';

@@ -101,6 +101,7 @@ function createFakeProxy(id: string, controlType: string): UI5ControlBase {
     getVisible: vi.fn<() => Promise<boolean>>().mockResolvedValue(true),
     isBound: vi.fn<(name: string) => Promise<boolean>>().mockResolvedValue(false),
     getModel: vi.fn<(name?: string) => Promise<unknown>>().mockResolvedValue(undefined),
+    toLocator: vi.fn().mockRejectedValue(new Error('toLocator not available in mock')),
   };
 }
 

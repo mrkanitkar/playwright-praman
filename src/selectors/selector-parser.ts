@@ -25,7 +25,10 @@
 
 import { ErrorCode } from '#core/errors/codes.js';
 import { SelectorError } from '#core/errors/selector-error.js';
-import type { UI5Selector } from '#core/types/selectors.js';
+import type { PropertyMatcher, UI5Selector } from '#core/types/selectors.js';
+
+/** Coerced property value — either a primitive string, number, or boolean. */
+type CoercedValue = string | number | boolean;
 
 /**
  * Maximum allowed length for a selector string.
@@ -71,7 +74,7 @@ const CONTROL_TYPE_PATTERN = /^\w+(?:\.\w+)+$/;
  * coercePropertyValue('hello'); // 'hello'
  * ```
  */
-function coercePropertyValue(value: string): unknown {
+function coercePropertyValue(value: string): CoercedValue {
   if (value === 'true') {
     return true;
   }
@@ -105,8 +108,10 @@ function coercePropertyValue(value: string): unknown {
  * // { text: 'Save', enabled: true }
  * ```
  */
-function parseProperties(body: string): Readonly<Record<string, unknown>> | undefined {
-  const properties: Record<string, unknown> = {};
+function parseProperties(
+  body: string,
+): Readonly<Record<string, string | number | boolean>> | undefined {
+  const properties: Record<string, string | number | boolean> = {};
   let hasProperties = false;
   let position = 0;
 
@@ -327,7 +332,8 @@ export function serializeUI5Selector(selector: UI5Selector): string {
 
   if (selector.properties !== undefined) {
     for (const [key, value] of Object.entries(selector.properties)) {
-      result += `[${key}=${String(value)}]`;
+      const stringValue = value instanceof RegExp ? value.source : String(value as CoercedValue);
+      result += `[${key}=${stringValue}]`;
     }
   }
 
@@ -393,4 +399,166 @@ export function validateUI5Selector(selector: UI5Selector): readonly string[] {
  */
 export function isUI5SelectorString(value: string): boolean {
   return value.startsWith(UI5_PREFIX);
+}
+
+/**
+ * Checks whether a property value is a {@link PropertyMatcher} object.
+ *
+ * @param val - The value to inspect
+ * @returns `true` if the value has `value` and `operator` fields
+ *
+ * @example
+ * ```typescript
+ * isPropertyMatcherObject({ value: 'Save', operator: 'contains' }); // true
+ * ```
+ */
+function isPropertyMatcherObject(val: unknown): val is PropertyMatcher {
+  if (typeof val !== 'object' || val === null) return false;
+  return 'value' in val && 'operator' in val;
+}
+
+/**
+ * Maps a {@link PropertyMatcher} operator to the CSS pseudo-class name.
+ *
+ * @param operator - The property matcher operator
+ * @returns The pseudo-class name (e.g., `'prop-contains'`)
+ *
+ * @example
+ * ```typescript
+ * operatorToPseudo('contains'); // 'prop-contains'
+ * ```
+ */
+function operatorToPseudo(operator: NonNullable<PropertyMatcher['operator']>): string {
+  switch (operator) {
+    case 'equals':
+      return 'prop';
+    case 'contains':
+      return 'prop-contains';
+    case 'startsWith':
+      return 'prop-starts-with';
+    case 'endsWith':
+      return 'prop-ends-with';
+    case 'regex':
+      return 'prop-regex';
+  }
+}
+
+/**
+ * Serializes a single property entry to a CSS pseudo-class fragment.
+ *
+ * @param key - Property name
+ * @param value - Property value (string, number, boolean, RegExp, or PropertyMatcher)
+ * @returns CSS pseudo-class fragment
+ */
+function serializePropertyEntry(key: string, value: unknown): string {
+  if (isPropertyMatcherObject(value)) {
+    const pseudo = operatorToPseudo(value.operator ?? 'equals');
+    return `:${pseudo}(${key}, "${String(value.value as CoercedValue)}")`;
+  }
+  if (value instanceof RegExp) {
+    return `:prop-regex(${key}, "${value.source}")`;
+  }
+  return `:prop(${key}, "${String(value as CoercedValue)}")`;
+}
+
+/**
+ * Serializes a nested {@link UI5Selector} into CSS pseudo-class syntax (recursive helper).
+ *
+ * @param selector - The UI5 selector to serialize
+ * @returns The CSS pseudo-class string without outer wrapping
+ *
+ * @example
+ * ```typescript
+ * serializeSelectorSegments({ controlType: 'sap.m.Button' });
+ * // ':type(sap.m.Button)'
+ * ```
+ */
+/**
+ * Serializes a record of key-value pairs into CSS pseudo-class fragments.
+ *
+ * @param record - Map of string key-value pairs
+ * @param pseudo - Pseudo-class name (e.g., `'binding'`, `'i18n'`)
+ * @returns Concatenated pseudo-class fragments
+ */
+function serializeRecordEntries(
+  record: Readonly<Record<string, string>> | undefined,
+  pseudo: string,
+): string {
+  if (record === undefined) return '';
+  let result = '';
+  for (const [key, value] of Object.entries(record)) {
+    result += `:${pseudo}(${key}, "${value}")`;
+  }
+  return result;
+}
+
+function serializeSelectorSegments(selector: UI5Selector): string {
+  let result = '';
+
+  if (selector.controlType !== undefined) {
+    result += `:type(${selector.controlType})`;
+  }
+
+  if (selector.id !== undefined) {
+    const idString = selector.id instanceof RegExp ? selector.id.source : selector.id;
+    result += `#${idString}`;
+  }
+
+  if (selector.matchSubclasses === true) {
+    result += ':subclass';
+  }
+
+  if (selector.properties !== undefined) {
+    for (const [key, value] of Object.entries(selector.properties)) {
+      result += serializePropertyEntry(key, value);
+    }
+  }
+
+  if (selector.viewName !== undefined) {
+    result += `:view(${selector.viewName})`;
+  }
+
+  result += serializeRecordEntries(selector.bindingPath, 'binding');
+  result += serializeRecordEntries(selector.i18NText, 'i18n');
+
+  if (selector.ancestor !== undefined) {
+    result += `:ancestor(${serializeSelectorSegments(selector.ancestor)})`;
+  }
+
+  if (selector.descendant !== undefined) {
+    result += `:descendant(${serializeSelectorSegments(selector.descendant)})`;
+  }
+
+  if (selector.searchOpenDialogs === true) {
+    result += ':open-dialog';
+  }
+
+  return result;
+}
+
+/**
+ * Converts a structured {@link UI5Selector} into a CSS-like pseudo-class selector string.
+ *
+ * @remarks
+ * This is the inverse of what the CSS selector engine parses. The output format
+ * uses pseudo-class syntax like `:type(sap.m.Button):prop(text, "Save")`.
+ *
+ * @param selector - The UI5 selector to serialize
+ * @returns The CSS-like pseudo-class selector string
+ *
+ * @example
+ * ```typescript
+ * import { serializeUI5SelectorToCSS } from './selector-parser.js';
+ *
+ * const css = serializeUI5SelectorToCSS({
+ *   controlType: 'sap.m.Button',
+ *   id: 'saveBtn',
+ *   properties: { text: 'Save' },
+ *   ancestor: { controlType: 'sap.m.Panel' },
+ * });
+ * // ':type(sap.m.Button)#saveBtn:prop(text, "Save"):ancestor(:type(sap.m.Panel))'
+ * ```
+ */
+export function serializeUI5SelectorToCSS(selector: UI5Selector): string {
+  return serializeSelectorSegments(selector);
 }

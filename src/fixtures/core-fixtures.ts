@@ -44,7 +44,10 @@
  * @module fixtures
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 import { expect, test as base } from '@playwright/test';
 import type { Frame } from '@playwright/test';
@@ -65,7 +68,6 @@ import {
   checkUI5ValueState,
   checkUI5Visible,
 } from '../matchers/ui5-matchers.js';
-import { createUI5SelectorEngineScript } from '../selectors/ui5-selector-engine.js';
 
 import { UI5Handler } from './ui5-handler.js';
 
@@ -204,16 +206,26 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
 
   selectorRegistration: [
     async ({ playwright }, use) => {
+      // Content-based registration: read the pre-built unified browser bundle.
+      // The bundle is a CJS module that assigns `module.exports.default` to the
+      // Playwright SelectorEngine ({query, queryAll}). We wrap it in an IIFE that
+      // creates a `module` shim and returns the default export — same pattern as
+      // playwright-ui5.
+      const fixturesDir = dirname(fileURLToPath(import.meta.url));
+      const enginePath = resolve(fixturesDir, '..', '..', 'dist', 'browser', 'ui5-engine.js');
+
       try {
-        await playwright.selectors.register('ui5', createUI5SelectorEngineScript);
+        const bundleSource = readFileSync(enginePath, 'utf-8');
+        const wrappedSource = `(() => { const module = {exports: {}}; ${bundleSource}; return module.exports.default })()`;
+        await playwright.selectors.register('ui5', { content: wrappedSource });
       } catch (error: unknown) {
-        // Idempotency: another worker may have already registered the engine
         const isAlreadyRegistered =
           error instanceof Error && error.message.includes('has been already registered');
         if (!isAlreadyRegistered) {
           throw error;
         }
       }
+
       await use();
     },
     { scope: 'worker', auto: true },
