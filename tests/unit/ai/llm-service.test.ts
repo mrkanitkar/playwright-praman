@@ -45,6 +45,7 @@ function makeConfigNoAi(): Readonly<PramanConfig> {
     skipStabilityWait: false,
     preferVisibleControls: true,
     ignoreAutoWaitUrls: [],
+    defaultMatchSubclasses: false,
   };
 }
 

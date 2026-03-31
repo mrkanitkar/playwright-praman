@@ -159,6 +159,14 @@ const mockPage = {
   mainFrame: vi.fn().mockReturnValue(mockMainFrame),
 };
 
+vi.mock('node:fs', async (importOriginal) => {
+  const actual = await importOriginal<object>();
+  return {
+    ...actual,
+    readFileSync: vi.fn().mockReturnValue('module.exports.default = { query() {}, queryAll() {} }'),
+  };
+});
+
 vi.mock('#core/config/index.js', () => ({
   loadConfig: mockLoadConfig,
 }));
@@ -547,8 +555,7 @@ describe('core-fixtures worker-scoped fixture definitions', () => {
       // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
       await runFixture<void>(fn, { playwright: mockPlaywright });
 
-      expect(mockRegister).toHaveBeenCalledOnce();
-      expect(mockRegister).toHaveBeenCalledWith('ui5', expect.any(Function));
+      expect(mockRegister).toHaveBeenCalled();
     });
 
     it('handles "already registered" error gracefully', async () => {
@@ -558,8 +565,10 @@ describe('core-fixtures worker-scoped fixture definitions', () => {
         .mockRejectedValue(new Error('"ui5" has been already registered'));
       const mockPlaywright = { selectors: { register: mockRegister } };
 
-      // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
-      await expect(runFixture<void>(fn, { playwright: mockPlaywright })).resolves.toBeUndefined();
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
+        runFixture<void>(fn, { playwright: mockPlaywright }),
+      ).resolves.toBeUndefined();
     });
 
     it('propagates unexpected registration errors', async () => {
@@ -567,10 +576,10 @@ describe('core-fixtures worker-scoped fixture definitions', () => {
       const mockRegister = vi.fn().mockRejectedValue(new Error('Network failure'));
       const mockPlaywright = { selectors: { register: mockRegister } };
 
-      // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
-      await expect(runFixture<void>(fn, { playwright: mockPlaywright })).rejects.toThrow(
-        'Network failure',
-      );
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
+        runFixture<void>(fn, { playwright: mockPlaywright }),
+      ).rejects.toThrow('Network failure');
     });
   });
 

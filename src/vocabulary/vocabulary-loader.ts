@@ -47,7 +47,7 @@ interface RawFieldDef {
   readonly businessContext?: string;
   readonly aliases?: readonly string[];
   readonly controlType?: string;
-  readonly properties?: Readonly<Record<string, unknown>>;
+  readonly properties?: Readonly<Record<string, string | number | boolean>>;
 }
 
 /** Raw section (header / item / actions / etc.) within a document type. */

@@ -7,7 +7,7 @@
  * See LICENSE and NOTICE files for details.
  */
 
-/* eslint-disable max-lines, sonarjs/use-type-alias -- Auto-generated: 199+ control interfaces */
+/* eslint-disable max-lines, sonarjs/use-type-alias, @typescript-eslint/consistent-type-imports -- Auto-generated: 199+ control interfaces */
 /**
  * Auto-generated typed UI5 control interfaces for SAP Fiori test automation.
  *
@@ -73,6 +73,20 @@ export interface UI5ControlBase {
   isBound(propertyName: string): Promise<boolean>;
   /** Returns the named model, or the default model if no name given. */
   getModel(name?: string): Promise<unknown>;
+
+  /**
+   * Converts this control proxy to a Playwright Locator via its DOM reference.
+   *
+   * @returns Playwright Locator pointing to the control's DOM element
+   *
+   * @example
+   * ```typescript
+   * const button = await ui5.control({ controlType: 'sap.m.Button', properties: { text: 'Save' } });
+   * const locator = await button.toLocator();
+   * await expect(locator).toBeVisible();
+   * ```
+   */
+  toLocator(): Promise<import('@playwright/test').Locator>;
 }
 
 // ═══════════════════════════════════════════════════════════════════════

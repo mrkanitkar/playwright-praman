@@ -25,6 +25,7 @@ export type { DiscoveryStrategyName, InteractionStrategyName } from '../config/s
 
 // ── Selector types (selectors.ts) ───────────────────────────────────
 export type {
+  PropertyMatcher,
   SerializedUI5Selector,
   UI5Interaction,
   UI5Selector,

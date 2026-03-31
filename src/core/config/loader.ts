@@ -83,6 +83,11 @@ const ENV_MAPPINGS: readonly EnvMapping[] = [
   },
   { envVar: 'PRAMAN_SKIP_STABILITY_WAIT', configKey: 'skipStabilityWait', type: 'boolean' },
   { envVar: 'PRAMAN_PREFER_VISIBLE', configKey: 'preferVisibleControls', type: 'boolean' },
+  {
+    envVar: 'PRAMAN_DEFAULT_MATCH_SUBCLASSES',
+    configKey: 'defaultMatchSubclasses',
+    type: 'boolean',
+  },
 ];
 
 const NESTED_ENV_MAPPINGS: readonly NestedEnvMapping[] = [

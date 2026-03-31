@@ -179,6 +179,8 @@ export const PramanConfigSchema = z
     opa5: opa5Schema.optional(),
     odataTracing: odataTracingSchema.optional(),
     controlTreeCapture: controlTreeCaptureSchema.optional(),
+    /** Default value for matchSubclasses on selectors that don't specify it. */
+    defaultMatchSubclasses: z.boolean().default(false),
   })
   .strict();
 

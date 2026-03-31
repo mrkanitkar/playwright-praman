@@ -56,6 +56,7 @@ function createDefaultMethods(
     getVisible: () => Promise.resolve(true),
     isBound: () => Promise.resolve(false),
     getModel: () => Promise.resolve(undefined),
+    toLocator: () => Promise.reject(new Error('toLocator not available in mock')),
   };
   /* eslint-enable @typescript-eslint/promise-function-async */
 }

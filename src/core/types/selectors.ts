@@ -21,6 +21,30 @@
 import type { UI5ControlMap } from './controls.js';
 
 /**
+ * A property matcher with an explicit comparison operator.
+ *
+ * @remarks
+ * When a selector property value is a `PropertyMatcher` object instead of
+ * a plain primitive, the `operator` field controls how the comparison is made.
+ *
+ * @example
+ * ```typescript
+ * const selector: UI5Selector = {
+ *   controlType: 'sap.m.Input',
+ *   properties: {
+ *     value: { value: 'partial', operator: 'contains' },
+ *   },
+ * };
+ * ```
+ */
+export interface PropertyMatcher {
+  /** The value to compare against. */
+  readonly value: string | number | boolean;
+  /** Comparison operator. Defaults to `'equals'` when omitted. */
+  readonly operator?: 'equals' | 'contains' | 'startsWith' | 'endsWith' | 'regex';
+}
+
+/**
  * UI5 control selector — the primary type for control discovery.
  *
  * @remarks
@@ -73,7 +97,9 @@ export interface UI5Selector {
   /** Owning view ID for scoped discovery. */
   readonly viewId?: string;
   /** Key-value property matchers evaluated against `control.getProperty()`. */
-  readonly properties?: Readonly<Record<string, unknown>>;
+  readonly properties?: Readonly<
+    Record<string, string | number | boolean | RegExp | PropertyMatcher>
+  >;
   /** OData binding path matchers for data-bound controls. */
   readonly bindingPath?: Readonly<Record<string, string>>;
   /** i18n text matchers (property name to expected translated value). */
@@ -84,6 +110,19 @@ export interface UI5Selector {
   readonly descendant?: UI5Selector;
   /** Sub-control interaction target (idSuffix, domChildWith). */
   readonly interaction?: UI5Interaction;
+  /**
+   * When `true`, matches controls that are subclasses of the specified `controlType`.
+   *
+   * @example
+   * ```typescript
+   * // Matches sap.m.Button AND sap.m.ToggleButton (which extends Button)
+   * const selector: UI5Selector = {
+   *   controlType: 'sap.m.Button',
+   *   matchSubclasses: true,
+   * };
+   * ```
+   */
+  readonly matchSubclasses?: boolean;
   /** When true, also searches controls inside open dialogs/popovers. */
   readonly searchOpenDialogs?: boolean;
 }
@@ -111,7 +150,10 @@ export interface SerializedUI5Selector {
   readonly viewName?: string;
   readonly viewId?: string;
   readonly properties?: Readonly<Record<string, unknown>>;
+  readonly matchSubclasses?: boolean;
   readonly searchOpenDialogs?: boolean;
+  readonly ancestor?: SerializedUI5Selector;
+  readonly descendant?: SerializedUI5Selector;
 }
 
 /**
@@ -184,8 +226,17 @@ export function serializeSelectorForBrowser(selector: UI5Selector): SerializedUI
     ...(selector.viewName !== undefined && { viewName: selector.viewName }),
     ...(selector.viewId !== undefined && { viewId: selector.viewId }),
     ...(selector.properties !== undefined && { properties: selector.properties }),
+    ...(selector.matchSubclasses !== undefined && {
+      matchSubclasses: selector.matchSubclasses,
+    }),
     ...(selector.searchOpenDialogs !== undefined && {
       searchOpenDialogs: selector.searchOpenDialogs,
+    }),
+    ...(selector.ancestor !== undefined && {
+      ancestor: serializeSelectorForBrowser(selector.ancestor),
+    }),
+    ...(selector.descendant !== undefined && {
+      descendant: serializeSelectorForBrowser(selector.descendant),
     }),
   };
 }
