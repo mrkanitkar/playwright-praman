@@ -8,6 +8,7 @@ maheshwar
 Kanitkar
 
 # Build & tooling
+fontoxpath
 tsup
 vitest
 docusaurus
@@ -21,6 +22,9 @@ kebabcase
 nodenext
 wdio
 WDIO
+
+# XPath error codes
+XPST
 
 # Testing concepts
 hermetic
