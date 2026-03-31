@@ -316,26 +316,27 @@ function attributeToXPathPredicate(attr: {
   const value = attr.value !== undefined && 'value' in attr.value ? (attr.value.value ?? '') : '';
   const escaped = escapeXPathString(value);
   const propExpr = `ui5:property(.,'${escapeXPathString(propName)}')`;
+  const strExpr = `string(${propExpr})`;
 
   if (attr.operator === undefined) {
-    return `[${propExpr}!='']`;
+    return `[${propExpr}]`;
   }
 
   switch (attr.operator) {
     case '=':
-      return `[${propExpr}='${escaped}']`;
+      return `[${strExpr}='${escaped}']`;
     case '^=':
-      return `[starts-with(${propExpr},'${escaped}')]`;
+      return `[starts-with(${strExpr},'${escaped}')]`;
     case '$=':
-      return `[ends-with(${propExpr},'${escaped}')]`;
+      return `[ends-with(${strExpr},'${escaped}')]`;
     case '*=':
-      return `[contains(${propExpr},'${escaped}')]`;
+      return `[contains(${strExpr},'${escaped}')]`;
     case '~=':
-      return `[contains(concat(' ',${propExpr},' '),' ${escaped} ')]`;
+      return `[contains(concat(' ',${strExpr},' '),' ${escaped} ')]`;
     case '|=':
-      return `[${propExpr}='${escaped}' or starts-with(${propExpr},'${escaped}-')]`;
+      return `[${strExpr}='${escaped}' or starts-with(${strExpr},'${escaped}-')]`;
     default:
-      return `[${propExpr}='${escaped}']`;
+      return `[${strExpr}='${escaped}']`;
   }
 }
 
@@ -478,6 +479,10 @@ function createTreeModelNodes(element: Element, registry: Ui5Registry): TreeMode
       } else {
         nodes.push(...createTreeModelNodes(child, registry));
       }
+    } else if (child.hasAttribute('data-sap-ui-area')) {
+      const areaId = child.getAttribute('id') ?? `area-${String(nodes.length)}`;
+      const childNodes = createTreeModelNodes(child, registry);
+      nodes.push({ id: areaId, controlType: 'ui5-area', children: childNodes });
     } else {
       nodes.push(...createTreeModelNodes(child, registry));
     }
@@ -539,8 +544,37 @@ function buildXmlDom(root: Element | Document, registry: Ui5Registry): Document 
 
   const treeNodes = createTreeModelNodes(domRoot, registry);
   addNodesToXml(xmlDoc, xmlRoot, treeNodes);
+  appendOrphanControls(xmlDoc, xmlRoot, registry);
 
   return xmlDoc;
+}
+
+/**
+ * Appends registry controls not discovered by the DOM walk to the XML root.
+ *
+ * @remarks
+ * Handles controls without DOM representation (e.g., dialogs not yet rendered,
+ * controls in aggregation-only relationships). They appear as root-level siblings
+ * in the XML tree since their parent-child relationship cannot be determined from DOM.
+ *
+ * @param xmlDoc - The XML document used to create elements
+ * @param xmlRoot - The root XML element to append orphans to
+ * @param registry - The UI5 Element registry
+ */
+function appendOrphanControls(xmlDoc: Document, xmlRoot: Element, registry: Ui5Registry): void {
+  const allControls = registry.all();
+  for (const [id, control] of Object.entries(allControls)) {
+    if (controlMap.has(id)) continue;
+    try {
+      const controlType = control.getMetadata().getName();
+      controlMap.set(id, control);
+      const el = xmlDoc.createElement(controlType);
+      el.setAttribute('id', id);
+      xmlRoot.appendChild(el);
+    } catch {
+      // Skip destroyed or inaccessible controls
+    }
+  }
 }
 
 // ── Phase 4: fontoxpath Custom Functions ──────────────────────────────────
@@ -548,18 +582,25 @@ function buildXmlDom(root: Element | Document, registry: Ui5Registry): Document 
 /**
  * Reads a UI5 property value from the control backing an XML element.
  *
+ * @remarks
+ * Returns a sequence of items rather than a single string so that fontoxpath
+ * can evaluate the result as an Effective Boolean Value (EBV) for presence checks
+ * (e.g., `[ui5:property(.,'enabled')]`) or coerce it with `string()` for
+ * comparison operators (e.g., `string(ui5:property(.,'enabled'))='true'`).
+ *
  * @param element - XML element with an `id` attribute
  * @param propName - Name of the UI5 property to read
- * @returns String representation of the property value
+ * @returns Sequence of items (empty sequence if property is absent or null)
  */
-function readUi5Property(element: Element, propName: string): string {
+function readUi5PropertyNative(element: Element, propName: string): unknown[] {
   const id = element.getAttribute('id') ?? '';
   const ctrl = controlMap.get(id);
-  if (ctrl === undefined) return '';
+  if (ctrl === undefined) return [];
   const val: unknown = ctrl.getProperty(propName);
-  if (val === null || val === undefined) return '';
-  if (Array.isArray(val)) return val.map(String).join(',');
-  return typeof val === 'object' ? JSON.stringify(val) : String(val as string | number | boolean);
+  if (val === null || val === undefined) return [];
+  if (Array.isArray(val)) return val.map(String);
+  if (typeof val === 'object') return [JSON.stringify(val)];
+  return [val];
 }
 
 /**
@@ -659,12 +700,12 @@ function registerUi5Functions(): void {
   registerCustomXPathFunction(
     { ...ns, localName: 'property' },
     ['element()', 'xs:string'],
-    'xs:string',
+    'item()*',
     (_ctx: unknown, element: Element, propName: string) => {
       try {
-        return readUi5Property(element, propName);
+        return readUi5PropertyNative(element, propName);
       } catch {
-        return '';
+        return [];
       }
     },
   );
@@ -804,6 +845,19 @@ function executeXPath(root: Element | Document, xpath: string, findFirst: boolea
 // ── Exported SelectorEngine ───────────────────────────────────────────────
 
 /**
+ * Detects whether an error is a CSS parse or XPath syntax error that should be surfaced.
+ *
+ * @param e - The caught error
+ * @returns `true` if the error is a parse/syntax error
+ */
+function isSyntaxError(e: unknown): boolean {
+  if (!(e instanceof Error)) return false;
+  if (e.name === 'ParserError') return true;
+  if (e.message.includes('XPST')) return true;
+  return false;
+}
+
+/**
  * Unified UI5 selector engine for Playwright.
  *
  * @remarks
@@ -835,7 +889,12 @@ const ui5Engine: SelectorEngine = {
       const xpath = isXPathSelector(selector) ? selector : cssToXPath(selector);
       const results = executeXPath(root, xpath, true);
       return results[0];
-    } catch {
+    } catch (e: unknown) {
+      if (isSyntaxError(e)) {
+        throw new Ui5SelectorEngineError(
+          `Invalid UI5 selector "${selector}": ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
       return undefined;
     }
   },
@@ -846,7 +905,12 @@ const ui5Engine: SelectorEngine = {
     try {
       const xpath = isXPathSelector(selector) ? selector : cssToXPath(selector);
       return executeXPath(root, xpath, false);
-    } catch {
+    } catch (e: unknown) {
+      if (isSyntaxError(e)) {
+        throw new Ui5SelectorEngineError(
+          `Invalid UI5 selector "${selector}": ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
       return [];
     }
   },

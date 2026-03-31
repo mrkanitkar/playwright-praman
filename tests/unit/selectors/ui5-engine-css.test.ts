@@ -39,22 +39,22 @@ describe('cssToXPath — basic selectors', () => {
 
   it('converts type with property', () => {
     const xpath = cssToXPath("sap.m.Button[text='Save']");
-    expect(xpath).toContain("ui5:property(.,'text')='Save'");
+    expect(xpath).toContain("string(ui5:property(.,'text'))='Save'");
   });
 
   it('converts property with starts-with operator', () => {
     const xpath = cssToXPath("sap.m.Button[text^='Save']");
-    expect(xpath).toContain("starts-with(ui5:property(.,'text'),'Save')");
+    expect(xpath).toContain("starts-with(string(ui5:property(.,'text')),'Save')");
   });
 
   it('converts property with ends-with operator', () => {
     const xpath = cssToXPath("sap.m.Button[text$='Draft']");
-    expect(xpath).toContain("ends-with(ui5:property(.,'text'),'Draft')");
+    expect(xpath).toContain("ends-with(string(ui5:property(.,'text')),'Draft')");
   });
 
   it('converts property with contains operator', () => {
     const xpath = cssToXPath("sap.m.Button[text*='ave']");
-    expect(xpath).toContain("contains(ui5:property(.,'text'),'ave')");
+    expect(xpath).toContain("contains(string(ui5:property(.,'text')),'ave')");
   });
 });
 
@@ -107,14 +107,14 @@ describe('cssToXPath — :not() pseudo-class', () => {
   it('converts :not with property to XPath negation', () => {
     const xpath = cssToXPath("sap.m.Button:not([enabled='false'])");
     expect(xpath).toContain('not(');
-    expect(xpath).toContain("ui5:property(.,'enabled')='false'");
+    expect(xpath).toContain("string(ui5:property(.,'enabled'))='false'");
   });
 
   it('converts :not with combined type and property', () => {
     const xpath = cssToXPath("*:not(sap.m.Button[text='Cancel'])");
     expect(xpath).toContain('not(');
     expect(xpath).toContain('self::sap.m.Button');
-    expect(xpath).toContain("ui5:property(.,'text')='Cancel'");
+    expect(xpath).toContain("string(ui5:property(.,'text'))='Cancel'");
   });
 
   it('converts :not with subclass', () => {
@@ -189,7 +189,7 @@ describe('cssToXPath — sibling combinators', () => {
   it('combines sibling with property predicate', () => {
     const xpath = cssToXPath("sap.m.Label + sap.m.Input[required='true']");
     expect(xpath).toContain('following-sibling::*[1]/self::sap.m.Input');
-    expect(xpath).toContain("ui5:property(.,'required')='true'");
+    expect(xpath).toContain("string(ui5:property(.,'required'))='true'");
   });
 
   it('chains multiple combinators', () => {
@@ -215,7 +215,7 @@ describe('cssToXPath — :labeled() pseudo-class', () => {
   it('combines :labeled() with other predicates', () => {
     const xpath = cssToXPath("sap.m.Input:labeled('Username')[required='true']");
     expect(xpath).toContain("ui5:labeled-by(.,'Username')");
-    expect(xpath).toContain("ui5:property(.,'required')='true'");
+    expect(xpath).toContain("string(ui5:property(.,'required'))='true'");
   });
 });
 
@@ -238,5 +238,63 @@ describe('cssToXPath — complex selector combinations', () => {
     const xpath = cssToXPath("sap.m.VBox > sap.m.Button:not([enabled='false'])");
     expect(xpath).toContain('//sap.m.VBox/sap.m.Button');
     expect(xpath).toContain('not(');
+  });
+});
+
+// ── GAP-S3: Error surfacing ────────────────────────────────────────────
+
+describe('cssToXPath — error surfacing (GAP-S3)', () => {
+  it('throws on completely invalid CSS selector', () => {
+    expect(() => cssToXPath('[')).toThrow();
+  });
+
+  it('throws on unknown pseudo-class', () => {
+    expect(() => cssToXPath('sap.m.Button:unknown')).toThrow();
+  });
+
+  it('throws on malformed attribute selector', () => {
+    expect(() => cssToXPath('sap.m.Button[=')).toThrow();
+  });
+
+  it('does not throw on valid type selector', () => {
+    expect(() => cssToXPath('sap.m.Button')).not.toThrow();
+  });
+
+  it('does not throw on valid property selector', () => {
+    expect(() => cssToXPath("sap.m.Button[text='Save']")).not.toThrow();
+  });
+
+  it('does not throw on valid pseudo-element', () => {
+    expect(() => cssToXPath('sap.m.InputBase::subclass')).not.toThrow();
+  });
+});
+
+// ── GAP-S1: ui5:property() return type ──────────────────────────────────
+
+describe('cssToXPath — property type handling (GAP-S1)', () => {
+  it('generates EBV-based presence check without operator', () => {
+    const xpath = cssToXPath('sap.m.Button[enabled]');
+    expect(xpath).toContain("[ui5:property(.,'enabled')]");
+    expect(xpath).not.toContain("!=''");
+  });
+
+  it('wraps property in string() for equality comparison', () => {
+    const xpath = cssToXPath("sap.m.Button[enabled='true']");
+    expect(xpath).toContain("string(ui5:property(.,'enabled'))='true'");
+  });
+
+  it('wraps property in string() for starts-with', () => {
+    const xpath = cssToXPath("sap.m.Button[text^='Sa']");
+    expect(xpath).toContain("starts-with(string(ui5:property(.,'text')),'Sa')");
+  });
+
+  it('wraps property in string() for ends-with', () => {
+    const xpath = cssToXPath("sap.m.Button[text$='ve']");
+    expect(xpath).toContain("ends-with(string(ui5:property(.,'text')),'ve')");
+  });
+
+  it('wraps property in string() for contains', () => {
+    const xpath = cssToXPath("sap.m.Button[text*='av']");
+    expect(xpath).toContain("contains(string(ui5:property(.,'text')),'av')");
   });
 });
