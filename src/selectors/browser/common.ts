@@ -67,6 +67,7 @@ export interface Ui5ControlRef {
   readonly isA: (type: string) => boolean;
   readonly isOpen?: () => boolean;
   readonly getBinding?: (name: string) => { readonly getPath: () => string } | null;
+  readonly getAssociation?: (name: string) => string | readonly string[] | null;
 }
 
 /** UI5 metadata reference. */
