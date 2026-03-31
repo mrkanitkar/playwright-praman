@@ -82,6 +82,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Debugging & Monitoring',
       items: [
+        'guides/inspect-command',
         'guides/debugging',
         'guides/errors',
         'guides/reporters',
