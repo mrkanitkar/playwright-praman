@@ -183,3 +183,6 @@ mycompany
 xyznonexistent
 gitignored
 combinators
+
+xclip
+xsel
