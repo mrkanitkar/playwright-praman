@@ -183,7 +183,7 @@ async function performLogin(
 ): Promise<FetchLoginResult> {
   try {
     return await page.evaluate(
-      /* eslint-disable @microsoft/sdl/no-cookies, n/no-unsupported-features/node-builtins */
+      /* eslint-disable @microsoft/sdl/no-cookies */
       async (args: {
         loginUrl: string;
         username: string;
@@ -224,7 +224,7 @@ async function performLogin(
           throw fetchError;
         }
       },
-      /* eslint-enable @microsoft/sdl/no-cookies, n/no-unsupported-features/node-builtins */
+      /* eslint-enable @microsoft/sdl/no-cookies */
       {
         loginUrl,
         username: config.username,

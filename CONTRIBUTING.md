@@ -7,7 +7,7 @@ test automation platform for Playwright.
 
 ### Prerequisites
 
-- Node.js 20+ (see `.nvmrc` for exact version)
+- Node.js 22+ (see `.nvmrc` for exact version)
 - npm (ships with Node.js)
 - Git
 
@@ -199,7 +199,7 @@ Husky enforces quality gates locally:
 ### CI Checks
 
 - Lint + Typecheck + Spell check + Dead code detection
-- Unit tests on Ubuntu, Windows, and macOS (Node 20, 22, 24)
+- Unit tests on Ubuntu, Windows, and macOS (Node 22, 24)
 - Build validation + export map check
 
 ## Reporting Issues

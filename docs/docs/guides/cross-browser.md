@@ -258,7 +258,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm ci
       - run: npx playwright install ${{ matrix.browser }}
       - run: npx playwright test --project=${{ matrix.browser }}

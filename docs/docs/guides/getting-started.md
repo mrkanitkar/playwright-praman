@@ -13,7 +13,7 @@ Two commands to get started. Then let AI agents generate your tests.
 
 ## Prerequisites
 
-- **Node.js** >= 20
+- **Node.js** >= 22
 - Access to an SAP UI5 / Fiori application
 - SAP credentials (username, password, base URL)
 

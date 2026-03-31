@@ -73,20 +73,20 @@ export interface ValidationReport {
 }
 
 /**
- * Checks that the running Node.js version meets the minimum requirement (`>=20`).
+ * Checks that the running Node.js version meets the minimum requirement (`>=22`).
  */
 function checkNodeVersion(): CheckResult {
   const version = process.versions.node;
   const [majorStr] = version.split('.');
   const major = Number(majorStr);
-  if (major >= 20) {
+  if (major >= 22) {
     return { name: 'Node.js version', status: 'pass', message: `v${version}` };
   }
   return {
     name: 'Node.js version',
     status: 'fail',
-    message: `v${version} (requires >=20)`,
-    suggestion: 'Upgrade Node.js to v20 or later',
+    message: `v${version} (requires >=22)`,
+    suggestion: 'Upgrade Node.js to v22 or later',
   };
 }
 

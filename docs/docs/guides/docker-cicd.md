@@ -23,7 +23,7 @@ The CI workflow (`.github/workflows/ci.yml`) runs on every push to `main` and ev
 | quality            |     | unit-tests              |     | build           |
 | (lint, typecheck,  |     | (3 OS x 3 Node)         |     | (3 OS)          |
 |  spell, deadcode,  |     | ubuntu/windows/macos    |     | ESM + CJS + DTS |
-|  markdown lint)    |     | Node 20/22/24           |     | attw, size-limit|
+|  markdown lint)    |     | Node 22/24              |     | attw, size-limit|
 +--------------------+     +-------------------------+     +-----------------+
          |                                                         |
          +-------------------------+-------------------------------+
@@ -48,10 +48,10 @@ Unit tests run across a full OS and Node.js matrix:
 strategy:
   matrix:
     os: [ubuntu-latest, windows-latest, macos-latest]
-    node-version: [20, 22, 24]
+    node-version: [22, 24]
 ```
 
-This produces 9 test runs (3 OS x 3 Node versions) to catch platform-specific issues early.
+This produces 6 test runs (3 OS x 2 Node versions) to catch platform-specific issues early.
 
 ### Quality Job
 
@@ -194,7 +194,7 @@ For local development with a mock SAP backend:
 # docker-compose.yml
 services:
   sap-mock:
-    image: node:20-slim
+    image: node:22-slim
     working_dir: /app
     volumes:
       - ./tests/mocks/odata-server:/app

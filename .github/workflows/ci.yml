@@ -52,13 +52,16 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [20, 22, 24]
+        node-version: [22, 24]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+      - name: Align npm version
+        if: matrix.node-version == 22
+        run: npm i -g npm@11
       - run: npm ci
       - run: npm run build
       - run: npm run test:unit -- --coverage

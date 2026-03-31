@@ -69,24 +69,24 @@ describe('cli/validator', () => {
   // ── checkNodeVersion ────────────────────────────────────────────────────────
 
   describe('Node.js version check', () => {
-    it('passes when Node.js major version is exactly 20', () => {
-      vi.spyOn(process.versions, 'node', 'get').mockReturnValue('20.0.0');
+    it('passes when Node.js major version is exactly 22', () => {
+      vi.spyOn(process.versions, 'node', 'get').mockReturnValue('22.0.0');
 
       const report = validate();
       const check = getCheck(report.checks, 'Node.js version');
 
       expect(check?.status).toBe('pass');
-      expect(check?.message).toBe('v20.0.0');
+      expect(check?.message).toBe('v22.0.0');
     });
 
-    it('passes when Node.js major version is greater than 20', () => {
-      vi.spyOn(process.versions, 'node', 'get').mockReturnValue('22.11.0');
+    it('passes when Node.js major version is greater than 22', () => {
+      vi.spyOn(process.versions, 'node', 'get').mockReturnValue('24.11.0');
 
       const report = validate();
       const check = getCheck(report.checks, 'Node.js version');
 
       expect(check?.status).toBe('pass');
-      expect(check?.message).toBe('v22.11.0');
+      expect(check?.message).toBe('v24.11.0');
     });
 
     it('fails when Node.js major version is 18', () => {
@@ -97,7 +97,7 @@ describe('cli/validator', () => {
 
       expect(check?.status).toBe('fail');
       expect(check?.message).toContain('18.20.4');
-      expect(check?.message).toContain('requires >=20');
+      expect(check?.message).toContain('requires >=22');
       expect(check?.suggestion).toBeTruthy();
     });
 
@@ -108,7 +108,7 @@ describe('cli/validator', () => {
       const check = getCheck(report.checks, 'Node.js version');
 
       expect(check?.status).toBe('fail');
-      expect(check?.suggestion).toContain('v20');
+      expect(check?.suggestion).toContain('v22');
     });
   });
 
@@ -393,7 +393,7 @@ describe('cli/validator', () => {
     });
 
     it('counts pass status correctly when all checks succeed', () => {
-      vi.spyOn(process.versions, 'node', 'get').mockReturnValue('20.0.0');
+      vi.spyOn(process.versions, 'node', 'get').mockReturnValue('22.0.0');
       mockedExecSync.mockReturnValue('10.0.0\n');
       mockedExistsSync.mockReturnValue(true);
       mockedReadFileSync.mockReturnValue(JSON.stringify({ version: '1.58.2' }));

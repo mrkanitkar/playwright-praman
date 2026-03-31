@@ -337,7 +337,6 @@ describe('APIAuthStrategy', () => {
       expect(loginCallArgs.client).toBeUndefined();
     });
 
-    /* eslint-disable n/no-unsupported-features/node-builtins -- fetch stubs for page.evaluate() callback coverage */
     describe('evaluate callback coverage', () => {
       let origDocument: typeof globalThis.document;
       let origFetch: typeof globalThis.fetch;
@@ -528,7 +527,6 @@ describe('APIAuthStrategy', () => {
         }
       });
     });
-    /* eslint-enable n/no-unsupported-features/node-builtins */
   });
 
   describe('isAuthenticated', () => {

@@ -11,7 +11,7 @@ automatically installs AI agent definitions, seed files, and IDE configuration.
 
 | Requirement           | Version                                                          |
 | --------------------- | ---------------------------------------------------------------- |
-| Node.js               | `>=20`                                                           |
+| Node.js               | `>=22`                                                           |
 | `@playwright/test`    | `>=1.57.0 <2.0.0` (peer dependency)                              |
 | SAP UI5 / Fiori app   | Any cloud or on-premise instance                                 |
 | Environment variables | `SAP_CLOUD_BASE_URL`, `SAP_CLOUD_USERNAME`, `SAP_CLOUD_PASSWORD` |
