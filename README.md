@@ -7,7 +7,7 @@
 [![npm downloads](https://img.shields.io/npm/dw/playwright-praman)](https://www.npmjs.com/package/playwright-praman)
 [![GitHub stars](https://img.shields.io/github/stars/mrkanitkar/playwright-praman)](https://github.com/mrkanitkar/playwright-praman)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)
 [![Repomix](https://img.shields.io/badge/Repomix-context-blue?logo=github)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml)
 [![Socket Badge](https://badge.socket.dev/npm/package/playwright-praman)](https://socket.dev/npm/package/playwright-praman)
@@ -56,7 +56,7 @@ Business analysts define the process. AI agents — Claude, Copilot, Jules — g
 | **Fiori Elements**        | Page-object helpers for List Report, Object Page, Overview Page                  |
 | **10 UI5 matchers**       | Playwright-native `expect()` extended with UI5-specific assertions               |
 | **AI test generation**    | Describe tests in business language, get production-ready Playwright code        |
-| **Cross-platform**        | Windows, macOS, Linux — Node.js 20+                                              |
+| **Cross-platform**        | Windows, macOS, Linux — Node.js 22+                                              |
 
 ## Quick Start
 

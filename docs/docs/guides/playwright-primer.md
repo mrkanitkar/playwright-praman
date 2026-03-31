@@ -62,11 +62,11 @@ npx playwright test
 
 ### Step 2: Node.js and npm (1 hour)
 
-Install Node.js (version 20 or later) from [nodejs.org](https://nodejs.org).
+Install Node.js (version 22 or later) from [nodejs.org](https://nodejs.org).
 
 ```bash
 # Verify installation
-node --version   # Should print v20.x.x or later
+node --version   # Should print v22.x.x or later
 npm --version    # Should print 10.x.x or later
 
 # Create a new project

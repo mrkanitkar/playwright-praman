@@ -87,7 +87,7 @@ const config: Config = {
         license: 'https://opensource.org/licenses/Apache-2.0',
         codeRepository: 'https://github.com/mrkanitkar/playwright-praman',
         downloadUrl: 'https://www.npmjs.com/package/playwright-praman',
-        softwareRequirements: 'Playwright, Node.js >= 20',
+        softwareRequirements: 'Playwright, Node.js >= 22',
         author: {
           '@type': 'Organization',
           name: 'Zestest',

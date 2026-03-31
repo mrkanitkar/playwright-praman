@@ -1161,7 +1161,7 @@ Scaffold projects, diagnose environments, and manage plugin installation.
 
 **Failures:**
 
-- Wrong Node.js version — requires `>=20`
+- Wrong Node.js version — requires `>=22`
 - Missing Playwright — init fails without `@playwright/test` peer
 
 :::tip Agent Hint
