@@ -37,8 +37,8 @@ describe('parsePlaywrightVersion', () => {
 });
 
 describe('detectFeatures', () => {
-  it('returns all features true for version 1.58.0', () => {
-    const version = { major: 1, minor: 58, patch: 0, raw: '1.58.0' };
+  it('returns all features true for version 1.59.0', () => {
+    const version = { major: 1, minor: 59, patch: 0, raw: '1.59.0' };
     const features = detectFeatures(version);
 
     expect(features.hasLocatorAssertions).toBe(true);
@@ -49,6 +49,11 @@ describe('detectFeatures', () => {
     expect(features.hasCustomExpect).toBe(true);
     expect(features.hasClockAPI).toBe(true);
     expect(features.hasAriaSnapshot).toBe(true);
+    expect(features.hasScreencastAPI).toBe(true);
+    expect(features.hasAriaSnapshotDepth).toBe(true);
+    expect(features.hasSetStorageState).toBe(true);
+    expect(features.hasLocatorNormalize).toBe(true);
+    expect(features.hasURLPatternMatcher).toBe(true);
   });
 
   it('returns no features for version 1.19.0', () => {
@@ -63,6 +68,11 @@ describe('detectFeatures', () => {
     expect(features.hasCustomExpect).toBe(false);
     expect(features.hasClockAPI).toBe(false);
     expect(features.hasAriaSnapshot).toBe(false);
+    expect(features.hasScreencastAPI).toBe(false);
+    expect(features.hasAriaSnapshotDepth).toBe(false);
+    expect(features.hasSetStorageState).toBe(false);
+    expect(features.hasLocatorNormalize).toBe(false);
+    expect(features.hasURLPatternMatcher).toBe(false);
   });
 
   it('returns partial features for version 1.40.0', () => {
@@ -86,14 +96,28 @@ describe('detectFeatures', () => {
     expect(features.hasClockAPI).toBe(true);
     expect(features.hasAriaSnapshot).toBe(false);
   });
+
+  it('returns pre-1.59 features true but 1.59 features false for version 1.58.0', () => {
+    const version = { major: 1, minor: 58, patch: 0, raw: '1.58.0' };
+    const features = detectFeatures(version);
+
+    expect(features.hasAriaSnapshot).toBe(true);
+    expect(features.hasScreencastAPI).toBe(false);
+    expect(features.hasAriaSnapshotDepth).toBe(false);
+    expect(features.hasSetStorageState).toBe(false);
+    expect(features.hasLocatorNormalize).toBe(false);
+    expect(features.hasURLPatternMatcher).toBe(false);
+  });
 });
 
 describe('hasFeature', () => {
   it('returns correct boolean for installed Playwright version', () => {
-    // Playwright 1.58.2 is installed — all features should be true
+    // Playwright 1.59.0 is installed — all features should be true
     expect(hasFeature('hasClockAPI')).toBe(true);
     expect(hasFeature('hasAriaSnapshot')).toBe(true);
     expect(hasFeature('hasLocatorAssertions')).toBe(true);
+    expect(hasFeature('hasScreencastAPI')).toBe(true);
+    expect(hasFeature('hasLocatorNormalize')).toBe(true);
   });
 });
 
@@ -149,5 +173,10 @@ describe('getPlaywrightFeatures', () => {
     expect(typeof features.hasLocatorAssertions).toBe('boolean');
     expect(typeof features.hasFilterLocator).toBe('boolean');
     expect(typeof features.hasBoxedStep).toBe('boolean');
+    expect(typeof features.hasScreencastAPI).toBe('boolean');
+    expect(typeof features.hasAriaSnapshotDepth).toBe('boolean');
+    expect(typeof features.hasSetStorageState).toBe('boolean');
+    expect(typeof features.hasLocatorNormalize).toBe('boolean');
+    expect(typeof features.hasURLPatternMatcher).toBe('boolean');
   });
 });
