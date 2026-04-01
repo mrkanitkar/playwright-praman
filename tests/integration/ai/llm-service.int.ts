@@ -162,7 +162,7 @@ describe('LlmService', () => {
         createLlmService({
           baseUrl: 'https://example.com',
         } as unknown as Readonly<PramanConfig>);
-      }).toThrowError();
+      }).toThrow();
     });
   });
 });
