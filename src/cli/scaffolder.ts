@@ -198,7 +198,7 @@ export async function scaffoldProject(options: ScaffoldOptions): Promise<Scaffol
 
   // Install IDE-specific agent, seed, and config files
   if (detection !== undefined) {
-    const ideFiles = await scaffoldIDEFiles(targetDir, detection, force);
+    const ideFiles = await scaffoldIDEFiles(targetDir, detection, force, cli);
     filesCreated.push(...ideFiles);
   }
 
