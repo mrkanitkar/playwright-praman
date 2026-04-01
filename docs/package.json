@@ -51,5 +51,9 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "overrides": {
+    "serve-handler": "6.1.7",
+    "serialize-javascript": "7.0.5"
   }
 }
