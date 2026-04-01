@@ -159,6 +159,7 @@
     "@anthropic-ai/sdk": ">=0.78.0",
     "@opentelemetry/api": ">=1.9.0",
     "@opentelemetry/sdk-node": ">=0.212.0",
+    "@playwright/cli": ">=0.1.3",
     "@playwright/test": ">=1.57.0 <2.0.0",
     "openai": ">=6.22.0"
   },
@@ -170,6 +171,9 @@
       "optional": true
     },
     "@opentelemetry/sdk-node": {
+      "optional": true
+    },
+    "@playwright/cli": {
       "optional": true
     },
     "openai": {
@@ -192,6 +196,7 @@
     "@microsoft/eslint-plugin-sdl": "1.1.0",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/sdk-node": "0.214.0",
+    "@playwright/cli": "0.1.3",
     "@playwright/test": "1.59.0",
     "@size-limit/file": "12.0.1",
     "@ui5/mcp-server": "0.2.9",

@@ -79,7 +79,10 @@ export function createProgram(): Command {
     .description('Scaffold a new Praman project')
     .option('--force', 'Overwrite existing files', false)
     .option('--skip-install', 'Skip npm install step', false)
-    .option('--cli', 'Also install Playwright CLI agent definitions', false)
+    .option(
+      '--no-cli',
+      'Disable Playwright CLI agent definitions (CLI agents are installed by default)',
+    )
     .option(TARGET_DIR_OPTION, TARGET_DIR_DESC, process.cwd())
     .addHelpText(
       'afterAll',
@@ -87,7 +90,7 @@ export function createProgram(): Command {
 Examples:
   $ npx playwright-praman init
   $ npx playwright-praman init --force
-  $ npx playwright-praman init --cli
+  $ npx playwright-praman init --no-cli
   $ npx playwright-praman init --skip-install --target ./my-project`,
     )
     .action(
@@ -116,7 +119,7 @@ Examples:
       'detect',
     )
     .option('--force', 'Overwrite existing agent files', false)
-    .option('--cli', 'Install CLI-based agents (Playwright CLI) alongside MCP-based', false)
+    .option('--no-cli', 'Disable CLI-based agents (Playwright CLI agents are installed by default)')
     .option(TARGET_DIR_OPTION, TARGET_DIR_DESC, process.cwd())
     .addHelpText(
       'afterAll',
@@ -124,7 +127,7 @@ Examples:
 Examples:
   $ npx playwright-praman init-agents --loop=vscode
   $ npx playwright-praman init-agents --loop=claude
-  $ npx playwright-praman init-agents --loop=claude --cli
+  $ npx playwright-praman init-agents --loop=claude --no-cli
   $ npx playwright-praman init-agents --loop=opencode
   $ npx playwright-praman init-agents --loop=cursor
   $ npx playwright-praman init-agents              # auto-detect`,

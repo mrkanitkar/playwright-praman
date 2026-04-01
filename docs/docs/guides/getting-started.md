@@ -37,16 +37,17 @@ npx playwright-praman init
 
 Praman has 3 direct dependencies and 5 peer dependencies:
 
-| Package                   | Type            | Purpose                                            |
-| ------------------------- | --------------- | -------------------------------------------------- |
-| `@playwright/test`        | Peer (required) | Playwright test runner (>=1.57.0)                  |
-| `commander`               | Dependency      | CLI framework for `npx playwright-praman` commands |
-| `pino`                    | Dependency      | Structured JSON logging                            |
-| `zod`                     | Dependency      | Configuration validation and type-safe schemas     |
-| `@anthropic-ai/sdk`       | Peer (optional) | AI test generation via Claude                      |
-| `openai`                  | Peer (optional) | AI test generation via OpenAI / Azure OpenAI       |
-| `@opentelemetry/api`      | Peer (optional) | Observability and distributed tracing              |
-| `@opentelemetry/sdk-node` | Peer (optional) | OpenTelemetry Node.js SDK                          |
+| Package                   | Type            | Purpose                                                   |
+| ------------------------- | --------------- | --------------------------------------------------------- |
+| `@playwright/test`        | Peer (required) | Playwright test runner (>=1.57.0) — auto-installed        |
+| `@playwright/cli`         | Peer (required) | Playwright CLI for agent browser control — auto-installed |
+| `commander`               | Dependency      | CLI framework for `npx playwright-praman` commands        |
+| `pino`                    | Dependency      | Structured JSON logging                                   |
+| `zod`                     | Dependency      | Configuration validation and type-safe schemas            |
+| `@anthropic-ai/sdk`       | Peer (optional) | AI test generation via Claude                             |
+| `openai`                  | Peer (optional) | AI test generation via OpenAI / Azure OpenAI              |
+| `@opentelemetry/api`      | Peer (optional) | Observability and distributed tracing                     |
+| `@opentelemetry/sdk-node` | Peer (optional) | OpenTelemetry Node.js SDK                                 |
 
 #### IDE detection and agent installation
 

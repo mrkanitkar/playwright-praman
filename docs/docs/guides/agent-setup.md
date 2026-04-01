@@ -13,25 +13,36 @@ automatically installs AI agent definitions, seed files, and IDE configuration.
 | --------------------- | ---------------------------------------------------------------- |
 | Node.js               | `>=22`                                                           |
 | `@playwright/test`    | `>=1.57.0 <2.0.0` (peer dependency)                              |
+| `@playwright/cli`     | `>=0.1.3` (peer dependency, auto-installed by `init`)            |
 | SAP UI5 / Fiori app   | Any cloud or on-premise instance                                 |
 | Environment variables | `SAP_CLOUD_BASE_URL`, `SAP_CLOUD_USERNAME`, `SAP_CLOUD_PASSWORD` |
 
-Install the package and browser binaries:
+Install the package — `init` will handle the rest:
 
 ```bash
-npm install --save-dev playwright-praman @playwright/test
-npx playwright install
+npm install --save-dev playwright-praman
+npx playwright-praman init
 ```
 
-Praman does **not** auto-install Playwright browsers. Run `npx playwright install` once after installation.
+`init` automatically installs `@playwright/test`, `@playwright/cli`, and `dotenv` if they are missing,
+then runs `npx playwright install chromium` to ensure the browser binary is present.
+You do not need to install those packages manually.
 
 ## What `init` Installs
 
 Run in your project root:
 
 ```bash
+# MCP + CLI agents (default)
 npx playwright-praman init
+
+# MCP agents only (opt out of CLI agents)
+npx playwright-praman init --no-cli
 ```
+
+`init` installs both **MCP-based agents** and **Playwright CLI–based agents** for every detected
+IDE by default. Both agent sets coexist — you can switch between them at any time.
+Pass `--no-cli` to install MCP agents only. See [MCP vs CLI](./mcp-vs-cli.md) for guidance.
 
 ### Base scaffold (always)
 
@@ -45,6 +56,8 @@ npx playwright-praman init
 | `.auth/`               | Auth state storage       |
 
 ### Claude Code (detected via `CLAUDE.md` or `.claude/`)
+
+#### MCP agents (default)
 
 | Path                                     | Description                         |
 | ---------------------------------------- | ----------------------------------- |
@@ -63,6 +76,20 @@ After `init`, append the Praman section to your `CLAUDE.md`:
 cat node_modules/playwright-praman/docs/user-integration/claude-md-appendable.md >> CLAUDE.md
 ```
 
+#### CLI agents (installed by default)
+
+Installed by default with `init` or `init-agents --loop=claude`. Pass `--no-cli` to skip:
+
+| Path                                         | Description                           |
+| -------------------------------------------- | ------------------------------------- |
+| `.claude/agents/praman-sap-planner-cli.md`   | SAP UI5 test planner — Playwright CLI |
+| `.claude/agents/praman-sap-generator-cli.md` | Test generator — Playwright CLI       |
+| `.claude/agents/praman-sap-healer-cli.md`    | Failing test fixer — Playwright CLI   |
+| `.claude/prompts/praman-cli-plan.md`         | `/praman-cli-plan` slash command      |
+| `.claude/prompts/praman-cli-generate.md`     | `/praman-cli-generate` slash command  |
+| `.claude/prompts/praman-cli-heal.md`         | `/praman-cli-heal` slash command      |
+| `.claude/prompts/praman-cli-coverage.md`     | Full coverage pipeline (CLI)          |
+
 ### VS Code (detected via `.vscode/` directory or `TERM_PROGRAM=vscode`)
 
 | Path                           | Description                           |
@@ -72,6 +99,8 @@ cat node_modules/playwright-praman/docs/user-integration/claude-md-appendable.md
 | `.vscode/praman.code-snippets` | `praman-test`, `praman-step` snippets |
 
 ### Cursor (detected via `.cursor/` or `.cursorrc`)
+
+#### MCP agents (default)
 
 | Path                       | Description                |
 | -------------------------- | -------------------------- |
@@ -83,6 +112,14 @@ Append the full rules to your Cursor config:
 cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable.mdc >> .cursorrules
 ```
 
+#### CLI agents (installed by default)
+
+Installed by default with `init` or `init-agents --loop=cursor`. Pass `--no-cli` to skip:
+
+| Path                           | Description                    |
+| ------------------------------ | ------------------------------ |
+| `.cursor/rules/praman-cli.mdc` | Praman CLI rules for Cursor AI |
+
 ### Jules (detected via `.jules/`)
 
 | Path                     | Description                         |
@@ -90,6 +127,8 @@ cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable
 | `.jules/praman-setup.md` | Praman setup instructions for Jules |
 
 ### GitHub Copilot (detected via `.github/copilot-instructions.md` or `.github/agents/`)
+
+#### MCP agents (default)
 
 | Path                                           | Description                        |
 | ---------------------------------------------- | ---------------------------------- |
@@ -103,25 +142,51 @@ After `init`, append the Praman section to your `.github/copilot-instructions.md
 cat node_modules/playwright-praman/docs/user-integration/copilot-instructions-appendable.md >> .github/copilot-instructions.md
 ```
 
+#### CLI agents (installed by default)
+
+Installed by default with `init` or `init-agents --loop=copilot`. Pass `--no-cli` to skip:
+
+| Path                                               | Description                           |
+| -------------------------------------------------- | ------------------------------------- |
+| `.github/agents/praman-sap-planner-cli.agent.md`   | SAP UI5 test planner — Playwright CLI |
+| `.github/agents/praman-sap-generator-cli.agent.md` | Test generator — Playwright CLI       |
+| `.github/agents/praman-sap-healer-cli.agent.md`    | Failing test fixer — Playwright CLI   |
+
 ## Install Agents Only (`init-agents`)
 
 If you already have a Praman project and just need to install or update agent definitions
 for a specific IDE, use `init-agents` instead of the full `init`:
 
 ```bash
+# MCP + CLI agents (default) for a specific IDE
 npx playwright-praman init-agents --loop=vscode
 npx playwright-praman init-agents --loop=claude
 npx playwright-praman init-agents --loop=opencode
 npx playwright-praman init-agents --loop=cursor
 npx playwright-praman init-agents --loop=jules
 npx playwright-praman init-agents --loop=copilot
+
+# MCP agents only — skip CLI agents
+npx playwright-praman init-agents --loop=claude  --no-cli
+npx playwright-praman init-agents --loop=copilot --no-cli
+npx playwright-praman init-agents --loop=cursor  --no-cli
+
+# Auto-detect all IDEs (includes CLI agents by default)
+npx playwright-praman init-agents
 ```
 
 This mirrors Playwright's own `npx playwright init-agents --loop=<ide>` command.
 
+:::info VS Code + GitHub Copilot CLI agents
+VS Code Copilot reads agent files from `.github/agents/`. Use `--loop=copilot` — not
+`--loop=vscode` — to install CLI agents there. `--loop=vscode` only installs IDE settings
+(snippets, extensions, `settings.json`) and has no CLI agent files.
+:::
+
 | Flag             | Description                                                                                  |
 | ---------------- | -------------------------------------------------------------------------------------------- |
 | `--loop=<ide>`   | Target IDE: `vscode`, `claude`, `cursor`, `jules`, `opencode`, `copilot`, or `detect` (auto) |
+| `--no-cli`       | Skip Playwright CLI–based agents (MCP agents only)                                           |
 | `--force`        | Overwrite existing agent files                                                               |
 | `--target <dir>` | Target directory (default: current directory)                                                |
 
@@ -172,7 +237,7 @@ If `init` was run before IDE tools were set up, install files manually:
 ### Claude Code
 
 ```bash
-# Install agents
+# MCP agents (default)
 mkdir -p .claude/agents .claude/prompts tests/seeds
 
 cp node_modules/playwright-praman/agents/claude/praman-sap-planner.md .claude/agents/
@@ -188,6 +253,16 @@ cp node_modules/playwright-praman/seeds/sap-seed.spec.ts tests/seeds/
 
 # Append to CLAUDE.md
 cat node_modules/playwright-praman/docs/user-integration/claude-md-appendable.md >> CLAUDE.md
+
+# CLI agents (optional — requires --cli)
+cp node_modules/playwright-praman/agents/claude/praman-sap-planner-cli.md .claude/agents/
+cp node_modules/playwright-praman/agents/claude/praman-sap-generator-cli.md .claude/agents/
+cp node_modules/playwright-praman/agents/claude/praman-sap-healer-cli.md .claude/agents/
+
+cp node_modules/playwright-praman/agents/claude/prompts/praman-cli-plan.md .claude/prompts/
+cp node_modules/playwright-praman/agents/claude/prompts/praman-cli-generate.md .claude/prompts/
+cp node_modules/playwright-praman/agents/claude/prompts/praman-cli-heal.md .claude/prompts/
+cp node_modules/playwright-praman/agents/claude/prompts/praman-cli-coverage.md .claude/prompts/
 ```
 
 ### VS Code
@@ -202,14 +277,19 @@ mkdir -p .vscode
 ### Cursor
 
 ```bash
+# MCP agents (default)
 mkdir -p .cursor/rules
 cp node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable.mdc .cursor/rules/praman.mdc
 cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable.mdc >> .cursorrules
+
+# CLI agents (optional — requires --cli)
+cp node_modules/playwright-praman/docs/user-integration/praman-cli.mdc .cursor/rules/praman-cli.mdc
 ```
 
 ### GitHub Copilot
 
 ```bash
+# MCP agents (default)
 mkdir -p .github/agents
 
 cp node_modules/playwright-praman/agents/copilot/praman-sap-planner.agent.md .github/agents/
@@ -218,6 +298,11 @@ cp node_modules/playwright-praman/agents/copilot/praman-sap-healer.agent.md .git
 
 # Append to copilot-instructions.md
 cat node_modules/playwright-praman/docs/user-integration/copilot-instructions-appendable.md >> .github/copilot-instructions.md
+
+# CLI agents (optional — requires --cli)
+cp node_modules/playwright-praman/agents/copilot/praman-sap-planner-cli.agent.md .github/agents/
+cp node_modules/playwright-praman/agents/copilot/praman-sap-generator-cli.agent.md .github/agents/
+cp node_modules/playwright-praman/agents/copilot/praman-sap-healer-cli.agent.md .github/agents/
 ```
 
 ## Skill Files
@@ -255,9 +340,11 @@ npx playwright test tests/seeds/sap-seed.spec.ts --project=agent-seed-test
 The seed waits up to 20 minutes, polls for UI5 readiness, then keeps the browser open
 via `pauseAtEnd: true` for MCP-connected agents to use.
 
-## Available Agents (Claude Code)
+## Available Agents
 
-After setup, `.claude/agents/` contains 3 Praman SAP agents:
+### Claude Code — MCP agents
+
+After setup, `.claude/agents/` contains these MCP-based Praman SAP agents:
 
 | Agent                  | Slash Command          | Purpose                                             |
 | ---------------------- | ---------------------- | --------------------------------------------------- |
@@ -265,12 +352,45 @@ After setup, `.claude/agents/` contains 3 Praman SAP agents:
 | `praman-sap-generator` | `/praman-sap-generate` | Generate 100% Praman-compliant tests from plan      |
 | `praman-sap-healer`    | `/praman-sap-heal`     | Fix failing tests, enforce compliance               |
 
-Use the coverage prompt to run the full pipeline:
-
 ```text
 /praman-sap-coverage
 "Run full test coverage for the Purchase Order Fiori app"
 ```
+
+### Claude Code — CLI agents
+
+Installed with `--cli`. Use these when token efficiency matters or the MCP server is unavailable:
+
+| Agent                      | Slash Command          | Purpose                                        |
+| -------------------------- | ---------------------- | ---------------------------------------------- |
+| `praman-sap-planner-cli`   | `/praman-cli-plan`     | Explore live SAP app via CLI — token-efficient |
+| `praman-sap-generator-cli` | `/praman-cli-generate` | Generate Praman tests from plan via CLI        |
+| `praman-sap-healer-cli`    | `/praman-cli-heal`     | Fix failing tests via CLI                      |
+
+```text
+/praman-cli-coverage
+"Run full test coverage for the Purchase Order Fiori app"
+```
+
+### GitHub Copilot — MCP agents
+
+After setup, `.github/agents/` contains these MCP-based Copilot coding agents:
+
+| Agent file                      | Copilot Mention         | Purpose                                             |
+| ------------------------------- | ----------------------- | --------------------------------------------------- |
+| `praman-sap-planner.agent.md`   | `@praman-sap-planner`   | Explore live SAP app, produce test plan + seed spec |
+| `praman-sap-generator.agent.md` | `@praman-sap-generator` | Generate 100% Praman-compliant tests from plan      |
+| `praman-sap-healer.agent.md`    | `@praman-sap-healer`    | Fix failing tests, enforce compliance               |
+
+### GitHub Copilot — CLI agents
+
+Installed with `--cli`. Copilot coding agents that invoke `npx @playwright/cli` commands:
+
+| Agent file                          | Copilot Mention             | Purpose                                        |
+| ----------------------------------- | --------------------------- | ---------------------------------------------- |
+| `praman-sap-planner-cli.agent.md`   | `@praman-sap-planner-cli`   | Explore live SAP app via CLI — token-efficient |
+| `praman-sap-generator-cli.agent.md` | `@praman-sap-generator-cli` | Generate Praman tests from plan via CLI        |
+| `praman-sap-healer-cli.agent.md`    | `@praman-sap-healer-cli`    | Fix failing tests via CLI                      |
 
 ## LLM-Friendly Documentation (llms.txt)
 
@@ -537,17 +657,30 @@ Add Praman-specific code snippets to `.vscode/praman.code-snippets`:
 
 ## CLI Agents (Alternative to MCP)
 
-The Playwright CLI is a token-efficient alternative to the MCP server for AI agent workflows. Instead of running a persistent MCP server, agents invoke `npx playwright` commands directly. Both approaches are first-class and can coexist in the same project.
+The Playwright CLI is a token-efficient alternative to the MCP server for AI agent workflows.
+Instead of running a persistent MCP server, agents invoke `npx @playwright/cli` commands
+directly. Both approaches are first-class and can coexist in the same project.
 
-To scaffold CLI-based agent definitions:
+Install CLI agents alongside MCP agents:
 
 ```bash
-npx playwright-praman init-agents --loop=claude --cli
+# During initial setup
+npx playwright-praman init --cli
+
+# Or later, per IDE
+npx playwright-praman init-agents --loop=claude  --cli
+npx playwright-praman init-agents --loop=copilot --cli
+npx playwright-praman init-agents --loop=cursor  --cli
+
+# Auto-detect all IDEs
+npx playwright-praman init-agents --cli
 ```
 
-This installs agent definitions that use CLI commands (`open`, `snapshot`, `run-code`, `state-save`) instead of MCP tool calls. The CLI approach uses fewer tokens per interaction and works in environments where a long-running MCP server is impractical.
+CLI agents use commands (`open`, `snapshot`, `run-code`, `state-save`) instead of MCP tool
+calls, using 30–50% fewer tokens per agent session.
 
-For full setup instructions, see the [Playwright CLI Setup Guide](./playwright-cli-setup.md). For a detailed comparison, see [MCP vs CLI](./mcp-vs-cli.md).
+For full setup instructions, see the [Playwright CLI Setup Guide](./playwright-cli-setup.md).
+For a detailed comparison, see [MCP vs CLI](./mcp-vs-cli.md).
 
 ---
 

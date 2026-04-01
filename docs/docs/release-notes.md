@@ -234,6 +234,49 @@ ControlError: Control not found: sap.m.Button[text=Save]
     - Try using the inspect command: npx praman inspect <url>
 ```
 
+### 🤖 Playwright CLI Agents — Now the Default
+
+**Playwright CLI agents are now installed by default** by both `npx playwright-praman init` and
+`npx playwright-praman init-agents`. Previously they required an explicit `--cli` opt-in flag.
+
+**What changed:**
+
+| Before                               | After                                                         |
+| ------------------------------------ | ------------------------------------------------------------- |
+| `init` installs MCP agents only      | `init` installs MCP **and** CLI agents                        |
+| `--cli` required to add CLI agents   | `--no-cli` to skip CLI agents                                 |
+| `@playwright/cli` not auto-installed | `@playwright/cli` auto-installed alongside `@playwright/test` |
+
+**`init` now auto-installs four packages** when any are missing:
+
+| Package             | Role                                     |
+| ------------------- | ---------------------------------------- |
+| `@playwright/test`  | Playwright test runner                   |
+| `@playwright/cli`   | Playwright CLI for agent browser control |
+| `playwright-praman` | The plugin itself                        |
+| `dotenv`            | Environment variable loading             |
+
+This means `npm install playwright-praman && npx playwright-praman init` is the complete
+setup sequence — no separate `npm install @playwright/test @playwright/cli` step required.
+Chromium is still installed unconditionally via `npx playwright install chromium`.
+
+**Command reference:**
+
+```bash
+# Default — installs MCP + CLI agents, auto-installs all peer deps
+npx playwright-praman init
+
+# Opt out of CLI agents
+npx playwright-praman init --no-cli
+
+# init-agents also defaults to CLI-on
+npx playwright-praman init-agents --loop=claude
+npx playwright-praman init-agents --loop=copilot --no-cli
+```
+
+When CLI agents are being installed but `@playwright/cli` is absent from `node_modules`,
+the installer prints a warning with the exact install command.
+
 ### ⬆️ Node.js 22 Minimum
 
 The minimum supported Node.js version has been raised to **22** (from 20). Node.js 20 reached End-of-Life in April 2026.

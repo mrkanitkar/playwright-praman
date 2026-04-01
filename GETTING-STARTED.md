@@ -6,11 +6,21 @@ This guide walks you from zero to a running test in minutes.
 ## Installation
 
 ```bash
-npm install -D playwright-praman @playwright/test
+npm install -D playwright-praman
+npx playwright-praman init
+```
+
+`init` automatically installs `@playwright/test`, `@playwright/cli`, and `dotenv` if they are missing,
+then installs the Chromium browser binary. You do not need to install those packages separately.
+
+For manual installation (e.g. pnpm/yarn workspaces):
+
+```bash
+npm install -D playwright-praman @playwright/test @playwright/cli
 # or
-yarn add -D playwright-praman @playwright/test
+yarn add -D playwright-praman @playwright/test @playwright/cli
 # or
-pnpm add -D playwright-praman @playwright/test
+pnpm add -D playwright-praman @playwright/test @playwright/cli
 
 npx playwright install chromium
 ```
