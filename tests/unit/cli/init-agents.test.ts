@@ -105,7 +105,7 @@ describe('init-agents', () => {
       await runInitAgents({ targetDir: TARGET_DIR, loop: 'detect', force: false });
 
       expect(mockedDetectIDEs).toHaveBeenCalledWith(TARGET_DIR);
-      expect(mockedScaffoldIDEFiles).toHaveBeenCalledWith(TARGET_DIR, detection, false, false);
+      expect(mockedScaffoldIDEFiles).toHaveBeenCalledWith(TARGET_DIR, detection, false, true);
     });
 
     it('should build single-IDE detection when loop is specified', async () => {
@@ -118,7 +118,7 @@ describe('init-agents', () => {
         TARGET_DIR,
         expect.objectContaining({ claude: true, vscode: false, cursor: false }),
         false,
-        false,
+        true,
       );
     });
 
@@ -131,7 +131,7 @@ describe('init-agents', () => {
         TARGET_DIR,
         expect.anything(),
         true,
-        false,
+        true,
       );
     });
 
