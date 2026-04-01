@@ -10,58 +10,70 @@ keywords:
   - token efficient testing
 ---
 
-# MCP vs CLI
+# MCP vs CLI: Choosing Your Agent Interface
 
 Praman supports two first-class approaches for AI-driven SAP test automation: the **MCP server**
-(Model Context Protocol) and the **Playwright CLI**. Both produce identical output -- gold-standard
-`.spec.ts` files using Praman fixtures. This guide helps you choose the right approach for your
-workflow, or use both together.
+(Model Context Protocol) and the **Playwright CLI**. Both ship with Playwright 1.59+ out of the box
+-- no extra packages to install. Both produce identical gold-standard `.spec.ts` files using Praman
+fixtures.
 
-## Summary Comparison
+This guide helps you choose the right approach -- or use both together.
 
-| Dimension              | MCP                                      | CLI                                     |
-| ---------------------- | ---------------------------------------- | --------------------------------------- |
-| **Token cost**         | Higher (protocol envelope per tool call) | Lower (compact terminal output)         |
-| **Latency per action** | ~50-100ms (WebSocket round-trip)         | ~20-50ms (direct process invocation)    |
-| **Setup complexity**   | MCP server config + `.mcp.json`          | `playwright-cli` install only           |
-| **IDE support**        | VS Code (native), Claude Code, Copilot   | Any terminal-based agent                |
-| **Real-time feedback** | Rich (inline screenshots, DOM snapshots) | File-based (snapshots saved to `.yml`)  |
-| **Session management** | Tied to MCP server process lifecycle     | Named persistent sessions (`-s=<name>`) |
-| **CI/CD suitability**  | Requires running MCP server              | Native (just shell commands)            |
-| **Browser debugging**  | Inspector via MCP (`pauseAtEnd`)         | `--debug=cli` + `attach`                |
-| **Batch operations**   | Sequential tool calls                    | Scriptable, parallelizable              |
-| **Bridge injection**   | `initScript` in MCP config               | `initScript` in `praman-cli.json`       |
-| **Output quality**     | Gold-standard `.spec.ts`                 | Gold-standard `.spec.ts`                |
+## At a Glance
+
+| Dimension              | MCP                                      | CLI                                      |
+| ---------------------- | ---------------------------------------- | ---------------------------------------- |
+| **Included in**        | Playwright 1.59+ (`@playwright/mcp`)     | Playwright 1.59+ (`@playwright/cli`)     |
+| **Token cost**         | Higher (protocol envelope per tool call) | Lower (compact terminal output)          |
+| **Latency per action** | \~50--100 ms (WebSocket round-trip)      | \~20--50 ms (direct process invocation)  |
+| **Setup**              | Add `.mcp.json` to project root          | Add `praman-cli.config.json`             |
+| **IDE support**        | VS Code (native), Claude Code, Copilot   | Any terminal-based agent                 |
+| **Real-time feedback** | Rich (inline screenshots, DOM snapshots) | File-based (snapshots saved to `.yml`)   |
+| **Session management** | Tied to MCP server process lifecycle     | Named persistent sessions (`-s=<name>`)  |
+| **CI/CD suitability**  | Needs running MCP server                 | Native (just shell commands)             |
+| **Batch operations**   | Sequential tool calls                    | Scriptable, parallelizable               |
+| **Bridge injection**   | `initScript` in MCP config               | `initScript` in `praman-cli.config.json` |
+| **Output quality**     | Gold-standard `.spec.ts`                 | Gold-standard `.spec.ts`                 |
+
+:::tip Both are built in
+Since Playwright 1.59, both `@playwright/mcp` and `@playwright/cli` ship with Playwright itself.
+There is nothing extra to install -- just choose your config.
+:::
 
 ---
 
-## When to Use MCP
+## Option A: MCP
 
-MCP is the better choice when you need rich, interactive feedback during test development.
+MCP gives agents rich, interactive feedback -- inline screenshots, DOM snapshots returned directly in
+the conversation, and native IDE integration.
 
-### Ideal Scenarios
+### When MCP Shines
 
 - **Interactive exploration** -- stepping through a Fiori app while the agent narrates controls
-- **VS Code integration** -- the Playwright MCP extension provides inline screenshots and DOM views
+- **VS Code / Copilot integration** -- the Playwright MCP extension provides inline screenshots and
+  DOM views in the sidebar
 - **Real-time debugging** -- inspecting page state mid-flow without saving snapshots to disk
-- **First-time discovery** -- when you do not know the app structure and want visual feedback
+- **First-time discovery** -- when you don't know the app structure and want visual feedback
 - **Demo and training** -- showing stakeholders how the agent explores and generates tests
 
-### MCP Agent Setup
+### MCP Setup
+
+Add `.mcp.json` to your project root:
 
 ```json
-// .mcp.json
 {
   "mcpServers": {
-    "playwright-test": {
+    "playwright": {
       "command": "npx",
-      "args": ["playwright-mcp", "--config", ".playwright/mcp.config.json"]
+      "args": ["@playwright/mcp", "--caps", "vision"]
     }
   }
 }
 ```
 
-### MCP Agent Commands
+That's it. Playwright 1.59+ includes the MCP server -- no `npm install` needed.
+
+### MCP Agents
 
 | Agent         | Claude Code            | Copilot                 |
 | ------------- | ---------------------- | ----------------------- |
@@ -70,21 +82,14 @@ MCP is the better choice when you need rich, interactive feedback during test de
 | Healer        | `/praman-sap-heal`     | `@praman-sap-healer`    |
 | Full pipeline | `/praman-sap-coverage` | --                      |
 
-### MCP Strengths
-
-- **Inline DOM snapshots** returned directly in the agent conversation
-- **Screenshot capture** without saving to disk
-- **Playwright Inspector** integration via `pauseAtEnd: true`
-- **Native VS Code extension** support with sidebar controls
-
 ---
 
-## When to Use CLI
+## Option B: Playwright CLI
 
-CLI is the better choice when token efficiency, CI/CD integration, or terminal-based workflows
-matter.
+The CLI gives agents direct shell access to browser automation -- lower token overhead, scriptable
+commands, and native CI/CD integration.
 
-### Ideal Scenarios
+### When CLI Shines
 
 - **Token-sensitive workflows** -- large codebases where every token counts
 - **CI/CD pipelines** -- automated test generation and healing in GitHub Actions or Jenkins
@@ -93,7 +98,24 @@ matter.
 - **Large codebases** -- CLI snapshot files avoid bloating the conversation context
 - **Persistent sessions** -- keeping a browser open across multiple agent invocations
 
-### CLI Agent Commands
+### CLI Setup
+
+Create `.playwright/praman-cli.config.json` in your project:
+
+```json
+{
+  "browser": {
+    "browserName": "chromium",
+    "initScript": ["./node_modules/playwright-praman/dist/browser/praman-bridge-init.js"]
+  },
+  "timeouts": {
+    "navigation": 30000,
+    "action": 10000
+  }
+}
+```
+
+### CLI Agents
 
 | Agent         | Claude Code            | Copilot                     |
 | ------------- | ---------------------- | --------------------------- |
@@ -104,20 +126,19 @@ matter.
 
 ### CLI Strengths
 
-- **30-50% fewer tokens** per agent session compared to MCP
+- **30--50% fewer tokens** per agent session compared to MCP
 - **Scriptable** -- chain commands in shell scripts for batch operations
 - **File-based snapshots** -- agent reads only what it needs, not the full DOM
 - **Named sessions** -- `playwright-cli -s=sap` persists across commands
-- **No server process** -- no MCP server to start, configure, or keep alive
 - **CI-native** -- runs anywhere `npx` works, no WebSocket setup
 
 ---
 
 ## Using Both Together
 
-MCP and CLI are not mutually exclusive. Many teams use both:
+MCP and CLI are not mutually exclusive. Many teams use both depending on the task:
 
-| Phase                     | Approach | Reason                                |
+| Phase                     | Approach | Why                                   |
 | ------------------------- | -------- | ------------------------------------- |
 | **Initial exploration**   | MCP      | Rich visual feedback for unknown apps |
 | **Test generation**       | CLI      | Token-efficient batch generation      |
@@ -141,134 +162,41 @@ npx playwright test tests/e2e/purchase-order.spec.ts || true
 # /praman-cli-heal "Fix tests/e2e/purchase-order.spec.ts"
 ```
 
-### Shared State
-
-Both MCP and CLI agents save auth state in the same format:
-
-```bash
-# Save from MCP session
-# (agent uses browser_evaluate to call storageState)
-
-# Load in CLI session
-playwright-cli state-load sap-auth.json
-
-# Or vice versa -- save from CLI, use in MCP
-playwright-cli state-save sap-auth.json
-# (MCP agent loads via storageState config)
-```
-
 ---
 
-## Migration: MCP to CLI
+## Feature Parity
 
-Switching from MCP agents to CLI agents requires minimal changes.
+Both approaches support the full Praman agent pipeline:
 
-### Step 1: Install CLI Agent Definitions
-
-```bash
-npx playwright-praman init-agents --loop=claude
-# or
-npx playwright-praman init-agents --loop=copilot
-```
-
-This installs CLI agent files alongside your existing MCP agents. Both coexist.
-
-### Step 2: Map Commands
-
-| MCP Concept                   | CLI Equivalent                                    |
-| ----------------------------- | ------------------------------------------------- |
-| `browser_navigate(url)`       | `playwright-cli open <url>`                       |
-| `browser_click(selector)`     | `playwright-cli click <ref>`                      |
-| `browser_fill(selector, val)` | `playwright-cli fill <ref> "<val>"`               |
-| `browser_evaluate(js)`        | `playwright-cli run-code "async page => { ... }"` |
-| `browser_snapshot()`          | `playwright-cli snapshot --filename=snap.yml`     |
-| `browser_take_screenshot()`   | `playwright-cli screenshot --filename=shot.png`   |
-| MCP `pauseAtEnd: true`        | `--debug=cli` + `playwright-cli attach`           |
-
-### Step 3: Update Prompts (Optional)
-
-If you have custom prompts referencing MCP agents, duplicate them for CLI:
-
-```bash
-# Copy and adapt
-cp .claude/prompts/praman-sap-plan.md .claude/prompts/praman-cli-plan.md
-# Edit to reference praman-sap-planner-cli agent instead
-```
-
----
-
-## Migration: CLI to MCP
-
-### Step 1: Install MCP Server
-
-```bash
-npm install --save-dev @anthropic-ai/playwright-mcp
-```
-
-### Step 2: Configure MCP
-
-Create `.mcp.json` in your project root:
-
-```json
-{
-  "mcpServers": {
-    "playwright-test": {
-      "command": "npx",
-      "args": ["playwright-mcp", "--config", ".playwright/mcp.config.json"]
-    }
-  }
-}
-```
-
-### Step 3: Install MCP Agent Definitions
-
-```bash
-npx playwright-praman init-agents --loop=claude
-npx playwright-praman init-agents --loop=copilot
-```
-
-The MCP agents are installed alongside CLI agents. Use `/praman-sap-plan` instead of
-`/praman-cli-plan`.
-
----
-
-## Feature Parity Table
-
-Both MCP and CLI support the full Praman agent pipeline. This table shows detailed feature
-coverage:
-
-| Feature                    | MCP     | CLI | Notes                                       |
-| -------------------------- | ------- | --- | ------------------------------------------- |
-| SAP authentication         | Yes     | Yes | Both use `state-save`/`state-load`          |
-| FLP navigation             | Yes     | Yes | `browser_navigate` / `playwright-cli open`  |
-| UI5 control discovery      | Yes     | Yes | `browser_evaluate` / `run-code`             |
-| Bridge readiness check     | Yes     | Yes | Same `window.__praman_bridge.ready` check   |
-| Page snapshots             | Yes     | Yes | Inline (MCP) / file-based (CLI)             |
-| Screenshots                | Yes     | Yes | Inline (MCP) / file-based (CLI)             |
-| Form fill                  | Yes     | Yes | `browser_fill` / `playwright-cli fill`      |
-| Click interactions         | Yes     | Yes | `browser_click` / `playwright-cli click`    |
-| Value Help workflows       | Yes     | Yes | Same UI5 bridge patterns                    |
-| OData binding extraction   | Yes     | Yes | Same `run-code` / `evaluate` patterns       |
-| Named sessions             | No      | Yes | CLI-only: `-s=<name>` for persistent state  |
-| Inline DOM in conversation | Yes     | No  | MCP returns DOM directly; CLI saves to file |
-| Debug attach               | No      | Yes | CLI-only: `--debug=cli` + `attach`          |
-| CI/CD without server       | No      | Yes | CLI runs as plain shell commands            |
-| Planner agent              | Yes     | Yes | Identical output format                     |
-| Generator agent            | Yes     | Yes | Identical output format                     |
-| Healer agent               | Yes     | Yes | Identical debugging approach                |
-| Full coverage pipeline     | Yes     | Yes | Both support plan + generate + heal cycle   |
-| Custom control support     | Yes     | Yes | Same bridge + `run-code` patterns           |
-| Fiori Elements support     | Yes     | Yes | Same SmartField / MDC discovery             |
-| Multi-app batch            | Limited | Yes | CLI sessions are independently scriptable   |
+| Feature                    | MCP | CLI | Notes                                        |
+| -------------------------- | --- | --- | -------------------------------------------- |
+| SAP authentication         | Yes | Yes | Both use `storageState` for auth persistence |
+| FLP navigation             | Yes | Yes | `browser_navigate` / `playwright-cli open`   |
+| UI5 control discovery      | Yes | Yes | `browser_evaluate` / `run-code`              |
+| Bridge readiness check     | Yes | Yes | Same `window.__praman_bridge.ready` check    |
+| Page snapshots             | Yes | Yes | Inline (MCP) / file-based (CLI)              |
+| Screenshots                | Yes | Yes | Inline (MCP) / file-based (CLI)              |
+| Form fill + click          | Yes | Yes | `browser_fill` / `playwright-cli fill`       |
+| Value Help workflows       | Yes | Yes | Same UI5 bridge patterns                     |
+| OData binding extraction   | Yes | Yes | Same `run-code` / `evaluate` patterns        |
+| Named sessions             | No  | Yes | CLI-only: `-s=<name>` for persistent state   |
+| Inline DOM in conversation | Yes | No  | MCP returns DOM directly; CLI saves to file  |
+| CI/CD without server       | No  | Yes | CLI runs as plain shell commands             |
+| Planner agent              | Yes | Yes | Identical output format                      |
+| Generator agent            | Yes | Yes | Identical output format                      |
+| Healer agent               | Yes | Yes | Identical debugging approach                 |
+| Full coverage pipeline     | Yes | Yes | Both support plan + generate + heal cycle    |
+| Custom control support     | Yes | Yes | Same bridge + `run-code` patterns            |
+| Fiori Elements support     | Yes | Yes | Same SmartField / MDC discovery              |
 
 ---
 
 ## Recommendations
 
-| Team Profile                                         | Recommendation     |
+| Team Profile                                         | Start With         |
 | ---------------------------------------------------- | ------------------ |
-| VS Code users with Playwright extension              | Start with MCP     |
-| Terminal-first developers (vim, tmux, CLI agents)    | Start with CLI     |
+| VS Code users with Playwright extension              | MCP                |
+| Terminal-first developers (vim, tmux, CLI agents)    | CLI                |
 | CI/CD-heavy teams automating test generation         | CLI for pipelines  |
 | Mixed team with different IDEs                       | CLI (universal)    |
 | Teams exploring SAP apps for the first time          | MCP for discovery  |
@@ -277,8 +205,29 @@ coverage:
 
 ---
 
+## Installing Agent Definitions
+
+Both MCP and CLI agent definitions are installed via the same command:
+
+```bash
+# Install MCP agents (default)
+npx playwright-praman init-agents --loop=claude
+
+# Install CLI agents alongside MCP agents
+npx playwright-praman init-agents --loop=claude --cli
+
+# Auto-detect IDE and install both
+npx playwright-praman init-agents --cli
+```
+
+The `--cli` flag adds CLI agent definitions alongside MCP agents. Both sets coexist -- you can
+switch between `/praman-sap-plan` (MCP) and `/praman-cli-plan` (CLI) at any time.
+
+---
+
 ## Next Steps
 
-- [Playwright CLI Agents](./playwright-cli-agents.md) -- detailed CLI agent usage and customization
+- [Playwright CLI Setup](./playwright-cli-setup.md) -- detailed CLI configuration
+- [Playwright CLI Agents](./playwright-cli-agents.md) -- CLI agent usage and customization
 - [Running Your Agent](./running-your-agent.md) -- MCP-based agent workflow
 - [Agent & IDE Setup](./agent-setup.md) -- installation for all IDEs
