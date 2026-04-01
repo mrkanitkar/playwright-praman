@@ -145,7 +145,11 @@ export function createLlmService(config: Readonly<PramanConfig>): LlmService {
 // ── Implementation ─────────────────────────────────────────────────────────
 
 class LlmServiceImpl implements LlmService {
-  constructor(private readonly config: Readonly<PramanConfig>) {}
+  private readonly config: Readonly<PramanConfig>;
+
+  constructor(config: Readonly<PramanConfig>) {
+    this.config = config;
+  }
 
   isConfigured(): boolean {
     return this.config.ai !== undefined;

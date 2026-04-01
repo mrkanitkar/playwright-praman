@@ -97,6 +97,10 @@ const InterpretStepSchema = z.object({
  */
 export class AgenticHandler {
   private readonly checkpoints = new Map<string, AgenticCheckpoint>();
+  private readonly llm: LlmService;
+  private readonly contextBuilder: typeof buildPageContext;
+  private readonly capabilityRegistry: CapabilityRegistry;
+  private readonly recipeRegistry: RecipeRegistry;
 
   /**
    * Constructs an AgenticHandler.
@@ -112,11 +116,16 @@ export class AgenticHandler {
    * ```
    */
   constructor(
-    private readonly llm: LlmService,
-    private readonly contextBuilder: typeof buildPageContext,
-    private readonly capabilityRegistry: CapabilityRegistry,
-    private readonly recipeRegistry: RecipeRegistry = new RecipeRegistry(),
-  ) {}
+    llm: LlmService,
+    contextBuilder: typeof buildPageContext,
+    capabilityRegistry: CapabilityRegistry,
+    recipeRegistry: RecipeRegistry = new RecipeRegistry(),
+  ) {
+    this.llm = llm;
+    this.contextBuilder = contextBuilder;
+    this.capabilityRegistry = capabilityRegistry;
+    this.recipeRegistry = recipeRegistry;
+  }
 
   /**
    * Generate a test for a natural language scenario.

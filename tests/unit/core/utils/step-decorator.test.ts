@@ -541,7 +541,10 @@ describe('ui5Step', () => {
 
   it('works across multiple instances of the same class', async () => {
     class TestHandler {
-      constructor(readonly prefix: string) {}
+      readonly prefix: string;
+      constructor(prefix: string) {
+        this.prefix = prefix;
+      }
 
       @ui5Step
       async greet(): Promise<string> {

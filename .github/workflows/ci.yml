@@ -236,3 +236,27 @@ jobs:
           name: azure-playwright-report
           path: playwright-report/
           retention-days: 14
+
+  ts-compat:
+    name: TS Compat (TypeScript ${{ matrix.ts-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        ts-version: ['5.9.3', '6.0.2']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: Override TypeScript version
+        run: npm install --save-dev --save-exact typescript@${{ matrix.ts-version }}
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
+      - name: Export validation
+        run: npm run check:exports

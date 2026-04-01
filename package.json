@@ -100,7 +100,7 @@
     "playwright-praman": "dist/cli/index.js"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && tsx scripts/build-browser-bundles.ts",
     "dev": "tsup --watch",
     "clean": "node -e \"['dist','coverage','playwright-report','test-results','.auth'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
     "check:exports": "attw --pack . --profile node16",
@@ -137,7 +137,7 @@
     "generate:skill": "tsx scripts/generate-skill-md.ts",
     "validate:skill-md": "tsx scripts/validate-skill-md.ts",
     "build:browser": "tsx scripts/build-browser-bundles.ts",
-    "build:full": "npm run generate:capabilities && npm run generate:skill-md && npm run build && npm run build:browser && npm run generate:llms-txt",
+    "build:full": "npm run generate:capabilities && npm run generate:skill-md && npm run build && npm run generate:llms-txt",
     "generate:proxies": "tsx scripts/generate-typed-proxies.ts",
     "generate:sbom": "cyclonedx-npm --output-file playwright-praman.sbom.json --spec-version 1.5 --ignore-npm-errors",
     "generate:llms-txt": "tsx scripts/generate-llms-txt.ts",

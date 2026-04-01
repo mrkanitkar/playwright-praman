@@ -211,8 +211,10 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
       // Playwright SelectorEngine ({query, queryAll}). We wrap it in an IIFE that
       // creates a `module` shim and returns the default export — same pattern as
       // playwright-ui5.
-      const fixturesDir = dirname(fileURLToPath(import.meta.url));
-      const enginePath = resolve(fixturesDir, '..', '..', 'dist', 'browser', 'ui5-engine.js');
+      // After tsup bundles into dist/index.js, import.meta.url → dist/.
+      // The browser bundle lives at dist/browser/ui5-engine.js — one level down.
+      const distDir = dirname(fileURLToPath(import.meta.url));
+      const enginePath = resolve(distDir, 'browser', 'ui5-engine.js');
 
       try {
         const bundleSource = readFileSync(enginePath, 'utf-8');
