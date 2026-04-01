@@ -535,6 +535,22 @@ Add Praman-specific code snippets to `.vscode/praman.code-snippets`:
 | TypeScript errors in node_modules      | Add `"skipLibCheck": true` to tsconfig                            |
 | Slow IntelliSense                      | Exclude `node_modules`, `dist`, `test-results` in `tsconfig.json` |
 
+## CLI Agents (Alternative to MCP)
+
+The Playwright CLI is a token-efficient alternative to the MCP server for AI agent workflows. Instead of running a persistent MCP server, agents invoke `npx playwright` commands directly. Both approaches are first-class and can coexist in the same project.
+
+To scaffold CLI-based agent definitions:
+
+```bash
+npx playwright-praman init-agents --loop=claude --cli
+```
+
+This installs agent definitions that use CLI commands (`open`, `snapshot`, `run-code`, `state-save`) instead of MCP tool calls. The CLI approach uses fewer tokens per interaction and works in environments where a long-running MCP server is impractical.
+
+For full setup instructions, see the [Playwright CLI Setup Guide](./playwright-cli-setup.md). For a detailed comparison, see [MCP vs CLI](./mcp-vs-cli.md).
+
+---
+
 ## Cross-Platform Notes
 
 - All file operations use `node:path` — no hardcoded `/` or `\` separators

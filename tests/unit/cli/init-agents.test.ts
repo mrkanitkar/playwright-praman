@@ -40,6 +40,7 @@ vi.mock('../../../src/cli/version.js', () => ({
 vi.mock('../../../src/cli/ide-detector.js', () => ({
   detectIDEs: vi.fn(),
   getIDELabels: vi.fn(),
+  detectPlaywrightCli: vi.fn(() => false),
 }));
 
 vi.mock('../../../src/cli/ide-installer.js', () => ({
@@ -104,7 +105,7 @@ describe('init-agents', () => {
       await runInitAgents({ targetDir: TARGET_DIR, loop: 'detect', force: false });
 
       expect(mockedDetectIDEs).toHaveBeenCalledWith(TARGET_DIR);
-      expect(mockedScaffoldIDEFiles).toHaveBeenCalledWith(TARGET_DIR, detection, false);
+      expect(mockedScaffoldIDEFiles).toHaveBeenCalledWith(TARGET_DIR, detection, false, false);
     });
 
     it('should build single-IDE detection when loop is specified', async () => {
@@ -117,6 +118,7 @@ describe('init-agents', () => {
         TARGET_DIR,
         expect.objectContaining({ claude: true, vscode: false, cursor: false }),
         false,
+        false,
       );
     });
 
@@ -125,7 +127,12 @@ describe('init-agents', () => {
 
       await runInitAgents({ targetDir: TARGET_DIR, loop: 'cursor', force: true });
 
-      expect(mockedScaffoldIDEFiles).toHaveBeenCalledWith(TARGET_DIR, expect.anything(), true);
+      expect(mockedScaffoldIDEFiles).toHaveBeenCalledWith(
+        TARGET_DIR,
+        expect.anything(),
+        true,
+        false,
+      );
     });
 
     it('should warn and return early when no IDEs detected', async () => {

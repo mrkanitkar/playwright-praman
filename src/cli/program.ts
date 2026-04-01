@@ -79,6 +79,7 @@ export function createProgram(): Command {
     .description('Scaffold a new Praman project')
     .option('--force', 'Overwrite existing files', false)
     .option('--skip-install', 'Skip npm install step', false)
+    .option('--cli', 'Also install Playwright CLI agent definitions', false)
     .option(TARGET_DIR_OPTION, TARGET_DIR_DESC, process.cwd())
     .addHelpText(
       'afterAll',
@@ -86,21 +87,25 @@ export function createProgram(): Command {
 Examples:
   $ npx playwright-praman init
   $ npx playwright-praman init --force
+  $ npx playwright-praman init --cli
   $ npx playwright-praman init --skip-install --target ./my-project`,
     )
-    .action(async (opts: { force: boolean; skipInstall: boolean; target: string }) => {
-      try {
-        const initOpts: InitOptions = {
-          targetDir: opts.target,
-          force: opts.force,
-          skipInstall: opts.skipInstall,
-        };
-        await runInit(initOpts);
-      } catch (error: unknown) {
-        logError(error instanceof Error ? error.message : String(error));
-        process.exitCode = 1;
-      }
-    });
+    .action(
+      async (opts: { force: boolean; skipInstall: boolean; cli: boolean; target: string }) => {
+        try {
+          const initOpts: InitOptions = {
+            targetDir: opts.target,
+            force: opts.force,
+            skipInstall: opts.skipInstall,
+            cli: opts.cli,
+          };
+          await runInit(initOpts);
+        } catch (error: unknown) {
+          logError(error instanceof Error ? error.message : String(error));
+          process.exitCode = 1;
+        }
+      },
+    );
 
   prog
     .command('init-agents')
@@ -111,6 +116,7 @@ Examples:
       'detect',
     )
     .option('--force', 'Overwrite existing agent files', false)
+    .option('--cli', 'Install CLI-based agents (Playwright CLI) alongside MCP-based', false)
     .option(TARGET_DIR_OPTION, TARGET_DIR_DESC, process.cwd())
     .addHelpText(
       'afterAll',
@@ -118,11 +124,12 @@ Examples:
 Examples:
   $ npx playwright-praman init-agents --loop=vscode
   $ npx playwright-praman init-agents --loop=claude
+  $ npx playwright-praman init-agents --loop=claude --cli
   $ npx playwright-praman init-agents --loop=opencode
   $ npx playwright-praman init-agents --loop=cursor
   $ npx playwright-praman init-agents              # auto-detect`,
     )
-    .action(async (opts: { loop: string; force: boolean; target: string }) => {
+    .action(async (opts: { loop: string; force: boolean; cli: boolean; target: string }) => {
       try {
         if (!isValidLoop(opts.loop)) {
           logError(
@@ -135,6 +142,7 @@ Examples:
           targetDir: opts.target,
           loop: opts.loop,
           force: opts.force,
+          cli: opts.cli,
         };
         await runInitAgents(agentOpts);
       } catch (error: unknown) {

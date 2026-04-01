@@ -161,6 +161,7 @@ describe('cli/program (Commander.js)', () => {
         targetDir: TEST_DIR,
         force: true,
         skipInstall: true,
+        cli: false,
       });
     });
 

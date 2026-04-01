@@ -48,6 +48,8 @@ export interface ScaffoldOptions {
    * When provided, installs IDE-specific agent, seed, and config files.
    */
   readonly detection?: IDEDetection;
+  /** When `true`, install CLI-based agents (Playwright CLI) alongside MCP agents. */
+  readonly cli?: boolean;
 }
 
 /**
@@ -159,14 +161,14 @@ const SUBDIRECTORIES: readonly string[] = ['tests', '.auth'];
  * ```
  */
 export async function scaffoldProject(options: ScaffoldOptions): Promise<ScaffoldResult> {
-  const { targetDir, force = false, detection } = options;
+  const { targetDir, force = false, detection, cli = false } = options;
 
   // Guard: check if directory already exists
   const exists = await directoryExists(targetDir);
   if (exists && !force) {
     // Even in an existing project, install IDE-specific files when detected
     if (detection !== undefined) {
-      const ideFiles = await scaffoldIDEFiles(targetDir, detection, force);
+      const ideFiles = await scaffoldIDEFiles(targetDir, detection, force, cli);
       if (ideFiles.length > 0) {
         return { success: true, filesCreated: ideFiles };
       }

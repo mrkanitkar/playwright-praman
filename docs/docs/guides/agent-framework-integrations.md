@@ -282,9 +282,25 @@ The ADK integration will support Vertex AI backends, enabling teams to run the p
 
 ---
 
+## Playwright CLI Integration
+
+In addition to the framework adapters above, Praman supports a **Playwright CLI** integration path. The CLI is a token-efficient alternative to MCP where agents invoke `npx playwright` commands directly instead of connecting through a persistent server.
+
+| Integration            | Connection Model     | Token Efficiency | Best For                                     |
+| ---------------------- | -------------------- | ---------------- | -------------------------------------------- |
+| **MCP Server**         | Persistent WebSocket | Moderate         | Real-time agent loops, VS Code extensions    |
+| **Playwright CLI**     | Stateless commands   | High             | CI/CD pipelines, token-constrained agents    |
+| **Framework Adapters** | Native SDK tools     | Varies           | Multi-agent orchestration, complex workflows |
+
+The CLI works with any agent framework that can execute shell commands — including LangGraph, AutoGen, and OpenAI Agents SDK — without requiring a native adapter.
+
+See the [CLI Agents Guide](./playwright-cli-agents.md) for building agent loops with the CLI, and [MCP vs CLI](./mcp-vs-cli.md) for a detailed comparison.
+
+---
+
 ## Current Workaround: Use Praman Agents Directly
 
-While framework-native adapters are in development, you can orchestrate Praman's three agents today using **Claude Code MCP** or **GitHub Copilot Agent Mode** with the included agent definitions:
+While framework-native adapters are in development, you can orchestrate Praman's three agents today using **Claude Code MCP**, **Playwright CLI**, or **GitHub Copilot Agent Mode** with the included agent definitions:
 
 ```text
 .github/agents/praman-sap-planner.agent.md

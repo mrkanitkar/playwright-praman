@@ -28,6 +28,8 @@ XPST
 
 # Testing concepts
 hermetic
+scriptable
+parallelizable
 pageobject
 recordreplay
 recordreply
