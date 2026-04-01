@@ -183,6 +183,78 @@ const IDE_COPY_SPECS: Readonly<Record<keyof IDEDetection, IDESpec>> = {
   },
 };
 
+// ── CLI agent install specs ──────────────────────────────────────────────────
+
+/**
+ * CLI-specific install specs for Playwright CLI agent definitions.
+ *
+ * @remarks
+ * These are installed alongside the standard MCP agent definitions when
+ * the `--cli` flag is passed. They reference `skills/praman-sap-cli/`
+ * and use `playwright-cli` commands instead of MCP tools.
+ */
+const CLI_COPY_SPECS: Readonly<Record<string, IDESpec>> = {
+  claude: {
+    dirs: [
+      ['.claude', 'agents'],
+      ['.claude', 'prompts'],
+    ],
+    files: [
+      fc(
+        ['agents', 'claude', 'praman-sap-planner-cli.md'],
+        ['.claude', 'agents', 'praman-sap-planner-cli.md'],
+      ),
+      fc(
+        ['agents', 'claude', 'praman-sap-generator-cli.md'],
+        ['.claude', 'agents', 'praman-sap-generator-cli.md'],
+      ),
+      fc(
+        ['agents', 'claude', 'praman-sap-healer-cli.md'],
+        ['.claude', 'agents', 'praman-sap-healer-cli.md'],
+      ),
+      fc(
+        ['agents', 'claude', 'prompts', 'praman-cli-plan.md'],
+        ['.claude', 'prompts', 'praman-cli-plan.md'],
+      ),
+      fc(
+        ['agents', 'claude', 'prompts', 'praman-cli-generate.md'],
+        ['.claude', 'prompts', 'praman-cli-generate.md'],
+      ),
+      fc(
+        ['agents', 'claude', 'prompts', 'praman-cli-heal.md'],
+        ['.claude', 'prompts', 'praman-cli-heal.md'],
+      ),
+      fc(
+        ['agents', 'claude', 'prompts', 'praman-cli-coverage.md'],
+        ['.claude', 'prompts', 'praman-cli-coverage.md'],
+      ),
+    ],
+  },
+  cursor: {
+    dirs: [['.cursor', 'rules']],
+    files: [
+      fc(['docs', USER_INTEGRATION_DIR, 'praman-cli.mdc'], ['.cursor', 'rules', 'praman-cli.mdc']),
+    ],
+  },
+  copilot: {
+    dirs: [['.github', 'agents']],
+    files: [
+      fc(
+        ['agents', 'copilot', 'praman-sap-planner-cli.agent.md'],
+        ['.github', 'agents', 'praman-sap-planner-cli.agent.md'],
+      ),
+      fc(
+        ['agents', 'copilot', 'praman-sap-generator-cli.agent.md'],
+        ['.github', 'agents', 'praman-sap-generator-cli.agent.md'],
+      ),
+      fc(
+        ['agents', 'copilot', 'praman-sap-healer-cli.agent.md'],
+        ['.github', 'agents', 'praman-sap-healer-cli.agent.md'],
+      ),
+    ],
+  },
+};
+
 // ── Private helpers ───────────────────────────────────────────────────────────
 
 /**
@@ -408,6 +480,111 @@ async function scaffoldPromptFiles(
   }
 }
 
+// ── CLI-specific scaffold helpers ────────────────────────────────────────────
+
+/**
+ * Copies the CLI config template into the user's project root.
+ *
+ * @remarks
+ * Scaffolds `.playwright/praman-cli.config.json` from
+ * `examples/praman-cli.config.json` in the package. The `.playwright/`
+ * directory is Playwright CLI's default config location.
+ */
+async function scaffoldCliConfig(
+  targetDir: string,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  const destDir = join(targetDir, '.playwright');
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- destDir composed from targetDir + known constant path
+  await mkdir(destDir, { recursive: true });
+  await copyIfMissing(
+    pkgPath('examples', 'praman-cli.config.json'),
+    join(destDir, 'praman-cli.config.json'),
+    force,
+    created,
+  );
+}
+
+/**
+ * Copies the CLI-specific skill files (`skills/praman-sap-cli/`) from the
+ * package into the user's project. These skill files contain Playwright CLI
+ * patterns for SAP testing agents.
+ */
+async function scaffoldCliSkillFiles(
+  targetDir: string,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  const srcDir = pkgPath('skills', 'praman-sap-cli');
+  const destDir = join(targetDir, 'skills', 'praman-sap-cli');
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- destDir composed from targetDir + known constant path
+  await mkdir(destDir, { recursive: true });
+
+  // Copy top-level files
+  let entries: string[];
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- srcDir is resolved from package root + known constant path
+    entries = await readdir(srcDir);
+  } catch {
+    logWarn(`CLI skills source directory not found: ${srcDir}`);
+    return;
+  }
+
+  for (const entry of entries) {
+    if (entry === 'references') continue; // handle subdirectory separately
+    const srcPath = join(srcDir, entry);
+    const destPath = join(destDir, entry);
+    await copyIfMissing(srcPath, destPath, force, created);
+  }
+
+  // Copy references subdirectory
+  const refSrcDir = join(srcDir, 'references');
+  const refDestDir = join(destDir, 'references');
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- destDir composed from known constant path segments
+  await mkdir(refDestDir, { recursive: true });
+
+  let refEntries: string[];
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- srcDir is resolved from package root + known constant path
+    refEntries = await readdir(refSrcDir);
+  } catch {
+    logWarn(`CLI skills references directory not found: ${refSrcDir}`);
+    return;
+  }
+
+  for (const entry of refEntries) {
+    const srcPath = join(refSrcDir, entry);
+    const destPath = join(refDestDir, entry);
+    await copyIfMissing(srcPath, destPath, force, created);
+  }
+}
+
+/**
+ * Installs CLI-specific agent files for each detected IDE that has CLI specs.
+ */
+async function installCliAgentFiles(
+  targetDir: string,
+  detection: IDEDetection,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  for (const [ideKey, spec] of Object.entries(CLI_COPY_SPECS)) {
+    if (!(ideKey in detection) || !detection[ideKey as keyof IDEDetection]) continue;
+
+    for (const dirSegments of spec.dirs) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from targetDir + known constant directory segments
+      await mkdir(join(targetDir, ...dirSegments), { recursive: true });
+    }
+    for (const copySpec of spec.files) {
+      const srcPath = pkgPath(...copySpec.srcSegments);
+      const destPath = join(targetDir, ...copySpec.destSegments);
+      await copyIfMissing(srcPath, destPath, force, created);
+    }
+  }
+}
+
 // ── Main export ───────────────────────────────────────────────────────────────
 
 /**
@@ -423,6 +600,7 @@ async function scaffoldPromptFiles(
  * @param targetDir - Absolute path to the user's project root.
  * @param detection - IDE detection result from {@link detectIDEs}.
  * @param force - When `true`, overwrite existing destination files.
+ * @param cli - When `true`, also install CLI-based agent definitions.
  * @returns Absolute paths of files that were actually written.
  *
  * @example
@@ -433,6 +611,7 @@ async function scaffoldPromptFiles(
  *   '/home/user/project',
  *   { claude: true, vscode: true, cursor: false, opencode: false, jules: false },
  *   false,
+ *   true, // also install CLI agents
  * );
  * console.log('Created:', created);
  * ```
@@ -441,6 +620,7 @@ export async function scaffoldIDEFiles(
   targetDir: string,
   detection: IDEDetection,
   force: boolean,
+  cli = false,
 ): Promise<readonly string[]> {
   const created: string[] = [];
 
@@ -504,6 +684,13 @@ export async function scaffoldIDEFiles(
     await scaffoldSkillFiles(targetDir, force, created);
     await scaffoldExampleFiles(targetDir, force, created);
     await scaffoldPromptFiles(targetDir, force, created);
+  }
+
+  // ── CLI-based agent definitions (opt-in via --cli flag) ──
+  if (cli) {
+    await installCliAgentFiles(targetDir, detection, force, created);
+    await scaffoldCliConfig(targetDir, force, created);
+    await scaffoldCliSkillFiles(targetDir, force, created);
   }
 
   return created;

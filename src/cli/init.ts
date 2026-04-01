@@ -48,6 +48,8 @@ export interface InitOptions {
   readonly force: boolean;
   /** When `true`, skip npm install step. */
   readonly skipInstall: boolean;
+  /** When `true`, install CLI-based agents (Playwright CLI) alongside MCP agents. */
+  readonly cli?: boolean;
 }
 
 /** Total number of init steps displayed to the user. */
@@ -224,6 +226,7 @@ export async function runInit(options: InitOptions): Promise<void> {
     targetDir: options.targetDir,
     force: options.force,
     detection,
+    cli: options.cli ?? false,
   });
 
   if (result.success) {

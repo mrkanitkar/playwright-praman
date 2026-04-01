@@ -6,6 +6,43 @@ title: Changelog
 
 # Changelog
 
+## [1.2.0] - 2026-04-01
+
+### Features
+
+- **deps:** upgrade Playwright to 1.59.0, add feature flags for screencast, ariaSnapshotDepth, setStorageState, locatorNormalize, urlPatternMatcher
+- **deps:** upgrade TypeScript 5.9.3 → 6.0.2, add TS 5.9/6.0 compat CI matrix
+- **deps:** raise minimum Node.js to 22, drop EOL Node 20
+- **selectors:** unify UI5 selector engine with fontoxpath + css-selector-parser; add `:not()`, `:labeled()`, positional and sibling selectors
+- **cli:** implement interactive `inspect` command for live UI5 control discovery
+- **cli:** add `config` command to display resolved configuration
+- **cli:** add `init-agents` command for lightweight IDE-specific agent installation
+- **config:** add nested env var support for auth, ai, telemetry, odataTracing
+- **errors:** add docs URL to error messages, JSON, and AI context
+- **core:** add extension system and matcher registry
+- **ci:** add Playwright canary (next) to integration matrix
+- **docs:** 100% TSDoc coverage — zero TypeDoc warnings
+
+### Bug Fixes
+
+- **deps:** resolve all npm audit vulnerabilities (0 remaining)
+- **deps:** resolve docs vulnerabilities (0 remaining)
+- **selectors:** preserve array types, align area node name, handle negative nth-child
+- **selectors:** fix ui5:property() type fidelity, error surfacing, and tree builder gaps
+- **ci:** remove export validation from ts-compat job
+- **ci:** skip DTS in ts-compat job for TS 5.9
+- **ci:** add missing commit scopes (deps, release, adapter)
+- **ci:** handle corrupted npm on macOS ARM64 runners
+- **ci:** regenerate lockfile and fix docs broken links
+- **docs:** fix documentation accuracy — eliminate fictional APIs across 42 files
+
+### Breaking Changes
+
+- The `enableXpathEngine` configuration field has been removed. The unified selector engine handles all selector styles automatically.
+- Minimum Node.js version raised from 20 to 22.
+
+---
+
 ## [1.0.1] - 2026-02-23
 
 ### Added

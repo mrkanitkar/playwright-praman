@@ -105,3 +105,23 @@ export function detectIDEs(targetDir: string): IDEDetection {
 export function getIDELabels(detection: IDEDetection): readonly string[] {
   return IDE_RULES.filter((rule) => detection[rule.name]).map((rule) => rule.label);
 }
+
+/**
+ * Checks whether the Playwright CLI (`@playwright/cli`) is available in
+ * the project's `node_modules/.bin/`. Informational only — used to print
+ * a hint when the CLI is detected but `--cli` was not passed.
+ *
+ * @param targetDir - The project directory to scan.
+ * @returns `true` if `playwright-cli` binary exists in `node_modules/.bin/`.
+ *
+ * @example
+ * ```typescript
+ * if (detectPlaywrightCli('/path/to/project')) {
+ *   console.log('Playwright CLI detected — consider using --cli flag');
+ * }
+ * ```
+ */
+export function detectPlaywrightCli(targetDir: string): boolean {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from targetDir + known constant segments
+  return existsSync(join(targetDir, 'node_modules', '.bin', 'playwright-cli'));
+}

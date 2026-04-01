@@ -19,7 +19,7 @@
  */
 
 import type { IDEDetection } from './ide-detector.js';
-import { detectIDEs, getIDELabels } from './ide-detector.js';
+import { detectIDEs, detectPlaywrightCli, getIDELabels } from './ide-detector.js';
 import { scaffoldIDEFiles } from './ide-installer.js';
 import { logBanner, logSection, logStep, logSuccess, logWarn } from './logger.js';
 import { getVersion } from './version.js';
@@ -49,6 +49,8 @@ export interface InitAgentsOptions {
   readonly loop: LoopTarget | 'detect';
   /** When `true`, overwrite existing agent files. */
   readonly force: boolean;
+  /** When `true`, install CLI-based agents (Playwright CLI) alongside MCP agents. */
+  readonly cli?: boolean;
 }
 
 /**
@@ -130,7 +132,14 @@ export async function runInitAgents(options: InitAgentsOptions): Promise<void> {
   // ── Step 2: Install agent files ──
   logStep(2, totalSteps, 'Installing agent files');
 
-  const created = await scaffoldIDEFiles(options.targetDir, detection, options.force);
+  const useCli = options.cli === true;
+
+  // Hint: if Playwright CLI is detected but --cli was not passed
+  if (!useCli && detectPlaywrightCli(options.targetDir)) {
+    logWarn('Playwright CLI detected. Consider using --cli to install CLI-based agents.');
+  }
+
+  const created = await scaffoldIDEFiles(options.targetDir, detection, options.force, useCli);
 
   if (created.length === 0) {
     logWarn('No new files created (agents may already be installed). Use --force to overwrite.');

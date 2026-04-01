@@ -195,6 +195,10 @@ Output:
 
 **GitHub Copilot / Cursor / Jules:** Use the agent definitions installed by `init` (see [Agent & IDE Setup](./agent-setup)).
 
+:::info Playwright CLI — token-efficient alternative
+Praman agents can also connect to the browser via the **Playwright CLI** (`@playwright/cli`) instead of MCP. The CLI uses shell commands instead of JSON-RPC tool calls, which reduces token usage in agent conversations. Both MCP and CLI are first-class options — see the [Playwright CLI Setup](./playwright-cli-setup) guide for installation and configuration.
+:::
+
 ### The plan → generate → heal pipeline
 
 ```text
@@ -1163,15 +1167,16 @@ my-sap-tests/
 
 ## Next Steps
 
-| Topic                     | Documentation                           |
-| ------------------------- | --------------------------------------- |
-| Configuration reference   | [Configuration](./configuration)        |
-| Authentication strategies | [Authentication](./authentication)      |
-| Selector reference        | [Selectors](./selectors)                |
-| Fixture reference         | [Fixtures](./fixtures)                  |
-| Error reference           | [Errors](./errors)                      |
-| Agent & IDE setup         | [Agent Setup](./agent-setup)            |
-| Vocabulary system         | [Vocabulary](./vocabulary-system)       |
-| Intent API                | [Intent API](./intent-api)              |
-| Examples                  | [Examples](../examples/)                |
-| Architecture overview     | [Architecture](./architecture-overview) |
+| Topic                     | Documentation                                  |
+| ------------------------- | ---------------------------------------------- |
+| Configuration reference   | [Configuration](./configuration)               |
+| Authentication strategies | [Authentication](./authentication)             |
+| Selector reference        | [Selectors](./selectors)                       |
+| Fixture reference         | [Fixtures](./fixtures)                         |
+| Error reference           | [Errors](./errors)                             |
+| Agent & IDE setup         | [Agent Setup](./agent-setup)                   |
+| Playwright CLI setup      | [Playwright CLI Setup](./playwright-cli-setup) |
+| Vocabulary system         | [Vocabulary](./vocabulary-system)              |
+| Intent API                | [Intent API](./intent-api)                     |
+| Examples                  | [Examples](../examples/)                       |
+| Architecture overview     | [Architecture](./architecture-overview)        |
