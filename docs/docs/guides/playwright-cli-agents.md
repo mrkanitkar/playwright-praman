@@ -1,8 +1,9 @@
 ---
-title: 'Playwright CLI Agents'
-description: 'Using Praman AI agents with the Playwright CLI for token-efficient SAP UI5 test automation. Claude Code, GitHub Copilot, and Cursor support.'
+title: 'Praman CLI Agents for Playwright CLI'
+description: 'Praman CLI Agents — three AI agent definitions built on the Playwright CLI for token-efficient SAP UI5 test automation. Claude Code, GitHub Copilot, and Cursor support.'
 sidebar_label: 'CLI Agents'
 keywords:
+  - praman cli agents
   - playwright cli agents
   - sap test automation cli
   - claude code sap testing
@@ -10,12 +11,12 @@ keywords:
   - token efficient test generation
 ---
 
-# Playwright CLI Agents
+# Praman CLI Agents for Playwright CLI
 
-Praman ships three AI agent definitions optimized for the **Playwright CLI** -- a token-efficient
-alternative to the MCP-based agents. Both MCP and CLI agents are first-class, coexisting options.
-CLI agents produce identical output (gold-standard `.spec.ts` files) while consuming significantly
-fewer tokens per interaction.
+Praman ships three **Praman CLI Agents** — AI agent definitions built on the **Playwright CLI** —
+as a token-efficient alternative to the MCP-based agents. Both MCP and Praman CLI Agents are
+first-class, coexisting options. Praman CLI Agents produce identical output (gold-standard
+`.spec.ts` files) while consuming significantly fewer tokens per interaction.
 
 ## Overview
 
@@ -30,13 +31,13 @@ bridge patterns, and discovery snippets.
 
 ---
 
-## How CLI Agents Differ from MCP Agents
+## How Praman CLI Agents Differ from MCP Agents
 
 MCP agents drive the browser through Playwright's MCP server (`browser_click`, `browser_fill`,
-`browser_snapshot`). CLI agents use the same Playwright browser but interact through terminal
-commands (`run-code`, `snapshot`, `fill`, `click`).
+`browser_snapshot`). Praman CLI Agents use the same Playwright browser but interact through
+terminal commands (`run-code`, `snapshot`, `fill`, `click`).
 
-| Aspect               | MCP Agents                              | CLI Agents                                  |
+| Aspect               | MCP Agents                              | Praman CLI Agents                           |
 | -------------------- | --------------------------------------- | ------------------------------------------- |
 | **Browser control**  | MCP tool calls (`browser_click`, etc.)  | `playwright-cli` commands via `Bash`        |
 | **Token cost**       | Higher (MCP protocol overhead per call) | Lower (compact CLI output)                  |
@@ -196,7 +197,7 @@ cp node_modules/playwright-praman/docs/user-integration/praman-cli.mdc .cursor/r
 
 ## Agent Workflow: Plan, Generate, Heal
 
-The three CLI agents form a pipeline that produces production-ready tests:
+The three Praman CLI Agents form a pipeline that produces production-ready tests:
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
@@ -253,7 +254,7 @@ playwright-cli snapshot --filename=failure-state.yml
 
 ## CLI Command Reference
 
-These are the core `playwright-cli` commands used by all three agents:
+These are the core `playwright-cli` commands used by all three Praman CLI Agents:
 
 | Command                                  | Purpose                            |
 | ---------------------------------------- | ---------------------------------- |
