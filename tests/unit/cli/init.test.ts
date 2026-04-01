@@ -322,7 +322,7 @@ describe('cli/init', () => {
       await runInit(DEFAULT_OPTS);
 
       expect(mockExecSync).toHaveBeenCalledWith(
-        'npm install @playwright/test playwright-praman dotenv',
+        'npm install @playwright/test @playwright/cli playwright-praman dotenv',
         expect.objectContaining({ stdio: 'inherit' }),
       );
     });

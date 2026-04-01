@@ -8,12 +8,12 @@
  */
 
 /**
- * Tests for `src/cli/program.ts` — `--cli` flag parsing.
+ * Tests for `src/cli/program.ts` — `--no-cli` flag parsing.
  *
  * @remarks
- * Verifies that the `--cli` option is correctly parsed by the `init` and
- * `init-agents` Commander commands, and that it defaults to `false` when
- * omitted.
+ * Verifies that the `--no-cli` option is correctly parsed by the `init` and
+ * `init-agents` Commander commands, and that `cli` defaults to `true` when
+ * the flag is omitted (CLI agents are installed by default).
  *
  * Uses `createProgram()` factory per test with `exitOverride()` and
  * `configureOutput()` for test isolation.
@@ -99,7 +99,7 @@ async function createTestProgram(): Promise<Command> {
 
 // ── Tests ───────────────────────────────────────────────────────────────────
 
-describe('cli/program — --cli flag parsing', () => {
+describe('cli/program — --no-cli flag parsing', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     process.exitCode = undefined;
@@ -111,24 +111,31 @@ describe('cli/program — --cli flag parsing', () => {
     process.exitCode = undefined;
   });
 
-  it('init --cli sets cli: true in parsed options', async () => {
-    await prog.parseAsync(['init', '--cli'], { from: 'user' });
+  it('init without --no-cli defaults cli to true', async () => {
+    await prog.parseAsync(['init'], { from: 'user' });
 
     expect(mockedRunInit).toHaveBeenCalledOnce();
     expect(mockedRunInit).toHaveBeenCalledWith(expect.objectContaining({ cli: true }));
   });
 
-  it('init-agents --cli sets cli: true in parsed options', async () => {
-    await prog.parseAsync(['init-agents', '--cli'], { from: 'user' });
+  it('init --no-cli sets cli: false in parsed options', async () => {
+    await prog.parseAsync(['init', '--no-cli'], { from: 'user' });
+
+    expect(mockedRunInit).toHaveBeenCalledOnce();
+    expect(mockedRunInit).toHaveBeenCalledWith(expect.objectContaining({ cli: false }));
+  });
+
+  it('init-agents without --no-cli defaults cli to true', async () => {
+    await prog.parseAsync(['init-agents'], { from: 'user' });
 
     expect(mockedRunInitAgents).toHaveBeenCalledOnce();
     expect(mockedRunInitAgents).toHaveBeenCalledWith(expect.objectContaining({ cli: true }));
   });
 
-  it('init without --cli defaults cli to false', async () => {
-    await prog.parseAsync(['init'], { from: 'user' });
+  it('init-agents --no-cli sets cli: false in parsed options', async () => {
+    await prog.parseAsync(['init-agents', '--no-cli'], { from: 'user' });
 
-    expect(mockedRunInit).toHaveBeenCalledOnce();
-    expect(mockedRunInit).toHaveBeenCalledWith(expect.objectContaining({ cli: false }));
+    expect(mockedRunInitAgents).toHaveBeenCalledOnce();
+    expect(mockedRunInitAgents).toHaveBeenCalledWith(expect.objectContaining({ cli: false }));
   });
 });
