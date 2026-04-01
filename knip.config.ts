@@ -41,6 +41,8 @@ const config: KnipConfig = {
     '@ui5/mcp-server',
     // Optional peer dep kept in devDeps for testing telemetry integration
     '@opentelemetry/sdk-node',
+    // Peer dep + devDep used in CLI init commands; knip can't trace dynamic usage
+    '@playwright/cli',
   ],
   ignoreBinaries: ['docusaurus', 'playwright-praman'],
   rules: {
