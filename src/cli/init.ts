@@ -111,12 +111,15 @@ function installPackageIfNeeded(options: InitOptions): boolean {
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- composed from targetDir + known constant segments
   const hasPlaywright = existsSync(join(modules, '@playwright', 'test'));
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- composed from targetDir + known constant segments
+  const hasPlaywrightCli = existsSync(join(modules, '@playwright', 'cli'));
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- composed from targetDir + known constant segments
   const hasPraman = existsSync(join(modules, 'playwright-praman'));
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- composed from targetDir + known constant segments
   const hasDotenv = existsSync(join(modules, 'dotenv'));
 
   const missing: string[] = [];
   if (!hasPlaywright) missing.push('@playwright/test');
+  if (!hasPlaywrightCli) missing.push('@playwright/cli');
   if (!hasPraman) missing.push('playwright-praman');
   if (!hasDotenv) missing.push('dotenv');
 
@@ -226,7 +229,7 @@ export async function runInit(options: InitOptions): Promise<void> {
     targetDir: options.targetDir,
     force: options.force,
     detection,
-    cli: options.cli ?? false,
+    cli: options.cli ?? true,
   });
 
   if (result.success) {

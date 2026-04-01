@@ -132,11 +132,13 @@ export async function runInitAgents(options: InitAgentsOptions): Promise<void> {
   // ── Step 2: Install agent files ──
   logStep(2, totalSteps, 'Installing agent files');
 
-  const useCli = options.cli === true;
+  const useCli = options.cli !== false;
 
-  // Hint: if Playwright CLI is detected but --cli was not passed
-  if (!useCli && detectPlaywrightCli(options.targetDir)) {
-    logWarn('Playwright CLI detected. Consider using --cli to install CLI-based agents.');
+  // Hint: if Playwright CLI is not detected but CLI agents are being installed
+  if (useCli && !detectPlaywrightCli(options.targetDir)) {
+    logWarn(
+      'Playwright CLI (@playwright/cli) not detected. Install it: npm install -D @playwright/cli',
+    );
   }
 
   const created = await scaffoldIDEFiles(options.targetDir, detection, options.force, useCli);

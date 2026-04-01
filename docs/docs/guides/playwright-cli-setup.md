@@ -130,21 +130,37 @@ npx @playwright/cli close
 
 ## Agent Setup with CLI
 
-Praman's `init-agents` command supports a `--cli` flag that configures agents to use the
-Playwright CLI instead of (or in addition to) MCP:
+Praman's `init-agents` command supports a `--cli` flag that installs CLI-based agent
+definitions alongside (or instead of) the default MCP-based ones:
 
 ```bash
+# Claude Code
 npx playwright-praman init-agents --loop=claude --cli
+
+# GitHub Copilot — also covers VS Code Copilot (.github/agents/)
+npx playwright-praman init-agents --loop=copilot --cli
+
+# Cursor
+npx playwright-praman init-agents --loop=cursor --cli
+
+# Auto-detect all IDEs and install CLI agents for each
+npx playwright-praman init-agents --cli
 ```
 
-This installs agent definitions that reference CLI commands instead of MCP tool calls.
-The agents will use `npx @playwright/cli` commands to interact with the browser.
+This installs agent definitions that reference `npx @playwright/cli` commands instead of
+MCP tool calls.
 
-| Flag           | Description                                              |
-| -------------- | -------------------------------------------------------- |
-| `--loop=<ide>` | Target IDE: `claude`, `vscode`, `cursor`, `copilot`, etc |
-| `--cli`        | Configure agents for Playwright CLI (instead of MCP)     |
-| `--force`      | Overwrite existing agent files                           |
+:::note VS Code vs GitHub Copilot
+VS Code Copilot reads agents from `.github/agents/`. Use `--loop=copilot` (not `--loop=vscode`)
+to install CLI agents there. `--loop=vscode` installs VS Code IDE settings only (snippets,
+extensions, settings.json) — it has no CLI agent files.
+:::
+
+| Flag           | Description                                                              |
+| -------------- | ------------------------------------------------------------------------ |
+| `--loop=<ide>` | Target IDE: `claude`, `copilot`, `cursor`, `jules`, `opencode`, `vscode` |
+| `--cli`        | Install Playwright CLI–based agents alongside MCP agents (opt-in)        |
+| `--force`      | Overwrite existing agent files                                           |
 
 ## MCP vs CLI Comparison
 

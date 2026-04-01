@@ -12,6 +12,8 @@
 * **cli:** implement interactive inspect command ([9bfbeb8](https://github.com/mrkanitkar/playwright-praman/commit/9bfbeb8))
 * **cli:** add 'config' command to display resolved configuration ([4beafd7](https://github.com/mrkanitkar/playwright-praman/commit/4beafd7))
 * **cli:** add init-agents command for lightweight IDE-specific agent installation ([6519f28](https://github.com/mrkanitkar/playwright-praman/commit/6519f28))
+* **cli:** install Playwright CLI agents by default; add --no-cli opt-out for init and init-agents
+* **cli:** auto-install @playwright/test, @playwright/cli, dotenv when missing during init
 * **config:** add nested env var support for auth, ai, telemetry, odataTracing ([cbb67a4](https://github.com/mrkanitkar/playwright-praman/commit/cbb67a4))
 * **errors:** add docs url to error messages, JSON, and AI context ([0754979](https://github.com/mrkanitkar/playwright-praman/commit/0754979))
 * **core:** add extension system and matcher registry ([64903fb](https://github.com/mrkanitkar/playwright-praman/commit/64903fb))
