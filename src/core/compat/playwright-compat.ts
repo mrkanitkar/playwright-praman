@@ -77,6 +77,11 @@ export interface PlaywrightFeatures {
   readonly hasLocatorAssertions: boolean;
   readonly hasFilterLocator: boolean;
   readonly hasBoxedStep: boolean;
+  readonly hasScreencastAPI: boolean;
+  readonly hasAriaSnapshotDepth: boolean;
+  readonly hasSetStorageState: boolean;
+  readonly hasLocatorNormalize: boolean;
+  readonly hasURLPatternMatcher: boolean;
 }
 
 /**
@@ -125,6 +130,11 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
     hasCustomExpect: isAtLeast(ver, '1.44.0'),
     hasClockAPI: isAtLeast(ver, '1.45.0'),
     hasAriaSnapshot: isAtLeast(ver, '1.49.0'),
+    hasScreencastAPI: isAtLeast(ver, '1.59.0'),
+    hasAriaSnapshotDepth: isAtLeast(ver, '1.59.0'),
+    hasSetStorageState: isAtLeast(ver, '1.59.0'),
+    hasLocatorNormalize: isAtLeast(ver, '1.59.0'),
+    hasURLPatternMatcher: isAtLeast(ver, '1.59.0'),
   };
 }
 

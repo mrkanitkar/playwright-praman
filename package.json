@@ -191,7 +191,7 @@
     "@microsoft/eslint-plugin-sdl": "1.1.0",
     "@opentelemetry/api": "1.9.0",
     "@opentelemetry/sdk-node": "0.212.0",
-    "@playwright/test": "1.58.2",
+    "@playwright/test": "1.59.0",
     "@size-limit/file": "12.0.0",
     "@ui5/mcp-server": "0.2.9",
     "@vitest/coverage-v8": "4.0.18",

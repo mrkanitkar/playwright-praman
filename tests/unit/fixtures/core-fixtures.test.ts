@@ -81,6 +81,11 @@ const mockFeatures: PlaywrightFeatures = {
   hasLocatorAssertions: true,
   hasFilterLocator: true,
   hasBoxedStep: true,
+  hasScreencastAPI: true,
+  hasAriaSnapshotDepth: true,
+  hasSetStorageState: true,
+  hasLocatorNormalize: true,
+  hasURLPatternMatcher: true,
 };
 
 const mockLoadConfig = vi.fn().mockResolvedValue(mockConfig);
