@@ -1,9 +1,30 @@
 # Reference planning docs (historical, pre-existing formatting)
+
 plans/plan.md
 plans/setup.md
 
 # Skill files (authored externally, varied formatting)
+
 skills/playwright-praman-sap-testing/skills-tdd.md
 
+# Generated/external reports and planning docs
+
+ARCHITECTURE_REVIEW_CLI_INTEGRATION.md
+REVIEW_ARCHITECTURE.md
+VERIFICATION_REPORT.md
+blog-praman-discovery-interaction.md
+capability-query-implementation.md
+dx-audit-report.md
+linkedin-article-interaction-strategies.md
+praman-cli-agentic-evaluation.md
+praman-prompts/
+docs/dx-comparison-praman-fixture-vs-cli.md
+docs/implementation-plan-playwright-cli-support.md
+docs/playwright-cli-integration-analysis.md
+docs/playwright-cli-integration-review.md
+docs/review-implementation-plan-playwright-cli.md
+docs/typescript-6.0-compatibility-report.md
+
 # Node modules
+
 node_modules/
