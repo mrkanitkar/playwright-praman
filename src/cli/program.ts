@@ -28,9 +28,12 @@
  * @module cli/program
  */
 
+import { writeFile } from 'node:fs/promises';
 import process from 'node:process';
 
 import { Command } from 'commander';
+
+import { createBridgeInjectionScript } from '../bridge/browser-scripts/inject-ui5.js';
 
 import type { ConfigShowOptions } from './config-show.js';
 import { runConfigShow } from './config-show.js';
@@ -41,7 +44,9 @@ import type { InitOptions } from './init.js';
 import { runInit } from './init.js';
 import type { InspectOptions } from './inspect.js';
 import { runInspect } from './inspect.js';
-import { logError } from './logger.js';
+import { logError, logSuccess } from './logger.js';
+import type { SnapshotOptions } from './snapshot-command.js';
+import { runSnapshot } from './snapshot-command.js';
 import type { UninstallOptions } from './uninstall.js';
 import { runUninstall } from './uninstall.js';
 import { getVersion } from './version.js';
@@ -277,6 +282,78 @@ Examples:
         process.exitCode = 1;
       }
     });
+
+  prog
+    .command('bridge-script')
+    .description('Export bridge init script for playwright-cli initScript config')
+    .option('--output <path>', 'Write to file instead of stdout')
+    .addHelpText(
+      'afterAll',
+      `
+Examples:
+  $ npx playwright-praman bridge-script
+  $ npx playwright-praman bridge-script --output .playwright/praman-bridge.js`,
+    )
+    .action(async (opts: { output?: string }) => {
+      try {
+        const script = createBridgeInjectionScript();
+        if (opts.output !== undefined) {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename -- opts.output is a user-provided CLI argument for bridge script output path
+          await writeFile(opts.output, script, 'utf8');
+          logSuccess(`Bridge script written to ${opts.output}`);
+        } else {
+          process.stdout.write(script);
+        }
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
+
+  prog
+    .command('snapshot')
+    .description('Capture a structured SAP UI5 control tree snapshot from a live session')
+    .option('--session <name>', 'Playwright session name to connect to', 'pwtest')
+    .option('--output <path>', 'Write snapshot to file (default: stdout)')
+    .option('--format <fmt>', 'Output format: json | yaml | table', 'json')
+    .option('--depth <n>', 'Maximum number of controls to return (0 = unlimited)', '0')
+    .option('--filter <type>', 'Filter by control type prefix (e.g. sap.m.Button)')
+    .addHelpText(
+      'afterAll',
+      `
+Examples:
+  $ npx playwright-praman snapshot
+  $ npx playwright-praman snapshot --format table
+  $ npx playwright-praman snapshot --filter sap.m.Button
+  $ npx playwright-praman snapshot --depth 50 --output snapshot.json
+  $ npx playwright-praman snapshot --session mySession --format yaml`,
+    )
+    .action(
+      (opts: {
+        session?: string;
+        output?: string;
+        format?: string;
+        depth?: string;
+        filter?: string;
+      }) => {
+        try {
+          const rawFormat = opts.format ?? 'json';
+          const format: 'json' | 'yaml' | 'table' =
+            rawFormat === 'yaml' || rawFormat === 'table' ? rawFormat : 'json';
+          const snapshotOpts: SnapshotOptions = {
+            ...(opts.session !== undefined ? { session: opts.session } : {}),
+            ...(opts.output !== undefined ? { output: opts.output } : {}),
+            format,
+            depth: opts.depth !== undefined ? Number.parseInt(opts.depth, 10) : 0,
+            ...(opts.filter !== undefined ? { filter: opts.filter } : {}),
+          };
+          runSnapshot(snapshotOpts);
+        } catch (error: unknown) {
+          logError(error instanceof Error ? error.message : String(error));
+          process.exitCode = 1;
+        }
+      },
+    );
 
   return prog;
 }

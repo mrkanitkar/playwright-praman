@@ -89,6 +89,21 @@ For detailed domain knowledge, see `skills/playwright-praman-sap-testing/`:
 - `skills-reviewer.md` — PR review, quality gates
 - `skills-security-build.md` — CI/CD, security, build
 
+## CLI-Based Test Automation (Playwright CLI)
+
+For agent-driven SAP test generation using the Playwright CLI (`@playwright/cli`):
+
+**Skill reference**: `skills/praman-sap-cli/SKILL.md`
+
+Key patterns:
+
+- Always use `--config=.playwright/praman-cli.config.json` on `open` command (injects praman bridge)
+- Use `run-code` with `page.evaluate()` to discover UI5 controls via `ElementRegistry`
+- `return` is the ONLY way to get output from `run-code` — `console.log()` is invisible
+- Three-step input: `setValue()` + `fireChange()` + `waitForUI5()`
+- Use `searchOpenDialogs: true` for dialog controls
+- Output: `import { test, expect } from 'playwright-praman'` (NEVER `@playwright/test`)
+
 ## Commit Messages
 
 Conventional Commits: `feat(scope): description`

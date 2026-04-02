@@ -14,8 +14,8 @@
  * Runs environment checks before init/doctor commands execute.
  * Returns a structured report with pass/fail/warn status per check.
  *
- * This file exceeds 300 LOC (~324 lines) due to eight self-contained check
- * functions with individual TSDoc. A follow-up decomposition is planned.
+ * This file exceeds 300 LOC due to twelve self-contained check functions with
+ * individual TSDoc. A follow-up decomposition is planned.
  *
  * @module cli/validator
  */
@@ -111,6 +111,7 @@ function checkNpmAvailable(): CheckResult {
 /** Minimum Playwright version required by Praman. Must match peerDependencies. */
 const MIN_PLAYWRIGHT_VERSION = '1.57.0';
 const PW_VERSION_CHECK_NAME = 'Playwright version';
+const PW_SCOPE = '@playwright';
 
 /**
  * Compares two semantic version strings numerically.
@@ -149,7 +150,7 @@ function isVersionAtLeast(version: string, minimum: string): boolean {
  * which is unavailable in pure ESM modules.
  */
 function checkPlaywrightInstalled(): CheckResult {
-  const playwrightPath = join(process.cwd(), 'node_modules', '@playwright', 'test');
+  const playwrightPath = join(process.cwd(), 'node_modules', PW_SCOPE, 'test');
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- path is constructed from cwd() + fixed segments
   if (existsSync(playwrightPath)) {
     return { name: '@playwright/test', status: 'pass', message: 'installed' };
@@ -178,7 +179,7 @@ function checkPlaywrightInstalled(): CheckResult {
  * ```
  */
 function checkPlaywrightVersion(): CheckResult {
-  const pkgPath = join(process.cwd(), 'node_modules', '@playwright', 'test', 'package.json');
+  const pkgPath = join(process.cwd(), 'node_modules', PW_SCOPE, 'test', 'package.json');
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- path constructed from cwd() + fixed segments
     const content = readFileSync(pkgPath, 'utf8');
@@ -247,8 +248,148 @@ function checkSapUsername(): CheckResult {
   };
 }
 
+const PLAYWRIGHT_CLI_PKG = '@playwright/cli';
+const PRAMAN_CLI_CONFIG_FILE = '.playwright/praman-cli.config.json';
+const CLAUDE_AGENT_FILE = '.claude/agents/praman-sap-planner-cli.md';
 const PLAYWRIGHT_CONFIG_FILE = 'playwright.config.ts';
 const PRAMAN_CONFIG_FILE = 'praman.config.ts';
+
+/**
+ * Checks that `@playwright/cli` is installed in the project's `node_modules`.
+ *
+ * @remarks
+ * Uses directory existence check, consistent with {@link checkPlaywrightInstalled}.
+ *
+ * @example
+ * ```typescript
+ * const result = checkPlaywrightCliInstalled();
+ * // { name: '@playwright/cli', status: 'pass', message: 'installed' }
+ * ```
+ */
+function checkPlaywrightCliInstalled(): CheckResult {
+  const pkgPath = join(process.cwd(), 'node_modules', PW_SCOPE, 'cli');
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- path is constructed from cwd() + fixed segments
+  if (existsSync(pkgPath)) {
+    return { name: PLAYWRIGHT_CLI_PKG, status: 'pass', message: 'installed' };
+  }
+  return {
+    name: PLAYWRIGHT_CLI_PKG,
+    status: 'warn',
+    message: 'not installed',
+    suggestion: 'npm install -D @playwright/cli',
+  };
+}
+
+/**
+ * Checks that `.playwright/praman-cli.config.json` exists in the project root.
+ *
+ * @remarks
+ * This config file is required for the Playwright CLI agent integration.
+ *
+ * @example
+ * ```typescript
+ * const result = checkPramanCliConfig();
+ * // { name: '.playwright/praman-cli.config.json', status: 'pass', message: 'found' }
+ * ```
+ */
+function checkPramanCliConfig(): CheckResult {
+  const configPath = join(process.cwd(), PRAMAN_CLI_CONFIG_FILE);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- path is constructed from cwd() + fixed filename
+  if (existsSync(configPath)) {
+    return { name: PRAMAN_CLI_CONFIG_FILE, status: 'pass', message: 'found' };
+  }
+  return {
+    name: PRAMAN_CLI_CONFIG_FILE,
+    status: 'warn',
+    message: 'not found',
+    suggestion: `Run: npx playwright-praman init to generate ${PRAMAN_CLI_CONFIG_FILE}`,
+  };
+}
+
+/**
+ * Checks that every `initScript` path listed in `.playwright/praman-cli.config.json`
+ * resolves to an existing file on disk.
+ *
+ * @remarks
+ * Reads and parses the config JSON, then calls {@link existsSync} on each path
+ * listed under `browser.initScript[]`. Returns `pass` when all paths resolve,
+ * `fail` when any path is missing, and `warn` when the config cannot be read.
+ *
+ * @example
+ * ```typescript
+ * const result = checkInitScriptPaths();
+ * // { name: 'initScript paths', status: 'pass', message: 'all 2 path(s) resolved' }
+ * ```
+ */
+function checkInitScriptPaths(): CheckResult {
+  const configPath = join(process.cwd(), PRAMAN_CLI_CONFIG_FILE);
+  const CHECK_NAME = 'initScript paths';
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path constructed from cwd() + fixed filename
+    const content = readFileSync(configPath, 'utf8');
+    const config: { browser?: { initScript?: string[] } } = JSON.parse(content) as {
+      browser?: { initScript?: string[] };
+    };
+    const scripts = config.browser?.initScript ?? [];
+    if (scripts.length === 0) {
+      return { name: CHECK_NAME, status: 'pass', message: 'no initScript paths configured' };
+    }
+    const missing = scripts.filter((scriptPath) => {
+      const resolved = scriptPath.startsWith('/') ? scriptPath : join(process.cwd(), scriptPath);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- path comes from project config, not user input
+      return !existsSync(resolved);
+    });
+    if (missing.length > 0) {
+      return {
+        name: CHECK_NAME,
+        status: 'fail',
+        message: `${String(missing.length)} missing: ${missing.join(', ')}`,
+        suggestion:
+          'Run: npx playwright-praman bridge-script --output <path> to generate missing scripts',
+      };
+    }
+    return {
+      name: CHECK_NAME,
+      status: 'pass',
+      message: `all ${String(scripts.length)} path(s) resolved`,
+    };
+  } catch {
+    return {
+      name: CHECK_NAME,
+      status: 'warn',
+      message: `Could not read ${PRAMAN_CLI_CONFIG_FILE}`,
+      suggestion: `Run: npx playwright-praman init to create ${PRAMAN_CLI_CONFIG_FILE}`,
+    };
+  }
+}
+
+/**
+ * Checks that the Claude agent definition file for the SAP planner agent exists.
+ *
+ * @remarks
+ * The CLI agent files are optional but recommended for AI-assisted SAP test generation.
+ * Returns `pass` if the file exists and `warn` if it is absent.
+ *
+ * @example
+ * ```typescript
+ * const result = checkCliAgentFiles();
+ * // { name: 'CLI agent files', status: 'pass', message: 'found' }
+ * ```
+ */
+function checkCliAgentFiles(): CheckResult {
+  const agentPath = join(process.cwd(), CLAUDE_AGENT_FILE);
+  const CHECK_NAME = 'CLI agent files';
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- path constructed from cwd() + fixed filename
+  if (existsSync(agentPath)) {
+    return { name: CHECK_NAME, status: 'pass', message: 'found' };
+  }
+  return {
+    name: CHECK_NAME,
+    status: 'warn',
+    message: 'not found (optional)',
+    suggestion: 'Run: npx playwright-praman init-agents --loop=claude to install agent files',
+  };
+}
 
 /**
  * Checks that a `playwright.config.ts` file exists in the current working directory.
@@ -289,8 +430,10 @@ function checkPramanConfig(): CheckResult {
  *
  * @remarks
  * Checks include: Node.js version, npm availability, Playwright installation,
- * SAP environment variables, and project configuration files. Intended to be
- * called by the `init` and `doctor` CLI commands before performing any actions.
+ * SAP environment variables, project configuration files, `@playwright/cli`
+ * installation, Praman CLI config presence, `initScript` path resolution, and
+ * Claude agent file presence. Intended to be called by the `init` and `doctor`
+ * CLI commands before performing any actions.
  *
  * @returns A {@link ValidationReport} containing all check results and counts.
  *
@@ -314,6 +457,10 @@ export function validate(): ValidationReport {
     checkSapUsername(),
     checkPlaywrightConfig(),
     checkPramanConfig(),
+    checkPlaywrightCliInstalled(),
+    checkPramanCliConfig(),
+    checkInitScriptPaths(),
+    checkCliAgentFiles(),
   ];
   return {
     checks,

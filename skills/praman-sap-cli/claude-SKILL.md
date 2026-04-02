@@ -9,7 +9,7 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 
 # SAP UI5 Test Automation via Playwright CLI
 
-**Package**: `playwright-praman` v1.0.1
+**Package**: `playwright-praman` v1.1.2
 **CLI Requirement**: `@playwright/cli` v0.1.3+ and `playwright` v1.59+
 **Purpose**: Discover SAP UI5 controls, debug Praman tests, and automate SAP Fiori workflows using the Playwright CLI. Agents use CLI commands for live discovery, then produce Praman fixture code as output.
 
@@ -18,8 +18,8 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 ## Quick Start
 
 ```bash
-# 1. Open SAP app in browser
-playwright-cli open https://my-sap-system.example.com/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html
+# 1. Open SAP app in browser (--config is MANDATORY for bridge injection)
+playwright-cli open https://my-sap-system.example.com/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html --config=.playwright/praman-cli.config.json
 
 # 2. Authenticate (fill credentials, click login)
 playwright-cli fill e3 "SAP_USERNAME"
@@ -72,7 +72,7 @@ playwright-cli close
    ```bash
    npm install playwright-praman
    ```
-4. **Config file** (optional): `playwright-cli open --config=praman-cli.json`
+4. **Config file** (optional): `playwright-cli open --config=.playwright/praman-cli.config.json`
    - Format: `{ "browser": { "initScript": ["./praman-bridge.js"] } }`
    - `initScript` uses CDP `addScriptToEvaluateOnNewDocument` and auto-injects into all same-origin frames
 5. **Sessions**: Use `playwright-cli -s=sap open` for persistent browser sessions across CLI invocations
@@ -332,7 +332,7 @@ SAP workflows often span multiple steps. Use named sessions to persist browser s
 
 ```bash
 # Start a named session with persistent profile
-playwright-cli -s=sap open https://sap-system.example.com --persistent
+playwright-cli -s=sap open https://sap-system.example.com --persistent --config=.playwright/praman-cli.config.json
 
 # Work across multiple CLI invocations
 playwright-cli -s=sap fill e3 "user"

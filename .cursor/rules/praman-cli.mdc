@@ -1,0 +1,94 @@
+---
+description: Praman CLI patterns for SAP UI5 test automation with playwright-cli
+globs:
+  - "**/*.spec.ts"
+  - "**/*.test.ts"
+alwaysApply: false
+---
+
+# Praman CLI — SAP UI5 Testing Patterns
+
+Token-efficient CLI alternative to MCP. Bridge object: `window.__praman_bridge`.
+
+## Bridge Readiness Check
+
+Always verify the bridge is ready before interacting with controls:
+
+```bash
+npx playwright-cli run-code -s=sap "async page => {
+  const ready = await page.evaluate(() => window.__praman_bridge?.ready);
+  return ready;
+}"
+```
+
+Never proceed if `ready` is not `true`. The bridge is injected via `browser.initScript` in `.playwright/praman-cli.config.json`.
+
+## Control Discovery via run-code
+
+Use `getById()` to locate UI5 controls. Always `return` values — `console.log()` output is invisible to the agent.
+
+```bash
+npx playwright-cli run-code -s=sap "async page => {
+  const ctrl = await page.evaluate(() =>
+    window.__praman_bridge.getById('container-app---main--myInput')
+  );
+  return ctrl;
+}"
+```
+
+## WARNING: console.log() Is Invisible
+
+`console.log()` inside `run-code` produces NO output for the agent. Always use `return` to surface results.
+
+```typescript
+// WRONG — agent sees nothing
+async page => { console.log(await page.evaluate(() => ...)); }
+
+// CORRECT — agent receives the value
+async page => { return await page.evaluate(() => ...); }
+```
+
+## setValue + fireChange + waitForUI5 Pattern
+
+Every input interaction requires all three steps — never skip `fireChange()` or `waitForUI5()`:
+
+```bash
+npx playwright-cli run-code -s=sap "async page => {
+  await page.evaluate(() => {
+    const ctrl = window.__praman_bridge.getById('container-app---main--inputField');
+    ctrl.setValue('test value');
+    ctrl.fireChange({ value: 'test value' });
+  });
+  await page.evaluate(() => window.__praman_bridge.waitForUI5());
+  return 'input set';
+}"
+```
+
+## Snapshot: Always Use --filename
+
+Agents MUST use `--filename` so the snapshot is written to a deterministic path they can read back:
+
+```bash
+npx playwright-cli snapshot -s=sap --filename=current-state.txt
+```
+
+Without `--filename`, the snapshot goes to stdout and may be truncated or lost in large outputs.
+
+## Sessions
+
+Use `-s=name` to persist the browser across commands. All commands in a test flow should share one session:
+
+```bash
+npx playwright-cli run-code -s=sap "async page => { ... }"
+npx playwright-cli snapshot -s=sap --filename=after-action.txt
+```
+
+## 7 Mandatory Rules for Generated Test Files
+
+1. `import { test, expect } from 'playwright-praman'` — the ONLY valid import
+2. Praman fixtures for ALL UI5 controls — NEVER `page.click('#__...')` or `.sapM...` selectors
+3. Playwright native ONLY for verified non-UI5 elements (login forms, plain DOM)
+4. Auth lives in the seed file — NEVER call `sapAuth.login()` in test body
+5. `setValue()` + `fireChange()` + `waitForUI5()` for every input — no exceptions
+6. `searchOpenDialogs: true` when interacting with controls inside dialogs
+7. TSDoc compliance header in every generated test file
