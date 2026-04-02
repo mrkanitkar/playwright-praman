@@ -46,6 +46,7 @@ const sidebars: SidebarsConfig = {
         {
           type: 'category',
           label: 'Playwright CLI',
+          link: { type: 'doc', id: 'guides/playwright-cli-overview' },
           items: [
             'guides/playwright-cli-setup',
             'guides/playwright-cli-discovery',
