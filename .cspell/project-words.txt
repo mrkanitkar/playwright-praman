@@ -50,6 +50,7 @@ navigations
 networkidle
 viewports
 PWDEBUG
+pwtest
 geolocation
 
 # TypeScript / code terms
@@ -65,6 +66,11 @@ serializability
 frontmatter
 
 # British English variants
+deserialise
+serialise
+serialiser
+serialises
+serialisation
 initialised
 optimised
 normalised
