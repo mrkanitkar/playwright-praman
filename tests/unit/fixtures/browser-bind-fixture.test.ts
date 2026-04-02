@@ -361,6 +361,69 @@ describe('browser-bind-fixture — PRAMAN_BIND=1', () => {
   });
 });
 
+describe('browser-bind-fixture — PRAMAN_BIND_TITLE env override', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.stubEnv('PRAMAN_BIND', '1');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('uses custom bind title from PRAMAN_BIND_TITLE env var', async () => {
+    vi.stubEnv('PRAMAN_BIND_TITLE', 'my-custom-agent');
+    const fn = extractFixtureFn(fixtures['browserBind']);
+    const browser = makeMockBrowser();
+
+    const result = await runFixture<{ bound: boolean; bindTitle: string | undefined }>(fn, {
+      browser,
+      rootLogger: mockRootLogger,
+    });
+
+    expect(result.bindTitle).toBe('my-custom-agent');
+    expect(browser['bind']).toHaveBeenCalledWith('my-custom-agent');
+  });
+
+  it('uses default bind title "praman-agent" when PRAMAN_BIND_TITLE is not set', async () => {
+    const fn = extractFixtureFn(fixtures['browserBind']);
+    const browser = makeMockBrowser();
+
+    const result = await runFixture<{ bound: boolean; bindTitle: string | undefined }>(fn, {
+      browser,
+      rootLogger: mockRootLogger,
+    });
+
+    expect(result.bindTitle).toBe('praman-agent');
+    expect(browser['bind']).toHaveBeenCalledWith('praman-agent');
+  });
+
+  it('returns bindTitle=undefined when PRAMAN_BIND is disabled', async () => {
+    vi.unstubAllEnvs();
+    const fn = extractFixtureFn(fixtures['browserBind']);
+    const browser = makeMockBrowser();
+
+    const result = await runFixture<{ bound: boolean; bindTitle: string | undefined }>(fn, {
+      browser,
+      rootLogger: mockRootLogger,
+    });
+
+    expect(result.bindTitle).toBeUndefined();
+  });
+
+  it('handles non-Error throw from browser.bind() (String coercion branch)', async () => {
+    const fn = extractFixtureFn(fixtures['browserBind']);
+    const browser: Record<string, unknown> = {
+      bind: vi.fn().mockRejectedValue('string-error'),
+      unbind: vi.fn().mockResolvedValue(undefined),
+    };
+
+    await expect(runFixture(fn, { browser, rootLogger: mockRootLogger })).rejects.toThrow(
+      'string-error',
+    );
+  });
+});
+
 describe('browser-bind-fixture — type-level assertions', () => {
   it('browserBindTest is defined and has extend method', () => {
     // The mock test.extend() returns a MockPlaywrightTest — not a bare function.
