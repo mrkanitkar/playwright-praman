@@ -126,6 +126,20 @@ npx playwright-praman bridge-script --output .playwright/praman-bridge.js
 
 See [CLI Setup](./playwright-cli-setup.md) for full configuration.
 
+### Pre-Built Discovery Scripts
+
+Praman ships 4 parameter-free `run-code` scripts in `dist/scripts/` for common discovery operations:
+
+```bash
+# Discover all controls with types, properties, methods (max 100)
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/discover-all.js)"
+
+# Wait for UI5 stability
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/wait-for-ui5.js)"
+```
+
+See [CLI Quick Reference](./playwright-cli-reference.md) for the full scripts table.
+
 ### Skill Files
 
 Praman installs skill files to per-IDE locations so agents auto-discover SAP testing capabilities:
@@ -150,6 +164,8 @@ In addition to standard Playwright CLI commands, Praman provides:
 | `npx playwright-praman bridge-script` | Export bridge init script for CLI config         |
 | `npx playwright-praman snapshot`      | Capture structured SAP UI5 control tree snapshot |
 | `npx playwright-praman doctor`        | Validate complete setup (12 checks)              |
+| `npx playwright-praman capabilities`  | Show capability manifest for agent preflight     |
+| `npx playwright-praman verify-spec <file>` | Validate generated .spec.ts against gold-standard rules |
 
 See [CLI Quick Reference](./playwright-cli-reference.md) for full option tables.
 

@@ -6,6 +6,20 @@ Praman ships with a capability registry and a recipe registry that describe what
 can do and how to do it. These registries serve two audiences: human testers browsing the API
 surface, and AI agents that need structured context for test generation.
 
+:::tip CLI Capability Manifest
+Praman also provides an offline CLI command for agents that need to discover capabilities
+without importing the package:
+
+```bash
+npx playwright-praman capabilities --agent
+```
+
+This returns a compact manifest of 13 CLI-specific capabilities (discovery, interaction,
+navigation, stability, generation) that work via `playwright-cli run-code` and `eval`.
+The CLI manifest is separate from the fixture registry documented below — see
+[CLI Quick Reference](./playwright-cli-reference.md#capabilities--capability-manifest) for details.
+:::
+
 ## Capabilities
 
 A **capability** is a single API method or fixture function that Praman exposes. Each capability

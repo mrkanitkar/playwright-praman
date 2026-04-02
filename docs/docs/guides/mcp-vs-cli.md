@@ -168,26 +168,28 @@ npx playwright test tests/e2e/purchase-order.spec.ts || true
 
 Both approaches support the full Praman agent pipeline:
 
-| Feature                    | MCP | CLI | Notes                                        |
-| -------------------------- | --- | --- | -------------------------------------------- |
-| SAP authentication         | Yes | Yes | Both use `storageState` for auth persistence |
-| FLP navigation             | Yes | Yes | `browser_navigate` / `playwright-cli open`   |
-| UI5 control discovery      | Yes | Yes | `browser_evaluate` / `run-code`              |
-| Bridge readiness check     | Yes | Yes | Same `window.__praman_bridge.ready` check    |
-| Page snapshots             | Yes | Yes | Inline (MCP) / file-based (CLI)              |
-| Screenshots                | Yes | Yes | Inline (MCP) / file-based (CLI)              |
-| Form fill + click          | Yes | Yes | `browser_fill` / `playwright-cli fill`       |
-| Value Help workflows       | Yes | Yes | Same UI5 bridge patterns                     |
-| OData binding extraction   | Yes | Yes | Same `run-code` / `evaluate` patterns        |
-| Named sessions             | No  | Yes | CLI-only: `-s=<name>` for persistent state   |
-| Inline DOM in conversation | Yes | No  | MCP returns DOM directly; CLI saves to file  |
-| CI/CD without server       | No  | Yes | CLI runs as plain shell commands             |
-| Planner agent              | Yes | Yes | Identical output format                      |
-| Generator agent            | Yes | Yes | Identical output format                      |
-| Healer agent               | Yes | Yes | Identical debugging approach                 |
-| Full coverage pipeline     | Yes | Yes | Both support plan + generate + heal cycle    |
-| Custom control support     | Yes | Yes | Same bridge + `run-code` patterns            |
-| Fiori Elements support     | Yes | Yes | Same SmartField / MDC discovery              |
+| Feature                    | MCP | CLI | Notes                                                      |
+| -------------------------- | --- | --- | ---------------------------------------------------------- |
+| SAP authentication         | Yes | Yes | Both use `storageState` for auth persistence               |
+| FLP navigation             | Yes | Yes | `browser_navigate` / `playwright-cli open`                 |
+| UI5 control discovery      | Yes | Yes | `browser_evaluate` / `run-code`                            |
+| Bridge readiness check     | Yes | Yes | Same `window.__praman_bridge.ready` check                  |
+| Page snapshots             | Yes | Yes | Inline (MCP) / file-based (CLI)                            |
+| Screenshots                | Yes | Yes | Inline (MCP) / file-based (CLI)                            |
+| Form fill + click          | Yes | Yes | `browser_fill` / `playwright-cli fill`                     |
+| Value Help workflows       | Yes | Yes | Same UI5 bridge patterns                                   |
+| OData binding extraction   | Yes | Yes | Same `run-code` / `evaluate` patterns                      |
+| Named sessions             | No  | Yes | CLI-only: `-s=<name>` for persistent state                 |
+| Inline DOM in conversation | Yes | No  | MCP returns DOM directly; CLI saves to file                |
+| CI/CD without server       | No  | Yes | CLI runs as plain shell commands                           |
+| Planner agent              | Yes | Yes | Identical output format                                    |
+| Generator agent            | Yes | Yes | Identical output format                                    |
+| Healer agent               | Yes | Yes | Identical debugging approach                               |
+| Full coverage pipeline     | Yes | Yes | Both support plan + generate + heal cycle                  |
+| Custom control support     | Yes | Yes | Same bridge + `run-code` patterns                          |
+| Fiori Elements support     | Yes | Yes | Same SmartField / MDC discovery                            |
+| Spec compliance check      | No  | Yes | `npx playwright-praman verify-spec <file>`                 |
+| Capability manifest        | No  | Yes | `npx playwright-praman capabilities --agent`               |
 
 ---
 
@@ -210,18 +212,19 @@ Both approaches support the full Praman agent pipeline:
 Both MCP and CLI agent definitions are installed via the same command:
 
 ```bash
-# Install MCP agents (default)
+# Install agents (CLI agents included by default)
 npx playwright-praman init-agents --loop=claude
 
-# Install CLI agents alongside MCP agents
-npx playwright-praman init-agents --loop=claude --cli
+# Skip CLI agents
+npx playwright-praman init-agents --loop=claude --no-cli
 
-# Auto-detect IDE and install both
-npx playwright-praman init-agents --cli
+# Auto-detect IDE and install
+npx playwright-praman init-agents
 ```
 
-The `--cli` flag adds CLI agent definitions alongside MCP agents. Both sets coexist -- you can
-switch between `/praman-sap-plan` (MCP) and `/praman-cli-plan` (CLI) at any time.
+CLI agent definitions are installed by default alongside MCP agents. Pass `--no-cli` to skip them.
+Both sets coexist -- you can switch between `/praman-sap-plan` (MCP) and `/praman-cli-plan` (CLI)
+at any time.
 
 ---
 

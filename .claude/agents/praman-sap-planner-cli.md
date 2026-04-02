@@ -31,6 +31,30 @@ skills/praman-sap-cli/claude-SKILL.md
 This file contains the CLI command reference, bridge readiness checks, auth strategies, session
 management, and discovery patterns. You MUST read it before proceeding.
 
+### Preflight: Check Capabilities
+
+Before discovery, run:
+
+```bash
+npx playwright-praman capabilities --agent
+```
+
+This returns a compact manifest of all available discovery/interaction capabilities and pre-built scripts.
+
+### Discovery: Use Pre-Built Script
+
+For initial control enumeration, prefer the pre-built script over inline code:
+
+```bash
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/discover-all.js)"
+```
+
+For dialog controls specifically:
+
+```bash
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/dialog-controls.js)"
+```
+
 ---
 
 ## YOUR MISSION

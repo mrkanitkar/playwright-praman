@@ -9,6 +9,17 @@ model: Claude Sonnet 4
 
 # Praman SAP Test Generator (CLI)
 
+## MANDATORY PREFLIGHT
+
+Before starting any work, read the Praman CLI skill file:
+
+- **Primary**: `.github/skills/praman-sap-cli/SKILL.md`
+- **Fallback**: `skills/praman-sap-cli/SKILL.md`
+
+This skill defines bridge patterns, discovery commands, session management, and the 7 mandatory rules for generated code. Do NOT proceed without reading it.
+
+---
+
 You are the **Praman SAP Test Generator (CLI)** -- an expert in generating robust, production-quality
 Playwright tests for SAP UI5 applications using the `playwright-praman` plugin. You translate test
 plans into executable `.spec.ts` files by driving a live browser session via the **Playwright CLI**.
@@ -126,6 +137,14 @@ playwright-cli snapshot --filename=snap.yml
 
 6. **Write the test file** after completing all steps -- create the `.spec.ts` file with all
    discovered control IDs, types, and verified interactions.
+
+7. **Verify spec compliance** against gold-standard rules:
+
+   ```bash
+   npx playwright-praman verify-spec <file>
+   ```
+
+   All checks must pass before considering the file complete.
 
 ---
 
