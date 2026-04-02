@@ -507,18 +507,17 @@ async function scaffoldCliConfig(
 }
 
 /**
- * Copies the CLI-specific skill files (`skills/praman-sap-cli/`) from the
- * package into the user's project. These skill files contain Playwright CLI
- * patterns for SAP testing agents.
+ * Copies skill files from a source directory into a destination, including
+ * a `references/` subdirectory. Used by {@link scaffoldCliSkillFiles} for
+ * each target location.
  */
-async function scaffoldCliSkillFiles(
-  targetDir: string,
+async function copySkillTree(
+  srcDir: string,
+  destDir: string,
+  sourceFile: string | undefined,
   force: boolean,
   created: string[],
 ): Promise<void> {
-  const srcDir = pkgPath('skills', 'praman-sap-cli');
-  const destDir = join(targetDir, 'skills', 'praman-sap-cli');
-
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- destDir composed from targetDir + known constant path
   await mkdir(destDir, { recursive: true });
 
@@ -534,9 +533,12 @@ async function scaffoldCliSkillFiles(
 
   for (const entry of entries) {
     if (entry === 'references') continue; // handle subdirectory separately
-    const srcPath = join(srcDir, entry);
-    const destPath = join(destDir, entry);
-    await copyIfMissing(srcPath, destPath, force, created);
+    // When sourceFile is set, copy that specific file as SKILL.md
+    if (sourceFile !== undefined && sourceFile !== '' && entry === sourceFile) {
+      await copyIfMissing(join(srcDir, entry), join(destDir, 'SKILL.md'), force, created);
+    } else if (sourceFile === undefined || sourceFile === '') {
+      await copyIfMissing(join(srcDir, entry), join(destDir, entry), force, created);
+    }
   }
 
   // Copy references subdirectory
@@ -555,9 +557,42 @@ async function scaffoldCliSkillFiles(
   }
 
   for (const entry of refEntries) {
-    const srcPath = join(refSrcDir, entry);
-    const destPath = join(refDestDir, entry);
-    await copyIfMissing(srcPath, destPath, force, created);
+    await copyIfMissing(join(refSrcDir, entry), join(refDestDir, entry), force, created);
+  }
+}
+
+/**
+ * Copies the CLI-specific skill files (`skills/praman-sap-cli/`) from the
+ * package into the user's project and into per-IDE skill directories.
+ *
+ * @remarks
+ * Installs to three locations:
+ * 1. `skills/praman-sap-cli/` — project root (agent MANDATORY PREFLIGHT reads this)
+ * 2. `.claude/skills/praman-sap-cli/` — Claude Code auto-discovery (uses `claude-SKILL.md` as SKILL.md)
+ * 3. `.github/skills/praman-sap-cli/` — Copilot auto-discovery (uses base `SKILL.md`)
+ */
+async function scaffoldCliSkillFiles(
+  targetDir: string,
+  detection: IDEDetection,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  const CLI_SKILL_DIR = 'praman-sap-cli';
+  const srcDir = pkgPath('skills', CLI_SKILL_DIR);
+
+  // 1. Project root: skills/praman-sap-cli/ (all files)
+  await copySkillTree(srcDir, join(targetDir, 'skills', CLI_SKILL_DIR), undefined, force, created);
+
+  // 2. Claude Code: .claude/skills/praman-sap-cli/ (uses claude-SKILL.md as SKILL.md)
+  if (detection.claude) {
+    const claudeDestDir = join(targetDir, '.claude', 'skills', CLI_SKILL_DIR);
+    await copySkillTree(srcDir, claudeDestDir, 'claude-SKILL.md', force, created);
+  }
+
+  // 3. Copilot: .github/skills/praman-sap-cli/ (uses base SKILL.md)
+  if (detection.copilot || detection.vscode) {
+    const copilotDestDir = join(targetDir, '.github', 'skills', CLI_SKILL_DIR);
+    await copySkillTree(srcDir, copilotDestDir, 'SKILL.md', force, created);
   }
 }
 
@@ -690,7 +725,7 @@ export async function scaffoldIDEFiles(
   if (cli) {
     await installCliAgentFiles(targetDir, detection, force, created);
     await scaffoldCliConfig(targetDir, force, created);
-    await scaffoldCliSkillFiles(targetDir, force, created);
+    await scaffoldCliSkillFiles(targetDir, detection, force, created);
   }
 
   return created;

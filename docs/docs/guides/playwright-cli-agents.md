@@ -312,7 +312,7 @@ Create a `praman-cli.json` to configure the CLI browser session:
 Pass it to the CLI:
 
 ```bash
-playwright-cli open https://my-sap-system.example.com --config=praman-cli.json
+playwright-cli open https://my-sap-system.example.com --config=.playwright/praman-cli.config.json
 ```
 
 ### Environment Variables

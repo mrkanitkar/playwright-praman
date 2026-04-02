@@ -128,3 +128,19 @@ export type { ODataTraceFixtures } from './odata-trace-fixtures.js';
 
 export { controlTreeTest } from './control-tree-fixtures.js';
 export type { ControlTreeFixtures } from './control-tree-fixtures.js';
+
+export { browserBindTest } from './browser-bind-fixture.js';
+export type {
+  BrowserBindFixtures,
+  BrowserBindResult,
+  BrowserBindWorkerDeps,
+} from './browser-bind-fixture.js';
+
+export { screencastTest } from './screencast-fixture.js';
+export type {
+  ScreencastFixture,
+  ScreencastFixtures,
+  ScreencastFrame,
+  ScreencastFrameHandler,
+  ScreencastWorkerDeps,
+} from './screencast-fixture.js';
