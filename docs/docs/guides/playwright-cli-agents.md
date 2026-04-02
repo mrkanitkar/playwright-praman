@@ -364,6 +364,33 @@ npx playwright-praman doctor
 | `initScript paths`       | All `initScript` paths in the config resolve to existing files |
 | `CLI agent files`        | At least one CLI agent definition exists for detected IDEs     |
 
+### `capabilities` — Capability Manifest
+
+Returns a machine-readable manifest of all Praman CLI capabilities. Agents use this as a preflight check to learn what discovery, interaction, and generation operations are available:
+
+```bash
+# JSON output (default)
+npx playwright-praman capabilities
+
+# Compact agent-friendly format
+npx playwright-praman capabilities --agent
+
+# Table format
+npx playwright-praman capabilities --format table
+```
+
+The planner agent runs `npx playwright-praman capabilities --agent` at the start of every session to discover available operations before opening a browser.
+
+### `verify-spec` — Spec Compliance Check
+
+Validates a generated `.spec.ts` file against gold-standard rules. The generator and healer agents run this after producing or fixing test files:
+
+```bash
+npx playwright-praman verify-spec tests/e2e/my-app.spec.ts
+```
+
+Checks: correct imports, IDS constant, test.step usage, no banned patterns (`page.waitForTimeout`, `page.click('#__...')`), TSDoc header, and ESLint compliance. Exit code `1` on failure.
+
 ---
 
 ## Customizing Agent Behavior
@@ -394,7 +421,7 @@ Create a `praman-cli.json` to configure the CLI browser session:
 ```json
 {
   "browser": {
-    "initScript": ["./node_modules/playwright-praman/bridge/praman-bridge.js"],
+    "initScript": ["./node_modules/playwright-praman/dist/browser/praman-bridge-init.js"],
     "viewport": { "width": 1920, "height": 1080 }
   }
 }

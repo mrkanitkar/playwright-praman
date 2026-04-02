@@ -28,6 +28,8 @@ XPST
 
 # Testing concepts
 hermetic
+introspection
+prebuilt
 scriptable
 parallelizable
 pageobject
@@ -196,3 +198,17 @@ combinators
 
 xclip
 xsel
+sapmbutton
+costcenter
+mmpur
+sapbw
+KUNNR
+zzznomatch
+cori
+unminified
+npmjs
+detachhead
+codegen
+Codegen
+mgmt
+testlib

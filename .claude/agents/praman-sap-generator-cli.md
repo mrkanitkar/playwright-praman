@@ -200,7 +200,15 @@ For each test scenario in the plan:
 
     Fix any issues found and re-validate.
 
-13. **Close the browser session**:
+13. **Verify spec compliance** against gold-standard rules:
+
+    ```bash
+    npx playwright-praman verify-spec tests/e2e/sap-cloud/{app}-e2e-praman-gold-standard.spec.ts
+    ```
+
+    All checks must pass (imports, IDS pattern, test.step usage, no banned patterns, TSDoc header).
+
+14. **Close the browser session**:
 
     ```bash
     playwright-cli -s=gen close

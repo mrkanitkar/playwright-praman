@@ -6,6 +6,7 @@
  * This file may contain AI-assisted code.
  * See LICENSE and NOTICE files for details.
  */
+/* eslint-disable max-lines -- CLI command hub; refactor to per-command modules planned for Sprint 3 */
 /**
  * Commander.js program definition for the Praman CLI.
  *
@@ -354,6 +355,39 @@ Examples:
         }
       },
     );
+
+  // ── capabilities command ──
+  prog
+    .command('capabilities')
+    .description('Show Praman capability manifest for agents')
+    .option('--format <fmt>', 'Output format: json, table, agent', 'json')
+    .option('--agent', 'Shortcut for --format=agent')
+    .action(async (opts: { format?: string; agent?: boolean }) => {
+      try {
+        const { runCapabilities } = await import('./capabilities-command.js');
+        const format = opts.agent === true
+          ? 'agent'
+          : (opts.format as 'json' | 'table' | 'agent' | undefined) ?? 'json';
+        runCapabilities({ format });
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
+
+  // ── verify-spec command ──
+  prog
+    .command('verify-spec <file>')
+    .description('Verify a generated .spec.ts against gold-standard rules')
+    .action(async (file: string) => {
+      try {
+        const { runVerifySpec } = await import('./verify-spec-command.js');
+        runVerifySpec(file);
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
 
   return prog;
 }

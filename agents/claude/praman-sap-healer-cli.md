@@ -35,6 +35,17 @@ You MUST read it before proceeding.
 
 ## Healing Workflow
 
+### Step 0: Pre-Fix Validation
+
+Before modifying any spec, run compliance verification:
+
+```bash
+npx playwright-praman verify-spec <file>
+```
+
+This identifies structural issues (wrong imports, missing IDS, banned patterns) that may be the
+root cause before you even start debugging.
+
 ### Step 1: Read the Failing Test File
 
 Use `Read` to examine the failing `.spec.ts` file. Understand the test structure, imports,
@@ -347,7 +358,13 @@ grep -n "from 'dhikraft'" <file>
 ```
 
 2. **Verify zero forbidden patterns** in the healed file.
-3. **Update the compliance header** in the TSDoc comment.
+3. **Run verify-spec** to confirm compliance:
+
+```bash
+npx playwright-praman verify-spec <file>
+```
+
+4. **Update the compliance header** in the TSDoc comment.
 
 ### Step 10: Iteration
 

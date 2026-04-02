@@ -363,6 +363,18 @@ export default tseslint.config(
     },
   },
 
+  // ── Setup file overrides ─────────────────────────────────────────────────
+  // Setup files are auth/lifecycle scripts, not regular tests — relax test-only rules
+  {
+    files: ['tests/*.setup.ts', 'tests/**/*.setup.ts'],
+    rules: {
+      'playwright/require-top-level-describe': 'off',
+      'playwright/expect-expect': 'off',
+      'playwright/no-conditional-in-test': 'off',
+      'security/detect-non-literal-regexp': 'off',
+    },
+  },
+
   // ── Browser-evaluated scripts override ───────────────────────────────────
   {
     files: ['src/bridge/browser-scripts/**/*.ts'],

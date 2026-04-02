@@ -83,6 +83,46 @@ npx playwright-cli run-code -s=sap "async page => { ... }"
 npx playwright-cli snapshot -s=sap --filename=after-action.txt
 ```
 
+## eval vs run-code
+
+`eval` requires a function wrapper. Bare expressions fail silently:
+
+```bash
+# ✅ CORRECT
+playwright-cli eval "() => window.__praman_bridge?.ready"
+
+# ❌ WRONG
+playwright-cli eval "window.__praman_bridge?.ready"
+```
+
+Use `eval` for quick checks; use `run-code` for multi-step operations.
+
+## Pre-Built Discovery Scripts
+
+Shipped in `node_modules/playwright-praman/dist/scripts/`:
+
+```bash
+# Discover all controls (max 100)
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/discover-all.js)"
+
+# Wait for UI5 stability
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/wait-for-ui5.js)"
+
+# Bridge diagnostics
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/bridge-status.js)"
+
+# Dialog controls
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/dialog-controls.js)"
+```
+
+## Verify Generated Spec
+
+After generating a spec file, run compliance verification:
+
+```bash
+npx playwright-praman verify-spec tests/e2e/my-app.spec.ts
+```
+
 ## 7 Mandatory Rules for Generated Test Files
 
 1. `import { test, expect } from 'playwright-praman'` — the ONLY valid import
