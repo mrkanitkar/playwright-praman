@@ -80,9 +80,7 @@ export function checkIdsPattern(content: string): CheckResult {
   const pass = /const\s+IDS\s*=\s*\{/.test(content);
   return {
     pass,
-    message: pass
-      ? 'Has IDS constant'
-      : 'Missing IDS constant (expected: const IDS = { ... })',
+    message: pass ? 'Has IDS constant' : 'Missing IDS constant (expected: const IDS = { ... })',
   };
 }
 
@@ -168,7 +166,7 @@ export function checkTsDocHeader(content: string): CheckResult {
  * // { pass: true, message: 'ESLint clean' }
  * ```
  */
-export function runEslintCheck(filePath: string): CheckResult {
+function runEslintCheck(filePath: string): CheckResult {
   try {
     // eslint-disable-next-line sonarjs/os-command -- filePath is validated by commander arg parser
     execSync(`npx eslint --no-warn-ignored ${filePath}`, {
