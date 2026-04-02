@@ -254,7 +254,7 @@ cp node_modules/playwright-praman/seeds/sap-seed.spec.ts tests/seeds/
 # Append to CLAUDE.md
 cat node_modules/playwright-praman/docs/user-integration/claude-md-appendable.md >> CLAUDE.md
 
-# CLI agents (optional — requires --cli)
+# CLI agents (installed by default — pass --no-cli to skip)
 cp node_modules/playwright-praman/agents/claude/praman-sap-planner-cli.md .claude/agents/
 cp node_modules/playwright-praman/agents/claude/praman-sap-generator-cli.md .claude/agents/
 cp node_modules/playwright-praman/agents/claude/praman-sap-healer-cli.md .claude/agents/
@@ -282,7 +282,7 @@ mkdir -p .cursor/rules
 cp node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable.mdc .cursor/rules/praman.mdc
 cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable.mdc >> .cursorrules
 
-# CLI agents (optional — requires --cli)
+# CLI agents (installed by default — pass --no-cli to skip)
 cp node_modules/playwright-praman/docs/user-integration/praman-cli.mdc .cursor/rules/praman-cli.mdc
 ```
 
@@ -299,7 +299,7 @@ cp node_modules/playwright-praman/agents/copilot/praman-sap-healer.agent.md .git
 # Append to copilot-instructions.md
 cat node_modules/playwright-praman/docs/user-integration/copilot-instructions-appendable.md >> .github/copilot-instructions.md
 
-# CLI agents (optional — requires --cli)
+# CLI agents (installed by default — pass --no-cli to skip)
 cp node_modules/playwright-praman/agents/copilot/praman-sap-planner-cli.agent.md .github/agents/
 cp node_modules/playwright-praman/agents/copilot/praman-sap-generator-cli.agent.md .github/agents/
 cp node_modules/playwright-praman/agents/copilot/praman-sap-healer-cli.agent.md .github/agents/
@@ -307,15 +307,34 @@ cp node_modules/playwright-praman/agents/copilot/praman-sap-healer-cli.agent.md 
 
 ## Skill Files
 
-The skill files (SKILL.md and supporting references) are **not copied** into your project.
-All Praman agents read them directly from the installed package:
+### MCP Skill Files
+
+MCP skill files are **not copied** into your project. All Praman agents read them directly from the installed package:
 
 ```text
 node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.md
-node_modules/playwright-praman/skills/playwright-praman-sap-testing/ai-quick-reference.md
 ```
 
 This ensures agents always use the current installed version without any stale copies.
+
+### CLI Skill Files
+
+CLI skill files **are copied** into your project by `init` (or `init-agents`). This enables per-IDE auto-discovery:
+
+| Location                                 | Purpose                              |
+| ---------------------------------------- | ------------------------------------ |
+| `skills/praman-sap-cli/SKILL.md`         | Project root — agent PREFLIGHT reads |
+| `.claude/skills/praman-sap-cli/SKILL.md` | Claude Code auto-discovery           |
+| `.github/skills/praman-sap-cli/SKILL.md` | GitHub Copilot auto-discovery        |
+
+Each skill directory includes a `references/` subdirectory with:
+
+- `sap-test-generation.md` — gold-standard test template
+- `screenshot-patterns.md` — dual screenshot pattern
+- `debug-cli.md` — `--debug=cli` workflow
+- `trace-cli.md` — trace viewer usage
+
+Pass `--no-cli` to skip CLI skill installation.
 
 ## The Seed File
 
@@ -359,7 +378,7 @@ After setup, `.claude/agents/` contains these MCP-based Praman SAP agents:
 
 ### Claude Code — CLI agents
 
-Installed with `--cli`. Use these when token efficiency matters or the MCP server is unavailable:
+Installed by default. Use these when token efficiency matters or the MCP server is unavailable:
 
 | Agent                      | Slash Command          | Purpose                                        |
 | -------------------------- | ---------------------- | ---------------------------------------------- |
@@ -384,7 +403,7 @@ After setup, `.github/agents/` contains these MCP-based Copilot coding agents:
 
 ### GitHub Copilot — CLI agents
 
-Installed with `--cli`. Copilot coding agents that invoke `npx @playwright/cli` commands:
+Installed by default. Copilot coding agents that invoke `npx @playwright/cli` commands:
 
 | Agent file                          | Copilot Mention             | Purpose                                        |
 | ----------------------------------- | --------------------------- | ---------------------------------------------- |
@@ -661,19 +680,27 @@ The Playwright CLI is a token-efficient alternative to the MCP server for AI age
 Instead of running a persistent MCP server, agents invoke `npx @playwright/cli` commands
 directly. Both approaches are first-class and can coexist in the same project.
 
-Install CLI agents alongside MCP agents:
+CLI agents are installed by default. Opt out with `--no-cli`:
 
 ```bash
-# During initial setup
-npx playwright-praman init --cli
+# During initial setup (CLI agents included by default)
+npx playwright-praman init
 
-# Or later, per IDE
-npx playwright-praman init-agents --loop=claude  --cli
-npx playwright-praman init-agents --loop=copilot --cli
-npx playwright-praman init-agents --loop=cursor  --cli
+# Opt out of CLI agents
+npx playwright-praman init --no-cli
+
+# Or later, per IDE (CLI agents included by default)
+npx playwright-praman init-agents --loop=claude
+npx playwright-praman init-agents --loop=copilot
+npx playwright-praman init-agents --loop=cursor
 
 # Auto-detect all IDEs
-npx playwright-praman init-agents --cli
+npx playwright-praman init-agents
+
+# Opt out of CLI agents per IDE
+npx playwright-praman init-agents --loop=claude  --no-cli
+npx playwright-praman init-agents --loop=copilot --no-cli
+npx playwright-praman init-agents --loop=cursor  --no-cli
 ```
 
 CLI agents use commands (`open`, `snapshot`, `run-code`, `state-save`) instead of MCP tool
@@ -681,6 +708,26 @@ calls, using 30–50% fewer tokens per agent session.
 
 For full setup instructions, see the [Playwright CLI Setup Guide](./playwright-cli-setup.md).
 For a detailed comparison, see [MCP vs CLI](./mcp-vs-cli.md).
+
+## Validating Your Setup
+
+Run `praman doctor` to verify your complete setup including CLI-specific checks:
+
+```bash
+npx playwright-praman doctor
+```
+
+The doctor command validates 12 checks across three categories:
+
+| Category            | Checks                                                                                 |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| **Core**            | `@playwright/test` installed, version >= 1.57.0, env vars configured                   |
+| **Configuration**   | `playwright.config.ts`, `praman.config.ts` exist                                       |
+| **CLI (if active)** | `@playwright/cli` installed, `praman-cli.config.json`, `initScript` paths, agent files |
+
+:::tip Fix issues automatically
+Most `doctor` failures include a `suggestion` field with the exact command to run.
+:::
 
 ---
 
