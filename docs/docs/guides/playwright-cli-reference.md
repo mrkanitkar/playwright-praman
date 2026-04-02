@@ -34,6 +34,9 @@ This page is a compact reference for every Playwright CLI command used with Pram
 | `npx playwright state-load <name>`         | Restore browser state from a saved file               |
 | `npx playwright close`                     | Close the browser                                     |
 | `npx playwright delete-data`               | Delete all saved browser state data                   |
+| `npx playwright-praman bridge-script`      | Export bridge init script for CLI config              |
+| `npx playwright-praman snapshot`           | Capture structured SAP UI5 control tree snapshot      |
+| `npx playwright-praman doctor`             | Validate CLI setup (includes 4 CLI-specific checks)   |
 
 ---
 
@@ -316,6 +319,100 @@ delete-data    → clean slate
 
 ---
 
+## Praman-Specific Commands
+
+These commands extend the Playwright CLI with SAP UI5-specific features:
+
+### `bridge-script`
+
+Exports the Praman UI5 bridge injection script. Use this instead of hardcoding the `node_modules` path:
+
+```bash
+# Print to stdout
+npx playwright-praman bridge-script
+
+# Write to file for CLI config
+npx playwright-praman bridge-script --output .playwright/praman-bridge.js
+```
+
+Then reference the output file in your CLI config:
+
+```json
+{
+  "browser": {
+    "initScript": {
+      "path": ".playwright/praman-bridge.js"
+    }
+  }
+}
+```
+
+### `snapshot`
+
+Captures a structured view of all UI5 controls from a running CLI session. Unlike `playwright snapshot` (which captures an accessibility tree), `praman snapshot` returns control IDs, types, properties, and OData bindings:
+
+```bash
+# JSON output (default)
+npx playwright-praman snapshot
+
+# Table format for quick inspection
+npx playwright-praman snapshot --format table
+
+# Filter by control type
+npx playwright-praman snapshot --filter sap.m.Button
+
+# Limit results and save to file
+npx playwright-praman snapshot --depth 50 --output snapshot.json
+
+# YAML format from a named session
+npx playwright-praman snapshot --session mySession --format yaml
+```
+
+| Option             | Default   | Description                            |
+| ------------------ | --------- | -------------------------------------- |
+| `--session <name>` | `pwtest`  | Playwright session name to connect to  |
+| `--output <path>`  | stdout    | Write snapshot to file                 |
+| `--format <fmt>`   | `json`    | Output format: `json`, `yaml`, `table` |
+| `--depth <n>`      | `0` (all) | Maximum number of controls to return   |
+| `--filter <type>`  | —         | Filter by control type prefix          |
+
+Example table output:
+
+```bash
+npx playwright-praman snapshot --format table --filter sap.m.Input
+```
+
+Output:
+
+```text
+┌──────────────────────┬──────────────┬─────────┬───────────┐
+│ ID                   │ Type         │ Visible │ Value     │
+├──────────────────────┼──────────────┼─────────┼───────────┤
+│ app--nameInput       │ sap.m.Input  │ true    │ ACME Corp │
+│ app--qtyInput        │ sap.m.Input  │ true    │ 100       │
+└──────────────────────┴──────────────┴─────────┴───────────┘
+```
+
+### `doctor`
+
+Validates your complete Praman + CLI setup:
+
+```bash
+npx playwright-praman doctor
+```
+
+```text
+✓ @playwright/test        installed
+✓ Playwright version      v1.59.0
+✓ SAP_CLOUD_BASE_URL      set
+✓ @playwright/cli         installed
+✓ praman-cli.config.json  found
+✓ initScript paths        valid
+✓ CLI agent files         found
+```
+
+---
+
 ## Next Steps
 
 - [CLI Setup Guide](./playwright-cli-setup.md) — install and configure the CLI
@@ -323,3 +420,4 @@ delete-data    → clean slate
 - [CLI iFrame Guide](./playwright-cli-iframes.md) — handle SAP iframes
 - [CLI Agents Guide](./playwright-cli-agents.md) — build agent loops with the CLI
 - [MCP vs CLI](./mcp-vs-cli.md) — choose between MCP and CLI
+- [Browser Bind & Screencast](./browser-bind.md) — expose test browser to CLI agents
