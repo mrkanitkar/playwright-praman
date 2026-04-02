@@ -51,6 +51,8 @@ networkidle
 viewports
 PWDEBUG
 pwtest
+screencasts
+screencast
 geolocation
 
 # TypeScript / code terms
