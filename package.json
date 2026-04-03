@@ -8,6 +8,16 @@
     "url": "https://praman.dev"
   },
   "license": "Apache-2.0",
+  "imports": {
+    "#ai/*": "./src/ai/*",
+    "#bridge/*": "./src/bridge/*",
+    "#core/*": "./src/core/*",
+    "#extensions/*": "./src/extensions/*",
+    "#fixtures/*": "./src/fixtures/*",
+    "#intents/*": "./src/intents/*",
+    "#proxy/*": "./src/proxy/*",
+    "#vocabulary/*": "./src/vocabulary/*"
+  },
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -100,7 +110,7 @@
     "playwright-praman": "dist/cli/index.js"
   },
   "scripts": {
-    "build": "tsup && tsx scripts/build-browser-bundles.ts",
+    "build": "tsup; tsx scripts/build-browser-bundles.ts",
     "dev": "tsup --watch",
     "clean": "node -e \"['dist','coverage','playwright-report','test-results','.auth'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
     "check:exports": "attw --pack . --ignore-rules no-resolution",
@@ -146,6 +156,7 @@
     "audit": "npm audit --audit-level=high",
     "audit:fix": "npm audit fix",
     "prepublishOnly": "npm run ci",
+    "preuninstall": "node dist/cli/preuninstall.js",
     "prepare": "husky"
   },
   "dependencies": {
