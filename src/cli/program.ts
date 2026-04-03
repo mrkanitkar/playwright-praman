@@ -84,7 +84,6 @@ export function createProgram(): Command {
     .command('init')
     .description('Scaffold a new Praman project')
     .option('--force', 'Overwrite existing files', false)
-    .option('--skip-install', 'Skip npm install step', false)
     .option(
       '--no-cli',
       'Disable Playwright CLI agent definitions (CLI agents are installed by default)',
@@ -97,24 +96,21 @@ Examples:
   $ npx playwright-praman init
   $ npx playwright-praman init --force
   $ npx playwright-praman init --no-cli
-  $ npx playwright-praman init --skip-install --target ./my-project`,
+  $ npx playwright-praman init --target ./my-project`,
     )
-    .action(
-      async (opts: { force: boolean; skipInstall: boolean; cli: boolean; target: string }) => {
-        try {
-          const initOpts: InitOptions = {
-            targetDir: opts.target,
-            force: opts.force,
-            skipInstall: opts.skipInstall,
-            cli: opts.cli,
-          };
-          await runInit(initOpts);
-        } catch (error: unknown) {
-          logError(error instanceof Error ? error.message : String(error));
-          process.exitCode = 1;
-        }
-      },
-    );
+    .action(async (opts: { force: boolean; cli: boolean; target: string }) => {
+      try {
+        const initOpts: InitOptions = {
+          targetDir: opts.target,
+          force: opts.force,
+          cli: opts.cli,
+        };
+        await runInit(initOpts);
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
 
   prog
     .command('init-agents')
@@ -365,9 +361,10 @@ Examples:
     .action(async (opts: { format?: string; agent?: boolean }) => {
       try {
         const { runCapabilities } = await import('./capabilities-command.js');
-        const format = opts.agent === true
-          ? 'agent'
-          : (opts.format as 'json' | 'table' | 'agent' | undefined) ?? 'json';
+        const format =
+          opts.agent === true
+            ? 'agent'
+            : ((opts.format as 'json' | 'table' | 'agent' | undefined) ?? 'json');
         runCapabilities({ format });
       } catch (error: unknown) {
         logError(error instanceof Error ? error.message : String(error));
