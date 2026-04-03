@@ -129,7 +129,6 @@ describe('cli/program (Commander.js)', () => {
       expect(mockedRunInit).toHaveBeenCalledWith(
         expect.objectContaining({
           force: false,
-          skipInstall: false,
         }),
       );
     });
@@ -140,12 +139,6 @@ describe('cli/program (Commander.js)', () => {
       expect(mockedRunInit).toHaveBeenCalledWith(expect.objectContaining({ force: true }));
     });
 
-    it('passes --skip-install flag to runInit as skipInstall: true', async () => {
-      await prog.parseAsync(['init', '--skip-install'], { from: 'user' });
-
-      expect(mockedRunInit).toHaveBeenCalledWith(expect.objectContaining({ skipInstall: true }));
-    });
-
     it('passes --target <dir> to runInit as targetDir', async () => {
       await prog.parseAsync(['init', '--target', TEST_DIR], { from: 'user' });
 
@@ -153,14 +146,13 @@ describe('cli/program (Commander.js)', () => {
     });
 
     it('passes all init options together', async () => {
-      await prog.parseAsync(['init', '--force', '--skip-install', '--target', TEST_DIR], {
+      await prog.parseAsync(['init', '--force', '--target', TEST_DIR], {
         from: 'user',
       });
 
       expect(mockedRunInit).toHaveBeenCalledWith({
         targetDir: TEST_DIR,
         force: true,
-        skipInstall: true,
         cli: true,
       });
     });
@@ -361,7 +353,7 @@ describe('cli/program (Commander.js)', () => {
 
       expect(mockedRunInit).not.toHaveBeenCalled();
       expect(stdoutCapture).toContain('--force');
-      expect(stdoutCapture).toContain('--skip-install');
+      expect(stdoutCapture).toContain('--no-cli');
     });
   });
 
