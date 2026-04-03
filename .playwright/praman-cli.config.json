@@ -6,7 +6,7 @@
       "channel": "chromium"
     },
     "initScript": [
-      "./node_modules/playwright-praman/dist/browser/praman-bridge-init.js"
+      "./dist/browser/praman-bridge-init.js"
     ]
   }
 }
