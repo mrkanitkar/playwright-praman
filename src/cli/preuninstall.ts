@@ -86,8 +86,11 @@ async function main(): Promise<void> {
 }
 
 // Always exit 0 — a failing preuninstall must never block package removal.
-try {
-  await main();
-} catch {
-  // Intentionally swallow errors to avoid blocking npm remove.
-}
+// eslint-disable-next-line unicorn/prefer-top-level-await -- IIFE needed to guarantee exit 0
+void (async () => {
+  try {
+    await main();
+  } catch {
+    // Intentionally swallow errors to avoid blocking npm remove.
+  }
+})();

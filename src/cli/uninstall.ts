@@ -410,7 +410,7 @@ export async function moveFilesToTrash(
 }
 
 /** Removes empty directories bottom-up, walking parent chain up to targetDir. */
-export async function cleanEmptyDirs(dirs: ReadonlySet<string>, targetDir: string): Promise<void> {
+async function cleanEmptyDirs(dirs: ReadonlySet<string>, targetDir: string): Promise<void> {
   const visited = new Set<string>();
   const sortedDirs = [...dirs].sort((a, b) => b.length - a.length);
 

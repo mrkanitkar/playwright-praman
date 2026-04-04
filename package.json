@@ -110,7 +110,7 @@
     "playwright-praman": "dist/cli/index.js"
   },
   "scripts": {
-    "build": "tsup; tsx scripts/build-browser-bundles.ts",
+    "build": "tsup && tsx scripts/build-browser-bundles.ts",
     "dev": "tsup --watch",
     "clean": "node -e \"['dist','coverage','playwright-report','test-results','.auth'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
     "check:exports": "attw --pack . --ignore-rules no-resolution",

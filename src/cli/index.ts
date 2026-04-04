@@ -29,13 +29,15 @@
 
 import process from 'node:process';
 
-// Load .env file if dotenv is available (devDependency)
-try {
-  await import('dotenv/config');
-} catch {
-  // dotenv not installed — env vars must be set manually
-}
+// eslint-disable-next-line unicorn/prefer-top-level-await -- IIFE needed for dynamic import fallback
+void (async () => {
+  // Load .env file if dotenv is available (devDependency)
+  try {
+    await import('dotenv/config');
+  } catch {
+    // dotenv not installed — env vars must be set manually
+  }
 
-import { program } from './program.js';
-
-await program.parseAsync(process.argv);
+  const { program } = await import('./program.js');
+  await program.parseAsync(process.argv);
+})();
