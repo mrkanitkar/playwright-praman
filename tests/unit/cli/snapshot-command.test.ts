@@ -46,8 +46,6 @@ vi.mock('../../../src/cli/logger.js', () => ({
   logError: vi.fn(),
   logSection: vi.fn(),
   logStep: vi.fn(),
-  logRaw: vi.fn(),
-  logDivider: vi.fn(),
   logTable: vi.fn(),
 }));
 
