@@ -40,6 +40,7 @@ export default tseslint.config(
       'praman-audit-report/**',
       'landing-previews/**',
       'plans/**',
+      'specs/**',
     ],
   },
 
