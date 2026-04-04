@@ -68,8 +68,6 @@ vi.mock('../../../src/cli/logger.js', () => ({
   logWarn: vi.fn(),
   logSection: vi.fn(),
   logTable: vi.fn(),
-  logRaw: vi.fn(),
-  logDivider: vi.fn(),
 }));
 
 const { writeFile } = await import('node:fs/promises');
