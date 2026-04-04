@@ -58,7 +58,7 @@ function PersonaGrid(): ReactNode {
     },
     {
       role: 'SAP Basis / Technical Lead',
-      title: 'Test 61 UI5 control types without brittle selectors',
+      title: 'Test 199 UI5 control types without brittle selectors',
       challenge: 'UI5 generates dynamic IDs. Traditional Selenium/Playwright selectors break on every transport. You spend more time fixing tests than writing them.',
       solution: 'Native UI5 control APIs with 3-tier resolution, auto-retry, and self-healing. Tests survive UI5 version upgrades and theme changes.',
       cta: 'Explore Control Proxy',

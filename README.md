@@ -45,6 +45,8 @@ Praman ships two first-class agent interfaces, both built into **Playwright 1.59
 
 Both produce identical gold-standard `.spec.ts` files using Praman fixtures. Both are installed by default when you run `npx playwright-praman init`.
 
+> **[Agentic and Open Source Solutions for SAP Testing: Which One Should You Pick](https://mrkanitkar.github.io/playwright-praman/blog/2026/04/02/sap-test-automation-comparison)** compares all tools.
+
 ## Who is Praman for?
 
 - **CXOs & Program Leads** — go-live confidence backed by deployment evidence, not hope

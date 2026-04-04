@@ -52,3 +52,68 @@ billing:
   label: Billing
   permalink: /billing
   description: SAP Billing Document (F0798/F0797) test automation prompts and guides.
+
+comparison:
+  label: Comparison
+  permalink: /comparison
+  description: Side-by-side comparisons of SAP test automation tools and frameworks.
+
+wdi5:
+  label: wdi5
+  permalink: /wdi5
+  description: wdi5 comparison, migration guides, and interoperability with Praman.
+
+open-source:
+  label: Open Source
+  permalink: /open-source
+  description: Open source SAP testing tools, community projects, and ecosystem analysis.
+
+cli:
+  label: CLI
+  permalink: /cli
+  description: Praman CLI commands, Playwright CLI integration, and agent tooling.
+
+signavio:
+  label: Signavio
+  permalink: /signavio
+  description: SAP Signavio process intelligence integration for test case generation.
+
+bpmn:
+  label: BPMN
+  permalink: /bpmn
+  description: BPMN-driven test design and process-based test case generation.
+
+test-design:
+  label: Test Design
+  permalink: /test-design
+  description: Test design techniques, patterns, and methodologies for SAP UI5 automation.
+
+cloud-alm:
+  label: Cloud ALM
+  permalink: /cloud-alm
+  description: SAP Cloud ALM integration for test management and quality tracking.
+
+csv:
+  label: CSV
+  permalink: /csv
+  description: CSV-based test data management and data-driven testing patterns.
+
+v1.2:
+  label: v1.2
+  permalink: /v-1-2
+  description: Praman v1.2 release — new features, improvements, and bug fixes.
+
+playwright-1.59:
+  label: Playwright 1.59
+  permalink: /playwright-1-59
+  description: Playwright 1.59 compatibility and feature updates.
+
+typescript-6:
+  label: TypeScript 6
+  permalink: /typescript-6
+  description: TypeScript 6 compatibility and migration guidance.
+
+selectors:
+  label: Selectors
+  permalink: /selectors
+  description: UI5 control selector strategies, tips, and best practices.

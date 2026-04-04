@@ -140,6 +140,15 @@ export const ErrorCode = Object.freeze({
   ERR_MATCHER_DUPLICATE: 'ERR_MATCHER_DUPLICATE',
   ERR_MATCHER_INVALID: 'ERR_MATCHER_INVALID',
   ERR_MATCHER_FROZEN: 'ERR_MATCHER_FROZEN',
+
+  // ── Browser bind errors ─────────────────────────────────────────────
+  ERR_BIND_NOT_SUPPORTED: 'ERR_BIND_NOT_SUPPORTED',
+  ERR_BIND_FAILED: 'ERR_BIND_FAILED',
+
+  // ── Screencast errors ───────────────────────────────────────────────
+  ERR_SCREENCAST_NOT_STARTED: 'ERR_SCREENCAST_NOT_STARTED',
+  ERR_SCREENCAST_CHAPTER_FAILED: 'ERR_SCREENCAST_CHAPTER_FAILED',
+  ERR_SCREENCAST_FRAME_HANDLER: 'ERR_SCREENCAST_FRAME_HANDLER',
 } as const);
 
 /**
@@ -177,7 +186,9 @@ export type ErrorCategory =
   | 'VOCAB'
   | 'INTENT'
   | 'FLP'
-  | 'MATCHER';
+  | 'MATCHER'
+  | 'BIND'
+  | 'SCREENCAST';
 
 /**
  * Template literal type enforcing the `ERR_<CATEGORY>_<REASON>` format.

@@ -1,190 +1,215 @@
-# Project & package names
-praman
-playwright-praman
-dhikraft
-zestest
-mrkanitkar
-maheshwar
-Kanitkar
 
-# Build & tooling
-fontoxpath
-tsup
-vitest
-docusaurus
-pino
-commitlint
-commitizen
-semver
-attw
-camelcase
-kebabcase
-nodenext
-wdio
-WDIO
 
-# XPath error codes
-XPST
 
-# Testing concepts
-hermetic
-scriptable
-parallelizable
-pageobject
-recordreplay
-recordreply
-microbenchmarks
-Microbenchmarks
-wdi5
-INTERACTABLE
-interactable
-Aggs
 
-# Playwright / browser terms
-domcontentloaded
-framenavigated
-framesent
-framereceived
-connectionfailed
-navigations
-networkidle
-viewports
-PWDEBUG
-geolocation
 
-# TypeScript / code terms
-thenable
-serializable
-serialisable
-introspectable
-resumability
-appendable
-stringifying
-unparseable
-serializability
-frontmatter
 
-# British English variants
-initialised
-optimised
-normalised
-initialisation
-initialise
-stabilise
-categorise
-categorisation
-summarising
-behaviour
-Behaviour
 
-# VS Code extension IDs
-dbaeumer
-yoavbls
-usernamehw
-errorlens
-eamodio
-kohler
-yzhang
 
-# Cursor / IDE
-cursorrc
-cursorrules
-opencode
 
-# CI / security
-cyclonedx
-sbom
-provenance
-blocklist
-deadcode
-healthcheck
-mdlint
 
-# Abbreviated identifiers (proxy API)
-ptest
-pstep
-pcontrol
-pclick
-pfill
-nocol
-cidx
-cval
-fitems
-fctrl
-vitems
-vtext
-vkey
-dlgs
 
-# Test management
-qtest
-QTEST
-testrail
-TESTRAIL
+
+
+
+
+
+
+
+
 
 # AI / LLM
-agentic
-llmstxt
-llms
-langgraph
-langchain
-Pydantic
-upvote
-embedder
-Embedder
-
-# Observability
-opentelemetry
-otel
-otlp
-
+# Abbreviated identifiers (proxy API)
 # Auth / security tokens
-TESTUSER
-testuser
-JSESSIONID
-SESSIONID
-certuser
-
+# British English variants
+# Build & tooling
+# CI / security
+# Cursor / IDE
+# Font names
 # Legacy terminology (used in docs discussing these terms)
+# Miscellaneous
+# Observability
+# Playwright / browser terms
+# Project & package names
+# SAP / business terms
+# Test management
+# Testing concepts
+# Testing frameworks & roles
+# TypeScript / code terms
+# VS Code extension IDs
+# XPath error codes
+Aggs
+BLACKLIST
+Behaviour
+Blacklist
+Codegen
+EBELN
+Embedder
+INTERACTABLE
+JSESSIONID
+KUNNR
+Kanitkar
+Microbenchmarks
+Outb
+PWDEBUG
+Pydantic
+QTEST
+SAPGUI
+SDET
+SESSIONID
+SOGE
+Segoe
+Signavio
+Sxxxxxxxx
+TESTRAIL
+TESTUSER
+Visio
+WDIO
+XPST
+agentic
+apos
+appendable
+attw
+behaviour
 blacklist
 blacklisted
-BLACKLIST
-Blacklist
-
-# Testing frameworks & roles
-pytest
-xdist
-testng
-SDET
-
-# SAP / business terms
-Visio
-Signavio
-EBELN
-SOGE
-SAPGUI
-Outb
-Sxxxxxxxx
-readymade
-
-# Font names
-Segoe
-
-# Miscellaneous
-scaffolder
+blocklist
+camelcase
+categorisation
+categorise
+certuser
 checkmark
-workitem
-redaction
-unredacted
+cidx
+codegen
+combinators
+commitizen
+commitlint
+connectionfailed
+cori
+costcenter
+cursorrc
+cursorrules
+cval
+cyclonedx
+dbaeumer
+deadcode
+deserialise
+detachhead
+dhikraft
+dlgs
+docusaurus
+domcontentloaded
+eamodio
+embedder
 endo
-apos
-tsyringe
-roundtrips
+errorlens
+fctrl
+fitems
+fontoxpath
+framenavigated
+framereceived
+framesent
+frontmatter
+geolocation
+gitignored
+healthcheck
+hermetic
+initialisation
+initialise
+initialised
+interactable
+introspectable
+introspection
+kebabcase
+kohler
+langchain
+langgraph
+llms
+llmstxt
+maheshwar
+mdlint
+mgmt
+microbenchmarks
+mmpur
+mrkanitkar
 myapp
 mycompany
-xyznonexistent
-gitignored
-combinators
-
+navigations
+networkidle
+nocol
+nodenext
+normalised
+npmjs
+opencode
+opentelemetry
+optimised
+otel
+otlp
+pageobject
+parallelizable
+pclick
+pcontrol
+pfill
+pino
+playwright-praman
+praman
+prebuilt
+preuninstall
+provenance
+pstep
+ptest
+pwtest
+pytest
+qtest
+readymade
+recordreplay
+recordreply
+redaction
+resumability
+roundtrips
+sapbw
+sapmbutton
+sbom
+scaffolder
+screencast
+screencasts
+scriptable
+semver
+serialisable
+serialisation
+serialise
+serialiser
+serialises
+serializability
+serializable
+stabilise
+stringifying
+summarising
+testlib
+testng
+testrail
+testuser
+thenable
+tsup
+tsyringe
+unminified
+unparseable
+unredacted
+upvote
+usernamehw
+viewports
+vitems
+vitest
+vkey
+vtext
+wdi5
+wdio
+workitem
 xclip
+xdist
 xsel
+xyznonexistent
+yoavbls
+yzhang
+zestest
+zzznomatch

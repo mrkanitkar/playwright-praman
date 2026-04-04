@@ -449,7 +449,7 @@ function FeatureGrid(): ReactNode {
     {
       icon: '\u{1F527}',
       title: '21 Fixtures, 199 Interfaces, 4,092 Methods',
-      desc: '61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more. Just destructure and go.',
+      desc: '199 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, and more. Just destructure and go.',
     },
     {
       icon: '\u{26A1}',
@@ -533,7 +533,7 @@ function Numbers(): ReactNode {
     { value: '21', label: 'Fixtures' },
     { value: '199', label: 'Typed Interfaces' },
     { value: '4,092', label: 'Methods' },
-    { value: '61', label: 'UI5 Control Types' },
+    { value: '199', label: 'UI5 Control Types' },
     { value: '8', label: 'SAP Libraries' },
     { value: '6', label: 'Sub-Path Exports' },
   ];
@@ -568,8 +568,8 @@ function Numbers(): ReactNode {
 export default function Features(): ReactNode {
   return (
     <Layout
-      title="SAP Testing Features — 61 UI5 Controls, OData, Fiori Elements, AI Codegen"
-      description="Complete SAP test automation features: 61 UI5 control types, OData V2/V4, Fiori Elements helpers, SAP login automation, AI test generation, SAP-native locators. Free open-source Playwright plugin."
+      title="SAP Testing Features — 199 UI5 Controls, OData, Fiori Elements, AI Codegen"
+      description="Complete SAP test automation features: 199 UI5 control types, OData V2/V4, Fiori Elements helpers, SAP login automation, AI test generation, SAP-native locators. Free open-source Playwright plugin."
     >
       <main>
         <section
