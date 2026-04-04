@@ -6,7 +6,6 @@
  * This file may contain AI-assisted code.
  * See LICENSE and NOTICE files for details.
  */
-/* eslint-disable max-lines -- CLI command hub; refactor to per-command modules planned for Sprint 3 */
 /**
  * Commander.js program definition for the Praman CLI.
  *
@@ -43,8 +42,6 @@ import type { InitAgentsOptions } from './init-agents.js';
 import { isValidLoop, runInitAgents } from './init-agents.js';
 import type { InitOptions } from './init.js';
 import { runInit } from './init.js';
-import type { InspectOptions } from './inspect.js';
-import { runInspect } from './inspect.js';
 import { logError, logSuccess } from './logger.js';
 import type { SnapshotOptions } from './snapshot-command.js';
 import { runSnapshot } from './snapshot-command.js';
@@ -207,46 +204,6 @@ Examples:
             removeBrowsers: opts.removeBrowsers,
           };
           await runUninstall(uninstallOpts);
-        } catch (error: unknown) {
-          logError(error instanceof Error ? error.message : String(error));
-          process.exitCode = 1;
-        }
-      },
-    );
-
-  prog
-    .command('inspect [url]')
-    .description('Open a live SAP app in a browser and interactively inspect UI5 controls')
-    .option('--auth <path>', 'Playwright storageState JSON file for authentication')
-    .option('--browser <name>', 'Browser: chromium, firefox, webkit', 'chromium')
-    .option('--timeout <ms>', 'UI5 bootstrap timeout in milliseconds', '30000')
-    .option('--viewport <WxH>', 'Viewport size', '1920x1080')
-    .addHelpText(
-      'afterAll',
-      `
-Examples:
-  $ npx playwright-praman inspect https://my-sap.example.com
-  $ npx playwright-praman inspect https://my-sap.example.com --auth .auth/user.json
-  $ npx playwright-praman inspect --browser firefox`,
-    )
-    .action(
-      async (
-        url: string | undefined,
-        opts: { auth?: string; browser?: string; timeout?: string; viewport?: string },
-      ) => {
-        try {
-          const browser =
-            opts.browser === 'firefox' || opts.browser === 'webkit' || opts.browser === 'chromium'
-              ? opts.browser
-              : 'chromium';
-          const inspectOpts: InspectOptions = {
-            ...(url !== undefined ? { url } : {}),
-            ...(opts.auth !== undefined ? { auth: opts.auth } : {}),
-            browser,
-            ...(opts.timeout !== undefined ? { timeout: Number.parseInt(opts.timeout, 10) } : {}),
-            ...(opts.viewport !== undefined ? { viewport: opts.viewport } : {}),
-          };
-          await runInspect(inspectOpts);
         } catch (error: unknown) {
           logError(error instanceof Error ? error.message : String(error));
           process.exitCode = 1;

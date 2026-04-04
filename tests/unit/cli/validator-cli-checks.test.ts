@@ -14,8 +14,7 @@
  * Covers:
  * 1. `@playwright/cli` installed check
  * 2. `.playwright/praman-cli.config.json` exists check
- * 3. `initScript` path resolution check
- * 4. CLI agent files presence check
+ * 3. CLI agent files presence check
  *
  * Mocks `node:fs` (existsSync, readFileSync) to avoid filesystem side effects.
  *
@@ -98,7 +97,7 @@ describe('cli/validator — CLI checks', () => {
       const check = getCheck(report.checks, '@playwright/cli');
 
       expect(check.status).toBe('warn');
-      expect(check.message).toBe('not installed');
+      expect(check.message).toBe('not installed (optional — for AI agent CLI mode)');
       expect(check.suggestion).toContain('@playwright/cli');
     });
 
@@ -145,157 +144,6 @@ describe('cli/validator — CLI checks', () => {
       const check = getCheck(report.checks, '.playwright/praman-cli.config.json');
 
       expect(check.suggestion).toContain('playwright-praman init');
-    });
-  });
-
-  // ── initScript paths resolve ──────────────────────────────────────────────
-
-  describe('initScript paths check', () => {
-    it('passes when no initScript paths are configured', () => {
-      mockedReadFileSync.mockReturnValue(JSON.stringify({ browser: {} }));
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.status).toBe('pass');
-      expect(check.message).toContain('no initScript paths');
-    });
-
-    it('passes when all configured initScript paths exist', () => {
-      mockedReadFileSync.mockImplementation((filePath) => {
-        if (String(filePath).includes('praman-cli.config.json')) {
-          return JSON.stringify({
-            browser: { initScript: ['.playwright/bridge.js', '.playwright/polyfill.js'] },
-          });
-        }
-        throw new Error('ENOENT');
-      });
-      mockedExistsSync.mockImplementation((filePath) => {
-        const p = String(filePath);
-        return p.includes('bridge.js') || p.includes('polyfill.js');
-      });
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.status).toBe('pass');
-      expect(check.message).toContain('all 2 path(s) resolved');
-    });
-
-    it('fails when one initScript path is missing', () => {
-      mockedReadFileSync.mockImplementation((filePath) => {
-        if (String(filePath).includes('praman-cli.config.json')) {
-          return JSON.stringify({
-            browser: { initScript: ['.playwright/bridge.js', '.playwright/missing.js'] },
-          });
-        }
-        throw new Error('ENOENT');
-      });
-      mockedExistsSync.mockImplementation((filePath) => {
-        return String(filePath).includes('bridge.js');
-      });
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.status).toBe('fail');
-      expect(check.message).toContain('1 missing');
-      expect(check.message).toContain('missing.js');
-    });
-
-    it('fails when multiple initScript paths are missing', () => {
-      mockedReadFileSync.mockImplementation((filePath) => {
-        if (String(filePath).includes('praman-cli.config.json')) {
-          return JSON.stringify({
-            browser: {
-              initScript: ['.playwright/a.js', '.playwright/b.js', '.playwright/c.js'],
-            },
-          });
-        }
-        throw new Error('ENOENT');
-      });
-      mockedExistsSync.mockReturnValue(false);
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.status).toBe('fail');
-      expect(check.message).toContain('3 missing');
-    });
-
-    it('includes bridge-script suggestion when paths are missing', () => {
-      mockedReadFileSync.mockImplementation((filePath) => {
-        if (String(filePath).includes('praman-cli.config.json')) {
-          return JSON.stringify({ browser: { initScript: ['.playwright/missing.js'] } });
-        }
-        throw new Error('ENOENT');
-      });
-      mockedExistsSync.mockReturnValue(false);
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.suggestion).toContain('bridge-script');
-    });
-
-    it('warns when config file cannot be read', () => {
-      mockedReadFileSync.mockImplementation(() => {
-        throw new Error('ENOENT');
-      });
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.status).toBe('warn');
-      expect(check.message).toContain('Could not read');
-    });
-
-    it('warns when config JSON is malformed', () => {
-      mockedReadFileSync.mockImplementation((filePath) => {
-        if (String(filePath).includes('praman-cli.config.json')) {
-          return 'not-valid-json{{{';
-        }
-        throw new Error('ENOENT');
-      });
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.status).toBe('warn');
-    });
-
-    it('passes when browser.initScript is absent (empty config)', () => {
-      mockedReadFileSync.mockImplementation((filePath) => {
-        if (String(filePath).includes('praman-cli.config.json')) {
-          return JSON.stringify({});
-        }
-        throw new Error('ENOENT');
-      });
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.status).toBe('pass');
-      expect(check.message).toContain('no initScript paths');
-    });
-
-    it('handles absolute initScript paths correctly', () => {
-      mockedReadFileSync.mockImplementation((filePath) => {
-        if (String(filePath).includes('praman-cli.config.json')) {
-          return JSON.stringify({
-            browser: { initScript: ['/absolute/path/bridge.js'] },
-          });
-        }
-        throw new Error('ENOENT');
-      });
-      mockedExistsSync.mockImplementation((filePath) => {
-        return String(filePath) === '/absolute/path/bridge.js';
-      });
-
-      const report = validate();
-      const check = getCheck(report.checks, 'initScript paths');
-
-      expect(check.status).toBe('pass');
     });
   });
 
@@ -346,18 +194,17 @@ describe('cli/validator — CLI checks', () => {
   // ── validate() total check count ─────────────────────────────────────────
 
   describe('validate() with new checks registered', () => {
-    it('returns a report with exactly 12 checks', () => {
+    it('returns a report with exactly 11 checks', () => {
       const report = validate();
 
-      expect(report.checks).toHaveLength(12);
+      expect(report.checks).toHaveLength(11);
     });
 
-    it('all 4 new checks have required name, status, and message fields', () => {
+    it('all 3 CLI checks have required name, status, and message fields', () => {
       const report = validate();
       const newCheckNames = [
         '@playwright/cli',
         '.playwright/praman-cli.config.json',
-        'initScript paths',
         'CLI agent files',
       ];
 
@@ -370,10 +217,10 @@ describe('cli/validator — CLI checks', () => {
       }
     });
 
-    it('passed + failed + warnings equals 12 with new checks', () => {
+    it('passed + failed + warnings equals 11 with new checks', () => {
       const report = validate();
 
-      expect(report.passed + report.failed + report.warnings).toBe(12);
+      expect(report.passed + report.failed + report.warnings).toBe(11);
     });
   });
 });

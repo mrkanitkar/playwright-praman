@@ -12,8 +12,8 @@
  *
  * @remarks
  * Mocks `node:fs`, `node:fs/promises`, `node:child_process`, and the CLI
- * logger to verify argument parsing, file manifest filtering, dry-run and
- * confirm modes, and browser removal without touching the real filesystem.
+ * logger to verify argument parsing, file manifest filtering, move-to-trash
+ * logic, and browser removal without touching the real filesystem.
  *
  * @module cli/uninstall
  */
@@ -35,11 +35,17 @@ const mockUnlink = vi.fn().mockResolvedValue(undefined);
 const mockReaddir = vi.fn().mockResolvedValue([]);
 const mockRmdir = vi.fn().mockResolvedValue(undefined);
 const mockRm = vi.fn().mockResolvedValue(undefined);
+const mockMkdir = vi.fn().mockResolvedValue(undefined);
+const mockCopyFile = vi.fn().mockResolvedValue(undefined);
+const mockRename = vi.fn().mockResolvedValue(undefined);
 vi.mock('node:fs/promises', () => ({
   unlink: mockUnlink,
   readdir: mockReaddir,
   rmdir: mockRmdir,
   rm: mockRm,
+  mkdir: mockMkdir,
+  copyFile: mockCopyFile,
+  rename: mockRename,
 }));
 
 const mockExecSync = vi.fn();
@@ -69,7 +75,8 @@ vi.mock('../../../src/cli/logger.js', () => ({
 
 const { logStep, logSuccess, logWarn, logSection } = await import('../../../src/cli/logger.js');
 
-const { getScaffoldedFiles, runUninstall } = await import('../../../src/cli/uninstall.js');
+const { TRASH_DIR_NAME, getScaffoldedFiles, runUninstall } =
+  await import('../../../src/cli/uninstall.js');
 
 /** Safe non-tmp test path to avoid sonarjs/publicly-writable-directories. */
 const TEST_DIR = join('/home', 'testuser', 'project');
@@ -219,6 +226,75 @@ describe('cli/uninstall', () => {
 
       expect(categories.has('prompt')).toBe(true);
     });
+
+    // ── CLI manifest entries ──────────────────────────────────────────────
+
+    it('includes CLI agent entries in manifest', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const paths = files.map((f) => f.relativePath);
+
+      expect(paths).toContain('.claude/agents/praman-sap-planner-cli.md');
+      expect(paths).toContain('.claude/agents/praman-sap-generator-cli.md');
+      expect(paths).toContain('.claude/agents/praman-sap-healer-cli.md');
+      expect(paths).toContain('.claude/prompts/praman-cli-plan.md');
+      expect(paths).toContain('.claude/prompts/praman-cli-generate.md');
+      expect(paths).toContain('.claude/prompts/praman-cli-heal.md');
+      expect(paths).toContain('.claude/prompts/praman-cli-coverage.md');
+    });
+
+    it('includes Copilot CLI agent entries in manifest', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const paths = files.map((f) => f.relativePath);
+
+      expect(paths).toContain('.github/agents/praman-sap-planner-cli.agent.md');
+      expect(paths).toContain('.github/agents/praman-sap-generator-cli.agent.md');
+      expect(paths).toContain('.github/agents/praman-sap-healer-cli.agent.md');
+    });
+
+    it('includes CLI skill directories in manifest', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const paths = files.map((f) => f.relativePath);
+
+      expect(paths).toContain('skills/praman-sap-cli/');
+      expect(paths).toContain('.claude/skills/praman-sap-cli/');
+      expect(paths).toContain('.github/skills/praman-sap-cli/');
+    });
+
+    it('includes CLI config and IDE entries in manifest', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const paths = files.map((f) => f.relativePath);
+
+      expect(paths).toContain('.playwright/praman-cli.config.json');
+      expect(paths).toContain('.cursor/rules/praman-cli.mdc');
+    });
+
+    it('includes .auth/ directory in config category', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const authEntry = files.find((f) => f.relativePath === '.auth/');
+
+      expect(authEntry).toBeDefined();
+      expect(authEntry?.category).toBe('config');
+    });
+
+    it('includes playwright.config.original.ts backup in config category', () => {
+      mockExistsSync.mockReturnValue(true);
+
+      const files = getScaffoldedFiles(TEST_DIR, baseOptions);
+      const backupEntry = files.find((f) => f.relativePath === 'playwright.config.original.ts');
+
+      expect(backupEntry).toBeDefined();
+      expect(backupEntry?.category).toBe('config');
+    });
   });
 
   // ── runUninstall ────────────────────────────────────────────────────────
@@ -236,7 +312,7 @@ describe('cli/uninstall', () => {
       });
 
       expect(logWarn).toHaveBeenCalledWith(expect.stringContaining('No scaffolded files found'));
-      expect(mockUnlink).not.toHaveBeenCalled();
+      expect(mockRename).not.toHaveBeenCalled();
     });
 
     it('displays grouped manifest and prompts when no --confirm', async () => {
@@ -260,7 +336,7 @@ describe('cli/uninstall', () => {
       expect(mockQuestion).toHaveBeenCalled();
     });
 
-    it('does not delete files when user declines prompt', async () => {
+    it('does not move files when user declines prompt', async () => {
       mockExistsSync.mockReturnValue(true);
       mockPromptAnswer('n');
 
@@ -272,11 +348,11 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
-      expect(mockUnlink).not.toHaveBeenCalled();
-      expect(logWarn).toHaveBeenCalledWith('Aborted. No files were removed.');
+      expect(mockRename).not.toHaveBeenCalled();
+      expect(logWarn).toHaveBeenCalledWith('Aborted. No files were moved.');
     });
 
-    it('deletes files when user approves prompt', async () => {
+    it('moves files to deleted-praman-files/ when user approves prompt', async () => {
       mockExistsSync.mockImplementation(
         (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
@@ -290,10 +366,17 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
-      expect(mockUnlink).toHaveBeenCalledWith(join(TEST_DIR, 'playwright.config.ts'));
+      expect(mockMkdir).toHaveBeenCalledWith(
+        join(TEST_DIR, TRASH_DIR_NAME),
+        expect.objectContaining({ recursive: true }),
+      );
+      expect(mockRename).toHaveBeenCalledWith(
+        join(TEST_DIR, 'playwright.config.ts'),
+        join(TEST_DIR, TRASH_DIR_NAME, 'playwright.config.ts'),
+      );
     });
 
-    it('skips prompt and deletes files when --confirm is set', async () => {
+    it('skips prompt and moves files when --confirm is set', async () => {
       mockExistsSync.mockImplementation(
         (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
@@ -307,10 +390,13 @@ describe('cli/uninstall', () => {
       });
 
       expect(mockQuestion).not.toHaveBeenCalled();
-      expect(mockUnlink).toHaveBeenCalledWith(join(TEST_DIR, 'playwright.config.ts'));
+      expect(mockRename).toHaveBeenCalledWith(
+        join(TEST_DIR, 'playwright.config.ts'),
+        join(TEST_DIR, TRASH_DIR_NAME, 'playwright.config.ts'),
+      );
     });
 
-    it('logs success with count after confirmed removal', async () => {
+    it('logs success with count after confirmed move', async () => {
       mockExistsSync.mockImplementation(
         (p: string) =>
           p === join(TEST_DIR, 'playwright.config.ts') ||
@@ -326,13 +412,13 @@ describe('cli/uninstall', () => {
       });
 
       expect(logSuccess).toHaveBeenCalledWith(expect.stringContaining('2 of 2'));
+      expect(logSuccess).toHaveBeenCalledWith(expect.stringContaining(TRASH_DIR_NAME));
     });
 
-    it('handles unlink errors gracefully', async () => {
+    it('logs preservation message after move', async () => {
       mockExistsSync.mockImplementation(
         (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );
-      mockUnlink.mockRejectedValueOnce(new Error('EACCES'));
 
       await runUninstall({
         targetDir: TEST_DIR,
@@ -342,12 +428,29 @@ describe('cli/uninstall', () => {
         removeBrowsers: false,
       });
 
-      expect(logWarn).toHaveBeenCalledWith(expect.stringContaining('Could not remove'));
+      expect(logWarn).toHaveBeenCalledWith(expect.stringContaining('delete manually when ready'));
+    });
+
+    it('handles move errors gracefully', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
+      );
+      mockRename.mockRejectedValueOnce(new Error('EACCES'));
+
+      await runUninstall({
+        targetDir: TEST_DIR,
+        confirm: true,
+        keepConfig: false,
+        keepAgents: false,
+        removeBrowsers: false,
+      });
+
+      expect(logWarn).toHaveBeenCalledWith(expect.stringContaining('Could not move'));
       // Should still log summary
       expect(logSuccess).toHaveBeenCalledWith(expect.stringContaining('0 of 1'));
     });
 
-    it('cleans empty directories after file removal', async () => {
+    it('cleans empty directories after file move', async () => {
       mockExistsSync.mockImplementation(
         (p: string) => p === join(TEST_DIR, '.vscode', 'extensions.json'),
       );
@@ -380,6 +483,35 @@ describe('cli/uninstall', () => {
 
       // playwright.config.ts is in targetDir root, dirname is targetDir — should NOT be rmdir'd
       expect(mockRmdir).not.toHaveBeenCalledWith(TEST_DIR);
+    });
+
+    it('uses recursive copy for directory entries', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, 'skills/praman-sap-cli/'),
+      );
+      // Simulate empty directory so copyDirRecursive resolves quickly
+      mockReaddir.mockResolvedValue([]);
+
+      await runUninstall({
+        targetDir: TEST_DIR,
+        confirm: true,
+        keepConfig: false,
+        keepAgents: false,
+        removeBrowsers: false,
+      });
+
+      // Should create destination directory
+      expect(mockMkdir).toHaveBeenCalledWith(
+        join(TEST_DIR, TRASH_DIR_NAME, 'skills/praman-sap-cli/'),
+        expect.objectContaining({ recursive: true }),
+      );
+      // Should read source directory contents
+      expect(mockReaddir).toHaveBeenCalledWith(
+        join(TEST_DIR, 'skills/praman-sap-cli/'),
+        expect.objectContaining({ withFileTypes: true }),
+      );
+      // Should remove empty source directory after copy
+      expect(mockRmdir).toHaveBeenCalledWith(join(TEST_DIR, 'skills/praman-sap-cli/'));
     });
 
     it('calls execSync for browser removal when removeBrowsers is true', async () => {
@@ -441,7 +573,7 @@ describe('cli/uninstall', () => {
       );
     });
 
-    it('runs npm uninstall playwright-praman after file removal', async () => {
+    it('runs npm uninstall playwright-praman after file move', async () => {
       mockExistsSync.mockImplementation(
         (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),
       );

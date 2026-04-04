@@ -55,10 +55,6 @@ vi.mock('../../../src/cli/config-show.js', () => ({
   runConfigShow: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('../../../src/cli/inspect.js', () => ({
-  runInspect: vi.fn().mockResolvedValue(undefined),
-}));
-
 vi.mock('../../../src/cli/init-agents.js', () => ({
   runInitAgents: vi.fn().mockResolvedValue(undefined),
   isValidLoop: vi.fn().mockReturnValue(true),

@@ -97,6 +97,16 @@ playwright-cli snapshot --filename=snap.yml
 
 ## Healing Workflow
 
+### Step 0: Pre-Fix Validation
+
+Before modifying any spec, run compliance verification:
+
+```bash
+npx playwright-praman verify-spec <file>
+```
+
+This identifies structural issues before you start debugging.
+
 ### Step 1: Run All Tests to Identify Failures
 
 ```bash

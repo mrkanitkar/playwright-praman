@@ -372,10 +372,10 @@ describe('cli/validator', () => {
   // ── validate() — structured report ─────────────────────────────────────────
 
   describe('validate() structured report', () => {
-    it('returns a report with exactly 12 checks', () => {
+    it('returns a report with exactly 11 checks', () => {
       const report = validate();
 
-      expect(report.checks).toHaveLength(12);
+      expect(report.checks).toHaveLength(11);
     });
 
     it('report contains passed, failed, and warnings counts', () => {
@@ -407,7 +407,7 @@ describe('cli/validator', () => {
 
       const report = validate();
 
-      expect(report.passed).toBe(12);
+      expect(report.passed).toBe(11);
       expect(report.failed).toBe(0);
       expect(report.warnings).toBe(0);
     });

@@ -275,8 +275,9 @@ function checkPlaywrightCliInstalled(): CheckResult {
   return {
     name: PLAYWRIGHT_CLI_PKG,
     status: 'warn',
-    message: 'not installed',
-    suggestion: 'npm install -D @playwright/cli',
+    message: 'not installed (optional — for AI agent CLI mode)',
+    suggestion:
+      "npm install -D @playwright/cli — reuses Playwright's bundled browsers (no separate download)",
   };
 }
 
@@ -304,63 +305,6 @@ function checkPramanCliConfig(): CheckResult {
     message: 'not found',
     suggestion: `Run: npx playwright-praman init to generate ${PRAMAN_CLI_CONFIG_FILE}`,
   };
-}
-
-/**
- * Checks that every `initScript` path listed in `.playwright/praman-cli.config.json`
- * resolves to an existing file on disk.
- *
- * @remarks
- * Reads and parses the config JSON, then calls {@link existsSync} on each path
- * listed under `browser.initScript[]`. Returns `pass` when all paths resolve,
- * `fail` when any path is missing, and `warn` when the config cannot be read.
- *
- * @example
- * ```typescript
- * const result = checkInitScriptPaths();
- * // { name: 'initScript paths', status: 'pass', message: 'all 2 path(s) resolved' }
- * ```
- */
-function checkInitScriptPaths(): CheckResult {
-  const configPath = join(process.cwd(), PRAMAN_CLI_CONFIG_FILE);
-  const CHECK_NAME = 'initScript paths';
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path constructed from cwd() + fixed filename
-    const content = readFileSync(configPath, 'utf8');
-    const config: { browser?: { initScript?: string[] } } = JSON.parse(content) as {
-      browser?: { initScript?: string[] };
-    };
-    const scripts = config.browser?.initScript ?? [];
-    if (scripts.length === 0) {
-      return { name: CHECK_NAME, status: 'pass', message: 'no initScript paths configured' };
-    }
-    const missing = scripts.filter((scriptPath) => {
-      const resolved = scriptPath.startsWith('/') ? scriptPath : join(process.cwd(), scriptPath);
-      // eslint-disable-next-line security/detect-non-literal-fs-filename -- path comes from project config, not user input
-      return !existsSync(resolved);
-    });
-    if (missing.length > 0) {
-      return {
-        name: CHECK_NAME,
-        status: 'fail',
-        message: `${String(missing.length)} missing: ${missing.join(', ')}`,
-        suggestion:
-          'Run: npx playwright-praman bridge-script --output <path> to generate missing scripts',
-      };
-    }
-    return {
-      name: CHECK_NAME,
-      status: 'pass',
-      message: `all ${String(scripts.length)} path(s) resolved`,
-    };
-  } catch {
-    return {
-      name: CHECK_NAME,
-      status: 'warn',
-      message: `Could not read ${PRAMAN_CLI_CONFIG_FILE}`,
-      suggestion: `Run: npx playwright-praman init to create ${PRAMAN_CLI_CONFIG_FILE}`,
-    };
-  }
 }
 
 /**
@@ -431,8 +375,8 @@ function checkPramanConfig(): CheckResult {
  * @remarks
  * Checks include: Node.js version, npm availability, Playwright installation,
  * SAP environment variables, project configuration files, `@playwright/cli`
- * installation, Praman CLI config presence, `initScript` path resolution, and
- * Claude agent file presence. Intended to be called by the `init` and `doctor`
+ * installation, Praman CLI config presence, and Claude agent file presence.
+ * Intended to be called by the `init` and `doctor`
  * CLI commands before performing any actions.
  *
  * @returns A {@link ValidationReport} containing all check results and counts.
@@ -459,7 +403,6 @@ export function validate(): ValidationReport {
     checkPramanConfig(),
     checkPlaywrightCliInstalled(),
     checkPramanCliConfig(),
-    checkInitScriptPaths(),
     checkCliAgentFiles(),
   ];
   return {

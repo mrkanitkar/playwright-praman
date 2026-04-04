@@ -29,6 +29,13 @@
 
 import process from 'node:process';
 
+// Load .env file if dotenv is available (devDependency)
+try {
+  await import('dotenv/config');
+} catch {
+  // dotenv not installed — env vars must be set manually
+}
+
 import { program } from './program.js';
 
-program.parse(process.argv);
+await program.parseAsync(process.argv);
