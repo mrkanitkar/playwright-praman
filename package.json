@@ -230,7 +230,7 @@
     "glob": "13.0.6",
     "husky": "9.1.7",
     "jsdom": "29.0.1",
-    "knip": "5.83.1",
+    "knip": "6.3.0",
     "lint-staged": "16.4.0",
     "markdownlint-cli2": "0.22.0",
     "openai": "6.33.0",
