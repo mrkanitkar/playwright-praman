@@ -26,7 +26,7 @@ const steps = [
   {
     num: '03',
     label: 'Connect OData & Test Data',
-    desc: 'OData V2/V4 CRUD + UI5 control discovery across 61 types',
+    desc: 'OData V2/V4 CRUD + UI5 control discovery across 199 types',
   },
   {
     num: '04',
@@ -425,7 +425,7 @@ const messages: FlowMessage[] = [
     from: 3,
     to: 2,
     label: 'Control Metadata + OData Schema',
-    detail: 'Returns 61 control types, bindings, value helps, OData V2/V4 entity sets & properties',
+    detail: 'Returns 199 control types, bindings, value helps, OData V2/V4 entity sets & properties',
     dashed: true,
   },
   {
@@ -1391,7 +1391,7 @@ function TechnicalDocumentation(): ReactNode {
             { num: '10', label: 'Bridge Scripts' },
             { num: '13', label: 'Error Classes' },
             { num: '3', label: 'Interaction Strategies' },
-            { num: '61', label: 'UI5 Control Types' },
+            { num: '199', label: 'UI5 Control Types' },
             { num: '6', label: 'Sub-path Exports' },
             { num: '11', label: 'ESLint Plugins' },
             { num: '14', label: 'Source Directories' },
@@ -1682,7 +1682,7 @@ function TechnicalDocumentation(): ReactNode {
               ['  bridge/interaction-strategies/', '3 strategies (UI5Native, DomFirst, OPA5)'],
               ['src/cli/', 'CLI tooling'],
               ['src/core/', 'Foundation: errors, config, logging, types'],
-              ['  core/constants/', 'Control types (61), timeouts, defaults'],
+              ['  core/constants/', 'Control types (199), timeouts, defaults'],
               ['  core/errors/', '14 error classes, 67 error codes'],
               ['  core/logging/', 'Pino structured logger'],
               ['  core/types/', '551 type definitions'],

@@ -114,6 +114,7 @@ function seedCliSourceFiles(prefix: string): void {
 
   // CLI skill files (flat directory)
   mockFs.files.set(join(prefix, 'skills', 'praman-sap-cli', 'SKILL.md'), 'cli-skill');
+  mockFs.files.set(join(prefix, 'skills', 'praman-sap-cli', 'claude-SKILL.md'), 'claude-cli-skill');
   mockFs.files.set(join(prefix, 'skills', 'praman-sap-cli', 'cli-patterns.md'), 'cli-patterns');
   // CLI skill references subdirectory
   mockFs.files.set(join(prefix, 'skills', 'praman-sap-cli', 'references', 'ref1.md'), 'ref1');
@@ -274,7 +275,7 @@ describe('cli/ide-installer — CLI agent files (cli=true)', () => {
     expect(mockFs.written.has(join(TEST_DIR, '.playwright', 'praman-cli.config.json'))).toBe(true);
   });
 
-  it('scaffolds CLI skill files when cli=true', async () => {
+  it('scaffolds CLI skill files to project root when cli=true', async () => {
     const detection = makeDetection({ claude: true });
 
     await scaffoldIDEFiles(TEST_DIR, detection, false, true);
@@ -282,6 +283,52 @@ describe('cli/ide-installer — CLI agent files (cli=true)', () => {
     // CLI skill files are copied to skills/praman-sap-cli/
     const skillDir = join(TEST_DIR, 'skills', 'praman-sap-cli');
     expect(mockFs.dirs.has(skillDir)).toBe(true);
+  });
+
+  it('installs CLI skill to .claude/skills/ when detection.claude=true', async () => {
+    const detection = makeDetection({ claude: true });
+
+    await scaffoldIDEFiles(TEST_DIR, detection, false, true);
+
+    // claude-SKILL.md should be copied as SKILL.md under .claude/skills/
+    const claudeSkillPath = join(TEST_DIR, '.claude', 'skills', 'praman-sap-cli', 'SKILL.md');
+    expect(mockFs.written.has(claudeSkillPath)).toBe(true);
+
+    // References should also be copied
+    const refPath = join(TEST_DIR, '.claude', 'skills', 'praman-sap-cli', 'references', 'ref1.md');
+    expect(mockFs.written.has(refPath)).toBe(true);
+  });
+
+  it('installs CLI skill to .github/skills/ when detection.copilot=true', async () => {
+    const detection = makeDetection({ copilot: true });
+
+    await scaffoldIDEFiles(TEST_DIR, detection, false, true);
+
+    // SKILL.md should be copied under .github/skills/
+    const copilotSkillPath = join(TEST_DIR, '.github', 'skills', 'praman-sap-cli', 'SKILL.md');
+    expect(mockFs.written.has(copilotSkillPath)).toBe(true);
+
+    // References should also be copied
+    const refPath = join(TEST_DIR, '.github', 'skills', 'praman-sap-cli', 'references', 'ref1.md');
+    expect(mockFs.written.has(refPath)).toBe(true);
+  });
+
+  it('installs CLI skill to .github/skills/ when detection.vscode=true (implies Copilot)', async () => {
+    const detection = makeDetection({ vscode: true });
+
+    await scaffoldIDEFiles(TEST_DIR, detection, false, true);
+
+    const copilotSkillPath = join(TEST_DIR, '.github', 'skills', 'praman-sap-cli', 'SKILL.md');
+    expect(mockFs.written.has(copilotSkillPath)).toBe(true);
+  });
+
+  it('does NOT install CLI skill to .claude/skills/ when detection.claude=false', async () => {
+    const detection = makeDetection({ copilot: true }); // claude=false
+
+    await scaffoldIDEFiles(TEST_DIR, detection, false, true);
+
+    const claudeSkillPath = join(TEST_DIR, '.claude', 'skills', 'praman-sap-cli', 'SKILL.md');
+    expect(mockFs.written.has(claudeSkillPath)).toBe(false);
   });
 
   it('does NOT copy CLI files when cli=false (default)', async () => {

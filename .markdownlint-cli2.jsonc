@@ -1,6 +1,6 @@
 {
   "config": {
-    "extends": ".markdownlint.jsonc"
+    "extends": ".markdownlint.jsonc",
   },
   "ignores": [
     "plans/**",
@@ -27,6 +27,21 @@
     "docs/api/**",
     "playwright-report/**",
     "seo/**",
-    "CHANGELOG.md"
-  ]
+    "CHANGELOG.md",
+    "ARCHITECTURE_REVIEW_CLI_INTEGRATION.md",
+    "REVIEW_ARCHITECTURE.md",
+    "VERIFICATION_REPORT.md",
+    "blog-praman-discovery-interaction.md",
+    "capability-query-implementation.md",
+    "dx-audit-report.md",
+    "linkedin-article-interaction-strategies.md",
+    "praman-cli-agentic-evaluation.md",
+    "praman-prompts/**",
+    "docs/dx-comparison-praman-fixture-vs-cli.md",
+    "docs/implementation-plan-playwright-cli-support.md",
+    "docs/playwright-cli-integration-analysis.md",
+    "docs/playwright-cli-integration-review.md",
+    "docs/review-implementation-plan-playwright-cli.md",
+    "docs/typescript-6.0-compatibility-report.md",
+  ],
 }

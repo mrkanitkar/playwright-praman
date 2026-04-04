@@ -90,6 +90,23 @@ npx playwright-praman init-agents --loop=cursor
 .cursor/rules/praman-cli.mdc
 ```
 
+### Skill Files
+
+CLI agents read the praman skill file for command reference, bridge patterns, and discovery snippets. `init` installs skill files to per-IDE locations for auto-discovery:
+
+| IDE            | Skill Location                           | Discovery Mechanism                  |
+| -------------- | ---------------------------------------- | ------------------------------------ |
+| Claude Code    | `.claude/skills/praman-sap-cli/SKILL.md` | Claude Code auto-discovers skills    |
+| GitHub Copilot | `.github/skills/praman-sap-cli/SKILL.md` | Copilot reads `.github/skills/`      |
+| Project root   | `skills/praman-sap-cli/SKILL.md`         | Agent MANDATORY PREFLIGHT reads this |
+
+Each skill directory also includes a `references/` subdirectory with additional context:
+
+- `sap-test-generation.md` — gold-standard code template and forbidden patterns
+- `screenshot-patterns.md` — dual screenshot pattern (assertions vs error evidence)
+- `debug-cli.md` — `--debug=cli` workflow reference
+- `trace-cli.md` — `npx playwright trace` usage
+
 ---
 
 ## Claude Code Usage
@@ -275,6 +292,107 @@ for discovery results -- always `return` values.
 
 ---
 
+## Praman CLI Commands
+
+In addition to `playwright-cli` commands, Praman provides its own CLI commands for bridge and snapshot operations:
+
+### `bridge-script` — Export Bridge Init Script
+
+Exports the Praman bridge injection script for use with `playwright-cli` `initScript` configuration:
+
+```bash
+# Print to stdout
+npx playwright-praman bridge-script
+
+# Write to file
+npx playwright-praman bridge-script --output .playwright/praman-bridge.js
+```
+
+Use this to generate the bridge script without manually locating it in `node_modules`:
+
+```json
+{
+  "browser": {
+    "initScript": {
+      "path": ".playwright/praman-bridge.js"
+    }
+  }
+}
+```
+
+### `snapshot` — SAP UI5 Control Tree Snapshot
+
+Captures a structured snapshot of all UI5 controls from a running Playwright CLI session:
+
+```bash
+# JSON output (default)
+npx playwright-praman snapshot
+
+# Table format for quick inspection
+npx playwright-praman snapshot --format table
+
+# Filter by control type
+npx playwright-praman snapshot --filter sap.m.Button
+
+# Limit results and save to file
+npx playwright-praman snapshot --depth 50 --output snapshot.json
+
+# YAML format from a named session
+npx playwright-praman snapshot --session mySession --format yaml
+```
+
+| Option             | Default   | Description                            |
+| ------------------ | --------- | -------------------------------------- |
+| `--session <name>` | `pwtest`  | Playwright session name to connect to  |
+| `--output <path>`  | stdout    | Write snapshot to file                 |
+| `--format <fmt>`   | `json`    | Output format: `json`, `yaml`, `table` |
+| `--depth <n>`      | `0` (all) | Maximum number of controls to return   |
+| `--filter <type>`  | —         | Filter by control type prefix          |
+
+### `doctor` — Validate CLI Setup
+
+The `praman doctor` command now includes CLI-specific checks:
+
+```bash
+npx playwright-praman doctor
+```
+
+| Check                    | What It Validates                                              |
+| ------------------------ | -------------------------------------------------------------- |
+| `@playwright/cli`        | CLI package is installed in `node_modules`                     |
+| `praman-cli.config.json` | CLI config exists at `.playwright/praman-cli.config.json`      |
+| `initScript paths`       | All `initScript` paths in the config resolve to existing files |
+| `CLI agent files`        | At least one CLI agent definition exists for detected IDEs     |
+
+### `capabilities` — Capability Manifest
+
+Returns a machine-readable manifest of all Praman CLI capabilities. Agents use this as a preflight check to learn what discovery, interaction, and generation operations are available:
+
+```bash
+# JSON output (default)
+npx playwright-praman capabilities
+
+# Compact agent-friendly format
+npx playwright-praman capabilities --agent
+
+# Table format
+npx playwright-praman capabilities --format table
+```
+
+The planner agent runs `npx playwright-praman capabilities --agent` at the start of every session to discover available operations before opening a browser.
+
+### `verify-spec` — Spec Compliance Check
+
+Validates a generated `.spec.ts` file against gold-standard rules. The generator and healer agents run this after producing or fixing test files:
+
+```bash
+npx playwright-praman verify-spec tests/e2e/my-app.spec.ts
+```
+
+Checks: correct imports, IDS constant, test.step usage, no banned patterns (`page.waitForTimeout`, `page.click('#__...')`), TSDoc header, and ESLint compliance. Exit code `1` on failure.
+
+---
+
 ## Customizing Agent Behavior
 
 ### Modify Agent Instructions
@@ -303,7 +421,7 @@ Create a `praman-cli.json` to configure the CLI browser session:
 ```json
 {
   "browser": {
-    "initScript": ["./node_modules/playwright-praman/bridge/praman-bridge.js"],
+    "initScript": ["./node_modules/playwright-praman/dist/browser/praman-bridge-init.js"],
     "viewport": { "width": 1920, "height": 1080 }
   }
 }
@@ -312,8 +430,18 @@ Create a `praman-cli.json` to configure the CLI browser session:
 Pass it to the CLI:
 
 ```bash
-playwright-cli open https://my-sap-system.example.com --config=praman-cli.json
+playwright-cli open https://my-sap-system.example.com --config=.playwright/praman-cli.config.json
 ```
+
+### Browser Bind (Playwright 1.59+)
+
+Enable `PRAMAN_BIND=1` to expose the test browser to CLI agents during test execution:
+
+```bash
+PRAMAN_BIND=1 npx playwright test tests/e2e/my-sap-test.spec.ts
+```
+
+The test fixture calls `browser.bind('praman-agent')` and logs the endpoint URL. A CLI agent can then attach to the running test browser to inspect live UI state. See [Browser Bind & Screencast](./browser-bind.md) for details.
 
 ### Environment Variables
 

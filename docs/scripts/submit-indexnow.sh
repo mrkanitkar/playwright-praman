@@ -33,6 +33,7 @@ curl -s -X POST "https://api.indexnow.org/indexnow" \
       \"${BASE_URL}/docs/guides/docker-cicd\",
       \"${BASE_URL}/docs/api/\",
       \"${BASE_URL}/blog\",
+      \"${BASE_URL}/blog/sap-test-automation-comparison\",
       \"${BASE_URL}/llms.txt\",
       \"${BASE_URL}/llms-full.txt\"
     ]

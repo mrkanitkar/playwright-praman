@@ -14,6 +14,7 @@
 
 import * as esbuild from 'esbuild';
 import { mkdirSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -65,6 +66,30 @@ async function main(): Promise<void> {
   const bridgeElapsed = Date.now() - bridgeStart;
   // eslint-disable-next-line no-console -- build script
   console.log(`  ✓ praman-bridge-init → dist/browser/praman-bridge-init.js (${bridgeElapsed}ms)`);
+
+  // 3. Pre-built run-code scripts (plain text function exports)
+  const scriptsStart = Date.now();
+  const scriptsOutDir = resolve(rootDir, 'dist', 'scripts');
+  mkdirSync(scriptsOutDir, { recursive: true });
+
+  const scriptModules = await import('../src/scripts/index.js');
+  const scriptEntries: Record<string, string> = {
+    'discover-all.js': scriptModules.DISCOVER_ALL_SCRIPT,
+    'wait-for-ui5.js': scriptModules.WAIT_FOR_UI5_SCRIPT,
+    'bridge-status.js': scriptModules.BRIDGE_STATUS_SCRIPT,
+    'dialog-controls.js': scriptModules.DIALOG_CONTROLS_SCRIPT,
+  };
+
+  for (const [filename, content] of Object.entries(scriptEntries)) {
+    if (/["`$]/.test(content)) {
+      throw new Error(`Shell-unsafe character found in ${filename}. Pre-built scripts must not contain " \` or $.`);
+    }
+    await writeFile(resolve(scriptsOutDir, filename), content, 'utf8');
+  }
+
+  const scriptsElapsed = Date.now() - scriptsStart;
+  // eslint-disable-next-line no-console -- build script
+  console.log(`  ✓ pre-built scripts → dist/scripts/ (${scriptsElapsed}ms)`);
 
   // eslint-disable-next-line no-console -- build script
   console.log('Done.');

@@ -28,9 +28,12 @@
  * @module cli/program
  */
 
+import { writeFile } from 'node:fs/promises';
 import process from 'node:process';
 
 import { Command } from 'commander';
+
+import { createBridgeInjectionScript } from '../bridge/browser-scripts/inject-ui5.js';
 
 import type { ConfigShowOptions } from './config-show.js';
 import { runConfigShow } from './config-show.js';
@@ -39,9 +42,9 @@ import type { InitAgentsOptions } from './init-agents.js';
 import { isValidLoop, runInitAgents } from './init-agents.js';
 import type { InitOptions } from './init.js';
 import { runInit } from './init.js';
-import type { InspectOptions } from './inspect.js';
-import { runInspect } from './inspect.js';
-import { logError } from './logger.js';
+import { logError, logSuccess } from './logger.js';
+import type { SnapshotOptions } from './snapshot-command.js';
+import { runSnapshot } from './snapshot-command.js';
 import type { UninstallOptions } from './uninstall.js';
 import { runUninstall } from './uninstall.js';
 import { getVersion } from './version.js';
@@ -78,7 +81,6 @@ export function createProgram(): Command {
     .command('init')
     .description('Scaffold a new Praman project')
     .option('--force', 'Overwrite existing files', false)
-    .option('--skip-install', 'Skip npm install step', false)
     .option(
       '--no-cli',
       'Disable Playwright CLI agent definitions (CLI agents are installed by default)',
@@ -91,24 +93,21 @@ Examples:
   $ npx playwright-praman init
   $ npx playwright-praman init --force
   $ npx playwright-praman init --no-cli
-  $ npx playwright-praman init --skip-install --target ./my-project`,
+  $ npx playwright-praman init --target ./my-project`,
     )
-    .action(
-      async (opts: { force: boolean; skipInstall: boolean; cli: boolean; target: string }) => {
-        try {
-          const initOpts: InitOptions = {
-            targetDir: opts.target,
-            force: opts.force,
-            skipInstall: opts.skipInstall,
-            cli: opts.cli,
-          };
-          await runInit(initOpts);
-        } catch (error: unknown) {
-          logError(error instanceof Error ? error.message : String(error));
-          process.exitCode = 1;
-        }
-      },
-    );
+    .action(async (opts: { force: boolean; cli: boolean; target: string }) => {
+      try {
+        const initOpts: InitOptions = {
+          targetDir: opts.target,
+          force: opts.force,
+          cli: opts.cli,
+        };
+        await runInit(initOpts);
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
 
   prog
     .command('init-agents')
@@ -213,46 +212,6 @@ Examples:
     );
 
   prog
-    .command('inspect [url]')
-    .description('Open a live SAP app in a browser and interactively inspect UI5 controls')
-    .option('--auth <path>', 'Playwright storageState JSON file for authentication')
-    .option('--browser <name>', 'Browser: chromium, firefox, webkit', 'chromium')
-    .option('--timeout <ms>', 'UI5 bootstrap timeout in milliseconds', '30000')
-    .option('--viewport <WxH>', 'Viewport size', '1920x1080')
-    .addHelpText(
-      'afterAll',
-      `
-Examples:
-  $ npx playwright-praman inspect https://my-sap.example.com
-  $ npx playwright-praman inspect https://my-sap.example.com --auth .auth/user.json
-  $ npx playwright-praman inspect --browser firefox`,
-    )
-    .action(
-      async (
-        url: string | undefined,
-        opts: { auth?: string; browser?: string; timeout?: string; viewport?: string },
-      ) => {
-        try {
-          const browser =
-            opts.browser === 'firefox' || opts.browser === 'webkit' || opts.browser === 'chromium'
-              ? opts.browser
-              : 'chromium';
-          const inspectOpts: InspectOptions = {
-            ...(url !== undefined ? { url } : {}),
-            ...(opts.auth !== undefined ? { auth: opts.auth } : {}),
-            browser,
-            ...(opts.timeout !== undefined ? { timeout: Number.parseInt(opts.timeout, 10) } : {}),
-            ...(opts.viewport !== undefined ? { viewport: opts.viewport } : {}),
-          };
-          await runInspect(inspectOpts);
-        } catch (error: unknown) {
-          logError(error instanceof Error ? error.message : String(error));
-          process.exitCode = 1;
-        }
-      },
-    );
-
-  prog
     .command('config')
     .description('Display the resolved Praman configuration')
     .option('--json', 'Output as raw JSON', false)
@@ -272,6 +231,112 @@ Examples:
           showSecrets: opts.showSecrets,
         };
         await runConfigShow(configOpts);
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
+
+  prog
+    .command('bridge-script')
+    .description('Export bridge init script for playwright-cli initScript config')
+    .option('--output <path>', 'Write to file instead of stdout')
+    .addHelpText(
+      'afterAll',
+      `
+Examples:
+  $ npx playwright-praman bridge-script
+  $ npx playwright-praman bridge-script --output .playwright/praman-bridge.js`,
+    )
+    .action(async (opts: { output?: string }) => {
+      try {
+        const script = createBridgeInjectionScript();
+        if (opts.output !== undefined) {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename -- opts.output is a user-provided CLI argument for bridge script output path
+          await writeFile(opts.output, script, 'utf8');
+          logSuccess(`Bridge script written to ${opts.output}`);
+        } else {
+          process.stdout.write(script);
+        }
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
+
+  prog
+    .command('snapshot')
+    .description('Capture a structured SAP UI5 control tree snapshot from a live session')
+    .option('--session <name>', 'Playwright session name to connect to', 'pwtest')
+    .option('--output <path>', 'Write snapshot to file (default: stdout)')
+    .option('--format <fmt>', 'Output format: json | yaml | table', 'json')
+    .option('--depth <n>', 'Maximum number of controls to return (0 = unlimited)', '0')
+    .option('--filter <type>', 'Filter by control type prefix (e.g. sap.m.Button)')
+    .addHelpText(
+      'afterAll',
+      `
+Examples:
+  $ npx playwright-praman snapshot
+  $ npx playwright-praman snapshot --format table
+  $ npx playwright-praman snapshot --filter sap.m.Button
+  $ npx playwright-praman snapshot --depth 50 --output snapshot.json
+  $ npx playwright-praman snapshot --session mySession --format yaml`,
+    )
+    .action(
+      (opts: {
+        session?: string;
+        output?: string;
+        format?: string;
+        depth?: string;
+        filter?: string;
+      }) => {
+        try {
+          const rawFormat = opts.format ?? 'json';
+          const format: 'json' | 'yaml' | 'table' =
+            rawFormat === 'yaml' || rawFormat === 'table' ? rawFormat : 'json';
+          const snapshotOpts: SnapshotOptions = {
+            ...(opts.session !== undefined ? { session: opts.session } : {}),
+            ...(opts.output !== undefined ? { output: opts.output } : {}),
+            format,
+            depth: opts.depth !== undefined ? Number.parseInt(opts.depth, 10) : 0,
+            ...(opts.filter !== undefined ? { filter: opts.filter } : {}),
+          };
+          runSnapshot(snapshotOpts);
+        } catch (error: unknown) {
+          logError(error instanceof Error ? error.message : String(error));
+          process.exitCode = 1;
+        }
+      },
+    );
+
+  // ── capabilities command ──
+  prog
+    .command('capabilities')
+    .description('Show Praman capability manifest for agents')
+    .option('--format <fmt>', 'Output format: json, table, agent', 'json')
+    .option('--agent', 'Shortcut for --format=agent')
+    .action(async (opts: { format?: string; agent?: boolean }) => {
+      try {
+        const { runCapabilities } = await import('./capabilities-command.js');
+        const format =
+          opts.agent === true
+            ? 'agent'
+            : ((opts.format as 'json' | 'table' | 'agent' | undefined) ?? 'json');
+        runCapabilities({ format });
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
+
+  // ── verify-spec command ──
+  prog
+    .command('verify-spec <file>')
+    .description('Verify a generated .spec.ts against gold-standard rules')
+    .action(async (file: string) => {
+      try {
+        const { runVerifySpec } = await import('./verify-spec-command.js');
+        runVerifySpec(file);
       } catch (error: unknown) {
         logError(error instanceof Error ? error.message : String(error));
         process.exitCode = 1;
