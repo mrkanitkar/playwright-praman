@@ -156,7 +156,7 @@ function UI5SVG(): ReactNode {
         fontSize="10"
         fontWeight="700"
       >
-        61 Controls · 8 Libraries · 3 LTS Versions
+        199 Controls · 8 Libraries · 3 LTS Versions
       </text>
     </svg>
   );
@@ -480,7 +480,7 @@ const SLIDES: CarouselSlide[] = [
     badge: 'SAP UI5 Native',
     title: 'Every UI5 control. Every LTS version. Every interaction.',
     subtitle:
-      '61 control types across sap.m, sap.ui.table, sap.ui.comp, and more — with typed, self-healing fixtures across LTS 1.108 · 1.120 · 1.136.',
+      '199 control types across sap.m, sap.ui.table, sap.ui.comp, and more — with typed, self-healing fixtures across LTS 1.108 · 1.120 · 1.136.',
     tags: ['21 Fixtures', '199 Typed Interfaces', '4,092 Methods'],
     primaryCta: { label: 'Explore Fixtures', to: '/docs' },
     secondaryCta: { label: 'View Capabilities', to: '/features' },
@@ -559,7 +559,7 @@ function HeroCarousel(): ReactNode {
       <div className="praman-hero-persistent">
         <h1 className="praman-hero-h1">Playwright Plugin for SAP Testing {'&'} Automation</h1>
         <p className="praman-hero-tagline">
-          AI agents generate production-ready Playwright tests for SAP S/4HANA, Fiori {'&'} UI5. 61
+          AI agents generate production-ready Playwright tests for SAP S/4HANA, Fiori {'&'} UI5. 199
           controls. OData. Fiori Elements. Open source.
         </p>
       </div>
@@ -1310,7 +1310,7 @@ function Capabilities(): ReactNode {
           <div>
             <h3>21 Fixtures, 199 Typed Interfaces, 4,092 Methods</h3>
             <p>
-              61 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap,
+              199 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap,
               sap.f, and more. OData CRUD, Fiori Elements, FLP navigation, SAP auth, SM12 locks, AI
               discovery. Just destructure and go.
             </p>
@@ -1450,7 +1450,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="Playwright Plugin for SAP Testing &amp; Automation"
-      description="AI agents generate production-ready Playwright tests for SAP S/4HANA, Fiori &amp; UI5. 61 controls, OData, Fiori Elements. Open-source SAP test automation plugin."
+      description="AI agents generate production-ready Playwright tests for SAP S/4HANA, Fiori &amp; UI5. 199 controls, OData, Fiori Elements. Open-source SAP test automation plugin."
     >
       <main>
         <HeroCarousel />

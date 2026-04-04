@@ -7,23 +7,27 @@
  * See LICENSE and NOTICE files for details.
  */
 
+/* eslint-disable max-lines -- manifest entries + move/cleanup helpers exceed 300 LOC */
+
 /**
- * Uninstall command — removes scaffolded files from the project.
+ * Uninstall command — moves scaffolded files to a trash directory.
  *
  * @remarks
- * Dry-run by default. Requires `--confirm` flag to execute actual removal.
- * Protected files (`.env`, `tests/`, `node_modules/`, `package.json`) are NEVER removed.
+ * Dry-run by default. Requires `--confirm` flag to skip interactive prompt.
+ * Files are moved to `deleted-praman-files/` preserving their relative path
+ * structure, allowing easy recovery. Protected files (`.env`, `tests/`,
+ * `node_modules/`, `package.json`) are NEVER touched.
  * Optionally removes Playwright browsers with `--remove-browsers`.
  *
- * This file exceeds 300 LOC (~373 lines) due to the scaffolded file manifest
- * and multiple helper functions. A follow-up decomposition is planned.
+ * This file exceeds 300 LOC due to the scaffolded file manifest
+ * and multiple helper functions.
  *
  * @module cli/uninstall
  */
 
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { readdir, rm, rmdir, unlink } from 'node:fs/promises';
+import { copyFile, mkdir, readdir, rmdir, rename, unlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import process from 'node:process';
 import { createInterface } from 'node:readline';
@@ -175,6 +179,95 @@ const SCAFFOLDED_MANIFEST: readonly FileEntry[] = [
   },
   { relativePath: '.env.example', category: 'config', label: 'Environment template' },
   { relativePath: '.gitignore', category: 'config', label: 'Git ignore rules' },
+
+  // agent — Claude Code CLI
+  {
+    relativePath: '.claude/agents/praman-sap-planner-cli.md',
+    category: 'agent',
+    label: 'Claude CLI planner agent',
+  },
+  {
+    relativePath: '.claude/agents/praman-sap-generator-cli.md',
+    category: 'agent',
+    label: 'Claude CLI generator agent',
+  },
+  {
+    relativePath: '.claude/agents/praman-sap-healer-cli.md',
+    category: 'agent',
+    label: 'Claude CLI healer agent',
+  },
+  {
+    relativePath: '.claude/prompts/praman-cli-plan.md',
+    category: 'agent',
+    label: 'Claude CLI plan prompt',
+  },
+  {
+    relativePath: '.claude/prompts/praman-cli-generate.md',
+    category: 'agent',
+    label: 'Claude CLI generate prompt',
+  },
+  {
+    relativePath: '.claude/prompts/praman-cli-heal.md',
+    category: 'agent',
+    label: 'Claude CLI heal prompt',
+  },
+  {
+    relativePath: '.claude/prompts/praman-cli-coverage.md',
+    category: 'agent',
+    label: 'Claude CLI coverage prompt',
+  },
+
+  // agent — Copilot CLI
+  {
+    relativePath: '.github/agents/praman-sap-planner-cli.agent.md',
+    category: 'agent',
+    label: 'Copilot CLI planner agent',
+  },
+  {
+    relativePath: '.github/agents/praman-sap-generator-cli.agent.md',
+    category: 'agent',
+    label: 'Copilot CLI generator agent',
+  },
+  {
+    relativePath: '.github/agents/praman-sap-healer-cli.agent.md',
+    category: 'agent',
+    label: 'Copilot CLI healer agent',
+  },
+
+  // ide — CLI
+  { relativePath: '.cursor/rules/praman-cli.mdc', category: 'ide', label: 'Cursor CLI rules' },
+
+  // config — CLI
+  {
+    relativePath: '.playwright/praman-cli.config.json',
+    category: 'config',
+    label: 'Playwright CLI config',
+  },
+
+  // skill — CLI directories
+  {
+    relativePath: 'skills/praman-sap-cli/',
+    category: 'skill',
+    label: 'CLI skill files',
+  },
+  {
+    relativePath: '.claude/skills/praman-sap-cli/',
+    category: 'skill',
+    label: 'Claude CLI skill files',
+  },
+  {
+    relativePath: '.github/skills/praman-sap-cli/',
+    category: 'skill',
+    label: 'Copilot CLI skill files',
+  },
+
+  // config — auth storage and backup
+  { relativePath: '.auth/', category: 'config', label: 'Auth storage directory' },
+  {
+    relativePath: 'playwright.config.original.ts',
+    category: 'config',
+    label: 'Playwright config backup',
+  },
 ];
 
 /** Category display labels for grouped output. */
@@ -243,30 +336,77 @@ function displayManifest(files: readonly FileEntry[]): void {
   }
 }
 
-/** Removes files/directories and cleans empty parent directories. Returns count removed. */
-async function removeFiles(files: readonly FileEntry[], targetDir: string): Promise<number> {
+/** Name of the trash directory where scaffolded files are moved during uninstall. */
+export const TRASH_DIR_NAME = 'deleted-praman-files';
+
+/** Recursively copies a directory tree from `src` to `dest`, then removes the source. */
+async function copyDirRecursive(src: string, dest: string): Promise<void> {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- paths composed from targetDir + known manifest paths
+  const entries = await readdir(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcEntry = join(src, entry.name);
+    const destEntry = join(dest, entry.name);
+    if (entry.isDirectory()) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- paths composed from targetDir + known manifest paths
+      await mkdir(destEntry, { recursive: true });
+      await copyDirRecursive(srcEntry, destEntry);
+    } else {
+      await copyFile(srcEntry, destEntry);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- paths composed from targetDir + known manifest paths
+      await unlink(srcEntry);
+    }
+  }
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- directory inside targetDir
+  await rmdir(src);
+}
+
+/**
+ * Moves scaffolded files into a `deleted-praman-files/` directory, preserving
+ * their relative path structure. Cleans empty source directories afterward.
+ *
+ * @param files - The list of scaffolded files to move.
+ * @param targetDir - Absolute path to the project root.
+ * @returns The number of files/directories successfully moved.
+ *
+ * @example
+ * ```typescript
+ * const moved = await moveFilesToTrash(files, '/home/user/project');
+ * // Files are now in /home/user/project/deleted-praman-files/
+ * ```
+ */
+export async function moveFilesToTrash(
+  files: readonly FileEntry[],
+  targetDir: string,
+): Promise<number> {
+  const trashDir = join(targetDir, TRASH_DIR_NAME);
   const dirsToCheck = new Set<string>();
-  let removed = 0;
+  let moved = 0;
 
   for (const file of files) {
     const isDir = file.relativePath.endsWith('/');
-    const fullPath = join(targetDir, file.relativePath);
+    const srcPath = join(targetDir, file.relativePath);
+    const destPath = join(trashDir, file.relativePath);
+
     try {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- destPath composed from targetDir + known constant + known manifest paths
+      await mkdir(isDir ? destPath : dirname(destPath), { recursive: true });
+
       if (isDir) {
-        await rm(fullPath, { recursive: true, force: true });
+        // Move directory contents file-by-file, then remove source
+        await copyDirRecursive(srcPath, destPath);
       } else {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from targetDir + known manifest paths
-        await unlink(fullPath);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- paths composed from targetDir + known manifest paths
+        await rename(srcPath, destPath);
       }
-      removed++;
-      dirsToCheck.add(dirname(fullPath));
+      moved++;
+      dirsToCheck.add(dirname(srcPath));
     } catch {
-      logWarn(`Could not remove: ${file.relativePath}`);
+      logWarn(`Could not move: ${file.relativePath}`);
     }
   }
 
   await cleanEmptyDirs(dirsToCheck, targetDir);
-  return removed;
+  return moved;
 }
 
 /** Removes empty directories bottom-up, walking parent chain up to targetDir. */
@@ -329,10 +469,12 @@ function uninstallPackage(targetDir: string): void {
 }
 
 /**
- * Executes the uninstall command, removing scaffolded files from the project.
+ * Executes the uninstall command, moving scaffolded files to a trash directory.
  *
  * @remarks
- * Lists what will be removed and prompts the user for confirmation.
+ * Lists what will be moved and prompts the user for confirmation.
+ * Files are moved to `deleted-praman-files/` in the project root,
+ * preserving their relative path structure for easy recovery.
  * With `--confirm`, skips the interactive prompt.
  * With `--remove-browsers`, also runs `npx playwright uninstall --all`.
  * Always runs `npm uninstall playwright-praman` after file removal.
@@ -362,20 +504,23 @@ export async function runUninstall(options: UninstallOptions): Promise<void> {
 
   // Interactive confirmation unless --confirm flag is set
   if (!options.confirm) {
-    logWarn(`This will remove ${String(files.length)} file(s) and uninstall playwright-praman.`);
-    const approved = await promptConfirm('Proceed with removal?');
+    logWarn(
+      `This will move ${String(files.length)} file(s) to ${TRASH_DIR_NAME}/ and uninstall playwright-praman.`,
+    );
+    const approved = await promptConfirm('Proceed?');
     if (!approved) {
-      logWarn('Aborted. No files were removed.');
+      logWarn('Aborted. No files were moved.');
       return;
     }
   }
 
-  const removed = await removeFiles(files, options.targetDir);
+  const moved = await moveFilesToTrash(files, options.targetDir);
 
   if (options.removeBrowsers) {
     removeBrowsersCmd();
   }
 
   uninstallPackage(options.targetDir);
-  logSuccess(`Removed ${String(removed)} of ${String(files.length)} scaffolded file(s).`);
+  logSuccess(`Moved ${String(moved)} of ${String(files.length)} file(s) to ${TRASH_DIR_NAME}/.`);
+  logWarn(`Files preserved in ${TRASH_DIR_NAME}/ — delete manually when ready.`);
 }

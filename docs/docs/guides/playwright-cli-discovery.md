@@ -658,6 +658,37 @@ playwright-cli snapshot --filename=snap.yml
 The snapshot file (~200 tokens) provides a structural reference that agents can
 consume without reading the full DOM.
 
+## Pre-Built Discovery Scripts
+
+Praman ships 4 parameter-free scripts in `node_modules/playwright-praman/dist/scripts/` for the most common operations. These avoid composing inline `run-code` for standard tasks:
+
+| Script               | Purpose                                          | Returns                                                    |
+| -------------------- | ------------------------------------------------ | ---------------------------------------------------------- |
+| `discover-all.js`    | All controls with IDs, types, methods (max 100)  | `{ total, showing, controls: [...] }`                      |
+| `wait-for-ui5.js`    | Poll for UI5 stability (30s timeout, 500ms poll) | `{ stable: boolean, elapsed: number }`                     |
+| `bridge-status.js`   | Bridge readiness diagnostics                     | `{ ready, ui5Version, bridgeVersion, controlCount, ... }`  |
+| `dialog-controls.js` | Controls inside open dialogs, grouped by dialog  | `{ dialogs: [...], totalControls: number }`                |
+
+### Usage
+
+```bash
+# Discover all controls (includes methods via bridge.utils.retrieveControlMethods)
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/discover-all.js)"
+
+# Wait for UI5 stability before running other discovery
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/wait-for-ui5.js)"
+
+# Check bridge status
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/bridge-status.js)"
+
+# Find controls in open dialogs
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/dialog-controls.js)"
+```
+
+These scripts use the `async page => { ... }` contract required by `run-code`. They are shell-safe (no `"`, backtick, or `$` in the script content) and return only JSON-serializable values.
+
+For parameterized operations (inspecting a specific control, filtering by type), use the inline `run-code` patterns shown above — pre-built scripts cannot accept parameters because `run-code` only exposes `page` in scope.
+
 ## Troubleshooting
 
 | Symptom                              | Cause                               | Solution                                                               |

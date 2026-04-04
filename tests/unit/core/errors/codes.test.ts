@@ -125,8 +125,10 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 67 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(67);
+  it('has exactly 72 error codes', () => {
+    // 67 original + 2 BIND (ERR_BIND_NOT_SUPPORTED, ERR_BIND_FAILED)
+    // + 3 SCREENCAST (ERR_SCREENCAST_NOT_STARTED, ERR_SCREENCAST_CHAPTER_FAILED, ERR_SCREENCAST_FRAME_HANDLER)
+    expect(Object.keys(ErrorCode)).toHaveLength(72);
   });
 
   // ── Immutability test ────────────────────────────────────────────────

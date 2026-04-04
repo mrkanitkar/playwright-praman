@@ -12,6 +12,7 @@ export default defineConfig({
     'fe/index': 'src/fe/index.ts',
     'reporters/index': 'src/reporters/index.ts',
     'cli/index': 'src/cli/index.ts',
+    'cli/preuninstall': 'src/cli/preuninstall.ts',
   },
   define: {
     __PRAMAN_VERSION__: JSON.stringify(pkg.version),

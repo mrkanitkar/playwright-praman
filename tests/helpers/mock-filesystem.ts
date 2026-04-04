@@ -113,11 +113,19 @@ export function createMockFileSystem(initialFiles?: Record<string, string>): Moc
     return Promise.resolve();
   });
 
-  const readdir = vi.fn().mockImplementation((path: string) => {
+  const readdir = vi.fn().mockImplementation((dirPath: string) => {
     const entries: string[] = [];
+    const prefix = dirPath.endsWith('/') || dirPath.endsWith('\\') ? dirPath : `${dirPath}/`;
+    const prefixLen = prefix.length;
     for (const filePath of files.keys()) {
-      if (filePath.startsWith(`${path}/`) && !filePath.slice(path.length + 1).includes('/')) {
-        entries.push(filePath.slice(path.length + 1));
+      // Normalize separators for cross-platform compatibility (Windows uses \)
+      const normalizedFile = filePath.replaceAll('\\', '/');
+      const normalizedPrefix = prefix.replaceAll('\\', '/');
+      if (
+        normalizedFile.startsWith(normalizedPrefix) &&
+        !normalizedFile.slice(prefixLen).includes('/')
+      ) {
+        entries.push(normalizedFile.slice(prefixLen));
       }
     }
     return Promise.resolve(entries);

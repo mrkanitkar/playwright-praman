@@ -1,16 +1,133 @@
 # SAP UI5 Test Automation via Playwright CLI
 
-**Package**: `playwright-praman` v1.0.1
+**Package**: `playwright-praman` v1.1.2
 **CLI Requirement**: `@playwright/cli` v0.1.3+ and `playwright` v1.59+
 **Purpose**: Discover SAP UI5 controls, debug Praman tests, and automate SAP Fiori workflows using the Playwright CLI. Agents use CLI commands for live discovery, then produce Praman fixture code as output.
+
+---
+
+## Setup: Create Config File
+
+Create `.playwright/praman-cli.config.json` in your project root:
+
+```bash
+mkdir -p .playwright
+cat > .playwright/praman-cli.config.json << 'PRAMAN_EOF'
+{
+  "browser": {
+    "browserName": "chromium",
+    "initScript": ["./node_modules/playwright-praman/dist/browser/praman-bridge-init.js"]
+  },
+  "timeouts": {
+    "navigation": 120000
+  }
+}
+PRAMAN_EOF
+```
+
+> **Without `--config`:** Browser opens fine, page loads fine, but `window.__praman_bridge` is `undefined`. All discovery scripts will fail.
+
+---
+
+## eval vs run-code
+
+| Use | Command | Syntax |
+|-----|---------|--------|
+| Quick check | `eval` | `playwright-cli eval "() => window.__praman_bridge?.ready"` |
+| Multi-step | `run-code` | `playwright-cli run-code "async page => { ... }"` |
+
+**CRITICAL:** `eval` requires a function wrapper `() => expr`. Bare expressions will fail.
+
+```bash
+# ✅ CORRECT
+playwright-cli eval "() => window.__praman_bridge?.ready"
+
+# ❌ WRONG — fails silently
+playwright-cli eval "window.__praman_bridge?.ready"
+```
+
+**`run-code` rules:**
+- Only `page` is in scope — no `process.env`, no `require()`
+- `console.log()` is invisible — always use `return` to get data
+- Return ONLY serializable values: strings, numbers, booleans, null, plain objects, arrays
+- Do NOT return: functions, DOM nodes, Symbols, circular references
+
+---
+
+## Discover Controls with Methods
+
+### Pre-built Script (recommended)
+
+```bash
+playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/discover-all.js)"
+```
+
+Returns up to 100 controls with IDs, types, properties, and method names.
+
+### Inline Alternative
+
+```bash
+playwright-cli -s=sap run-code "async page => {
+  return await page.evaluate(() => {
+    const bridge = window.__praman_bridge;
+    if (!bridge || !bridge.ready) return { error: 'Bridge not ready' };
+    return Object.values(sap.ui.core.ElementRegistry.all()).slice(0, 100).map(c => ({
+      id: c.getId(),
+      type: c.getMetadata().getName(),
+      methods: bridge.utils.retrieveControlMethods(c.getId())
+    }));
+  });
+}"
+```
+
+---
+
+## Inspect Single Control
+
+Replace `CONTROL_ID` with target ID:
+
+```bash
+playwright-cli -s=sap run-code "async page => {
+  return await page.evaluate((id) => {
+    const b = window.__praman_bridge;
+    const c = b.getById(id);
+    if (!c) return { error: 'Not found: ' + id };
+    const m = c.getMetadata();
+    return {
+      id: c.getId(),
+      type: m.getName(),
+      methods: b.utils.retrieveControlMethods(id),
+      properties: { text: c.getText?.(), value: c.getValue?.(), enabled: c.getEnabled?.() },
+      bindings: Object.keys(c.getBindingInfo ? c.mBindingInfos || {} : {})
+    };
+  }, 'CONTROL_ID');
+}"
+```
+
+---
+
+## Pre-Built Scripts
+
+Shipped in `node_modules/playwright-praman/dist/scripts/`:
+
+| Script | Purpose | Parameterized |
+|--------|---------|:---:|
+| `discover-all.js` | All controls with methods (max 100) | No |
+| `wait-for-ui5.js` | Poll for UI5 stability | No |
+| `bridge-status.js` | Bridge readiness diagnostics | No |
+| `dialog-controls.js` | Controls inside open dialogs | No |
+
+Usage: `playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/SCRIPT.js)"`
+
+> If script not found, use inline `run-code` patterns above as fallback.
 
 ---
 
 ## Quick Start
 
 ```bash
-# 1. Open SAP app in browser
-playwright-cli open https://my-sap-system.example.com/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html
+# 1. Open SAP app in browser (--config is MANDATORY for bridge injection)
+playwright-cli open https://my-sap-system.example.com/sap/bc/ui5_ui5/ui2/ushell/shells/abap/FioriLaunchpad.html --config=.playwright/praman-cli.config.json
 
 # 2. Authenticate (fill credentials, click login)
 playwright-cli fill e3 "SAP_USERNAME"
@@ -63,7 +180,7 @@ playwright-cli close
    ```bash
    npm install playwright-praman
    ```
-4. **Config file** (optional): `playwright-cli open --config=praman-cli.json`
+4. **Config file** (optional): `playwright-cli open --config=.playwright/praman-cli.config.json`
    - Format: `{ "browser": { "initScript": ["./praman-bridge.js"] } }`
    - `initScript` uses CDP `addScriptToEvaluateOnNewDocument` and auto-injects into all same-origin frames
 5. **Sessions**: Use `playwright-cli -s=sap open` for persistent browser sessions across CLI invocations
@@ -323,7 +440,7 @@ SAP workflows often span multiple steps. Use named sessions to persist browser s
 
 ```bash
 # Start a named session with persistent profile
-playwright-cli -s=sap open https://sap-system.example.com --persistent
+playwright-cli -s=sap open https://sap-system.example.com --persistent --config=.playwright/praman-cli.config.json
 
 # Work across multiple CLI invocations
 playwright-cli -s=sap fill e3 "user"
@@ -363,11 +480,12 @@ playwright-cli snapshot --filename=after-save.yml
 
 ## Troubleshooting
 
-| Symptom                    | Cause                                        | Fix                                                      |
-| -------------------------- | -------------------------------------------- | -------------------------------------------------------- |
-| `bridgeReady: false`       | initScript not configured or page not loaded | Check `browser.initScript` in config; wait for FLP shell |
-| `run-code` returns nothing | Missing `return` statement                   | Add `return` -- `console.log()` is invisible             |
-| Snapshot too large         | No `--filename` flag                         | Always use `--filename=snap.yml` for agents              |
-| Control not found          | Page not stable or wrong ID                  | Run `ui5.waitForUI5()` equivalent; verify ID in registry |
-| Session lost               | No `--persistent` flag                       | Use `playwright-cli -s=name open --persistent`           |
-| Auth expired               | Session timeout                              | Re-run `state-load sap-auth.json` or re-authenticate     |
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `bridge not ready` | Missing `--config` flag | Add `--config=.playwright/praman-cli.config.json` to `open` command |
+| `eval` returns nothing | Bare expression (no wrapper) | Wrap in `() => expr`: `playwright-cli eval "() => expr"` |
+| `console.log` invisible | `run-code` captures return, not stdout | Use `return` instead of `console.log` |
+| `snapshot` filename error | Missing `--filename` | Use `playwright-cli screenshot --filename=step-01.png` |
+| 0 controls found | Page not fully loaded | Run `wait-for-ui5.js` script first |
+| `$(cat ...)` fails on Windows | Bash-only syntax | Use PowerShell: `playwright-cli run-code (Get-Content script.js -Raw)` |
+| Token overflow | Too many controls | Discovery scripts cap at 100; use type filter for targeted queries |

@@ -18,24 +18,26 @@ import { test, expect } from 'playwright-praman';
 
 ## Fixture Summary
 
-| Fixture         | Scope  | Type           | Description                                                                           |
-| --------------- | ------ | -------------- | ------------------------------------------------------------------------------------- |
-| `ui5`           | test   | Core           | Control discovery, interaction, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces |
-| `ui5Navigation` | test   | Navigation     | 9 FLP navigation methods                                                              |
-| `btpWorkZone`   | test   | Navigation     | Dual-frame BTP WorkZone manager                                                       |
-| `sapAuth`       | test   | Authentication | SAP authentication (6 strategies)                                                     |
-| `fe`            | test   | Fiori Elements | `.listReport`, `.objectPage`, `.table`, `.list` helpers                               |
-| `pramanAI`      | test   | AI             | Page discovery, agentic handler, LLM, vocabulary                                      |
-| `intent`        | test   | Business       | `.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`                 |
-| `ui5Shell`      | test   | FLP            | Shell header (home, user menu)                                                        |
-| `ui5Footer`     | test   | FLP            | Page footer bar (Save, Edit, Delete, etc.)                                            |
-| `flpLocks`      | test   | FLP            | SM12 lock management with auto-cleanup                                                |
-| `flpSettings`   | test   | FLP            | User settings reader (language, date format)                                          |
-| `testData`      | test   | Data           | Template-based data generation with auto-cleanup                                      |
-| `pramanConfig`  | worker | Infrastructure | Frozen config (loaded once per worker)                                                |
-| `pramanLogger`  | test   | Infrastructure | Test-scoped pino logger                                                               |
-| `rootLogger`    | worker | Infrastructure | Worker-scoped root logger                                                             |
-| `tracer`        | worker | Infrastructure | OpenTelemetry tracer (NoOp when disabled)                                             |
+| Fixture         | Scope  | Type            | Description                                                                                |
+| --------------- | ------ | --------------- | ------------------------------------------------------------------------------------------ |
+| `ui5`           | test   | Core            | Control discovery, interaction, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces      |
+| `ui5Navigation` | test   | Navigation      | 9 FLP navigation methods                                                                   |
+| `btpWorkZone`   | test   | Navigation      | Dual-frame BTP WorkZone manager                                                            |
+| `sapAuth`       | test   | Authentication  | SAP authentication (6 strategies)                                                          |
+| `fe`            | test   | Fiori Elements  | `.listReport`, `.objectPage`, `.table`, `.list` helpers                                    |
+| `pramanAI`      | test   | AI              | Page discovery, agentic handler, LLM, vocabulary                                           |
+| `intent`        | test   | Business        | `.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`                      |
+| `ui5Shell`      | test   | FLP             | Shell header (home, user menu)                                                             |
+| `ui5Footer`     | test   | FLP             | Page footer bar (Save, Edit, Delete, etc.)                                                 |
+| `flpLocks`      | test   | FLP             | SM12 lock management with auto-cleanup                                                     |
+| `flpSettings`   | test   | FLP             | User settings reader (language, date format)                                               |
+| `testData`      | test   | Data            | Template-based data generation with auto-cleanup                                           |
+| `pramanConfig`  | worker | Infrastructure  | Frozen config (loaded once per worker)                                                     |
+| `pramanLogger`  | test   | Infrastructure  | Test-scoped pino logger                                                                    |
+| `rootLogger`    | worker | Infrastructure  | Worker-scoped root logger                                                                  |
+| `tracer`        | worker | Infrastructure  | OpenTelemetry tracer (NoOp when disabled)                                                  |
+| `browserBind`   | test   | CLI Integration | `PRAMAN_BIND=1` exposes browser to CLI agents via `browser.bind()` (Playwright 1.59+)      |
+| `screencast`    | test   | CLI Integration | Chapter markers, action overlays, frame streaming via `page.screencast` (Playwright 1.59+) |
 
 ## Auto-Fixtures
 
@@ -175,6 +177,42 @@ test('shell and footer', async ({ ui5Shell, ui5Footer }) => {
   await ui5Shell.clickHome();
 });
 ```
+
+## CLI Integration Fixtures
+
+### Browser Bind: `browserBind`
+
+Opt-in via `PRAMAN_BIND=1`. Exposes the test browser to Playwright CLI agents.
+
+```typescript
+// PRAMAN_BIND=1 npx playwright test
+test('agent-assisted test', async ({ browserBind }) => {
+  if (browserBind.bound) {
+    console.info('Agent can connect at:', browserBind.endpointUrl);
+    // CLI agent inspects live UI while test pauses...
+  }
+});
+```
+
+See [Browser Bind & Screencast](./browser-bind.md) for full details.
+
+### Screencast: `screencast`
+
+Chapter annotations and frame streaming for Playwright 1.59+ screencasts.
+
+```typescript
+test('recorded test', async ({ screencast, ui5 }) => {
+  await screencast.showChapter('Setup');
+  await ui5.click({ id: 'editBtn' });
+
+  await screencast.showChapter('Fill Form');
+  await ui5.fill({ id: 'nameInput' }, 'ACME Corp');
+
+  await screencast.showActions({ enabled: true });
+});
+```
+
+See [Browser Bind & Screencast](./browser-bind.md) for full details.
 
 ## Lock Management: `flpLocks`
 
