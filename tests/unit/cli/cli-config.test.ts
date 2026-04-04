@@ -52,11 +52,12 @@ describe('examples/praman-cli.config.json — CLI config template', () => {
     expect(typeof browser['browserName']).toBe('string');
   });
 
-  it('has timeouts.navigation as a number', () => {
+  it('has browser.launchOptions.channel as a string', () => {
     const config = JSON.parse(rawContent) as Record<string, unknown>;
-    const timeouts = config['timeouts'] as Record<string, unknown>;
+    const browser = config['browser'] as Record<string, unknown>;
+    const launchOptions = browser['launchOptions'] as Record<string, unknown>;
 
-    expect(timeouts).toBeDefined();
-    expect(typeof timeouts['navigation']).toBe('number');
+    expect(launchOptions).toBeDefined();
+    expect(typeof launchOptions['channel']).toBe('string');
   });
 });
