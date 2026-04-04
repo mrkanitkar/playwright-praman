@@ -138,6 +138,14 @@ playwright-cli snapshot --filename=snap.yml
 6. **Write the test file** after completing all steps -- create the `.spec.ts` file with all
    discovered control IDs, types, and verified interactions.
 
+7. **Verify spec compliance** against gold-standard rules:
+
+   ```bash
+   npx playwright-praman verify-spec <file>
+   ```
+
+   All checks must pass before considering the file complete.
+
 ---
 
 ## SAP-Specific Generation Rules

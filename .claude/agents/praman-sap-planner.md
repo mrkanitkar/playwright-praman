@@ -93,7 +93,7 @@ browser_run_code({
 ### Rule 1: SINGLE FILE OUTPUT
 
 ```
-CORRECT: tests/e2e/sap-cloud/{app-name}-e2e-praman-gold-standard.spec.ts (ONE file)
+CORRECT: tests/e2e/{app-name}/{scenario}-gold.spec.ts (ONE file)
 WRONG: Multiple files (navigation.spec.ts, creation.spec.ts, etc.)
 ```
 
@@ -841,7 +841,7 @@ system/client information, MDC vs Smart controls}
 
 #### 1.1. {Scenario Title}
 
-**File:** `tests/e2e/sap-cloud/{app-name}-e2e-praman-gold-standard.spec.ts`
+**File:** `tests/e2e/{app-name}/{scenario-slug}.spec.ts`
 
 **Steps:**
 
