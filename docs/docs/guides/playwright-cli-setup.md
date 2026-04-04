@@ -63,30 +63,31 @@ Create `.playwright/praman-cli.config.json` in your project root:
 ```json
 {
   "browser": {
-    "type": "chromium",
+    "browserName": "chromium",
     "launchOptions": {
-      "headless": false
+      "headless": false,
+      "channel": "chromium"
     },
-    "initScript": {
-      "path": "node_modules/playwright-praman/dist/bridge/init-script.js"
-    }
-  },
-  "baseURL": "${SAP_CLOUD_BASE_URL}",
-  "storageState": ".auth/sap-session.json"
+    "initScript": ["./node_modules/playwright-praman/dist/browser/praman-bridge-init.js"]
+  }
 }
 ```
 
-| Field                   | Purpose                                                |
-| ----------------------- | ------------------------------------------------------ |
-| `browser.type`          | Browser engine (`chromium`, `firefox`, `webkit`)       |
-| `browser.launchOptions` | Playwright launch options (headed mode for debugging)  |
-| `browser.initScript`    | Praman bridge script — injected into every page        |
-| `baseURL`               | SAP system base URL (reads from env var)               |
-| `storageState`          | Reuse authenticated session from `tests/auth.setup.ts` |
+| Field                           | Purpose                                                    |
+| ------------------------------- | ---------------------------------------------------------- |
+| `browser.browserName`           | Browser engine (`chromium`, `firefox`, `webkit`)           |
+| `browser.launchOptions`         | Playwright launch options (headed mode, channel selection) |
+| `browser.launchOptions.channel` | Set to `"chromium"` to use Playwright's bundled browser    |
+| `browser.initScript`            | Praman bridge script — injected into every page via CDP    |
 
 :::tip Auth session reuse
-Run `npx playwright test tests/auth.setup.ts` once to save a session to `.auth/sap-session.json`.
-The CLI will reuse this session, so you do not need to log in again.
+To reuse an authenticated session, run `npx playwright test tests/auth.setup.ts` once to
+save a session to `.auth/sap-session.json`, then load it with the CLI:
+
+```bash
+npx @playwright/cli state-load .auth/sap-session.json
+```
+
 :::
 
 ## Quick Test
@@ -99,28 +100,42 @@ Verify that the bridge is loaded and the CLI can discover UI5 controls.
 npx @playwright/cli open --config .playwright/praman-cli.config.json "$SAP_CLOUD_BASE_URL"
 ```
 
-This launches Chromium with the Praman bridge injected and navigates to your SAP system.
+This launches Playwright's bundled Chromium with the Praman bridge injected and navigates to
+your SAP system. The `--config` flag is only needed on the `open` command — subsequent
+commands connect to the running session automatically.
 
 ### 2. Verify bridge readiness
 
-In a separate terminal, or after the browser is open, run:
+In a **separate terminal**, run:
 
 ```bash
-npx @playwright/cli evaluate --config .playwright/praman-cli.config.json \
-  "window.__praman_bridge__ !== undefined"
+npx @playwright/cli eval "() => window.__praman_bridge !== undefined"
 ```
 
 Expected output: `true`. This confirms the bridge init script was injected successfully.
 
+:::note `eval` syntax
+The `eval` command requires a function wrapper: `"() => expression"`, not a bare expression.
+:::
+
 ### 3. Discover a control
 
 ```bash
-npx @playwright/cli evaluate --config .playwright/praman-cli.config.json \
-  "window.__praman_bridge__.findControl({ controlType: 'sap.m.Button' })"
+npx @playwright/cli eval "() => {
+  const reg = sap.ui.core.ElementRegistry.all();
+  const btn = Object.values(reg).find(c => c.getMetadata().getName() === 'sap.m.Button');
+  return btn ? { id: btn.getId(), text: btn.getText ? btn.getText() : '' } : null;
+}"
 ```
 
 This returns the first `sap.m.Button` control found on the page. If you see a JSON object
 with control metadata, the bridge is working correctly.
+
+For more complex discovery, use `run-code` with the pre-built scripts:
+
+```bash
+npx @playwright/cli run-code "$(cat node_modules/playwright-praman/dist/scripts/discover-all.js)"
+```
 
 ### 4. Close the browser
 
@@ -130,21 +145,24 @@ npx @playwright/cli close
 
 ## Agent Setup with CLI
 
-Praman's `init-agents` command supports a `--cli` flag that installs CLI-based agent
-definitions alongside (or instead of) the default MCP-based ones:
+Praman's `init-agents` command installs CLI-based agent definitions by default. Use
+`--no-cli` to skip them if you only want MCP-based agents:
 
 ```bash
-# Claude Code
-npx playwright-praman init-agents --loop=claude --cli
+# Claude Code (CLI agents installed by default)
+npx playwright-praman init-agents --loop=claude
 
 # GitHub Copilot — also covers VS Code Copilot (.github/agents/)
-npx playwright-praman init-agents --loop=copilot --cli
+npx playwright-praman init-agents --loop=copilot
 
 # Cursor
-npx playwright-praman init-agents --loop=cursor --cli
+npx playwright-praman init-agents --loop=cursor
 
-# Auto-detect all IDEs and install CLI agents for each
-npx playwright-praman init-agents --cli
+# Auto-detect all IDEs
+npx playwright-praman init-agents
+
+# Skip CLI agents (MCP agents only)
+npx playwright-praman init-agents --loop=claude --no-cli
 ```
 
 This installs agent definitions that reference `npx @playwright/cli` commands instead of
@@ -159,7 +177,7 @@ extensions, settings.json) — it has no CLI agent files.
 | Flag           | Description                                                              |
 | -------------- | ------------------------------------------------------------------------ |
 | `--loop=<ide>` | Target IDE: `claude`, `copilot`, `cursor`, `jules`, `opencode`, `vscode` |
-| `--cli`        | Install Playwright CLI–based agents alongside MCP agents (opt-in)        |
+| `--no-cli`     | Skip Playwright CLI agent definitions (installed by default)             |
 | `--force`      | Overwrite existing agent files                                           |
 
 ## MCP vs CLI Comparison
@@ -186,7 +204,7 @@ protocol and token efficiency.
 {
   "tool": "browser_evaluate",
   "arguments": {
-    "expression": "window.__praman_bridge__.findControl({ controlType: 'sap.m.Button', properties: { text: 'Create' } })"
+    "expression": "window.__praman_bridge.findControl({ controlType: 'sap.m.Button', properties: { text: 'Create' } })"
   }
 }
 ```
@@ -194,7 +212,7 @@ protocol and token efficiency.
 **CLI approach** (shell command):
 
 ```bash
-npx @playwright/cli evaluate "window.__praman_bridge__.findControl({ controlType: 'sap.m.Button', properties: { text: 'Create' } })"
+npx @playwright/cli eval "() => window.__praman_bridge.findControl({ controlType: 'sap.m.Button', properties: { text: 'Create' } })"
 ```
 
 Both return the same result. The CLI version uses fewer tokens because there is no JSON
@@ -217,7 +235,7 @@ wrapper around the command.
 **CLI approach**:
 
 ```bash
-npx @playwright/cli click --ref "s1e45"
+npx @playwright/cli click "Create BOM button"
 ```
 
 ### Example: Taking a Screenshot
@@ -233,7 +251,7 @@ npx @playwright/cli click --ref "s1e45"
 **CLI approach**:
 
 ```bash
-npx @playwright/cli screenshot --path screenshot.png
+npx @playwright/cli screenshot screenshot.png
 ```
 
 ## Using MCP and CLI Together
@@ -248,24 +266,24 @@ Both share the same `.auth/` session storage and `praman.config.ts` settings.
 
 ## Troubleshooting
 
-| Symptom                                    | Likely Cause                        | Fix                                                              |
-| ------------------------------------------ | ----------------------------------- | ---------------------------------------------------------------- |
-| `command not found: playwright`            | CLI not installed                   | Run `npm install -g @playwright/cli@latest` or use `npx`         |
-| `__praman_bridge__ is undefined`           | Bridge init script not loaded       | Verify `initScript.path` in `.playwright/praman-cli.config.json` |
-| `ERR_BRIDGE_TIMEOUT`                       | Page is not a UI5 app               | Verify `baseURL` points to a Fiori Launchpad URL                 |
-| Browser opens but no SAP login             | Missing or expired auth session     | Re-run `npx playwright test tests/auth.setup.ts`                 |
-| `storageState` file not found              | Auth setup not run yet              | Run auth setup first: `npx playwright test tests/auth.setup.ts`  |
-| CLI hangs after `open`                     | Browser waiting for interaction     | Use a separate terminal for subsequent CLI commands              |
-| `initScript` path resolves to missing file | Package not installed or wrong path | Run `npm install` and verify the path exists                     |
-| `ERR_CONTROL_NOT_FOUND`                    | Control not on current page         | Navigate to the correct page first, then retry discovery         |
-| Permission denied on global install        | npm global directory permissions    | Use `npx @playwright/cli` instead of global install              |
+| Symptom                                    | Likely Cause                        | Fix                                                                      |
+| ------------------------------------------ | ----------------------------------- | ------------------------------------------------------------------------ |
+| `command not found: playwright`            | CLI not installed                   | Run `npm install -g @playwright/cli@latest` or use `npx`                 |
+| `__praman_bridge is undefined`             | Bridge init script not loaded       | Verify `initScript` path in `.playwright/praman-cli.config.json`         |
+| `ERR_BRIDGE_TIMEOUT`                       | Page is not a UI5 app               | Verify the URL passed to `open` points to a Fiori Launchpad              |
+| Browser opens but no SAP login             | Missing or expired auth session     | Re-run `npx playwright test tests/auth.setup.ts`                         |
+| `storageState` file not found              | Auth setup not run yet              | Run auth setup first: `npx playwright test tests/auth.setup.ts`          |
+| CLI hangs after `open`                     | Browser waiting for interaction     | Use a separate terminal for subsequent CLI commands                      |
+| `initScript` path resolves to missing file | Package not installed or wrong path | Run `npm install` and verify `dist/browser/praman-bridge-init.js` exists |
+| `ERR_CONTROL_NOT_FOUND`                    | Control not on current page         | Navigate to the correct page first, then retry discovery                 |
+| Permission denied on global install        | npm global directory permissions    | Use `npx @playwright/cli` instead of global install                      |
 
 ### Verifying the Init Script Path
 
 If the bridge is not loading, verify the init script exists:
 
 ```bash
-ls node_modules/playwright-praman/dist/bridge/init-script.js
+ls node_modules/playwright-praman/dist/browser/praman-bridge-init.js
 ```
 
 If the file does not exist, reinstall the package:
@@ -279,10 +297,10 @@ npm install --save-dev playwright-praman
 To confirm the bridge is injected, open the browser console (F12) and type:
 
 ```javascript
-typeof window.__praman_bridge__;
+typeof window.__praman_bridge;
 ```
 
-If this returns `"undefined"`, the init script path in your config is incorrect. If it
+If this returns `"undefined"`, the `initScript` path in your config is incorrect. If it
 returns `"object"`, the bridge is loaded and ready.
 
 ## Next Steps

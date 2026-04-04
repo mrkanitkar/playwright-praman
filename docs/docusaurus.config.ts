@@ -180,7 +180,7 @@ const config: Config = {
             name: 'How many SAP UI5 controls does Praman support?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Praman supports 61 UI5 control types across 8 SAP libraries: sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, sap.ui.mdc, sap.ui.unified, and sap.ui.core. Each control type has a fully typed proxy with IntelliSense.',
+              text: 'Praman supports 199 UI5 control types across 8 SAP libraries: sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, sap.ui.mdc, sap.ui.unified, and sap.ui.core. Each control type has a fully typed proxy with IntelliSense.',
             },
           },
           {
@@ -196,7 +196,7 @@ const config: Config = {
             name: 'How does Praman compare to Playwright-SAP?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Both extend Playwright for SAP testing. Praman provides 61 typed UI5 control proxies with IntelliSense, AI-powered test generation via coding agents, OData V2/V4 testing utilities, Fiori Elements page-object helpers, 6 SAP auth strategies, and 10 custom matchers. Playwright-SAP provides SAP-aware locators (getByRoleUI5, locateSID) and auto-login helpers. Praman is a deeper plugin with fixtures and AI; Playwright-SAP is a lighter locator extension.',
+              text: 'Both extend Playwright for SAP testing. Praman provides 199 typed UI5 control proxies with IntelliSense, AI-powered test generation via coding agents, OData V2/V4 testing utilities, Fiori Elements page-object helpers, 6 SAP auth strategies, and 10 custom matchers. Playwright-SAP provides SAP-aware locators (getByRoleUI5, locateSID) and auto-login helpers. Praman is a deeper plugin with fixtures and AI; Playwright-SAP is a lighter locator extension.',
             },
           },
           {
@@ -620,7 +620,7 @@ const config: Config = {
         name: 'description',
         content:
           'AI agents generate production-ready Playwright tests for SAP S/4HANA, Fiori & UI5. ' +
-          '61 controls, OData, Fiori Elements. Open-source SAP test automation plugin.',
+          '199 controls, OData, Fiori Elements. Open-source SAP test automation plugin.',
       },
       {
         name: 'keywords',

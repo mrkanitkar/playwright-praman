@@ -40,6 +40,7 @@ export default tseslint.config(
       'praman-audit-report/**',
       'landing-previews/**',
       'plans/**',
+      'specs/**',
     ],
   },
 
@@ -360,6 +361,18 @@ export default tseslint.config(
       '@typescript-eslint/promise-function-async': 'error',
       'promise/catch-or-return': 'error',
       'promise/always-return': 'error',
+    },
+  },
+
+  // ── Setup file overrides ─────────────────────────────────────────────────
+  // Setup files are auth/lifecycle scripts, not regular tests — relax test-only rules
+  {
+    files: ['tests/*.setup.ts', 'tests/**/*.setup.ts'],
+    rules: {
+      'playwright/require-top-level-describe': 'off',
+      'playwright/expect-expect': 'off',
+      'playwright/no-conditional-in-test': 'off',
+      'security/detect-non-literal-regexp': 'off',
     },
   },
 

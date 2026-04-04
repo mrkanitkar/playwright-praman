@@ -55,16 +55,6 @@ vi.mock('../../../src/cli/scaffolder.js', () => ({
   scaffoldProject: vi.fn(),
 }));
 
-const mockExistsSync = vi.fn().mockReturnValue(true);
-vi.mock('node:fs', () => ({
-  existsSync: mockExistsSync,
-}));
-
-const mockExecSync = vi.fn();
-vi.mock('node:child_process', () => ({
-  execSync: mockExecSync,
-}));
-
 const { logBanner, logStep, logSection, logSuccess, logWarn, logError } =
   await import('../../../src/cli/logger.js');
 const { getVersion } = await import('../../../src/cli/version.js');
@@ -118,7 +108,6 @@ function makeFailureResult(reason: string): ScaffoldResult {
 /** Sets up default mocks for a happy-path scenario. */
 function setupHappyPath(): void {
   mockedGetVersion.mockReturnValue('1.0.0');
-  mockExistsSync.mockReturnValue(true); // package already installed
   mockedValidate.mockReturnValue(
     makeReport([
       { name: 'Node.js version', status: 'pass', message: 'v20.11.0' },
@@ -139,7 +128,6 @@ const TEST_DIR = '/home/testuser/test-dir';
 const DEFAULT_OPTS: InitOptions = {
   targetDir: process.cwd(),
   force: false,
-  skipInstall: false,
 };
 
 // ── Lazy import ─────────────────────────────────────────────────────────────
@@ -193,7 +181,7 @@ describe('cli/init', () => {
       const { runInit } = await loadInit();
       await runInit(DEFAULT_OPTS);
 
-      expect(mockedLogStep).toHaveBeenCalledWith(1, 5, 'Validating environment');
+      expect(mockedLogStep).toHaveBeenCalledWith(1, 4, 'Validating environment');
     });
 
     it('shows logSuccess for passing checks', async () => {
@@ -287,74 +275,6 @@ describe('cli/init', () => {
     });
   });
 
-  // ── runInit: package install ────────────────────────────────────────────────
-
-  describe('package install', () => {
-    it('displays logStep for install step', async () => {
-      const { runInit } = await loadInit();
-      await runInit(DEFAULT_OPTS);
-
-      expect(mockedLogStep).toHaveBeenCalledWith(2, 5, 'Installing package');
-    });
-
-    it('shows all-installed when every package exists in node_modules', async () => {
-      mockExistsSync.mockReturnValue(true);
-
-      const { runInit } = await loadInit();
-      await runInit(DEFAULT_OPTS);
-
-      expect(mockedLogSuccess).toHaveBeenCalledWith('All packages already installed');
-    });
-
-    it('shows skip warning when --skip-install is set', async () => {
-      mockExistsSync.mockReturnValue(false);
-
-      const { runInit } = await loadInit();
-      await runInit({ ...DEFAULT_OPTS, skipInstall: true });
-
-      expect(mockedLogWarn).toHaveBeenCalledWith('Skipped package install (--skip-install)');
-    });
-
-    it('installs only missing packages', async () => {
-      mockExistsSync.mockReturnValue(false);
-
-      const { runInit } = await loadInit();
-      await runInit(DEFAULT_OPTS);
-
-      expect(mockExecSync).toHaveBeenCalledWith(
-        'npm install @playwright/test @playwright/cli playwright-praman dotenv',
-        expect.objectContaining({ stdio: 'inherit' }),
-      );
-    });
-
-    it('always runs chromium browser install', async () => {
-      mockExistsSync.mockReturnValue(true);
-
-      const { runInit } = await loadInit();
-      await runInit(DEFAULT_OPTS);
-
-      expect(mockExecSync).toHaveBeenCalledWith(
-        'npx playwright install chromium',
-        expect.objectContaining({ stdio: 'inherit' }),
-      );
-    });
-
-    it('exits early when npm install fails', async () => {
-      mockExistsSync.mockReturnValue(false);
-      mockExecSync.mockImplementation(() => {
-        throw new Error('install failed');
-      });
-
-      const { runInit } = await loadInit();
-      await runInit(DEFAULT_OPTS);
-
-      expect(mockedLogError).toHaveBeenCalledWith(
-        'Failed to install packages. Run npm install manually.',
-      );
-      expect(mockedScaffoldProject).not.toHaveBeenCalled();
-    });
-  });
-
   // ── runInit: IDE detection ─────────────────────────────────────────────────
 
   describe('IDE detection', () => {
@@ -369,7 +289,7 @@ describe('cli/init', () => {
       const { runInit } = await loadInit();
       await runInit(DEFAULT_OPTS);
 
-      expect(mockedLogStep).toHaveBeenCalledWith(3, 5, 'Detecting IDEs');
+      expect(mockedLogStep).toHaveBeenCalledWith(2, 4, 'Detecting IDEs');
     });
 
     it('shows detected IDEs via logSuccess', async () => {
@@ -413,7 +333,7 @@ describe('cli/init', () => {
       const { runInit } = await loadInit();
       await runInit(DEFAULT_OPTS);
 
-      expect(mockedLogStep).toHaveBeenCalledWith(4, 5, 'Scaffolding project');
+      expect(mockedLogStep).toHaveBeenCalledWith(3, 4, 'Scaffolding project');
     });
 
     it('shows created files on success', async () => {
@@ -459,7 +379,7 @@ describe('cli/init', () => {
       const { runInit } = await loadInit();
       await runInit(DEFAULT_OPTS);
 
-      expect(mockedLogStep).toHaveBeenCalledWith(5, 5, 'Done!');
+      expect(mockedLogStep).toHaveBeenCalledWith(4, 4, 'Done!');
     });
 
     it('calls logSection with Next Steps', async () => {
@@ -518,7 +438,6 @@ describe('cli/init', () => {
       expect(callOrder).toStrictEqual([
         'banner',
         'step:Validating environment',
-        'step:Installing package',
         'step:Detecting IDEs',
         'step:Scaffolding project',
         'step:Done!',

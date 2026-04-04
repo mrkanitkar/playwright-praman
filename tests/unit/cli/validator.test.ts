@@ -372,10 +372,10 @@ describe('cli/validator', () => {
   // ── validate() — structured report ─────────────────────────────────────────
 
   describe('validate() structured report', () => {
-    it('returns a report with exactly 8 checks', () => {
+    it('returns a report with exactly 11 checks', () => {
       const report = validate();
 
-      expect(report.checks).toHaveLength(8);
+      expect(report.checks).toHaveLength(11);
     });
 
     it('report contains passed, failed, and warnings counts', () => {
@@ -396,13 +396,18 @@ describe('cli/validator', () => {
       vi.spyOn(process.versions, 'node', 'get').mockReturnValue('22.0.0');
       mockedExecSync.mockReturnValue('10.0.0\n');
       mockedExistsSync.mockReturnValue(true);
-      mockedReadFileSync.mockReturnValue(JSON.stringify({ version: '1.58.2' }));
+      mockedReadFileSync.mockImplementation((filePath) => {
+        if (String(filePath).includes('praman-cli.config.json')) {
+          return JSON.stringify({ browser: { initScript: [] } });
+        }
+        return JSON.stringify({ version: '1.58.2' });
+      });
       vi.stubEnv('SAP_CLOUD_BASE_URL', 'https://example.com');
       vi.stubEnv('SAP_CLOUD_USERNAME', 'admin');
 
       const report = validate();
 
-      expect(report.passed).toBe(8);
+      expect(report.passed).toBe(11);
       expect(report.failed).toBe(0);
       expect(report.warnings).toBe(0);
     });
