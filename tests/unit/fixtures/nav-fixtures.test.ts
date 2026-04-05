@@ -52,6 +52,15 @@ vi.mock('../../../src/modules/navigation.js', () => ({
   getCurrentHash: mockGetCurrentHash,
 }));
 
+// ── Mock navigation-space module ─────────────────────────────────────
+const mockNavigateToSpace = vi.fn().mockResolvedValue(undefined);
+const mockNavigateToSectionLink = vi.fn().mockResolvedValue(undefined);
+
+vi.mock('../../../src/modules/navigation-space.js', () => ({
+  navigateToSpace: mockNavigateToSpace,
+  navigateToSectionLink: mockNavigateToSectionLink,
+}));
+
 // ── Mock workzone module ──────────────────────────────────────────────
 const mockWorkZoneManager = {
   detect: vi.fn().mockResolvedValue(true),
@@ -259,6 +268,8 @@ describe('nav-fixtures fixture definitions', () => {
       expect(typeof nav.navigateForward).toBe('function');
       expect(typeof nav.searchAndOpenApp).toBe('function');
       expect(typeof nav.getCurrentHash).toBe('function');
+      expect(typeof nav.navigateToSpace).toBe('function');
+      expect(typeof nav.navigateToSectionLink).toBe('function');
     });
 
     it('navigateToApp delegates to module function with page', async () => {
@@ -423,6 +434,40 @@ describe('nav-fixtures fixture definitions', () => {
       expect(mockSearchAndOpenApp).toHaveBeenCalledWith(mockPage, 'Purchase Orders', {
         timeout: 10_000,
       });
+    });
+
+    it('navigateToSpace delegates to navigation-space module', async () => {
+      const fn = extractFixtureFn(fixtures['ui5Navigation']);
+      const nav = await runFixture<UI5NavigationAPI>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await nav.navigateToSpace('Bills Of Material', { timeout: 5000 });
+
+      expect(mockNavigateToSpace).toHaveBeenCalledOnce();
+      expect(mockNavigateToSpace).toHaveBeenCalledWith(mockPage, 'Bills Of Material', {
+        timeout: 5000,
+      });
+    });
+
+    it('navigateToSectionLink delegates to navigation-space module', async () => {
+      const fn = extractFixtureFn(fixtures['ui5Navigation']);
+      const nav = await runFixture<UI5NavigationAPI>(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      await nav.navigateToSectionLink('Maintain Bill of Material', { timeout: 5000 });
+
+      expect(mockNavigateToSectionLink).toHaveBeenCalledOnce();
+      expect(mockNavigateToSectionLink).toHaveBeenCalledWith(
+        mockPage,
+        'Maintain Bill of Material',
+        { timeout: 5000 },
+      );
     });
   });
 

@@ -20,6 +20,12 @@
  * `unknown`. These casts are safe because the method names are known UI5 API contracts
  * (getId, getMetadata, getName, getDomRef, getVisible).
  *
+ * **LOC exception**: This file exceeds 300 LOC (~500 lines) because `tryStaticAreaScan`,
+ * `isInsideOpenDialog`, `tryDirectIdLookup`, `tryRegistryScan`, `scanRegistry`, and
+ * `tryRecordReplay` form a cohesive discovery pipeline that shares types, helpers, and
+ * the `buildResult`/`extractMethods` functions. Splitting into separate files would
+ * create circular imports or require duplicating these shared internals.
+ *
  * @module bridge/browser-scripts
  */
 
@@ -112,6 +118,11 @@ function buildResult(ctrl: UI5Record): ControlDiscoveryResult {
  * Uses 3-tier discovery: getById, registry scan (enhanced GAP-02/GAP-21),
  * and RecordReplay. Passed to `page.evaluate(fn, args)`.
  *
+ * When `searchOpenDialogs` is `true` in the selector, controls inside open
+ * dialogs (rendered in the `sap-ui-static` UI area) are prioritized. A static
+ * area scan runs BEFORE the normal registry scan and, if a match is found,
+ * returns immediately without falling through.
+ *
  * @param params - Selector, bridge namespace, and discovery options.
  * @returns Discovery result or empty result if not found.
  *
@@ -138,6 +149,18 @@ export async function browserFindControl(
 
     const selectorId = params.selector['id'] as string | undefined;
     const hasId = selectorId !== undefined && selectorId !== '';
+    const searchOpenDialogs = params.selector['searchOpenDialogs'] as boolean | undefined;
+
+    // Tier 0: Static area scan for open dialogs (priority when searchOpenDialogs)
+    if (searchOpenDialogs === true) {
+      const preferVisible = params.preferVisibleControls !== false;
+      const tier0 = tryStaticAreaScan(
+        hasId ? selectorId : undefined,
+        params.selector,
+        preferVisible,
+      );
+      if (tier0 !== null) return tier0;
+    }
 
     // Tier 1: Direct ID lookup (exact match) - skipped when forceRegistryScan
     if (params.forceRegistryScan !== true && hasId) {
@@ -167,6 +190,173 @@ function tryDirectIdLookup(
   const expectedType = selector['controlType'] as string | undefined;
   if (expectedType !== undefined && !hasMatchingType(directCtrl, expectedType)) return null;
   return buildResult(directCtrl);
+}
+
+/**
+ * Dialog-type control names recognized for static area scanning.
+ *
+ * @remarks
+ * These are the UI5 control types that represent dialog/popover containers
+ * in the static UI area. Controls inside these containers are considered
+ * "inside an open dialog" when the container's `isOpen()` returns `true`.
+ */
+const DIALOG_TYPE_NAMES: ReadonlySet<string> = new Set([
+  'sap.m.Dialog',
+  'sap.m.Popover',
+  'sap.m.ResponsivePopover',
+  'sap.m.SelectDialog',
+  'sap.m.TableSelectDialog',
+  'sap.m.BusyDialog',
+  'sap.m.ViewSettingsDialog',
+  'sap.ui.comp.valuehelpdialog.ValueHelpDialog',
+  'sap.ui.comp.p13n.P13nDialog',
+]);
+
+/**
+ * Checks whether a control is inside an open dialog by walking its parent chain.
+ *
+ * @remarks
+ * Traverses the `getParent()` chain looking for any ancestor whose metadata
+ * name is a recognized dialog type AND whose `isOpen()` returns `true`.
+ *
+ * @param ctrl - The UI5 control to check.
+ * @returns `true` if the control is nested inside an open dialog/popover.
+ *
+ * @example
+ * ```typescript
+ * const insideDialog = isInsideOpenDialog(ctrl);
+ * ```
+ */
+function getControlTypeName(record: UI5Record): string | undefined {
+  const getMetaFn = getMethodFn(record, 'getMetadata');
+  if (getMetaFn === undefined) return undefined;
+  const meta = getMetaFn.call(record) as UI5Record | null;
+  if (meta === null) return undefined;
+  const getNameFn = getMethodFn(meta, 'getName');
+  if (getNameFn === undefined) return undefined;
+  return getNameFn.call(meta) as string;
+}
+
+function isDialogAndOpen(record: UI5Record): boolean {
+  const typeName = getControlTypeName(record);
+  if (typeName === undefined || !DIALOG_TYPE_NAMES.has(typeName)) return false;
+  const isOpenFn = getMethodFn(record, 'isOpen');
+  return isOpenFn !== undefined && Boolean(isOpenFn.call(record));
+}
+
+function isInsideOpenDialog(ctrl: UI5Record): boolean {
+  let current: UI5Record | null = ctrl;
+  while (current !== null) {
+    if (isDialogAndOpen(current)) return true;
+    const getParentFn = getMethodFn(current, 'getParent');
+    current = getParentFn !== undefined ? (getParentFn.call(current) as UI5Record | null) : null;
+  }
+  return false;
+}
+
+/**
+ * Scans the `sap-ui-static` UI area for controls inside open dialogs.
+ *
+ * @remarks
+ * Gets all controls from the static UI area, filters to those inside an
+ * open dialog container, then applies the standard selector matching logic.
+ * Returns the first (or best visible) match among dialog controls.
+ *
+ * @param selectorId - Optional ID from the selector for ID-based matching.
+ * @param selector - The full selector record to match against.
+ * @param preferVisible - When true, prefer visible controls over hidden ones.
+ * @returns Discovery result if a matching dialog control is found, or `null`.
+ *
+ * @example
+ * ```typescript
+ * const result = tryStaticAreaScan('okBtn', { id: 'okBtn', searchOpenDialogs: true }, true);
+ * ```
+ */
+function getStaticArea(): UI5Record | null {
+  const sapGlobal = Reflect.get(window, 'sap') as UI5Record | undefined;
+  if (sapGlobal === undefined) return null;
+  const ui = sapGlobal['ui'] as UI5Record | undefined;
+  if (ui === undefined) return null;
+  const getCoreFn = getMethodFn(ui, 'getCore');
+  if (getCoreFn === undefined) return null;
+  const coreInstance = getCoreFn.call(ui) as UI5Record | null;
+  if (coreInstance === null) return null;
+  const getUIAreaFn = getMethodFn(coreInstance, 'getUIArea');
+  if (getUIAreaFn === undefined) return null;
+  return getUIAreaFn.call(coreInstance, 'sap-ui-static') as UI5Record | null;
+}
+
+function collectStaticAreaControls(staticArea: UI5Record): UI5Record[] {
+  const getContentFn = getMethodFn(staticArea, 'getContent');
+  if (getContentFn === undefined) return [];
+  const contentControls = getContentFn.call(staticArea) as UI5Record[];
+  const allControls: UI5Record[] = [];
+  for (const topCtrl of contentControls) {
+    allControls.push(topCtrl);
+    const findAggFn = getMethodFn(topCtrl, 'findAggregatedObjects');
+    if (findAggFn !== undefined) {
+      const children = findAggFn.call(topCtrl, true) as UI5Record[];
+      for (const child of children) {
+        allControls.push(child);
+      }
+    }
+  }
+  return allControls;
+}
+
+function matchesDialogControlId(
+  ctrl: UI5Record,
+  selectorId: string,
+  suffix: string,
+  useRegExp: boolean,
+): boolean {
+  const getIdFn = getMethodFn(ctrl, 'getId');
+  if (getIdFn === undefined) return false;
+  const ctrlId = getIdFn.call(ctrl) as string;
+  if (useRegExp) return isRegExpIdMatch(ctrlId, selectorId);
+  return ctrlId === selectorId || (ctrlId.length > suffix.length && ctrlId.endsWith(suffix));
+}
+
+function findMatchInDialogControls(
+  allControls: UI5Record[],
+  selectorId: string | undefined,
+  selector: UI5Record,
+  preferVisible: boolean,
+): ControlDiscoveryResult | null {
+  const suffix = selectorId !== undefined ? '--' + selectorId : '';
+  const useRegExp =
+    selectorId !== undefined &&
+    selectorId.startsWith('/') &&
+    selectorId.endsWith('/') &&
+    selectorId.length > 2;
+
+  let firstMatch: UI5Record | null = null;
+  let visibleMatch: UI5Record | null = null;
+
+  for (const ctrl of allControls) {
+    if (!isInsideOpenDialog(ctrl)) continue;
+    if (selectorId !== undefined && !matchesDialogControlId(ctrl, selectorId, suffix, useRegExp))
+      continue;
+    if (!matchesSelector(ctrl, selector)) continue;
+
+    if (!preferVisible) return buildResult(ctrl);
+    firstMatch ??= ctrl;
+    if (isControlVisible(ctrl)) visibleMatch ??= ctrl;
+  }
+
+  const bestMatch = visibleMatch ?? firstMatch;
+  return bestMatch !== null ? buildResult(bestMatch) : null;
+}
+
+function tryStaticAreaScan(
+  selectorId: string | undefined,
+  selector: UI5Record,
+  preferVisible: boolean,
+): ControlDiscoveryResult | null {
+  const staticArea = getStaticArea();
+  if (staticArea === null) return null;
+  const allControls = collectStaticAreaControls(staticArea);
+  return findMatchInDialogControls(allControls, selectorId, selector, preferVisible);
 }
 
 /** Tier 2: Route to registry scan with appropriate parameters. */

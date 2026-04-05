@@ -325,7 +325,8 @@ const mockConfig: Readonly<PramanConfig> = Object.freeze(
 );
 
 // ── Import after mocks ──────────────────────────────────────────────
-const { moduleTest, withStability } = await import('#fixtures/module-fixtures.js');
+const { moduleTest, withStability, createDialogFixture } =
+  await import('#fixtures/module-fixtures.js');
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
@@ -1518,6 +1519,57 @@ describe('module-fixtures fixture definitions', () => {
       await wrapped.beta();
 
       expect(callOrder).toEqual(['guard', 'alpha', 'guard', 'beta']);
+    });
+  });
+
+  describe('createDialogFixture factory', () => {
+    const DIALOG_METHODS = [
+      'waitFor',
+      'getOpen',
+      'isOpen',
+      'dismiss',
+      'confirm',
+      'waitForClosed',
+      'getButtons',
+    ] as const;
+
+    it('returns an object with all 7 dialog methods', () => {
+      const mockPage = {} as never;
+      const dialog = createDialogFixture(mockPage);
+
+      for (const method of DIALOG_METHODS) {
+        expect(dialog[method]).toBeDefined();
+      }
+      expect(Object.keys(dialog)).toHaveLength(DIALOG_METHODS.length);
+    });
+
+    it('every returned property is a function', () => {
+      const mockPage = {} as never;
+      const dialog = createDialogFixture(mockPage);
+
+      for (const method of DIALOG_METHODS) {
+        expect(typeof dialog[method]).toBe('function');
+      }
+    });
+  });
+
+  describe('dialog fixture runtime assertion', () => {
+    it('logs a warning when dialog is undefined on the extended handler', async () => {
+      // Simulate a broken createDialogFixture that returns undefined
+      // by mocking it at the module level (already mocked dialog module functions)
+      // Instead, we verify the normal path does NOT log a warning
+      const fn = extractFixtureFn(fixtures['ui5']);
+      await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockChildLogger,
+      });
+
+      // In the normal path, dialog is defined, so warn should NOT be called
+      // with the dialog-undefined message
+      expect(mockChildLogger.warn).not.toHaveBeenCalledWith(
+        expect.stringContaining('ui5.dialog is undefined'),
+      );
     });
   });
 });

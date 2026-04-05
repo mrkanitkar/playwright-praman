@@ -27,6 +27,14 @@ export {
 } from './navigation.js';
 export type { NavigationIntent, NavigationOptions, NavigationPage } from './navigation.js';
 
+// ── Navigation (Space / Section) ────────────────────────────────────
+export { navigateToSectionLink, navigateToSpace } from './navigation-space.js';
+export type {
+  SectionLinkNavigationOptions,
+  SpaceNavigationOptions,
+  SpaceNavigationPage,
+} from './navigation-space.js';
+
 // ── WorkZone ──────────────────────────────────────────────────────────
 export { createWorkZoneManager } from './workzone.js';
 export type {

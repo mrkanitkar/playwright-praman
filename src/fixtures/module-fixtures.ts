@@ -365,6 +365,13 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       odata: withStability(createODataFixture(page as never), guard, 'odata'),
     }) as ExtendedUI5Handler;
 
+    // Runtime assertion: guard against dialog fixture being undefined (mergeTests ordering issue)
+    if (extended.dialog === undefined) {
+      logger.warn(
+        "ui5.dialog is undefined — ensure you imported test from 'playwright-praman', not from '@playwright/test'",
+      );
+    }
+
     // Apply registered custom extensions as sub-namespaces
     const extensionContext: ExtensionContext = { page, handler, config: pramanConfig };
     for (const ext of getExtensions()) {
