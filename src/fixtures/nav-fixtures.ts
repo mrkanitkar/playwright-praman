@@ -13,7 +13,7 @@
  * @remarks
  * Provides two fixtures for SAP Fiori Launchpad navigation:
  *
- * - `ui5Navigation` — wraps all 9 navigation module functions, injecting
+ * - `ui5Navigation` — wraps all 11 navigation module functions, injecting
  *   `page` and `baseURL` automatically. Creates a `'nav'` child logger.
  *
  * - `btpWorkZone` — creates a BTP WorkZone manager for dual-frame environments.
@@ -37,6 +37,11 @@
 import { test as base } from '@playwright/test';
 import type { Logger } from 'pino';
 
+import type {
+  SectionLinkNavigationOptions,
+  SpaceNavigationOptions,
+} from '../modules/navigation-space.js';
+import { navigateToSectionLink, navigateToSpace } from '../modules/navigation-space.js';
 import type { NavigationIntent, NavigationOptions } from '../modules/navigation.js';
 import {
   getCurrentHash,
@@ -64,7 +69,7 @@ import { withStep } from '#core/utils/step-decorator.js';
  * @aiContext Use to navigate between SAP Fiori Launchpad apps and views.
  *
  * @remarks
- * Wraps all 9 FLP navigation module functions. The `page` argument is
+ * Wraps all 11 FLP navigation module functions. The `page` argument is
  * injected automatically from the Playwright fixture system.
  *
  * @example
@@ -223,6 +228,45 @@ export interface UI5NavigationAPI {
    * ```
    */
   getCurrentHash(): Promise<string>;
+
+  /**
+   * Navigates to an FLP Space Tab by its visible title text.
+   *
+   * @remarks
+   * Uses Playwright-native `getByText()` because `sap.m.IconTabFilter`
+   * has no `press()` / `firePress()` methods.
+   *
+   * @ai
+   * @aiContext Use to switch between FLP Spaces in modern BTP Work Zone layouts.
+   *
+   * @param spaceTitle - Visible title text of the FLP Space Tab.
+   * @param options - Space navigation options (timeout, exact).
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateToSpace('Procurement');
+   * ```
+   */
+  navigateToSpace(spaceTitle: string, options?: SpaceNavigationOptions): Promise<void>;
+
+  /**
+   * Navigates via an FLP Section Link in a Space-based layout.
+   *
+   * @remarks
+   * Uses Playwright-native `getByRole('link')` to locate the section link.
+   *
+   * @ai
+   * @aiContext Use to navigate within FLP Space sections.
+   *
+   * @param linkName - Accessible name (visible text) of the section link.
+   * @param options - Section link navigation options (timeout).
+   *
+   * @example
+   * ```typescript
+   * await ui5Navigation.navigateToSectionLink('Purchase Orders');
+   * ```
+   */
+  navigateToSectionLink(linkName: string, options?: SectionLinkNavigationOptions): Promise<void>;
 }
 
 /**
@@ -237,7 +281,7 @@ export interface UI5NavigationAPI {
  * ```
  */
 export interface NavFixtures {
-  /** Wraps all 9 FLP navigation functions with automatic page injection. */
+  /** Wraps all 11 FLP navigation functions with automatic page injection. */
   ui5Navigation: UI5NavigationAPI;
   /** BTP WorkZone manager for dual-frame environments. */
   btpWorkZone: BTPWorkZoneManager;
@@ -270,7 +314,7 @@ export interface NavWorkerDeps {
  * Playwright test object extended with navigation fixtures.
  *
  * @remarks
- * Provides `ui5Navigation` (all 9 nav functions) and `btpWorkZone`
+ * Provides `ui5Navigation` (all 11 nav functions) and `btpWorkZone`
  * (WorkZone manager). Dependencies from coreTest (`pramanConfig`,
  * `rootLogger`) are declared as option placeholders.
  *
@@ -337,6 +381,14 @@ export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
         ),
       getCurrentHash: async () =>
         withStep('ui5Navigation.getCurrentHash', async () => getCurrentHash(page as never)),
+      navigateToSpace: async (spaceTitle, options?) =>
+        withStep(`ui5Navigation.navigateToSpace: ${spaceTitle}`, async () =>
+          navigateToSpace(page as never, spaceTitle, options),
+        ),
+      navigateToSectionLink: async (linkName, options?) =>
+        withStep(`ui5Navigation.navigateToSectionLink: ${linkName}`, async () =>
+          navigateToSectionLink(page as never, linkName, options),
+        ),
     };
 
     await use(nav);

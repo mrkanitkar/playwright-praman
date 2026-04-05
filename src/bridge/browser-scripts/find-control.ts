@@ -15,6 +15,11 @@
  * using a 2-tier strategy (A.3): RecordReplay primary + getById fallback.
  * Returns `ControlDiscoveryResult`-shaped objects.
  *
+ * **LOC exception**: This file exceeds 300 LOC (~400 lines) because the string-form
+ * snippets (method extraction, result building, enhanced matching, static area scan)
+ * must be inlined into the generated IIFE. These snippets are constants that cannot
+ * be split across files without breaking the single-string evaluation contract.
+ *
  * @module bridge/browser-scripts
  */
 
@@ -121,10 +126,90 @@ const ENHANCED_MATCHING_SNIPPET = `
 `;
 
 /**
+ * Static area scan snippet for open dialog control prioritization.
+ *
+ * @remarks
+ * When `searchOpenDialogs` is true in the selector, this snippet scans the
+ * `sap-ui-static` UI area for controls inside open dialogs before the normal
+ * registry scan. If a match is found, it is returned immediately.
+ */
+const STATIC_AREA_SCAN_SNIPPET = `
+  var DIALOG_TYPES = {
+    'sap.m.Dialog': true, 'sap.m.Popover': true,
+    'sap.m.ResponsivePopover': true, 'sap.m.SelectDialog': true,
+    'sap.m.TableSelectDialog': true, 'sap.m.BusyDialog': true,
+    'sap.m.ViewSettingsDialog': true,
+    'sap.ui.comp.valuehelpdialog.ValueHelpDialog': true,
+    'sap.ui.comp.p13n.P13nDialog': true
+  };
+
+  function isInsideOpenDialog(ctrl) {
+    var cur = ctrl;
+    while (cur) {
+      if (cur.getMetadata) {
+        var tn = cur.getMetadata().getName ? cur.getMetadata().getName() : '';
+        if (DIALOG_TYPES[tn]) {
+          if (typeof cur.isOpen === 'function' && cur.isOpen()) return true;
+        }
+      }
+      cur = typeof cur.getParent === 'function' ? cur.getParent() : null;
+    }
+    return false;
+  }
+
+  function tryStaticAreaScan(selector, selectorId, preferVisible) {
+    if (typeof sap === 'undefined' || !sap.ui || !sap.ui.getCore) return null;
+    var core = sap.ui.getCore();
+    if (!core || !core.getUIArea) return null;
+    var area = core.getUIArea('sap-ui-static');
+    if (!area || !area.getContent) return null;
+    var content = area.getContent();
+    var aControls = [];
+    for (var ci = 0; ci < content.length; ci++) {
+      aControls.push(content[ci]);
+      if (typeof content[ci].findAggregatedObjects === 'function') {
+        var children = content[ci].findAggregatedObjects(true);
+        for (var chi = 0; chi < children.length; chi++) {
+          aControls.push(children[chi]);
+        }
+      }
+    }
+    var suffix = selectorId ? '--' + selectorId : null;
+    var isRegExp = selectorId && typeof selectorId === 'string'
+      && selectorId.charAt(0) === '/' && selectorId.charAt(selectorId.length - 1) === '/'
+      && selectorId.length > 2;
+    var firstMatch = null;
+    var visibleMatch = null;
+    for (var si = 0; si < aControls.length; si++) {
+      var sc = aControls[si];
+      if (!isInsideOpenDialog(sc)) continue;
+      if (selectorId && sc.getId) {
+        var scId = sc.getId();
+        if (isRegExp) {
+          var pat = new RegExp(selectorId.slice(1, -1));
+          if (!pat.test(scId)) continue;
+        } else if (scId !== selectorId && !(scId.length > suffix.length && scId.indexOf(suffix) === scId.length - suffix.length)) {
+          continue;
+        }
+      }
+      if (!matchesFullSelector(sc, selector)) continue;
+      if (!preferVisible) return buildResult(sc);
+      if (!firstMatch) firstMatch = sc;
+      if (sc.getVisible && sc.getVisible()) {
+        if (!visibleMatch) visibleMatch = sc;
+      }
+    }
+    var best = preferVisible ? (visibleMatch || firstMatch) : firstMatch;
+    return best ? buildResult(best) : null;
+  }
+`;
+
+/**
  * Creates a browser script that finds a single UI5 control.
  *
  * @remarks
- * Uses 3-tier discovery:
+ * Uses 3-tier discovery (plus Tier 0 for open dialogs):
+ * 0. Static area scan when `searchOpenDialogs` is true (prioritizes dialog controls)
  * 1. getById exact match (for full ID selectors)
  * 2. Registry scan with enhanced matching: exact/suffix/RegExp ID,
  *    controlType, properties, viewName, bindingPath. Prefers visible controls.
@@ -154,6 +239,7 @@ export function createFindControlScript(): string {
       ${METHOD_EXTRACTION_SNIPPET}
       ${BUILD_RESULT_SNIPPET}
       ${ENHANCED_MATCHING_SNIPPET}
+      ${STATIC_AREA_SCAN_SNIPPET}
 
       var selector = arguments[0];
       var findOptions = arguments[1] || {};
@@ -163,8 +249,15 @@ export function createFindControlScript(): string {
         return empty;
       }
 
-      // Tier 1: Direct ID lookup via registry (exact match) — skip when forceRegistryScan
       var selectorId = typeof selector === 'string' ? selector : selector.id;
+
+      // Tier 0: Static area scan for open dialogs (priority when searchOpenDialogs)
+      if (selector.searchOpenDialogs === true) {
+        var tier0 = tryStaticAreaScan(selector, selectorId, preferVisible);
+        if (tier0) return tier0;
+      }
+
+      // Tier 1: Direct ID lookup via registry (exact match) — skip when forceRegistryScan
       if (selectorId && !forceRegistryScan) {
         var directCtrl = bridge.getById(selectorId);
         if (directCtrl) {

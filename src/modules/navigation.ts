@@ -163,6 +163,12 @@ export async function navigateToApp(
 /**
  * Navigates to an FLP tile by its title text.
  *
+ * @remarks
+ * This function only works for **GenericTile-based FLP layouts** (classic FLP).
+ * For modern Space/Section-based FLP layouts (BTP Work Zone, S/4HANA 2021+),
+ * use {@link navigateToSpace} and {@link navigateToSectionLink} from
+ * `navigation-space.ts` instead.
+ *
  * @intent Open a Fiori Launchpad tile by its visible title.
  * Use when the agent needs to navigate via UI interaction rather than hash.
  * @guarantee On success, the tile is clicked and UI5 stability is reached.
@@ -170,7 +176,8 @@ export async function navigateToApp(
  * @ai
  * @aiContext Use navigateToApp() for hash-based navigation; use this when
  * the semantic object hash is unknown but the tile title is visible.
- * @sapModule sap.ushell.ui.launchpad.Tile — FLP tile click navigation
+ * For Space-based FLP layouts, use navigateToSpace() + navigateToSectionLink().
+ * @sapModule sap.ushell.ui.launchpad.Tile — FLP tile click navigation (GenericTile layout only)
  * @businessContext User-facing tile-based navigation on SAP Fiori Launchpad home screen.
  *
  * @param page - Playwright Page (or compatible subset).

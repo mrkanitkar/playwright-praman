@@ -28,6 +28,8 @@ interface MockControl {
   getVisible: () => boolean;
   getParent?: () => MockControl | null;
   getBinding?: (name: string) => { getPath: () => string } | null;
+  isOpen?: () => boolean;
+  findAggregatedObjects?: () => MockControl[];
   [key: string]: unknown;
 }
 
@@ -464,6 +466,292 @@ describe('browserFindControl', () => {
 
       expect(result.id).toBe('someBtn');
       expect(result.controlType).toBe('sap.m.Button');
+    });
+  });
+
+  // ── searchOpenDialogs: Static area scan ────────────────────────────
+
+  describe('searchOpenDialogs', () => {
+    /**
+     * Sets up browser globals with a static UI area containing dialog controls.
+     *
+     * @param registryControls - Controls in the normal element registry.
+     * @param staticAreaControls - Top-level controls in the sap-ui-static UI area.
+     */
+    function setupWithStaticArea(
+      registryControls: Record<string, MockControl>,
+      staticAreaControls: MockControl[],
+    ): void {
+      const bridge = {
+        getById: (id: string) => {
+          const ctrl = registryControls[id];
+          return ctrl ?? null;
+        },
+      };
+
+      const registry = {
+        all: () => registryControls,
+      };
+
+      const staticArea = {
+        getContent: () => staticAreaControls,
+      };
+
+      const coreInstance = {
+        getUIArea: (areaId: string) => (areaId === 'sap-ui-static' ? staticArea : null),
+      };
+
+      Object.defineProperty(globalThis, 'window', {
+        value: globalThis,
+        writable: true,
+        configurable: true,
+      });
+
+      Object.defineProperty(globalThis, '__praman_bridge', {
+        value: bridge,
+        writable: true,
+        configurable: true,
+      });
+
+      Object.defineProperty(globalThis, 'sap', {
+        value: {
+          ui: {
+            getCore: () => coreInstance,
+            core: {
+              Element: {
+                registry,
+                closestTo: () => null,
+              },
+            },
+          },
+        },
+        writable: true,
+        configurable: true,
+      });
+    }
+
+    /** Creates a mock control inside an open dialog container. */
+    function createDialogChild(overrides: {
+      id: string;
+      controlType: string;
+      visible?: boolean;
+      properties?: Record<string, unknown>;
+    }): { ctrl: MockControl; dialog: MockControl } {
+      // Create the dialog parent first
+      const dialog: MockControl = {
+        getId: () => 'dialog1',
+        getMetadata: () => ({ getName: () => 'sap.m.Dialog' }),
+        getDomRef: () => ({ id: 'dialog1' }),
+        getVisible: () => true,
+        getParent: () => null,
+        isOpen: () => true,
+        findAggregatedObjects: () => [],
+      };
+
+      const ctrl = createMockControl({
+        ...overrides,
+        parent: dialog,
+      });
+
+      // The dialog returns this control as aggregated child
+      dialog.findAggregatedObjects = () => [ctrl];
+
+      return { ctrl, dialog };
+    }
+
+    it('prioritizes controls inside open dialogs when searchOpenDialogs is true', async () => {
+      // A button exists in the normal registry AND inside a dialog
+      const registryBtn = createMockControl({
+        id: 'view--okBtn',
+        controlType: 'sap.m.Button',
+        properties: { text: 'OK' },
+      });
+
+      const { dialog } = createDialogChild({
+        id: 'dlg--okBtn',
+        controlType: 'sap.m.Button',
+        properties: { text: 'OK' },
+      });
+
+      setupWithStaticArea({ 'view--okBtn': registryBtn }, [dialog]);
+
+      const result = await browserFindControl({
+        ...BASE_PARAMS,
+        selector: { id: 'okBtn', controlType: 'sap.m.Button', searchOpenDialogs: true },
+      });
+
+      // Should find the dialog control (dlg--okBtn), not the registry one
+      expect(result.id).toBe('dlg--okBtn');
+      expect(result.controlType).toBe('sap.m.Button');
+    });
+
+    it('falls through to normal scan when no dialog controls match', async () => {
+      const registryBtn = createMockControl({
+        id: 'view--saveBtn',
+        controlType: 'sap.m.Button',
+        properties: { text: 'Save' },
+      });
+
+      // Dialog contains an input, not a button with text 'Save'
+      const { dialog } = createDialogChild({
+        id: 'dlg--input1',
+        controlType: 'sap.m.Input',
+      });
+
+      setupWithStaticArea({ 'view--saveBtn': registryBtn }, [dialog]);
+
+      const result = await browserFindControl({
+        ...BASE_PARAMS,
+        selector: { id: 'saveBtn', controlType: 'sap.m.Button', searchOpenDialogs: true },
+      });
+
+      // Should fall through to registry and find the registry control
+      expect(result.id).toBe('view--saveBtn');
+      expect(result.controlType).toBe('sap.m.Button');
+    });
+
+    it('skips static area scan when searchOpenDialogs is false', async () => {
+      const registryBtn = createMockControl({
+        id: 'view--okBtn',
+        controlType: 'sap.m.Button',
+      });
+
+      const { dialog } = createDialogChild({
+        id: 'dlg--okBtn',
+        controlType: 'sap.m.Button',
+      });
+
+      setupWithStaticArea({ 'view--okBtn': registryBtn }, [dialog]);
+
+      const result = await browserFindControl({
+        ...BASE_PARAMS,
+        selector: { id: 'okBtn', controlType: 'sap.m.Button', searchOpenDialogs: false },
+      });
+
+      // Should find the registry control since static area scan is skipped
+      expect(result.id).toBe('view--okBtn');
+    });
+
+    it('skips static area scan when searchOpenDialogs is not set', async () => {
+      const registryBtn = createMockControl({
+        id: 'view--okBtn',
+        controlType: 'sap.m.Button',
+      });
+
+      const { dialog } = createDialogChild({
+        id: 'dlg--okBtn',
+        controlType: 'sap.m.Button',
+      });
+
+      setupWithStaticArea({ 'view--okBtn': registryBtn }, [dialog]);
+
+      const result = await browserFindControl({
+        ...BASE_PARAMS,
+        selector: { id: 'okBtn', controlType: 'sap.m.Button' },
+      });
+
+      // Should find the registry control since searchOpenDialogs is not set
+      expect(result.id).toBe('view--okBtn');
+    });
+
+    it('ignores controls inside a closed dialog', async () => {
+      const registryBtn = createMockControl({
+        id: 'view--okBtn',
+        controlType: 'sap.m.Button',
+      });
+
+      // Create a dialog that is NOT open
+      const closedDialog: MockControl = {
+        getId: () => 'closedDialog',
+        getMetadata: () => ({ getName: () => 'sap.m.Dialog' }),
+        getDomRef: () => ({ id: 'closedDialog' }),
+        getVisible: () => true,
+        getParent: () => null,
+        isOpen: () => false,
+        findAggregatedObjects: () => [],
+      };
+
+      const dialogBtn = createMockControl({
+        id: 'dlg--okBtn',
+        controlType: 'sap.m.Button',
+        parent: closedDialog,
+      });
+
+      closedDialog.findAggregatedObjects = () => [dialogBtn];
+
+      setupWithStaticArea({ 'view--okBtn': registryBtn }, [closedDialog]);
+
+      const result = await browserFindControl({
+        ...BASE_PARAMS,
+        selector: { id: 'okBtn', controlType: 'sap.m.Button', searchOpenDialogs: true },
+      });
+
+      // Should NOT find the closed dialog's control, should fall through to registry
+      expect(result.id).toBe('view--okBtn');
+    });
+
+    it('matches controls inside sap.m.Popover', async () => {
+      const popover: MockControl = {
+        getId: () => 'popover1',
+        getMetadata: () => ({ getName: () => 'sap.m.Popover' }),
+        getDomRef: () => ({ id: 'popover1' }),
+        getVisible: () => true,
+        getParent: () => null,
+        isOpen: () => true,
+        findAggregatedObjects: () => [],
+      };
+
+      const popoverBtn = createMockControl({
+        id: 'pop--actionBtn',
+        controlType: 'sap.m.Button',
+        parent: popover,
+      });
+
+      popover.findAggregatedObjects = () => [popoverBtn];
+
+      setupWithStaticArea({}, [popover]);
+
+      const result = await browserFindControl({
+        ...BASE_PARAMS,
+        selector: { id: 'actionBtn', controlType: 'sap.m.Button', searchOpenDialogs: true },
+      });
+
+      expect(result.id).toBe('pop--actionBtn');
+      expect(result.controlType).toBe('sap.m.Button');
+    });
+
+    it('matches controls inside sap.m.SelectDialog', async () => {
+      const selectDialog: MockControl = {
+        getId: () => 'selectDlg1',
+        getMetadata: () => ({ getName: () => 'sap.m.SelectDialog' }),
+        getDomRef: () => ({ id: 'selectDlg1' }),
+        getVisible: () => true,
+        getParent: () => null,
+        isOpen: () => true,
+        findAggregatedObjects: () => [],
+      };
+
+      const listItem = createMockControl({
+        id: 'selectDlg1--list-item0',
+        controlType: 'sap.m.StandardListItem',
+        parent: selectDialog,
+      });
+
+      selectDialog.findAggregatedObjects = () => [listItem];
+
+      setupWithStaticArea({}, [selectDialog]);
+
+      const result = await browserFindControl({
+        ...BASE_PARAMS,
+        selector: {
+          controlType: 'sap.m.StandardListItem',
+          searchOpenDialogs: true,
+        },
+        forceRegistryScan: true,
+      });
+
+      expect(result.id).toBe('selectDlg1--list-item0');
+      expect(result.controlType).toBe('sap.m.StandardListItem');
     });
   });
 
