@@ -8,6 +8,16 @@ From business process to Playwright test — autonomously. This guide walks you 
 
 ## Prerequisites Checklist
 
+:::warning Playwright 1.59+ MCP Server
+If using MCP-based agents, install `@playwright/mcp` separately — it is no longer bundled with Playwright 1.59+.
+
+```bash
+npm install @playwright/mcp
+```
+
+CLI agents (files with `-cli` suffix) do not need this package.
+:::
+
 Before launching your agent, verify the following files exist in your project. All paths are relative to your project root.
 
 ### Agent Definitions

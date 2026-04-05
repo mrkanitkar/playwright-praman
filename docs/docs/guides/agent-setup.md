@@ -17,6 +17,16 @@ automatically installs AI agent definitions, seed files, and IDE configuration.
 | SAP UI5 / Fiori app   | Any cloud or on-premise instance                                 |
 | Environment variables | `SAP_CLOUD_BASE_URL`, `SAP_CLOUD_USERNAME`, `SAP_CLOUD_PASSWORD` |
 
+:::warning Playwright 1.59+ MCP Server
+Starting with Playwright 1.59, the MCP server is no longer bundled with Playwright. Install it separately:
+
+```bash
+npm install @playwright/mcp
+```
+
+CLI agents (`-cli` suffix) do **not** require the MCP server — they use `@playwright/cli` which is built into Playwright.
+:::
+
 Install the package — `init` will handle the rest:
 
 ```bash
@@ -360,6 +370,12 @@ The seed waits up to 20 minutes, polls for UI5 readiness, then keeps the browser
 via `pauseAtEnd: true` for MCP-connected agents to use.
 
 ## Available Agents
+
+:::info Naming Convention
+
+- Files **with** a `-cli` suffix (e.g., `praman-sap-planner-cli`) are **CLI agents** — they use `@playwright/cli` and do **not** need the MCP server.
+- Files **without** a `-cli` suffix (e.g., `praman-sap-planner`) are **MCP agents** — they require `@playwright/mcp` (install separately on Playwright 1.59+).
+  :::
 
 ### Claude Code — MCP agents
 

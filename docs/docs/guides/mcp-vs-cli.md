@@ -13,9 +13,9 @@ keywords:
 # MCP vs CLI: Choosing Your Agent Interface
 
 Praman supports two first-class approaches for AI-driven SAP test automation: the **MCP server**
-(Model Context Protocol) and the **Playwright CLI**. Both ship with Playwright 1.59+ out of the box
--- no extra packages to install. Both produce identical gold-standard `.spec.ts` files using Praman
-fixtures.
+(Model Context Protocol) and the **Playwright CLI**. The CLI is built into Playwright 1.59+ (includes
+browsers). The MCP server requires a separate install: `npm install @playwright/mcp`. Both produce
+identical gold-standard `.spec.ts` files using Praman fixtures.
 
 This guide helps you choose the right approach -- or use both together.
 
@@ -23,7 +23,7 @@ This guide helps you choose the right approach -- or use both together.
 
 | Dimension              | MCP                                      | CLI                                      |
 | ---------------------- | ---------------------------------------- | ---------------------------------------- |
-| **Included in**        | Playwright 1.59+ (`@playwright/mcp`)     | Playwright 1.59+ (`@playwright/cli`)     |
+| **Included in**        | `@playwright/mcp` (separate install)     | Playwright 1.59+ (built-in)              |
 | **Token cost**         | Higher (protocol envelope per tool call) | Lower (compact terminal output)          |
 | **Latency per action** | \~50--100 ms (WebSocket round-trip)      | \~20--50 ms (direct process invocation)  |
 | **Setup**              | Add `.mcp.json` to project root          | Add `praman-cli.config.json`             |
@@ -35,9 +35,27 @@ This guide helps you choose the right approach -- or use both together.
 | **Bridge injection**   | `initScript` in MCP config               | `initScript` in `praman-cli.config.json` |
 | **Output quality**     | Gold-standard `.spec.ts`                 | Gold-standard `.spec.ts`                 |
 
-:::tip Both are built in
-Since Playwright 1.59, both `@playwright/mcp` and `@playwright/cli` ship with Playwright itself.
-There is nothing extra to install -- just choose your config.
+:::tip CLI is built in, MCP is a separate package
+The Playwright CLI is built into Playwright 1.59+ -- nothing extra to install. The MCP server
+requires a separate package: `npm install @playwright/mcp`. Once installed, just choose your config.
+:::
+
+## Agent Naming Convention
+
+Each Praman agent ships as two files -- one for MCP and one for CLI. The `-cli` suffix tells you
+which interface the agent uses:
+
+| Agent File                          | Type | Requires              |
+| ----------------------------------- | ---- | --------------------- |
+| `praman-sap-planner.agent.md`       | MCP  | `@playwright/mcp`     |
+| `praman-sap-planner-cli.agent.md`   | CLI  | Built into Playwright |
+| `praman-sap-generator.agent.md`     | MCP  | `@playwright/mcp`     |
+| `praman-sap-generator-cli.agent.md` | CLI  | Built into Playwright |
+| `praman-sap-healer.agent.md`        | MCP  | `@playwright/mcp`     |
+| `praman-sap-healer-cli.agent.md`    | CLI  | Built into Playwright |
+
+:::info Naming rule
+Files with `-cli` suffix = CLI agent (no MCP server needed). Files without `-cli` = MCP agent.
 :::
 
 ---
@@ -58,7 +76,13 @@ the conversation, and native IDE integration.
 
 ### MCP Setup
 
-Add `.mcp.json` to your project root:
+First, install the MCP server package (it is not included in Playwright core):
+
+```bash
+npm install @playwright/mcp
+```
+
+Then add `.mcp.json` to your project root:
 
 ```json
 {
@@ -70,8 +94,6 @@ Add `.mcp.json` to your project root:
   }
 }
 ```
-
-That's it. Playwright 1.59+ includes the MCP server -- no `npm install` needed.
 
 ### MCP Agents
 
@@ -168,28 +190,28 @@ npx playwright test tests/e2e/purchase-order.spec.ts || true
 
 Both approaches support the full Praman agent pipeline:
 
-| Feature                    | MCP | CLI | Notes                                                      |
-| -------------------------- | --- | --- | ---------------------------------------------------------- |
-| SAP authentication         | Yes | Yes | Both use `storageState` for auth persistence               |
-| FLP navigation             | Yes | Yes | `browser_navigate` / `playwright-cli open`                 |
-| UI5 control discovery      | Yes | Yes | `browser_evaluate` / `run-code`                            |
-| Bridge readiness check     | Yes | Yes | Same `window.__praman_bridge.ready` check                  |
-| Page snapshots             | Yes | Yes | Inline (MCP) / file-based (CLI)                            |
-| Screenshots                | Yes | Yes | Inline (MCP) / file-based (CLI)                            |
-| Form fill + click          | Yes | Yes | `browser_fill` / `playwright-cli fill`                     |
-| Value Help workflows       | Yes | Yes | Same UI5 bridge patterns                                   |
-| OData binding extraction   | Yes | Yes | Same `run-code` / `evaluate` patterns                      |
-| Named sessions             | No  | Yes | CLI-only: `-s=<name>` for persistent state                 |
-| Inline DOM in conversation | Yes | No  | MCP returns DOM directly; CLI saves to file                |
-| CI/CD without server       | No  | Yes | CLI runs as plain shell commands                           |
-| Planner agent              | Yes | Yes | Identical output format                                    |
-| Generator agent            | Yes | Yes | Identical output format                                    |
-| Healer agent               | Yes | Yes | Identical debugging approach                               |
-| Full coverage pipeline     | Yes | Yes | Both support plan + generate + heal cycle                  |
-| Custom control support     | Yes | Yes | Same bridge + `run-code` patterns                          |
-| Fiori Elements support     | Yes | Yes | Same SmartField / MDC discovery                            |
-| Spec compliance check      | No  | Yes | `npx playwright-praman verify-spec <file>`                 |
-| Capability manifest        | No  | Yes | `npx playwright-praman capabilities --agent`               |
+| Feature                    | MCP | CLI | Notes                                        |
+| -------------------------- | --- | --- | -------------------------------------------- |
+| SAP authentication         | Yes | Yes | Both use `storageState` for auth persistence |
+| FLP navigation             | Yes | Yes | `browser_navigate` / `playwright-cli open`   |
+| UI5 control discovery      | Yes | Yes | `browser_evaluate` / `run-code`              |
+| Bridge readiness check     | Yes | Yes | Same `window.__praman_bridge.ready` check    |
+| Page snapshots             | Yes | Yes | Inline (MCP) / file-based (CLI)              |
+| Screenshots                | Yes | Yes | Inline (MCP) / file-based (CLI)              |
+| Form fill + click          | Yes | Yes | `browser_fill` / `playwright-cli fill`       |
+| Value Help workflows       | Yes | Yes | Same UI5 bridge patterns                     |
+| OData binding extraction   | Yes | Yes | Same `run-code` / `evaluate` patterns        |
+| Named sessions             | No  | Yes | CLI-only: `-s=<name>` for persistent state   |
+| Inline DOM in conversation | Yes | No  | MCP returns DOM directly; CLI saves to file  |
+| CI/CD without server       | No  | Yes | CLI runs as plain shell commands             |
+| Planner agent              | Yes | Yes | Identical output format                      |
+| Generator agent            | Yes | Yes | Identical output format                      |
+| Healer agent               | Yes | Yes | Identical debugging approach                 |
+| Full coverage pipeline     | Yes | Yes | Both support plan + generate + heal cycle    |
+| Custom control support     | Yes | Yes | Same bridge + `run-code` patterns            |
+| Fiori Elements support     | Yes | Yes | Same SmartField / MDC discovery              |
+| Spec compliance check      | No  | Yes | `npx playwright-praman verify-spec <file>`   |
+| Capability manifest        | No  | Yes | `npx playwright-praman capabilities --agent` |
 
 ---
 
