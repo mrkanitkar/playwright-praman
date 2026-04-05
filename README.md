@@ -45,7 +45,7 @@ cp .env.example .env
 
 → [Getting Started guide](https://praman.dev/docs/guides/getting-started)
 
-## Two Ways to Test
+## Pick CLI Agents, MCP Agents, or Just Start Coding
 
 ### Option A — AI Agents (recommended)
 
