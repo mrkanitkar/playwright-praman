@@ -1,6 +1,8 @@
 # playwright-praman
 
 > Agent-First SAP UI5 Test Automation Plugin for Playwright
+>
+> ⭐ If Praman saves you time, [star the repo](https://github.com/mrkanitkar/playwright-praman) — it helps others find it.
 
 [![CI](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/playwright-praman)](https://www.npmjs.com/package/playwright-praman)
@@ -93,17 +95,17 @@ Fixtures available: `ui5`, `ui5Navigation`, `sapAuth`, `fe`, `ui5.table`, `ui5.d
 
 → [Fixture Reference](https://praman.dev/docs/guides/fixtures) · [Selector Reference](https://praman.dev/docs/guides/selectors) · [Examples](./examples/)
 
-## Key Capabilities
+## What You Can Do with Praman
 
-- **199 UI5 control types** — `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc`
-- **Typed control proxies** — full IntelliSense and autocomplete for every SAP control
-- **UI5 stability sync** — automatic waiting, no `page.waitForTimeout()` needed
-- **6 auth strategies** — BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, Manual
-- **OData V2/V4** — mock, intercept, and assert OData requests with tracing reports
-- **Fiori Elements** — List Report, Object Page, and Overview Page helpers
-- **10 UI5 matchers** — Playwright-native `expect()` extended with UI5-specific assertions
-- **Vocabulary & Intent API** — resolve SAP field names to selectors; express tests as business operations
-- **Cross-platform** — Windows, macOS, Linux · Node.js 22+ · TypeScript 5.x & 6.x
+- **Test any SAP UI5 control** — 199 control types covered (`sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc`)
+- **Write tests with full IntelliSense** — typed control proxies, no DOM digging, no guessing selectors
+- **Never write `waitForTimeout()` again** — UI5 stability sync handles all timing automatically
+- **Authenticate with any SAP system** — BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, Manual
+- **Verify your backend** — mock, intercept, and assert OData V2/V4 requests with tracing reports
+- **Test Fiori Elements apps without boilerplate** — List Report, Object Page, and Overview Page helpers included
+- **Assert SAP state natively** — 10 UI5-specific matchers extend Playwright's `expect()`
+- **Express tests in business language** — Vocabulary & Intent API maps SAP field names to selectors automatically
+- **Run anywhere** — Windows, macOS, Linux · Node.js 22+ · TypeScript 5.x & 6.x
 
 → [Full capability reference](https://praman.dev/docs)
 
