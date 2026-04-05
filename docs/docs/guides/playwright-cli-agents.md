@@ -50,6 +50,24 @@ terminal commands (`run-code`, `snapshot`, `fill`, `click`).
 The key insight: `run-code` replaces `browser_evaluate`, `snapshot --filename` replaces
 `browser_snapshot`, and named sessions (`-s=sap`) replace MCP's persistent browser context.
 
+:::info Agent Naming Convention
+
+- Files with `-cli` suffix (e.g., `praman-sap-planner-cli.agent.md`) = **CLI agent** (no MCP server needed)
+- Files without `-cli` suffix (e.g., `praman-sap-planner.agent.md`) = **MCP agent** (requires `@playwright/mcp`)
+  :::
+
+---
+
+## Prerequisites
+
+Before using Praman CLI Agents, ensure you have the following in place:
+
+- **`@playwright/cli`** includes browser binaries — no separate `install-browser` step is needed in most cases. However, if using an older version or a global install, run `npx playwright-cli install-browser chromium` manually.
+- **Config file**: `.playwright/cli.config.json` auto-loads by default. Praman uses `.playwright/praman-cli.config.json`, which requires an explicit `--config` flag on every `open` command.
+- **`.env` format**: Use `KEY=value` only. Do **not** use `//` comments — they cause shell sourcing errors. Use `#` for comments.
+- **Agent skills**: Run `playwright-cli install --skills` to install the agent skill files into IDE-specific locations.
+- **Session name**: Set `PLAYWRIGHT_CLI_SESSION=sap claude .` to pre-configure the session name when launching Claude Code.
+
 ---
 
 ## Installation
@@ -292,6 +310,92 @@ for discovery results -- always `return` values.
 
 ---
 
+## FLP Navigation Patterns
+
+Modern SAP Fiori Launchpad (FLP) uses several navigation patterns. Check your FLP layout type
+before assuming GenericTiles -- the wrong pattern causes `navigateToTile()` failures.
+
+| Pattern         | When to Use                           | Praman Code                                                   |
+| --------------- | ------------------------------------- | ------------------------------------------------------------- |
+| GenericTile     | Classic FLP tile layout               | `await ui5.navigate.toTile('Tile Header')`                    |
+| Space Tab       | Modern FLP with spaces                | `await page.getByText('Space Name', { exact: true }).click()` |
+| Section Link    | Section-based app list within a space | `await page.getByRole('link', { name: 'App Name' }).click()`  |
+| Hash Navigation | Direct semantic object navigation     | `await ui5.navigate.toApp('SemanticObject-action')`           |
+
+:::warning IconTabFilter has no press() method
+`sap.m.IconTabFilter` does **not** have `press()` or `firePress()` methods. Playwright native
+DOM click is the only reliable approach for Space Tabs:
+
+```typescript
+await page.getByText('Bills Of Material', { exact: true }).click();
+```
+
+This is one of the few cases where Playwright native interaction is correct even for a UI5 control.
+:::
+
+:::tip Check your FLP layout first
+Before writing navigation code, verify which pattern your FLP uses. Run a quick discovery to
+check whether GenericTiles exist on the page. If `tileCount` is 0, the FLP uses Space Tabs or
+Section Links instead. See the plan file's FLP Navigation Patterns section
+for discovery scripts.
+:::
+
+---
+
+## Dialog Handling
+
+Dialog interactions require specific patterns to work reliably with Praman fixtures.
+
+### Import Requirement
+
+`ui5.dialog.*` methods require importing from `playwright-praman`, **not** from `@playwright/test`:
+
+```typescript
+// Correct -- provides ui5.dialog and all Praman fixtures
+import { test, expect } from 'playwright-praman';
+
+// Wrong -- ui5.dialog will be undefined
+import { test, expect } from '@playwright/test';
+```
+
+### V4 Fiori Elements Button ID Pattern
+
+V4 FE action parameter dialogs use predictable ID patterns based on the SRVD namespace:
+
+```text
+fe::APD_::${SRVD}.${ActionName}::Action::Ok      --> Primary action (Create/Save)
+fe::APD_::${SRVD}.${ActionName}::Action::Cancel   --> Cancel
+```
+
+### Control Disambiguation in Dialogs
+
+When multiple controls match the same properties (e.g., two buttons labeled "Create"), use
+these techniques in order of preference:
+
+1. **Exact ID** -- most reliable, especially for V4 FE generated IDs
+2. **`check()` callback** -- for exact text matching when IDs are not known
+3. **`controlType` + `properties`** -- least specific, may match multiple controls
+
+### searchOpenDialogs: true
+
+The `searchOpenDialogs: true` option prioritizes controls inside open dialogs:
+
+```typescript
+// Find button inside open dialog
+const btn = await ui5.control({
+  id: 'fe::APD_::SRVD.CreateBOM::Action::Ok',
+  searchOpenDialogs: true,
+});
+await ui5.press(btn);
+```
+
+:::warning searchOpenDialogs with ambiguous controls
+When multiple controls have the same properties, `searchOpenDialogs: true` alone may not be
+sufficient. Always prefer an exact ID to avoid matching the wrong control.
+:::
+
+---
+
 ## Praman CLI Commands
 
 In addition to `playwright-cli` commands, Praman provides its own CLI commands for bridge and snapshot operations:
@@ -457,14 +561,30 @@ SAP_CLOUD_PASSWORD=your-sap-password
 
 ## Troubleshooting
 
-| Problem                        | Solution                                                         |
-| ------------------------------ | ---------------------------------------------------------------- |
-| Bridge not ready               | Check `initScript` path in `praman-cli.json`                     |
-| `run-code` returns nothing     | Use `return` instead of `console.log()`                          |
-| Session not found              | Use `-s=<name>` consistently across commands                     |
-| Auth state expired             | Re-authenticate and `state-save` a fresh state file              |
-| Agent generates raw Playwright | Verify SKILL.md is readable at `skills/praman-sap-cli/SKILL.md`  |
-| Snapshot too large             | Always use `--filename` to save to file instead of inline output |
+| Problem                                 | Solution                                                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Bridge not ready                        | Check `initScript` path in `praman-cli.json`                                                                       |
+| `run-code` returns nothing              | Use `return` instead of `console.log()`                                                                            |
+| Session not found                       | Use `-s=<name>` consistently across commands                                                                       |
+| Auth state expired                      | Re-authenticate and `state-save` a fresh state file                                                                |
+| Agent generates raw Playwright          | Verify SKILL.md is readable at `skills/praman-sap-cli/SKILL.md`                                                    |
+| Snapshot too large                      | Always use `--filename` to save to file instead of inline output                                                   |
+| Login click timeout during IDP redirect | Expected behavior -- IDP redirect takes time. Increase timeout or wait for redirect to complete, then verify login |
+| `ui5.dialog` is undefined               | Wrong import or fixture level. Use `import { test } from 'playwright-praman'`, not `@playwright/test`              |
+| `npx playwright mcp` not found          | Playwright 1.59.x no longer bundles MCP. Install `@playwright/mcp` separately. CLI agents do not need MCP.         |
+
+---
+
+## Known Limitations
+
+| Limitation                                         | Details                                                                                                                 |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `searchOpenDialogs` requires exact ID              | When multiple controls share the same properties, `searchOpenDialogs: true` alone is insufficient. Use exact ID.        |
+| `navigateToTile()` only works for GenericTiles     | Modern FLP layouts using Space Tabs or Section Links require Playwright native interactions instead.                    |
+| `ui5.dialog.*` requires `playwright-praman` import | The dialog sub-fixture is not available when importing from `@playwright/test`.                                         |
+| V4 FE button IDs follow generated patterns         | Generated IDs based on SRVD namespace may change between UI5 versions. Pin your ID constants and update after upgrades. |
+
+---
 
 ## Next Steps
 

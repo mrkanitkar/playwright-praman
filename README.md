@@ -36,12 +36,12 @@ so tests survive UI5 upgrades, theme changes, and custom CSS without breaking.
 
 Business analysts define the process. AI agents — Claude, Copilot, Jules — generate the tests. No scripting required.
 
-Praman ships two first-class agent interfaces, both built into **Playwright 1.59+**:
+Praman ships two first-class agent interfaces:
 
-| Interface          | Transport              | Best For                                                       |
-| ------------------ | ---------------------- | -------------------------------------------------------------- |
-| **Playwright MCP** | WebSocket (JSON-RPC)   | Interactive exploration, VS Code / Copilot, inline screenshots |
-| **Playwright CLI** | stdin/stdout (compact) | CI/CD, token-efficient, any terminal-based agent               |
+| Interface          | Transport              | Install                                         | Best For                                         |
+| ------------------ | ---------------------- | ----------------------------------------------- | ------------------------------------------------ |
+| **Playwright MCP** | WebSocket (JSON-RPC)   | Requires `@playwright/mcp` (separate install)   | Interactive exploration, VS Code / Copilot       |
+| **Playwright CLI** | stdin/stdout (compact) | Included in `@playwright/test` (built-in 1.59+) | CI/CD, token-efficient, any terminal-based agent |
 
 Both produce identical gold-standard `.spec.ts` files using Praman fixtures. Both are installed by default when you run `npx playwright-praman init`.
 
@@ -56,21 +56,21 @@ Both produce identical gold-standard `.spec.ts` files using Praman fixtures. Bot
 
 ## Key Capabilities
 
-| Capability                | Details                                                                           |
-| ------------------------- | --------------------------------------------------------------------------------- |
-| **199 UI5 control types** | Covers `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc`  |
-| **Typed control proxies** | Full IntelliSense and autocomplete for every SAP control                          |
-| **UI5 stability sync**    | Automatic waiting — no `page.waitForTimeout()` needed                             |
-| **FLP navigation**        | Navigate to any Fiori Launchpad app by semantic object + action                   |
-| **6 auth strategies**     | BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, Manual          |
-| **OData V2/V4**           | Mock, intercept, and assert OData requests                                        |
-| **Fiori Elements**        | Page-object helpers for List Report, Object Page, Overview Page                   |
-| **10 UI5 matchers**       | Playwright-native `expect()` extended with UI5-specific assertions                |
-| **AI test generation**    | Describe tests in business language, get production-ready Playwright code         |
-| **MCP & CLI agents**      | Playwright MCP (interactive) and CLI (compact) — both built into Playwright 1.59+ |
-| **Playwright 1.57–1.59+** | Peer dep `>=1.57.0 <2.0.0`; CI-tested on 1.59                                     |
-| **TypeScript 5.x & 6.x**  | Builds with TS 6.x; published types compatible with TS 5.x consumers              |
-| **Cross-platform**        | Windows, macOS, Linux — Node.js 22+                                               |
+| Capability                | Details                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------- |
+| **199 UI5 control types** | Covers `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc`   |
+| **Typed control proxies** | Full IntelliSense and autocomplete for every SAP control                           |
+| **UI5 stability sync**    | Automatic waiting — no `page.waitForTimeout()` needed                              |
+| **FLP navigation**        | Navigate to any Fiori Launchpad app by semantic object + action                    |
+| **6 auth strategies**     | BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, Manual           |
+| **OData V2/V4**           | Mock, intercept, and assert OData requests                                         |
+| **Fiori Elements**        | Page-object helpers for List Report, Object Page, Overview Page                    |
+| **10 UI5 matchers**       | Playwright-native `expect()` extended with UI5-specific assertions                 |
+| **AI test generation**    | Describe tests in business language, get production-ready Playwright code          |
+| **MCP & CLI agents**      | MCP (interactive, separate install) and CLI (compact, built into Playwright 1.59+) |
+| **Playwright 1.57–1.59+** | Peer dep `>=1.57.0 <2.0.0`; CI-tested on 1.59                                      |
+| **TypeScript 5.x & 6.x**  | Builds with TS 6.x; published types compatible with TS 5.x consumers               |
+| **Cross-platform**        | Windows, macOS, Linux — Node.js 22+                                                |
 
 ## Quick Start
 
@@ -94,9 +94,17 @@ Two paths to get started — choose your workflow:
 Describe your business process — Praman's **plan → generate → heal** pipeline does the rest:
 
 ```bash
+# MCP agent (requires @playwright/mcp, uses seed file + browser screenshots)
 /praman-sap-coverage
 # Then enter: "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
+
+# CLI agent (built into Playwright 1.59+, no MCP server or seed file needed)
+/praman-cli-coverage
+# Then enter: "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
 ```
+
+> **Naming convention:** Agents with a `-cli` suffix use Playwright CLI (no MCP needed).
+> Agents without a suffix use Playwright MCP (requires `@playwright/mcp`).
 
 | Agent         | What it does                                                                  |
 | ------------- | ----------------------------------------------------------------------------- |
@@ -106,7 +114,9 @@ Describe your business process — Praman's **plan → generate → heal** pipel
 
 The result is a **production-ready `.spec.ts` file** — no manual scripting required. Works with Claude Code, GitHub Copilot, Cursor, and Jules.
 
-Agents connect to your live SAP system via **seed files** (`tests/seeds/sap-seed.spec.ts`) — these handle authentication and keep the browser open so agents can discover UI5 controls at runtime.
+**MCP agents** connect to your live SAP system via **seed files** (`tests/seeds/sap-seed.spec.ts`) —
+these handle authentication and keep the browser open so agents can discover UI5 controls at runtime.
+**CLI agents** do not need a seed file or MCP server — Playwright CLI manages the browser directly.
 
 Need agents for a different IDE? Mirrors Playwright's `init-agents`:
 
@@ -114,6 +124,8 @@ Need agents for a different IDE? Mirrors Playwright's `init-agents`:
 npx playwright-praman init-agents --loop=vscode
 npx playwright-praman init-agents --loop=claude
 npx playwright-praman init-agents --loop=cursor
+npx playwright-praman init-agents --loop=copilot
+npx playwright-praman init-agents --loop=jules
 # Add --no-cli to install MCP agents only (CLI agents are included by default)
 npx playwright-praman init-agents --loop=claude --no-cli
 ```
@@ -222,7 +234,36 @@ Output:
   - Test script: tests/e2e/sap-cloud/
 ```
 
-The agent explores your live SAP system, discovers UI5 controls via `sap.ui.getCore()`, and generates a `.spec.ts` file using Praman fixtures — no manual scripting required.
+The MCP agent explores your live SAP system, discovers UI5 controls via `sap.ui.getCore()`,
+and generates a `.spec.ts` file using Praman fixtures — no manual scripting required.
+
+#### CLI Agent Alternative
+
+CLI agents use Playwright CLI instead of MCP — no seed file or MCP server needed.
+Reference the `-cli` variant of the planner agent:
+
+```text
+Goal: Create SAP test case and test script
+
+1. Use praman SAP planner CLI agent:
+   .github/agents/praman-sap-planner-cli.agent.md
+
+2. Login using credentials in .env file and use Chrome in headed mode.
+   Do not use sub-agents.
+
+3. Ensure you use UI5 query and capture UI5 methods at each step.
+   Use UI5 methods for all control interactions.
+
+4. Here is the test case:
+   (same steps as above)
+
+Output:
+  - Test plan: specs/
+  - Test script: tests/e2e/sap-cloud/
+```
+
+> **Key difference:** CLI agents omit the seed file (step 4 in the MCP template).
+> Playwright CLI manages the browser lifecycle directly.
 
 ### What You Get
 
@@ -485,6 +526,9 @@ interface IntentResult<T = void> {
 | API reference                 | [API Docs](https://praman.dev/docs/api/)                                                           |
 | LLM-friendly docs             | [llms.txt](https://praman.dev/llms.txt)                                                            |
 | Repomix context (AI agents)   | [Download artifact](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml) |
+| CLI Agents guide              | [CLI Agents](https://praman.dev/docs/guides/playwright-cli-agents)                                 |
+| MCP vs CLI comparison         | [MCP vs CLI](https://praman.dev/docs/guides/mcp-vs-cli)                                            |
+| CLI Setup                     | [CLI Setup](https://praman.dev/docs/guides/playwright-cli-setup)                                   |
 
 ## Migrating to Praman
 
@@ -516,10 +560,10 @@ Yes. Praman extends Playwright — it does not replace it. You can mix Praman fi
 
 ### How does AI test generation work?
 
-Praman integrates with AI coding agents (Claude Code, GitHub Copilot, Cursor, Jules) via two built-in agent interfaces:
+Praman integrates with AI coding agents (Claude Code, GitHub Copilot, Cursor, Jules) via two agent interfaces:
 **Playwright MCP** (interactive, inline screenshots, ideal for VS Code and Copilot) and
 **Playwright CLI** (compact terminal output, ideal for CI/CD and token-efficient workflows).
-Both ship with Playwright 1.59+ — no extra packages needed.
+CLI is built into Playwright 1.59+; MCP requires installing `@playwright/mcp` separately.
 You describe what to test in business language
 (e.g., "test creating a purchase order with approval workflow"),
 and the agent generates production-ready Playwright tests using Praman fixtures — not brittle selectors.
