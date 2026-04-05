@@ -31,10 +31,10 @@ PRAMAN_EOF
 
 ## eval vs run-code
 
-| Use | Command | Syntax |
-|-----|---------|--------|
-| Quick check | `eval` | `playwright-cli eval "() => window.__praman_bridge?.ready"` |
-| Multi-step | `run-code` | `playwright-cli run-code "async page => { ... }"` |
+| Use         | Command    | Syntax                                                      |
+| ----------- | ---------- | ----------------------------------------------------------- |
+| Quick check | `eval`     | `playwright-cli eval "() => window.__praman_bridge?.ready"` |
+| Multi-step  | `run-code` | `playwright-cli run-code "async page => { ... }"`           |
 
 **CRITICAL:** `eval` requires a function wrapper `() => expr`. Bare expressions will fail.
 
@@ -47,6 +47,7 @@ playwright-cli eval "window.__praman_bridge?.ready"
 ```
 
 **`run-code` rules:**
+
 - Only `page` is in scope — no `process.env`, no `require()`
 - `console.log()` is invisible — always use `return` to get data
 - Return ONLY serializable values: strings, numbers, booleans, null, plain objects, arrays
@@ -110,12 +111,12 @@ playwright-cli -s=sap run-code "async page => {
 
 Shipped in `node_modules/playwright-praman/dist/scripts/`:
 
-| Script | Purpose | Parameterized |
-|--------|---------|:---:|
-| `discover-all.js` | All controls with methods (max 100) | No |
-| `wait-for-ui5.js` | Poll for UI5 stability | No |
-| `bridge-status.js` | Bridge readiness diagnostics | No |
-| `dialog-controls.js` | Controls inside open dialogs | No |
+| Script               | Purpose                             | Parameterized |
+| -------------------- | ----------------------------------- | :-----------: |
+| `discover-all.js`    | All controls with methods (max 100) |      No       |
+| `wait-for-ui5.js`    | Poll for UI5 stability              |      No       |
+| `bridge-status.js`   | Bridge readiness diagnostics        |      No       |
+| `dialog-controls.js` | Controls inside open dialogs        |      No       |
 
 Usage: `playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/SCRIPT.js)"`
 
@@ -416,6 +417,108 @@ test.describe('Purchase Order E2E Tests', () => {
 
 ---
 
+## Fixture Levels and Dialog Fallback Patterns
+
+### `ui5.dialog` requires Praman import
+
+The `ui5.dialog.*` methods (`confirm`, `dismiss`, `waitFor`, etc.) are provided by the
+Praman fixture system. They require importing `test` from `playwright-praman`, NOT from
+`@playwright/test`:
+
+```typescript
+// CORRECT -- ui5.dialog is available
+import { test, expect } from 'playwright-praman';
+
+// WRONG -- ui5.dialog will be undefined
+import { test, expect } from '@playwright/test';
+```
+
+If `ui5.dialog` is `undefined` at runtime, the test is using the wrong import.
+
+### Fallback: Dialog button via `searchOpenDialogs`
+
+When `ui5.dialog` methods are unavailable or the dialog uses non-standard buttons,
+use `ui5.control()` with `searchOpenDialogs: true` and the exact V4 FE button ID:
+
+```typescript
+// V4 FE dialog button ID pattern:
+// fe::APD_::${SRVD}.${ActionName}::Action::Ok
+const okBtn = await ui5.control({
+  id: 'fe::APD_::ns.service.CreateAction::Action::Ok',
+  searchOpenDialogs: true,
+});
+await okBtn.press();
+await ui5.waitForUI5();
+```
+
+The `searchOpenDialogs: true` option scans the static area for controls inside open
+dialogs, ensuring the control is found even when it is outside the normal DOM tree.
+
+---
+
+## FLP Navigation Patterns
+
+Different FLP layouts require different navigation methods. Choose the correct one
+based on the target element type:
+
+| Method                           | Target Element        | Use When                          |
+| -------------------------------- | --------------------- | --------------------------------- |
+| `navigateToSpace('Space Name')`  | `sap.m.IconTabFilter` | FLP Space Tab navigation          |
+| `navigateToSectionLink('App')`   | Section link (role)   | Section link within a Space       |
+| `navigateToTile('Tile Header')`  | `sap.m.GenericTile`   | GenericTile layout (classic FLP)  |
+| `navigateToApp('SemObj-action')` | Hash-based intent     | Direct semantic object navigation |
+
+### Space Tab navigation
+
+`sap.m.IconTabFilter` has no `press()` or `firePress()` methods in the UI5 API.
+`navigateToSpace()` uses a Playwright native DOM click internally because the
+IconTabFilter control does not expose a programmatic activation method:
+
+```typescript
+await test.step('Navigate to Space', async () => {
+  await ui5Navigation.navigateToSpace('My Workspace');
+  await ui5.waitForUI5();
+});
+```
+
+### Section link navigation
+
+`navigateToSectionLink()` uses Playwright role-based locators to click links within
+the current FLP section:
+
+```typescript
+await test.step('Open App from Section', async () => {
+  await ui5Navigation.navigateToSectionLink('Manage Purchase Orders');
+  await ui5.waitForUI5();
+});
+```
+
+### GenericTile navigation
+
+`navigateToTile()` only works for `sap.m.GenericTile` layouts. It will fail if the
+FLP uses Spaces with section links instead of tiles:
+
+```typescript
+await test.step('Open App from Tile', async () => {
+  await ui5Navigation.navigateToTile('Create Purchase Order');
+  await ui5.waitForUI5();
+});
+```
+
+### Hash-based navigation
+
+`navigateToApp()` bypasses the FLP shell entirely and navigates by semantic object
+and action hash:
+
+```typescript
+await test.step('Navigate by Intent', async () => {
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+  await ui5.waitForUI5();
+});
+```
+
+---
+
 ## Reference Documents
 
 Detailed patterns and advanced usage are in the `references/` directory:
@@ -480,12 +583,12 @@ playwright-cli snapshot --filename=after-save.yml
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `bridge not ready` | Missing `--config` flag | Add `--config=.playwright/praman-cli.config.json` to `open` command |
-| `eval` returns nothing | Bare expression (no wrapper) | Wrap in `() => expr`: `playwright-cli eval "() => expr"` |
-| `console.log` invisible | `run-code` captures return, not stdout | Use `return` instead of `console.log` |
-| `snapshot` filename error | Missing `--filename` | Use `playwright-cli screenshot --filename=step-01.png` |
-| 0 controls found | Page not fully loaded | Run `wait-for-ui5.js` script first |
-| `$(cat ...)` fails on Windows | Bash-only syntax | Use PowerShell: `playwright-cli run-code (Get-Content script.js -Raw)` |
-| Token overflow | Too many controls | Discovery scripts cap at 100; use type filter for targeted queries |
+| Symptom                       | Cause                                  | Fix                                                                    |
+| ----------------------------- | -------------------------------------- | ---------------------------------------------------------------------- |
+| `bridge not ready`            | Missing `--config` flag                | Add `--config=.playwright/praman-cli.config.json` to `open` command    |
+| `eval` returns nothing        | Bare expression (no wrapper)           | Wrap in `() => expr`: `playwright-cli eval "() => expr"`               |
+| `console.log` invisible       | `run-code` captures return, not stdout | Use `return` instead of `console.log`                                  |
+| `snapshot` filename error     | Missing `--filename`                   | Use `playwright-cli screenshot --filename=step-01.png`                 |
+| 0 controls found              | Page not fully loaded                  | Run `wait-for-ui5.js` script first                                     |
+| `$(cat ...)` fails on Windows | Bash-only syntax                       | Use PowerShell: `playwright-cli run-code (Get-Content script.js -Raw)` |
+| Token overflow                | Too many controls                      | Discovery scripts cap at 100; use type filter for targeted queries     |

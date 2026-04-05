@@ -213,6 +213,38 @@ const dialogInput = await ui5.control({
 });
 ```
 
+### Rule 8: Dialog Fixture Fallback
+
+If `ui5.dialog` is `undefined` at runtime, the test is using the wrong import
+(`@playwright/test` instead of `playwright-praman`). As a fallback, use
+`ui5.control()` with `searchOpenDialogs: true` and the exact V4 FE button ID:
+
+```typescript
+// Fallback when ui5.dialog is unavailable
+const okBtn = await ui5.control({
+  id: 'fe::APD_::ns.service.CreateAction::Action::Ok',
+  searchOpenDialogs: true,
+});
+await okBtn.press();
+```
+
+### Rule 9: FLP Navigation Method Selection
+
+Choose the correct navigation method based on the FLP layout:
+
+- `navigateToSpace('Space Name')` -- for FLP Space Tabs (`sap.m.IconTabFilter` has no `press()`/`firePress()`)
+- `navigateToSectionLink('App Name')` -- for section links within a Space
+- `navigateToTile('Tile Header')` -- only for `sap.m.GenericTile` layouts
+- `navigateToApp('SemObj-action')` -- hash-based navigation (bypasses FLP shell)
+
+```typescript
+// Space-based FLP layout
+await ui5Navigation.navigateToSpace('My Workspace');
+await ui5.waitForUI5();
+await ui5Navigation.navigateToSectionLink('Manage Purchase Orders');
+await ui5.waitForUI5();
+```
+
 ---
 
 ## DISCOVERY WORKFLOW (CLI)

@@ -289,6 +289,37 @@ playwright-cli -s=sap run-code "async page => {
 }"
 ```
 
+### Dialog Fixture Fallback
+
+If `ui5.dialog` is `undefined` at runtime, the test is using the wrong import
+(`@playwright/test` instead of `playwright-praman`). As a fallback, use
+`ui5.control()` with `searchOpenDialogs: true` and the exact V4 FE button ID:
+
+```typescript
+// Fallback when ui5.dialog is unavailable
+const okBtn = await ui5.control({
+  id: 'fe::APD_::ns.service.CreateAction::Action::Ok',
+  searchOpenDialogs: true,
+});
+await okBtn.press();
+```
+
+### FLP Navigation for Non-GenericTile Layouts
+
+When the FLP uses Spaces instead of tiles, use `navigateToSpace()` and
+`navigateToSectionLink()` instead of `navigateToTile()`:
+
+```typescript
+// Space-based FLP layout (IconTabFilter has no press/firePress)
+await ui5Navigation.navigateToSpace('My Workspace');
+await ui5.waitForUI5();
+await ui5Navigation.navigateToSectionLink('Manage Purchase Orders');
+await ui5.waitForUI5();
+```
+
+If a test fails because `navigateToTile()` cannot find the tile, check whether the
+FLP uses Spaces -- if so, switch to `navigateToSpace()` + `navigateToSectionLink()`.
+
 ### Step 4: Root Cause Analysis
 
 Determine the underlying cause by examining SAP-specific failure categories:
