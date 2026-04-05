@@ -49,10 +49,12 @@ Both produce identical gold-standard `.spec.ts` files using Praman fixtures. Bot
 
 ## Who is Praman for?
 
-- **CXOs & Program Leads** — go-live confidence backed by deployment evidence, not hope
-- **SAP test engineers** — reliable E2E tests for S/4HANA, Fiori, and BTP apps in minutes
-- **AI coding agents** (Claude Code, GitHub Copilot, Cursor, Jules) — generate tests from business descriptions
-- **QA teams** — agentic AI power for Playwright, purpose-built for SAP UI5-native testing
+| Stakeholder                                                | Value                                                                                                    |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **SAP test engineers**                                     | Write reliable E2E tests for any S/4HANA or Fiori app in minutes — no DOM hunting, no fragile selectors  |
+| **QA teams**                                               | Replace manual SAP test scripting with AI-generated, self-healing Playwright tests purpose-built for UI5 |
+| **AI coding agents** (Claude Code, Copilot, Cursor, Jules) | Generate production-ready SAP tests from a business process description, no source code or specs needed  |
+| **Program leads & delivery managers**                      | Ship SAP go-lives with deployment evidence — not manual sign-off and hope                                |
 
 ## Key Capabilities
 
