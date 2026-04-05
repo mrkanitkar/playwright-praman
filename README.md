@@ -9,43 +9,14 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/mrkanitkar/playwright-praman)
-[![Repomix](https://img.shields.io/badge/Repomix-context-blue?logo=github)](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml)
-[![Socket Badge](https://badge.socket.dev/npm/package/playwright-praman)](https://socket.dev/npm/package/playwright-praman)
 [![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20Agent-First%20SAP%20UI5%20Test%20Automation%20Plugin%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fpraman.dev%2Fllms-full.txt%0A%0AMy%20question%3A%20)
-[![npm trends](https://img.shields.io/npm/dm/playwright-praman?label=monthly%20downloads)](https://npmtrends.com/playwright-praman-vs-playwright-sap-vs-wdio-ui5-service)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/playwright-praman)](https://bundlephobia.com/package/playwright-praman)
 
-## What is Praman?
+Praman extends [Playwright](https://playwright.dev/) with deep SAP UI5 awareness — querying controls through
+the **UI5 runtime registry**, not fragile DOM selectors, so tests survive upgrades and theme changes.
+Describe your business process; AI agents deliver production-ready test scripts.
 
-Enterprise Playwright plugin for SAP S/4HANA. Describe your business process — AI agents deliver production-ready test scripts.
-
-Praman extends [Playwright](https://playwright.dev/) with deep SAP UI5 awareness.
-It queries controls through the **runtime control registry** — not fragile DOM selectors —
-so tests survive UI5 upgrades, theme changes, and custom CSS without breaking.
-
-## When to Use?
-
-- **SAP RISE & Public Cloud migration** — validate every Fiori app before and after cutover
-- **Frequent upgrade cycles** — quarterly UI5 patches, feature packs, and S/4HANA updates need continuous regression
-- **No documentation** — AI agents discover controls from your live system, no specs required
-- **Cost reduction** — replace manual test scripting with autonomous agent-generated tests
-- **Agentic automation** — build a complete plan → generate → heal pipeline with zero human scripting
-- **Greenfield, brownfield, or bluefield** — one plugin covers every S/4HANA deployment model
-
-## Agent-First Design
-
-Business analysts define the process. AI agents — Claude, Copilot, Jules — generate the tests. No scripting required.
-
-Praman ships two first-class agent interfaces:
-
-| Interface          | Transport              | Install                                         | Best For                                         |
-| ------------------ | ---------------------- | ----------------------------------------------- | ------------------------------------------------ |
-| **Playwright MCP** | WebSocket (JSON-RPC)   | Requires `@playwright/mcp` (separate install)   | Interactive exploration, VS Code / Copilot       |
-| **Playwright CLI** | stdin/stdout (compact) | Included in `@playwright/test` (built-in 1.59+) | CI/CD, token-efficient, any terminal-based agent |
-
-Both produce identical gold-standard `.spec.ts` files using Praman fixtures. Both are installed by default when you run `npx playwright-praman init`.
-
-> **[Agentic and Open Source Solutions for SAP Testing: Which One Should You Pick](https://mrkanitkar.github.io/playwright-praman/blog/2026/04/02/sap-test-automation-comparison)** compares all tools.
+> **[Comparing SAP test automation tools →](https://mrkanitkar.github.io/playwright-praman/blog/2026/04/02/sap-test-automation-comparison)**
 
 ## Who is Praman for?
 
@@ -56,24 +27,6 @@ Both produce identical gold-standard `.spec.ts` files using Praman fixtures. Bot
 | **AI coding agents** (Claude Code, Copilot, Cursor, Jules) | Generate production-ready SAP tests from a business process description, no source code or specs needed  |
 | **Program leads & delivery managers**                      | Ship SAP go-lives with deployment evidence — not manual sign-off and hope                                |
 
-## Key Capabilities
-
-| Capability                | Details                                                                            |
-| ------------------------- | ---------------------------------------------------------------------------------- |
-| **199 UI5 control types** | Covers `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc`   |
-| **Typed control proxies** | Full IntelliSense and autocomplete for every SAP control                           |
-| **UI5 stability sync**    | Automatic waiting — no `page.waitForTimeout()` needed                              |
-| **FLP navigation**        | Navigate to any Fiori Launchpad app by semantic object + action                    |
-| **6 auth strategies**     | BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, Manual           |
-| **OData V2/V4**           | Mock, intercept, and assert OData requests                                         |
-| **Fiori Elements**        | Page-object helpers for List Report, Object Page, Overview Page                    |
-| **10 UI5 matchers**       | Playwright-native `expect()` extended with UI5-specific assertions                 |
-| **AI test generation**    | Describe tests in business language, get production-ready Playwright code          |
-| **MCP & CLI agents**      | MCP (interactive, separate install) and CLI (compact, built into Playwright 1.59+) |
-| **Playwright 1.57–1.59+** | Peer dep `>=1.57.0 <2.0.0`; CI-tested on 1.59                                      |
-| **TypeScript 5.x & 6.x**  | Builds with TS 6.x; published types compatible with TS 5.x consumers               |
-| **Cross-platform**        | Windows, macOS, Linux — Node.js 22+                                                |
-
 ## Quick Start
 
 ```bash
@@ -81,571 +34,123 @@ npm install playwright-praman
 npx playwright-praman init
 ```
 
-That's it. `init` validates your environment, installs Chromium, scaffolds config files, detects your IDE, and installs AI agent definitions.
+`init` scaffolds config, installs Chromium, and sets up AI agent definitions for your IDE.
 
 ```bash
-# Set your SAP credentials
 cp .env.example .env
-# Edit .env with your SAP_CLOUD_BASE_URL, SAP_CLOUD_USERNAME, SAP_CLOUD_PASSWORD
+# Add SAP_CLOUD_BASE_URL, SAP_CLOUD_USERNAME, SAP_CLOUD_PASSWORD
 ```
 
-Two paths to get started — choose your workflow:
+→ [Getting Started guide](https://praman.dev/docs/guides/getting-started)
 
-### Path A: Generate Tests with AI Agents (recommended)
+## Two Ways to Test
 
-Describe your business process — Praman's **plan → generate → heal** pipeline does the rest:
+### Option A — AI Agents (recommended)
+
+Describe your business process. Praman's **plan → generate → heal** pipeline does the rest.
 
 ```bash
-# MCP agent (requires @playwright/mcp, uses seed file + browser screenshots)
+# In Claude Code, Copilot, or Cursor:
 /praman-sap-coverage
-# Then enter: "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
-
-# CLI agent (built into Playwright 1.59+, no MCP server or seed file needed)
-/praman-cli-coverage
-# Then enter: "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
+# "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
 ```
 
-> **Naming convention:** Agents with a `-cli` suffix use Playwright CLI (no MCP needed).
-> Agents without a suffix use Playwright MCP (requires `@playwright/mcp`).
+| Agent         | What it does                                           |
+| ------------- | ------------------------------------------------------ |
+| **Planner**   | Explores your live SAP system and produces a test plan |
+| **Generator** | Converts the plan into typed Playwright + Praman code  |
+| **Healer**    | Runs the test, fixes failures, repeats until green     |
 
-| Agent         | What it does                                                                  |
-| ------------- | ----------------------------------------------------------------------------- |
-| **Planner**   | Explores your live SAP system, discovers UI5 controls, produces a test plan   |
-| **Generator** | Converts the plan into executable Playwright + Praman code with typed proxies |
-| **Healer**    | Runs the test, fixes failures, ensures compliance — repeats until green       |
+Two agent variants ship by default — **MCP** (interactive, VS Code/Copilot) and **CLI** (terminal, token-efficient).
+Files with a `-cli` suffix use Playwright CLI; files without use Playwright MCP (requires `@playwright/mcp`).
 
-The result is a **production-ready `.spec.ts` file** — no manual scripting required. Works with Claude Code, GitHub Copilot, Cursor, and Jules.
+→ [Agent & IDE Setup](https://praman.dev/docs/guides/agent-setup) · [MCP vs CLI](https://praman.dev/docs/guides/mcp-vs-cli) · [CLI Agents Guide](https://praman.dev/docs/guides/playwright-cli-agents)
 
-**MCP agents** connect to your live SAP system via **seed files** (`tests/seeds/sap-seed.spec.ts`) —
-these handle authentication and keep the browser open so agents can discover UI5 controls at runtime.
-**CLI agents** do not need a seed file or MCP server — Playwright CLI manages the browser directly.
-
-Need agents for a different IDE? Mirrors Playwright's `init-agents`:
-
-```bash
-npx playwright-praman init-agents --loop=vscode
-npx playwright-praman init-agents --loop=claude
-npx playwright-praman init-agents --loop=cursor
-npx playwright-praman init-agents --loop=copilot
-npx playwright-praman init-agents --loop=jules
-# Add --no-cli to install MCP agents only (CLI agents are included by default)
-npx playwright-praman init-agents --loop=claude --no-cli
-```
-
-> Guides: [Getting Started](https://praman.dev/docs/guides/getting-started)
-> · [Agent & IDE Setup](https://praman.dev/docs/guides/agent-setup)
-> · [Running Your Agent](https://praman.dev/docs/guides/running-your-agent)
-
-### Path B: Write Tests Manually
-
-Prefer writing tests by hand? Use Praman fixtures directly:
+### Option B — Write Tests Manually
 
 ```typescript
 import { test, expect } from 'playwright-praman';
 
-test('open Fiori app', async ({ page, ui5 }) => {
-  await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
+test('create purchase order', async ({ page, ui5, ui5Navigation }) => {
+  await ui5Navigation.navigateToTile('Purchase Orders');
   await ui5.waitForUI5();
 
-  const tile = await ui5.control({
-    controlType: 'sap.m.GenericTile',
-    properties: { header: 'My App' },
+  const createBtn = await ui5.control({
+    controlType: 'sap.m.Button',
+    properties: { text: 'Create' },
   });
-  expect(await tile.getControlType()).toBe('sap.m.GenericTile');
+  await createBtn.press();
+  await ui5.waitForUI5();
 });
 ```
 
-```bash
-npx playwright test --project=chromium --headed
-```
-
-Destructure any fixture you need:
-
-| Fixture         | What it gives you                                  |
-| --------------- | -------------------------------------------------- |
-| `ui5`           | Control discovery, interaction, `waitForUI5()`     |
-| `ui5Navigation` | FLP tile/intent navigation, `navigateToApp()`      |
-| `sapAuth`       | SAP login with 6 auth strategies                   |
-| `fe`            | Fiori Elements helpers (List Report, Object Page)  |
-| `ui5.table`     | Table rows, cells, sort, filter, export            |
-| `ui5.dialog`    | Dialog open/close, confirm/dismiss                 |
-| `ui5.odata`     | OData model access, `waitForODataLoad()`           |
-| `pramanAI`      | AI agent integration for test generation           |
-| `intent`        | SAP domain actions (create PO, post invoice, etc.) |
-| `testData`      | Test data generation with UUID/timestamp support   |
-| `controlTree`   | UI5 control tree inspection and discovery          |
-| `shellFooter`   | FLP shell bar and footer interaction               |
-| `flpLocks`      | SM12 lock management with auto-cleanup             |
-
-> See the [Fixture Reference](https://praman.dev/docs/guides/fixtures) and [Selector Reference](https://praman.dev/docs/guides/selectors) for the full API.
-
-## Example
-
-### Prompt Template — AI Agent Test Generation
-
-Describe your SAP business process as a prompt. Praman's AI agents (Claude Code, Copilot, Cursor, Jules) turn it into a production-ready test script.
-
-```text
-Goal: Create SAP test case and test script
-
-1. Use praman SAP planner agent:
-   .github/agents/praman-sap-planner.agent.md
-
-2. Login using credentials in .env file and use Chrome in headed mode.
-   Do not use sub-agents.
-
-3. Ensure you use UI5 query and capture UI5 methods at each step.
-   Use UI5 methods for all control interactions.
-
-4. Use seed file: tests/seeds/sap-seed.spec.ts
-
-5. Here is the test case:
-
-   Login to SAP and ensure you are on the landing page.
-
-   Step 1: Navigate to Maintain Bill of Material app and click Create BOM
-     - expect: Create BOM dialog opens with all fields visible
-
-   Step 2: Select Material via Value Help — pick a valid material
-     - expect: Material field is populated with selected material
-
-   Step 3: Select Plant via Value Help — pick plant matching the material
-     - expect: Plant field is populated with selected plant
-
-   Step 4: Select BOM Usage "Production (1)" from dropdown
-     - expect: BOM Usage field shows "Production (1)"
-
-   Step 5: Verify all required fields are filled before submission
-     - expect: Material field has a value
-     - expect: BOM Usage field has value "Production (1)"
-     - expect: Valid From date is set
-     - expect: Create BOM button is enabled
-
-   Step 6: Click "Create BOM" submit button in dialog footer
-     - expect: If valid combination — dialog closes, BOM created,
-       user returns to list report
-     - expect: If invalid combination — error message dialog appears
-
-   Step 7: If error occurs, close error dialog and cancel
-     - expect: Error dialog closes
-     - expect: Create BOM dialog closes
-     - expect: User returns to list report
-
-Output:
-  - Test plan: specs/
-  - Test script: tests/e2e/sap-cloud/
-```
-
-The MCP agent explores your live SAP system, discovers UI5 controls via `sap.ui.getCore()`,
-and generates a `.spec.ts` file using Praman fixtures — no manual scripting required.
-
-#### CLI Agent Alternative
-
-CLI agents use Playwright CLI instead of MCP — no seed file or MCP server needed.
-Reference the `-cli` variant of the planner agent:
-
-```text
-Goal: Create SAP test case and test script
-
-1. Use praman SAP planner CLI agent:
-   .github/agents/praman-sap-planner-cli.agent.md
-
-2. Login using credentials in .env file and use Chrome in headed mode.
-   Do not use sub-agents.
-
-3. Ensure you use UI5 query and capture UI5 methods at each step.
-   Use UI5 methods for all control interactions.
-
-4. Here is the test case:
-   (same steps as above)
-
-Output:
-  - Test plan: specs/
-  - Test script: tests/e2e/sap-cloud/
-```
-
-> **Key difference:** CLI agents omit the seed file (step 4 in the MCP template).
-> Playwright CLI manages the browser lifecycle directly.
-
-### What You Get
-
-The pipeline produces two artifacts:
-
-1. **Test plan** (`specs/*.plan.md`) — structured Markdown with app overview, discovered controls, step-by-step scenarios, and expected outcomes
-2. **Test script** (`tests/e2e/*.spec.ts`) — production-ready Playwright + Praman code generated from the plan
-
-#### Sample Test Plan (excerpt)
-
-```markdown
-# BOM Create Flow — Test Plan
-
-## Application Overview
-
-SAP S/4HANA Cloud - Maintain Bill of Material (Version 2).
-Fiori Elements V4 List Report with Create BOM dialog.
-UI5 Version: 1.142.4. Controls use MDC field types.
-
-## Test Scenarios
-
-### 1. Navigate to Maintain BOM app from FLP
-
-1. Click on 'Maintain Bill Of Material (Version 2)' tile
-   - expect: Page navigates to #MaterialBOM-maintainMaterialBOM
-   - expect: Filter bar is visible with fields: Material, Plant, BOM Usage
-   - expect: 'Create BOM' button is visible and enabled
-```
-
-#### Sample Test Script
-
-```typescript
-import { test, expect } from 'playwright-praman';
-
-test.describe('Maintain BOM — Create Flow', () => {
-  test('Create BOM end-to-end', async ({ page, ui5, ui5Navigation }) => {
-    await test.step('Step 1: Navigate to app', async () => {
-      await ui5Navigation.navigateToTile('Maintain Bill of Material');
-      await ui5.waitForUI5();
-    });
-
-    await test.step('Step 2: Open Create BOM dialog', async () => {
-      const createBtn = await ui5.control({
-        controlType: 'sap.m.Button',
-        properties: { text: 'Create' },
-      });
-      await createBtn.press();
-      await ui5.waitForUI5();
-    });
-
-    await test.step('Step 3: Fill Material via Value Help', async () => {
-      const materialField = await ui5.control({
-        id: 'materialInput',
-        searchOpenDialogs: true,
-      });
-      await materialField.setValue('MAT-001');
-      await materialField.fireChange({ value: 'MAT-001' });
-      await ui5.waitForUI5();
-      expect(await materialField.getValue()).toBeTruthy();
-    });
-  });
-});
-```
-
-More examples in the [`examples/`](./examples/) directory.
-
-## How Praman Works
-
-Praman uses a **6-layer architecture**:
-
-1. **Core Infrastructure** — error system, logging (pino), config (zod), path helpers
-2. **Bridge Adapters** — inject JavaScript into the browser to query the UI5 runtime control registry
-3. **Typed Proxy** — TypeScript proxies for each UI5 control type with full IntelliSense
-4. **Fixtures** — Playwright test fixtures (`ui5`, `ui5Navigation`, `ui5Table`, `ui5Auth`, etc.)
-5. **AI Layer** — LLM integration for agentic test generation from business-language descriptions
-6. **Reporters** — Custom Playwright reporters for compliance evidence and OData trace
-
-Lower layers never import from higher layers. The bridge communicates with UI5's `sap.ui.getCore()` and OData model APIs directly in the browser context.
-
-## Discovery & Interaction Strategies
-
-Praman uses two configurable strategy systems — **discovery** (how controls are found) and **interaction** (how actions are performed). Both use priority chains with automatic fallbacks.
-
-### 3 Discovery Strategies
-
-| Strategy       | How It Works                                                    | Best For                         |
-| -------------- | --------------------------------------------------------------- | -------------------------------- |
-| `direct-id`    | Single ID lookup via `sap.ui.core.Element.registry`             | Known stable IDs — fastest path  |
-| `recordreplay` | SAP `RecordReplay` API (UI5 >= 1.94) with full selector support | Complex selectors, standard apps |
-| `registry`     | Full registry scan matching type, properties, bindings          | Dynamic controls, fallback       |
-
-Praman runs strategies in priority order and stops at the first match. ID-only selectors automatically promote `direct-id` to first position.
-
-### 3 Interaction Strategies
-
-| Strategy     | Approach                                                    | Best For                                      |
-| ------------ | ----------------------------------------------------------- | --------------------------------------------- |
-| `ui5-native` | Direct UI5 event firing (`firePress`, `setValue`) — default | Standard Fiori apps (broadest fallback)       |
-| `dom-first`  | DOM events first, UI5 fallback                              | Custom composites, Web Components, Shadow DOM |
-| `opa5`       | SAP `RecordReplay.interactWithControl()` (UI5 >= 1.94)      | SAP compliance audits, OPA5 migration         |
-
-Each strategy includes a built-in fallback chain — no single strategy needs to handle every control type alone.
-
-### Configuration
-
-```bash
-# Environment variables — override per test run
-PRAMAN_INTERACTION_STRATEGY=dom-first npx playwright test
-PRAMAN_DISCOVERY_STRATEGIES=direct-id,recordreplay,registry npx playwright test
-```
-
-See the full [Discovery & Interaction Strategies](https://praman.dev/docs/guides/discovery-and-interaction) guide
-for decision matrices, fallback chain diagrams, and recommended configurations by app type.
-
-## Vocabulary System
-
-Use the vocabulary system when your tests need to reference SAP fields
-by **business name** instead of hard-coded selectors.
-The vocabulary resolves natural-language terms like "vendor", "supplier",
-or "LIFNR" to the correct UI5 selector — with fuzzy matching,
-synonym resolution, and cross-domain search across 6 SAP modules.
-
-**When to use:** AI agents generating tests from business descriptions,
-tests that must survive field-label changes across SAP upgrades,
-or any scenario where you want selector resolution decoupled from test logic.
-
-```typescript
-import { createVocabularyService } from 'playwright-praman/vocabulary';
-import type { VocabularyService, SAPDomain } from 'playwright-praman/vocabulary';
-
-const vocabulary: VocabularyService = createVocabularyService();
-await vocabulary.loadDomain('procurement');
-
-// Search by business term — returns ranked results with confidence scores
-const results = await vocabulary.search('vendor');
-// → [{ term: 'supplier', confidence: 0.9, domain: 'procurement', sapField: 'LIFNR', selector: {...} }]
-
-// Resolve a term directly to a UI5 selector (returns undefined if ambiguous)
-const selector = await vocabulary.getFieldSelector('supplier', 'procurement');
-
-// Autocomplete for AI agent prompts
-const suggestions = await vocabulary.getSuggestions('ven', 5);
-// → ['vendor', 'vendor invoice', 'vendor master']
-```
-
-### Bundled SAP Domains
-
-| Domain          | SAP Module | Coverage                                |
-| --------------- | ---------- | --------------------------------------- |
-| `procurement`   | MM         | Vendors, purchase orders, goods receipt |
-| `sales`         | SD         | Customers, sales orders, deliveries     |
-| `finance`       | FI         | GL accounts, AP invoices, AR payments   |
-| `manufacturing` | PP         | Production orders, BOMs, routings       |
-| `warehouse`     | WM/EWM     | Storage locations, picking, transfers   |
-| `quality`       | QM         | Inspection lots, results, certificates  |
-
-> Guide: [Vocabulary System](https://praman.dev/docs/guides/vocabulary-system) · [Vocabulary Discovery Examples](https://praman.dev/docs/examples/vocabulary-discovery)
-
-## Intent API
-
-Use the intent API when you want to express test steps as **business operations**
-rather than individual control interactions. Instead of filling 5 fields and
-clicking Save, call `intent.procurement.createPurchaseOrder(data)` — the intent
-handles navigation, field filling, vocabulary resolution, confirmation,
-and save validation.
-
-**When to use:** AI-generated tests, cross-module business flows, tests that
-should read like requirements documents, or when you need structured result
-metadata (duration, steps executed, SAP module) for reporting.
-
-### Via Fixture (recommended)
-
-```typescript
-import { test, expect } from 'playwright-praman';
-
-test('create purchase order', async ({ intent }) => {
-  const result = await intent.procurement.createPurchaseOrder({
-    vendor: '100001',
-    material: 'MAT-001',
-    quantity: 10,
-    plant: '1000',
-  });
-
-  expect(result.status).toBe('success');
-  expect(result.metadata.sapModule).toBe('MM');
-  expect(result.metadata.stepsExecuted).toContain('save');
-});
-```
-
-### Core Wrappers (building blocks)
-
-Core wrappers are the low-level functions that domain intents compose. Use them directly when you need fine-grained control or are building a custom domain flow:
-
-| Wrapper             | Purpose                                              |
-| ------------------- | ---------------------------------------------------- |
-| `fillField`         | Fill input with vocabulary term resolution           |
-| `clickButton`       | Click button by text label                           |
-| `selectOption`      | Select dropdown option with vocabulary lookup        |
-| `assertField`       | Assert field value matches expected text             |
-| `navigateAndSearch` | FLP navigation + vocabulary-driven search            |
-| `confirmAndWait`    | Click OK/Confirm and wait for UI5 stability          |
-| `waitForSave`       | Wait for save completion (replaces `waitForTimeout`) |
-
-### Domain Namespaces
-
-| Namespace       | SAP Module | Operations                                            |
-| --------------- | ---------- | ----------------------------------------------------- |
-| `procurement`   | MM         | Create/search PO, goods receipt, invoice verification |
-| `sales`         | SD         | Create/search SO, delivery, billing                   |
-| `finance`       | FI         | Journal entry, vendor invoice, payment, GL posting    |
-| `manufacturing` | PP         | Production order, confirmation, BOM maintenance       |
-| `masterData`    | Cross      | Vendor, customer, material master create/search       |
-
-### IntentResult Envelope
-
-Every intent function returns an `IntentResult<T>` with status, error details, and execution metadata — designed for both human reporting and AI agent self-healing:
-
-```typescript
-interface IntentResult<T = void> {
-  readonly status: 'success' | 'error' | 'partial';
-  readonly data?: T;
-  readonly error?: { readonly code: string; readonly message: string };
-  readonly metadata: {
-    readonly duration: number;
-    readonly retryable: boolean;
-    readonly suggestions: string[];
-    readonly intentName: string;
-    readonly sapModule: string;
-    readonly stepsExecuted: string[];
-  };
-}
-```
-
-> Guide: [Intent API](https://praman.dev/docs/guides/intent-api) · [Intent Examples](https://praman.dev/docs/examples/intent-api)
-
-## Sub-path Exports
-
-| Export                         | Description                                                                  |
-| ------------------------------ | ---------------------------------------------------------------------------- |
-| `playwright-praman`            | Core fixtures (`ui5`, `ui5Navigation`, `sapAuth`, `fe`), typed proxy, bridge |
-| `playwright-praman/ai`         | AI/LLM service for agentic test generation and self-healing                  |
-| `playwright-praman/intents`    | Business-level SAP operations — core wrappers + 5 domain namespaces          |
-| `playwright-praman/vocabulary` | SAP business term → UI5 selector resolution with fuzzy matching (6 domains)  |
-| `playwright-praman/fe`         | Fiori Elements page-object helpers (List Report, Object Page, Overview Page) |
-| `playwright-praman/reporters`  | Custom Playwright reporters for compliance evidence and OData trace          |
+Fixtures available: `ui5`, `ui5Navigation`, `sapAuth`, `fe`, `ui5.table`, `ui5.dialog`,
+`ui5.odata`, `intent`, `pramanAI`, `testData`, `controlTree`, `shellFooter`, `flpLocks`.
+
+→ [Fixture Reference](https://praman.dev/docs/guides/fixtures) · [Selector Reference](https://praman.dev/docs/guides/selectors) · [Examples](./examples/)
+
+## Key Capabilities
+
+- **199 UI5 control types** — `sap.m`, `sap.ui.table`, `sap.ui.comp`, `sap.uxap`, `sap.f`, `sap.ui.mdc`
+- **Typed control proxies** — full IntelliSense and autocomplete for every SAP control
+- **UI5 stability sync** — automatic waiting, no `page.waitForTimeout()` needed
+- **6 auth strategies** — BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, Manual
+- **OData V2/V4** — mock, intercept, and assert OData requests with tracing reports
+- **Fiori Elements** — List Report, Object Page, and Overview Page helpers
+- **10 UI5 matchers** — Playwright-native `expect()` extended with UI5-specific assertions
+- **Vocabulary & Intent API** — resolve SAP field names to selectors; express tests as business operations
+- **Cross-platform** — Windows, macOS, Linux · Node.js 22+ · TypeScript 5.x & 6.x
+
+→ [Full capability reference](https://praman.dev/docs)
 
 ## Documentation
 
-| Topic                         | Link                                                                                               |
-| ----------------------------- | -------------------------------------------------------------------------------------------------- |
-| Full documentation            | [praman.dev](https://praman.dev)                                                                   |
-| Getting started guide         | [Getting Started](https://praman.dev/docs/guides/getting-started)                                  |
-| Configuration reference       | [Configuration](https://praman.dev/docs/guides/configuration)                                      |
-| Authentication (6 strategies) | [Authentication](https://praman.dev/docs/guides/authentication)                                    |
-| Agent & IDE setup             | [Agent Setup](https://praman.dev/docs/guides/agent-setup)                                          |
-| Fixtures reference            | [Fixtures](https://praman.dev/docs/guides/fixtures)                                                |
-| Vocabulary system             | [Vocabulary](https://praman.dev/docs/guides/vocabulary-system)                                     |
-| Intent API                    | [Intents](https://praman.dev/docs/guides/intent-api)                                               |
-| Error codes (67)              | [Errors](https://praman.dev/docs/guides/errors)                                                    |
-| API reference                 | [API Docs](https://praman.dev/docs/api/)                                                           |
-| LLM-friendly docs             | [llms.txt](https://praman.dev/llms.txt)                                                            |
-| Repomix context (AI agents)   | [Download artifact](https://github.com/mrkanitkar/playwright-praman/actions/workflows/repomix.yml) |
-| CLI Agents guide              | [CLI Agents](https://praman.dev/docs/guides/playwright-cli-agents)                                 |
-| MCP vs CLI comparison         | [MCP vs CLI](https://praman.dev/docs/guides/mcp-vs-cli)                                            |
-| CLI Setup                     | [CLI Setup](https://praman.dev/docs/guides/playwright-cli-setup)                                   |
+| Topic                              | Link                                                                   |
+| ---------------------------------- | ---------------------------------------------------------------------- |
+| Full documentation                 | [praman.dev](https://praman.dev)                                       |
+| Getting started                    | [Getting Started](https://praman.dev/docs/guides/getting-started)      |
+| Configuration                      | [Configuration](https://praman.dev/docs/guides/configuration)          |
+| Authentication                     | [Authentication](https://praman.dev/docs/guides/authentication)        |
+| Agent & IDE setup                  | [Agent Setup](https://praman.dev/docs/guides/agent-setup)              |
+| Fixtures reference                 | [Fixtures](https://praman.dev/docs/guides/fixtures)                    |
+| Discovery & interaction strategies | [Strategies](https://praman.dev/docs/guides/discovery-and-interaction) |
+| Vocabulary system                  | [Vocabulary](https://praman.dev/docs/guides/vocabulary-system)         |
+| Intent API                         | [Intents](https://praman.dev/docs/guides/intent-api)                   |
+| OData tracing                      | [OData Tracing](https://praman.dev/docs/guides/odata-tracing)          |
+| Error codes                        | [Errors](https://praman.dev/docs/guides/errors)                        |
+| API reference                      | [API Docs](https://praman.dev/docs/api/)                               |
+| LLM-friendly docs                  | [llms.txt](https://praman.dev/llms.txt)                                |
 
-## Migrating to Praman
+## Migrating from Another Tool?
 
-Already using another SAP testing tool? Step-by-step migration guides:
+- [From wdi5](https://praman.dev/docs/guides/migration-from-wdi5)
+- [From Tricentis Tosca](https://praman.dev/docs/guides/migration-from-tosca)
+- [From Selenium WebDriver](https://praman.dev/docs/guides/migration-from-selenium)
+- [From raw Playwright](https://praman.dev/docs/guides/migration-from-playwright)
 
-- [**From wdi5**](https://praman.dev/docs/guides/migration-from-wdi5) — API mapping from `browser.asControl()` to `ui5.control()`, selector conversion, fixture equivalents
-- [**From Tricentis Tosca**](https://praman.dev/docs/guides/migration-from-tosca) — module-to-fixture mapping, open-source cost comparison
-- [**From Selenium WebDriver**](https://praman.dev/docs/guides/migration-from-selenium) — WebDriver to Playwright patterns, locator strategy migration
-- [**From raw Playwright**](https://praman.dev/docs/guides/migration-from-playwright) — add UI5 awareness to existing Playwright tests
+## FAQ
 
-## Frequently Asked Questions
+**Do I need SAP source code?** No — Praman uses the public UI5 runtime API (`sap.ui.getCore()`).
 
-### What SAP systems does Praman support?
+**Does it work with existing Playwright tests?** Yes — Praman extends Playwright. Mix `ui5` fixtures
+with native `page.click()` in the same file.
 
-Praman supports SAP S/4HANA (on-premise and cloud), SAP BTP applications,
-SAP Fiori Launchpad, and any web application built with SAPUI5 or OpenUI5.
-It works with both SAP Fiori Elements and custom UI5 freestyle apps.
+**Which SAP systems are supported?** S/4HANA (cloud and on-premise), BTP, Fiori Launchpad,
+SAPUI5, and OpenUI5 — both Fiori Elements and freestyle apps.
 
-### Do I need access to SAP source code?
-
-No. Praman interacts with UI5 controls through the public runtime API (`sap.ui.getCore()`).
-It queries the control registry at runtime, so you only need browser access to the application.
-
-### Can I use Praman with existing Playwright tests?
-
-Yes. Praman extends Playwright — it does not replace it. You can mix Praman fixtures
-(`ui5`, `ui5Navigation`, `ui5Table`) with native Playwright APIs
-(`page.click()`, `page.locator()`) in the same test file.
-
-### How does AI test generation work?
-
-Praman integrates with AI coding agents (Claude Code, GitHub Copilot, Cursor, Jules) via two agent interfaces:
-**Playwright MCP** (interactive, inline screenshots, ideal for VS Code and Copilot) and
-**Playwright CLI** (compact terminal output, ideal for CI/CD and token-efficient workflows).
-CLI is built into Playwright 1.59+; MCP requires installing `@playwright/mcp` separately.
-You describe what to test in business language
-(e.g., "test creating a purchase order with approval workflow"),
-and the agent generates production-ready Playwright tests using Praman fixtures — not brittle selectors.
-
-### How does Praman compare to wdi5?
-
-Both access the UI5 control registry. Praman is built on Playwright (faster, parallel, modern tooling),
-while wdi5 uses WebdriverIO. Praman adds typed control proxies with IntelliSense,
-AI-powered test generation, Fiori Elements page-object helpers,
-OData V2/V4 mock/intercept utilities, and 10 UI5-specific Playwright matchers.
-
-## OData Performance Tracing
-
-Praman can automatically capture OData network requests during test execution and produce a performance report — no manual instrumentation needed.
-
-### Enable tracing
-
-```typescript
-// praman.config.ts
-import { defineConfig } from 'playwright-praman';
-
-export default defineConfig({
-  odataTracing: { enabled: true },
-});
-```
-
-### Add the reporter
-
-```typescript
-// playwright.config.ts
-import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  reporter: [['list'], ['playwright-praman/reporters', { outputDir: 'test-results' }]],
-});
-```
-
-The reporter writes `odata-trace.json` with per-entity-set stats (total calls, avg/max duration, error count, method breakdown) and individual request traces.
-
-### Custom URL patterns
-
-By default, Praman matches `/sap/opu/odata/`, `/sap/opu/odata4/`, `/odata/v2/`, and `/odata/v4/`. Add custom patterns for non-standard service paths:
-
-```typescript
-odataTracing: {
-  enabled: true,
-  urlPatterns: ['/my-custom-service/'],
-},
-```
-
-> **Note:** Auto-tracing captures browser-level traffic (XHR/fetch from the SAP Fiori app). Node-level `page.request.*` API calls are not intercepted.
-
-## Error Codes Quick Reference
-
-Every Praman error includes a machine-readable `code`, human-readable `message`, `attempted` action, `retryable` flag, and `suggestions[]` array. 14 error classes, 66 error codes.
-
-| Prefix           | Domain          | Common cause                                         |
-| ---------------- | --------------- | ---------------------------------------------------- |
-| `ERR_CONTROL_*`  | UI5 controls    | Control not found, not visible, not enabled          |
-| `ERR_BRIDGE_*`   | Bridge adapter  | UI5 not loaded, CSP policy, iframe isolation         |
-| `ERR_AUTH_*`     | Authentication  | Wrong credentials, session expired, strategy invalid |
-| `ERR_NAV_*`      | FLP navigation  | Tile not found, route failed, timeout                |
-| `ERR_ODATA_*`    | OData requests  | 403/404 response, CSRF token, parse error            |
-| `ERR_SELECTOR_*` | Selector engine | Invalid syntax, ambiguous match                      |
-| `ERR_TIMEOUT_*`  | Timeouts        | UI5 stability, control discovery, operation          |
-| `ERR_CONFIG_*`   | Configuration   | Invalid value, missing file, parse error             |
-| `ERR_AI_*`       | AI/LLM          | Provider unavailable, token limit, rate limited      |
-
-All errors extend `PramanError` with `.toUserMessage()` for terminal output and `.toAIContext()` for agent self-healing. See the full [Error Reference](https://praman.dev/docs/guides/errors).
-
-## Support
-
-If Praman saves you time, please [star the repo](https://github.com/mrkanitkar/playwright-praman) — it helps others discover the project.
+→ [Full FAQ](https://praman.dev/docs/faq)
 
 ## Security
 
-- **npm provenance** — every published version includes a [provenance attestation](https://docs.npmjs.com/generating-provenance-statements)
-- **3 production dependencies** — `commander` (MIT), `pino` (MIT), `zod` (MIT)
-- **SBOM** — CycloneDX 1.5 generated per release
-- **SHA-pinned Actions** — see [SECURITY.md](./SECURITY.md)
+- 3 production dependencies (`commander`, `pino`, `zod` — all MIT)
+- npm provenance attestation on every release
+- SHA-pinned GitHub Actions · CycloneDX SBOM per release
+
+→ [SECURITY.md](./SECURITY.md)
+
+## Support
+
+If Praman saves you time, please [⭐ star the repo](https://github.com/mrkanitkar/playwright-praman).
 
 ## License
 
