@@ -61,8 +61,12 @@ Describe your business process. Praman's **plan → generate → heal** pipeline
 | **Generator** | Converts the plan into typed Playwright + Praman code  |
 | **Healer**    | Runs the test, fixes failures, repeats until green     |
 
-Two agent variants ship by default — **MCP** (interactive, VS Code/Copilot) and **CLI** (terminal, token-efficient).
-Files with a `-cli` suffix use Playwright CLI; files without use Playwright MCP (requires `@playwright/mcp`).
+| Interface          | Transport            | Install                      | Best For                                   |
+| ------------------ | -------------------- | ---------------------------- | ------------------------------------------ |
+| **Playwright MCP** | WebSocket (JSON-RPC) | `@playwright/mcp` (separate) | Interactive exploration, VS Code / Copilot |
+| **Playwright CLI** | stdin/stdout         | Built into Playwright 1.59+  | CI/CD, token-efficient, any terminal agent |
+
+Agent files with a `-cli` suffix use Playwright CLI; files without use Playwright MCP.
 
 → [Agent & IDE Setup](https://praman.dev/docs/guides/agent-setup) · [MCP vs CLI](https://praman.dev/docs/guides/mcp-vs-cli) · [CLI Agents Guide](https://praman.dev/docs/guides/playwright-cli-agents)
 
