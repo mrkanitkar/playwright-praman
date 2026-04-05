@@ -212,6 +212,42 @@ Use Praman fixture methods for ALL UI5 control interactions:
 | Control proxy   | `ctrl.isOpen()`      | `await ctrl.isOpen()`                               |
 | Control proxy   | `ctrl.close()`       | `await ctrl.close()`                                |
 
+### Dialog Fixture Fallback
+
+If `ui5.dialog` is `undefined` at runtime, the test is using the wrong import
+(`@playwright/test` instead of `playwright-praman`). As a fallback, use
+`ui5.control()` with `searchOpenDialogs: true` and the exact V4 FE button ID:
+
+```typescript
+// Fallback when ui5.dialog is unavailable
+const okBtn = await ui5.control({
+  id: 'fe::APD_::ns.service.CreateAction::Action::Ok',
+  searchOpenDialogs: true,
+});
+await okBtn.press();
+```
+
+### FLP Navigation Method Selection
+
+Choose the correct navigation method based on the FLP layout:
+
+- `navigateToSpace('Space Name')` -- for FLP Space Tabs (`sap.m.IconTabFilter` has no `press()`/`firePress()`)
+- `navigateToSectionLink('App Name')` -- for section links within a Space
+- `navigateToTile('Tile Header')` -- only for `sap.m.GenericTile` layouts
+- `navigateToApp('SemObj-action')` -- hash-based navigation (bypasses FLP shell)
+
+```typescript
+// Space-based FLP layout
+await ui5Navigation.navigateToSpace('My Workspace');
+await ui5.waitForUI5();
+await ui5Navigation.navigateToSectionLink('Manage Purchase Orders');
+await ui5.waitForUI5();
+
+// Classic tile layout
+await ui5Navigation.navigateToTile('Create Purchase Order');
+await ui5.waitForUI5();
+```
+
 ### Playwright Native -- ONLY for Non-UI5 Elements
 
 | Use Case             | Method                       | Why                                 |
