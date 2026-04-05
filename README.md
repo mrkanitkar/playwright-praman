@@ -51,12 +51,6 @@ cp .env.example .env
 
 Describe your business process. Praman's **plan → generate → heal** pipeline does the rest.
 
-```bash
-# In Claude Code, Copilot, or Cursor:
-/praman-sap-coverage
-# "Test creating a purchase order with vendor 1000, material MAT-001, quantity 10"
-```
-
 | Agent         | What it does                                           |
 | ------------- | ------------------------------------------------------ |
 | **Planner**   | Explores your live SAP system and produces a test plan |
