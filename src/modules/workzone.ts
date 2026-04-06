@@ -48,7 +48,7 @@ export interface WorkZonePage {
   waitForFunction(
     pageFunction: string | (() => unknown),
     options?: { readonly timeout?: number; readonly polling?: number },
-  ): Promise<void>;
+  ): Promise<unknown>;
   frameLocator(selector: string): WorkZoneFrameLocator;
   frame(options: { readonly url: RegExp | string }): WorkZoneFrame | null;
   frames(): readonly WorkZoneFrame[];
@@ -70,7 +70,7 @@ export interface WorkZoneFrame {
   waitForFunction(
     pageFunction: string | (() => unknown),
     options?: { readonly timeout?: number; readonly polling?: number },
-  ): Promise<void>;
+  ): Promise<unknown>;
   url(): string;
 }
 

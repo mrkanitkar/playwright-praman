@@ -50,8 +50,8 @@ export interface NavigationPage {
     pageFunction: (() => boolean) | string,
     options?: { readonly timeout?: number; readonly polling?: number },
   ): Promise<unknown>;
-  goBack(options?: { readonly timeout?: number }): Promise<void>;
-  goForward(options?: { readonly timeout?: number }): Promise<void>;
+  goBack(options?: { readonly timeout?: number }): Promise<unknown>;
+  goForward(options?: { readonly timeout?: number }): Promise<unknown>;
   locator(selector: string): NavigationLocator;
 }
 

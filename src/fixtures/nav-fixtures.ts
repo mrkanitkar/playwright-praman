@@ -306,9 +306,8 @@ export interface NavWorkerDeps {
 // ── NavigationPage / WorkZonePage compatibility ──────────────────────
 //
 // The module functions accept minimal `NavigationPage` / `WorkZonePage`
-// interfaces. Playwright's `Page` satisfies both at runtime. Using
-// `as never` casts here to avoid importing Playwright's full `Page` type
-// while maintaining type safety at the module boundary.
+// interfaces. Playwright's `Page` is structurally compatible with both,
+// so no type casts are needed at the fixture boundary.
 
 /**
  * Playwright test object extended with navigation fixtures.
@@ -346,48 +345,40 @@ export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
     const nav: UI5NavigationAPI = {
       navigateToApp: async (appId, options?) =>
         withStep(`ui5Navigation.navigateToApp: ${appId}`, async () =>
-          navigateToApp(
-            page as never,
-            appId,
-            baseURL !== undefined ? { baseURL, ...options } : options,
-          ),
+          navigateToApp(page, appId, baseURL !== undefined ? { baseURL, ...options } : options),
         ),
       navigateToTile: async (title, options?) =>
         withStep(`ui5Navigation.navigateToTile: ${title}`, async () =>
-          navigateToTile(page as never, title, options),
+          navigateToTile(page, title, options),
         ),
       navigateToIntent: async (intent, params?, options?) =>
         withStep(
           `ui5Navigation.navigateToIntent: ${intent.semanticObject}-${intent.action}`,
-          async () => navigateToIntent(page as never, intent, params, options),
+          async () => navigateToIntent(page, intent, params, options),
         ),
       navigateToHash: async (hash, options?) =>
         withStep(`ui5Navigation.navigateToHash: ${hash}`, async () =>
-          navigateToHash(page as never, hash, options),
+          navigateToHash(page, hash, options),
         ),
       navigateToHome: async (options?) =>
-        withStep('ui5Navigation.navigateToHome', async () =>
-          navigateToHome(page as never, options),
-        ),
+        withStep('ui5Navigation.navigateToHome', async () => navigateToHome(page, options)),
       navigateBack: async (options?) =>
-        withStep('ui5Navigation.navigateBack', async () => navigateBack(page as never, options)),
+        withStep('ui5Navigation.navigateBack', async () => navigateBack(page, options)),
       navigateForward: async (options?) =>
-        withStep('ui5Navigation.navigateForward', async () =>
-          navigateForward(page as never, options),
-        ),
+        withStep('ui5Navigation.navigateForward', async () => navigateForward(page, options)),
       searchAndOpenApp: async (title, options?) =>
         withStep(`ui5Navigation.searchAndOpenApp: ${title}`, async () =>
-          searchAndOpenApp(page as never, title, options),
+          searchAndOpenApp(page, title, options),
         ),
       getCurrentHash: async () =>
-        withStep('ui5Navigation.getCurrentHash', async () => getCurrentHash(page as never)),
+        withStep('ui5Navigation.getCurrentHash', async () => getCurrentHash(page)),
       navigateToSpace: async (spaceTitle, options?) =>
         withStep(`ui5Navigation.navigateToSpace: ${spaceTitle}`, async () =>
-          navigateToSpace(page as never, spaceTitle, options),
+          navigateToSpace(page, spaceTitle, options),
         ),
       navigateToSectionLink: async (linkName, options?) =>
         withStep(`ui5Navigation.navigateToSectionLink: ${linkName}`, async () =>
-          navigateToSectionLink(page as never, linkName, options),
+          navigateToSectionLink(page, linkName, options),
         ),
     };
 
@@ -406,7 +397,7 @@ export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
         resetPageInjection(page);
       },
     };
-    const manager = createWorkZoneManager(page as never, adapterShim as never);
+    const manager = createWorkZoneManager(page, adapterShim);
     await use(manager);
   },
 });
