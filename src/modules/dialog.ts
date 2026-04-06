@@ -243,6 +243,7 @@ export async function waitForDialog(
  * Returns all currently open dialogs in the UI5 static UI area.
  *
  * @intent List all currently open dialogs for inspection or decision-making.
+ * @guarantee Returns an array of DialogInfo objects for all open dialogs (empty array if none).
  * @ai
  * @aiContext Scans sap-ui-static UIArea content for recognized dialog types.
  * Returns empty array if no dialogs are open.
@@ -265,6 +266,7 @@ export async function getOpenDialogs(page: DialogPage): Promise<readonly DialogI
  * Checks whether a specific dialog (by ID) is currently open.
  *
  * @intent Check if a known dialog is currently open, by its UI5 control ID.
+ * @guarantee Returns true if the dialog is open, false otherwise (including when control not found).
  * @ai
  * @aiContext Calls isOpen() on the control. Returns false if the control is not found or not open.
  * @sapModule sap.m.Dialog — isOpen() check
@@ -477,6 +479,7 @@ export async function waitForDialogClosed(
  * Returns all buttons within a dialog (beginButton, endButton, and buttons aggregation).
  *
  * @intent List all buttons available in a dialog for inspection or custom interaction.
+ * @guarantee Returns an array of button objects with id, text, and type (empty array if no buttons).
  * @ai
  * @aiContext Returns beginButton, endButton, and all buttons from the aggregation.
  * If no dialogId is given, uses the topmost open dialog.

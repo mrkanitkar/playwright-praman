@@ -228,6 +228,7 @@ export async function detectTableType(page: TablePage, tableId: string): Promise
  * Returns row IDs from a UI5 table.
  *
  * @intent Retrieve the UI5 control IDs of all visible rows in a table.
+ * @guarantee Returns an array of UI5 control IDs for visible rows (empty array if no rows).
  * @ai
  * @aiContext Returns DOM row IDs (not OData keys). Use for iterating rows or passing to other APIs.
  * @sapModule sap.m.Table, sap.ui.table.Table — getItems() / getRows() aggregation
@@ -260,6 +261,7 @@ export async function getTableRows(
  * Returns the total row count from a UI5 table's binding.
  *
  * @intent Get the total number of rows in a table (from binding length or items count).
+ * @guarantee Returns the row count from the table binding (0 if no binding or no data).
  * @ai
  * @aiContext For grid tables, reads binding.getLength(). For responsive tables, reads items.length.
  * @sapModule sap.m.Table, sap.ui.table.Table — row binding length
@@ -296,6 +298,7 @@ export async function getTableRowCount(
  * Returns the text value of a specific table cell.
  *
  * @intent Read the display text of a cell at a specific row and column position.
+ * @guarantee On success, returns the text or value of the cell control at the given position.
  * @ai
  * @aiContext Uses getText() or getValue() on the inner cell control. Returns text representation.
  * @sapModule sap.m.Table, sap.ui.table.Table — cell control text/value access
@@ -349,6 +352,7 @@ export async function getTableCellValue(
  * Returns all table data as plain JSON objects from OData binding contexts.
  *
  * @intent Extract all OData entity data bound to the table rows as JSON objects.
+ * @guarantee Returns an array of binding context objects for each row (empty array if no data).
  * @ai
  * @aiContext Reads binding contexts (getObject()) for each row. Returns raw OData entity data,
  * not display text. Useful for data-level assertions.
@@ -435,6 +439,7 @@ export async function selectTableRow(
  * Selects all rows in a UI5 table.
  *
  * @intent Select all rows in the table (equivalent to "Select All" checkbox).
+ * @guarantee On success, all rows in the table are selected.
  * @ai
  * @aiContext Uses selectAll() on both grid and responsive table variants.
  * @sapModule sap.m.Table, sap.ui.table.Table — selectAll() API
@@ -470,6 +475,7 @@ export async function selectAllTableRows(
  * Deselects all rows in a UI5 table.
  *
  * @intent Clear all row selections in the table.
+ * @guarantee On success, all row selections are cleared (no rows selected).
  * @ai
  * @aiContext Uses clearSelection() for grid tables, removeSelections(true) for responsive tables.
  * @sapModule sap.m.Table, sap.ui.table.Table — clearSelection() / removeSelections()
@@ -557,6 +563,7 @@ export async function waitForTableData(
  * Returns the indices of selected rows.
  *
  * @intent Get the zero-based indices of all currently selected rows.
+ * @guarantee Returns an array of zero-based row indices that are currently selected (empty array if none).
  * @ai
  * @aiContext Uses getSelectedIndices() for grid tables, getSelectedItems() for responsive tables.
  * @sapModule sap.m.Table, sap.ui.table.Table — selection state query

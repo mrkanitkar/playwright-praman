@@ -159,6 +159,7 @@ function modelArg(modelName: string | undefined): string {
  * Retrieves data from a UI5 OData model at the given path.
  *
  * @intent Read data from the UI5 OData model at a specific binding path.
+ * @guarantee On success, returns the data at the path (array, object, or primitive) from the model.
  * @ai
  * @aiContext Accesses the component's OData model via getData() or getProperty().
  * Path must start with '/'. Use modelName option for named models.
@@ -224,6 +225,7 @@ export async function getModelData(
  * Reads a single property from a UI5 OData model.
  *
  * @intent Read a specific property value from the OData model.
+ * @guarantee On success, returns the property value at the path, or undefined if not found.
  * @ai
  * @aiContext Uses model.getProperty() for single-value reads. More efficient than getModelData()
  * when only one property is needed.
@@ -433,6 +435,7 @@ export async function fetchCSRFToken(
  * Reads the number of entities in a binding from the UI5 model.
  *
  * @intent Count the number of entities at a specific OData model path.
+ * @guarantee Returns the array length at the path, or 0 if data is not an array or not loaded.
  * @ai
  * @aiContext Returns array length from getData() at the path. Returns 0 if not an array.
  * @sapModule sap.ui.model.odata.v2.ODataModel, sap.ui.model.odata.v4.ODataModel
@@ -479,6 +482,7 @@ export async function getEntityCount(
  * Checks whether the UI5 OData model has unsaved (pending) changes.
  *
  * @intent Check if the OData model has unsaved changes (dirty state).
+ * @guarantee Returns true if model.hasPendingChanges() is true, false otherwise (including when model is not found).
  * @ai
  * @aiContext Calls model.hasPendingChanges(). Useful to verify before navigating away or
  * to assert that edits have been properly saved.

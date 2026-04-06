@@ -324,6 +324,7 @@ export async function setDatePickerValue(
  * Gets the current value from a `sap.m.DatePicker` control.
  *
  * @intent Read the current date string from a DatePicker control.
+ * @guarantee Returns the raw date string from the control's getValue() method.
  * @ai
  * @aiContext Returns the raw string value from getValue(). Format depends on the control's valueFormat.
  * @sapModule sap.m.DatePicker — getValue()
@@ -418,6 +419,7 @@ export async function setDateRangeSelection(
  * Gets the current date range from a `sap.m.DateRangeSelection` control.
  *
  * @intent Read the current start and end dates from a DateRangeSelection control.
+ * @guarantee Returns an object with start and end date strings in ISO format from the control.
  * @ai
  * @aiContext Returns ISO-formatted date strings from getDateValue() and getSecondDateValue().
  * @sapModule sap.m.DateRangeSelection — getDateValue(), getSecondDateValue()
@@ -576,6 +578,7 @@ export async function setTimePickerValue(
  * Gets the current value from a `sap.m.TimePicker` control.
  *
  * @intent Read the current time string from a TimePicker control.
+ * @guarantee Returns the raw time string from the control's getValue() method.
  * @ai
  * @aiContext Returns the raw string value from getValue().
  * @sapModule sap.m.TimePicker — getValue()
