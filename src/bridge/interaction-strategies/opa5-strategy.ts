@@ -15,6 +15,10 @@
  * Most compatible with SAP testing standards but requires
  * RecordReplay API (UI5 \>= 1.94).
  *
+ * All browser-side scripts use `page.evaluate(fn, args)` to safely
+ * pass arguments via Playwright's structured clone serialization,
+ * eliminating string interpolation injection risks (P17).
+ *
  * @module interaction-strategies
  */
 
@@ -59,6 +63,192 @@ const DEFAULT_CONFIG: Required<Opa5StrategyConfig> = {
   debug: false,
 } as const;
 
+/** Arguments passed to the browser-side press script. */
+interface PressArgs {
+  readonly ns: string;
+  readonly controlId: string;
+  readonly timeout: number;
+  readonly autoWait: boolean;
+  readonly debug: boolean;
+}
+
+/** Arguments passed to the browser-side enterText script. */
+interface EnterTextArgs {
+  readonly ns: string;
+  readonly controlId: string;
+  readonly text: string;
+  readonly timeout: number;
+  readonly autoWait: boolean;
+  readonly debug: boolean;
+}
+
+/** Arguments passed to the browser-side select script. */
+interface SelectArgs {
+  readonly ns: string;
+  readonly controlId: string;
+  readonly itemId: string;
+  readonly timeout: number;
+  readonly autoWait: boolean;
+  readonly debug: boolean;
+}
+
+// ── Browser-context types (used inside page.evaluate) ─────────────────
+// These mirror the shapes of objects available at runtime in the browser.
+// They cannot reference Node-side imports.
+
+/** Bridge shape as seen from the browser context. */
+interface BrowserBridge {
+  getById?: (id: string) => BrowserControl | null;
+  RecordReplay?: BrowserRecordReplay;
+}
+
+/** RecordReplay API shape in the browser. */
+interface BrowserRecordReplay {
+  interactWithControl: (params: Record<string, unknown>) => void;
+  getAutoWaiter?: () => BrowserAutoWaiter | null;
+}
+
+/** AutoWaiter shape in the browser. */
+interface BrowserAutoWaiter {
+  hasToWait: () => boolean;
+}
+
+/** Minimal control shape for fallback interactions. */
+interface BrowserControl {
+  firePress?: () => void;
+  fireSelect?: () => void;
+  setValue?: (v: string) => void;
+  setSelectedKey?: (key: string) => void;
+}
+
+/**
+ * Browser-context: waits for the OPA5 AutoWaiter to settle, if available.
+ *
+ * @remarks
+ * Extracted as a named function to reduce cognitive complexity of the
+ * main interaction functions. Called inside `page.evaluate()` callbacks.
+ */
+async function browserWaitForAutoWaiter(recordReplay: BrowserRecordReplay): Promise<void> {
+  const autoWaiter = recordReplay.getAutoWaiter?.();
+  if (autoWaiter?.hasToWait() !== true) return;
+  await new Promise<void>((resolve) => {
+    const interval = setInterval(() => {
+      if (!autoWaiter.hasToWait()) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 100);
+  });
+}
+
+// ── Browser-side script functions (P17 safe — function-form) ──────────
+
+/** Browser-side debug log helper. */
+const OPA5_LOG_PREFIX = '[praman:opa5]';
+
+/**
+ * Browser-context: press fallback when RecordReplay is unavailable.
+ */
+function browserPressFallback(bridge: BrowserBridge | undefined, controlId: string): BridgeResult {
+  const ctrl = bridge?.getById?.(controlId) ?? null;
+  if (ctrl === null) return { success: false, error: `Control not found: ${controlId}` };
+  let fired = false;
+  if (typeof ctrl.firePress === 'function') { ctrl.firePress(); fired = true; }
+  if (typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); fired = true; }
+  if (fired) return { success: true };
+  return { success: false, error: `RecordReplay not available and no fire* methods on: ${controlId}` };
+}
+
+/**
+ * Browser-context: press interaction via RecordReplay with fallback.
+ */
+async function browserPress(args: PressArgs): Promise<BridgeResult> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: bridge is injected at runtime on window
+  const bridge = (window as any)[args.ns] as BrowserBridge | undefined;
+  if (bridge?.RecordReplay === undefined) return browserPressFallback(bridge, args.controlId);
+  try {
+    if (args.autoWait) await browserWaitForAutoWaiter(bridge.RecordReplay);
+    bridge.RecordReplay.interactWithControl({
+      selector: { id: args.controlId },
+      interactionType: 'PRESS',
+      interactionTimeout: args.timeout,
+    });
+    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+    if (args.debug) console.log(OPA5_LOG_PREFIX, 'press', args.controlId, JSON.stringify({ success: true }));
+    return { success: true };
+  } catch (e: unknown) {
+    const errMsg = e instanceof Error ? e.message : String(e);
+    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+    if (args.debug) console.log(OPA5_LOG_PREFIX, 'press', args.controlId, JSON.stringify({ success: false, error: errMsg }));
+    return { success: false, error: errMsg };
+  }
+}
+
+/**
+ * Browser-context: enterText interaction via RecordReplay with fallback.
+ */
+async function browserEnterText(args: EnterTextArgs): Promise<BridgeResult> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: bridge is injected at runtime on window
+  const bridge = (window as any)[args.ns] as BrowserBridge | undefined;
+  if (bridge?.RecordReplay === undefined) {
+    const ctrl = bridge?.getById?.(args.controlId) ?? null;
+    if (ctrl !== null && typeof ctrl.setValue === 'function') {
+      ctrl.setValue(args.text);
+      return { success: true };
+    }
+    return { success: false, error: 'RecordReplay not available' };
+  }
+  try {
+    if (args.autoWait) await browserWaitForAutoWaiter(bridge.RecordReplay);
+    bridge.RecordReplay.interactWithControl({
+      selector: { id: args.controlId },
+      interactionType: 'ENTER_TEXT',
+      enterText: args.text,
+      interactionTimeout: args.timeout,
+    });
+    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+    if (args.debug) console.log(OPA5_LOG_PREFIX, 'enterText', args.controlId, JSON.stringify({ success: true, text: args.text }));
+    return { success: true };
+  } catch (e: unknown) {
+    const errMsg = e instanceof Error ? e.message : String(e);
+    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+    if (args.debug) console.log(OPA5_LOG_PREFIX, 'enterText', args.controlId, JSON.stringify({ success: false, error: errMsg }));
+    return { success: false, error: errMsg };
+  }
+}
+
+/**
+ * Browser-context: select interaction via RecordReplay with fallback.
+ */
+async function browserSelect(args: SelectArgs): Promise<BridgeResult> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: bridge is injected at runtime on window
+  const bridge = (window as any)[args.ns] as BrowserBridge | undefined;
+  if (bridge?.RecordReplay === undefined) {
+    const ctrl = bridge?.getById?.(args.controlId) ?? null;
+    if (ctrl !== null && typeof ctrl.setSelectedKey === 'function') {
+      ctrl.setSelectedKey(args.itemId);
+      return { success: true };
+    }
+    return { success: false, error: 'RecordReplay not available' };
+  }
+  try {
+    if (args.autoWait) await browserWaitForAutoWaiter(bridge.RecordReplay);
+    bridge.RecordReplay.interactWithControl({
+      selector: { id: args.controlId },
+      interactionType: 'PRESS',
+      interactionTimeout: args.timeout,
+    });
+    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+    if (args.debug) console.log(OPA5_LOG_PREFIX, 'select', args.controlId, JSON.stringify({ success: true, itemId: args.itemId }));
+    return { success: true };
+  } catch (e: unknown) {
+    const errMsg = e instanceof Error ? e.message : String(e);
+    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+    if (args.debug) console.log(OPA5_LOG_PREFIX, 'select', args.controlId, JSON.stringify({ success: false, error: errMsg }));
+    return { success: false, error: errMsg };
+  }
+}
+
 /**
  * Interaction strategy using SAP OPA5 RecordReplay API.
  *
@@ -80,48 +270,16 @@ export class Opa5Strategy implements InteractionStrategy {
 
   /** {@inheritDoc InteractionStrategy.press} */
   async press(page: Page, controlId: string): Promise<void> {
-    const ns = BRIDGE_GLOBALS.NAMESPACE;
-    const timeout = this.config.interactionTimeout;
-    const autoWait = this.config.autoWait;
-    const debug = this.config.debug;
     const result: BridgeResult = await page.evaluate(
-      `(async function() {
-        var bridge = window.${ns};
-        if (!bridge || !bridge.RecordReplay) {
-          var ctrl = bridge && bridge.getById('${controlId}');
-          if (!ctrl) return { success: false, error: 'Control not found: ${controlId}' };
-          var fired = false;
-          if (typeof ctrl.firePress === 'function') { ctrl.firePress(); fired = true; }
-          if (typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); fired = true; }
-          if (fired) return { success: true };
-          return { success: false, error: 'RecordReplay not available and no fire* methods on: ${controlId}' };
-        }
-        try {
-          ${
-            autoWait
-              ? `var autoWaiter = bridge.RecordReplay.getAutoWaiter ? bridge.RecordReplay.getAutoWaiter() : null;
-          if (autoWaiter && autoWaiter.hasToWait()) {
-            await new Promise(function(resolve) {
-              var interval = setInterval(function() {
-                if (!autoWaiter.hasToWait()) { clearInterval(interval); resolve(); }
-              }, 100);
-            });
-          }`
-              : ''
-          }
-          bridge.RecordReplay.interactWithControl({
-            selector: { id: '${controlId}' },
-            interactionType: 'PRESS',
-            interactionTimeout: ${String(timeout)}
-          });
-          // NOTE: debug log calls in this strategy are browser-context template strings, gated by the debug flag
-          ${debug ? `console.log('[praman:opa5]', 'press', '${controlId}', JSON.stringify({ success: true }));` : ''}
-          return { success: true };
-        } catch (e) {
-          ${debug ? `console.log('[praman:opa5]', 'press', '${controlId}', JSON.stringify({ success: false, error: e.message }));` : ''}
-          return { success: false, error: e.message };
-        }
-      })()`,
+      /* v8 ignore next -- browser-context: executed in Chromium, not Node.js */
+      browserPress,
+      {
+        ns: BRIDGE_GLOBALS.NAMESPACE,
+        controlId,
+        timeout: this.config.interactionTimeout,
+        autoWait: this.config.autoWait,
+        debug: this.config.debug,
+      },
     );
     if (!result.success) {
       throw new ControlError({
@@ -141,45 +299,17 @@ export class Opa5Strategy implements InteractionStrategy {
 
   /** {@inheritDoc InteractionStrategy.enterText} */
   async enterText(page: Page, controlId: string, text: string): Promise<void> {
-    const ns = BRIDGE_GLOBALS.NAMESPACE;
-    const timeout = this.config.interactionTimeout;
-    const autoWait = this.config.autoWait;
-    const debug = this.config.debug;
-    const escaped = text.replaceAll('\\', '\\\\').replaceAll("'", "\\'");
     const result: BridgeResult = await page.evaluate(
-      `(async function() {
-        var bridge = window.${ns};
-        if (!bridge || !bridge.RecordReplay) {
-          var ctrl = bridge && bridge.getById('${controlId}');
-          if (ctrl && typeof ctrl.setValue === 'function') { ctrl.setValue('${escaped}'); return { success: true }; }
-          return { success: false, error: 'RecordReplay not available' };
-        }
-        try {
-          ${
-            autoWait
-              ? `var autoWaiter = bridge.RecordReplay.getAutoWaiter ? bridge.RecordReplay.getAutoWaiter() : null;
-          if (autoWaiter && autoWaiter.hasToWait()) {
-            await new Promise(function(resolve) {
-              var interval = setInterval(function() {
-                if (!autoWaiter.hasToWait()) { clearInterval(interval); resolve(); }
-              }, 100);
-            });
-          }`
-              : ''
-          }
-          bridge.RecordReplay.interactWithControl({
-            selector: { id: '${controlId}' },
-            interactionType: 'ENTER_TEXT',
-            enterText: '${escaped}',
-            interactionTimeout: ${String(timeout)}
-          });
-          ${debug ? `console.log('[praman:opa5]', 'enterText', '${controlId}', JSON.stringify({ success: true, text: '${escaped}' }));` : ''}
-          return { success: true };
-        } catch (e) {
-          ${debug ? `console.log('[praman:opa5]', 'enterText', '${controlId}', JSON.stringify({ success: false, error: e.message }));` : ''}
-          return { success: false, error: e.message };
-        }
-      })()`,
+      /* v8 ignore next -- browser-context: executed in Chromium, not Node.js */
+      browserEnterText,
+      {
+        ns: BRIDGE_GLOBALS.NAMESPACE,
+        controlId,
+        text,
+        timeout: this.config.interactionTimeout,
+        autoWait: this.config.autoWait,
+        debug: this.config.debug,
+      },
     );
     if (!result.success) {
       throw new ControlError({
@@ -195,43 +325,17 @@ export class Opa5Strategy implements InteractionStrategy {
 
   /** {@inheritDoc InteractionStrategy.select} */
   async select(page: Page, controlId: string, itemId: string): Promise<void> {
-    const ns = BRIDGE_GLOBALS.NAMESPACE;
-    const timeout = this.config.interactionTimeout;
-    const autoWait = this.config.autoWait;
-    const debug = this.config.debug;
     const result: BridgeResult = await page.evaluate(
-      `(async function() {
-        var bridge = window.${ns};
-        if (!bridge || !bridge.RecordReplay) {
-          var ctrl = bridge && bridge.getById('${controlId}');
-          if (ctrl && typeof ctrl.setSelectedKey === 'function') { ctrl.setSelectedKey('${itemId}'); return { success: true }; }
-          return { success: false, error: 'RecordReplay not available' };
-        }
-        try {
-          ${
-            autoWait
-              ? `var autoWaiter = bridge.RecordReplay.getAutoWaiter ? bridge.RecordReplay.getAutoWaiter() : null;
-          if (autoWaiter && autoWaiter.hasToWait()) {
-            await new Promise(function(resolve) {
-              var interval = setInterval(function() {
-                if (!autoWaiter.hasToWait()) { clearInterval(interval); resolve(); }
-              }, 100);
-            });
-          }`
-              : ''
-          }
-          bridge.RecordReplay.interactWithControl({
-            selector: { id: '${controlId}' },
-            interactionType: 'PRESS',
-            interactionTimeout: ${String(timeout)}
-          });
-          ${debug ? `console.log('[praman:opa5]', 'select', '${controlId}', JSON.stringify({ success: true, itemId: '${itemId}' }));` : ''}
-          return { success: true };
-        } catch (e) {
-          ${debug ? `console.log('[praman:opa5]', 'select', '${controlId}', JSON.stringify({ success: false, error: e.message }));` : ''}
-          return { success: false, error: e.message };
-        }
-      })()`,
+      /* v8 ignore next -- browser-context: executed in Chromium, not Node.js */
+      browserSelect,
+      {
+        ns: BRIDGE_GLOBALS.NAMESPACE,
+        controlId,
+        itemId,
+        timeout: this.config.interactionTimeout,
+        autoWait: this.config.autoWait,
+        debug: this.config.debug,
+      },
     );
     if (!result.success) {
       throw new ControlError({
