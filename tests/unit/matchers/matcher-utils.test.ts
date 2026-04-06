@@ -44,9 +44,10 @@ vi.mock('#bridge/browser-scripts/execute-method.js', () => ({
  */
 function createMockPage(
   resolvedValue?: unknown,
-): MatcherPage & { evaluate: ReturnType<typeof vi.fn> } {
+): MatcherPage & { evaluate: ReturnType<typeof vi.fn>; waitForFunction: ReturnType<typeof vi.fn> } {
   return {
     evaluate: vi.fn().mockResolvedValue(resolvedValue),
+    waitForFunction: vi.fn().mockResolvedValue(undefined),
   };
 }
 
@@ -87,6 +88,7 @@ describe('getControlProperty', () => {
   it('throws ControlError when page.evaluate rejects', async () => {
     const page: MatcherPage = {
       evaluate: vi.fn().mockRejectedValue(new Error('Control not found')),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
     };
 
     await expect(getControlProperty(page, 'btn1', 'text')).rejects.toThrow(ControlError);
@@ -98,6 +100,7 @@ describe('getControlProperty', () => {
   it('wraps non-Error thrown values in ControlError details', async () => {
     const page: MatcherPage = {
       evaluate: vi.fn().mockRejectedValue('string-error'),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
     };
 
     const error = await getControlProperty(page, 'btn1', 'text').catch((e: unknown) => e);
@@ -159,6 +162,7 @@ describe('getControlAggregation', () => {
   it('throws ControlError when page.evaluate rejects', async () => {
     const page: MatcherPage = {
       evaluate: vi.fn().mockRejectedValue(new Error('Control not found')),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
     };
 
     await expect(getControlAggregation(page, 'table1', 'items')).rejects.toThrow(ControlError);
@@ -170,6 +174,7 @@ describe('getControlAggregation', () => {
   it('wraps non-Error thrown values in ControlError details', async () => {
     const page: MatcherPage = {
       evaluate: vi.fn().mockRejectedValue('string-error'),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
     };
 
     const error = await getControlAggregation(page, 'table1', 'items').catch((e: unknown) => e);
@@ -218,6 +223,7 @@ describe('getUI5BindingInfo', () => {
   it('throws ControlError when page.evaluate rejects', async () => {
     const page: MatcherPage = {
       evaluate: vi.fn().mockRejectedValue(new Error('Evaluate failed')),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
     };
 
     await expect(getUI5BindingInfo(page, 'input1', 'value')).rejects.toThrow(ControlError);
@@ -229,6 +235,7 @@ describe('getUI5BindingInfo', () => {
   it('wraps non-Error thrown values in ControlError details', async () => {
     const page: MatcherPage = {
       evaluate: vi.fn().mockRejectedValue('string-error'),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
     };
 
     const error = await getUI5BindingInfo(page, 'input1', 'value').catch((e: unknown) => e);
@@ -272,6 +279,7 @@ describe('getUI5ControlType', () => {
   it('throws ControlError when page.evaluate rejects', async () => {
     const page: MatcherPage = {
       evaluate: vi.fn().mockRejectedValue(new Error('Evaluate failed')),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
     };
 
     await expect(getUI5ControlType(page, 'btn1')).rejects.toThrow(ControlError);
@@ -283,6 +291,7 @@ describe('getUI5ControlType', () => {
   it('wraps non-Error thrown values in ControlError details', async () => {
     const page: MatcherPage = {
       evaluate: vi.fn().mockRejectedValue('string-error'),
+      waitForFunction: vi.fn().mockResolvedValue(undefined),
     };
 
     const error = await getUI5ControlType(page, 'btn1').catch((e: unknown) => e);
@@ -306,6 +315,10 @@ describe('MatcherPage type', () => {
   it('accepts minimal page object', () => {
     expectTypeOf<{
       evaluate: <TResult>(script: string, arg?: unknown) => Promise<TResult>;
+      waitForFunction: (
+        pageFunction: string | (() => unknown),
+        options?: { timeout?: number },
+      ) => Promise<unknown>;
     }>().toExtend<MatcherPage>();
   });
 });

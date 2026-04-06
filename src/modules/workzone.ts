@@ -174,7 +174,7 @@ export function createWorkZoneManager(
 
     async enableDualBridge(): Promise<void> {
       // Inject bridge in main frame (shell)
-      await ensureBridgeInjected(page as never);
+      await ensureBridgeInjected(page);
 
       // Inject bridge in app iframe via Frame.evaluate
       const appFrame = findAppFrame(page);

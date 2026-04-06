@@ -21,6 +21,7 @@ export type {
   PramanBridge,
   PramanBridgeUtils,
 } from './bridge-types.js';
+export type { BridgeInjectablePage } from './injection.js';
 export {
   ensureBridgeInjected,
   injectBridge,
