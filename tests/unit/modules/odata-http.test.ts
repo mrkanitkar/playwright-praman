@@ -510,6 +510,106 @@ describe('OData HTTP module', () => {
     });
   });
 
+  // ── Cross-cutting: Timeout ────────────────────────────────────────────────
+
+  describe('timeout option', () => {
+    it('passes timeout to createEntity request', async () => {
+      const mock = createMockPage();
+      mock.request.post.mockResolvedValue(createMockResponse(201, {}));
+
+      await createEntity(
+        asPage(mock),
+        SERVICE_URL,
+        'Products',
+        { Name: 'A' },
+        {
+          csrfToken: 'token',
+          timeout: 5000,
+        },
+      );
+
+      const callArgs = mock.request.post.mock.calls[0] as unknown[];
+      const opts = callArgs[1] as { timeout: number };
+      expect(opts.timeout).toBe(5000);
+    });
+
+    it('passes timeout to updateEntity request', async () => {
+      const mock = createMockPage();
+      mock.request.patch.mockResolvedValue(createMockResponse(200, {}));
+
+      await updateEntity(
+        asPage(mock),
+        SERVICE_URL,
+        'Products',
+        "('1')",
+        { Name: 'B' },
+        {
+          csrfToken: 'token',
+          timeout: 3000,
+        },
+      );
+
+      const callArgs = mock.request.patch.mock.calls[0] as unknown[];
+      const opts = callArgs[1] as { timeout: number };
+      expect(opts.timeout).toBe(3000);
+    });
+
+    it('passes timeout to deleteEntity request', async () => {
+      const mock = createMockPage();
+      mock.request.delete.mockResolvedValue(createMockResponse(204, {}));
+
+      await deleteEntity(asPage(mock), SERVICE_URL, 'Products', "('1')", {
+        csrfToken: 'token',
+        timeout: 4000,
+      });
+
+      const callArgs = mock.request.delete.mock.calls[0] as unknown[];
+      const opts = callArgs[1] as { timeout: number };
+      expect(opts.timeout).toBe(4000);
+    });
+
+    it('passes timeout to callFunctionImport GET request', async () => {
+      const mock = createMockPage();
+      mock.request.get.mockResolvedValue(createMockResponse(200, { result: 1 }));
+
+      await callFunctionImport(asPage(mock), SERVICE_URL, 'GetPrice', undefined, 'GET', {
+        timeout: 6000,
+      });
+
+      const callArgs = mock.request.get.mock.calls[0] as unknown[];
+      const opts = callArgs[1] as { timeout: number };
+      expect(opts.timeout).toBe(6000);
+    });
+
+    it('passes timeout to callFunctionImport POST request', async () => {
+      const mock = createMockPage();
+      mock.request.post.mockResolvedValue(createMockResponse(200, { result: 1 }));
+
+      await callFunctionImport(asPage(mock), SERVICE_URL, 'Calculate', undefined, 'POST', {
+        csrfToken: 'token',
+        timeout: 7000,
+      });
+
+      const callArgs = mock.request.post.mock.calls[0] as unknown[];
+      const opts = callArgs[1] as { timeout: number };
+      expect(opts.timeout).toBe(7000);
+    });
+
+    it('passes timeout to queryEntities request', async () => {
+      const mock = createMockPage();
+      mock.request.get.mockResolvedValue(createMockResponse(200, { value: [] }));
+
+      await queryEntities(asPage(mock), SERVICE_URL, 'Products', {
+        filter: 'Price gt 10',
+        timeout: 8000,
+      });
+
+      const callArgs = mock.request.get.mock.calls[0] as unknown[];
+      const opts = callArgs[1] as { timeout: number };
+      expect(opts.timeout).toBe(8000);
+    });
+  });
+
   // ── Cross-cutting: Headers ────────────────────────────────────────────────
 
   describe('header handling', () => {

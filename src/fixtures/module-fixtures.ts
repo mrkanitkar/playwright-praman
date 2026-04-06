@@ -45,7 +45,7 @@ import {
   waitForDialog,
   waitForDialogClosed,
 } from '../modules/dialog.js';
-import type { ODataHttpOptions, ODataQueryOptions } from '../modules/odata-http.js';
+import type { ODataHttpOptions, ODataHttpPage, ODataQueryOptions } from '../modules/odata-http.js';
 import {
   callFunctionImport,
   createEntity,
@@ -53,7 +53,7 @@ import {
   queryEntities,
   updateEntity,
 } from '../modules/odata-http.js';
-import type { ODataOptions, WaitForODataLoadOptions } from '../modules/odata.js';
+import type { ODataOptions, ODataPage, WaitForODataLoadOptions } from '../modules/odata.js';
 import {
   fetchCSRFToken,
   getEntityCount,
@@ -218,7 +218,7 @@ export function createDateFixture(page: DatePage) {
  * @example `const o = createODataFixture(page); const data = await o.getModelData('/Products');`
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
-export function createODataFixture(page: never) {
+export function createODataFixture(page: ODataPage & ODataHttpPage) {
   return {
     getModelData: async (path: string, opts?: ODataOptions) => getModelData(page, path, opts),
     getModelProperty: async (path: string, opts?: ODataOptions) =>
@@ -361,7 +361,7 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       table: withStability(createTableFixture(page), guard, 'table'),
       dialog: withStability(createDialogFixture(page), guard, 'dialog'),
       date: withStability(createDateFixture(page), guard, 'date'),
-      odata: withStability(createODataFixture(page as never), guard, 'odata'),
+      odata: withStability(createODataFixture(page), guard, 'odata'),
     }) as ExtendedUI5Handler;
 
     // Apply registered custom extensions as sub-namespaces

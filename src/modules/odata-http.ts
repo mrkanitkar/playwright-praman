@@ -113,10 +113,10 @@ interface APIResponse {
 
 /** Internal: Request options (mirrors Playwright's APIRequestContext options). */
 interface RequestOptions {
-  headers?: Record<string, string> | undefined;
+  headers?: Record<string, string>;
   data?: unknown;
-  timeout?: number | undefined;
-  params?: Record<string, string | number | boolean> | undefined;
+  timeout?: number;
+  params?: Record<string, string | number | boolean>;
 }
 
 /**
@@ -279,7 +279,7 @@ export async function createEntity<TData = unknown>(
   const response = await page.request.post(url, {
     headers,
     data,
-    timeout: options?.timeout,
+    ...(options?.timeout !== undefined && { timeout: options.timeout }),
   });
 
   const status = response.status();
@@ -325,7 +325,7 @@ export async function updateEntity<TData = unknown>(
   const response = await page.request.patch(url, {
     headers,
     data,
-    timeout: options?.timeout,
+    ...(options?.timeout !== undefined && { timeout: options.timeout }),
   });
 
   const status = response.status();
@@ -367,7 +367,7 @@ export async function deleteEntity(
 
   const response = await page.request.delete(url, {
     headers,
-    timeout: options?.timeout,
+    ...(options?.timeout !== undefined && { timeout: options.timeout }),
   });
 
   const status = response.status();
@@ -427,16 +427,16 @@ export async function callFunctionImport<TData = unknown>(
     const headers = buildHeaders(options);
     response = await page.request.get(url, {
       headers,
-      params: requestParams,
-      timeout: options?.timeout,
+      ...(requestParams !== undefined && { params: requestParams }),
+      ...(options?.timeout !== undefined && { timeout: options.timeout }),
     });
   } else {
     const token = requireCsrfToken(options, operation);
     const headers = buildHeaders({ ...options, csrfToken: token });
     response = await page.request.post(url, {
       headers,
-      params: requestParams,
-      timeout: options?.timeout,
+      ...(requestParams !== undefined && { params: requestParams }),
+      ...(options?.timeout !== undefined && { timeout: options.timeout }),
     });
   }
 
@@ -478,8 +478,8 @@ export async function queryEntities<TData = unknown>(
 
   const response = await page.request.get(url, {
     headers,
-    params,
-    timeout: options?.timeout,
+    ...(params !== undefined && { params }),
+    ...(options?.timeout !== undefined && { timeout: options.timeout }),
   });
 
   const status = response.status();
