@@ -19,6 +19,7 @@ import {
   isUI5SelectorString,
   parseUI5Selector,
   serializeUI5Selector,
+  serializeUI5SelectorToCSS,
   validateUI5Selector,
 } from '../../../src/selectors/selector-parser.js';
 
@@ -181,5 +182,308 @@ describe('isUI5SelectorString', () => {
 
   it('returns false for string without prefix', () => {
     expect(isUI5SelectorString('sap.m.Button')).toBe(false);
+  });
+});
+
+// ── serializeUI5SelectorToCSS ──────────────────────────────────────────
+
+describe('serializeUI5SelectorToCSS', () => {
+  it('serializes controlType as :type() pseudo-class', () => {
+    expect(serializeUI5SelectorToCSS({ controlType: 'sap.m.Button' })).toBe(':type(sap.m.Button)');
+  });
+
+  it('serializes id with # prefix', () => {
+    expect(serializeUI5SelectorToCSS({ id: 'saveBtn' })).toBe('#saveBtn');
+  });
+
+  it('serializes RegExp id using .source', () => {
+    expect(serializeUI5SelectorToCSS({ id: /^submit/i })).toBe('#^submit');
+  });
+
+  it('serializes controlType + id together', () => {
+    expect(serializeUI5SelectorToCSS({ controlType: 'sap.m.Button', id: 'btn1' })).toBe(
+      ':type(sap.m.Button)#btn1',
+    );
+  });
+
+  it('serializes matchSubclasses as :subclass', () => {
+    expect(serializeUI5SelectorToCSS({ controlType: 'sap.m.Button', matchSubclasses: true })).toBe(
+      ':type(sap.m.Button):subclass',
+    );
+  });
+
+  it('omits :subclass when matchSubclasses is false', () => {
+    expect(serializeUI5SelectorToCSS({ controlType: 'sap.m.Button', matchSubclasses: false })).toBe(
+      ':type(sap.m.Button)',
+    );
+  });
+
+  it('serializes string property as :prop()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        properties: { text: 'Save' },
+      }),
+    ).toBe(':type(sap.m.Button):prop(text, "Save")');
+  });
+
+  it('serializes numeric property as :prop()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Input',
+        properties: { maxLength: 100 },
+      }),
+    ).toBe(':type(sap.m.Input):prop(maxLength, "100")');
+  });
+
+  it('serializes boolean property as :prop()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        properties: { enabled: true },
+      }),
+    ).toBe(':type(sap.m.Button):prop(enabled, "true")');
+  });
+
+  it('serializes RegExp property as :prop-regex()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Input',
+        properties: { value: /^test/ },
+      }),
+    ).toBe(':type(sap.m.Input):prop-regex(value, "^test")');
+  });
+
+  it('serializes PropertyMatcher with equals operator as :prop()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        properties: { text: { value: 'Save', operator: 'equals' } },
+      }),
+    ).toBe(':type(sap.m.Button):prop(text, "Save")');
+  });
+
+  it('serializes PropertyMatcher with contains operator as :prop-contains()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Input',
+        properties: { value: { value: 'partial', operator: 'contains' } },
+      }),
+    ).toBe(':type(sap.m.Input):prop-contains(value, "partial")');
+  });
+
+  it('serializes PropertyMatcher with startsWith operator', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Input',
+        properties: { value: { value: 'prefix', operator: 'startsWith' } },
+      }),
+    ).toBe(':type(sap.m.Input):prop-starts-with(value, "prefix")');
+  });
+
+  it('serializes PropertyMatcher with endsWith operator', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Input',
+        properties: { value: { value: 'suffix', operator: 'endsWith' } },
+      }),
+    ).toBe(':type(sap.m.Input):prop-ends-with(value, "suffix")');
+  });
+
+  it('serializes PropertyMatcher with regex operator', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Input',
+        properties: { value: { value: '^test$', operator: 'regex' } },
+      }),
+    ).toBe(':type(sap.m.Input):prop-regex(value, "^test$")');
+  });
+
+  it('serializes PropertyMatcher without operator via operatorToPseudo default', () => {
+    // When operator is present, isPropertyMatcherObject matches and operatorToPseudo is used
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        properties: { text: { value: 'OK', operator: 'equals' } },
+      }),
+    ).toBe(':type(sap.m.Button):prop(text, "OK")');
+  });
+
+  it('serializes viewName as :view()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        viewName: 'myApp.view.Main',
+      }),
+    ).toBe(':type(sap.m.Button):view(myApp.view.Main)');
+  });
+
+  it('serializes bindingPath entries as :binding()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Text',
+        bindingPath: { text: '/ProductName' },
+      }),
+    ).toBe(':type(sap.m.Text):binding(text, "/ProductName")');
+  });
+
+  it('serializes i18NText entries as :i18n()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        i18NText: { text: 'SAVE_BUTTON' },
+      }),
+    ).toBe(':type(sap.m.Button):i18n(text, "SAVE_BUTTON")');
+  });
+
+  it('serializes ancestor recursively as :ancestor()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        ancestor: { controlType: 'sap.m.Panel' },
+      }),
+    ).toBe(':type(sap.m.Button):ancestor(:type(sap.m.Panel))');
+  });
+
+  it('serializes descendant recursively as :descendant()', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Panel',
+        descendant: { controlType: 'sap.m.Button', properties: { text: 'OK' } },
+      }),
+    ).toBe(':type(sap.m.Panel):descendant(:type(sap.m.Button):prop(text, "OK"))');
+  });
+
+  it('serializes searchOpenDialogs as :open-dialog', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        searchOpenDialogs: true,
+      }),
+    ).toBe(':type(sap.m.Button):open-dialog');
+  });
+
+  it('omits :open-dialog when searchOpenDialogs is false', () => {
+    expect(
+      serializeUI5SelectorToCSS({
+        controlType: 'sap.m.Button',
+        searchOpenDialogs: false,
+      }),
+    ).toBe(':type(sap.m.Button)');
+  });
+
+  it('serializes a complex selector with all fields', () => {
+    const result = serializeUI5SelectorToCSS({
+      controlType: 'sap.m.Button',
+      id: 'confirmBtn',
+      matchSubclasses: true,
+      properties: { text: 'Confirm', enabled: true },
+      viewName: 'myApp.view.Detail',
+      bindingPath: { text: '/ConfirmLabel' },
+      i18NText: { tooltip: 'CONFIRM_TOOLTIP' },
+      ancestor: { controlType: 'sap.m.Dialog' },
+      descendant: { controlType: 'sap.ui.core.Icon' },
+      searchOpenDialogs: true,
+    });
+
+    expect(result).toBe(
+      ':type(sap.m.Button)#confirmBtn:subclass' +
+        ':prop(text, "Confirm"):prop(enabled, "true")' +
+        ':view(myApp.view.Detail)' +
+        ':binding(text, "/ConfirmLabel")' +
+        ':i18n(tooltip, "CONFIRM_TOOLTIP")' +
+        ':ancestor(:type(sap.m.Dialog))' +
+        ':descendant(:type(sap.ui.core.Icon))' +
+        ':open-dialog',
+    );
+  });
+
+  it('returns empty string for empty selector', () => {
+    expect(serializeUI5SelectorToCSS({})).toBe('');
+  });
+
+  it('serializes multiple properties in order', () => {
+    const result = serializeUI5SelectorToCSS({
+      properties: { text: 'A', enabled: true, visible: false },
+    });
+    expect(result).toContain(':prop(text, "A")');
+    expect(result).toContain(':prop(enabled, "true")');
+    expect(result).toContain(':prop(visible, "false")');
+  });
+
+  it('serializes multiple binding paths', () => {
+    const result = serializeUI5SelectorToCSS({
+      bindingPath: { text: '/Name', value: '/Value' },
+    });
+    expect(result).toContain(':binding(text, "/Name")');
+    expect(result).toContain(':binding(value, "/Value")');
+  });
+});
+
+// ── Additional edge cases for existing functions ───────────────────────
+
+describe('serializeUI5Selector — edge cases', () => {
+  it('serializes RegExp id using .source', () => {
+    expect(serializeUI5Selector({ controlType: 'sap.m.Button', id: /^save/ })).toBe(
+      'ui5=sap.m.Button#^save',
+    );
+  });
+
+  it('serializes RegExp property value using .source', () => {
+    expect(
+      serializeUI5Selector({
+        controlType: 'sap.m.Input',
+        properties: { value: /test\d+/ },
+      }),
+    ).toContain('[value=test\\d+]');
+  });
+});
+
+describe('validateUI5Selector — edge cases', () => {
+  it('returns error for empty string id', () => {
+    const errors = validateUI5Selector({ id: '' });
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors).toContain('id must not be an empty string');
+  });
+
+  it('accepts RegExp id without error', () => {
+    const errors = validateUI5Selector({ id: /^submit/ });
+    expect(errors).toEqual([]);
+  });
+
+  it('accepts properties-only selector', () => {
+    const errors = validateUI5Selector({ properties: { text: 'Save' } });
+    expect(errors).toEqual([]);
+  });
+});
+
+describe('parseUI5Selector — edge cases', () => {
+  it('coerces numeric string to number', () => {
+    const result = parseUI5Selector('ui5=sap.m.Input[maxLength=42]');
+    expect(result.properties).toEqual({ maxLength: 42 });
+  });
+
+  it('does not coerce non-round-tripping numeric string', () => {
+    const result = parseUI5Selector('ui5=sap.m.Input[value=007]');
+    expect(result.properties).toEqual({ value: '007' });
+  });
+
+  it('handles property block with no = sign', () => {
+    const result = parseUI5Selector('ui5=sap.m.Button[noequals]');
+    // No key=value pair, so no properties extracted
+    expect(result.properties).toBeUndefined();
+  });
+
+  it('handles property block with empty key', () => {
+    const result = parseUI5Selector('ui5=sap.m.Button[=value]');
+    // Empty key should be skipped
+    expect(result.properties).toBeUndefined();
+  });
+
+  it('parses id-only with properties', () => {
+    const result = parseUI5Selector('ui5=#myId[text=Save]');
+    expect(result.id).toBe('myId');
+    expect(result.properties).toEqual({ text: 'Save' });
+    expect(result.controlType).toBeUndefined();
   });
 });
