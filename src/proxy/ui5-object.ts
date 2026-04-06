@@ -106,10 +106,12 @@ export class UI5Object {
   /** Fully qualified type name. */
   readonly type: string;
   /** Cached set of method names loaded from the browser-side prototype chain. */
-  readonly methodCache: ReadonlySet<string>;
+  get methodCache(): ReadonlySet<string> {
+    return this._methodCache;
+  }
 
   private readonly page: Page;
-  /** Mutable internal set — exposed as ReadonlySet via `methodCache`. */
+  /** Mutable internal set — exposed as ReadonlySet via `methodCache` getter. */
   private _methodCache: Set<string>;
 
   private constructor(params: UI5ObjectCreateParams) {
@@ -117,7 +119,6 @@ export class UI5Object {
     this.type = params.type;
     this.page = params.page;
     this._methodCache = new Set<string>();
-    this.methodCache = this._methodCache;
   }
 
   /**
@@ -407,7 +408,5 @@ export class UI5Object {
       { uuid: this.uuid, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
     );
     this._methodCache = new Set(methods);
-    // Re-assign the public readonly reference so it points to the new set
-    (this as { methodCache: ReadonlySet<string> }).methodCache = this._methodCache;
   }
 }
