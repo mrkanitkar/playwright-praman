@@ -220,6 +220,7 @@ export async function navigateToTile(
  *
  * @intent Navigate using a structured semantic object + action pair with optional query params.
  * Prefer this over navigateToApp() when parameters need to be passed to the target app.
+ * @guarantee On success, the FLP hash is set to the intent with parameters and UI5 is stable.
  * @ai
  * @aiContext Build the intent from the app's cross-navigation inbound config.
  * Parameters are appended as URL query string (e.g., `#PurchaseOrder-manage?PurchaseOrder=4500001234`).
@@ -256,6 +257,7 @@ export async function navigateToIntent(
  * Navigates to a specific hash directly.
  *
  * @intent Set the FLP URL hash directly for low-level navigation.
+ * @guarantee On success, the FLP hash is set to the given value and UI5 is stable.
  * @ai
  * @aiContext Use when the full hash is known. For structured navigation, prefer navigateToIntent().
  * @sapModule sap.ushell.Container — Direct hash manipulation via window.hasher
@@ -309,6 +311,7 @@ export async function navigateToHome(
  * Navigates back in browser history.
  *
  * @intent Go back to the previous page in browser history.
+ * @guarantee On success, the browser has navigated back and UI5 is stable.
  * @ai
  * @aiContext Uses Playwright's goBack(). Waits for UI5 stability after navigation.
  * @sapModule sap.ushell.Container — Browser history back navigation
@@ -333,6 +336,7 @@ export async function navigateBack(
  * Navigates forward in browser history.
  *
  * @intent Go forward in browser history after a back navigation.
+ * @guarantee On success, the browser has navigated forward and UI5 is stable.
  * @ai
  * @aiContext Uses Playwright's goForward(). Waits for UI5 stability after navigation.
  * @sapModule sap.ushell.Container — Browser history forward navigation
@@ -358,6 +362,7 @@ export async function navigateForward(
  *
  * @intent Search for and open an application using the FLP shell search bar.
  * Use when the tile is not visible on the home screen but can be found via search.
+ * @guarantee On success, the app matching the title is opened and UI5 is stable.
  * @ai
  * @aiContext Types the app title into the shell search field, then clicks the matching result.
  * Fallback navigation method when tile-based or hash-based navigation is not feasible.
@@ -390,6 +395,7 @@ export async function searchAndOpenApp(
  * Returns the current URL hash (without leading '#').
  *
  * @intent Read the current FLP navigation hash to determine which app is active.
+ * @guarantee Returns the current hash string without the leading '#'.
  * @ai
  * @aiContext Pure read operation (no stability wait). Use for assertions or conditional navigation.
  * @sapModule sap.ushell.Container — Read current FLP hash from window.location.hash

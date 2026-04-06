@@ -124,6 +124,7 @@ let frozen = false;
  *
  * @intent Provide a factory so custom matchers automatically get web-first
  * retry behavior identical to built-in Praman matchers.
+ * @guarantee Returns a matcher function that retries the check with pollUntilPass semantics.
  *
  * @remarks
  * The returned function:
@@ -204,6 +205,7 @@ export function createUI5Matcher<TArgs extends readonly unknown[] = readonly unk
  *
  * @intent Allow users to extend Praman's assertion vocabulary with
  * domain-specific matchers that use the same semantics as built-in matchers.
+ * @guarantee On success, the matcher is registered and available via expect(control).toXxx().
  *
  * @remarks
  * Matchers must be registered before the Playwright worker initializes

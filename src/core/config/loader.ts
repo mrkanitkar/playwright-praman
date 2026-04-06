@@ -307,6 +307,8 @@ function deepMergeConfig(
 /**
  * Loads, validates, and freezes Praman configuration.
  *
+ * @guarantee Returns a frozen, validated PramanConfig with all defaults applied via Zod schema.
+ *
  * @param options - Optional inline overrides.
  * @returns Frozen, validated PramanConfig with all defaults applied.
  *
@@ -376,6 +378,8 @@ export async function loadConfig(options?: LoadConfigOptions): Promise<Readonly<
  *
  * @remarks
  * Used in `praman.config.ts` for IDE autocomplete and type checking.
+ *
+ * @guarantee Returns the input unchanged (identity function for type inference).
  *
  * @param input - Config input to pass through.
  * @returns The input unchanged.

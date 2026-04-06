@@ -71,6 +71,7 @@ export interface UI5BindingInfo {
  * Retrieves a control property via `page.evaluate()` using the bridge.
  *
  * @intent Read a single property value from a UI5 control for matcher assertions.
+ * @guarantee On success, returns the property value from the control (may be undefined for missing properties).
  *
  * @remarks
  * Ensures the bridge is injected, then executes the getter method for
@@ -126,6 +127,7 @@ export async function getControlProperty(
  * Retrieves a control aggregation via `page.evaluate()` using the bridge.
  *
  * @intent Read an aggregation (child controls) from a UI5 control for table/list assertions.
+ * @guarantee Returns an array of BridgeControlRef objects (empty array if no items in aggregation).
  *
  * @remarks
  * Ensures the bridge is injected, then executes the getter method for

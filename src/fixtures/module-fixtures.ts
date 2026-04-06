@@ -213,9 +213,36 @@ export function createDateFixture(page: DatePage) {
 }
 
 /**
- * Creates the OData sub-namespace fixture object.
+ * Creates the OData sub-namespace fixture object (`ui5.odata.*`).
  *
- * @example `const o = createODataFixture(page); const data = await o.getModelData('/Products');`
+ * @remarks
+ * Exposes two categories of OData operations under a single namespace:
+ *
+ * **Model-level** (browser-side, via `page.evaluate()`):
+ * - `getModelData()`, `getModelProperty()` — read from UI5 OData model
+ * - `waitForLoad()` — poll until model data loads
+ * - `fetchCSRFToken()` — HEAD request for CSRF token
+ * - `getEntityCount()`, `hasPendingChanges()` — model inspection
+ *
+ * **HTTP-level** (server-side, via Playwright `page.request`):
+ * - `createEntity()`, `updateEntity()`, `deleteEntity()` — CRUD (require CSRF token)
+ * - `queryEntities()` — GET with $filter/$select/$expand/$orderby/$top/$skip
+ * - `callFunctionImport()` — invoke OData function imports (GET or POST)
+ *
+ * All methods are auto-wrapped with `withStability()` (UI5 stability guard)
+ * and `withStep()` (Playwright trace viewer integration).
+ *
+ * @param page - Playwright Page satisfying both ODataPage and ODataHttpPage interfaces.
+ *
+ * @example
+ * ```typescript
+ * // Model-level: read data from UI5 model
+ * const products = await ui5.odata.getModelData('/Products');
+ *
+ * // HTTP-level: create entity via POST
+ * const { token } = await ui5.odata.fetchCSRFToken('/sap/opu/odata/sap/SVC/');
+ * await ui5.odata.createEntity('/sap/opu/odata/sap/SVC/', 'Products', { Name: 'A' }, { csrfToken: token });
+ * ```
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 export function createODataFixture(page: ODataPage & ODataHttpPage) {

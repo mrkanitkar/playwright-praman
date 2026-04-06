@@ -246,6 +246,12 @@ function assertSuccessStatus(status: number, url: string, operation: string): vo
  * Creates a new entity via HTTP POST.
  *
  * @intent Create a new OData entity by sending a POST request to the service.
+ * @guarantee On success, the entity is created and the response contains the created entity data with HTTP 201 status.
+ * @ai
+ * @aiContext Uses Playwright's request API to POST directly to the OData service.
+ * Requires a CSRF token obtained via fetchCSRFToken(). Supports both OData V2 and V4 response formats.
+ * @sapModule sap.ui.model.odata.v2.ODataModel — HTTP-level entity creation
+ * @businessContext Create new business entities (e.g., purchase orders, products) via direct HTTP POST.
  *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.
@@ -291,6 +297,12 @@ export async function createEntity<TData = unknown>(
  * Updates an existing entity via HTTP PATCH.
  *
  * @intent Update an existing OData entity by sending a PATCH request with partial data.
+ * @guarantee On success, the entity is updated and the response contains the updated entity data.
+ * @ai
+ * @aiContext Uses Playwright's request API to PATCH the entity. Only changed fields need to be provided.
+ * Requires a CSRF token. ETag is returned for optimistic concurrency control.
+ * @sapModule sap.ui.model.odata.v2.ODataModel — HTTP-level entity update
+ * @businessContext Update existing business entities (e.g., change PO quantity, update product price).
  *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.
@@ -337,6 +349,12 @@ export async function updateEntity<TData = unknown>(
  * Deletes an entity via HTTP DELETE.
  *
  * @intent Remove an OData entity by sending a DELETE request to the service.
+ * @guarantee On success, the entity is deleted and the HTTP response status is 2xx.
+ * @ai
+ * @aiContext Uses Playwright's request API to DELETE the entity. Requires a CSRF token.
+ * No response body is returned on successful deletion.
+ * @sapModule sap.ui.model.odata.v2.ODataModel — HTTP-level entity deletion
+ * @businessContext Delete business entities (e.g., cancel draft documents, remove test data).
  *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.
@@ -378,6 +396,12 @@ export async function deleteEntity(
  * Calls an OData function import via HTTP.
  *
  * @intent Invoke an OData function import with parameters via HTTP GET or POST.
+ * @guarantee On success, the function import is executed and the response contains the result data.
+ * @ai
+ * @aiContext Sends GET or POST to the function import URL. GET does not require a CSRF token;
+ * POST requires one. Parameters are passed as URL query parameters.
+ * @sapModule sap.ui.model.odata.v2.ODataModel — HTTP-level function import invocation
+ * @businessContext Execute server-side business logic (e.g., CalculatePrice, ReleaseOrder, CheckAvailability).
  *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.
@@ -449,6 +473,12 @@ export async function callFunctionImport<TData = unknown>(
  * Queries an entity set via HTTP GET with OData system query options.
  *
  * @intent Read a collection of OData entities with optional filtering, sorting, and paging.
+ * @guarantee On success, returns an array of entities matching the query with HTTP status.
+ * @ai
+ * @aiContext Uses Playwright's request API to GET the entity set with OData query parameters.
+ * Supports $filter, $select, $expand, $orderby, $top, $skip. Parses both V2 (d.results) and V4 (value) formats.
+ * @sapModule sap.ui.model.odata.v2.ODataModel, sap.ui.model.odata.v4.ODataModel
+ * @businessContext Query business entities for test data verification or setup (e.g., find products by price, list open POs).
  *
  * @param page - Playwright Page with request API.
  * @param serviceUrl - OData service root URL.

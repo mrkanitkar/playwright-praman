@@ -70,6 +70,8 @@ const registry: ExtensionRegistration[] = [];
  * }
  * ```
  *
+ * @guarantee On success, the extension is registered and available as ui5.&lt;name&gt;.method() in fixtures.
+ *
  * @typeParam T - The shape of the methods object returned by the factory.
  * @param name - Unique namespace name. Must be non-empty and not conflict
  *   with built-in namespaces or UI5Handler method names.
