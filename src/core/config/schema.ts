@@ -38,6 +38,18 @@ import { z } from 'zod';
 
 // ── Auth sub-schema ──────────────────────────────────────────────────
 const authSchema = z.object({
+  /**
+   * Auth strategy for SAP login.
+   *
+   * @remarks
+   * - `basic`: On-premise form-based login (onprem-strategy)
+   * - `btp-saml`: BTP Cloud SAML via IAS (cloud-saml-strategy)
+   * - `office365`: Microsoft 365 / Azure AD SSO (office365-strategy)
+   * - `custom`: User-provided login function
+   *
+   * For API-based, certificate, or multi-tenant auth, see the
+   * authentication guide — these are configured programmatically.
+   */
   strategy: z.enum(['btp-saml', 'basic', 'office365', 'custom']).default('basic'),
   baseUrl: z.url(),
   username: z.string().optional(),
@@ -80,6 +92,7 @@ const telemetrySchema = z.object({
 
 // ── Selectors sub-schema ─────────────────────────────────────────────
 const selectorsSchema = z.object({
+  /** @deprecated Use top-level `controlDiscoveryTimeout` instead. */
   defaultTimeout: z.number().int().positive().default(10_000),
   preferVisibleControls: z.boolean().default(true),
   skipStabilityWait: z.boolean().default(false),
@@ -181,6 +194,16 @@ export const PramanConfigSchema = z
     controlTreeCapture: controlTreeCaptureSchema.optional(),
     /** Default value for matchSubclasses on selectors that don't specify it. */
     defaultMatchSubclasses: z.boolean().default(false),
+    /**
+     * Whether to auto-capture diagnostic artifacts (screenshot, control tree, page context)
+     * on test failure.
+     *
+     * @remarks
+     * When `true` (default), the failure artifacts fixture automatically attaches
+     * a screenshot (PNG), UI5 control tree snapshot (JSON), and page metadata (JSON)
+     * to the test report on any test failure. Set to `false` to disable.
+     */
+    captureFailureArtifacts: z.boolean().default(true),
   })
   .strict();
 

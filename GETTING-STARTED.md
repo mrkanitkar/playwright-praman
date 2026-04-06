@@ -78,6 +78,37 @@ SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'
 SAP_CLIENT=100             # OnPrem only
 ```
 
+> **Tip:** `SAP_BASE_URL` should be the root URL of your SAP system (no trailing path).
+> For BTP, use the full Launchpad URL.
+
+#### Example: On-Premise (Basic Auth)
+
+```bash
+SAP_BASE_URL=https://sap-dev.company.com:44300
+SAP_USERNAME=TEST_USER
+SAP_PASSWORD=SecureP@ss123
+SAP_AUTH_STRATEGY=basic
+SAP_CLIENT=100
+```
+
+#### Example: BTP Cloud (SAML)
+
+```bash
+SAP_BASE_URL=https://my-tenant.launchpad.cfapps.eu10.hana.ondemand.com
+SAP_USERNAME=test.user@company.com
+SAP_PASSWORD=SecureP@ss123
+SAP_AUTH_STRATEGY=btp-saml
+```
+
+#### Example: Office 365
+
+```bash
+SAP_BASE_URL=https://sap-portal.company.com
+SAP_USERNAME=test.user@company.onmicrosoft.com
+SAP_PASSWORD=SecureP@ss123
+SAP_AUTH_STRATEGY=office365
+```
+
 ### 3. Add .auth to .gitignore
 
 ```bash
@@ -120,6 +151,31 @@ test('navigate to Purchase Order app and verify table', async ({ ui5, ui5Navigat
   });
 });
 ```
+
+## Verify Your Setup
+
+Run the example test in headed mode to see it in action:
+
+```bash
+npx playwright test tests/purchase-order.spec.ts --headed
+```
+
+**What to expect:**
+
+- A Chromium window opens and navigates to your SAP login page
+- Auth completes automatically (you will see the FLP home screen)
+- The test interacts with UI5 controls and closes
+
+**Common first-run issues:**
+
+| Symptom                           | Likely Cause                           | Fix                                           |
+| --------------------------------- | -------------------------------------- | --------------------------------------------- |
+| Browser opens but stays blank     | `SAP_BASE_URL` is wrong or unreachable | Check URL in browser manually                 |
+| Login page appears but auth fails | Wrong credentials or strategy          | Verify `.env` values; try logging in manually |
+| Auth succeeds but test times out  | App tile not found or UI5 not loaded   | Run `npx playwright-praman doctor`            |
+| `ERR_BRIDGE_NOT_READY`            | UI5 framework not detected             | Ensure the page is a UI5 application          |
+
+For more help: [Troubleshooting Guide](./TROUBLESHOOTING.md)
 
 ## Running Tests
 
@@ -325,6 +381,25 @@ for the complete 7-rule compliance framework.
 
 **Forbidden patterns**: Never use `page.click('#__...')`, `page.fill('#__...')`,
 or `page.locator('.sapM...')` for UI5 elements. Always use Praman fixtures.
+
+#### Agent Seed File
+
+The seed file (`tests/seeds/sap-seed.spec.ts`) is a special Playwright test that:
+
+1. Authenticates with your SAP system using raw Playwright (no Praman fixtures)
+2. Navigates to the Fiori Launchpad
+3. Waits for UI5 controls to load
+4. Keeps the browser open via MCP `pauseAtEnd` for agent discovery
+
+Use the seed when AI agents need a live, authenticated browser session to explore your app:
+
+```bash
+npx playwright test tests/seeds/sap-seed.spec.ts --project=agent-seed-test
+```
+
+The seed deliberately avoids Praman fixtures so that the MCP server can inspect the
+page without fixture lifecycle interference. For normal test authoring, use the
+standard auth-setup.ts pattern instead.
 
 ### SAP Business Analyst
 

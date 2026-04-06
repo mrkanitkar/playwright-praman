@@ -8,6 +8,8 @@ keywords:
   - sap ui5 test automation
 ---
 
+For step-by-step diagnostic help, see the [Troubleshooting Guide](./troubleshooting.md).
+
 Praman provides 14 typed error classes with 58 machine-readable error codes. Every error includes
 the attempted operation, a `retryable` flag, and actionable recovery `suggestions`.
 

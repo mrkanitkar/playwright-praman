@@ -18,7 +18,7 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 
-import { calculateBackoff, retry } from '#core/utils/retry.js';
+import { calculateBackoff, MAX_RETRY_LIMIT, retry } from '#core/utils/retry.js';
 
 describe('retry', () => {
   // ── Success scenarios ───────────────────────────────────────────────
@@ -141,6 +141,40 @@ describe('retry', () => {
 
     expect(result).toBe('ok');
     expect(fn).toHaveBeenCalledTimes(3);
+  });
+
+  // ── maxRetries clamping (F-01) ──────────────────────────────────────
+  it('clamps maxRetries above MAX_RETRY_LIMIT to 10', async () => {
+    const fn = vi.fn<() => Promise<string>>().mockRejectedValue(new Error('always-fail'));
+
+    await expect(
+      retry(fn, { maxRetries: 50, baseDelay: 1, maxDelay: 10, jitter: false }),
+    ).rejects.toThrow('always-fail');
+
+    // 1 initial + MAX_RETRY_LIMIT retries = 11
+    expect(fn).toHaveBeenCalledTimes(MAX_RETRY_LIMIT + 1);
+  });
+
+  it('allows maxRetries within limit', async () => {
+    const fn = vi.fn<() => Promise<string>>().mockRejectedValue(new Error('always-fail'));
+
+    await expect(
+      retry(fn, { maxRetries: 5, baseDelay: 1, maxDelay: 10, jitter: false }),
+    ).rejects.toThrow('always-fail');
+
+    // 1 initial + 5 retries = 6
+    expect(fn).toHaveBeenCalledTimes(6);
+  });
+
+  it('clamps negative maxRetries to 0', async () => {
+    const fn = vi.fn<() => Promise<string>>().mockRejectedValue(new Error('immediate'));
+
+    await expect(
+      retry(fn, { maxRetries: -1, baseDelay: 1, maxDelay: 10, jitter: false }),
+    ).rejects.toThrow('immediate');
+
+    // 1 initial + 0 retries = 1
+    expect(fn).toHaveBeenCalledTimes(1);
   });
 
   it('skips retry entirely when shouldRetry returns false on first error', async () => {

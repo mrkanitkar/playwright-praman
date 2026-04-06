@@ -78,6 +78,7 @@ interface MinimalConfig {
   preferVisibleControls: boolean;
   ignoreAutoWaitUrls: string[];
   defaultMatchSubclasses: boolean;
+  captureFailureArtifacts: boolean;
 }
 
 function makeMinimalConfig(
@@ -93,6 +94,7 @@ function makeMinimalConfig(
     preferVisibleControls: true,
     ignoreAutoWaitUrls: [] as string[],
     defaultMatchSubclasses: false,
+    captureFailureArtifacts: true,
   };
 }
 

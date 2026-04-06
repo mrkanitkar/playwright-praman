@@ -46,6 +46,7 @@ function makeConfigNoAi(): Readonly<PramanConfig> {
     preferVisibleControls: true,
     ignoreAutoWaitUrls: [],
     defaultMatchSubclasses: false,
+    captureFailureArtifacts: true,
   };
 }
 

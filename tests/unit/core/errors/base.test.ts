@@ -14,7 +14,7 @@
  * Verifies constructor, inheritance, serialization (toJSON), user-friendly
  * output (toUserMessage), AI context (toAIContext), defaults, and immutability.
  */
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { PramanError } from '#core/errors/base.js';
 import type { PramanErrorOptions } from '#core/errors/base.js';
@@ -28,6 +28,10 @@ const SAMPLE_OPTIONS: PramanErrorOptions = {
 };
 
 describe('PramanError', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   // ── Constructor & Inheritance ────────────────────────────────────────
   describe('constructor', () => {
     it('creates an instance of PramanError', () => {
@@ -245,6 +249,20 @@ describe('PramanError', () => {
       const error = new PramanError(SAMPLE_OPTIONS);
       const msg = error.toUserMessage();
       expect(msg).toContain('Docs: https://praman.dev/docs/guides/errors#config-errors');
+    });
+
+    it('includes local docs fallback when PRAMAN_DEBUG is true', () => {
+      vi.stubEnv('PRAMAN_DEBUG', 'true');
+      const error = new PramanError(SAMPLE_OPTIONS);
+      const msg = error.toUserMessage();
+      expect(msg).toContain('Local: node_modules/playwright-praman/docs/docs/guides/errors.md');
+    });
+
+    it('omits local docs fallback when PRAMAN_DEBUG is not set', () => {
+      vi.stubEnv('PRAMAN_DEBUG', '');
+      const error = new PramanError(SAMPLE_OPTIONS);
+      const msg = error.toUserMessage();
+      expect(msg).not.toContain('Local:');
     });
 
     it('derives correct docs URL for different error categories', () => {

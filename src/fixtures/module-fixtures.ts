@@ -270,6 +270,16 @@ export function createODataFixture(page: ODataPage & ODataHttpPage) {
  * @param obj - Object whose methods to wrap.
  * @param guard - Async stability guard called before each method.
  * @param namespace - Namespace prefix for step names (e.g., `'table'`, `'dialog'`).
+ *
+ * @example
+ * ```typescript
+ * import { withStability } from '#fixtures/module-fixtures.js';
+ *
+ * const stableUi5 = withStability(ui5Methods, async () => {
+ *   await waitForUI5Stable(page, config);
+ * }, 'ui5');
+ * // Every method on stableUi5 now auto-waits for UI5 stability before execution
+ * ```
  */
 export function withStability<T extends Record<string, (...args: never[]) => Promise<unknown>>>(
   obj: T,
@@ -340,6 +350,7 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       config: {
         ui5WaitTimeout: pramanConfig.ui5WaitTimeout,
         controlDiscoveryTimeout:
+          // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation -- backward-compat fallback
           pramanConfig.selectors?.defaultTimeout ?? pramanConfig.controlDiscoveryTimeout,
         preferVisibleControls:
           pramanConfig.selectors?.preferVisibleControls ?? pramanConfig.preferVisibleControls,

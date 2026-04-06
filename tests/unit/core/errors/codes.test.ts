@@ -126,9 +126,14 @@ describe('ErrorCode', () => {
 
   // ── Count test (detect accidental additions/removals) ────────────────
   it('has exactly 72 error codes', () => {
-    // 67 original + 2 BIND (ERR_BIND_NOT_SUPPORTED, ERR_BIND_FAILED)
-    // + 3 SCREENCAST (ERR_SCREENCAST_NOT_STARTED, ERR_SCREENCAST_CHAPTER_FAILED, ERR_SCREENCAST_FRAME_HANDLER)
     expect(Object.keys(ErrorCode)).toHaveLength(72);
+  });
+
+  it('documents the correct error code count in header comment', () => {
+    // Dynamically count from the actual exports — NOT a hardcoded magic number.
+    // If this snapshot breaks, update the header comment in codes.ts.
+    const count = Object.keys(ErrorCode).length;
+    expect(count).toMatchInlineSnapshot(`72`);
   });
 
   // ── Immutability test ────────────────────────────────────────────────

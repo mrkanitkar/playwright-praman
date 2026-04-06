@@ -10,16 +10,28 @@ keywords:
 
 Praman supports 6 pluggable authentication strategies for SAP systems.
 
-## Strategies
+## Auth Strategy Mapping
 
-| Strategy         | Use Case                                      | Config Value     |
-| ---------------- | --------------------------------------------- | ---------------- |
-| **On-Premise**   | On-premise SAP NetWeaver / S/4HANA            | `'onprem'`       |
-| **Cloud SAML**   | SAP BTP with SAML IdP (IAS, Azure AD)         | `'cloud-saml'`   |
-| **Office 365**   | Microsoft SSO for SAP connected to Azure      | `'office365'`    |
-| **Multi-Tenant** | SAP BTP multi-tenant apps with subdomain auth | `'multi-tenant'` |
-| **API**          | API key or OAuth bearer token (headless)      | `'api'`          |
-| **Certificate**  | Client certificate authentication             | `'certificate'`  |
+The `auth.strategy` config field accepts 4 values. Each maps to an internal
+strategy implementation:
+
+| Config Value | Strategy File          | Use Case                         |
+| ------------ | ---------------------- | -------------------------------- |
+| `basic`      | onprem-strategy.ts     | SAP NetWeaver / ABAP on-premise  |
+| `btp-saml`   | cloud-saml-strategy.ts | SAP BTP Cloud via IAS / SAML     |
+| `office365`  | office365-strategy.ts  | Azure AD / Microsoft 365 SSO     |
+| `custom`     | (user-provided)        | Custom IDP or non-standard login |
+
+### Specialized Strategies (Not Config-Selectable)
+
+These strategies are used programmatically, not via the `auth.strategy` config:
+
+- **api-strategy.ts** — Headless API-based auth (for CI/CD token-based auth).
+  Use via `sapAuth.loginWithApi()`.
+- **certificate-strategy.ts** — Client certificate auth (configured at
+  browser context level in `playwright.config.ts`, not via Praman config).
+- **multi-tenant-strategy.ts** — BTP multi-tenant routing (delegates to
+  cloud-saml or onprem internally, selected by `SAP_ACTIVE_SYSTEM` env var).
 
 ## Setup Project Pattern
 

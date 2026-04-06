@@ -33,12 +33,12 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
-  retries: process.env['CI'] ? 2 : 0,
+  retries: process.env['CI'] ? 2 : 0, // Retry failed tests twice in CI
   workers: process.env['CI'] ? 1 : undefined,
   reporter: 'html',
 
-  // Global timeout — SAP operations are slow (login, UI5 rendering)
-  timeout: 5 * 60 * 1000, // 5 minutes
+  // 5 minutes per test — increase for slow SAP systems (login, UI5 rendering)
+  timeout: 5 * 60 * 1000,
 
   use: {
     trace: 'on-first-retry',
@@ -46,19 +46,23 @@ export default defineConfig({
   },
 
   projects: [
-    // Runs FIRST: logs into SAP and saves session to .auth/sap-state.json
+    // Auth project runs FIRST — logs into SAP and saves the session.
+    // Other projects depend on this, so they reuse the saved session
+    // instead of logging in again for every test.
     {
       name: 'auth-setup',
       testMatch: '**/auth.setup.ts',
     },
 
-    // Runs AFTER auth-setup: loads saved session — no re-login needed
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        // Reuse the auth session saved by the 'auth-setup' project above.
+        // This file is created automatically — add '.auth/' to .gitignore.
         storageState: '.auth/sap-state.json',
       },
+      // This line means 'chromium' waits for 'auth-setup' to finish first.
       dependencies: ['auth-setup'],
       testIgnore: '**/auth.setup.ts',
     },

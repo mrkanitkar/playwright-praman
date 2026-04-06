@@ -50,9 +50,15 @@ const VSCODE_SNIPPETS = `{
     "body": [
       "import { test, expect } from 'playwright-praman';",
       "",
-      "test('$1', async ({ ui5 }) => {",
-      "  const control = await ui5.control({ $2 });",
-      "  $0",
+      "test('$1', async ({ ui5, ui5Navigation }) => {",
+      "  await test.step('$2', async () => {",
+      "    await ui5Navigation.navigateToApp('$3');",
+      "    await ui5.waitForUI5();",
+      "  });",
+      "",
+      "  await test.step('$4', async () => {",
+      "    $0",
+      "  });",
       "});"
     ],
     "description": "Praman SAP UI5 test scaffold"
@@ -62,7 +68,87 @@ const VSCODE_SNIPPETS = `{
     "scope": "typescript",
     "body": ["await test.step('$1', async () => {", "  $0", "});"],
     "description": "Praman test step"
+  },
+  "Praman Button Click": {
+    "prefix": "praman-click",
+    "scope": "typescript",
+    "body": [
+      "const \${1:btn} = await ui5.control({",
+      "  controlType: '\${2:sap.m.Button}',",
+      "  properties: { text: '\${3:Create}' },",
+      "});",
+      "await \${1:btn}.press();",
+      "await ui5.waitForUI5();"
+    ],
+    "description": "Click a UI5 button"
+  },
+  "Praman Input Fill": {
+    "prefix": "praman-fill",
+    "scope": "typescript",
+    "body": [
+      "await ui5.fill({ controlType: '\${1:sap.m.Input}', properties: { name: '\${2:fieldName}' } }, '\${3:value}');",
+      "await ui5.waitForUI5();"
+    ],
+    "description": "Fill a UI5 input field"
+  },
+  "Praman Table Read": {
+    "prefix": "praman-table",
+    "scope": "typescript",
+    "body": [
+      "const rowCount = await ui5.table.getRowCount('\${1:tableId}');",
+      "const cellValue = await ui5.table.getCellValue('\${1:tableId}', \${2:0}, \${3:0});",
+      "expect(cellValue).toBe('\${4:expected}');"
+    ],
+    "description": "Read from a UI5 table"
+  },
+  "Praman Dialog Handle": {
+    "prefix": "praman-dialog",
+    "scope": "typescript",
+    "body": [
+      "await ui5.dialog.waitFor();",
+      "const dialogBtn = await ui5.control({",
+      "  controlType: 'sap.m.Button',",
+      "  properties: { text: '\${1:OK}' },",
+      "  searchOpenDialogs: true,",
+      "});",
+      "await dialogBtn.press();",
+      "await ui5.dialog.waitForClosed();"
+    ],
+    "description": "Handle a UI5 dialog"
   }
+}
+`;
+
+const VSCODE_LAUNCH = `{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Current Test (Headed)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["playwright", "test", "\${relativeFile}", "--headed", "--debug"],
+      "console": "integratedTerminal",
+      "env": { "PRAMAN_DEBUG": "true" }
+    },
+    {
+      "name": "Debug All Tests (Headed)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["playwright", "test", "--headed", "--debug"],
+      "console": "integratedTerminal",
+      "env": { "PRAMAN_DEBUG": "true" }
+    },
+    {
+      "name": "Run Praman Doctor",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["playwright-praman", "doctor"],
+      "console": "integratedTerminal"
+    }
+  ]
 }
 `;
 
@@ -100,7 +186,7 @@ async function writeIfMissing(
 // ── VS Code scaffolding ───────────────────────────────────────────────────────
 
 /**
- * Writes the three generated VS Code config files into `.vscode/`.
+ * Writes the generated VS Code config files into `.vscode/`.
  *
  * @param targetDir - Absolute path to the user's project root.
  * @param force - When `true`, overwrite existing destination files.
@@ -115,6 +201,7 @@ export async function scaffoldVSCodeFiles(
     [join(targetDir, '.vscode', 'settings.json'), VSCODE_SETTINGS],
     [join(targetDir, '.vscode', 'extensions.json'), VSCODE_EXTENSIONS],
     [join(targetDir, '.vscode', 'praman.code-snippets'), VSCODE_SNIPPETS],
+    [join(targetDir, '.vscode', 'launch.json'), VSCODE_LAUNCH],
   ];
   for (const [filePath, content] of vscodePairs) {
     await writeIfMissing(filePath, content, force, created);

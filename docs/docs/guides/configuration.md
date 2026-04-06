@@ -109,6 +109,22 @@ export default defineConfig({
 | `autoWait`           | `boolean` | `true`  | Auto-wait for OPA5 readiness  |
 | `debug`              | `boolean` | `false` | Enable OPA5 debug mode        |
 
+## Timeout Precedence
+
+When multiple timeout values could apply, Praman uses this precedence (highest first):
+
+1. **Per-call options** — `ui5.control({ id: 'x' }, { timeout: 5000 })`
+2. **Top-level config** — `controlDiscoveryTimeout: 10000`
+3. **Selectors section** — `selectors.defaultTimeout: 10000` (fallback if top-level not set)
+4. **Built-in default** — 10,000ms
+
+We recommend using only `controlDiscoveryTimeout` at the top level.
+`selectors.defaultTimeout` exists for backward compatibility and will be
+removed in a future major version.
+
+For details on the 3-tier stability wait system, see
+[Stability & Timing](./stability-timing.md).
+
 ## Environment Variable Overrides
 
 Top-level config fields can be overridden via environment variables:
@@ -121,13 +137,12 @@ Top-level config fields can be overridden via environment variables:
 | `PRAMAN_INTERACTION_STRATEGY`      | `interactionStrategy`     |
 | `PRAMAN_SKIP_STABILITY_WAIT`       | `skipStabilityWait`       |
 
-**Precedence** (highest to lowest):
+**General config precedence** (highest to lowest):
 
 1. Per-call options (e.g., `ui5.control({ ... }, { timeout: 5000 })`)
-2. Selectors sub-schema config
+2. Environment variable overrides
 3. Top-level config
-4. Environment variable overrides
-5. Schema defaults
+4. Schema defaults
 
 ## Complete `playwright.config.ts` Example
 
