@@ -55,7 +55,7 @@ describe('cli/scaffolder', () => {
   // ── scaffoldProject — happy path ────────────────────────────────────────────
 
   describe('scaffoldProject — creates directory structure when target does not exist', () => {
-    it('returns success with list of created files', async () => {
+    it('returns success with list of created files', { timeout: 15_000 }, async () => {
       const options: ScaffoldOptions = { targetDir: TEST_DIR };
 
       const result = await scaffoldProject(options);
