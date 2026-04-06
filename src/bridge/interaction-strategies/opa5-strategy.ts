@@ -121,6 +121,8 @@ interface BrowserControl {
   setSelectedKey?: (key: string) => void;
 }
 
+/* v8 ignore start -- browser-context functions: executed inside page.evaluate() in Chromium, not reachable by Node.js V8 coverage */
+
 /**
  * Browser-context: waits for the OPA5 AutoWaiter to settle, if available.
  *
@@ -248,6 +250,8 @@ async function browserSelect(args: SelectArgs): Promise<BridgeResult> {
     return { success: false, error: errMsg };
   }
 }
+
+/* v8 ignore stop */
 
 /**
  * Interaction strategy using SAP OPA5 RecordReplay API.
