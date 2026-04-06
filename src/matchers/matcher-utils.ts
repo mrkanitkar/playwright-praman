@@ -39,6 +39,11 @@ import { ControlError } from '#core/errors/control-error.js';
 export interface MatcherPage {
   /** Executes a script in the browser context and returns the result. */
   evaluate<TResult>(script: string, arg?: unknown): Promise<TResult>;
+  /** Waits for a condition in the browser context (required for bridge injection). */
+  waitForFunction(
+    pageFunction: string | (() => unknown),
+    options?: { timeout?: number },
+  ): Promise<unknown>;
 }
 
 /**
@@ -88,7 +93,7 @@ export async function getControlProperty(
   propertyName: string,
 ): Promise<unknown> {
   try {
-    await ensureBridgeInjected(page as never);
+    await ensureBridgeInjected(page);
     const methodName = `get${propertyName.charAt(0).toUpperCase()}${propertyName.slice(1)}`;
     const script = createExecuteMethodScript();
     const withArgs = script.replace(
@@ -143,7 +148,7 @@ export async function getControlAggregation(
   aggregationName: string,
 ): Promise<readonly BridgeControlRef[]> {
   try {
-    await ensureBridgeInjected(page as never);
+    await ensureBridgeInjected(page);
     const methodName = `get${aggregationName.charAt(0).toUpperCase()}${aggregationName.slice(1)}`;
     const script = createExecuteMethodScript();
     const withArgs = script.replace(
@@ -213,7 +218,7 @@ export async function getUI5BindingInfo(
   propertyName: string,
 ): Promise<UI5BindingInfo | null> {
   try {
-    await ensureBridgeInjected(page as never);
+    await ensureBridgeInjected(page);
     const script = `(function() {
       try {
         var ctrl = sap.ui.getCore().byId(${JSON.stringify(controlId)});
@@ -272,7 +277,7 @@ export async function getUI5ControlType(
   controlId: string,
 ): Promise<string | null> {
   try {
-    await ensureBridgeInjected(page as never);
+    await ensureBridgeInjected(page);
     const script = `(function() {
       try {
         var ctrl = sap.ui.getCore().byId(${JSON.stringify(controlId)});

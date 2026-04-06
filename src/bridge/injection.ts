@@ -31,8 +31,32 @@ import { createBridgeInjectionScript } from './browser-scripts/inject-ui5.js';
 
 import { BridgeError } from '#core/errors/bridge-error.js';
 
+/**
+ * Minimal page interface for bridge injection operations.
+ *
+ * @remarks
+ * Decouples bridge injection from Playwright's full `Page` type, allowing
+ * callers with narrower page interfaces (e.g., `WorkZonePage`) to use
+ * bridge injection without type casts.
+ *
+ * @example
+ * ```typescript
+ * const page: BridgeInjectablePage = { evaluate: ..., waitForFunction: ... };
+ * await ensureBridgeInjected(page);
+ * ```
+ */
+export interface BridgeInjectablePage {
+  /** Executes a script in the browser context. */
+  evaluate(script: string, arg?: unknown): Promise<unknown>;
+  /** Waits for a condition to be true in the browser context. */
+  waitForFunction(
+    pageFunction: string | (() => unknown),
+    options?: { timeout?: number },
+  ): Promise<unknown>;
+}
+
 /** Tracks which pages have been lazily injected (WeakSet avoids memory leaks). */
-const injectedPages = new WeakSet<Page>();
+const injectedPages = new WeakSet();
 
 /** Tracks which targets have been eagerly injected via `addInitScript()`. */
 const eagerInjectedTargets = new WeakSet<Page | BrowserContext>();
@@ -107,9 +131,9 @@ export async function injectBridgeEager(target: Page | BrowserContext): Promise<
  * if (!ready) await injectBridge(page);
  * ```
  */
-export async function isBridgeReady(page: Page): Promise<boolean> {
+export async function isBridgeReady(page: BridgeInjectablePage): Promise<boolean> {
   const ns = BRIDGE_GLOBALS.NAMESPACE;
-  return page.evaluate<boolean>(`!!(window.${ns} && window.${ns}.ready)`);
+  return page.evaluate(`!!(window.${ns} && window.${ns}.ready)`) as Promise<boolean>;
 }
 
 /**
@@ -128,7 +152,7 @@ export async function isBridgeReady(page: Page): Promise<boolean> {
  * // Bridge is now ready for operations
  * ```
  */
-export async function injectBridge(page: Page): Promise<void> {
+export async function injectBridge(page: BridgeInjectablePage): Promise<void> {
   const timeout = BRIDGE_TIMEOUTS.INJECTION;
   const readyFlag = BRIDGE_GLOBALS.READY_FLAG;
 
@@ -193,7 +217,7 @@ export async function injectBridge(page: Page): Promise<void> {
  * await ensureBridgeInjected(page);
  * ```
  */
-export async function ensureBridgeInjected(page: Page): Promise<void> {
+export async function ensureBridgeInjected(page: BridgeInjectablePage): Promise<void> {
   if (injectedPages.has(page)) {
     return;
   }
@@ -215,7 +239,7 @@ export async function ensureBridgeInjected(page: Page): Promise<void> {
  * // Next ensureBridgeInjected() call will re-inject
  * ```
  */
-export function resetPageInjection(page: Page): void {
+export function resetPageInjection(page: BridgeInjectablePage): void {
   injectedPages.delete(page);
 }
 
@@ -230,7 +254,10 @@ export function resetPageInjection(page: Page): void {
  * await waitForBridgeReady(page, 5000);
  * ```
  */
-export async function waitForBridgeReady(page: Page, timeout?: number): Promise<void> {
+export async function waitForBridgeReady(
+  page: BridgeInjectablePage,
+  timeout?: number,
+): Promise<void> {
   const readyFlag = BRIDGE_GLOBALS.READY_FLAG;
   const effectiveTimeout = timeout ?? BRIDGE_TIMEOUTS.INJECTION;
   try {
