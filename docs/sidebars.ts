@@ -151,6 +151,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Reference',
       items: [
+        'guides/quick-reference',
         'guides/configuration',
         'guides/compatibility',
         'guides/stability-timing',
