@@ -20,6 +20,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { PramanError } from '../../../src/core/errors/base.js';
 import {
+  applyRegisteredMatchers,
   createUI5Matcher,
   getRegisteredMatcherCount,
   getRegisteredMatchers,
@@ -208,8 +209,18 @@ describe('matcher-registry', () => {
       }).toThrow(/already registered/);
     });
 
-    it('throws PramanError when registry is frozen', () => {
-      getRegisteredMatchers(); // freeze
+    it('allows registration after getRegisteredMatchers (read does not freeze)', () => {
+      getRegisteredMatchers(); // read-only, does NOT freeze
+
+      const matcher: UI5MatcherFn = createUI5Matcher(createSimpleCheck(true));
+
+      // Should NOT throw — getRegisteredMatchers no longer freezes
+      registerUI5Matcher('toHaveUI5Icon', matcher);
+      expect(getRegisteredMatcherCount()).toBe(1);
+    });
+
+    it('throws PramanError when registry is frozen via applyRegisteredMatchers', () => {
+      applyRegisteredMatchers(); // freeze
 
       const matcher: UI5MatcherFn = createUI5Matcher(createSimpleCheck(true));
 
@@ -253,10 +264,10 @@ describe('matcher-registry', () => {
       expect(result['toHaveUI5Tooltip']).toBe(tooltipMatcher);
     });
 
-    it('freezes the registry after first call', () => {
+    it('does not freeze the registry (read-only)', () => {
       getRegisteredMatchers();
 
-      expect(isMatcherRegistryFrozen()).toBe(true);
+      expect(isMatcherRegistryFrozen()).toBe(false);
     });
 
     it('returns a frozen object', () => {
@@ -291,8 +302,14 @@ describe('matcher-registry', () => {
       expect(isMatcherRegistryFrozen()).toBe(false);
     });
 
-    it('returns true after getRegisteredMatchers', () => {
+    it('returns false after getRegisteredMatchers (read does not freeze)', () => {
       getRegisteredMatchers();
+
+      expect(isMatcherRegistryFrozen()).toBe(false);
+    });
+
+    it('returns true after applyRegisteredMatchers', () => {
+      applyRegisteredMatchers();
 
       expect(isMatcherRegistryFrozen()).toBe(true);
     });
@@ -311,7 +328,7 @@ describe('matcher-registry', () => {
     });
 
     it('unfreezes the registry', () => {
-      getRegisteredMatchers();
+      applyRegisteredMatchers();
       expect(isMatcherRegistryFrozen()).toBe(true);
 
       resetMatcherRegistry();
@@ -321,7 +338,7 @@ describe('matcher-registry', () => {
 
     it('allows re-registration after reset', () => {
       registerUI5Matcher('toHaveUI5Icon', createUI5Matcher(createSimpleCheck(true)));
-      getRegisteredMatchers(); // freeze
+      applyRegisteredMatchers(); // freeze
 
       resetMatcherRegistry();
 
@@ -387,7 +404,7 @@ describe('matcher-registry', () => {
     });
 
     it('frozen error includes helpful suggestions', () => {
-      getRegisteredMatchers();
+      applyRegisteredMatchers();
 
       try {
         registerUI5Matcher('toHaveUI5Y', createUI5Matcher(createSimpleCheck(true)));

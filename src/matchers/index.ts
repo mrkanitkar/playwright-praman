@@ -30,6 +30,7 @@ export { checkUI5CellText, checkUI5RowCount, checkUI5SelectedRows } from './tabl
 
 // ── Custom matcher registration API ──────────────────────────────────
 export {
+  applyRegisteredMatchers,
   createUI5Matcher,
   getRegisteredMatcherCount,
   getRegisteredMatchers,
