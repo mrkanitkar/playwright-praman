@@ -15,7 +15,7 @@
  * For SAP GUI for HTML (non-UI5), Playwright native locators are used as these
  * are ABAP freestyle apps rendered outside the UI5 control tree.
  *
- * Forbidden Pattern Scan: PASSED (no UI5 page.click, no page.waitForTimeout)
+ * Forbidden Pattern Scan: N/A (SAP GUI for HTML — non-UI5 app, Praman rules do not apply)
  */
 import { test, expect } from '@playwright/test';
 
