@@ -25,7 +25,7 @@
 
 import type { Frame } from '@playwright/test';
 
-import type { DateInput, DateOptions } from '../modules/date.js';
+import type { DateInput, DateOptions, DatePage } from '../modules/date.js';
 import {
   getDatePickerValue,
   getDateRangeSelection,
@@ -35,7 +35,7 @@ import {
   setDateRangeSelection,
   setTimePickerValue,
 } from '../modules/date.js';
-import type { FindDialogOptions } from '../modules/dialog.js';
+import type { DialogPage, FindDialogOptions } from '../modules/dialog.js';
 import {
   confirmDialog,
   dismissDialog,
@@ -86,7 +86,7 @@ import {
   selectRowByValues,
   setTableCellValue,
 } from '../modules/table-operations.js';
-import type { TableOptions, WaitForTableDataOptions } from '../modules/table.js';
+import type { TableOptions, TablePage, WaitForTableDataOptions } from '../modules/table.js';
 import {
   deselectAllTableRows,
   detectTableType,
@@ -118,7 +118,7 @@ import type { ExtensionContext } from '#extensions/extension-types.js';
  * @example `const t = createTableFixture(page); await t.getRows('myTable');`
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
-export function createTableFixture(page: never) {
+export function createTableFixture(page: TablePage) {
   return {
     detectType: async (tableId: string) => detectTableType(page, tableId),
     getRows: async (tableId: string, opts?: TableOptions) => getTableRows(page, tableId, opts),
@@ -177,7 +177,7 @@ export function createTableFixture(page: never) {
  * @example `const d = createDialogFixture(page); await d.confirm();`
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
-export function createDialogFixture(page: never) {
+export function createDialogFixture(page: DialogPage) {
   return {
     waitFor: async (opts?: FindDialogOptions) => waitForDialog(page, opts),
     getOpen: async () => getOpenDialogs(page),
@@ -196,7 +196,7 @@ export function createDialogFixture(page: never) {
  * @example `const d = createDateFixture(page); await d.setDatePicker('dp1', '2024-01-01');`
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
-export function createDateFixture(page: never) {
+export function createDateFixture(page: DatePage) {
   return {
     setDatePicker: async (controlId: string, date: DateInput, opts?: DateOptions) =>
       setDatePickerValue(page, controlId, date, opts),
@@ -356,21 +356,13 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       });
     };
 
-    // Type assertions: `page as never` prevents fixture factory from depending on concrete Page type;
     // `as ExtendedUI5Handler` narrows Object.assign result to the branded union type
     const extended = Object.assign(handler, {
-      table: withStability(createTableFixture(page as never), guard, 'table'),
-      dialog: withStability(createDialogFixture(page as never), guard, 'dialog'),
-      date: withStability(createDateFixture(page as never), guard, 'date'),
+      table: withStability(createTableFixture(page), guard, 'table'),
+      dialog: withStability(createDialogFixture(page), guard, 'dialog'),
+      date: withStability(createDateFixture(page), guard, 'date'),
       odata: withStability(createODataFixture(page as never), guard, 'odata'),
     }) as ExtendedUI5Handler;
-
-    // Runtime assertion: guard against dialog fixture being undefined (mergeTests ordering issue)
-    if (extended.dialog === undefined) {
-      logger.warn(
-        "ui5.dialog is undefined — ensure you imported test from 'playwright-praman', not from '@playwright/test'",
-      );
-    }
 
     // Apply registered custom extensions as sub-namespaces
     const extensionContext: ExtensionContext = { page, handler, config: pramanConfig };

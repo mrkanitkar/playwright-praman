@@ -39,6 +39,7 @@ import {
   feGetTableRowCount,
   feFindRowByValues,
 } from '../fe/fe-table-helpers.js';
+import type { ListReportPage } from '../fe/list-report.js';
 import {
   clearFilterBar,
   executeSearch,
@@ -81,7 +82,7 @@ export interface FEFixtures {
 /**
  * Creates the FE fixture object with all four sub-namespaces.
  *
- * @param page - Playwright page instance (typed as `never` for loose coupling).
+ * @param page - Playwright page (or compatible minimal subset).
  * @returns Fully-constructed FioriElementsFixture with all sub-namespaces.
  *
  * @example
@@ -90,7 +91,7 @@ export interface FEFixtures {
  * await fe.listReport.search();
  * ```
  */
-export function createFEFixture(page: never): FioriElementsFixture {
+export function createFEFixture(page: ListReportPage): FioriElementsFixture {
   return {
     listReport: {
       getTable: async () => getListReportTable(page),
@@ -150,7 +151,6 @@ export function createFEFixture(page: never): FioriElementsFixture {
  */
 export const feTest = base.extend<FEFixtures>({
   fe: async ({ page }, use) => {
-    // Type assertion: `page as never` prevents factory from depending on concrete Page type
-    await use(createFEFixture(page as never));
+    await use(createFEFixture(page));
   },
 });
