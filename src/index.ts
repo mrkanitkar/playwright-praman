@@ -132,6 +132,21 @@ export {
 export type { NavigationOptions } from './modules/navigation.js';
 export type { UI5NavigationAPI } from './fixtures/nav-fixtures.js';
 
+// ── Navigation (Space / Section) ───────────────────────────────────
+export { navigateToSpace, navigateToSectionLink } from './modules/index.js';
+export type {
+  SpaceNavigationOptions,
+  SectionLinkNavigationOptions,
+} from './modules/index.js';
+
+// ── WorkZone ───────────────────────────────────────────────────────
+export { createWorkZoneManager } from './modules/index.js';
+export type {
+  BTPWorkZoneManager,
+  WorkZonePage,
+  WorkZoneFrame,
+} from './modules/index.js';
+
 // ── Table (core) ────────────────────────────────────────────────────
 export {
   deselectAllTableRows,
