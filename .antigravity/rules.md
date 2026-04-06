@@ -104,6 +104,16 @@ Key patterns:
 - Use `searchOpenDialogs: true` for dialog controls
 - Output: `import { test, expect } from 'playwright-praman'` (NEVER `@playwright/test`)
 
+## 7 Mandatory Rules (SAP Test Generation)
+
+1. `import { test, expect } from 'playwright-praman'` ONLY
+2. Praman fixtures for ALL UI5 elements — NEVER `page.click('#__...')`
+3. Playwright native ONLY for verified non-UI5 elements
+4. Auth in seed — NEVER `sapAuth.login()` in test body
+5. `setValue()` + `fireChange()` + `waitForUI5()` for every input
+6. `searchOpenDialogs: true` for dialog controls
+7. TSDoc compliance header in every generated test
+
 ## Commit Messages
 
 Conventional Commits: `feat(scope): description`
