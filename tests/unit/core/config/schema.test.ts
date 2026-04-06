@@ -203,6 +203,7 @@ describe('PramanConfigSchema', () => {
       });
       expect(result.success).toBe(true);
       if (result.success) {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation -- testing deprecated field
         expect(result.data.selectors?.defaultTimeout).toBe(10_000);
         expect(result.data.selectors?.preferVisibleControls).toBe(true);
         expect(result.data.selectors?.skipStabilityWait).toBe(false);

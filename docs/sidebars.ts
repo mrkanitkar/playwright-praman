@@ -99,6 +99,8 @@ const sidebars: SidebarsConfig = {
         'guides/inspect-command',
         'guides/debugging',
         'guides/errors',
+        'guides/troubleshooting',
+        'guides/debugging-agent-failures',
         'guides/reporters',
         'guides/performance-benchmarks',
         {
@@ -150,6 +152,8 @@ const sidebars: SidebarsConfig = {
       label: 'Reference',
       items: [
         'guides/configuration',
+        'guides/compatibility',
+        'guides/stability-timing',
         'guides/fixtures',
         'guides/fixture-composition',
         {

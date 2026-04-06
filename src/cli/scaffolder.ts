@@ -18,11 +18,14 @@
  * @module cli/scaffolder
  */
 
-import { access, mkdir, writeFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { access, copyFile, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import type { IDEDetection } from './ide-detector.js';
 import { scaffoldIDEFiles } from './ide-installer.js';
+import { logWarn } from './logger.js';
+import { getPackageRoot } from './version.js';
 
 /**
  * Options for scaffolding a new Praman project.
@@ -131,6 +134,93 @@ const TEMPLATE_FILES: readonly (readonly [string, string])[] = [
 const SUBDIRECTORIES: readonly string[] = ['tests', '.auth'];
 
 /**
+ * Checks whether Docker is available on the system.
+ *
+ * @remarks
+ * Runs `docker --version` in a try/catch so that a missing Docker
+ * installation never causes init to fail.
+ *
+ * @returns `true` when `docker --version` exits successfully.
+ *
+ * @example
+ * ```typescript
+ * if (await isDockerAvailable()) {
+ *   // copy Docker templates
+ * }
+ * ```
+ */
+export async function isDockerAvailable(): Promise<boolean> {
+  return new Promise((resolve) => {
+    try {
+      // eslint-disable-next-line sonarjs/no-os-command-from-path -- Docker binary is expected on PATH; no user-controlled input
+      execFile('docker', ['--version'], (error) => {
+        resolve(error === null);
+      });
+    } catch {
+      resolve(false);
+    }
+  });
+}
+
+/**
+ * Copies Docker reference templates from the package `examples/docker/`
+ * into the user's project when Docker is detected.
+ *
+ * @param targetDir - Absolute path to the user's project root.
+ * @param force - When `true`, overwrite existing destination files.
+ * @param created - Array to push created file paths into.
+ *
+ * @example
+ * ```typescript
+ * await scaffoldDockerFiles('/home/user/project', false, []);
+ * ```
+ */
+export async function scaffoldDockerFiles(
+  targetDir: string,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  const dockerAvailable = await isDockerAvailable();
+  if (!dockerAvailable) {
+    return;
+  }
+
+  const pkgRoot = getPackageRoot();
+  const destDir = join(targetDir, 'examples', 'docker');
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- destDir composed from targetDir + known constant path
+  await mkdir(destDir, { recursive: true });
+
+  const files = ['docker-compose.yml', 'Dockerfile'] as const;
+  for (const fileName of files) {
+    const srcPath = join(pkgRoot, 'examples', 'docker', fileName);
+    const destPath = join(destDir, fileName);
+
+    if (!force) {
+      try {
+        await access(destPath);
+        continue; // file exists — skip
+      } catch {
+        // file does not exist — proceed to copy
+      }
+    }
+
+    try {
+      await access(srcPath);
+    } catch {
+      logWarn(`Docker template source not found: ${srcPath}`);
+      continue;
+    }
+
+    try {
+      await copyFile(srcPath, destPath);
+      created.push(destPath);
+    } catch {
+      logWarn(`Failed to copy Docker template: ${srcPath}`);
+    }
+  }
+}
+
+/**
  * Scaffolds a new Praman project at the specified target directory.
  *
  * @remarks
@@ -195,6 +285,9 @@ export async function scaffoldProject(options: ScaffoldOptions): Promise<Scaffol
     await writeFile(filePath, content, 'utf8');
     filesCreated.push(filePath);
   }
+
+  // Copy Docker reference templates when Docker is available
+  await scaffoldDockerFiles(targetDir, force, filesCreated);
 
   // Install IDE-specific agent, seed, and config files
   if (detection !== undefined) {

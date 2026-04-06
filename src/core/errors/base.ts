@@ -34,6 +34,8 @@
  * @module errors
  */
 
+import { env } from 'node:process';
+
 import type { ErrorCode } from './codes.js';
 
 /** Base URL for the Praman error reference documentation. */
@@ -236,6 +238,10 @@ export class PramanError extends Error {
 
     lines.push('');
     lines.push(`  Docs: ${getErrorDocsUrl(this.code)}`);
+
+    if (env['PRAMAN_DEBUG'] === 'true') {
+      lines.push(`  Local: node_modules/playwright-praman/docs/docs/guides/errors.md`);
+    }
 
     return lines.join('\n');
   }

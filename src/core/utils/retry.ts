@@ -31,11 +31,28 @@
  * @module utils
  */
 
+import { createLogger } from '#core/logging/logger.js';
+
+/**
+ * Hard ceiling for `maxRetries` to prevent resource exhaustion.
+ *
+ * @remarks
+ * Any value above this limit is silently clamped down.
+ * Negative values are clamped to 0 (no retries, single attempt only).
+ *
+ * @example
+ * ```typescript
+ * import { MAX_RETRY_LIMIT } from '#core/utils/retry.js';
+ * console.log(MAX_RETRY_LIMIT); // 10
+ * ```
+ */
+export const MAX_RETRY_LIMIT = 10 as const;
+
 /**
  * Options for configuring retry behavior.
  */
 export interface RetryOptions {
-  /** Maximum number of retry attempts after the initial call. Default: 3. */
+  /** Maximum number of retry attempts after the initial call. Default: 3. Capped at {@link MAX_RETRY_LIMIT} (10). */
   readonly maxRetries?: number;
   /** Base delay in ms before the first retry. Default: 100. */
   readonly baseDelay?: number;
@@ -107,7 +124,17 @@ export function calculateBackoff(
  * ```
  */
 export async function retry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T> {
-  const maxRetries = options?.maxRetries ?? 3;
+  const rawMaxRetries = options?.maxRetries ?? 3;
+  const maxRetries = Math.min(Math.max(rawMaxRetries, 0), MAX_RETRY_LIMIT);
+
+  if (rawMaxRetries > MAX_RETRY_LIMIT || rawMaxRetries < 0) {
+    const log = createLogger('retry');
+    log.warn(
+      { requested: rawMaxRetries, applied: maxRetries },
+      'maxRetries clamped to safe range [0, MAX_RETRY_LIMIT]',
+    );
+  }
+
   const baseDelay = options?.baseDelay ?? 100;
   const maxDelay = options?.maxDelay ?? 5000;
   const jitter = options?.jitter ?? true;

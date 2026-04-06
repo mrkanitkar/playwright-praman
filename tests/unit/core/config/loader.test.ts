@@ -300,6 +300,63 @@ describe('loadConfig', () => {
     const config = await loadConfig({ overrides: { logLevel: 'debug' } });
     expect(config.logLevel).toBe('debug');
   });
+
+  // ── OPA5 env var overrides ──────────────────────────────────────────
+  it('reads PRAMAN_OPA5_DEBUG env var', async () => {
+    vi.stubEnv('PRAMAN_OPA5_DEBUG', 'true');
+    const config = await loadConfig();
+    expect(config.opa5).toMatchObject({ debug: true });
+  });
+
+  it('reads PRAMAN_OPA5_AUTO_WAIT env var', async () => {
+    vi.stubEnv('PRAMAN_OPA5_AUTO_WAIT', 'false');
+    const config = await loadConfig();
+    expect(config.opa5).toMatchObject({ autoWait: false });
+  });
+
+  it('reads PRAMAN_OPA5_INTERACTION_TIMEOUT env var as number', async () => {
+    vi.stubEnv('PRAMAN_OPA5_INTERACTION_TIMEOUT', '10000');
+    const config = await loadConfig();
+    expect(config.opa5).toMatchObject({ interactionTimeout: 10_000 });
+  });
+
+  it('ignores missing opa5 env vars and uses schema defaults', async () => {
+    const config = await loadConfig();
+    // opa5 is optional, but if provided by env, defaults from schema apply
+    // When no env vars set, opa5 should be undefined (optional section)
+    expect(config.opa5).toBeUndefined();
+  });
+
+  // ── controlTreeCapture env var overrides ────────────────────────────
+  it('reads PRAMAN_CONTROL_TREE_MAX_DEPTH env var as number', async () => {
+    vi.stubEnv('PRAMAN_CONTROL_TREE_MAX_DEPTH', '20');
+    const config = await loadConfig();
+    expect(config.controlTreeCapture).toMatchObject({ maxDepth: 20 });
+  });
+
+  it('reads PRAMAN_CONTROL_TREE_ENABLED env var', async () => {
+    vi.stubEnv('PRAMAN_CONTROL_TREE_ENABLED', 'false');
+    const config = await loadConfig();
+    expect(config.controlTreeCapture).toMatchObject({ enabled: false });
+  });
+
+  it('reads PRAMAN_CONTROL_TREE_MAX_CONTROLS env var as number', async () => {
+    vi.stubEnv('PRAMAN_CONTROL_TREE_MAX_CONTROLS', '10000');
+    const config = await loadConfig();
+    expect(config.controlTreeCapture).toMatchObject({ maxControls: 10_000 });
+  });
+
+  // ── captureFailureArtifacts env var ─────────────────────────────────
+  it('reads PRAMAN_CAPTURE_FAILURE_ARTIFACTS env var', async () => {
+    vi.stubEnv('PRAMAN_CAPTURE_FAILURE_ARTIFACTS', 'false');
+    const config = await loadConfig();
+    expect(config.captureFailureArtifacts).toBe(false);
+  });
+
+  it('defaults captureFailureArtifacts to true when env var not set', async () => {
+    const config = await loadConfig();
+    expect(config.captureFailureArtifacts).toBe(true);
+  });
 });
 
 describe('defineConfig', () => {

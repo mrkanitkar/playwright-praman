@@ -88,6 +88,11 @@ const ENV_MAPPINGS: readonly EnvMapping[] = [
     configKey: 'defaultMatchSubclasses',
     type: 'boolean',
   },
+  {
+    envVar: 'PRAMAN_CAPTURE_FAILURE_ARTIFACTS',
+    configKey: 'captureFailureArtifacts',
+    type: 'boolean',
+  },
 ];
 
 const NESTED_ENV_MAPPINGS: readonly NestedEnvMapping[] = [
@@ -132,6 +137,34 @@ const NESTED_ENV_MAPPINGS: readonly NestedEnvMapping[] = [
     section: 'odataTracing',
     field: 'enabled',
     type: 'boolean',
+  },
+  // opa5 section
+  {
+    envVar: 'PRAMAN_OPA5_INTERACTION_TIMEOUT',
+    section: 'opa5',
+    field: 'interactionTimeout',
+    type: 'number',
+  },
+  { envVar: 'PRAMAN_OPA5_AUTO_WAIT', section: 'opa5', field: 'autoWait', type: 'boolean' },
+  { envVar: 'PRAMAN_OPA5_DEBUG', section: 'opa5', field: 'debug', type: 'boolean' },
+  // controlTreeCapture section
+  {
+    envVar: 'PRAMAN_CONTROL_TREE_ENABLED',
+    section: 'controlTreeCapture',
+    field: 'enabled',
+    type: 'boolean',
+  },
+  {
+    envVar: 'PRAMAN_CONTROL_TREE_MAX_DEPTH',
+    section: 'controlTreeCapture',
+    field: 'maxDepth',
+    type: 'number',
+  },
+  {
+    envVar: 'PRAMAN_CONTROL_TREE_MAX_CONTROLS',
+    section: 'controlTreeCapture',
+    field: 'maxControls',
+    type: 'number',
   },
 ];
 

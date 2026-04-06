@@ -159,6 +159,7 @@ provenance
 pstep
 ptest
 pwtest
+pwuser
 pytest
 qtest
 readymade

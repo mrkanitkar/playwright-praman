@@ -1,0 +1,19 @@
+# Reference docker-compose for running Praman SAP tests in containers.
+# Copy to your project root and customize.
+#
+# Usage:
+#   cp node_modules/playwright-praman/examples/docker/* .
+#   docker compose run --rm praman-tests
+#
+# Requires: .env file with SAP_* credentials (never commit to git)
+
+services:
+  praman-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    volumes:
+      - ./test-results:/app/test-results
+      - ./playwright-report:/app/playwright-report
+    command: npx playwright test --reporter=html

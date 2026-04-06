@@ -30,20 +30,25 @@
  * All Praman error codes as a frozen constant object.
  *
  * @remarks
- * Categories (14):
+ * Total: 72 error codes across 16 categories.
+ *
+ * Categories:
  * - Config (3): schema validation, file not found, parse failure
  * - Bridge (5): timeout, injection, readiness, version mismatch, execution
- * - Control (9): not found, visibility, enabled, interactable, not ui5, property, aggregation, method, interaction failed
+ * - Control (10): not found, visibility, enabled, interactable, not ui5, property, aggregation, method, interaction failed, no DOM ref
  * - Auth (4): failure, timeout, session expired, invalid strategy
  * - Navigation (3): tile not found, route failed, timeout
  * - OData (4): request failed, parse, CSRF token, trace
  * - Selector (3): invalid, ambiguous, parse
  * - Timeout (3): UI5 stability, control discovery, generic operation
  * - AI (11): provider unavailable, invalid response, token limit, rate limited, not configured, llm call failed, response parse failed, context build failed, step interpret failed, invalid request, capability not found
- * - Plugin (3): load failure, init failure, incompatible version
+ * - Plugin (5): load failure, init failure, incompatible version, extension duplicate, extension invalid
  * - Vocabulary (4): term not found, domain load failed, JSON invalid, ambiguous match
  * - Intent (4): field not found, action failed, navigation failed, validation failed
  * - FLP (5): shell not found, permission denied, API unavailable, invalid user, operation timeout
+ * - Matcher (3): duplicate, invalid, frozen
+ * - Bind (2): not supported, failed
+ * - Screencast (3): not started, chapter failed, frame handler
  */
 export const ErrorCode = Object.freeze({
   // ── Config errors ──────────────────────────────────────────────────
