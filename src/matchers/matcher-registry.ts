@@ -305,10 +305,38 @@ export function registerUI5Matcher(name: string, matcherFn: UI5MatcherFn): void 
 }
 
 /**
- * Returns all registered custom matchers as a record for `expect.extend()`.
+ * Returns all registered custom matchers as a record without freezing the registry.
+ *
+ * @intent Provide a read-only snapshot of registered matchers for diagnostics
+ * or debugging without permanently locking the registry.
+ *
+ * @remarks
+ * This is safe to call at any time — it does NOT freeze the registry.
+ * Use {@link applyRegisteredMatchers} when you want to freeze and apply.
+ *
+ * @returns Record mapping matcher names to matcher functions.
+ *
+ * @example
+ * ```typescript
+ * // Debugging: inspect registered matchers without side effects
+ * const matchers = getRegisteredMatchers();
+ * console.log(Object.keys(matchers));
+ * ```
+ */
+export function getRegisteredMatchers(): Readonly<Record<string, UI5MatcherFn>> {
+  const result: Record<string, UI5MatcherFn> = {};
+  for (const [name, entry] of registry) {
+    // eslint-disable-next-line security/detect-object-injection
+    result[name] = entry.matcherFn;
+  }
+  return Object.freeze(result);
+}
+
+/**
+ * Returns all registered custom matchers and freezes the registry.
  *
  * @intent Provide the fixture layer with a snapshot of registered matchers
- * to wire into Playwright's assertion system.
+ * to wire into Playwright's assertion system, permanently locking the registry.
  *
  * @remarks
  * This is called internally by the `matcherRegistration` fixture.
@@ -320,19 +348,13 @@ export function registerUI5Matcher(name: string, matcherFn: UI5MatcherFn): void 
  * @example
  * ```typescript
  * // Internal fixture usage:
- * const customMatchers = getRegisteredMatchers();
+ * const customMatchers = applyRegisteredMatchers();
  * expect.extend(customMatchers);
  * ```
  */
-export function getRegisteredMatchers(): Readonly<Record<string, UI5MatcherFn>> {
+export function applyRegisteredMatchers(): Readonly<Record<string, UI5MatcherFn>> {
   frozen = true;
-
-  const result: Record<string, UI5MatcherFn> = {};
-  for (const [name, entry] of registry) {
-    // eslint-disable-next-line security/detect-object-injection
-    result[name] = entry.matcherFn;
-  }
-  return Object.freeze(result);
+  return getRegisteredMatchers();
 }
 
 /**

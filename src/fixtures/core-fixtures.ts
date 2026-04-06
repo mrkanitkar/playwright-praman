@@ -53,7 +53,7 @@ import { expect, test as base } from '@playwright/test';
 import type { Frame } from '@playwright/test';
 import type { Logger } from 'pino';
 
-import { getRegisteredMatchers } from '../matchers/matcher-registry.js';
+import { applyRegisteredMatchers } from '../matchers/matcher-registry.js';
 import {
   checkUI5CellText,
   checkUI5RowCount,
@@ -251,7 +251,7 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
       });
 
       // User-registered custom matchers (freezes the registry)
-      const customMatchers = getRegisteredMatchers();
+      const customMatchers = applyRegisteredMatchers();
       if (Object.keys(customMatchers).length > 0) {
         expect.extend(customMatchers);
       }
