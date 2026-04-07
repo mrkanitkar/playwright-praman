@@ -71,7 +71,8 @@ test('edit order assigned to this worker', async ({ ui5, page }, testInfo) => {
 
 ## Praman Bridge in Parallel Workers
 
-The Praman bridge is injected per-page, not per-worker. Each worker creates its own browser context and page, so bridge injection is fully independent. No special configuration is needed for the bridge in parallel mode.
+The Praman bridge is injected per-page, not per-worker. Each worker creates its own browser context and page, so bridge injection is fully
+independent. No special configuration is needed for the bridge in parallel mode.
 
 One consideration: if `controlDiscoveryTimeout` is too low and the SAP system is under load from multiple workers, increase it:
 
@@ -121,7 +122,9 @@ export default defineConfig({
 
 ## Common Pitfalls
 
-- **Too many workers against SAP**: SAP systems have session limits. If you see `ERR_AUTH_FAILED` errors in parallel runs, reduce `workers` or use more test accounts.
-- **Shared mutable state**: Never store test state in module-level variables. Each worker is a separate process, so module state is not shared. Use `testData.save()` and `testData.load()` for cross-step persistence.
+- **Too many workers against SAP**: SAP systems have session limits. If you see `ERR_AUTH_FAILED` errors in parallel runs, reduce `workers`
+  or use more test accounts.
+- **Shared mutable state**: Never store test state in module-level variables. Each worker is a separate process, so module state is not shared.
+  Use `testData.save()` and `testData.load()` for cross-step persistence.
 - **FLP tile cache**: The Fiori Launchpad caches tile data per session. Parallel workers reusing the same `storageState` share the same FLP cache, which is generally safe for read operations.
 - **Shard imbalance**: Playwright distributes by file, not by test count. If one file has 50 tests and others have 5, sharding will be uneven. Keep test files roughly equal in size.

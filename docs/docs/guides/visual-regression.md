@@ -228,7 +228,7 @@ npx playwright test tests/visual/ -g "list report" --update-snapshots
 
 Screenshot baselines should be committed to version control:
 
-```
+```text
 tests/
   visual/
     po-list-report.spec.ts
