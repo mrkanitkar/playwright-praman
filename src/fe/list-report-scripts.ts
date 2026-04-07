@@ -217,7 +217,7 @@ export const LR_CLEAR_FILTER_BAR_SCRIPT = `(function(filterBarId) {
   try {
     var c = sap.ui.getCore().byId(filterBarId);
     if (!c) return { success: false, reason: 'filter_bar_not_found' };
-    if (typeof c.clear === 'function') { c.clear(); return { success: true }; }
+    if (typeof c.fireClear === 'function') { c.fireClear(); return { success: true }; }
     if (typeof c.getFilterGroupItems === 'function') {
       var items = c.getFilterGroupItems();
       for (var i = 0; i < items.length; i++) {

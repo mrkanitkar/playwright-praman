@@ -160,7 +160,6 @@ async function browserPress(args: PressArgs): Promise<BridgeResult> {
     bridge.RecordReplay.interactWithControl({
       selector: { id: args.controlId },
       interactionType: 'PRESS',
-      interactionTimeout: args.timeout,
     });
     // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
     if (args.debug) console.log(OPA5_LOG_PREFIX, 'press', args.controlId, JSON.stringify({ success: true }));
@@ -193,7 +192,6 @@ async function browserEnterText(args: EnterTextArgs): Promise<BridgeResult> {
       selector: { id: args.controlId },
       interactionType: 'ENTER_TEXT',
       enterText: args.text,
-      interactionTimeout: args.timeout,
     });
     // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
     if (args.debug) console.log(OPA5_LOG_PREFIX, 'enterText', args.controlId, JSON.stringify({ success: true, text: args.text }));
@@ -225,7 +223,6 @@ async function browserSelect(args: SelectArgs): Promise<BridgeResult> {
     bridge.RecordReplay.interactWithControl({
       selector: { id: args.controlId },
       interactionType: 'PRESS',
-      interactionTimeout: args.timeout,
     });
     // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
     if (args.debug) console.log(OPA5_LOG_PREFIX, 'select', args.controlId, JSON.stringify({ success: true, itemId: args.itemId }));
