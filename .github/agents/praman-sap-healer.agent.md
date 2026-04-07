@@ -326,7 +326,7 @@ Run via `browser_evaluate` to check UI5 framework state:
     version: sap.ui.version || 'unknown',
     coreInitialized: false,
     pendingRequests: 0,
-    autoWaiterStatus: null,
+    ui5IdleStatus: null,
     errorMessages: [],
   };
 
@@ -334,17 +334,15 @@ Run via `browser_evaluate` to check UI5 framework state:
     var core = sap.ui.getCore();
     result.coreInitialized = !!core;
 
-    // Check AutoWaiter (are there pending async operations?)
+    // Check UI5 idle status (are there pending async operations?)
     try {
       var RecordReplay = sap.ui.require('sap/ui/test/RecordReplay');
-      if (RecordReplay && RecordReplay.getAutoWaiter) {
-        var waiter = RecordReplay.getAutoWaiter();
-        if (waiter) {
-          result.autoWaiterStatus = waiter.hasToWait() ? 'BUSY' : 'IDLE';
-        }
+      if (RecordReplay && typeof RecordReplay.waitForUI5 === 'function') {
+        await RecordReplay.waitForUI5();
+        result.ui5IdleStatus = 'IDLE';
       }
     } catch (e) {
-      result.autoWaiterStatus = 'check-failed: ' + e.message;
+      result.ui5IdleStatus = 'check-failed: ' + e.message;
     }
 
     // Check for pending XHR requests

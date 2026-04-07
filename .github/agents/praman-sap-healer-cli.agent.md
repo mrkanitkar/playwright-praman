@@ -156,16 +156,16 @@ playwright-cli -s=sap run-code "async page => {
       version: sap.ui.version || 'unknown',
       coreInitialized: !!core,
       pendingRequests: 0,
-      autoWaiterStatus: null,
+      ui5IdleStatus: null,
       errorMessages: [],
     };
     try {
       const RecordReplay = sap.ui.require('sap/ui/test/RecordReplay');
-      if (RecordReplay?.getAutoWaiter) {
-        const waiter = RecordReplay.getAutoWaiter();
-        result.autoWaiterStatus = waiter?.hasToWait() ? 'BUSY' : 'IDLE';
+      if (RecordReplay && typeof RecordReplay.waitForUI5 === 'function') {
+        await RecordReplay.waitForUI5();
+        result.ui5IdleStatus = 'IDLE';
       }
-    } catch(e) { result.autoWaiterStatus = 'check-failed: ' + e.message; }
+    } catch(e) { result.ui5IdleStatus = 'check-failed: ' + e.message; }
     try {
       const mm = core.getMessageManager();
       if (mm) {

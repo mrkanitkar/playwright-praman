@@ -367,9 +367,9 @@ function __praman_isUI5Stable() {
     if (core.getUIDirty?.()) return false;
 
     // Check 3: No pending XHR requests (OData)
-    if (typeof sap.ui.test?.RecordReplay?.getAutoWaiter === 'function') {
-      const waiter = sap.ui.test.RecordReplay.getAutoWaiter();
-      if (waiter && !waiter.hasToWait()) return true;
+    if (typeof sap.ui.test?.RecordReplay?.waitForUI5 === 'function') {
+      await sap.ui.test.RecordReplay.waitForUI5();
+      return true; // UI5 is idle
     }
 
     // Check 4: No pending timeouts from UI5

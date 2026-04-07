@@ -410,8 +410,7 @@ ui5-native with reduced coverage.
 | API                                  | Operation | What It Does                                    | Reference                                                                                                                  |
 | ------------------------------------ | --------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `RecordReplay.interactWithControl()` | all       | SAP's official control interaction API          | [API Reference](https://ui5.sap.com/#/api/sap.ui.test.RecordReplay%23methods/sap.ui.test.RecordReplay.interactWithControl) |
-| `RecordReplay.getAutoWaiter()`       | all       | Gets the OPA5 auto-waiter instance              | [API Reference](https://ui5.sap.com/#/api/sap.ui.test.RecordReplay%23methods/sap.ui.test.RecordReplay.getAutoWaiter)       |
-| `autoWaiter.hasToWait()`             | all       | Returns `true` while UI5 has pending async work | [API Reference](https://ui5.sap.com/#/api/sap.ui.test.autowaiter.autoWaiter%23methods/hasToWait)                           |
+| `RecordReplay.waitForUI5()`           | all       | Waits for UI5 to finish pending async operations | [API Reference](https://ui5.sap.com/#/api/sap.ui.test.RecordReplay%23methods/sap.ui.test.RecordReplay.waitForUI5)          |
 | `control.firePress()`                | press     | Fallback if RecordReplay unavailable            | [API Reference](https://ui5.sap.com/#/api/sap.m.Button%23events/press)                                                     |
 | `control.fireSelect()`               | press     | Fallback if RecordReplay unavailable            | —                                                                                                                          |
 | `control.setValue(text)`             | enterText | Fallback if RecordReplay unavailable            | [API Reference](https://ui5.sap.com/#/api/sap.m.InputBase%23methods/setValue)                                              |
@@ -423,7 +422,7 @@ ui5-native with reduced coverage.
 | Field                | Default | Description                                            |
 | -------------------- | ------- | ------------------------------------------------------ |
 | `interactionTimeout` | `5000`  | Timeout in ms for `RecordReplay.interactWithControl()` |
-| `autoWait`           | `true`  | Poll `hasToWait()` before each interaction             |
+| `autoWait`           | `true`  | Call `waitForUI5()` before each interaction             |
 | `debug`              | `false` | Log `[praman:opa5]` messages to browser console        |
 
 **Fallback chains in code:**
@@ -431,7 +430,7 @@ ui5-native with reduced coverage.
 ```
 press() — opa5-strategy.ts lines 82–140
   if RecordReplay available:
-  │ ├── autoWaiter.hasToWait() polling loop (100ms interval)
+  │ ├── RecordReplay.waitForUI5()
   │ └── RecordReplay.interactWithControl({
   │       selector: { id },
   │       interactionType: 'PRESS',
@@ -445,7 +444,7 @@ press() — opa5-strategy.ts lines 82–140
 
 enterText() — opa5-strategy.ts lines 143–194
   if RecordReplay available:
-  │ ├── autoWaiter polling
+  │ ├── waitForUI5()
   │ └── RecordReplay.interactWithControl({
   │       interactionType: 'ENTER_TEXT',
   │       enterText: text
@@ -456,7 +455,7 @@ enterText() — opa5-strategy.ts lines 143–194
 
 select() — opa5-strategy.ts lines 197–246
   if RecordReplay available:
-  │ ├── autoWaiter polling
+  │ ├── waitForUI5()
   │ └── RecordReplay.interactWithControl({
   │       interactionType: 'PRESS'          ← uses PRESS, not SELECT
   │     })                                  → done
