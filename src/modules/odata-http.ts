@@ -245,6 +245,7 @@ function assertSuccessStatus(status: number, url: string, operation: string): vo
 /**
  * Creates a new entity via HTTP POST.
  *
+ * @capability ui5.odata.createEntity
  * @intent Create a new OData entity by sending a POST request to the service.
  * @guarantee On success, the entity is created and the response contains the created entity data with HTTP 201 status.
  * @ai
@@ -296,6 +297,7 @@ export async function createEntity<TData = unknown>(
 /**
  * Updates an existing entity via HTTP PATCH.
  *
+ * @capability ui5.odata.updateEntity
  * @intent Update an existing OData entity by sending a PATCH request with partial data.
  * @guarantee On success, the entity is updated and the response contains the updated entity data.
  * @ai
@@ -348,6 +350,7 @@ export async function updateEntity<TData = unknown>(
 /**
  * Deletes an entity via HTTP DELETE.
  *
+ * @capability ui5.odata.deleteEntity
  * @intent Remove an OData entity by sending a DELETE request to the service.
  * @guarantee On success, the entity is deleted and the HTTP response status is 2xx.
  * @ai
@@ -395,6 +398,7 @@ export async function deleteEntity(
 /**
  * Calls an OData function import via HTTP.
  *
+ * @capability ui5.odata.callFunctionImport
  * @intent Invoke an OData function import with parameters via HTTP GET or POST.
  * @guarantee On success, the function import is executed and the response contains the result data.
  * @ai
@@ -472,6 +476,7 @@ export async function callFunctionImport<TData = unknown>(
 /**
  * Queries an entity set via HTTP GET with OData system query options.
  *
+ * @capability ui5.odata.queryEntities
  * @intent Read a collection of OData entities with optional filtering, sorting, and paging.
  * @guarantee On success, returns an array of entities matching the query with HTTP status.
  * @ai

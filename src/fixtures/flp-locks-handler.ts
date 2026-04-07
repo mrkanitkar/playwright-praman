@@ -110,6 +110,8 @@ interface ODataLockResponse {
  * auto-cleanup tracked entries during teardown. All public methods are
  * decorated with `@ui5Step` for Playwright trace/report integration.
  *
+ * @capability flpLocks.getLockEntries
+ *
  * @example
  * ```typescript
  * const locks = new FLPLocksHandler({ page });

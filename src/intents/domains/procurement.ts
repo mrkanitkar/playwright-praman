@@ -98,6 +98,7 @@ function mmResult<T>(params: {
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create a purchase order from structured input data.
+ * @capability intent.procurement.createPurchaseOrder
  * @sapModule MM
  * @businessContext ME21N / Manage Purchase Orders — new PO creation.
  *
@@ -205,6 +206,7 @@ export async function createPurchaseOrder(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Approve a purchase order via the FLP approval workflow.
+ * @capability intent.procurement.approvePurchaseOrder
  * @sapModule MM
  * @businessContext ME28 / Manage Purchase Orders — approval action.
  *
@@ -252,6 +254,7 @@ export async function approvePurchaseOrder(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Search purchase orders using smart filter bar criteria.
+ * @capability intent.procurement.searchPurchaseOrders
  * @sapModule MM
  * @businessContext ME2M / Manage Purchase Orders — list search.
  *
@@ -298,6 +301,7 @@ export async function searchPurchaseOrders(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create a purchase requisition from structured input data.
+ * @capability intent.procurement.createPurchaseRequisition
  * @sapModule MM
  * @businessContext ME51N — purchase requisition creation.
  *
@@ -389,6 +393,7 @@ export async function createPurchaseRequisition(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Post a goods receipt against a purchase order.
+ * @capability intent.procurement.confirmGoodsReceipt
  * @sapModule MM
  * @businessContext MIGO — goods receipt for purchase order.
  *
@@ -437,6 +442,7 @@ export async function confirmGoodsReceipt(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Search vendor master records using FLP list app filters.
+ * @capability intent.procurement.searchVendors
  * @sapModule MM
  * @businessContext MK03 / Manage Suppliers — vendor search.
  *

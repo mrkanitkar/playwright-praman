@@ -80,6 +80,7 @@ export interface MatcherOptions {
  * Checks that a UI5 control's `text` property matches the expected value.
  *
  * @intent Assert that a UI5 control displays specific text content.
+ * @capability matchers.toHaveUI5Text
  *
  * @remarks
  * Supports both exact string comparison and RegExp pattern matching.
@@ -126,6 +127,7 @@ export async function checkUI5Text(
  * Checks that a UI5 control is visible.
  *
  * @intent Assert that a UI5 control is visible in the view.
+ * @capability matchers.toBeUI5Visible
  *
  * @remarks
  * Reads the `visible` property via `page.evaluate()` with bridge scripts.
@@ -166,6 +168,7 @@ export async function checkUI5Visible(
  * Checks that a UI5 control is enabled.
  *
  * @intent Assert that a UI5 control is enabled and interactive.
+ * @capability matchers.toBeUI5Enabled
  *
  * @remarks
  * Reads the `enabled` property via `page.evaluate()` with bridge scripts.
@@ -206,6 +209,7 @@ export async function checkUI5Enabled(
  * Checks that a UI5 control property matches the expected value.
  *
  * @intent Assert that any UI5 control property has an expected value.
+ * @capability matchers.toHaveUI5Property
  *
  * @remarks
  * Uses strict equality (`===`) for primitive values and `JSON.stringify`
@@ -251,6 +255,7 @@ export async function checkUI5Property(
  * Checks that a UI5 control's `valueState` property matches the expected state.
  *
  * @intent Assert the validation state (None, Error, Warning, Success, Information) of a UI5 control.
+ * @capability matchers.toHaveUI5ValueState
  *
  * @remarks
  * Common value states in UI5: `'None'`, `'Error'`, `'Warning'`, `'Success'`, `'Information'`.

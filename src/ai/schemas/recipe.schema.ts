@@ -45,7 +45,7 @@ export type RecipePriority = z.infer<typeof RecipePrioritySchema>;
  * adapt for specific SAP Fiori test scenarios.
  *
  * @intent Provide reusable SAP Fiori test patterns for AI generation.
- * @capability AI recipe lookup, test scaffolding.
+ * @capability pramanAI.recipes
  *
  * @example
  * ```typescript

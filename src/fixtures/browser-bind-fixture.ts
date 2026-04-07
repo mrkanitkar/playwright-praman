@@ -166,7 +166,7 @@ function getBindTitle(): string {
  * built-in `browser` fixture.
  *
  * @intent Expose the test browser to Playwright CLI agents for agentic workflows
- * @capability browser-bind, cli-agent-integration
+ * @capability ui5.control
  *
  * @example
  * ```typescript

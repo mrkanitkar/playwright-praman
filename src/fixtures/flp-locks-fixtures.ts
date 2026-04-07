@@ -62,6 +62,8 @@ export interface FLPLocksFixtures {
  * each test and calls `cleanup()` during teardown to release tracked lock
  * entries in reverse order (non-fatal on failure).
  *
+ * @capability flpLocks.getLockEntries
+ *
  * @example
  * ```typescript
  * flpLocksTest('verify lock cleanup', async ({ flpLocks }) => {

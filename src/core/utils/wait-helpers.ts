@@ -86,6 +86,8 @@ export interface WaitForUI5StableOptions {
 /**
  * Waits for SAP UI5 to report zero pending async operations.
  *
+ * @capability ui5.waitForUI5
+ *
  * @remarks
  * Uses `page.waitForFunction()` to poll `sap.ui.getCore().getUIPending() === 0`.
  * When `skipStabilityWait` is true, falls back to `briefDOMSettle` instead.

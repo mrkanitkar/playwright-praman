@@ -21,7 +21,7 @@
  * corresponding provider is configured.
  *
  * @intent Provide LLM text generation with structured output validation
- * @capability ai-llm-service
+ * @capability pramanAI.llm
  * @sapModule All
  *
  * @example

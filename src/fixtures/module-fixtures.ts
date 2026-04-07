@@ -349,6 +349,8 @@ export interface ModuleFixtures {
  * from coreTest. Only overrides the `ui5` fixture to attach
  * `.table`, `.dialog`, `.date`, `.odata` sub-namespaces.
  *
+ * @capability ui5.table.getRows
+ *
  * @example
  * ```typescript
  * import { moduleTest } from '#fixtures/module-fixtures.js';

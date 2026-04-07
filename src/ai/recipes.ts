@@ -35,7 +35,7 @@ const registry = new RecipeRegistry();
  * Consumer-facing recipes introspection API.
  *
  * @intent Provide drop-in parity with mk's `recipes` object.
- * @capability Recipe discovery, AI test scaffolding.
+ * @capability pramanAI.recipes
  *
  * @example
  * ```typescript

@@ -66,6 +66,8 @@ export interface FEListPage {
 /**
  * Gets the number of items in a `sap.m.List` control.
  *
+ * @capability fe.list.getItemCount
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param listId - The UI5 control ID of the list.
  * @returns The number of items in the list.
@@ -100,6 +102,8 @@ export async function feGetListItemCount(page: FEListPage, listId: string): Prom
 
 /**
  * Gets the title of a list item at the specified index.
+ *
+ * @capability fe.list.getItemTitle
  *
  * @param page - Playwright Page (or compatible subset).
  * @param listId - The UI5 control ID of the list.
@@ -211,6 +215,8 @@ export async function feGetListItemDescription(
 /**
  * Finds the index of a list item by its title text.
  *
+ * @capability fe.list.findItemByTitle
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param listId - The UI5 control ID of the list.
  * @param title - The title text to search for (exact match).
@@ -254,6 +260,8 @@ export async function feFindListItemByTitle(
  *
  * @remarks
  * Fires the `press` event on the list item. Falls back to `tap` if `firePress` is unavailable.
+ *
+ * @capability fe.list.clickItem
  *
  * @param page - Playwright Page (or compatible subset).
  * @param listId - The UI5 control ID of the list.
@@ -310,6 +318,8 @@ export async function feClickListItem(
  *
  * @remarks
  * Calls `setSelected(selected)` on the list item and fires `selectionChange` on the list.
+ *
+ * @capability fe.list.selectItem
  *
  * @param page - Playwright Page (or compatible subset).
  * @param listId - The UI5 control ID of the list.

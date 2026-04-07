@@ -47,7 +47,7 @@ import { assertNever } from '#core/utils/assert-never.js';
  * Queryable registry of Praman API capabilities for AI agents.
  *
  * @intent Expose Praman API surface to LLMs for test generation.
- * @capability AI context building, capability discovery.
+ * @capability pramanAI.capabilities
  *
  * @example
  * ```typescript

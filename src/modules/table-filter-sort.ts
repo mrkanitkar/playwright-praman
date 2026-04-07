@@ -114,6 +114,7 @@ function isGridVariant(variant: string): boolean {
 /**
  * Applies a filter to a table column.
  *
+ * @capability ui5.table.filterByColumn
  * @intent Filter a UI5 table column by a specified value and operator.
  *
  * @param page - Playwright Page (or compatible subset).
@@ -163,6 +164,7 @@ export async function filterByColumn(
 /**
  * Sorts a table by a specific column.
  *
+ * @capability ui5.table.sortByColumn
  * @intent Sort a UI5 table by a specified column in ascending or descending order.
  *
  * @param page - Playwright Page (or compatible subset).
@@ -209,6 +211,7 @@ export async function sortByColumn(
 /**
  * Returns the current sort state of a table column.
  *
+ * @capability ui5.table.getSortOrder
  * @intent Read the current sort direction and column for a UI5 table column.
  *
  * @param page - Playwright Page (or compatible subset).
@@ -234,6 +237,7 @@ export async function getSortOrder(
 /**
  * Returns the current filter value of a table column.
  *
+ * @capability ui5.table.getFilterValue
  * @intent Read the currently applied filter value for a UI5 table column.
  *
  * @param page - Playwright Page (or compatible subset).
@@ -259,6 +263,7 @@ export async function getFilterValue(
 /**
  * Exports visible table data as an array of objects keyed by column header text.
  *
+ * @capability ui5.table.exportData
  * @intent Extract all visible table data as structured JSON objects for assertions or export.
  *
  * @remarks This does NOT create a file export; it reads cell values as JSON objects.
@@ -297,6 +302,7 @@ export async function exportTableData(
 /**
  * Clicks the settings/personalization button in the table toolbar.
  *
+ * @capability ui5.table.clickSettings
  * @intent Open the table personalization/settings dialog by clicking its toolbar button.
  *
  * @param page - Playwright Page (or compatible subset).

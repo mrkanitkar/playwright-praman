@@ -61,6 +61,8 @@ export interface FLPSettingsFixtures {
  * {@link FLPSettingsHandler} instance on each test and requires no teardown.
  * The `page` dependency comes from Playwright's built-in fixture.
  *
+ * @capability flpSettings.getLanguage
+ *
  * @example
  * ```typescript
  * flpSettingsTest('verify locale settings', async ({ flpSettings }) => {

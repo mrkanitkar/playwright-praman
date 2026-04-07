@@ -36,7 +36,7 @@ const registry = new CapabilityRegistry();
  * Consumer-facing capabilities introspection API.
  *
  * @intent Provide drop-in parity with mk's `capabilities` object.
- * @capability Capability discovery, AI context building.
+ * @capability pramanAI.capabilities
  *
  * @example
  * ```typescript

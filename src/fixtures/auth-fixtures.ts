@@ -131,6 +131,8 @@ const fixtureLogger = {
  * NOTE: No auto-login — test setup projects call `handler.login()` explicitly.
  * NOTE: No auto-logout — session managed by setup project (D28 pattern).
  *
+ * @capability sapAuth.login
+ *
  * @example
  * ```typescript
  * import { authTest } from '#fixtures/auth-fixtures.js';

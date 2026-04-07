@@ -17,7 +17,7 @@
  * All LLM interactions return `AiResponse<T>` for consistent agent consumption (D29).
  *
  * @intent Execute autonomous SAP UI5 test operations
- * @capability ai-agentic-handler
+ * @capability pramanAI.agentic
  * @sapModule All
  *
  * @module ai
@@ -81,7 +81,7 @@ const InterpretStepSchema = z.object({
  * never throw on LLM errors.
  *
  * @intent Execute autonomous SAP UI5 test operations
- * @capability ai-agentic-handler
+ * @capability pramanAI.agentic
  * @sapModule All
  *
  * @example

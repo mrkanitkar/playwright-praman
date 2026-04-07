@@ -41,6 +41,8 @@ const customStrategies = new Map<string, AuthStrategy>();
 /**
  * Create an authentication strategy based on configuration.
  *
+ * @capability sapAuth.login
+ *
  * @remarks
  * Follows a priority chain:
  * 1. Explicit `strategy` name (custom registry first, then built-in)

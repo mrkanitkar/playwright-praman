@@ -95,6 +95,8 @@ const FLP_SERVICE = 'UShell Container';
  * Each getter calls a single `page.evaluate()` targeting
  * `sap.ushell.Container.getUser()`.
  *
+ * @capability flpSettings.getLanguage
+ *
  * @example
  * ```typescript
  * const handler = new FLPSettingsHandler({ page });

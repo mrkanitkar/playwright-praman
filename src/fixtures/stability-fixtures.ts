@@ -97,6 +97,8 @@ interface StabilityDeps {
  *    `pramanConfig.skipStabilityWait` is `true`. Failures are caught
  *    silently to avoid breaking tests.
  *
+ * @capability ui5.waitForUI5
+ *
  * @example
  * ```typescript
  * import { stabilityTest } from '#fixtures/stability-fixtures.js';

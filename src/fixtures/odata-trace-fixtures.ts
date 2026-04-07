@@ -142,6 +142,8 @@ export function isODataUrl(url: string, patterns: readonly string[]): boolean {
  * On teardown, attaches the collected traces as a JSON attachment
  * named `'odata-trace'` for the {@link ODataTraceReporter} to consume.
  *
+ * @capability ui5.odata.getModelData
+ *
  * @example
  * ```typescript
  * import { odataTraceTest } from '#fixtures/odata-trace-fixtures.js';

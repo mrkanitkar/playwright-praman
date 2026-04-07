@@ -159,6 +159,7 @@ async function stabilityWait(page: TablePage, options?: TableOptions): Promise<v
 /**
  * Detects the UI5 table variant for a given control ID.
  *
+ * @capability ui5.table.detectType
  * @intent Identify the table type (sap.m.Table, sap.ui.table.Table, SmartTable, MDC Table)
  * so subsequent table operations use the correct API calls.
  * @guarantee On success, returns a TableInfo with correct variant and effectiveId.
@@ -227,6 +228,7 @@ export async function detectTableType(page: TablePage, tableId: string): Promise
 /**
  * Returns row IDs from a UI5 table.
  *
+ * @capability ui5.table.getRows
  * @intent Retrieve the UI5 control IDs of all visible rows in a table.
  * @guarantee Returns an array of UI5 control IDs for visible rows (empty array if no rows).
  * @ai
@@ -260,6 +262,7 @@ export async function getTableRows(
 /**
  * Returns the total row count from a UI5 table's binding.
  *
+ * @capability ui5.table.getRowCount
  * @intent Get the total number of rows in a table (from binding length or items count).
  * @guarantee Returns the row count from the table binding (0 if no binding or no data).
  * @ai
@@ -297,6 +300,7 @@ export async function getTableRowCount(
 /**
  * Returns the text value of a specific table cell.
  *
+ * @capability ui5.table.getCellValue
  * @intent Read the display text of a cell at a specific row and column position.
  * @guarantee On success, returns the text or value of the cell control at the given position.
  * @ai
@@ -351,6 +355,7 @@ export async function getTableCellValue(
 /**
  * Returns all table data as plain JSON objects from OData binding contexts.
  *
+ * @capability ui5.table.getData
  * @intent Extract all OData entity data bound to the table rows as JSON objects.
  * @guarantee Returns an array of binding context objects for each row (empty array if no data).
  * @ai
@@ -389,6 +394,7 @@ export async function getTableData(
 /**
  * Selects a table row by index.
  *
+ * @capability ui5.table.selectRow
  * @intent Select (highlight) a table row by its zero-based index.
  * @guarantee On success, the row is selected in the table's selection model.
  * @ai
@@ -438,6 +444,7 @@ export async function selectTableRow(
 /**
  * Selects all rows in a UI5 table.
  *
+ * @capability ui5.table.selectAll
  * @intent Select all rows in the table (equivalent to "Select All" checkbox).
  * @guarantee On success, all rows in the table are selected.
  * @ai
@@ -474,6 +481,7 @@ export async function selectAllTableRows(
 /**
  * Deselects all rows in a UI5 table.
  *
+ * @capability ui5.table.deselectAll
  * @intent Clear all row selections in the table.
  * @guarantee On success, all row selections are cleared (no rows selected).
  * @ai
@@ -510,6 +518,7 @@ export async function deselectAllTableRows(
 /**
  * Waits for table data to load with a minimum row count.
  *
+ * @capability ui5.table.waitForData
  * @intent Wait until the table has loaded at least N rows of data.
  * @guarantee On success, the table binding has at least minRows entries.
  * @prerequisite The table must be bound to an OData model that will eventually load data.
@@ -562,6 +571,7 @@ export async function waitForTableData(
 /**
  * Returns the indices of selected rows.
  *
+ * @capability ui5.table.getSelectedRows
  * @intent Get the zero-based indices of all currently selected rows.
  * @guarantee Returns an array of zero-based row indices that are currently selected (empty array if none).
  * @ai
