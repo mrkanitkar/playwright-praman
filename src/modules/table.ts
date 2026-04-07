@@ -10,10 +10,23 @@
 /* eslint-disable max-lines -- 10 public functions with TSDoc + 6 variant scripts exceed 300 LOC */
 /**
  * Table abstraction module for 6 SAP UI5 table variants.
- * @remarks Pure-function module. Browser-context code uses string scripts via `page.evaluate()`.
+ *
+ * @remarks
+ * Pure-function module. Browser-context code uses string scripts via `page.evaluate()`.
+ *
+ * **Standalone vs fixture usage:** These functions require a `page` parameter and are
+ * intended for advanced use cases (custom fixtures, non-Playwright runners, library authors).
+ * Most users should use the `ui5.table` fixture instead, which injects `page` automatically.
+ *
+ * @preferFixture ui5.table — use `ui5.table.getRows(id)` instead of `getTableRows(page, id)`.
+ *
  * @example
  * ```typescript
- * import { detectTableType, getTableData } from '../modules/table.js';
+ * // Preferred — via fixture (page injected automatically):
+ * const rows = await ui5.table.getRows('myTable');
+ *
+ * // Advanced — standalone (requires manual page parameter):
+ * import { detectTableType, getTableData } from 'playwright-praman';
  * const info = await detectTableType(page, 'myTable');
  * ```
  * @module modules

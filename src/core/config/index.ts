@@ -44,3 +44,6 @@ export type {
 // ── Loader ───────────────────────────────────────────────────────────
 export { defineConfig, loadConfig } from './loader.js';
 export type { LoadConfigOptions } from './loader.js';
+
+// ── Presets ──────────────────────────────────────────────────────────
+export { presets } from './presets.js';

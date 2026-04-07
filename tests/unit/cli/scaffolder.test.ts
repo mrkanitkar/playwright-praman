@@ -32,6 +32,15 @@ vi.mock('node:fs/promises', () => {
   return mockFs.mocks;
 });
 
+// Mock child_process so `isDockerAvailable()` never spawns a real process.
+// On Windows CI (Node 24) the real `docker --version` can hang, causing a timeout.
+vi.mock('node:child_process', () => ({
+  execFile: (_cmd: string, _args: string[], cb: (err: Error | null) => void) => {
+    // Simulate Docker not found
+    cb(new Error('mock: docker not available'));
+  },
+}));
+
 // Re-import after mock setup to get the mocked version
 const { scaffoldProject } = await import('../../../src/cli/scaffolder.js');
 
@@ -55,7 +64,7 @@ describe('cli/scaffolder', () => {
   // ── scaffoldProject — happy path ────────────────────────────────────────────
 
   describe('scaffoldProject — creates directory structure when target does not exist', () => {
-    it('returns success with list of created files', { timeout: 15_000 }, async () => {
+    it('returns success with list of created files', async () => {
       const options: ScaffoldOptions = { targetDir: TEST_DIR };
 
       const result = await scaffoldProject(options);
