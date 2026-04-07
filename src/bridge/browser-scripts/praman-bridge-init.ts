@@ -10,6 +10,15 @@
 /**
  * Standalone Praman bridge initialization script for Playwright CLI `initScript`.
  *
+ * @intent Enable agent-driven SAP UI5 test automation by establishing a browser-side
+ * bridge (`window.__praman_bridge`) that exposes control discovery, method execution,
+ * and object storage APIs — without requiring the SAP test framework to be loaded first.
+ * Lazy injection (W14) is chosen over eager injection because SAP UI5 bootstraps
+ * asynchronously and `sap.ui.require` may not be available at page load. Polling at
+ * 100ms intervals balances responsiveness against CPU overhead. The 3-tier `getById`
+ * resolution (D19) ensures compatibility across UI5 1.38–1.130+ by falling back through
+ * `Element.getElementById` → `ElementRegistry.get` → `Core.byId`.
+ *
  * @remarks
  * This file is bundled by esbuild into `dist/browser/praman-bridge-init.js` as an IIFE.
  * It runs in the browser context (no Node.js APIs) and initializes

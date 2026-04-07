@@ -125,23 +125,59 @@ interface TestFixtures {
  * ```
  */
 interface WorkerFixtures {
-  /** Validated, frozen Praman configuration loaded once per worker. */
+  /**
+   * Validated, frozen Praman configuration loaded once per worker.
+   *
+   * @intent Provide a single source of truth for all Praman settings (timeouts, strategies,
+   * selectors, log level) so that every test in the worker shares identical configuration
+   * without re-parsing or risking mutation.
+   */
   pramanConfig: Readonly<PramanConfig>;
 
-  /** Root pino logger with redaction, configured from pramanConfig. */
+  /**
+   * Root pino logger with redaction, configured from pramanConfig.
+   *
+   * @intent Establish structured logging with PII redaction at the worker level so that
+   * test-scoped child loggers inherit consistent formatting, log level, and transport
+   * configuration without redundant setup.
+   */
   rootLogger: Logger;
 
-  /** OpenTelemetry tracer wrapper (NoOp in Phase 1). */
+  /**
+   * OpenTelemetry tracer wrapper (NoOp in Phase 1).
+   *
+   * @intent Enable distributed tracing instrumentation from day one so that bridge calls,
+   * control discovery, and interactions can be traced end-to-end when a real exporter is
+   * configured. NoOp in Phase 1 ensures zero overhead until needed.
+   */
   tracer: TracerWrapper;
 
-  /** Playwright version feature flags, auto-initialized per worker. */
+  /**
+   * Playwright version feature flags, auto-initialized per worker.
+   *
+   * @intent Detect Playwright version capabilities once per worker so that feature-gated
+   * code (e.g., `selectors.register` content mode, `locator.filter`) can branch without
+   * repeated version parsing.
+   */
   playwrightCompat: PlaywrightFeatures;
 
-  /** Registers the `ui5=` selector engine once per worker. */
+  /**
+   * Registers the `ui5=` selector engine once per worker.
+   *
+   * @intent Make `page.locator('ui5=...')` available in all tests by registering the
+   * custom selector engine at the worker level. This enables Playwright-native locator
+   * strategies for UI5 controls alongside standard CSS/XPath selectors.
+   */
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- Playwright fixtures use void for side-effect-only fixtures
   selectorRegistration: void;
 
-  /** Registers custom UI5 + table matchers via expect.extend() once per worker. */
+  /**
+   * Registers custom UI5 + table matchers via expect.extend() once per worker.
+   *
+   * @intent Provide domain-specific assertions (`toHaveUI5Text`, `toBeUI5Visible`,
+   * `toHaveUI5RowCount`, etc.) that poll with auto-retry semantics, matching Playwright's
+   * web-first assertion pattern. Registered once per worker to avoid duplicate extension.
+   */
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- Playwright fixtures use void for side-effect-only fixtures
   matcherRegistration: void;
 }

@@ -10,6 +10,16 @@
 /**
  * Browser scripts for UI5 control discovery.
  *
+ * @intent Provide robust control discovery across all SAP UI5 versions and dialog
+ * states via a multi-tier strategy (A.3). Tier 0 (static area scan) handles open
+ * dialogs/popovers where controls live outside the normal DOM tree. Tier 1 (direct
+ * `getById`) is the fast path for known IDs. Tier 2 (registry scan with enhanced
+ * matching) supports suffix IDs, RegExp patterns, controlType, properties, viewName,
+ * and bindingPath — enabling flexible selector strategies for AI-generated tests.
+ * Tier 3 (RecordReplay) is the SAP-provided fallback for controlType+properties
+ * selectors. Visible-control preference (GAP-21) ensures tests interact with the
+ * topmost visible control when duplicates exist (e.g., behind/in-front-of dialogs).
+ *
  * @remarks
  * Generates JavaScript strings for discovering UI5 controls in the browser
  * using a 2-tier strategy (A.3): RecordReplay primary + getById fallback.

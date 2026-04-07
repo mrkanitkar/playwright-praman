@@ -10,6 +10,15 @@
 /**
  * Core bridge injection script for UI5 framework integration.
  *
+ * @intent Generate a self-contained JavaScript string that can be injected via
+ * `page.evaluate()` to bootstrap the Praman bridge in any SAP UI5 page. Uses lazy
+ * injection (W14) because the script may run before UI5 finishes bootstrapping —
+ * the bridge marks itself ready with or without RecordReplay, so tests can proceed
+ * on non-UI5 pages gracefully. The 3-tier `getById` resolution (D19) ensures
+ * backward compatibility across UI5 versions (1.38+ legacy `Core.byId`, 1.67+
+ * `ElementRegistry.get`, 1.120+ `Element.getElementById`). The script is idempotent
+ * (checks `window.__praman_ready`) to support re-injection after SPA navigation.
+ *
  * @remarks
  * Generates the main JavaScript string that sets up `window.__praman_bridge`
  * with all required helper functions, module references, and version-aware

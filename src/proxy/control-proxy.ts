@@ -267,9 +267,30 @@ export interface ControlInfoFull {
 /**
  * Inline 7-type return handler — routes bridge results to values or sub-proxies.
  *
+ * @intent Map each of the 7 bridge return types to the correct Node-side representation
+ * so that proxy consumers get intuitive values: primitives for `result`, empty arrays for
+ * `empty`, `undefined` for `none`/`unknown`, a same-type sub-proxy for `element` (setter
+ * chaining), a new-type sub-proxy for `newElement` (navigation), an array of sub-proxies
+ * for `aggregation` (e.g., `getItems()`), a `UI5Object` proxy for `object` (non-serializable
+ * like `sap.ui.model.Context`), and an array of `UI5Object` proxies for `objectArray`.
+ *
  * @remarks
  * Replaces the separate `return-handler.ts` + `proxy-converter.ts` files.
  * Creates sub-proxies for element, newElement, aggregation, and object returns.
+ *
+ * Return type mapping:
+ * - `result` → raw value (primitive or serializable array)
+ * - `empty` → `[]`
+ * - `none` / `unknown` → `undefined`
+ * - `element` → sub-proxy with same controlType (setter chaining pattern)
+ * - `newElement` → sub-proxy with discovered controlType (parent/child navigation)
+ * - `aggregation` → array of sub-proxies (one per aggregated control)
+ * - `object` → `UI5Object` proxy for non-serializable bridge-stored objects
+ * - `objectArray` → array of `UI5Object` proxies (GAP-11)
+ *
+ * @param result - The raw execution result from the bridge's `page.evaluate()` call.
+ * @param state - The proxy state used to create sub-proxies with the same page/strategy.
+ * @returns The mapped value — a primitive, proxy, array, or `undefined`.
  */
 async function handleReturn(
   result: MethodExecutionResult,
@@ -696,6 +717,12 @@ function throwIfBlacklisted(prop: string, state: ControlProxyState): void {
 
 /**
  * Creates a single unified Proxy for a UI5 control.
+ *
+ * @intent Provide a transparent, chainable proxy that makes UI5 controls feel like
+ * local async objects. Every property access on the proxy becomes a `page.evaluate()`
+ * call to the browser-side bridge, and the 7-type return handler automatically wraps
+ * results in sub-proxies or primitives. This eliminates manual bridge calls in tests
+ * and enables fluent patterns like `await control.getParent().getText()`.
  *
  * @remarks
  * mk-style: constructor-free, single `new Proxy()` with one get trap.
