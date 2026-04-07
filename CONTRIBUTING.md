@@ -54,7 +54,7 @@ Layer 1: Core          — Logging, config, errors, utilities
 `./reporters`
 
 **Path aliases**: Use `#core/*`, `#bridge/*`, `#proxy/*`, `#fixtures/*`
-(TypeScript-only, resolved via `vite-tsconfig-paths` in tests).
+(TypeScript-only, resolved via Vite 8 native `resolve.tsconfigPaths` in tests).
 
 ## Code Standards
 
