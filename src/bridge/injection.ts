@@ -10,6 +10,14 @@
 /**
  * Node-side bridge injection engine (W14: lazy + eager injection).
  *
+ * @intent Enable test code running in Node.js to communicate with SAP UI5
+ * controls that live in the browser. UI5 has no remote API — the only way to
+ * discover controls, read properties, or invoke methods is to execute
+ * JavaScript inside the browser where `sap.ui.getCore()` is available. This
+ * module injects a thin "bridge" script into the page that exposes those
+ * capabilities to Playwright's `page.evaluate()` channel, so every subsequent
+ * proxy / fixture call can reach UI5 without re-injecting.
+ *
  * @remarks
  * Manages the lifecycle of bridge injection into the browser context.
  * Supports two injection modes:
@@ -63,6 +71,10 @@ const eagerInjectedTargets = new WeakSet<Page | BrowserContext>();
 
 /**
  * Eagerly injects the bridge via `addInitScript()`.
+ *
+ * @intent Pre-register the bridge so it is available the instant UI5
+ * initializes, before any test code runs. Required for auth flows or
+ * pre-navigation setup where lazy injection would be too late.
  *
  * @remarks
  * Uses Playwright's `addInitScript()` to inject the bridge code before any
@@ -122,6 +134,10 @@ export async function injectBridgeEager(target: Page | BrowserContext): Promise<
 /**
  * Checks whether the bridge is ready on the given page.
  *
+ * @intent Allow callers to probe bridge state without side-effects — useful
+ * for conditional logic that should only run when the bridge is already
+ * injected (e.g., skipping re-injection or choosing a fallback path).
+ *
  * @param page - The Playwright page to check.
  * @returns `true` if `window.__praman_bridge.ready === true`.
  *
@@ -138,6 +154,12 @@ export async function isBridgeReady(page: BridgeInjectablePage): Promise<boolean
 
 /**
  * Injects the bridge into the browser context.
+ *
+ * @intent Perform the actual three-step injection sequence (wait for UI5,
+ * evaluate bridge script, confirm readiness) so that all subsequent
+ * `page.evaluate()` calls can use `window.__praman_bridge` to reach UI5
+ * controls. This is the low-level primitive; most callers should use
+ * `ensureBridgeInjected()` instead for idempotent injection.
  *
  * @remarks
  * 1. Waits for UI5 to be available (`sap.ui.require` exists)
@@ -205,6 +227,11 @@ export async function injectBridge(page: BridgeInjectablePage): Promise<void> {
 /**
  * Ensures the bridge is injected, skipping if already done.
  *
+ * @intent Serve as the single entry point that every adapter method calls
+ * before executing browser operations. Guarantees the bridge exists without
+ * redundant re-injection — the WeakSet lookup makes repeated calls a no-op,
+ * so adapters don't need to track injection state themselves.
+ *
  * @remarks
  * Idempotent — safe to call multiple times. Tracks injection state
  * per page instance using a WeakSet.
@@ -227,6 +254,11 @@ export async function ensureBridgeInjected(page: BridgeInjectablePage): Promise<
 /**
  * Resets injection tracking for a page, allowing re-injection.
  *
+ * @intent Invalidate the cached injection state after navigation destroys
+ * the browser-side bridge (e.g., full page reload, cross-origin navigation).
+ * Without this reset, `ensureBridgeInjected()` would skip injection on a
+ * page that no longer has the bridge, causing all subsequent UI5 calls to fail.
+ *
  * @remarks
  * Called after page navigation invalidates the bridge.
  * The next call to `ensureBridgeInjected()` will re-inject.
@@ -245,6 +277,11 @@ export function resetPageInjection(page: BridgeInjectablePage): void {
 
 /**
  * Waits for the bridge to become ready on the given page.
+ *
+ * @intent Block until the bridge readiness flag is set, providing a
+ * synchronization point for callers that injected the bridge through an
+ * external mechanism (e.g., eager injection) and need to wait for it to
+ * finish initializing before issuing UI5 operations.
  *
  * @param page - The Playwright page to wait on.
  * @param timeout - Maximum wait time in ms (defaults to `BRIDGE_TIMEOUTS.INJECTION`).
