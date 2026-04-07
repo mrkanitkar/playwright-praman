@@ -58,6 +58,26 @@ import { testDataTest } from './test-data-fixtures.js';
  * authTest (sapAuth), navTest (ui5Navigation, btpWorkZone),
  * stabilityTest (auto-wait, request interception), and feTest (fe).
  *
+ * **Fixture override precedence in `mergeTests()`:**
+ *
+ * When multiple modules declare the same fixture name, Playwright resolves
+ * them using last-writer-wins semantics — the last module in the argument
+ * list that provides a real (non-placeholder) implementation wins.
+ *
+ * Overlapping fixtures and their resolution:
+ *
+ * - `pramanConfig` / `rootLogger` — real impl in `coreTest` (pulled in
+ *   transitively via `moduleTest`); 7 other modules declare placeholders
+ *   (`option: true`) that are satisfied by the real provider.
+ *
+ * - `ui5` — base impl in `coreTest`, **overridden** by `moduleTest`
+ *   (adds `.table`, `.dialog`, `.date`, `.odata` sub-namespaces).
+ *   `intentTest` declares a placeholder that resolves to `moduleTest`'s
+ *   enriched version. `moduleTest` must appear before `intentTest`.
+ *
+ * - All remaining fixture names (`sapAuth`, `fe`, `intent`, `flpLocks`,
+ *   etc.) are unique to their respective modules — no precedence concern.
+ *
  * @example
  * ```typescript
  * import { test } from 'playwright-praman';
