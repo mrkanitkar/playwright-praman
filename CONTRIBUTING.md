@@ -169,6 +169,26 @@ test(core): add config validation edge cases
 Coverage is enforced **per-file** (`perFile: true`). No single file can
 hide behind project averages.
 
+## Extension System
+
+Praman supports custom extensions via the extension registry
+(`src/extensions/`). Extensions register under a namespace that becomes
+accessible on the `ui5` fixture (e.g., `ui5.myNamespace.myMethod()`).
+
+### Reserved Namespaces
+
+The following names are **reserved** and cannot be used as extension
+namespaces. Attempting to register one throws `PluginError`
+(`ERR_PLUGIN_EXTENSION_INVALID`):
+
+- **Built-in sub-namespaces**: `table`, `dialog`, `date`, `odata`
+- **UI5Handler methods**: `control`, `controls`, `click`, `fill`, `press`,
+  `select`, `check`, `uncheck`, `clear`, `getText`, `getValue`,
+  `waitForUI5`, `waitFor`, `inspect`, `clearCache`, `destroy`
+
+The canonical list is `RESERVED_NAMESPACES` in
+`src/extensions/extension-types.ts`.
+
 ## Cross-Platform
 
 Praman supports Windows 10/11, macOS, and Linux. CI runs on a 3-OS matrix.

@@ -285,9 +285,28 @@ export type { RecipeEntry, RecipePriority } from './schemas/recipe.schema.js';
  * Checkpoint state for long-running agentic test generation sessions.
  *
  * @remarks
- * Serializable to JSON for persistence across process restarts.
- * `state` holds arbitrary step-specific data.
+ * **Beta** — serialization format may change in minor releases.
  *
+ * Serializable to JSON via `JSON.stringify()`. The JSON shape is:
+ * ```json
+ * {
+ *   "sessionId": "string (UUID recommended)",
+ *   "currentStep": "number (0-based index)",
+ *   "completedSteps": ["string[]"],
+ *   "remainingSteps": ["string[]"],
+ *   "state": { "arbitrary JSON-safe key/value pairs" },
+ *   "timestamp": "string (ISO 8601)"
+ * }
+ * ```
+ *
+ * Persist with `JSON.stringify(checkpoint)` and restore with
+ * `JSON.parse(stored) as AgenticCheckpoint`. All fields are `readonly`
+ * — create a new object to update.
+ *
+ * The `state` record must only contain JSON-serializable values
+ * (no functions, Dates, or circular references).
+ *
+ * @beta
  * @intent Enable resumable multi-step AI test generation workflows.
  *
  * @example
@@ -300,6 +319,13 @@ export type { RecipeEntry, RecipePriority } from './schemas/recipe.schema.js';
  *   state: { pageUrl: 'https://my.app/launchpad' },
  *   timestamp: new Date().toISOString(),
  * };
+ *
+ * // Persist to disk
+ * await fs.writeFile('checkpoint.json', JSON.stringify(checkpoint));
+ *
+ * // Restore
+ * const restored = JSON.parse(await fs.readFile('checkpoint.json', 'utf8')) as AgenticCheckpoint;
+ * handler.saveCheckpoint(restored);
  * ```
  */
 export interface AgenticCheckpoint {

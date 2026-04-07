@@ -108,6 +108,11 @@
       "tagName": "@alternative",
       "syntaxKind": "block",
       "allowMultiple": true
+    },
+    {
+      "tagName": "@preferFixture",
+      "syntaxKind": "block",
+      "allowMultiple": false
     }
   ],
   "supportForTags": {
@@ -142,7 +147,8 @@
     "@failureMode": true,
     "@prerequisite": true,
     "@postcondition": true,
-    "@alternative": true
+    "@alternative": true,
+    "@preferFixture": true
   },
   "reportUnsupportedHtmlElements": true
 }
