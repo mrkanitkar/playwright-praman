@@ -45,6 +45,8 @@ const config: KnipConfig = {
     '@playwright/cli',
     // Loaded dynamically by @rolldown/plugin-babel via string name, not import
     '@babel/plugin-proposal-decorators',
+    // Used in scripts/capability-validation-utils.ts — outside knip's project scope
+    'glob',
   ],
   ignoreBinaries: ['docusaurus', 'playwright-praman'],
   rules: {
