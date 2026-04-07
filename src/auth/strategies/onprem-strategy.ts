@@ -49,6 +49,56 @@ const SUBMIT_SELECTORS = ['#LOGIN_LINK', 'button[type="submit"]'] as const;
 const SHELL_HEADER_SELECTOR = '#shell-header';
 
 /**
+ * Execute an action against the first matching selector from a fallback chain.
+ *
+ * @remarks
+ * Iterates selectors in order, waits for each to appear, then runs the action.
+ * If both `waitForSelector` and the action fail for a selector, the next one is tried.
+ * Throws {@link AuthError} only when all selectors are exhausted.
+ *
+ * @param page - Page to evaluate against.
+ * @param selectors - Ordered list of CSS selectors to try.
+ * @param action - Async callback invoked with the matched selector.
+ * @param elementName - Human-readable element name for error messages.
+ * @param timeout - Timeout in ms to wait for each selector to appear.
+ * @param suggestions - Actionable fix recommendations for the error.
+ *
+ * @example
+ * ```typescript
+ * await withSelectorFallback(page, ['#a', '#b'], async (sel) => {
+ *   await page.click(sel);
+ * }, 'submit button', 30000, ['Verify the login page has a submit button']);
+ * ```
+ */
+async function withSelectorFallback(
+  page: AuthPage,
+  selectors: readonly string[],
+  action: (selector: string) => Promise<void>,
+  elementName: string,
+  timeout: number,
+  suggestions: readonly string[],
+): Promise<void> {
+  for (const selector of selectors) {
+    try {
+      await page.waitForSelector(selector, { timeout });
+      await action(selector);
+      return;
+    } catch {
+      // Selector not found or action failed, try next
+    }
+  }
+
+  throw new AuthError({
+    code: 'ERR_AUTH_FAILED',
+    message: `Login form element not found: ${elementName}`,
+    attempted: `Find ${elementName} using selectors: ${selectors.join(', ')}`,
+    retryable: false,
+    strategy: STRATEGY_NAME,
+    suggestions: [...suggestions],
+  });
+}
+
+/**
  * Fill a form field using a selector fallback chain via page.evaluate().
  *
  * @param page - Page to evaluate against.
@@ -69,10 +119,10 @@ async function fillWithFallback(
   fieldName: string,
   timeout: number,
 ): Promise<void> {
-  for (const selector of selectors) {
-    try {
-      await page.waitForSelector(selector, { timeout });
-
+  await withSelectorFallback(
+    page,
+    selectors,
+    async (selector) => {
       await page.evaluate(
         (args: { selector: string; value: string }) => {
           const element = document.querySelector<HTMLInputElement>(args.selector);
@@ -84,24 +134,15 @@ async function fillWithFallback(
         },
         { selector, value },
       );
-      return;
-    } catch {
-      // Selector not found, try next
-    }
-  }
-
-  throw new AuthError({
-    code: 'ERR_AUTH_FAILED',
-    message: `Login form field not found: ${fieldName}`,
-    attempted: `Find ${fieldName} field using selectors: ${selectors.join(', ')}`,
-    retryable: false,
-    strategy: STRATEGY_NAME,
-    suggestions: [
+    },
+    fieldName,
+    timeout,
+    [
       `Verify the SAP login page contains a ${fieldName} field`,
       'Check if the page has fully loaded before authentication',
       'Ensure the SAP system URL is correct',
     ],
-  });
+  );
 }
 
 /**
@@ -123,33 +164,24 @@ async function clickWithFallback(
   buttonName: string,
   timeout: number,
 ): Promise<void> {
-  for (const selector of selectors) {
-    try {
-      await page.waitForSelector(selector, { timeout });
-
+  await withSelectorFallback(
+    page,
+    selectors,
+    async (selector) => {
       await page.evaluate((sel: string) => {
         const element = document.querySelector<HTMLElement>(sel);
         if (element !== null) {
           element.click();
         }
       }, selector);
-      return;
-    } catch {
-      // Selector not found, try next
-    }
-  }
-
-  throw new AuthError({
-    code: 'ERR_AUTH_FAILED',
-    message: `Login button not found: ${buttonName}`,
-    attempted: `Find ${buttonName} button using selectors: ${selectors.join(', ')}`,
-    retryable: false,
-    strategy: STRATEGY_NAME,
-    suggestions: [
+    },
+    buttonName,
+    timeout,
+    [
       'Verify the SAP login page has a submit button',
       'Check if the login page structure matches expected SAP format',
     ],
-  });
+  );
 }
 
 /**

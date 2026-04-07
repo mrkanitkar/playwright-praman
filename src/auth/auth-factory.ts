@@ -34,6 +34,7 @@ import { Office365AuthStrategy } from './strategies/office365-strategy.js';
 import { OnPremAuthStrategy } from './strategies/onprem-strategy.js';
 
 import { AuthError } from '#core/errors/auth-error.js';
+import { ErrorCode } from '#core/errors/codes.js';
 
 /** Custom strategy registry for user-defined authentication strategies. */
 const customStrategies = new Map<string, AuthStrategy>();
@@ -189,7 +190,7 @@ function createBuiltinStrategy(name: string): AuthStrategy {
       return new MultiTenantAuthStrategy();
     default:
       throw new AuthError({
-        code: 'ERR_AUTH_FAILED',
+        code: ErrorCode.ERR_AUTH_FAILED,
         message: `Unknown auth strategy: ${name}`,
         attempted: `Create auth strategy '${name}'`,
         retryable: false,
