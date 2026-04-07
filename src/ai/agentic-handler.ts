@@ -414,13 +414,20 @@ export class AgenticHandler {
   }
 
   /**
-   * Serialize current execution checkpoint for resumability.
+   * Save an execution checkpoint for later resumability.
    *
    * @remarks
-   * Stores the checkpoint in an internal Map keyed by `checkpoint.sessionId`.
-   * Retrieve via `resumeFromCheckpoint(sessionId)`.
+   * **Beta** — checkpoint serialization format may change in minor releases.
    *
-   * @param checkpoint - Checkpoint state to save.
+   * Stores the checkpoint in an in-memory Map keyed by `checkpoint.sessionId`.
+   * Retrieve via {@link AgenticHandler.resumeFromCheckpoint | resumeFromCheckpoint}.
+   *
+   * For cross-process persistence, serialize with `JSON.stringify(checkpoint)`
+   * before saving to disk, then restore with
+   * `handler.saveCheckpoint(JSON.parse(stored) as AgenticCheckpoint)`.
+   *
+   * @beta
+   * @param checkpoint - Checkpoint state to save (see {@link AgenticCheckpoint} for JSON schema).
    *
    * @example
    * ```typescript
@@ -441,6 +448,14 @@ export class AgenticHandler {
   /**
    * Resume from a previously saved checkpoint.
    *
+   * @remarks
+   * **Beta** — checkpoint serialization format may change in minor releases.
+   *
+   * Returns the in-memory checkpoint. For cross-process resume, first
+   * load from disk and call {@link AgenticHandler.saveCheckpoint | saveCheckpoint}
+   * before calling this method.
+   *
+   * @beta
    * @param checkpointId - Session ID of the checkpoint to retrieve.
    * @returns The checkpoint if found, or `undefined`.
    *
@@ -448,7 +463,11 @@ export class AgenticHandler {
    * ```typescript
    * const checkpoint = handler.resumeFromCheckpoint('sess-001');
    * if (checkpoint) {
-   *   logger.info('Resuming from step:', checkpoint.currentStep);
+   *   // Resume execution from where it left off
+   *   const remaining = checkpoint.remainingSteps;
+   *   for (const step of remaining) {
+   *     await handler.interpretStep(step, page);
+   *   }
    * }
    * ```
    */

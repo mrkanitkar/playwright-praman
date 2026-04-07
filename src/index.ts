@@ -52,10 +52,17 @@ export { expect, test } from './fixtures/index.js';
 
 // ── Standalone fixture modules (for tree-shaking / selective merge) ──
 export { authTest, coreTest } from './fixtures/index.js';
+export { screencastTest } from './fixtures/index.js';
 export type { ExtendedUI5Handler } from './fixtures/index.js';
+export type {
+  ScreencastFixture,
+  ScreencastFixtures,
+  ScreencastFrame,
+  ScreencastFrameHandler,
+} from './fixtures/index.js';
 
 // ── Config ──────────────────────────────────────────────────────────
-export { defineConfig, loadConfig } from './core/config/index.js';
+export { defineConfig, loadConfig, presets } from './core/config/index.js';
 export type { PramanConfig, PramanConfigInput, LoadConfigOptions } from './core/config/index.js';
 
 // ── Errors ──────────────────────────────────────────────────────────
@@ -134,20 +141,17 @@ export type { UI5NavigationAPI } from './fixtures/nav-fixtures.js';
 
 // ── Navigation (Space / Section) ───────────────────────────────────
 export { navigateToSpace, navigateToSectionLink } from './modules/index.js';
-export type {
-  SpaceNavigationOptions,
-  SectionLinkNavigationOptions,
-} from './modules/index.js';
+export type { SpaceNavigationOptions, SectionLinkNavigationOptions } from './modules/index.js';
 
 // ── WorkZone ───────────────────────────────────────────────────────
 export { createWorkZoneManager } from './modules/index.js';
-export type {
-  BTPWorkZoneManager,
-  WorkZonePage,
-  WorkZoneFrame,
-} from './modules/index.js';
+export type { BTPWorkZoneManager, WorkZonePage, WorkZoneFrame } from './modules/index.js';
 
 // ── Table (core) ────────────────────────────────────────────────────
+// @preferFixture ui5.table — standalone functions below require a `page` parameter.
+// Most users should use the ui5.table fixture (e.g., ui5.table.getRows(id))
+// which injects page automatically. Standalone exports are for advanced use
+// cases: custom fixtures, non-Playwright runners, or library extensions.
 export {
   deselectAllTableRows,
   detectTableType,
@@ -170,6 +174,7 @@ export type {
 } from './modules/table.js';
 
 // ── Table (operations) ──────────────────────────────────────────────
+// @preferFixture ui5.table — see note above.
 export {
   clickRow,
   ensureRowVisible,
@@ -183,6 +188,7 @@ export {
 export type { ColumnValueCriteria } from './modules/table-operations.js';
 
 // ── Table (filter/sort) ─────────────────────────────────────────────
+// @preferFixture ui5.table — see note above.
 export {
   clickTableSettingsButton,
   exportTableData,
@@ -199,6 +205,7 @@ export type {
 } from './modules/table-filter-sort.js';
 
 // ── Dialog ──────────────────────────────────────────────────────────
+// @preferFixture ui5.dialog — use ui5.dialog.confirm() instead of confirmDialog(page, ...).
 export {
   confirmDialog,
   dismissDialog,
@@ -217,6 +224,7 @@ export type {
 } from './modules/dialog.js';
 
 // ── Date ────────────────────────────────────────────────────────────
+// @preferFixture ui5.date — use ui5.date.setDatePicker(id, date) instead of setDatePickerValue(page, ...).
 export {
   DATE_FORMATS,
   formatDateForUI5,
@@ -231,6 +239,7 @@ export {
 export type { DateFormatPattern, DateInput, DateOptions, DateRangeResult } from './modules/date.js';
 
 // ── OData (model-level) ─────────────────────────────────────────────
+// @preferFixture ui5.odata — use ui5.odata.getModelData(path) instead of getModelData(page, ...).
 export {
   fetchCSRFToken,
   getEntityCount,
