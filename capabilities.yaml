@@ -4,6 +4,7 @@
 #   - src/ai/capability-registry.generated.ts
 #   - docs/capabilities.md
 #   - skills/playwright-praman-sap-testing/capabilities-reference.md
+#   - capabilities.json (machine-readable manifest for AI agents)
 #
 # Run: npm run generate:capabilities
 #

@@ -4,12 +4,13 @@
  *
  * @remarks
  * Reads `capabilities.yaml` and `recipes.yaml`, validates via Zod schemas,
- * and writes 4 output files:
+ * and writes 5 output files:
  *
  * 1. `src/ai/capability-registry.generated.ts`
  * 2. `src/ai/recipe-registry.generated.ts`
  * 3. `docs/capabilities.md`
  * 4. `skills/playwright-praman-sap-testing/capabilities-reference.md`
+ * 5. `capabilities.json` (machine-readable manifest for AI agents)
  *
  * @see capabilities.yaml
  * @see recipes.yaml
@@ -39,6 +40,7 @@ const CAPABILITIES_SKILL_MD = resolve(
   ROOT,
   'skills/playwright-praman-sap-testing/capabilities-reference.md',
 );
+const CAPABILITIES_JSON = resolve(ROOT, 'capabilities.json');
 
 /* ── Helpers ──────────────────────────────────────────────────────────────── */
 
@@ -306,6 +308,47 @@ function generateSkillCapabilitiesMd(
   return lines.join('\n');
 }
 
+/**
+ * Generate `capabilities.json` — machine-readable manifest for AI agents.
+ *
+ * @remarks
+ * Produces a self-describing JSON file that AI coding agents (Claude Code,
+ * Copilot, Cursor, Codex) can parse programmatically without a YAML library.
+ */
+function generateCapabilitiesJson(
+  entries: readonly CapabilityEntry[],
+  yamlData: CapabilitiesYaml,
+): string {
+  const manifest = {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    name: 'playwright-praman',
+    description: 'Capability manifest for Praman SAP UI5 test automation',
+    registryVersion: yamlData.registryVersion,
+    generatedAt: today,
+    totalCapabilities: entries.length,
+    categories: yamlData.categories,
+    capabilities: entries.map((entry) => {
+      const obj: Record<string, unknown> = {
+        id: entry.id,
+        qualifiedName: entry.qualifiedName,
+        name: entry.name,
+        description: entry.description,
+        category: entry.category,
+        priority: entry.priority,
+        usageExample: entry.usageExample,
+        registryVersion: entry.registryVersion,
+      };
+      if (entry.intent !== undefined) obj['intent'] = entry.intent;
+      if (entry.sapModule !== undefined) obj['sapModule'] = entry.sapModule;
+      if (entry.controlTypes !== undefined) obj['controlTypes'] = entry.controlTypes;
+      if (entry.async !== undefined) obj['async'] = entry.async;
+      return obj;
+    }),
+  };
+
+  return `${JSON.stringify(manifest, null, 2)}\n`;
+}
+
 /* ── Main ─────────────────────────────────────────────────────────────────── */
 
 async function main(): Promise<void> {
@@ -377,6 +420,11 @@ async function main(): Promise<void> {
   const skillMdContent = generateSkillCapabilitiesMd(capabilities, capabilitiesYaml);
   await writeFile(CAPABILITIES_SKILL_MD, skillMdContent, 'utf-8');
   console.log(`  Written: ${CAPABILITIES_SKILL_MD}`);
+
+  // Output 5: capabilities.json (machine-readable manifest for AI agents)
+  const capsJsonContent = generateCapabilitiesJson(capabilities, capabilitiesYaml);
+  await writeFile(CAPABILITIES_JSON, capsJsonContent, 'utf-8');
+  console.log(`  Written: ${CAPABILITIES_JSON} (${String(capabilities.length)} entries)`);
 
   console.log('Done.');
 }

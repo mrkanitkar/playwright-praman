@@ -35,6 +35,7 @@
     "prompts/",
     ".env.example",
     "capabilities.yaml",
+    "capabilities.json",
     "recipes.yaml",
     "LICENSE",
     "NOTICE",
