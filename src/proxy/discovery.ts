@@ -162,9 +162,11 @@ export async function discoverControl(
   // Build priority chain (W9/W20) and try each strategy in order
   const priorities = getDiscoveryPriorities(selector, discoveryStrategies);
   let discoveryResult: ControlDiscoveryResult | null = null;
+  const attemptedStrategies: string[] = [];
 
   for (const strategy of priorities) {
     if (strategy === 'cache') continue; // Already handled above
+    attemptedStrategies.push(strategy);
     discoveryResult = await tryStrategy(strategy, selector, page, preferVisibleControls);
     if (discoveryResult !== null) break;
   }
@@ -172,13 +174,15 @@ export async function discoverControl(
   if (discoveryResult === null) {
     throw new ControlError({
       code: 'ERR_CONTROL_NOT_FOUND',
-      message: `Control not found after trying all discovery strategies: ${JSON.stringify(selector)}`,
+      message: `Control not found after trying ${String(attemptedStrategies.length)} discovery strategies (${attemptedStrategies.join(' → ')}): ${JSON.stringify(selector)}`,
       attempted: `Discover control with selector: ${JSON.stringify(selector)}`,
       retryable: true,
+      details: { selector, attemptedStrategies },
       suggestions: [
         'Verify the control ID exists in the UI5 view',
         'Check if the page has fully loaded (waitForUI5Stable)',
         'Try using controlType + properties instead of ID',
+        `Strategies attempted: ${attemptedStrategies.join(', ')}`,
       ],
     });
   }

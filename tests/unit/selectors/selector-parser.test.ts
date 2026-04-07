@@ -81,6 +81,31 @@ describe('parseUI5Selector', () => {
     expect(result.properties).toEqual({ placeholder: '' });
   });
 
+  it('handles escaped ] in property value', () => {
+    const result = parseUI5Selector('ui5=sap.m.Input[text=foo\\]bar]');
+    expect(result.controlType).toBe('sap.m.Input');
+    expect(result.properties).toEqual({ text: 'foo]bar' });
+  });
+
+  it('handles escaped [ in property value', () => {
+    const result = parseUI5Selector('ui5=sap.m.Input[text=foo\\[bar]');
+    expect(result.controlType).toBe('sap.m.Input');
+    expect(result.properties).toEqual({ text: 'foo[bar' });
+  });
+
+  it('handles multiple escaped brackets in property value', () => {
+    const result = parseUI5Selector('ui5=sap.m.Input[text=a\\]b\\[c]');
+    expect(result.controlType).toBe('sap.m.Input');
+    expect(result.properties).toEqual({ text: 'a]b[c' });
+  });
+
+  it('round-trips property value containing brackets', () => {
+    const selector = parseUI5Selector('ui5=sap.m.Input[text=foo\\]bar]');
+    const serialized = serializeUI5Selector(selector);
+    const reparsed = parseUI5Selector(serialized);
+    expect(reparsed.properties).toEqual({ text: 'foo]bar' });
+  });
+
   it('throws SelectorError on empty string', () => {
     expect(() => parseUI5Selector('')).toThrow(SelectorError);
     try {
@@ -150,6 +175,14 @@ describe('serializeUI5Selector', () => {
     const parsed = parseUI5Selector(original);
     const serialized = serializeUI5Selector(parsed);
     expect(serialized).toBe(original);
+  });
+
+  it('escapes brackets in property values during serialization', () => {
+    const selector: UI5Selector = {
+      controlType: 'sap.m.Input',
+      properties: { text: 'foo]bar' },
+    };
+    expect(serializeUI5Selector(selector)).toBe('ui5=sap.m.Input[text=foo\\]bar]');
   });
 });
 

@@ -115,9 +115,7 @@ describe('discoverControl', () => {
     const cache = new ControlProxyCache();
 
     try {
-      await discoverControl({ id: 'nonexistent' }, page, strategy, cache, [
-        'recordreplay',
-      ]);
+      await discoverControl({ id: 'nonexistent' }, page, strategy, cache, ['recordreplay']);
       expect.fail('Expected discoverControl to throw ControlError');
     } catch (error: unknown) {
       expect(error).toBeInstanceOf(ControlError);
@@ -145,9 +143,37 @@ describe('discoverControl', () => {
       const controlError = error as ControlError;
       expect(controlError.retryable).toBe(true);
       expect(controlError.suggestions).toEqual(
-        expect.arrayContaining([
-          expect.stringContaining('control ID'),
-        ]),
+        expect.arrayContaining([expect.stringContaining('control ID')]),
+      );
+    }
+  });
+
+  it('ControlError message includes attempted strategies', async () => {
+    const page = createMockPage({
+      evaluate: vi.fn().mockResolvedValue(createEmptyResult()),
+    });
+    const strategy = createMockStrategy();
+    const cache = new ControlProxyCache();
+
+    try {
+      await discoverControl({ id: 'btn1', controlType: 'sap.m.Button' }, page, strategy, cache, [
+        'direct-id',
+        'recordreplay',
+      ]);
+      expect.fail('Expected discoverControl to throw ControlError');
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(ControlError);
+      const controlError = error as ControlError;
+      expect(controlError.message).toContain('direct-id');
+      expect(controlError.message).toContain('recordreplay');
+      expect(controlError.message).toContain('2 discovery strategies');
+      expect(controlError.details).toEqual(
+        expect.objectContaining({
+          attemptedStrategies: ['direct-id', 'recordreplay'],
+        }),
+      );
+      expect(controlError.suggestions).toEqual(
+        expect.arrayContaining([expect.stringContaining('Strategies attempted')]),
       );
     }
   });

@@ -93,11 +93,68 @@ function coercePropertyValue(value: string): CoercedValue {
 }
 
 /**
+ * Finds the index of the unescaped closing `]` starting from `start`.
+ *
+ * @remarks
+ * Skips over `\]` sequences so that property values like `foo\]bar` are
+ * treated as a single value rather than ending the block early.
+ *
+ * @param body - The full property body string
+ * @param start - The index immediately after the opening `[`
+ * @returns The index of the unescaped `]`, or `-1` if not found
+ */
+function findUnescapedClose(body: string, start: number): number {
+  let i = start;
+  while (i < body.length) {
+    // eslint-disable-next-line security/detect-object-injection -- Controlled loop index over string chars
+    if (body[i] === '\\' && i + 1 < body.length) {
+      i += 2; // Skip escaped character
+      continue;
+    }
+    // eslint-disable-next-line security/detect-object-injection -- Controlled loop index over string chars
+    if (body[i] === ']') {
+      return i;
+    }
+    i++;
+  }
+  return -1;
+}
+
+/**
+ * Removes backslash escapes from a property value.
+ *
+ * @remarks
+ * Converts `\]` → `]` and `\[` → `[` while preserving other characters.
+ * This is the inverse of {@link escapePropertyValue}.
+ *
+ * @param value - The raw value from the selector (may contain `\]` or `\[`)
+ * @returns The unescaped value
+ */
+function unescapePropertyValue(value: string): string {
+  return value.replaceAll(/\\([\][])/g, '$1');
+}
+
+/**
+ * Escapes `[` and `]` in a property value for safe embedding in selector strings.
+ *
+ * @remarks
+ * Converts `]` → `\]` and `[` → `\[` so that the serialized selector
+ * can be round-tripped through {@link parseUI5Selector}.
+ *
+ * @param value - The property value string
+ * @returns The escaped value
+ */
+function escapePropertyValue(value: string): string {
+  return value.replaceAll(/([\][])/g, '\\$1');
+}
+
+/**
  * Parses property blocks from a selector body string.
  *
  * @remarks
  * Extracts `[key=value]` pairs from the string. The first `=` in each block
  * is the delimiter; subsequent `=` characters are part of the value.
+ * Escaped brackets (`\]`, `\[`) inside values are supported and unescaped.
  *
  * @param body - The portion of the selector after controlType and ID
  * @returns A record of property key-value pairs, or undefined if none found
@@ -106,6 +163,9 @@ function coercePropertyValue(value: string): CoercedValue {
  * ```typescript
  * parseProperties('[text=Save][enabled=true]');
  * // { text: 'Save', enabled: true }
+ *
+ * parseProperties('[text=foo\]bar]');
+ * // { text: 'foo]bar' }
  * ```
  */
 function parseProperties(
@@ -120,7 +180,7 @@ function parseProperties(
     if (openBracket < 0) {
       break;
     }
-    const closeBracket = body.indexOf(']', openBracket + 1);
+    const closeBracket = findUnescapedClose(body, openBracket + 1);
     if (closeBracket < 0) {
       break;
     }
@@ -129,7 +189,7 @@ function parseProperties(
     const eqIndex = content.indexOf('=');
     if (eqIndex >= 0) {
       const key = content.slice(0, eqIndex);
-      const rawValue = content.slice(eqIndex + 1);
+      const rawValue = unescapePropertyValue(content.slice(eqIndex + 1));
       if (key.length > 0) {
         // eslint-disable-next-line security/detect-object-injection -- Building properties from parsed selector keys
         properties[key] = coercePropertyValue(rawValue);
@@ -332,7 +392,8 @@ export function serializeUI5Selector(selector: UI5Selector): string {
 
   if (selector.properties !== undefined) {
     for (const [key, value] of Object.entries(selector.properties)) {
-      const stringValue = value instanceof RegExp ? value.source : String(value as CoercedValue);
+      const stringValue =
+        value instanceof RegExp ? value.source : escapePropertyValue(String(value as CoercedValue));
       result += `[${key}=${stringValue}]`;
     }
   }
