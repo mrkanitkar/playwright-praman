@@ -116,6 +116,8 @@ export const CapabilityEntrySchema = z.object({
   controlTypes: z.array(z.string()).optional(),
   /** Whether this is an async method. */
   async: z.boolean().optional(),
+  /** AI agent steering — tells agents to prefer a higher-level alternative. */
+  aiSteering: z.string().optional(),
 });
 /** A single capability entry inferred from `CapabilityEntrySchema`. */
 export type CapabilityEntry = z.infer<typeof CapabilityEntrySchema>;

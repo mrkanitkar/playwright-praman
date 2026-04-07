@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-04-07 with 179 entries.
+ * Generated on 2026-04-07 with 182 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {
@@ -2390,5 +2390,38 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     "priority": "fixture",
     "usageExample": "await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');",
     "registryVersion": 1
+  },
+  {
+    "id": "UI5-UI5-022",
+    "qualifiedName": "selectors.serializeUI5SelectorToCSS",
+    "name": "serializeUI5SelectorToCSS",
+    "description": "Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.",
+    "category": "ui5",
+    "priority": "implementation",
+    "usageExample": "import { serializeUI5SelectorToCSS } from 'playwright-praman';\nconst css = serializeUI5SelectorToCSS({ id: 'btn1' });",
+    "registryVersion": 1,
+    "aiSteering": "Use ui5.control() to discover controls by selector instead of manually serializing selectors to CSS."
+  },
+  {
+    "id": "UI5-ASSERT-008",
+    "qualifiedName": "matchers.getControlProperty",
+    "name": "getControlProperty",
+    "description": "Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.",
+    "category": "assert",
+    "priority": "implementation",
+    "usageExample": "import { getControlProperty } from 'playwright-praman';\nconst text = await getControlProperty(page, '__btn0', 'text');",
+    "registryVersion": 1,
+    "aiSteering": "Use expect(control).toHaveUI5Property(name, value) matcher for property assertions instead."
+  },
+  {
+    "id": "UI5-ASSERT-009",
+    "qualifiedName": "matchers.getControlAggregation",
+    "name": "getControlAggregation",
+    "description": "Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.",
+    "category": "assert",
+    "priority": "implementation",
+    "usageExample": "import { getControlAggregation } from 'playwright-praman';\nconst items = await getControlAggregation(page, '__list0', 'items');",
+    "registryVersion": 1,
+    "aiSteering": "Use ui5.table methods or expect(table).toHaveUI5RowCount(n) matcher for table assertions instead."
   },
 ] as const;

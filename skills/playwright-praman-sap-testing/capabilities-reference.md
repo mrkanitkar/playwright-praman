@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
 > Generated: 2026-04-07 — do not edit manually, run `npm run generate:capabilities`
-> Total: 179 capabilities
+> Total: 182 capabilities
 
 ---
 
@@ -28,6 +28,7 @@
 - **control.open** — Open a control (e.g., ComboBox dropdown) via proxy.
 - **control.close** — Close a control via proxy.
 - **control.setSelectedKey** — Set selected key on selection control via proxy.
+- **selectors.serializeUI5SelectorToCSS** — Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.
 
 ## table — Table discovery, reading, and manipulation
 
@@ -221,6 +222,8 @@
 - **matchers.toHaveUI5ValueState** — Assert control value state (Error, Warning, etc.).
 - **matchers.toHaveUI5RowCount** — Assert table has expected row count.
 - **matchers.toHaveUI5CellText** — Assert table cell contains expected text.
+- **matchers.getControlProperty** — Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.
+- **matchers.getControlAggregation** — Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.
 
 ## data — Test data generation, persistence, and cleanup
 

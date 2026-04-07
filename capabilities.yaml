@@ -2522,3 +2522,45 @@ capabilities:
     usageExample: |
       await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');
     registryVersion: 1
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Implementation-level APIs — exported for power users, not recommended for
+  # AI-generated tests. Each entry includes aiSteering to guide agents toward
+  # higher-level alternatives.
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-UI5-022
+    qualifiedName: selectors.serializeUI5SelectorToCSS
+    name: serializeUI5SelectorToCSS
+    description: 'Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.'
+    category: ui5
+    priority: implementation
+    aiSteering: 'Use ui5.control() to discover controls by selector instead of manually serializing selectors to CSS.'
+    usageExample: |
+      import { serializeUI5SelectorToCSS } from 'playwright-praman';
+      const css = serializeUI5SelectorToCSS({ id: 'btn1' });
+    registryVersion: 1
+
+  - id: UI5-ASSERT-008
+    qualifiedName: matchers.getControlProperty
+    name: getControlProperty
+    description: 'Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.'
+    category: assert
+    priority: implementation
+    aiSteering: 'Use expect(control).toHaveUI5Property(name, value) matcher for property assertions instead.'
+    usageExample: |
+      import { getControlProperty } from 'playwright-praman';
+      const text = await getControlProperty(page, '__btn0', 'text');
+    registryVersion: 1
+
+  - id: UI5-ASSERT-009
+    qualifiedName: matchers.getControlAggregation
+    name: getControlAggregation
+    description: 'Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.'
+    category: assert
+    priority: implementation
+    aiSteering: 'Use ui5.table methods or expect(table).toHaveUI5RowCount(n) matcher for table assertions instead.'
+    usageExample: |
+      import { getControlAggregation } from 'playwright-praman';
+      const items = await getControlAggregation(page, '__list0', 'items');
+    registryVersion: 1

@@ -1,7 +1,7 @@
 # Praman Capabilities Reference
 
 > **Generated**: 2026-04-07 — do not edit manually, run `npm run generate:capabilities`
-> **Total**: 179 capabilities across 15 categories
+> **Total**: 182 capabilities across 15 categories
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Category | Prefix | Description | Count |
 |----------|--------|-------------|-------|
-| ui5 | `UI5-UI5` | Core UI5 control interactions | 21 |
+| ui5 | `UI5-UI5` | Core UI5 control interactions | 22 |
 | table | `UI5-TABLE` | Table discovery, reading, and manipulation | 24 |
 | dialog | `UI5-DLG` | Dialog lifecycle management | 7 |
 | date | `UI5-DATE` | Date and time picker operations | 7 |
@@ -22,7 +22,7 @@
 | footer | `UI5-FOOTER` | Footer toolbar actions | 6 |
 | flp | `UI5-FLP` | Fiori Launchpad services (locks, settings) | 10 |
 | ai | `UI5-AI` | AI-powered discovery and context building | 9 |
-| assert | `UI5-ASSERT` | UI5-aware custom matchers for assertions | 7 |
+| assert | `UI5-ASSERT` | UI5-aware custom matchers for assertions | 9 |
 | data | `UI5-DATA` | Test data generation, persistence, and cleanup | 4 |
 
 ---
@@ -52,6 +52,7 @@
 | `UI5-UI5-019` | open | Open a control (e.g., ComboBox dropdown) via proxy. | `const combo = await ui5.control({ id: 'variantCombo' });` |
 | `UI5-UI5-020` | close | Close a control via proxy. | `const combo = await ui5.control({ id: 'variantCombo' });` |
 | `UI5-UI5-021` | setSelectedKey | Set selected key on selection control via proxy. | `const combo = await ui5.control({ id: 'variantCombo' });` |
+| `UI5-UI5-022` | serializeUI5SelectorToCSS | Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility. | `import { serializeUI5SelectorToCSS } from 'playwright-praman';` |
 
 ## table — Table discovery, reading, and manipulation
 
@@ -271,6 +272,8 @@
 | `UI5-ASSERT-005` | toHaveUI5ValueState | Assert control value state (Error, Warning, etc.). | `await expect(locator).toHaveUI5ValueState('Success');` |
 | `UI5-ASSERT-006` | toHaveUI5RowCount | Assert table has expected row count. | `await expect(table).toHaveUI5RowCount(5);` |
 | `UI5-ASSERT-007` | toHaveUI5CellText | Assert table cell contains expected text. | `await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');` |
+| `UI5-ASSERT-008` | getControlProperty | Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers. | `import { getControlProperty } from 'playwright-praman';` |
+| `UI5-ASSERT-009` | getControlAggregation | Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers. | `import { getControlAggregation } from 'playwright-praman';` |
 
 ## data — Test data generation, persistence, and cleanup
 

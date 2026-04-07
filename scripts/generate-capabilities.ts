@@ -89,6 +89,7 @@ function serializeEntry(entry: CapabilityEntry): string {
   if (entry.sapModule !== undefined) ordered['sapModule'] = entry.sapModule;
   if (entry.controlTypes !== undefined) ordered['controlTypes'] = entry.controlTypes;
   if (entry.async !== undefined) ordered['async'] = entry.async;
+  if (entry.aiSteering !== undefined) ordered['aiSteering'] = entry.aiSteering;
   return JSON.stringify(ordered, null, 2);
 }
 
@@ -342,6 +343,7 @@ function generateCapabilitiesJson(
       if (entry.sapModule !== undefined) obj['sapModule'] = entry.sapModule;
       if (entry.controlTypes !== undefined) obj['controlTypes'] = entry.controlTypes;
       if (entry.async !== undefined) obj['async'] = entry.async;
+      if (entry.aiSteering !== undefined) obj['aiSteering'] = entry.aiSteering;
       return obj;
     }),
   };
