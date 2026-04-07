@@ -308,7 +308,7 @@ applications because it triggers the same code paths that real user interactions
 | `control.fireLiveChange({ value })` | enterText | Fires live change as user types               | [API Reference](https://ui5.sap.com/#/api/sap.m.Input%23events/liveChange)         |
 | `control.fireChange({ value })`     | enterText | Fires change when input loses focus           | [API Reference](https://ui5.sap.com/#/api/sap.m.InputBase%23events/change)         |
 | `control.setSelectedKey(key)`       | select    | Sets the selected key on dropdowns            | [API Reference](https://ui5.sap.com/#/api/sap.m.Select%23methods/setSelectedKey)   |
-| `control.fireSelectionChange()`     | select    | Fires selection change event                  | [API Reference](https://ui5.sap.com/#/api/sap.m.Select%23events/change)            |
+| `control.fireSelectionChange()`     | select    | Fires selection change (List, Table, ComboBox — not Select) | [API Reference](https://ui5.sap.com/#/api/sap.m.ComboBox%23events/selectionChange) |
 
 **Fallback chains in code:**
 
@@ -329,8 +329,8 @@ enterText() — ui5-native-strategy.ts lines 100–128
 
 select() — ui5-native-strategy.ts lines 131–161
   ├── setSelectedKey(itemId)
-  ├── fireSelectionChange({ selectedItem })  → done
-  └── fireChange({ selectedItem })           → done (fallback)
+  ├── fireSelectionChange({ selectedItem })  → done (List, Table, ComboBox)
+  └── fireChange({ selectedItem })           → done (Select, or fallback)
 ```
 
 :::info Why firePress and fireSelect both fire
@@ -387,15 +387,15 @@ enterText() — dom-first-strategy.ts lines 138–193
 select() — dom-first-strategy.ts lines 196–243
   Same as ui5-native (no DOM shortcut for select):
   ├── setSelectedKey(itemId)
-  ├── fireSelectionChange({ selectedItem })  → done
-  └── fireChange({ selectedItem })           → done
+  ├── fireSelectionChange({ selectedItem })  → done (List, Table, ComboBox)
+  └── fireChange({ selectedItem })           → done (Select, or fallback)
 ```
 
 ### `opa5` — SAP RecordReplay API
 
 Uses SAP's official `RecordReplay.interactWithControl()` API from the OPA5 testing framework.
-Most compatible with SAP testing standards. Includes an optional **auto-waiter** that polls
-for UI5 stability before each interaction.
+Most compatible with SAP testing standards. Includes an optional **auto-wait** that calls
+`waitForUI5()` for UI5 stability before each interaction.
 
 Falls back to native UI5 fire\* methods if RecordReplay is not available.
 
@@ -421,7 +421,7 @@ ui5-native with reduced coverage.
 
 | Field                | Default | Description                                            |
 | -------------------- | ------- | ------------------------------------------------------ |
-| `interactionTimeout` | `5000`  | Timeout in ms for `RecordReplay.interactWithControl()` |
+| `interactionTimeout` | `5000`  | Internal OPA5 interaction timeout in ms (not passed to RecordReplay API) |
 | `autoWait`           | `true`  | Call `waitForUI5()` before each interaction             |
 | `debug`              | `false` | Log `[praman:opa5]` messages to browser console        |
 
@@ -433,8 +433,7 @@ press() — opa5-strategy.ts lines 82–140
   │ ├── RecordReplay.waitForUI5()
   │ └── RecordReplay.interactWithControl({
   │       selector: { id },
-  │       interactionType: 'PRESS',
-  │       interactionTimeout
+  │       interactionType: 'PRESS'
   │     })                                  → done
   │
   if RecordReplay NOT available (fallback):
@@ -513,7 +512,7 @@ common combinations.
 
 |                           | `ui5-native`              | `dom-first`                  | `opa5`                       |
 | ------------------------- | ------------------------- | ---------------------------- | ---------------------------- |
-| **Speed**                 | Fast                      | Fast                         | Medium (auto-waiter polling) |
+| **Speed**                 | Fast                      | Fast                         | Medium (waitForUI5 call)     |
 | **Standard UI5 controls** | Best                      | Good (via fallback)          | Best (SAP official)          |
 | **Custom composites**     | May fail (no `firePress`) | Best                         | May fail                     |
 | **UI5 Web Components**    | Does not work             | Works (DOM events)           | Does not work                |
