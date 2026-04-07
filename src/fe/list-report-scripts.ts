@@ -32,8 +32,10 @@
  */
 export const LR_FIND_TABLE_SCRIPT = `(function() {
   try {
-    var core = sap.ui.getCore();
-    var all = core.byFieldGroupId('');
+    var registry = sap.ui.core.Element && sap.ui.core.Element.registry
+      ? sap.ui.core.Element.registry
+      : (sap.ui.core.ElementRegistry || null);
+    var all = registry && registry.all ? Object.values(registry.all()) : [];
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
       if (el.getMetadata && el.getMetadata().getName() === 'sap.ui.comp.smarttable.SmartTable') {
@@ -66,8 +68,10 @@ export const LR_FIND_TABLE_SCRIPT = `(function() {
  */
 export const LR_FIND_FILTER_BAR_SCRIPT = `(function() {
   try {
-    var core = sap.ui.getCore();
-    var all = core.byFieldGroupId('');
+    var registry = sap.ui.core.Element && sap.ui.core.Element.registry
+      ? sap.ui.core.Element.registry
+      : (sap.ui.core.ElementRegistry || null);
+    var all = registry && registry.all ? Object.values(registry.all()) : [];
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
       if (el.getMetadata && el.getMetadata().getName() === 'sap.ui.comp.smartfilterbar.SmartFilterBar') {
@@ -289,8 +293,10 @@ export const LR_NAVIGATE_TO_ITEM_SCRIPT = `(function(arg) {
  */
 export const LR_GET_VARIANTS_SCRIPT = `(function() {
   try {
-    var core = sap.ui.getCore();
-    var all = core.byFieldGroupId('');
+    var registry = sap.ui.core.Element && sap.ui.core.Element.registry
+      ? sap.ui.core.Element.registry
+      : (sap.ui.core.ElementRegistry || null);
+    var all = registry && registry.all ? Object.values(registry.all()) : [];
     var vmControl = null;
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
@@ -337,8 +343,10 @@ export const LR_GET_VARIANTS_SCRIPT = `(function() {
  */
 export const LR_SELECT_VARIANT_SCRIPT = `(function(variantName) {
   try {
-    var core = sap.ui.getCore();
-    var all = core.byFieldGroupId('');
+    var registry = sap.ui.core.Element && sap.ui.core.Element.registry
+      ? sap.ui.core.Element.registry
+      : (sap.ui.core.ElementRegistry || null);
+    var all = registry && registry.all ? Object.values(registry.all()) : [];
     var vmControl = null;
     for (var i = 0; i < all.length; i++) {
       var el = all[i];

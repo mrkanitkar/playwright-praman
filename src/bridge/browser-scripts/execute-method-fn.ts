@@ -169,6 +169,14 @@ export function browserExecuteControlMethod(
     }
   }
 
+  /**
+   * Extracts the real ComboBox/MultiComboBox item from SAP's internal wrapper.
+   *
+   * WARNING: UNDOCUMENTED SAP INTERNAL API — `data('InputWithSuggestionsListItem')`
+   * accesses SAP-internal custom data linking suggestion popup items to source items.
+   * No public API alternative exists. Protected by try-catch fallback in caller.
+   * See: plans/sap-ui5-api-fiction-audit-2026-04-07.md §6.2
+   */
   function tryComboBoxExtraction(item: BridgeRecord, currentId: string): string {
     const getDomRefFn = getMethodFn(item, 'getDomRef');
     const domRef = getDomRefFn !== undefined ? getDomRefFn.call(item) : null;
@@ -190,6 +198,10 @@ export function browserExecuteControlMethod(
     let result = itemId;
     try {
       result = tryComboBoxExtraction(item, result);
+      // WARNING: UNDOCUMENTED SAP INTERNAL CONVENTION — PlanningCalendar uses
+      // '-CLI' (CalendarListItem) suffix for internal item IDs. No public API
+      // alternative exists. Protected by try-catch fallback.
+      // See: plans/sap-ui5-api-fiction-audit-2026-04-07.md §6.3
       if (result !== '' && result.includes('PlanningCalendar') && !result.includes('-CLI')) {
         result = result + '-CLI';
       }
