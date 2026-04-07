@@ -26,6 +26,8 @@ smartfilterbar
 smartform
 smartfield
 filterbar
+focusable
+Focusable
 uxap
 webc
 icontabfilter
