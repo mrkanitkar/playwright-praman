@@ -69,7 +69,7 @@ import type { UI5Handler } from './ui5-handler.js';
  * `ui5Navigation`, and `vocabulary` pre-injected.
  *
  * @intent Provide typed SAP business intent operations to Playwright tests.
- * @capability intent-fixture, procurement, sales, finance, manufacturing, masterData
+ * @capability intent.core.fillField
  *
  * @example
  * ```typescript
@@ -316,7 +316,7 @@ export interface IntentTestFixtures {
  * immediately without a separate setup step.
  *
  * @intent Provide typed SAP business intent operations to Playwright tests
- * @capability intent-fixture
+ * @capability intent.core.fillField
  *
  * @example
  * ```typescript

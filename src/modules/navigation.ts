@@ -120,6 +120,7 @@ async function setHash(page: NavigationPage, hash: string): Promise<void> {
 /**
  * Navigates to a SAP app by semantic object hash.
  *
+ * @capability ui5Navigation.navigateToApp
  * @intent Navigate to a specific SAP Fiori app using its semantic object hash.
  * Use when the AI agent needs to open a particular app from the FLP.
  * @guarantee On success, the FLP hash is set to the given appId and UI5 is stable.
@@ -169,6 +170,7 @@ export async function navigateToApp(
  * use {@link navigateToSpace} and {@link navigateToSectionLink} from
  * `navigation-space.ts` instead.
  *
+ * @capability ui5Navigation.navigateToTile
  * @intent Open a Fiori Launchpad tile by its visible title.
  * Use when the agent needs to navigate via UI interaction rather than hash.
  * @guarantee On success, the tile is clicked and UI5 stability is reached.
@@ -218,6 +220,7 @@ export async function navigateToTile(
 /**
  * Navigates to an SAP intent with optional parameters.
  *
+ * @capability ui5Navigation.navigateToIntent
  * @intent Navigate using a structured semantic object + action pair with optional query params.
  * Prefer this over navigateToApp() when parameters need to be passed to the target app.
  * @guarantee On success, the FLP hash is set to the intent with parameters and UI5 is stable.
@@ -256,6 +259,7 @@ export async function navigateToIntent(
 /**
  * Navigates to a specific hash directly.
  *
+ * @capability ui5Navigation.navigateToHash
  * @intent Set the FLP URL hash directly for low-level navigation.
  * @guarantee On success, the FLP hash is set to the given value and UI5 is stable.
  * @ai
@@ -283,6 +287,7 @@ export async function navigateToHash(
 /**
  * Navigates to the FLP home screen (#Shell-home).
  *
+ * @capability ui5Navigation.navigateToHome
  * @intent Return to the Fiori Launchpad home screen.
  * Use between test scenarios or to reset the navigation state.
  * @guarantee On success, the hash is set to 'Shell-home' and UI5 is stable.
@@ -310,6 +315,7 @@ export async function navigateToHome(
 /**
  * Navigates back in browser history.
  *
+ * @capability ui5Navigation.navigateBack
  * @intent Go back to the previous page in browser history.
  * @guarantee On success, the browser has navigated back and UI5 is stable.
  * @ai
@@ -335,6 +341,7 @@ export async function navigateBack(
 /**
  * Navigates forward in browser history.
  *
+ * @capability ui5Navigation.navigateForward
  * @intent Go forward in browser history after a back navigation.
  * @guarantee On success, the browser has navigated forward and UI5 is stable.
  * @ai
@@ -360,6 +367,7 @@ export async function navigateForward(
 /**
  * Searches for an app in the FLP shell search bar and opens it.
  *
+ * @capability ui5Navigation.searchAndOpenApp
  * @intent Search for and open an application using the FLP shell search bar.
  * Use when the tile is not visible on the home screen but can be found via search.
  * @guarantee On success, the app matching the title is opened and UI5 is stable.
@@ -394,6 +402,7 @@ export async function searchAndOpenApp(
 /**
  * Returns the current URL hash (without leading '#').
  *
+ * @capability ui5Navigation.getCurrentHash
  * @intent Read the current FLP navigation hash to determine which app is active.
  * @guarantee Returns the current hash string without the leading '#'.
  * @ai

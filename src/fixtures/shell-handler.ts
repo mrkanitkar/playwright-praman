@@ -61,6 +61,8 @@ export interface ShellHandlerOptions {
  * @ai
  * @aiContext Use for FLP shell header actions: home, user menu, notifications.
  *
+ * @capability ui5Shell.expectShellHeader
+ *
  * @remarks
  * Provides methods to verify the shell header visibility, navigate home,
  * and open the user menu. All operations use `page.evaluate()` for

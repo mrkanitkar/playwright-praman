@@ -85,6 +85,7 @@ function ppResult<T>(params: {
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create a production order from structured input data.
+ * @capability intent.manufacturing.createProductionOrder
  * @sapModule PP
  * @businessContext CO01 — create production order.
  *
@@ -193,6 +194,7 @@ export async function createProductionOrder(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Confirm a production order operation (goods produced).
+ * @capability intent.manufacturing.confirmProductionOrder
  * @sapModule PP
  * @businessContext CO11N — enter production order confirmation.
  *

@@ -62,6 +62,8 @@ export interface TestDataFixtures {
  * The `testData` fixture is scoped per-test. On teardown it calls
  * {@link TestDataHandler.cleanup | cleanup()} to remove all persisted files.
  *
+ * @capability testData.generate
+ *
  * @example
  * ```typescript
  * testDataTest('save and load', async ({ testData }) => {

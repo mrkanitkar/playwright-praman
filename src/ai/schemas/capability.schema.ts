@@ -75,7 +75,7 @@ export type CapabilityPriority = z.infer<typeof CapabilityPrioritySchema>;
  * the TypeScript type is derived via `z.infer<>`.
  *
  * @intent Describe a Praman API capability for AI-driven test generation.
- * @capability AI agent context, test scaffolding.
+ * @capability pramanAI.capabilities
  *
  * @example
  * ```typescript

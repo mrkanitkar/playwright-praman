@@ -60,6 +60,7 @@ For multi-skill tasks, load primary + supporting skill(s). Example:
 12. Node builtins must use `node:` prefix (e.g., `node:path`, `node:fs`)
 13. ESM only — `import`, never `require`
 14. No `I` prefix on interfaces — `BridgeAdapter` not `IBridgeAdapter`
+15. Every exported function/class must have `@capability <qualifiedName>` matching `capabilities.yaml`
 
 ## LSP Workflow Rules
 

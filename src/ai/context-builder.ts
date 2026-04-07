@@ -107,7 +107,7 @@ function enrichObjectCategory(control: DiscoveredControl): DiscoveredControl {
  *   `discoverPage()`, potentially enriched with `ui5Version`.
  *
  * @intent Build AI context from current page UI5 state
- * @capability ai-context-building
+ * @capability pramanAI.buildContext
  * @sapModule All
  *
  * @example

@@ -67,6 +67,8 @@ export interface ShellFooterFixtures {
  * each test and require no teardown. The `page` dependency comes from
  * Playwright's built-in fixture.
  *
+ * @capability ui5Shell.expectShellHeader
+ *
  * @example
  * ```typescript
  * shellFooterTest('shell operations', async ({ ui5Shell, ui5Footer }) => {

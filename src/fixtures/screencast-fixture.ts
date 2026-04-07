@@ -117,7 +117,7 @@ export interface ShowActionsOptions {
  * older Playwright versions — they degrade gracefully with a debug log.
  *
  * @intent Provide structured video recording with AI-first frame streaming
- * @capability screencast, video-chapters, ui5-overlay, ai-vision
+ * @capability ui5.inspect
  *
  * @example
  * ```typescript
@@ -257,7 +257,7 @@ type ScreencastApi = Pick<Screencast, 'showChapter' | 'showActions' | 'start' | 
  * ```
  *
  * @intent Provide structured video recording with real-time AI frame streaming
- * @capability screencast-fixture
+ * @capability ui5.inspect
  *
  * @example
  * ```typescript

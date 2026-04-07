@@ -99,6 +99,8 @@ export interface FETablePage {
  * Supports responsive tables (`sap.m.Table`) via `getItems()` and grid tables
  * (`sap.ui.table.Table` and variants) via `getBinding('rows').getLength()`.
  *
+ * @capability fe.table.getRowCount
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID of the table.
  * @returns The number of rows in the table.
@@ -141,6 +143,8 @@ export async function feGetTableRowCount(page: FETablePage, tableId: string): Pr
  * Looks up the column index by matching header text, then reads the cell value.
  * For responsive tables, uses `getItems()[row].getCells()[col]`.
  * For grid tables, uses `getRows()[row].getCells()[col]`.
+ *
+ * @capability fe.table.getCellValue
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID of the table.
@@ -228,6 +232,8 @@ export async function feGetCellValue(
  * All column lookup and row matching logic runs inside the browser script.
  * Returns -1 if no matching row is found.
  *
+ * @capability fe.table.findRow
+ *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID of the table.
  * @param values - A record mapping column names to expected cell values.
@@ -289,6 +295,8 @@ export async function feFindRowByValues(
  * @remarks
  * For responsive tables, fires the `press` event on the item or triggers a `tap`.
  * For grid tables, fires `rowSelectionChange` or triggers a DOM click on the row element.
+ *
+ * @capability fe.table.clickRow
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID of the table.
@@ -354,6 +362,8 @@ export async function feClickRow(
  * @remarks
  * For responsive tables, reads `getHeader().getText()` on each column.
  * For grid tables, reads `getLabel().getText()` or stringifies the label.
+ *
+ * @capability fe.table.getColumnNames
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID of the table.

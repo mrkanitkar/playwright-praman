@@ -87,6 +87,8 @@ export interface SAPAuthHandlerOptions {
 /**
  * Manages SAP authentication lifecycle with retry and session tracking.
  *
+ * @capability sapAuth.login
+ *
  * @example
  * ```typescript
  * const handler = new SAPAuthHandler({ strategy, logger });
@@ -107,6 +109,8 @@ export class SAPAuthHandler {
 
   /**
    * Login to SAP system with retry logic.
+   *
+   * @capability sapAuth.login
    *
    * @remarks
    * Delegates to the configured strategy's `authenticate()` method,
@@ -177,6 +181,8 @@ export class SAPAuthHandler {
   /**
    * Login to SAP system using environment variables.
    *
+   * @capability sapAuth.loginFromEnv
+   *
    * @remarks
    * Reads `SAP_ACTIVE_SYSTEM` (defaults to `'onprem'`) to determine
    * which set of env vars to use:
@@ -202,6 +208,8 @@ export class SAPAuthHandler {
 
   /**
    * Logout and clear session state.
+   *
+   * @capability sapAuth.logout
    *
    * @remarks
    * Performs UI-based logout matching SAP Fiori Launchpad shell behavior:
@@ -394,6 +402,8 @@ export class SAPAuthHandler {
   /**
    * Check if the current page is authenticated.
    *
+   * @capability sapAuth.isAuthenticated
+   *
    * @param page - Playwright page to check.
    * @returns `true` if authenticated.
    *
@@ -409,6 +419,8 @@ export class SAPAuthHandler {
 
   /**
    * Check if the current session has expired.
+   *
+   * @capability sapAuth.isSessionExpired
    *
    * @param timeoutMs - Session timeout in milliseconds (default: 30 min).
    * @returns `true` if session is expired or no login has occurred.
@@ -433,6 +445,8 @@ export class SAPAuthHandler {
 
   /**
    * Get current session information.
+   *
+   * @capability sapAuth.getSessionInfo
    *
    * @returns Session info or `null` if not logged in.
    *

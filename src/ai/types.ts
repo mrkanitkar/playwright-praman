@@ -136,7 +136,7 @@ export type AiProviderName = 'claude' | 'openai' | 'gemini';
  * Configuration for an AI provider connection.
  *
  * @intent Supply connection details to LLM service factories.
- * @capability AI provider selection, model routing.
+ * @capability pramanAI.llm
  *
  * @example
  * ```typescript
@@ -323,7 +323,7 @@ export interface AgenticCheckpoint {
  * A single UI5 control discovered during page analysis.
  *
  * @intent Represent discovered controls for AI-driven selector generation.
- * @capability Control discovery, AI page context.
+ * @capability pramanAI.discoverPage
  * @sapModule sap.ui.core.Control
  *
  * @example
@@ -362,7 +362,7 @@ export interface DiscoveredControl {
  * All arrays are partitioned views of the same discovered controls.
  *
  * @intent Provide structured page state for LLM-driven test authoring.
- * @capability AI context building, page discovery.
+ * @capability pramanAI.buildContext
  *
  * @example
  * ```typescript
@@ -408,7 +408,7 @@ export interface PageContext {
  * `metadata` carries provenance for debugging and auditing.
  *
  * @intent Hold the output of an AI-generated Playwright test including code and provenance.
- * @capability AI test generation, agentic workflow.
+ * @capability pramanAI.agentic
  *
  * @example
  * ```typescript

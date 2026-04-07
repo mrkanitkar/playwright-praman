@@ -86,6 +86,7 @@ function mdResult<T>(params: {
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create a new vendor/supplier master record.
+ * @capability intent.masterData.createVendorMaster
  * @sapModule MD
  * @businessContext MK01 / Manage Suppliers — vendor master creation.
  *
@@ -182,6 +183,7 @@ export async function createVendorMaster(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create a new customer master record.
+ * @capability intent.masterData.createCustomerMaster
  * @sapModule MD
  * @businessContext XD01 / Manage Customers — customer master creation.
  *
@@ -281,6 +283,7 @@ export async function createCustomerMaster(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create a new material master record.
+ * @capability intent.masterData.createMaterialMaster
  * @sapModule MD
  * @businessContext MM01 / Manage Material Master — material master creation.
  *

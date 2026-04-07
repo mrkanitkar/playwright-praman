@@ -189,6 +189,8 @@ interface WorkerFixtures {
  * Extends `@playwright/test` base test with Praman worker fixtures.
  * Use this as the base for further fixture composition.
  *
+ * @capability ui5.control
+ *
  * @example
  * ```typescript
  * import { coreTest } from '#fixtures/core-fixtures.js';

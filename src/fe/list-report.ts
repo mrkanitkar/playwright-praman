@@ -93,6 +93,7 @@ async function stabilityWait(page: ListReportPage, options?: ListReportOptions):
 /** Finds the main table on a List Report page (SmartTable first, then MDC Table).
  *
  * @intent Discover the main table control on a Fiori Elements List Report page.
+ * @capability fe.listReport.getTable
  *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Optional timeout settings.
@@ -127,6 +128,7 @@ export async function getListReportTable(
 /** Finds the filter bar on a List Report page (SmartFilterBar first, then MDC FilterBar).
  *
  * @intent Discover the filter bar control on a Fiori Elements List Report page.
+ * @capability fe.listReport.getFilterBar
  *
  * @param page - Playwright Page (or compatible subset).
  * @param options - Optional timeout settings.
@@ -161,6 +163,7 @@ export async function getFilterBar(
 /** Sets a filter field value on the filter bar.
  *
  * @intent Set a filter field value on the SmartFilterBar or MDC FilterBar.
+ * @capability fe.listReport.setFilter
  *
  * @param page - Playwright Page (or compatible subset).
  * @param filterBarId - The UI5 control ID of the filter bar.
@@ -203,6 +206,7 @@ export async function setFilterBarField(
 /** Gets the current value of a filter field on the filter bar.
  *
  * @intent Read the current value of a filter field on the filter bar.
+ * @capability fe.listReport.getFilterValue
  *
  * @param page - Playwright Page (or compatible subset).
  * @param filterBarId - The UI5 control ID of the filter bar.
@@ -228,6 +232,7 @@ export async function getFilterBarFieldValue(
 /** Executes search on the filter bar (Go button). Waits for UI5 stability after.
  *
  * @intent Trigger the filter bar search (equivalent to pressing the Go button).
+ * @capability fe.listReport.search
  *
  * @param page - Playwright Page (or compatible subset).
  * @param filterBarId - The UI5 control ID of the filter bar.
@@ -263,6 +268,7 @@ export async function executeSearch(
 /** Clears all filter fields on the filter bar.
  *
  * @intent Reset all filter fields on the filter bar to their default values.
+ * @capability fe.listReport.clearFilters
  *
  * @param page - Playwright Page (or compatible subset).
  * @param filterBarId - The UI5 control ID of the filter bar.
@@ -298,6 +304,7 @@ export async function clearFilterBar(
 /** Navigates to a table item by row index. Fires press/tap on the row.
  *
  * @intent Navigate from the List Report to an Object Page by clicking a table row.
+ * @capability fe.listReport.navigateToItem
  *
  * @param page - Playwright Page (or compatible subset).
  * @param tableId - The UI5 control ID of the table.
@@ -343,6 +350,7 @@ export async function navigateToItem(
 /** Gets the names of all available variants on the List Report page.
  *
  * @intent List all available view variants on the List Report page.
+ * @capability fe.listReport.getVariants
  *
  * @param page - Playwright Page (or compatible subset).
  * @returns Array of variant names. Empty array if no VariantManagement control exists.
@@ -361,6 +369,7 @@ export async function getAvailableVariants(page: ListReportPage): Promise<readon
 /** Selects a variant by name on the List Report page.
  *
  * @intent Select a saved view variant by its display name on the List Report.
+ * @capability fe.listReport.selectVariant
  *
  * @param page - Playwright Page (or compatible subset).
  * @param variantName - The display name of the variant to select.

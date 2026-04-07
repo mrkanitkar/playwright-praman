@@ -168,6 +168,7 @@ function toValidDate(input: DateInput): Date {
 /**
  * Formats a Date object into a UI5-compatible date string.
  *
+ * @capability ui5.date.setDatePicker
  * @intent Convert a Date to a UI5 date format string for use with DatePicker controls.
  * @guarantee Returns a correctly formatted date string matching the specified pattern.
  * @ai
@@ -231,6 +232,7 @@ export function formatDateForUI5(date: DateInput, format: string): string {
 /**
  * Sets a date value on a `sap.m.DatePicker` control.
  *
+ * @capability ui5.date.setDatePicker
  * @intent Set a date on a UI5 DatePicker control with automatic format conversion.
  * @guarantee On success, the control's value is set and fireChange() has been called.
  * @prerequisite The control must be a sap.m.DatePicker and must exist in the UI5 view.
@@ -323,6 +325,7 @@ export async function setDatePickerValue(
 /**
  * Gets the current value from a `sap.m.DatePicker` control.
  *
+ * @capability ui5.date.getDatePicker
  * @intent Read the current date string from a DatePicker control.
  * @guarantee Returns the raw date string from the control's getValue() method.
  * @ai
@@ -346,6 +349,7 @@ export async function getDatePickerValue(page: DatePage, controlId: string): Pro
 /**
  * Sets a date range on a `sap.m.DateRangeSelection` control.
  *
+ * @capability ui5.date.setDateRange
  * @intent Set both start and end dates on a DateRangeSelection control.
  * @guarantee On success, both date values are set and fireChange() is called.
  * @prerequisite startDate must be before or equal to endDate.
@@ -418,6 +422,7 @@ export async function setDateRangeSelection(
 /**
  * Gets the current date range from a `sap.m.DateRangeSelection` control.
  *
+ * @capability ui5.date.getDateRange
  * @intent Read the current start and end dates from a DateRangeSelection control.
  * @guarantee Returns an object with start and end date strings in ISO format from the control.
  * @ai
@@ -460,6 +465,7 @@ export async function getDateRangeSelection(
 /**
  * Sets a date and validates that the control does not enter an error state.
  *
+ * @capability ui5.date.setAndValidate
  * @intent Set a date and verify the control does not show a validation error.
  * @guarantee On success, the date is set and the control's valueState is not 'Error'.
  * @ai
@@ -514,6 +520,7 @@ export async function setAndValidateDate(
 /**
  * Sets a time value on a `sap.m.TimePicker` control.
  *
+ * @capability ui5.date.setTimePicker
  * @intent Set a time value on a UI5 TimePicker control.
  * @guarantee On success, the time value is set and fireChange() is called.
  * @ai
@@ -577,6 +584,7 @@ export async function setTimePickerValue(
 /**
  * Gets the current value from a `sap.m.TimePicker` control.
  *
+ * @capability ui5.date.getTimePicker
  * @intent Read the current time string from a TimePicker control.
  * @guarantee Returns the raw time string from the control's getValue() method.
  * @ai

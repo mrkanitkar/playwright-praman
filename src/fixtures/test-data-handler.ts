@@ -72,6 +72,8 @@ export interface TestDataHandlerOptions {
  * Designed for use in Playwright test fixtures. On teardown, call
  * {@link TestDataHandler.cleanup | cleanup()} to remove all persisted files.
  *
+ * @capability testData.generate
+ *
  * @example
  * ```typescript
  * const handler = new TestDataHandler({ baseDir: '/tmp/test-data' });

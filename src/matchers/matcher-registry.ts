@@ -124,6 +124,7 @@ let frozen = false;
  *
  * @intent Provide a factory so custom matchers automatically get web-first
  * retry behavior identical to built-in Praman matchers.
+ * @capability matchers.toHaveUI5Text
  * @guarantee Returns a matcher function that retries the check with pollUntilPass semantics.
  *
  * @remarks

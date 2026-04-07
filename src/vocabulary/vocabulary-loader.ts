@@ -190,6 +190,8 @@ function extractTerms(raw: RawDomainFile, domain: SAPDomain): Map<string, Vocabu
 /**
  * Resolve the absolute path to the `domains/` directory bundled with the package.
  *
+ * @capability pramanAI.vocabulary
+ *
  * @remarks
  * Uses `import.meta.url` to locate the source file at build time, then
  * navigates to the sibling `domains/` directory. This is the same technique
@@ -215,6 +217,8 @@ export function resolveDomainsDir(metaUrl: string): string {
 
 /**
  * Load and parse a domain JSON file into a map of {@link VocabularyTerm} objects.
+ *
+ * @capability pramanAI.vocabulary
  *
  * @remarks
  * Reads `<domainsDir>/<domain>.json` asynchronously, parses it, and extracts

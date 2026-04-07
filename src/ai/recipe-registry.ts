@@ -45,7 +45,7 @@ interface RecipeFilter {
  * Queryable registry of reusable test pattern recipes.
  *
  * @intent Provide curated SAP Fiori test patterns to AI agents and human testers.
- * @capability AI recipe lookup, test scaffolding.
+ * @capability pramanAI.recipes
  *
  * @example
  * ```typescript

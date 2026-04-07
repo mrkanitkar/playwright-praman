@@ -205,6 +205,8 @@ function flushCall(
  * P1 exception: This is a stateful class (manages initialized state,
  * WorkZone detection, and method call history).
  *
+ * @capability fe.listReport.getTable
+ *
  * @example
  * ```typescript
  * const fe = await initializeFETestLibrary(page, config);
@@ -399,6 +401,7 @@ export class FETestLibraryInstance {
  * Factory function to initialize the FE Test Library.
  *
  * @intent Initialize the SAP Fiori Elements OPA5 test library for Given/When/Then test execution.
+ * @capability fe.listReport.getTable
  *
  * @remarks
  * Injects browser-side scripts to load SAP FE test libraries and initialize

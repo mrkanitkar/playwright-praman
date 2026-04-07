@@ -135,6 +135,8 @@ function validateSelector(selector: UI5Selector): void {
  * @ai
  * @aiContext Main entry point for UI5 control interactions in tests.
  *
+ * @capability ui5.control
+ *
  * @example
  * ```typescript
  * const handler = new UI5Handler(options);
