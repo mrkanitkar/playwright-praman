@@ -69,7 +69,7 @@ export interface ControlTreeScriptParams {
  * Browser-side snippet: detects UI5 version with fallback chain.
  *
  * @remarks
- * Same fallback logic as `get-version.ts`: `sap.ui.version` → `getVersionInfo()` → `Global.version`.
+ * Same fallback logic as `get-version.ts`: `sap.ui.version` → `getVersionInfo()`.
  */
 const VERSION_DETECTION_SNIPPET = `
     function detectUI5Version() {
@@ -80,7 +80,6 @@ const VERSION_DETECTION_SNIPPET = `
             var info = sap.ui.getVersionInfo();
             if (info && info.version) return info.version;
           }
-          if (sap.ui.Global && sap.ui.Global.version) return sap.ui.Global.version;
         }
         return '0.0.0';
       } catch (e) {

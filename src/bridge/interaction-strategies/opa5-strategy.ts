@@ -105,12 +105,7 @@ interface BrowserBridge {
 /** RecordReplay API shape in the browser. */
 interface BrowserRecordReplay {
   interactWithControl: (params: Record<string, unknown>) => void;
-  getAutoWaiter?: () => BrowserAutoWaiter | null;
-}
-
-/** AutoWaiter shape in the browser. */
-interface BrowserAutoWaiter {
-  hasToWait: () => boolean;
+  waitForUI5: () => Promise<void>;
 }
 
 /** Minimal control shape for fallback interactions. */
@@ -124,23 +119,15 @@ interface BrowserControl {
 /* v8 ignore start -- browser-context functions: executed inside page.evaluate() in Chromium, not reachable by Node.js V8 coverage */
 
 /**
- * Browser-context: waits for the OPA5 AutoWaiter to settle, if available.
+ * Browser-context: waits for UI5 to finish pending async operations.
  *
  * @remarks
+ * Uses the official `RecordReplay.waitForUI5()` API (available since UI5 1.94).
  * Extracted as a named function to reduce cognitive complexity of the
  * main interaction functions. Called inside `page.evaluate()` callbacks.
  */
-async function browserWaitForAutoWaiter(recordReplay: BrowserRecordReplay): Promise<void> {
-  const autoWaiter = recordReplay.getAutoWaiter?.();
-  if (autoWaiter?.hasToWait() !== true) return;
-  await new Promise<void>((resolve) => {
-    const interval = setInterval(() => {
-      if (!autoWaiter.hasToWait()) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 100);
-  });
+async function browserWaitForUI5(recordReplay: BrowserRecordReplay): Promise<void> {
+  await recordReplay.waitForUI5();
 }
 
 // ── Browser-side script functions (P17 safe — function-form) ──────────
@@ -169,7 +156,7 @@ async function browserPress(args: PressArgs): Promise<BridgeResult> {
   const bridge = (window as any)[args.ns] as BrowserBridge | undefined;
   if (bridge?.RecordReplay === undefined) return browserPressFallback(bridge, args.controlId);
   try {
-    if (args.autoWait) await browserWaitForAutoWaiter(bridge.RecordReplay);
+    if (args.autoWait) await browserWaitForUI5(bridge.RecordReplay);
     bridge.RecordReplay.interactWithControl({
       selector: { id: args.controlId },
       interactionType: 'PRESS',
@@ -201,7 +188,7 @@ async function browserEnterText(args: EnterTextArgs): Promise<BridgeResult> {
     return { success: false, error: 'RecordReplay not available' };
   }
   try {
-    if (args.autoWait) await browserWaitForAutoWaiter(bridge.RecordReplay);
+    if (args.autoWait) await browserWaitForUI5(bridge.RecordReplay);
     bridge.RecordReplay.interactWithControl({
       selector: { id: args.controlId },
       interactionType: 'ENTER_TEXT',
@@ -234,7 +221,7 @@ async function browserSelect(args: SelectArgs): Promise<BridgeResult> {
     return { success: false, error: 'RecordReplay not available' };
   }
   try {
-    if (args.autoWait) await browserWaitForAutoWaiter(bridge.RecordReplay);
+    if (args.autoWait) await browserWaitForUI5(bridge.RecordReplay);
     bridge.RecordReplay.interactWithControl({
       selector: { id: args.controlId },
       interactionType: 'PRESS',
