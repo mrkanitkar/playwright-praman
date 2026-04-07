@@ -158,7 +158,7 @@ The predecessor plugin (v2.5.0) suffered from monolithic files:
 | File                   | LOC   | Problem                                  |
 | ---------------------- | ----- | ---------------------------------------- |
 | `ui5-handler.ts`       | 2,318 | God object handling all UI5 operations   |
-| `plugin-fixtures.ts`   | 2,263 | All 21 fixtures in one file              |
+| `plugin-fixtures.ts`   | 2,263 | All 17 fixtures in one file              |
 | `ui5-control-proxy.ts` | 1,829 | Double-proxy with redundant interception |
 
 Praman v1.0 decomposes these into focused modules following SRP (Single Responsibility Principle):

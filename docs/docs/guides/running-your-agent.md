@@ -1,10 +1,29 @@
 ---
 title: Running Your Agent for the First Time
+description: 'Step-by-step guide to run Praman AI agents: plan, generate, heal, and produce gold-standard SAP Playwright tests autonomously.'
+keywords:
+  - praman ai agent run
+  - sap test generation ai
+  - playwright sap gold standard test
+  - praman planner generator healer
+  - sap ui5 test automation agent
 ---
 
 # Running Your Agent for the First Time
 
-From business process to Playwright test — autonomously. This guide walks you through the complete flow of using Praman's AI agents to discover an SAP application, generate a test plan, produce a gold-standard test script, and iterate until it passes.
+:::info[In this guide]
+
+- Launch the planner agent to discover UI5 controls on a live SAP system
+- Review the structured test plan output with control maps and test scenarios
+- Generate a production-ready Playwright test script from the plan
+- Use the healer agent to fix failing tests iteratively
+- Produce a gold-standard `.spec.ts` ready for CI/CD
+
+:::
+
+From business process to Playwright test — autonomously. This guide walks you through the complete
+flow of using Praman's AI agents to discover an SAP application, generate a test plan, produce a
+gold-standard test script, and iterate until it passes.
 
 ## Prerequisites Checklist
 
@@ -285,6 +304,7 @@ The generator produces a test script using `playwright-praman` fixtures. The out
 <summary>Example: bom-create-flow-gold.spec.ts structure (click to expand)</summary>
 
 ```typescript
+// tests/e2e/sap-cloud/bom-create-flow-gold.spec.ts
 import { test, expect } from 'playwright-praman';
 
 // ── Control ID Constants (from discovery) ───────────────────────
@@ -419,7 +439,9 @@ After the heal cycle completes, you have a production-ready gold standard test w
 
 ### Full Gold Standard Example
 
-The script below is a complete, ready-to-run gold standard test for the **Maintain Bill of Material** app. Copy it, update the control IDs to match your system's live discovery output, and set `SAP_CLOUD_BASE_URL` in your `.env`.
+The script below is a complete, ready-to-run gold standard test for the
+**Maintain Bill of Material** app. Copy it, update the control IDs to match your system's live
+discovery output, and set `SAP_CLOUD_BASE_URL` in your `.env`.
 
 <details>
 <summary>bom-e2e-gold-standard.spec.ts — full source (click to expand)</summary>
@@ -985,3 +1007,80 @@ Running 1 test using 1 worker
 - Verify `.mcp.json` exists with the `playwright-test` server configured
 - Restart the MCP server: close and reopen your IDE
 - Check that `@playwright/test` is installed: `npx playwright --version`
+
+:::warning[Common mistake]
+Do not include `sapAuth.login()` inside your test body when using the setup project pattern.
+Authentication runs once in `auth-setup.ts` and the session is shared via `storageState`.
+Adding login calls in tests causes duplicate logins and session conflicts.
+:::
+
+## FAQ
+
+<details>
+<summary>How many heal iterations does it typically take?</summary>
+
+Typically 3-6 iterations depending on:
+
+- **SAP system response time** — slow systems need longer `toPass()` intervals
+- **OData data availability** — value help tables may load asynchronously
+- **Control rendering timing** — dialogs and popovers may not be immediately available
+- **Environment-specific quirks** — different SAP systems have different control IDs and behaviors
+
+The healer agent captures the exact error, identifies the root cause, applies a fix, and re-runs
+the test automatically. Each iteration gets progressively closer to a passing test.
+
+</details>
+
+<details>
+<summary>Can I run the planner without a live SAP system?</summary>
+
+No. The planner agent connects to a live SAP system to discover UI5 controls, OData bindings,
+and value help structures. This live discovery is what makes generated tests accurate — the
+planner reads actual control IDs and types from the running application.
+
+If you do not have a live system available, you can write tests manually using the
+[Playwright Primer](./playwright-primer) and [Selectors](./selectors) guides.
+
+</details>
+
+<details>
+<summary>The agent generates tests with page.click() instead of ui5.press() — how do I fix this?</summary>
+
+This means the agent is not using Praman fixtures correctly. Re-run the generator or healer with
+this instruction in your prompt:
+
+```text
+Use 100% Praman fixtures for all UI5 elements. Never use page.click(),
+page.fill(), or page.locator() for UI5 controls. Use ui5.press(),
+ui5.fill(), and ui5.control() instead.
+```
+
+Or run the gold standard conversion prompt:
+
+```text
+Convert the attached test script to Praman gold standard format.
+```
+
+</details>
+
+<details>
+<summary>How do I run the full pipeline with a single command?</summary>
+
+In Claude Code, use the slash command:
+
+```text
+/praman-sap-coverage
+```
+
+This runs the planner, generator, and healer in sequence. For other IDEs (Copilot, Cursor),
+use the prompt template from Step 1 — the agent will run all three phases automatically.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Selectors Guide →](./selectors)** — Understand how `ui5.control()` discovers controls by ID, type, and properties
+- **[Control Interactions →](./control-interactions)** — Learn `ui5.press()`, `ui5.fill()`, and proxy methods for all UI5 control types
+- **[Authentication Guide →](./authentication)** — Configure auth strategies for different SAP system types
+
+:::

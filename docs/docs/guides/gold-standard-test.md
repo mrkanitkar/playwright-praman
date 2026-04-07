@@ -1,6 +1,24 @@
 ---
 title: Gold Standard Test Pattern
+description: 'Complete reference test for Praman. Demonstrates test.step, fixtures, semantic selectors, custom matchers, error handling, and data cleanup.'
+keywords:
+  - praman best practices
+  - sap ui5 test template
+  - playwright sap test pattern
+  - sap fiori test example
 ---
+
+# Gold Standard Test Pattern
+
+:::info[In this guide]
+
+- Use a complete reference test as a template for business process tests
+- Apply every Praman best practice: `test.step()`, fixtures, semantic selectors, custom matchers
+- Handle error dialogs and attach failure diagnostics to test reports
+- Clean up test data in `afterAll` for repeatable test runs
+- Run data-driven variants with parameterized test data
+
+:::
 
 A complete reference test that demonstrates every Praman best practice in a single runnable
 example. Use this as a template for your most critical business process tests.
@@ -196,7 +214,7 @@ test.describe('Purchase Order Approval Flow', () => {
 
 ### 1. Test Organization
 
-```
+```text
 describe('Business Process Name')
   beforeEach  → navigate to known starting point
   test        → the actual business flow
@@ -376,3 +394,56 @@ Use this checklist when writing new tests to verify they meet gold standard qual
 - [ ] Auth handled by setup project (not inline login)
 - [ ] Test can run independently (no dependency on prior test state)
 - [ ] Trace and screenshot configured for failure analysis
+
+## FAQ
+
+<details>
+<summary>Do I need to follow every practice in the gold standard for every test?</summary>
+
+No. The gold standard is a reference for your most critical business process tests. For
+simpler tests (e.g., verifying a single field value), you can skip `test.step()` nesting,
+data cleanup, and error dialog handling. The key non-negotiable practices are: use Praman
+fixtures (never `page.click('#id')`), use semantic selectors, and avoid
+`page.waitForTimeout()`.
+
+</details>
+
+<details>
+<summary>Why use test.step() instead of separate test() calls?</summary>
+
+`test.step()` groups related actions within a single test while preserving individual step
+visibility in the HTML trace report. Separate `test()` calls would require re-authentication
+and re-navigation for each test, adding 30-60 seconds of overhead per test on SAP systems.
+Steps also share state (like captured document numbers) without needing external storage.
+
+</details>
+
+<details>
+<summary>How do I handle cleanup when a test fails mid-way?</summary>
+
+Use `test.afterAll()` or `test.afterEach()` with a try/catch. Track created entity IDs in
+variables declared at the `describe` scope. The cleanup code runs even when the test fails,
+and the try/catch prevents cleanup errors from masking the original failure:
+
+```typescript
+test.afterAll(async ({ ui5 }) => {
+  if (createdPONumber) {
+    try {
+      await ui5.odata.deleteEntity('/PurchaseOrders', createdPONumber);
+    } catch {
+      console.warn(`Cleanup failed for PO ${createdPONumber}`);
+    }
+  }
+});
+```
+
+</details>
+
+:::tip[Next steps]
+
+- **[Business Process Examples →](./business-process-examples.md)** — PO, SO, Journal Entry, and P2P end-to-end tests
+- **[Control Interactions →](./control-interactions.md)** — Detailed reference for each `ui5.*` method
+- **[Custom Matchers →](./custom-matchers.md)** — All 10 UI5-specific assertion matchers
+- **[Navigation →](./navigation.md)** — All navigation methods for FLP and BTP WorkZone
+
+:::

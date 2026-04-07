@@ -1,6 +1,6 @@
 ---
 title: Navigation
-description: '9 FLP navigation methods for Praman. Navigate SAP Fiori Launchpad apps by semantic object and action, with BTP WorkZone support.'
+description: '11 FLP navigation methods for Praman. Navigate SAP Fiori Launchpad apps by semantic object and action, with BTP WorkZone support.'
 keywords:
   - sap fiori launchpad automation
   - playwright sap fiori launchpad navigation
@@ -8,9 +8,23 @@ keywords:
   - sap btp workzone testing
 ---
 
-Praman provides 9 navigation functions via the `ui5Navigation` fixture, plus BTP WorkZone
-iframe management via `btpWorkZone`. All navigation uses the FLP's own `hasher` API for
-reliable hash-based routing without full page reloads.
+# Navigation
+
+:::info[In this guide]
+
+- Navigate between SAP Fiori apps without full page reloads
+- Use 11 navigation methods via the `ui5Navigation` and `btpWorkZone` fixtures
+- Manage BTP WorkZone iframe switching with the `btpWorkZone` fixture
+- Understand why `page.goto()` is the wrong approach for FLP navigation
+- Combine shell and workspace interactions in cross-frame tests
+
+:::
+
+Praman provides 11 navigation functions in total: 9 via the `ui5Navigation` fixture
+(`navigateToApp`, `navigateToTile`, `navigateToIntent`, `navigateToHash`, `navigateToHome`,
+`navigateBack`, `navigateForward`, `searchAndOpenApp`, `getCurrentHash`), plus BTP WorkZone
+iframe management via `btpWorkZone` (`getAppFrameForEval`, `getShellFrame`). All navigation
+uses the FLP's own `hasher` API for reliable hash-based routing without full page reloads.
 
 ## Why Not page.goto()?
 
@@ -173,7 +187,7 @@ frame switching transparently.
 
 ### The Frame Structure
 
-```
+```text
 Outer Frame (WorkZone shell)
   └── Inner Frame (workspace / application)
         └── UI5 Application
@@ -214,7 +228,7 @@ test('shell + workspace', async ({ btpWorkZone, ui5Shell, ui5 }) => {
 
 Every navigation call is wrapped in a Playwright `test.step()` for HTML report visibility:
 
-```
+```text
 test 'create purchase order'
   ├── ui5Navigation.navigateToApp: PurchaseOrder-create
   ├── ui5.fill: vendorInput
@@ -250,3 +264,51 @@ test('end-to-end purchase order workflow', async ({ ui5Navigation, ui5, ui5Shell
   expect(homeHash).toContain('Shell-home');
 });
 ```
+
+## FAQ
+
+<details>
+<summary>Why not use page.goto() for SAP Fiori navigation?</summary>
+
+`page.goto()` triggers a full page reload. In SAP Fiori Launchpad, this means the UI5 core
+must re-bootstrap (30-60 seconds on BTP), all OData models are re-initialized, and
+authentication may need to re-negotiate. Praman's navigation functions use
+`window.hasher.setHash()` via `page.evaluate()`, which changes the hash fragment in-place
+without a reload.
+
+</details>
+
+<details>
+<summary>How do I navigate to a specific entity (e.g., a purchase order by number)?</summary>
+
+Use `navigateToIntent` with parameters or `navigateToHash` with a deep link:
+
+```typescript
+// Intent with parameters
+await ui5Navigation.navigateToIntent(
+  { semanticObject: 'PurchaseOrder', action: 'display' },
+  { PurchaseOrder: '4500000001' },
+);
+
+// Direct hash
+await ui5Navigation.navigateToHash("PurchaseOrder-display&/PurchaseOrders('4500000001')");
+```
+
+</details>
+
+<details>
+<summary>Do I need special setup for BTP WorkZone apps?</summary>
+
+Use the `btpWorkZone` fixture. It detects the nested iframe structure automatically and
+ensures `ui5.*` operations target the correct frame. Without it, Playwright targets the outer
+WorkZone shell frame and cannot find UI5 controls rendered inside the inner workspace frame.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Control Interactions →](./control-interactions.md)** — Click, fill, and read controls after navigating
+- **[Business Process Examples →](./business-process-examples.md)** — End-to-end tests with multi-step navigation
+- **[Gold Standard Test Pattern →](./gold-standard-test.md)** — Complete reference test with navigation, interaction, and cleanup
+
+:::

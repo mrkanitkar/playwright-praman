@@ -1,0 +1,12 @@
+{
+  "config": {
+    "extends": "../.markdownlint.jsonc",
+    // Docusaurus: frontmatter title counts as h1, so content may have another h1
+    "MD025": false,
+    // Tables in docs often exceed 200 chars — exclude table lines
+    "MD013": {
+      "line_length": 200,
+      "tables": false
+    }
+  }
+}

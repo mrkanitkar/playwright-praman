@@ -1,6 +1,24 @@
 ---
 title: Typed Control Returns
+description: 'Get full TypeScript autocomplete for 199 SAP UI5 controls. Typed return types from ui5.control() with controlType string literals.'
+keywords:
+  - praman typed controls
+  - sap ui5 typescript autocomplete
+  - playwright ui5 control types
+  - sap ui5 test automation
 ---
+
+# Typed Control Returns
+
+:::info[In this guide]
+
+- Get typed return values from `ui5.control()` with full autocomplete
+- See 15-40+ control-specific methods instead of 10 generic base methods
+- Understand when typing applies and when it falls back to `UI5ControlBase`
+- Use typed controls to eliminate AI agent hallucination of method names
+- Import `UI5ControlMap` for advanced generic helper functions
+
+:::
 
 When you call `ui5.control()` with a `controlType` string, Praman narrows the return type to a
 control-specific TypeScript interface. Instead of a generic `UI5ControlBase` with 10 base methods,
@@ -69,7 +87,7 @@ agent uses that — not hallucinated method names.
 
 Without typed returns, agents see:
 
-```
+```text
 control: UI5ControlBase
   .getId() → Promise<string>
   .getVisible() → Promise<boolean>
@@ -80,7 +98,7 @@ control: UI5ControlBase
 
 With typed returns, agents see:
 
-```
+```text
 btn: UI5Button
   .getText() → Promise<string>
   .getIcon() → Promise<string>
@@ -349,6 +367,24 @@ const custom = await ui5.control({ controlType: 'com.mycompany.CustomInput' });
 const value = await custom.getValue(); // type is Promise<any>
 ```
 
+:::warning[Common mistake]
+Do not use a variable for `controlType` and expect typed returns. TypeScript can only narrow
+the return type when `controlType` is a **string literal**:
+
+```typescript
+// Wrong — variable type is `string`, no narrowing
+const type = 'sap.m.Button';
+const btn = await ui5.control({ controlType: type }); // UI5ControlBase
+
+// Correct — string literal enables type narrowing
+const btn = await ui5.control({ controlType: 'sap.m.Button' }); // UI5Button
+```
+
+If you must use a variable, add `as const`:
+`const type = 'sap.m.Button' as const;`
+
+:::
+
 ## Full Real-World Example
 
 A complete test using typed controls in a SAP Manage Purchase Orders scenario:
@@ -421,3 +457,42 @@ test('verify purchase order details', async ({ ui5, ui5Navigation }) => {
   });
 });
 ```
+
+## FAQ
+
+<details>
+<summary>Do typed returns change the runtime behavior?</summary>
+
+No. Typed returns are purely a TypeScript type-level feature. The same dynamic proxy object is
+returned at runtime. The only difference is that your IDE and AI agents see the exact methods
+available for the specific control type, giving you autocomplete and type checking.
+
+</details>
+
+<details>
+<summary>What happens if I call a method that does not exist on the control?</summary>
+
+The dynamic proxy forwards the call to the browser via `page.evaluate()`. If the method does
+not exist on the UI5 control, the call returns `undefined` or throws a runtime error. With
+typed returns, your IDE warns you about invalid method names at compile time, catching these
+errors before you run the test.
+
+</details>
+
+<details>
+<summary>How do I get typed returns for a control not in the built-in type map?</summary>
+
+Custom or third-party controls fall back to `UI5ControlBase`. Methods still work at runtime
+via the dynamic proxy, but you will not get autocomplete. You can extend `UI5ControlMap` with
+module augmentation if needed, but for most cases the base methods plus
+`getProperty('name')` are sufficient.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Selector Reference →](./selectors.md)** — All UI5Selector fields for finding controls
+- **[Control Interactions →](./control-interactions.md)** — Click, fill, and read controls with the `ui5` fixture
+- **[Custom Matchers →](./custom-matchers.md)** — Assert UI5 control state with 10 built-in matchers
+
+:::

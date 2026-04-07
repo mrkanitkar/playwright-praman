@@ -1,12 +1,27 @@
 ---
 title: 'For SAP Business Analysts'
 description: 'SAP business analysts can define test scenarios in business language. Praman AI agents generate Playwright tests for Purchase-to-Pay, Order-to-Cash, and other SAP processes.'
+keywords:
+  - sap business analyst testing
+  - sap test automation no code
+  - praman ai test generation
+  - sap fiori test scenarios
 ---
 
 You know SAP business processes inside out. You can walk through a Purchase-to-Pay cycle
 in your sleep, spot a missing three-way match before anyone else, and explain why a particular
 approval workflow exists. This guide shows how that knowledge translates directly into
 automated test coverage -- without requiring you to become a programmer.
+
+:::info[In this guide]
+
+- Define test scenarios using business process knowledge -- no programming required
+- Use the AI agent to generate executable tests from plain-language descriptions
+- Read and interpret test results in the Playwright HTML report
+- Map your existing activities (functional specs, UAT, compliance) to test automation artifacts
+- Collaborate effectively with Test Engineers on your team
+
+:::
 
 ## You Don't Need to Code
 
@@ -18,12 +33,12 @@ into executable Playwright tests. Here is how it works:
    plant 1000. Save it and confirm the success message shows a PO number."
 
 2. **The AI agent generates the test.** Praman's agent reads your description, opens the SAP
-   Fiori app in a real browser, discovers the UI controls, and writes a complete Playwright test.
+   Fiori app in a real browser, discovers the UI controls, and writes a complete [Playwright](#glossary-of-technical-terms) test.
 
 3. **The test engineer reviews and commits.** Your team's test engineer validates the generated
-   test, adjusts selectors if needed, and adds it to version control.
+   test, adjusts [selectors](#glossary-of-technical-terms) if needed, and adds it to [version control](#glossary-of-technical-terms).
 
-4. **The test runs automatically.** Every time someone deploys a change, CI/CD runs the test
+4. **The test runs automatically.** Every time someone deploys a change, [CI/CD](#glossary-of-technical-terms) runs the test
    and reports pass or fail -- with screenshots on failure.
 
 You stay in your comfort zone (business process knowledge), and the tooling handles the
@@ -252,6 +267,12 @@ The most effective SAP test automation teams pair a Business Analyst with a Test
 The BA defines _what_ to test and _what the expected outcome is_. The engineer handles _how_
 it gets automated.
 
+:::warning[Common mistake]
+Do not skip the Test Engineer review step. AI-generated tests need a developer to verify that
+selectors match the actual app, test data is valid for your system, and assertions check the
+right business outcomes. Treat generated tests as a strong first draft, not a finished product.
+:::
+
 ## Glossary of Technical Terms
 
 These terms come up frequently in test automation conversations. Each is explained using
@@ -270,12 +291,54 @@ SAP-familiar analogies.
 | **Test Step**   | A named block within a test (`test.step()`). Corresponds to a row in your functional spec -- "Step 3: Enter vendor number." Steps appear as collapsible sections in the report.                                    |
 | **Headed Mode** | Running the browser visibly on screen so you can watch the test execute. Useful for demos and debugging. In CI/CD, tests run "headless" (no visible browser) for speed.                                            |
 
-## Next Steps
+## FAQ
 
-Ready to go deeper? Here is a suggested reading path.
+<details>
+<summary>How do I work with the Test Engineer on my team?</summary>
 
-1. **[Getting Started](./getting-started)** -- Install Praman and run your first test
-2. **[Playwright Primer](./playwright-primer)** -- Ground-up introduction for non-programmers
-3. **[Business Process Examples](./business-process-examples)** -- Complete P2P, O2C, and R2R test examples
-4. **[Running Your Agent](./running-your-agent)** -- Set up and run the AI-powered test generation agent
-5. **[Transaction Mapping](./transaction-mapping)** -- Full SAP transaction to Fiori app mapping reference
+You provide the business knowledge: process descriptions, expected outcomes, edge cases, and
+test data. The Test Engineer handles the technical implementation: writing selectors, configuring
+auth, and setting up CI/CD. The most effective workflow is to write scenario descriptions (plain
+language or spec tables), have the AI agent generate a first draft, then have the engineer review
+and commit the final test.
+
+</details>
+
+<details>
+<summary>Do I need to learn TypeScript?</summary>
+
+No. You can contribute test scenarios in plain language or structured spec tables. The AI agent
+or a Test Engineer translates these into TypeScript test code. However, being able to read
+the commented test examples in this guide helps you validate that the generated test matches
+your intent.
+
+</details>
+
+<details>
+<summary>How do I know if the tests cover my business process?</summary>
+
+The Playwright HTML report shows every test with pass/fail status. Each `test.step()` inside a
+test corresponds to a step in your process (for example, "Fill header data" or "Verify success
+message"). If a step is missing, you can request it be added. Praman's heatmap reporter can also
+visualize which process steps have test coverage and which do not.
+
+</details>
+
+<details>
+<summary>What happens when a test fails?</summary>
+
+A failed test produces a screenshot of the exact browser state at the moment of failure, plus
+a trace file that replays every action, network call, and screen change. You can open these
+in a browser to see exactly what the automated user saw. This is often enough to identify
+whether the failure is a data issue, a missing authorization, or an application bug -- without
+reproducing the problem manually.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Getting Started](./getting-started.md)** -- Install Praman and run your first test
+- **[Playwright Primer](./playwright-primer.md)** -- Ground-up introduction for non-programmers
+- **[Control Interactions](./control-interactions.md)** -- How tests interact with SAP UI5 controls
+
+:::

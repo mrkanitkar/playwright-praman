@@ -1,6 +1,23 @@
 ---
 title: 'Playwright Primer for SAP Testers'
+description: 'Learn Playwright from scratch as an SAP tester. Covers TypeScript basics, async/await, fixtures, assertions, and test structure for Fiori apps.'
+keywords:
+  - playwright tutorial sap testers
+  - sap ecatt to playwright migration
+  - playwright basics for beginners
+  - sap fiori test automation playwright
+  - playwright fixtures tutorial
 ---
+
+:::info[In this guide]
+
+- Understand why Playwright is the right tool for SAP Fiori and UI5 web apps
+- Learn the TypeScript and async/await fundamentals needed for writing tests
+- Write and run your first Playwright test with Praman fixtures
+- Use `test.step()`, assertions, and fixtures to structure SAP test flows
+- Map familiar SAP testing concepts (ECATT, Tosca) to Playwright equivalents
+
+:::
 
 A ground-up introduction to Playwright and Praman for testers coming from SAP testing backgrounds
 (ECATT, Tosca, QTP/UFT, Solution Manager, CBTA). No prior Playwright or programming experience
@@ -117,6 +134,7 @@ declaration and `await` before each browser call.
 Create a file called `tests/hello.test.ts`:
 
 ```typescript
+// tests/hello.test.ts
 import { test, expect } from 'playwright-praman';
 
 test('my first test', async ({ page }) => {
@@ -166,6 +184,7 @@ In ECATT, you might use "variants" to inject test data. In Playwright, **fixture
 pre-configured objects to your tests automatically.
 
 ```typescript
+// tests/fixtures-demo.spec.ts
 import { test, expect } from 'playwright-praman';
 
 test('using fixtures', async ({ ui5, ui5Navigation, sapAuth }) => {
@@ -202,6 +221,7 @@ In ECATT, test scripts have numbered steps. In Playwright, use `test.step()` to 
 same structure.
 
 ```typescript
+// tests/purchase-order.spec.ts
 import { test, expect } from 'playwright-praman';
 
 test('create a purchase order', async ({ ui5, ui5Navigation, fe }) => {
@@ -405,3 +425,91 @@ await ui5Navigation.navigateToHome();
 | Test report                 | `npx playwright show-report` (HTML)                |
 | Reusable component / module | Playwright fixture                                 |
 | Test suite                  | `describe()` block or test file                    |
+
+:::warning[Common mistake]
+Do not forget `await` before browser calls. Every function that interacts with the browser
+(clicking, filling, navigating) returns a Promise. Missing `await` causes the operation to fire
+without waiting for completion, leading to flaky tests and confusing errors.
+
+```typescript
+// Wrong — missing await
+ui5.press({ id: 'saveBtn' }); // Returns immediately, button may not be clicked
+
+// Correct — await pauses until the action completes
+await ui5.press({ id: 'saveBtn' });
+```
+
+:::
+
+## FAQ
+
+<details>
+<summary>Do I need to learn TypeScript before using Praman?</summary>
+
+You need basic TypeScript knowledge — variables, strings, objects, and `async/await`. The
+[Step 3: TypeScript Basics](#step-3-typescript-basics-2-3-hours) section above covers what you need in
+2-3 hours. You do not need advanced TypeScript features like generics, decorators, or type guards.
+
+If you use AI agents to generate tests, you need even less TypeScript knowledge — the agents
+write the code for you. You only need to understand enough to review and modify generated tests.
+
+</details>
+
+<details>
+<summary>What is the difference between page.locator() and ui5.control()?</summary>
+
+`page.locator()` is Playwright's built-in method that finds elements by CSS selectors, text, or
+test IDs in the DOM. It works for any web application.
+
+`ui5.control()` is Praman's method that finds controls through the **UI5 runtime control
+registry**. It uses control types (`sap.m.Button`), properties (`{ text: 'Save' }`), and binding
+paths — not DOM selectors. This is more stable because UI5 control IDs and DOM structure change
+between versions, but the control registry API is the stable contract.
+
+**Rule**: Use `ui5.control()` for all UI5 controls. Use `page.locator()` only for non-UI5 elements
+(plain HTML, FLP shell tabs, iframes).
+
+</details>
+
+<details>
+<summary>How do I run just one test instead of all tests?</summary>
+
+Use the `--grep` flag or specify the test file directly:
+
+```bash
+# Run a specific file
+npx playwright test tests/purchase-order.test.ts
+
+# Run tests matching a name pattern
+npx playwright test --grep "create purchase order"
+
+# Run in debug mode with visible browser
+npx playwright test tests/purchase-order.test.ts --headed --debug
+```
+
+</details>
+
+<details>
+<summary>What happens if my test fails?</summary>
+
+Playwright automatically captures screenshots on failure and generates an HTML report. View it:
+
+```bash
+npx playwright show-report
+```
+
+The report shows the exact step that failed, a screenshot of the browser state, and the error
+message. If you use `test.step()`, the report shows which step failed within the test.
+
+For SAP-specific failures (`ERR_CONTROL_NOT_FOUND`, `ERR_BRIDGE_TIMEOUT`), Praman errors include
+`suggestions[]` with actionable fixes.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Getting Started →](./getting-started)** — Install Praman and generate your first SAP test with AI agents
+- **[Selectors Guide →](./selectors)** — Deep dive into `ui5.control()` selector syntax for SAP controls
+- **[Authentication Guide →](./authentication)** — Configure SAP login for your test environment
+
+:::

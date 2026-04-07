@@ -1,11 +1,26 @@
 ---
 title: 'From Tosca to Playwright-Praman'
 description: 'Migrate from Tricentis Tosca to Playwright + Praman for SAP Fiori and UI5 testing. Concept mapping, workflow changes, and step-by-step migration path.'
+keywords:
+  - tosca to playwright
+  - tosca alternative sap
+  - migrate tosca tests
+  - sap test automation open source
 ---
 
-A comprehensive guide for teams migrating from Tricentis Tosca to Playwright + Praman for
-SAP Fiori and UI5 web application testing. Covers concept mapping, workflow changes, and
-practical code examples.
+A guide for teams migrating from Tricentis Tosca to Playwright + Praman for SAP Fiori and
+UI5 web application testing. Covers concept mapping, workflow changes, and practical code
+examples.
+
+:::info[In this guide]
+
+- Map 25 Tosca concepts (TestCase, Module, TCD, Recovery Scenario) to Playwright equivalents
+- Convert Tosca TestCases with Modules and ActionModes into TypeScript test files
+- Replace Tosca workspace versioning with Git-based version control and code review
+- Transition from per-user licensing to open-source tooling (Apache 2.0)
+- Keep Tosca for SAP GUI testing while using Praman for Fiori/UI5 web apps
+
+:::
 
 ## Quick Comparison
 
@@ -199,25 +214,25 @@ test('create PO via intent API', async ({ intent }) => {
 
 ### Suggested Team Transition Plan
 
-**Week 1-2: Foundation**
+#### Week 1-2: Foundation
 
 - Install Node.js, VS Code, and Playwright on developer machines
 - Complete the [Playwright Primer](./playwright-primer) (2-3 hours per person)
 - Set up a Git repository for the test project
 
-**Week 3-4: First Tests**
+#### Week 3-4: First Tests
 
 - Convert 3-5 Tosca TestCases from a single Fiori app to Praman tests
 - Set up authentication via setup projects
 - Run tests locally and review the HTML report
 
-**Week 5-6: CI Integration**
+#### Week 5-6: CI Integration
 
 - Add `npx playwright test` to your CI/CD pipeline
 - Configure `screenshot: 'only-on-failure'` and `trace: 'on-first-retry'`
 - Set up environment variables for SAP credentials in CI secrets
 
-**Week 7-8: Scale**
+#### Week 7-8: Scale
 
 - Convert remaining Tosca TestCases in priority order
 - Adopt Fiori Elements helpers (`fe.listReport`, `fe.objectPage`) for standard Fiori apps
@@ -318,6 +333,12 @@ test('create PO', async ({ ui5, ui5Navigation }) => {
 });
 ```
 
+:::warning[Common mistake]
+Do not try to replicate Tosca's modular structure by creating one TypeScript file per Module. In Playwright,
+a test file contains complete test scenarios with `test.step()` blocks for structure. Shared logic goes into
+helper functions, not separate test files. This keeps tests self-contained and easier to debug.
+:::
+
 ## Quick Reference Card
 
 | I want to...        | Tosca                             | Praman                                                   |
@@ -333,3 +354,52 @@ test('create PO', async ({ ui5, ui5Navigation }) => {
 | Run in CI           | Tosca CI adapter + DEX            | `npx playwright test` in any CI                          |
 | Parameterize data   | TestCaseDesign (TCD)              | `for (const row of data) { test(...) }`                  |
 | Handle errors       | Recovery Scenario                 | Fixture teardown + `test.afterEach()`                    |
+
+## FAQ
+
+<details>
+<summary>Why move from a GUI-based tool to coded tests?</summary>
+
+Coded tests in Git provide benefits that GUI-based test management cannot: readable diffs on every
+change, pull request reviews before tests go live, branch-based parallel development, and seamless
+CI/CD integration without proprietary adapters. Your test logic becomes a first-class software
+artifact with full version history.
+
+</details>
+
+<details>
+<summary>Can I keep Tosca for SAP GUI and use Praman for Fiori?</summary>
+
+Yes. Tosca's SAP GUI engine has no equivalent in Playwright. Many teams run Tosca for SAP GUI
+transactions (SE38, SM30, etc.) and Praman for browser-based Fiori/UI5 apps. Both test suites
+can run in the same CI pipeline and report results independently.
+
+</details>
+
+<details>
+<summary>Do I need programming experience to use Praman?</summary>
+
+Basic TypeScript knowledge is needed to write and maintain tests. However, if your team includes
+a Test Engineer, Business Analysts can define scenarios in plain language and have the engineer
+translate them into code. Praman's AI agent can also generate tests from natural-language
+descriptions. See the [SAP Business Analyst Guide](./sap-business-analyst-guide.md) for details.
+
+</details>
+
+<details>
+<summary>How does Tosca's TestCaseDesign (TCD) map to Praman?</summary>
+
+TCD provides data-driven testing with parameterized test data. In Playwright, you define test data
+as arrays or load from CSV/JSON files, then loop over them with `for (const row of data) { test(...) }`.
+Each data combination becomes a separate named test in the report. See the "Test Data Parameterization"
+section above for a complete example.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Getting Started](./getting-started.md)** -- Install Praman and run your first SAP UI5 test
+- **[Selectors](./selectors.md)** -- Learn the full `UI5Selector` syntax for targeting controls
+- **[Control Interactions](./control-interactions.md)** -- Click, fill, select, and assert on UI5 controls
+
+:::

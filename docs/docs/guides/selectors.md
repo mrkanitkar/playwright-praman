@@ -8,8 +8,41 @@ keywords:
   - sap ui5 test automation
 ---
 
+# Selector Reference
+
+:::info[In this guide]
+
+- Choose the right selector fields for your use case
+- Find controls by ID, type, properties, binding path, and ancestry
+- Scope selectors to views and dialogs
+- Use the CSS-style `ui5=` locator syntax as an alternative
+- Avoid brittle DOM-based selectors
+
+:::
+
 Selectors are the primary way to find UI5 controls on a page. Praman uses `UI5Selector` objects
 that query the UI5 runtime's control registry — not the DOM.
+
+:::warning[Common mistake]
+Do not use DOM IDs (e.g., `#__xmlview0--btn1`) as selectors. UI5 generates these IDs at
+runtime and they change across views, components, and UI5 versions. Always use the control's
+stable ID or other semantic selector fields.
+
+```typescript
+// Wrong — brittle runtime-generated DOM ID
+await ui5.control({ id: '__xmlview0--btn1' });
+
+// Correct — stable application ID
+await ui5.control({ id: 'saveBtn' });
+
+// Better — semantic selector resilient to ID changes
+await ui5.control({
+  controlType: 'sap.m.Button',
+  properties: { text: 'Save' },
+});
+```
+
+:::
 
 :::info Locator Syntax
 You can also find controls using CSS-style syntax with `page.locator('ui5=...')`.
@@ -34,6 +67,29 @@ and positional pseudo-classes. See [Finding Controls with Locators](./locator-se
 | `searchOpenDialogs` | `boolean`                 | Also search controls inside open dialogs                                                                                                                                      |
 
 All fields are optional. At least one must be provided.
+
+### Which selector fields do I need?
+
+Use this decision tree to pick the most resilient selector for your situation:
+
+```text
+Do you know the control's stable ID?
+  ├── YES → Is the ID unique across all views?
+  │          ├── YES → Use { id: 'myId' }
+  │          └── NO  → Add viewName: { id: 'myId', viewName: 'app.view.Detail' }
+  │
+  └── NO  → Do you know the OData binding path?
+             ├── YES → Use { controlType, bindingPath }
+             │         (most resilient — survives ID refactoring)
+             │
+             └── NO  → Do you know a unique property value?
+                        ├── YES → Use { controlType, properties }
+                        │         e.g., { controlType: 'sap.m.Button', properties: { text: 'Save' } }
+                        │
+                        └── NO  → Is the control inside a specific parent?
+                                   ├── YES → Use { controlType, ancestor }
+                                   └── NO  → Use { controlType, viewName }
+```
 
 ## Examples
 
@@ -205,3 +261,66 @@ export default defineConfig({
   discoveryStrategies: ['direct-id', 'recordreplay'],
 });
 ```
+
+## FAQ
+
+<details>
+<summary>Can I use a RegExp for the id field?</summary>
+
+Yes. RegExp IDs are useful when the control ID includes a view prefix that may change:
+
+```typescript
+await ui5.control({ id: /vendorInput/ });
+```
+
+This matches any control whose ID contains `vendorInput`, such as
+`myApp--detailView--vendorInput`. RegExp selectors are more resilient than exact ID strings
+but less precise — ensure the pattern is specific enough to match only one control.
+
+</details>
+
+<details>
+<summary>When should I use bindingPath instead of properties?</summary>
+
+Use `bindingPath` when you want to find a control by its OData model binding rather than its
+displayed value. This is more resilient because binding paths are defined in the XML view and
+do not change with i18n translations or user data. For example,
+`{ bindingPath: { value: '/PurchaseOrder/Vendor' } }` finds the vendor input regardless of
+what text it currently displays.
+
+</details>
+
+<details>
+<summary>How do I find controls inside a dialog?</summary>
+
+Add `searchOpenDialogs: true` to your selector. Without this flag, the discovery engine only
+searches the main view's control tree and skips controls rendered in overlay dialogs.
+
+```typescript
+await ui5.control({
+  controlType: 'sap.m.Button',
+  properties: { text: 'Confirm' },
+  searchOpenDialogs: true,
+});
+```
+
+</details>
+
+<details>
+<summary>What is the difference between ancestor and descendant?</summary>
+
+`ancestor` scopes the search to controls that have a matching parent higher in the tree.
+`descendant` finds controls that contain a matching child. Use `ancestor` when you know the
+parent container (e.g., find an Input inside a specific Table). Use `descendant` when you
+know the child content (e.g., find a Form that contains a specific Input).
+
+</details>
+
+:::tip[Next steps]
+
+- **[Finding Controls with Locators →](./locator-selector-syntax.md)** — CSS-style `ui5=` selector syntax for `page.locator()`
+- **[Control Interactions →](./control-interactions.md)** — Click, fill, and read controls after finding them
+- **[Typed Control Returns →](./typed-controls.md)** — Get full autocomplete when using `controlType`
+- **[Discovery and Interaction Strategies →](./discovery-and-interaction.md)** — How the multi-strategy discovery chain works
+
+:::

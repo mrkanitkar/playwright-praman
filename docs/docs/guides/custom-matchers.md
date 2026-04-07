@@ -8,6 +8,24 @@ keywords:
   - sap ui5 test automation
 ---
 
+# Custom Matchers
+
+:::info[In this guide]
+
+- Assert UI5 control state with 10 purpose-built matchers
+- Understand why DOM-based assertions break on i18n changes and async updates
+- Use auto-retrying matchers that poll the UI5 runtime until timeout
+- Extend assertions with `expect.poll()` for custom UI5 checks
+- Compare Praman matchers with Playwright built-in matchers
+
+:::
+
+Standard Playwright assertions like `expect(text).toBe('Active')` break when your SAP app
+runs in a different locale, because the displayed text changes with i18n translations.
+DOM-based checks like `expect(locator).toBeEnabled()` can also produce false positives
+when a control appears enabled in the DOM but is disabled in the UI5 model during a pending
+OData operation.
+
 Praman extends Playwright's `expect()` with 10 UI5-specific matchers that query control state
 directly from the UI5 runtime. These matchers check the **UI5 model/control state**, not the
 DOM — which is the source of truth in SAP applications.
@@ -58,7 +76,7 @@ await expect(page).toHaveUI5Text('headerTitle', /Purchase Order/);
 
 **Error message preview:**
 
-```
+```text
 Expected: "Purchase Order Details"
 Received: "Sales Order Details"
 Control: headerTitle (sap.m.Title)
@@ -248,6 +266,21 @@ test('validate purchase order form', async ({ ui5, page }) => {
 });
 ```
 
+:::warning[Common mistake]
+Do not pass a Locator to Praman matchers. Unlike Playwright's built-in matchers, Praman
+matchers receive a **control ID string** and are called on `page`:
+
+```typescript
+// Wrong — Praman matchers do not accept Locator objects
+const locator = page.locator('ui5=sap.m.Button#saveBtn');
+await expect(locator).toBeUI5Enabled(); // Does not work
+
+// Correct — pass the control ID string to page
+await expect(page).toBeUI5Enabled('saveBtn');
+```
+
+:::
+
 ## Registration
 
 Matchers are auto-registered via the `matcherRegistration` worker-scoped auto-fixture. No setup
@@ -257,3 +290,51 @@ code is needed — just import `{ expect }` from `playwright-praman` and the mat
 import { test, expect } from 'playwright-praman';
 // All 10 matchers are ready to use
 ```
+
+## FAQ
+
+<details>
+<summary>Do Praman matchers auto-retry like Playwright matchers?</summary>
+
+Yes. All 10 matchers are registered as async custom matchers. They query the UI5 runtime via
+`page.evaluate()` on each poll iteration, and Playwright's `expect()` auto-retries until the
+configured timeout (default 5 seconds). You can increase the timeout per assertion:
+`await expect(page).toHaveUI5Text('field', 'value', { timeout: 15_000 })`.
+
+</details>
+
+<details>
+<summary>Can I use Playwright built-in matchers alongside Praman matchers?</summary>
+
+Yes. Use Praman matchers when checking UI5 model/control state (e.g., `toBeUI5Enabled`,
+`toHaveUI5Text`). Use Playwright matchers when checking DOM-level rendering (e.g.,
+`toBeVisible` for CSS visibility, `toHaveURL` for page URL, `toHaveTitle` for page title).
+Both work in the same test.
+
+</details>
+
+<details>
+<summary>How do I assert a property that has no built-in matcher?</summary>
+
+Use `toHaveUI5Property` for any named property, or `expect.poll()` for fully custom checks:
+
+```typescript
+// Named property
+await expect(page).toHaveUI5Property('myInput', 'placeholder', 'Enter value');
+
+// Custom poll
+await expect.poll(async () => {
+  const ctrl = await ui5.control({ id: 'myInput' });
+  return ctrl.getProperty('valueStateText');
+}).toBe('Required field');
+```
+
+</details>
+
+:::tip[Next steps]
+
+- **[Control Interactions →](./control-interactions.md)** — Click, fill, and read controls before asserting state
+- **[Gold Standard Test Pattern →](./gold-standard-test.md)** — See matchers used in a complete reference test
+- **[Selector Reference →](./selectors.md)** — Find the right control to assert against
+
+:::

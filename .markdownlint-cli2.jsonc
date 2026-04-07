@@ -13,7 +13,7 @@
     "prompts/**",
     "docs/mcp-sap-docs-setup.md",
     "docs/capabilities.md",
-    "docs/docs/**",
+    "docs/docs/api/**",
     "temp/**",
     "examples/**",
     "praman-audit-report/**",

@@ -29,7 +29,7 @@ function HowItWorks(): ReactNode {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginTop: '2.5rem' }}>
         <DemoStep step="1" title="Install Praman" desc="npm install playwright-praman — one package, 6 sub-path exports, zero config." />
         <DemoStep step="2" title="Configure Your SAP System" desc="Point to your SAP S/4HANA or ECC system. Set auth credentials. Define your FLP entry point." />
-        <DemoStep step="3" title="Write or Generate Tests" desc="Use AI agents to auto-generate tests or write them manually with 21 typed fixtures. ui5, odata, sapAuth — just destructure." />
+        <DemoStep step="3" title="Write or Generate Tests" desc="Use AI agents to auto-generate tests or write them manually with 17 typed fixtures. ui5, odata, sapAuth — just destructure." />
         <DemoStep step="4" title="Run with Evidence" desc="npx playwright test — parallel execution, compliance reports, business flow heatmaps, data integrity validation." />
       </div>
     </section>
