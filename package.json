@@ -200,6 +200,7 @@
   "devDependencies": {
     "@anthropic-ai/sdk": "0.82.0",
     "@arethetypeswrong/cli": "0.18.2",
+    "@babel/plugin-proposal-decorators": "7.29.0",
     "@commitlint/cli": "20.5.0",
     "@commitlint/config-conventional": "20.5.0",
     "@cyclonedx/cyclonedx-npm": "4.2.1",
@@ -210,6 +211,7 @@
     "@opentelemetry/sdk-node": "0.214.0",
     "@playwright/cli": "0.1.5",
     "@playwright/test": "1.59.1",
+    "@rolldown/plugin-babel": "0.2.2",
     "@size-limit/file": "12.0.1",
     "@ui5/mcp-server": "0.2.10",
     "@vitest/coverage-v8": "4.1.2",
@@ -245,7 +247,6 @@
     "typedoc-plugin-markdown": "4.11.0",
     "typescript": "6.0.2",
     "typescript-eslint": "8.58.0",
-    "vite-tsconfig-paths": "6.1.1",
     "vitest": "4.1.2",
     "yaml": "2.8.3",
     "zod-to-json-schema": "^3.25.1"

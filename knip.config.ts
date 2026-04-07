@@ -43,6 +43,8 @@ const config: KnipConfig = {
     '@opentelemetry/sdk-node',
     // Peer dep + devDep used in CLI init commands; knip can't trace dynamic usage
     '@playwright/cli',
+    // Loaded dynamically by @rolldown/plugin-babel via string name, not import
+    '@babel/plugin-proposal-decorators',
   ],
   ignoreBinaries: ['docusaurus', 'playwright-praman'],
   rules: {

@@ -1,11 +1,34 @@
-import tsconfigPaths from 'vite-tsconfig-paths';
+import babel from '@rolldown/plugin-babel';
 import { defineConfig } from 'vitest/config';
+
+/**
+ * Babel preset that lowers TC39 Stage 3 decorators (`@ui5Step`) for Vite 8.
+ *
+ * Vite 8 replaced esbuild with OXC for TS transforms. OXC does not yet
+ * support TC39 decorators (oxc-project/oxc#9170). The official migration
+ * path is `@rolldown/plugin-babel` with a code filter so only files
+ * containing `@` are processed — minimal perf impact.
+ */
+function tc39Decorators() {
+  return {
+    preset: () => ({
+      plugins: [['@babel/plugin-proposal-decorators', { version: '2023-11' }]],
+    }),
+    rolldown: {
+      filter: { code: '@' },
+    },
+  };
+}
 
 export default defineConfig({
   define: {
     __PRAMAN_VERSION__: JSON.stringify('0.0.0-test'),
   },
-  plugins: [tsconfigPaths()],
+  plugins: [babel({ presets: [tc39Decorators()] })],
+  // Vite 8 natively resolves tsconfig paths — replaces vite-tsconfig-paths plugin
+  resolve: {
+    tsconfigPaths: true,
+  },
   test: {
     include: ['tests/unit/**/*.test.ts'],
     exclude: ['tests/integration/**', 'tests/e2e/**'],
