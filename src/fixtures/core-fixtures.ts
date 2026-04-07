@@ -86,6 +86,27 @@ import type { TracerWrapper } from '#core/telemetry/index.js';
 const MIN_PLAYWRIGHT_VERSION = '1.57.0';
 
 /**
+ * Lazy-cached selector engine bundle source.
+ * Read once per Node.js process (not per Playwright worker) to avoid redundant disk I/O.
+ */
+let cachedEngineBundleSource: string | undefined;
+
+/**
+ * Read and cache the pre-built ui5-engine.js browser bundle.
+ *
+ * @returns The bundle source string wrapped for Playwright selector registration.
+ */
+function getEngineBundleSource(): string {
+  if (cachedEngineBundleSource === undefined) {
+    const distDir = dirname(fileURLToPath(import.meta.url));
+    const enginePath = resolve(distDir, 'browser', 'ui5-engine.js');
+    const bundleSource = readFileSync(enginePath, 'utf-8');
+    cachedEngineBundleSource = `(() => { const module = {exports: {}}; ${bundleSource}; return module.exports.default })()`;
+  }
+  return cachedEngineBundleSource;
+}
+
+/**
  * Test-scoped fixture types for the core layer.
  *
  * @remarks
@@ -244,19 +265,13 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
 
   selectorRegistration: [
     async ({ playwright }, use) => {
-      // Content-based registration: read the pre-built unified browser bundle.
+      // Content-based registration: use the lazy-cached pre-built browser bundle.
       // The bundle is a CJS module that assigns `module.exports.default` to the
       // Playwright SelectorEngine ({query, queryAll}). We wrap it in an IIFE that
       // creates a `module` shim and returns the default export — same pattern as
       // playwright-ui5.
-      // After tsup bundles into dist/index.js, import.meta.url → dist/.
-      // The browser bundle lives at dist/browser/ui5-engine.js — one level down.
-      const distDir = dirname(fileURLToPath(import.meta.url));
-      const enginePath = resolve(distDir, 'browser', 'ui5-engine.js');
-
       try {
-        const bundleSource = readFileSync(enginePath, 'utf-8');
-        const wrappedSource = `(() => { const module = {exports: {}}; ${bundleSource}; return module.exports.default })()`;
+        const wrappedSource = getEngineBundleSource();
         await playwright.selectors.register('ui5', { content: wrappedSource });
       } catch (error: unknown) {
         const isAlreadyRegistered =

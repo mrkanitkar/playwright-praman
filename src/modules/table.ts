@@ -24,14 +24,33 @@ import { TimeoutError } from '#core/errors/timeout-error.js';
 import { createLogger } from '#core/logging/index.js';
 import { DEFAULT_TIMEOUTS } from '#core/utils/constants.js';
 
-/** @example `const v: TableVariant = 'sap.m.Table';` */
-export type TableVariant =
-  | 'sap.m.Table'
-  | 'sap.ui.table.Table'
-  | 'sap.ui.table.TreeTable'
-  | 'sap.ui.table.AnalyticalTable'
-  | 'sap.ui.comp.smarttable.SmartTable'
-  | 'sap.ui.mdc.Table';
+/**
+ * All supported SAP UI5 table variant class names.
+ *
+ * @remarks
+ * Single source of truth — the {@link TableVariant} type is derived from this array.
+ * Adding or removing a variant here automatically updates the union type.
+ *
+ * @example `VALID_VARIANTS.includes('sap.m.Table') // true`
+ */
+const VALID_VARIANTS = [
+  'sap.m.Table',
+  'sap.ui.table.Table',
+  'sap.ui.table.TreeTable',
+  'sap.ui.table.AnalyticalTable',
+  'sap.ui.comp.smarttable.SmartTable',
+  'sap.ui.mdc.Table',
+] as const;
+
+/**
+ * Union of all 6 supported SAP UI5 table variant class names.
+ *
+ * @remarks
+ * Derived from {@link VALID_VARIANTS} — the const tuple is the single source of truth.
+ *
+ * @example `const v: TableVariant = 'sap.m.Table';`
+ */
+export type TableVariant = (typeof VALID_VARIANTS)[number];
 
 /** @example `const o: TableOptions = { timeout: 5000 };` */
 export interface TableOptions {
@@ -105,19 +124,23 @@ export interface TablePage {
   ): Promise<unknown>;
 }
 
-const VALID_VARIANTS: readonly string[] = [
-  'sap.m.Table',
-  'sap.ui.table.Table',
-  'sap.ui.table.TreeTable',
-  'sap.ui.table.AnalyticalTable',
-  'sap.ui.comp.smarttable.SmartTable',
-  'sap.ui.mdc.Table',
-];
-const GRID_VARIANTS: readonly string[] = [
+const GRID_VARIANTS: readonly TableVariant[] = [
   'sap.ui.table.Table',
   'sap.ui.table.TreeTable',
   'sap.ui.table.AnalyticalTable',
 ];
+
+/**
+ * Type guard narrowing a string to {@link TableVariant}.
+ *
+ * @param variant - The string to check.
+ * @returns `true` if the string is a valid table variant.
+ *
+ * @example `if (isTableVariant(name)) { /* name is TableVariant *\/ }`
+ */
+function isTableVariant(variant: string): variant is TableVariant {
+  return (VALID_VARIANTS as readonly string[]).includes(variant);
+}
 
 function iife(body: string, fallback: string): string {
   return `(function(){try{${body}}catch(e){return ${fallback};}})()`;
@@ -200,27 +223,28 @@ export async function detectTableType(page: TablePage, tableId: string): Promise
       suggestions: ['Verify the table control ID exists in the UI5 view'],
     });
   }
-  if (!VALID_VARIANTS.includes(result.variant)) {
+  const { variant } = result;
+  if (!isTableVariant(variant)) {
     throw new ControlError({
       code: ErrorCode.ERR_CONTROL_NOT_FOUND,
-      message: `Control is not a table variant: ${result.variant}`,
+      message: `Control is not a table variant: ${variant}`,
       attempted: `detectTableType(${tableId})`,
       retryable: false,
-      details: { actualType: result.variant },
+      details: { actualType: variant },
       suggestions: ['Verify the control ID points to a table, not another control type'],
     });
   }
   if (result.kind === 'smart') {
     return {
       kind: 'smart',
-      variant: result.variant as TableVariant,
+      variant,
       effectiveId: result.effectiveId,
       smartTableId: result.smartTableId ?? result.effectiveId,
     };
   }
   return {
     kind: 'standard',
-    variant: result.variant as TableVariant,
+    variant,
     effectiveId: result.effectiveId,
   };
 }
