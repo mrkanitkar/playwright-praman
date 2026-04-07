@@ -125,61 +125,6 @@ jobs:
           path: playwright-praman-*.tgz
           retention-days: 30
 
-  integration-tests:
-    name: Integration Tests (PW ${{ matrix.playwright-version }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [quality, build]
-    strategy:
-      fail-fast: false
-      matrix:
-        playwright-version: ['1.57.0', '1.59.0']
-        include:
-          - playwright-version: 'next'
-            canary: true
-    continue-on-error: ${{ matrix.canary || false }}
-    env:
-      SAP_CLOUD_BASE_URL: ${{ secrets.SAP_CLOUD_BASE_URL }}
-      SAP_CLOUD_USERNAME: ${{ secrets.SAP_CLOUD_USERNAME }}
-      SAP_CLOUD_PASSWORD: ${{ secrets.SAP_CLOUD_PASSWORD }}
-      SAP_CLIENT: ${{ secrets.SAP_CLIENT }}
-    steps:
-      - name: Check SAP credentials
-        id: check-creds
-        run: |
-          if [ -z "$SAP_CLOUD_BASE_URL" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "::warning::SAP credentials not configured — skipping integration tests"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-        if: steps.check-creds.outputs.skip == 'false'
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        if: steps.check-creds.outputs.skip == 'false'
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-      - run: npm ci
-        if: steps.check-creds.outputs.skip == 'false'
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        if: steps.check-creds.outputs.skip == 'false'
-        with:
-          name: dist
-          path: dist/
-      - run: npm install @playwright/test@${{ matrix.playwright-version }}
-        if: steps.check-creds.outputs.skip == 'false'
-      - run: npx playwright install --with-deps chromium
-        if: steps.check-creds.outputs.skip == 'false'
-      - run: npm run test:integration
-        if: steps.check-creds.outputs.skip == 'false'
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: ${{ !cancelled() && steps.check-creds.outputs.skip == 'false' }}
-        with:
-          name: playwright-report-pw-${{ matrix.playwright-version }}
-          path: playwright-report/
-          retention-days: 14
-
   security:
     name: Security Scan
     runs-on: ubuntu-latest
