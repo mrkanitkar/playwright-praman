@@ -17,7 +17,10 @@
 import type { Page } from '@playwright/test';
 import { test, expect } from '@playwright/test';
 
-import type { ControlDiscoveryResult, MethodExecutionResult } from '../../../src/bridge/bridge-types.js';
+import type {
+  ControlDiscoveryResult,
+  MethodExecutionResult,
+} from '../../../src/bridge/bridge-types.js';
 import { createExecuteMethodScript } from '../../../src/bridge/browser-scripts/execute-method.js';
 import { createFindControlScript } from '../../../src/bridge/browser-scripts/find-control.js';
 import { injectBridge } from '../../../src/bridge/injection.js';
@@ -29,7 +32,6 @@ import { navigateAndWaitForUI5 } from '../helpers/ui5-wait.js';
 /** Inject arguments into an IIFE string by replacing the trailing `})()` invocation. */
 function injectArgs(iife: string, ...args: unknown[]): string {
   const serialized = args.map((a) => JSON.stringify(a)).join(', ');
-  // eslint-disable-next-line unicorn/prefer-string-replace-all -- regex anchor $ required to replace only the trailing ()
   return iife.replace(/\)\(\)$/, `)( ${serialized})`);
 }
 
@@ -45,14 +47,13 @@ async function evalExec(
   methodName: string,
   args: unknown[] = [],
 ): Promise<MethodExecutionResult> {
-  return page.evaluate<MethodExecutionResult>(injectArgs(createExecuteMethodScript(), controlId, methodName, args));
+  return page.evaluate<MethodExecutionResult>(
+    injectArgs(createExecuteMethodScript(), controlId, methodName, args),
+  );
 }
 
 /** Helper to find first control of a given type. */
-async function findFirstControl(
-  page: Page,
-  controlType: string,
-): Promise<ControlDiscoveryResult> {
+async function findFirstControl(page: Page, controlType: string): Promise<ControlDiscoveryResult> {
   return evalFind(page, { controlType });
 }
 
