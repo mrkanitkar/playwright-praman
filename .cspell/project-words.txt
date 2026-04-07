@@ -103,6 +103,7 @@ eamodio
 embedder
 endo
 errorlens
+esbenp
 fctrl
 fitems
 fontoxpath
