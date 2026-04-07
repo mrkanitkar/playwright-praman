@@ -10,6 +10,17 @@
 /**
  * Browser scripts for UI5 control method execution (string-form).
  *
+ * @intent Enable method invocation on UI5 controls from Node.js test code by
+ * generating self-contained JavaScript strings that execute inside the browser via
+ * `page.evaluate()`. The 7-type return detection (A.4) is necessary because UI5
+ * methods return diverse types — primitives, the same control (setter chaining),
+ * different controls (navigation), aggregation arrays, and non-serializable objects
+ * (e.g., `sap.ui.model.Context`). Each type requires different proxy-side handling:
+ * primitives pass through, controls become sub-proxies, and non-serializable objects
+ * are stored in the bridge's UUID-keyed object map. Special-case handling (A.6) for
+ * ComboBox and PlanningCalendar corrects ID mismatches caused by SAP's internal
+ * list-item wrapping and CLI-suffix conventions.
+ *
  * @remarks
  * Generates JavaScript strings for executing methods on UI5 controls and
  * non-control objects with 7-type return detection (A.4) and special-case
