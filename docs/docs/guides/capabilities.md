@@ -60,7 +60,9 @@ const value = await control.getValue();
 
 ### 10 Custom UI5 Matchers
 
-Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visible`, `toBeUI5Enabled`, `toHaveUI5Property`, `toHaveUI5ValueState`, `toHaveUI5Binding`, `toBeUI5ControlType`, `toHaveUI5RowCount`, `toHaveUI5CellText`, `toHaveUI5SelectedRows`.
+Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visible`,
+`toBeUI5Enabled`, `toHaveUI5Property`, `toHaveUI5ValueState`, `toHaveUI5Binding`,
+`toBeUI5ControlType`, `toHaveUI5RowCount`, `toHaveUI5CellText`, `toHaveUI5SelectedRows`.
 
 ## SAP UI5 Control Support
 

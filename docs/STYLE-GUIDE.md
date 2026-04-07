@@ -142,6 +142,7 @@ See [Locator Selector Syntax](./locator-selector-syntax.md).
 ```
 
 Rules:
+
 - Minimum 3 questions per guide page
 - Phrase questions as a user would search for them
 - Include code examples in answers when relevant
@@ -181,6 +182,7 @@ cd docs && npx markdownlint-cli2 "docs/guides/**/*.md"
 ```
 
 Key rules enforced:
+
 - MD040: All code blocks must have a language specifier
 - MD013: Lines under 200 chars (tables excluded)
 - MD001: Heading levels increment by one

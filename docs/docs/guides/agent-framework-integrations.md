@@ -5,10 +5,16 @@ title: Integrating with AI Agent Frameworks
 # Integrating with AI Agent Frameworks
 
 :::info Roadmap
-Native integrations with the frameworks below are **on the Praman roadmap**. The architecture and adapter contracts described on this page reflect the planned design. Community contributions and early feedback are welcome — open a discussion on [GitHub](https://github.com/mrkanitkar/playwright-praman/discussions).
+Native integrations with the frameworks below are **on the Praman roadmap**. The architecture
+and adapter contracts described on this page reflect the planned design. Community contributions
+and early feedback are welcome — open a discussion on
+[GitHub](https://github.com/mrkanitkar/playwright-praman/discussions).
 :::
 
-Praman is designed from the ground up as an AI-first plugin. Its structured outputs — `AiResponse<T>` envelopes, `IntentDescriptor` payloads, capability manifests, and vocabulary graphs — map naturally onto the tool-call and agent-step patterns used by modern AI orchestration frameworks.
+Praman is designed from the ground up as an AI-first plugin. Its structured outputs —
+`AiResponse<T>` envelopes, `IntentDescriptor` payloads, capability manifests, and vocabulary
+graphs — map naturally onto the tool-call and agent-step patterns used by modern AI
+orchestration frameworks.
 
 This page describes the planned integration model for five major frameworks, explains what each integration will look like in practice, and lists the capabilities each adapter will expose.
 
@@ -38,13 +44,17 @@ All framework adapters will follow the same two-layer model:
 └──────────────────────────────────────────────────────────────┘
 ```
 
-Each adapter will expose Praman's SAP operations as **typed tool definitions** that the framework's orchestrator can call, chain, and retry. The browser state (Playwright `Page`) is kept alive across agent steps using the same fixture injection model Praman already uses.
+Each adapter will expose Praman's SAP operations as **typed tool definitions** that the
+framework's orchestrator can call, chain, and retry. The browser state (Playwright `Page`)
+is kept alive across agent steps using the same fixture injection model Praman already uses.
 
 ---
 
 ## LangGraph
 
-[LangGraph](https://www.langchain.com/langgraph) (LangChain) models multi-step agent workflows as typed state machines where each node is a callable tool or sub-graph. Praman maps directly onto this model — each UI5 operation is a node with clearly typed inputs and outputs.
+[LangGraph](https://www.langchain.com/langgraph) (LangChain) models multi-step agent workflows
+as typed state machines where each node is a callable tool or sub-graph. Praman maps directly
+onto this model — each UI5 operation is a node with clearly typed inputs and outputs.
 
 ### Planned Capabilities
 
@@ -90,14 +100,19 @@ const graph = new StateGraph({ channels: { messages: { value: [] } } })
 ```
 
 :::tip Why LangGraph fits SAP workflows
-SAP processes are inherently stateful and branching — a BOM creation may succeed, fail with a validation error, or require a different plant/material combination. LangGraph's conditional edges and interrupt/resume model handles this naturally without hard-coded `if/else` chains in test scripts.
+SAP processes are inherently stateful and branching — a BOM creation may succeed, fail with
+a validation error, or require a different plant/material combination. LangGraph's conditional
+edges and interrupt/resume model handles this naturally without hard-coded `if/else` chains
+in test scripts.
 :::
 
 ---
 
 ## AutoGen (Microsoft)
 
-[AutoGen](https://microsoft.github.io/autogen/) is Microsoft's open-source framework for building multi-agent systems where specialized agents collaborate to complete complex tasks. Its conversational agent model aligns with Praman's planner → generator → healer pipeline.
+[AutoGen](https://microsoft.github.io/autogen/) is Microsoft's open-source framework for building
+multi-agent systems where specialized agents collaborate to complete complex tasks. Its
+conversational agent model aligns with Praman's planner → generator → healer pipeline.
 
 ### Planned Capabilities
 
@@ -137,7 +152,9 @@ const sapTools = createAutoGenTools(page, ui5);
 
 ## Microsoft Agent Framework (Semantic Kernel)
 
-[Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/overview/) is Microsoft's SDK for building AI-powered applications with plugins, planners, and memory. Praman's capability registry and vocabulary system are designed to expose as Semantic Kernel plugins.
+[Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/overview/) is Microsoft's SDK
+for building AI-powered applications with plugins, planners, and memory. Praman's capability
+registry and vocabulary system are designed to expose as Semantic Kernel plugins.
 
 ### Planned Capabilities
 
@@ -180,7 +197,9 @@ kernel.addPlugin(new SapUi5Plugin(page, ui5), 'SapUI5');
 
 ## OpenAI Agents SDK
 
-The [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/) (previously Swarm) provides a lightweight framework for building agents that hand off between each other and call registered tools. Praman tools map directly onto the SDK's function-tool model.
+The [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/) (previously Swarm)
+provides a lightweight framework for building agents that hand off between each other and call
+registered tools. Praman tools map directly onto the SDK's function-tool model.
 
 ### Planned Capabilities
 
@@ -225,7 +244,10 @@ const tools = createOpenAITools(page, ui5);
 
 ## Google Agent Development Kit (ADK)
 
-[Google's Agent Development Kit](https://google.github.io/adk-docs/) (ADK) is Google's open-source framework for building and deploying multi-agent systems, with first-class support for tool use, multi-agent pipelines, and Vertex AI integration. The ADK's `BaseTool` interface is a natural fit for Praman's typed SAP tools.
+[Google's Agent Development Kit](https://google.github.io/adk-docs/) (ADK) is Google's open-source
+framework for building and deploying multi-agent systems, with first-class support for tool use,
+multi-agent pipelines, and Vertex AI integration. The ADK's `BaseTool` interface is a natural
+fit for Praman's typed SAP tools.
 
 ### Planned Capabilities
 
@@ -284,7 +306,9 @@ The ADK integration will support Vertex AI backends, enabling teams to run the p
 
 ## Playwright CLI Integration
 
-In addition to the framework adapters above, Praman supports a **Playwright CLI** integration path. The CLI is a token-efficient alternative to MCP where agents invoke `npx playwright` commands directly instead of connecting through a persistent server.
+In addition to the framework adapters above, Praman supports a **Playwright CLI** integration
+path. The CLI is a token-efficient alternative to MCP where agents invoke `npx playwright`
+commands directly instead of connecting through a persistent server.
 
 | Integration            | Connection Model     | Token Efficiency | Best For                                     |
 | ---------------------- | -------------------- | ---------------- | -------------------------------------------- |
@@ -300,7 +324,8 @@ See the [CLI Agents Guide](./playwright-cli-agents.md) for building agent loops 
 
 ## Current Workaround: Use Praman Agents Directly
 
-While framework-native adapters are in development, you can orchestrate Praman's three agents today using **Claude Code MCP**, **Playwright CLI**, or **GitHub Copilot Agent Mode** with the included agent definitions:
+While framework-native adapters are in development, you can orchestrate Praman's three agents today
+using **Claude Code MCP**, **Playwright CLI**, or **GitHub Copilot Agent Mode** with the included agent definitions:
 
 ```text
 .github/agents/praman-sap-planner.agent.md

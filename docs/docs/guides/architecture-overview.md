@@ -8,7 +8,7 @@ Praman v1.0 ships as a single npm package (`playwright-praman`) with sub-path ex
 
 ## 6-Layer Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Test Author / AI Agent                                                 │
 │  import { test, expect } from 'playwright-praman'                      │

@@ -5,7 +5,9 @@ title: 'Bridge Internals'
 # Bridge Internals
 
 :::info[Contributor Only]
-This page documents Praman's internal bridge architecture. The APIs shown here use internal path aliases (`#bridge/*`) and are not accessible to end users of the `playwright-praman` package. This content is intended for contributors and plugin developers.
+This page documents Praman's internal bridge architecture. The APIs shown here use internal
+path aliases (`#bridge/*`) and are not accessible to end users of the `playwright-praman` package.
+This content is intended for contributors and plugin developers.
 :::
 
 The bridge is the communication layer between Praman's Node.js test code and the SAP UI5 framework running in the browser. Understanding its internals is essential for debugging and extending Praman.
@@ -132,7 +134,7 @@ const result = await page.evaluate(findScript);
 
 The bridge provides a centralized `getById()` function that resolves UI5 control IDs using three fallback tiers:
 
-```
+```text
 Tier 1: Element.getElementById()     (UI5 1.108+)
 Tier 2: ElementRegistry.get()         (UI5 1.84+)
 Tier 3: sap.ui.getCore().byId()      (All versions)
@@ -144,7 +146,7 @@ This is registered once during injection. All browser scripts call `bridge.getBy
 
 SAP BTP WorkZone (formerly Fiori Launchpad as a Service) renders applications inside nested iframes. Praman handles this transparently:
 
-```
+```text
 +----------------------------------+
 | Shell Frame (WorkZone chrome)    |
 |  +----------------------------+  |
@@ -154,7 +156,9 @@ SAP BTP WorkZone (formerly Fiori Launchpad as a Service) renders applications in
 +----------------------------------+
 ```
 
-The bridge must be injected into the **app frame**, not the shell frame. Praman's fixture layer automatically detects the WorkZone dual-frame layout and targets the correct frame for bridge injection and control operations.
+The bridge must be injected into the **app frame**, not the shell frame. Praman's fixture layer
+automatically detects the WorkZone dual-frame layout and targets the correct frame for bridge
+injection and control operations.
 
 After frame navigation (e.g., navigating between Fiori Launchpad tiles), the bridge state in the previous frame is invalidated. The injection tracking resets and re-injects on the next operation.
 

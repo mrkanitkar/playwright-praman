@@ -30,7 +30,7 @@ When you call a method on the proxy (e.g., `button.getText()`), the proxy's `get
 2. Checks if the method is **blacklisted** (lifecycle/internal methods)
 3. If neither, forwards the call to the browser via `page.evaluate()`
 
-```
+```text
 Node.js                          Browser
 ───────                          ───────
 button.getText()
