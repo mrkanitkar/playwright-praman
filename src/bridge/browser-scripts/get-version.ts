@@ -44,10 +44,7 @@ export function createGetVersionScript(): string {
             return info.version;
           }
         }
-        if (sap.ui.Global && sap.ui.Global.version) {
-          return sap.ui.Global.version;
-        }
-      }
+}
       return '0.0.0';
     } catch (e) {
       return '0.0.0';
