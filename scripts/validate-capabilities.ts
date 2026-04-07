@@ -1,61 +1,46 @@
 #!/usr/bin/env tsx
 /**
- * Validate that capabilities.yaml entries reference real source-code methods.
+ * Validate that capabilities.yaml entries reference real source-code methods,
+ * and that public exports have @capability TSDoc tags.
  *
  * Cross-references YAML entries against @capability TSDoc tags in source files.
- * Exits with code 1 if YAML validation fails. Exits with code 0 otherwise
- * (WARN entries are acceptable — they just mean no @capability tag yet).
+ * Detects exports missing @capability tags and validates tag format.
+ *
+ * Flags:
+ *   --strict   Exit with code 1 if any export is missing @capability or
+ *              any tag value does not match a qualifiedName in capabilities.yaml.
  *
  * Run: npm run validate:capabilities
+ *      npm run validate:capabilities -- --strict
  */
 
 import { readFileSync } from 'node:fs';
-import { resolve, relative } from 'node:path';
+import { resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
-import { globSync } from 'glob';
 
 import { CapabilitiesYamlSchema } from '../src/ai/schemas/capability.schema.js';
 import type { CapabilitiesYaml } from '../src/ai/schemas/capability.schema.js';
+import {
+  scanSourceForCapabilityTags,
+  scanExportsForCapabilityTags,
+  computeDirectoryCoverage,
+  validateTagFormat,
+  GREEN,
+  YELLOW,
+  CYAN,
+  RED,
+  DIM,
+  RESET,
+  BOLD,
+} from './capability-validation-utils.js';
+import type { SourceCapability } from './capability-validation-utils.js';
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
 const ROOT = resolve(import.meta.dirname ?? '.', '..');
 const CAPABILITIES_YAML = resolve(ROOT, 'capabilities.yaml');
 const SRC_GLOB = 'src/**/*.ts';
-
-/**
- * Regex to capture @capability tag content on a single line in a TSDoc comment.
- * Captures everything after `@capability ` until end of line.
- */
-const CAPABILITY_TAG_REGEX = /@capability\s+(.+)/g;
-
-/* ── ANSI colors ─────────────────────────────────────────────────────────── */
-
-const GREEN = '\u001B[32m';
-const YELLOW = '\u001B[33m';
-const CYAN = '\u001B[36m';
-const RED = '\u001B[31m';
-const DIM = '\u001B[2m';
-const RESET = '\u001B[0m';
-const BOLD = '\u001B[1m';
-
-/* ── Types ───────────────────────────────────────────────────────────────── */
-
-interface SourceCapability {
-  /** The raw text after @capability tag */
-  readonly tagText: string;
-  /** Relative file path from project root */
-  readonly file: string;
-  /** Line number where the tag appears */
-  readonly line: number;
-}
-
-interface ValidationCounts {
-  pass: number;
-  warn: number;
-  info: number;
-  total: number;
-}
+const IS_STRICT = process.argv.includes('--strict');
 
 /* ── Step 1: Read and validate capabilities.yaml ─────────────────────────── */
 
@@ -82,39 +67,8 @@ function readAndValidateYaml(): CapabilitiesYaml | null {
   }
 }
 
-/* ── Step 2: Scan source files for @capability tags ──────────────────────── */
+/* ── Step 2: Cross-reference YAML ↔ source tags ─────────────────────────── */
 
-function scanSourceForCapabilityTags(): SourceCapability[] {
-  const sourceFiles = globSync(SRC_GLOB, { cwd: ROOT, absolute: true });
-  const capabilities: SourceCapability[] = [];
-
-  for (const filePath of sourceFiles) {
-    const content = readFileSync(filePath, 'utf-8');
-    const lines = content.split('\n');
-
-    for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-      const line = lines[lineIndex] ?? '';
-      CAPABILITY_TAG_REGEX.lastIndex = 0;
-      const match = CAPABILITY_TAG_REGEX.exec(line);
-      if (match !== null) {
-        const tagText = match[1]?.trim() ?? '';
-        capabilities.push({
-          tagText,
-          file: relative(ROOT, filePath),
-          line: lineIndex + 1,
-        });
-      }
-    }
-  }
-
-  return capabilities;
-}
-
-/* ── Step 3: Cross-reference ─────────────────────────────────────────────── */
-
-/**
- * Check if a YAML capability's qualifiedName or name appears in any @capability tag.
- */
 function findMatchingTag(
   qualifiedName: string,
   name: string,
@@ -122,14 +76,10 @@ function findMatchingTag(
 ): SourceCapability | undefined {
   return sourceTags.find((tag) => {
     const tagLower = tag.tagText.toLowerCase();
-    // Check if qualifiedName or name appears in the tag text
     return tagLower.includes(qualifiedName.toLowerCase()) || tagLower.includes(name.toLowerCase());
   });
 }
 
-/**
- * Check if a source @capability tag matches any YAML entry.
- */
 function isTagReferencedInYaml(tag: SourceCapability, yamlData: CapabilitiesYaml): boolean {
   const tagLower = tag.tagText.toLowerCase();
   return yamlData.capabilities.some((entry) => {
@@ -140,25 +90,24 @@ function isTagReferencedInYaml(tag: SourceCapability, yamlData: CapabilitiesYaml
   });
 }
 
-/* ── Step 4: Print report ────────────────────────────────────────────────── */
+interface CrossRefCounts {
+  pass: number;
+  warn: number;
+  info: number;
+  total: number;
+}
 
-function printReport(
+function printCrossRefReport(
   yamlData: CapabilitiesYaml,
   sourceTags: readonly SourceCapability[],
-): ValidationCounts {
-  const counts: ValidationCounts = {
-    pass: 0,
-    warn: 0,
-    info: 0,
-    total: yamlData.capabilities.length,
-  };
+): CrossRefCounts {
+  const counts: CrossRefCounts = { pass: 0, warn: 0, info: 0, total: yamlData.capabilities.length };
 
   console.log(
-    `${BOLD}Cross-referencing ${String(yamlData.capabilities.length)} YAML entries against ${String(sourceTags.length)} source @capability tags...${RESET}`,
+    `${BOLD}Cross-referencing ${String(counts.total)} YAML entries against ${String(sourceTags.length)} source @capability tags...${RESET}`,
   );
   console.log();
 
-  // Check each YAML entry against source tags
   for (const entry of yamlData.capabilities) {
     const match = findMatchingTag(entry.qualifiedName, entry.name, sourceTags);
     if (match !== undefined) {
@@ -176,7 +125,6 @@ function printReport(
 
   console.log();
 
-  // Check for orphaned @capability tags (in source but not in YAML)
   const orphanedTags = sourceTags.filter((tag) => !isTagReferencedInYaml(tag, yamlData));
   if (orphanedTags.length > 0) {
     counts.info = orphanedTags.length;
@@ -193,41 +141,111 @@ function printReport(
   return counts;
 }
 
-function printSummary(counts: ValidationCounts): void {
+/* ── Step 3: Export coverage + format validation ─────────────────────────── */
+
+function printExportCoverageReport(root: string): { missing: number; total: number } {
+  console.log(`${BOLD}Scanning exports for @capability tags...${RESET}`);
+  const exports = scanExportsForCapabilityTags(root, SRC_GLOB);
+  const missing = exports.filter((e) => !e.hasCapabilityTag);
+
+  console.log(`  Found ${String(exports.length)} exports, ${String(missing.length)} missing @capability`);
+  console.log();
+
+  if (missing.length > 0) {
+    console.log(`${BOLD}Exports missing @capability tag:${RESET}`);
+    console.log();
+    for (const exp of missing) {
+      console.log(`  ${YELLOW}\u26A0${RESET} ${exp.file}:${String(exp.line)} ${DIM}${exp.name}${RESET}`);
+    }
+    console.log();
+  }
+
+  // Per-directory coverage table
+  const coverage = computeDirectoryCoverage(exports);
+  console.log(`${BOLD}Per-directory coverage:${RESET}`);
+  console.log();
+  console.log(`  ${'Directory'.padEnd(25)} ${'Tagged'.padStart(7)} ${'Total'.padStart(7)} ${'Coverage'.padStart(9)}`);
+  console.log(`  ${'-'.repeat(25)} ${'-'.repeat(7)} ${'-'.repeat(7)} ${'-'.repeat(9)}`);
+  for (const dir of coverage) {
+    const color = dir.coveragePercent >= 90 ? GREEN : dir.coveragePercent >= 50 ? YELLOW : RED;
+    console.log(
+      `  ${dir.directory.padEnd(25)} ${String(dir.taggedExports).padStart(7)} ${String(dir.totalExports).padStart(7)} ${color}${String(dir.coveragePercent).padStart(8)}%${RESET}`,
+    );
+  }
+  console.log();
+
+  return { missing: missing.length, total: exports.length };
+}
+
+function printFormatValidationReport(
+  sourceTags: readonly SourceCapability[],
+  yamlData: CapabilitiesYaml,
+): number {
+  const qualifiedNames = new Set(yamlData.capabilities.map((c) => c.qualifiedName));
+  const invalid = validateTagFormat(sourceTags, qualifiedNames);
+
+  if (invalid.length > 0) {
+    console.log(`${BOLD}Tags not matching any qualifiedName in capabilities.yaml:${RESET}`);
+    console.log();
+    for (const tag of invalid) {
+      console.log(
+        `  ${RED}\u2717${RESET} ${tag.file}:${String(tag.line)} ${DIM}@capability ${tag.tagText}${RESET}`,
+      );
+    }
+    console.log();
+  }
+
+  return invalid.length;
+}
+
+/* ── Step 4: Summary ─────────────────────────────────────────────────────── */
+
+function printSummary(
+  crossRef: CrossRefCounts,
+  exportStats: { missing: number; total: number },
+  invalidFormat: number,
+): void {
   console.log(`${BOLD}${'='.repeat(60)}${RESET}`);
   console.log(`${BOLD}Summary${RESET}`);
   console.log(`${'='.repeat(60)}`);
-  console.log(`  Total YAML entries:  ${String(counts.total)}`);
-  console.log(`  ${GREEN}\u2713 PASS${RESET} (matched):     ${String(counts.pass)}`);
-  console.log(`  ${YELLOW}\u26A0 WARN${RESET} (no tag):      ${String(counts.warn)}`);
-  console.log(`  ${CYAN}i INFO${RESET} (orphan tags):  ${String(counts.info)}`);
+  console.log(`  YAML entries:           ${String(crossRef.total)}`);
+  console.log(`  ${GREEN}\u2713 PASS${RESET} (YAML↔source):   ${String(crossRef.pass)}`);
+  console.log(`  ${YELLOW}\u26A0 WARN${RESET} (no source tag): ${String(crossRef.warn)}`);
+  console.log(`  ${CYAN}i INFO${RESET} (orphan tags):    ${String(crossRef.info)}`);
+  console.log();
+  console.log(`  Exports scanned:        ${String(exportStats.total)}`);
+  console.log(`  Exports missing tag:    ${String(exportStats.missing)}`);
+  console.log(`  Invalid tag format:     ${String(invalidFormat)}`);
   console.log(`${'='.repeat(60)}`);
   console.log();
 
-  if (counts.warn > 0) {
-    console.log(
-      `${YELLOW}Note: ${String(counts.warn)} YAML entries have no @capability tag in source.${RESET}`,
-    );
-    console.log(`${DIM}This is OK — add @capability TSDoc tags to improve traceability.${RESET}`);
+  if (IS_STRICT && (exportStats.missing > 0 || invalidFormat > 0)) {
+    console.log(`${RED}STRICT MODE: Validation FAILED.${RESET}`);
+    if (exportStats.missing > 0) {
+      console.log(`  ${RED}${String(exportStats.missing)} exports missing @capability tag.${RESET}`);
+    }
+    if (invalidFormat > 0) {
+      console.log(`  ${RED}${String(invalidFormat)} tags do not match a qualifiedName.${RESET}`);
+    }
     console.log();
-  }
-
-  if (counts.info > 0) {
-    console.log(
-      `${CYAN}Note: ${String(counts.info)} source @capability tags have no matching YAML entry.${RESET}`,
-    );
-    console.log(
-      `${DIM}Consider adding these to capabilities.yaml if they represent public API.${RESET}`,
-    );
-    console.log();
+    process.exitCode = 1;
+    return;
   }
 
   console.log(`${GREEN}Validation passed.${RESET}`);
+  if (IS_STRICT) {
+    console.log(`${DIM}(strict mode — all checks passed)${RESET}`);
+  }
 }
 
 /* ── Main ─────────────────────────────────────────────────────────────────── */
 
 function main(): void {
+  if (IS_STRICT) {
+    console.log(`${BOLD}${CYAN}Running in --strict mode${RESET}`);
+    console.log();
+  }
+
   // Step 1: Read and validate YAML
   const yamlData = readAndValidateYaml();
   if (yamlData === null) {
@@ -241,20 +259,22 @@ function main(): void {
   );
   console.log();
 
-  // Step 2: Scan source files
+  // Step 2: Scan source tags and cross-reference
   console.log(`${BOLD}Scanning source files for @capability tags...${RESET}`);
-  const sourceTags = scanSourceForCapabilityTags();
+  const sourceTags = scanSourceForCapabilityTags(ROOT, SRC_GLOB);
   console.log(`  Found ${String(sourceTags.length)} @capability tags in source`);
   console.log();
 
-  // Step 3 & 4: Cross-reference and print report
-  const counts = printReport(yamlData, sourceTags);
+  const crossRef = printCrossRefReport(yamlData, sourceTags);
 
-  // Step 5: Print summary
-  printSummary(counts);
+  // Step 3: Export coverage
+  const exportStats = printExportCoverageReport(ROOT);
 
-  // Exit 0 — YAML is valid. WARN entries are acceptable.
-  process.exitCode = 0;
+  // Step 4: Format validation
+  const invalidFormat = printFormatValidationReport(sourceTags, yamlData);
+
+  // Step 5: Summary
+  printSummary(crossRef, exportStats, invalidFormat);
 }
 
 main();

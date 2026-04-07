@@ -109,6 +109,7 @@ async function stabilityWait(
 /**
  * Navigates to an FLP Space Tab by its visible title text.
  *
+ * @capability ui5Navigation.navigateToApp
  * @intent Navigate to a specific Space Tab in the modern FLP layout.
  * Use when the SAP FLP uses Space-based navigation (IconTabFilter tabs at the top).
  *
@@ -173,6 +174,7 @@ export async function navigateToSpace(
 /**
  * Navigates via an FLP Section Link in a Space-based layout.
  *
+ * @capability ui5Navigation.navigateToApp
  * @intent Click a section link within a Space to navigate to a specific area.
  * Use after navigating to a Space when the target content is in a specific section.
  *

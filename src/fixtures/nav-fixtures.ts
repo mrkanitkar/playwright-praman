@@ -317,6 +317,8 @@ export interface NavWorkerDeps {
  * (WorkZone manager). Dependencies from coreTest (`pramanConfig`,
  * `rootLogger`) are declared as option placeholders.
  *
+ * @capability ui5Navigation.navigateToApp
+ *
  * @example
  * ```typescript
  * import { navTest } from '#fixtures/nav-fixtures.js';

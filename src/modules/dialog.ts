@@ -182,6 +182,7 @@ function dialogScanScript(titleFilter: string, typeFilter: string, returnAll: bo
 /**
  * Waits for a dialog to appear in the UI5 static UI area.
  *
+ * @capability ui5.dialog.waitFor
  * @intent Wait for a UI5 dialog to open, optionally filtering by title or type.
  * Use before interacting with any dialog content.
  * @guarantee On success, returns a DialogInfo for the first matching open dialog.
@@ -242,6 +243,7 @@ export async function waitForDialog(
 /**
  * Returns all currently open dialogs in the UI5 static UI area.
  *
+ * @capability ui5.dialog.getOpen
  * @intent List all currently open dialogs for inspection or decision-making.
  * @guarantee Returns an array of DialogInfo objects for all open dialogs (empty array if none).
  * @ai
@@ -265,6 +267,7 @@ export async function getOpenDialogs(page: DialogPage): Promise<readonly DialogI
 /**
  * Checks whether a specific dialog (by ID) is currently open.
  *
+ * @capability ui5.dialog.isOpen
  * @intent Check if a known dialog is currently open, by its UI5 control ID.
  * @guarantee Returns true if the dialog is open, false otherwise (including when control not found).
  * @ai
@@ -294,6 +297,7 @@ export async function isDialogOpen(page: DialogPage, dialogId: string): Promise<
 /**
  * Dismisses (closes) the topmost dialog, or a dialog matching the given title.
  *
+ * @capability ui5.dialog.dismiss
  * @intent Close the topmost open dialog without confirming its action.
  * @guarantee On success, the dialog's close() method has been called and UI5 is stable.
  * @ai
@@ -332,6 +336,7 @@ export async function dismissDialog(page: DialogPage, options?: FindDialogOption
 /**
  * Confirms a dialog by pressing its begin button or a button matching common confirm labels.
  *
+ * @capability ui5.dialog.confirm
  * @intent Confirm (accept) the topmost dialog by pressing its primary action button.
  * @guarantee On success, the dialog's begin button or a confirm-label button has been pressed.
  * @recipe Multi-step dialog confirmation:
@@ -428,6 +433,7 @@ function buildDefaultBtnScript(id: string): string {
 /**
  * Waits for a specific dialog to be closed.
  *
+ * @capability ui5.dialog.waitForClosed
  * @intent Wait until a specific dialog is no longer open.
  * @guarantee On success, the dialog's isOpen() returns false or the control no longer exists.
  * @ai
@@ -478,6 +484,7 @@ export async function waitForDialogClosed(
 /**
  * Returns all buttons within a dialog (beginButton, endButton, and buttons aggregation).
  *
+ * @capability ui5.dialog.getButtons
  * @intent List all buttons available in a dialog for inspection or custom interaction.
  * @guarantee Returns an array of button objects with id, text, and type (empty array if no buttons).
  * @ai

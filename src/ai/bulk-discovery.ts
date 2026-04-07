@@ -468,7 +468,7 @@ function browserDiscoverControls(args: BrowserArgs): {
  *   `'error'` with a recoverable error payload.
  *
  * @intent Enumerate all UI5 controls for AI-driven selector generation.
- * @capability ui5-bulk-discovery
+ * @capability pramanAI.discoverPage
  * @sapModule All
  *
  * @example

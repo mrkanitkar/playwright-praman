@@ -65,7 +65,7 @@ import type { VocabularyService } from '../vocabulary/types.js';
  * agentic handler, LLM service, context builder, and vocabulary service.
  *
  * @intent Provide unified AI capabilities to Playwright tests via a single fixture.
- * @capability ai-fixture, ai-context-building, ai-agentic-handler
+ * @capability pramanAI.agentic
  *
  * @example
  * ```typescript
@@ -141,7 +141,7 @@ export interface AIFixtures {
  * at runtime, not at module load.
  *
  * @intent Expose AI capabilities to Playwright tests
- * @capability ai-fixture
+ * @capability pramanAI.capabilities
  *
  * @example
  * ```typescript

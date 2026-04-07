@@ -539,6 +539,8 @@ function serializeSelectorSegments(selector: UI5Selector): string {
 /**
  * Converts a structured {@link UI5Selector} into a CSS-like pseudo-class selector string.
  *
+ * @capability selectors.serializeUI5SelectorToCSS
+ *
  * @remarks
  * This is the inverse of what the CSS selector engine parses. The output format
  * uses pseudo-class syntax like `:type(sap.m.Button):prop(text, "Save")`.

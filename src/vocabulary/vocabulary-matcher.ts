@@ -129,6 +129,8 @@ function normalize(text: string): string {
 /**
  * Compute confidence for matching `query` against `candidate`.
  *
+ * @capability pramanAI.vocabulary
+ *
  * @remarks
  * Confidence tiers (in priority order):
  * 1. Exact match → 1.0
@@ -173,6 +175,8 @@ export function computeConfidence(query: string, candidate: string): number {
 /**
  * Compute the best confidence for a term given a normalized query.
  *
+ * @capability pramanAI.vocabulary
+ *
  * @remarks
  * Checks the canonical name first (full confidence), then each synonym
  * (synonym exact = 1.0, not penalized — synonyms are first-class names).
@@ -201,6 +205,8 @@ export function scoreTerm(query: string, term: VocabularyTerm): number {
 
 /**
  * Search a collection of terms for those matching `query`.
+ *
+ * @capability pramanAI.vocabulary
  *
  * @remarks
  * Returns all terms with confidence above zero, sorted descending by confidence.
@@ -247,6 +253,8 @@ export function matchTerms(
 
 /**
  * Resolve a single field selector from a list of search results.
+ *
+ * @capability pramanAI.vocabulary
  *
  * @remarks
  * Implements the disambiguation logic:

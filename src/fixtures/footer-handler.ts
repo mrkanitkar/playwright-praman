@@ -59,6 +59,8 @@ export interface FooterHandlerOptions {
  * @ai
  * @aiContext Use to click standard footer bar buttons (Save, Edit, etc.).
  *
+ * @capability ui5Footer.clickSave
+ *
  * @remarks
  * Provides convenience methods for common footer bar actions: Save, Apply,
  * Cancel, Edit, Delete, Create. Each method delegates to a shared

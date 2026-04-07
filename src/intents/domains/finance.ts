@@ -86,6 +86,7 @@ function fiResult<T>(params: {
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create and post a general-ledger journal entry.
+ * @capability intent.finance.createJournalEntry
  * @sapModule FI
  * @businessContext FB50 — enter G/L account document.
  *
@@ -191,6 +192,7 @@ export async function createJournalEntry(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Post a vendor invoice for accounts payable.
+ * @capability intent.finance.postVendorInvoice
  * @sapModule FI
  * @businessContext FB60 — enter vendor invoice.
  *
@@ -280,6 +282,7 @@ export async function postVendorInvoice(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Process an outgoing payment for a vendor.
+ * @capability intent.finance.processPayment
  * @sapModule FI
  * @businessContext F-53 / Manage Payment Runs — outgoing payment.
  *

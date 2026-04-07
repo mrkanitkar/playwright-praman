@@ -76,6 +76,7 @@ function sdResult<T>(params: {
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create a sales order from structured input data.
+ * @capability intent.sales.createSalesOrder
  * @sapModule SD
  * @businessContext VA01 — create sales order.
  *
@@ -172,6 +173,7 @@ export async function createSalesOrder(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Create a sales quotation from structured input data.
+ * @capability intent.sales.createQuotation
  * @sapModule SD
  * @businessContext VA21 — create quotation.
  *
@@ -251,6 +253,7 @@ export async function createQuotation(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Approve a sales quotation via the FLP workflow.
+ * @capability intent.sales.approveQuotation
  * @sapModule SD
  * @businessContext VA23 / Manage Quotations — approval action.
  *
@@ -298,6 +301,7 @@ export async function approveQuotation(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Search sales orders using smart filter bar criteria.
+ * @capability intent.sales.searchSalesOrders
  * @sapModule SD
  * @businessContext VA05 / Manage Sales Orders — list search.
  *
@@ -342,6 +346,7 @@ export async function searchSalesOrders(
  * @returns `IntentResult` describing the outcome.
  *
  * @intent Search customer master records via the FLP list app.
+ * @capability intent.sales.searchCustomers
  * @sapModule SD
  * @businessContext XD03 / Manage Customers — customer search.
  *
@@ -384,6 +389,7 @@ export async function searchCustomers(
  * @returns `IntentResult<string>` where `data` is the delivery status text.
  *
  * @intent Read the delivery status of a sales order.
+ * @capability intent.sales.checkDeliveryStatus
  * @sapModule SD
  * @businessContext VL06O / Manage Outbound Deliveries — status check.
  *

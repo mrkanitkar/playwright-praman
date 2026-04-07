@@ -117,6 +117,8 @@ interface ControlTreeDeps {
  * The result is attached as `'ui5-control-tree'` (application/json) for
  * the {@link ControlTreeReporter} and Playwright trace viewer to consume.
  *
+ * @capability ui5.inspect
+ *
  * @example
  * ```typescript
  * import { controlTreeTest } from '#fixtures/control-tree-fixtures.js';

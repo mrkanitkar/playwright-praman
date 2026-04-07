@@ -218,6 +218,8 @@ class VocabularyServiceImpl implements VocabularyService {
 /**
  * Create a new {@link VocabularyService} instance.
  *
+ * @capability pramanAI.vocabulary
+ *
  * @remarks
  * Returns a fresh service with no domains loaded. Call {@link VocabularyService.loadDomain}
  * before searching.

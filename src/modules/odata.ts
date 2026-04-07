@@ -158,6 +158,7 @@ function modelArg(modelName: string | undefined): string {
 /**
  * Retrieves data from a UI5 OData model at the given path.
  *
+ * @capability ui5.odata.getModelData
  * @intent Read data from the UI5 OData model at a specific binding path.
  * @guarantee On success, returns the data at the path (array, object, or primitive) from the model.
  * @ai
@@ -224,6 +225,7 @@ export async function getModelData(
 /**
  * Reads a single property from a UI5 OData model.
  *
+ * @capability ui5.odata.getModelProperty
  * @intent Read a specific property value from the OData model.
  * @guarantee On success, returns the property value at the path, or undefined if not found.
  * @ai
@@ -287,6 +289,7 @@ export async function getModelProperty(
 /**
  * Waits for OData data to load by polling a binding path.
  *
+ * @capability ui5.odata.waitForLoad
  * @intent Wait until OData data is loaded at a specific binding path.
  * @guarantee On success, the model has non-null data at the specified path.
  * @prerequisite An OData model must be configured on the component.
@@ -352,6 +355,7 @@ export async function waitForODataLoad(
 /**
  * Fetches a CSRF token from an OData service using a HEAD request.
  *
+ * @capability ui5.odata.fetchCSRFToken
  * @intent Fetch a CSRF token for subsequent write operations (POST/PATCH/DELETE).
  * @guarantee On success, returns a valid CSRF token string.
  * @prerequisite The user session must be authenticated against the OData service.
@@ -434,6 +438,7 @@ export async function fetchCSRFToken(
 /**
  * Reads the number of entities in a binding from the UI5 model.
  *
+ * @capability ui5.odata.getEntityCount
  * @intent Count the number of entities at a specific OData model path.
  * @guarantee Returns the array length at the path, or 0 if data is not an array or not loaded.
  * @ai
@@ -481,6 +486,7 @@ export async function getEntityCount(
 /**
  * Checks whether the UI5 OData model has unsaved (pending) changes.
  *
+ * @capability ui5.odata.hasPendingChanges
  * @intent Check if the OData model has unsaved changes (dirty state).
  * @guarantee Returns true if model.hasPendingChanges() is true, false otherwise (including when model is not found).
  * @ai

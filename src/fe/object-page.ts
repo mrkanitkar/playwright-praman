@@ -130,6 +130,7 @@ export async function getObjectPageLayout(
 /** Navigates to a specific section within the Object Page by title or ID.
  *
  * @intent Scroll to and activate a specific section on the Object Page.
+ * @capability fe.objectPage.navigateToSection
  *
  * @param page - Page to evaluate on.
  * @param sectionIdentifier - Section title or ID.
@@ -169,6 +170,7 @@ export async function navigateToSection(
 /** Reads form field data from a section of the Object Page.
  *
  * @intent Extract all form field key-value pairs from an Object Page section.
+ * @capability fe.objectPage.getSectionData
  *
  * @param page - Page to evaluate on.
  * @param sectionIdentifier - Section title or ID.
@@ -206,6 +208,7 @@ export async function getSectionData(
 /** Clicks a button in the Object Page header actions or footer bar.
  *
  * @intent Click a named button in the Object Page header or footer toolbar.
+ * @capability fe.objectPage.clickButton
  *
  * @param page - Page to evaluate on.
  * @param buttonName - Text label of the button.
@@ -246,6 +249,7 @@ export async function clickObjectPageButton(
 /** Clicks the "Edit" button on the Object Page.
  *
  * @intent Switch the Object Page to edit mode by clicking the Edit button.
+ * @capability fe.objectPage.clickEdit
  *
  * @example
  * ```typescript
@@ -262,6 +266,7 @@ export async function clickEditButton(
 /** Clicks the "Save" button on the Object Page.
  *
  * @intent Persist changes by clicking the Save button on the Object Page footer.
+ * @capability fe.objectPage.clickSave
  *
  * @example
  * ```typescript
@@ -278,6 +283,7 @@ export async function clickSaveButton(
 /** Returns all sections in the Object Page with visibility, index, and sub-sections.
  *
  * @intent List all sections in the Object Page layout for discovery or assertion.
+ * @capability fe.objectPage.getSections
  *
  * @param page - Page to evaluate on.
  * @returns Array of section descriptors.
@@ -295,6 +301,7 @@ export async function getObjectPageSections(
 /** Returns the header title of the Object Page.
  *
  * @intent Read the Object Page header title for assertion or identification.
+ * @capability fe.objectPage.getHeaderTitle
  *
  * @param page - Page to evaluate on.
  * @returns The header title string, or empty string if not found.
@@ -310,6 +317,7 @@ export async function getHeaderTitle(page: ObjectPagePage): Promise<string> {
 /** Checks whether the Object Page is currently in edit mode.
  *
  * @intent Determine the current edit/display state of the Object Page.
+ * @capability fe.objectPage.isInEditMode
  *
  * @remarks Checks `showFooter` property and `ui` model `/editable`/`/editMode`.
  * @param page - Page to evaluate on.

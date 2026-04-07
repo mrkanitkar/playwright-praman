@@ -170,7 +170,7 @@ function makeIntentResult<T>(params: {
  * @returns An `IntentResult<void>` describing the outcome.
  *
  * @intent Fill a form field by business-readable label.
- * @capability Decouples tests from hard-coded control IDs.
+ * @capability intent.core.fillField
  *
  * @example
  * ```typescript
@@ -230,7 +230,7 @@ export async function fillField(
  * @returns An `IntentResult<void>` describing the outcome.
  *
  * @intent Click a button by its visible label, not by ID.
- * @capability Works across locales when button text is locale-stable.
+ * @capability intent.core.clickButton
  *
  * @example
  * ```typescript
@@ -263,7 +263,7 @@ export async function clickButton(ui5: UI5HandlerSlice, text: string): Promise<I
  * @returns An `IntentResult<void>` describing the outcome.
  *
  * @intent Select a dropdown option by business field label.
- * @capability Avoids hard-coded control IDs in test code.
+ * @capability intent.core.selectOption
  *
  * @example
  * ```typescript
@@ -325,7 +325,7 @@ export async function selectOption(
  *   `status` is `'error'` when the term is not found or the value does not match.
  *
  * @intent Assert a field value by business label without knowing the control ID.
- * @capability Enables readable, maintainable assertions in E2E tests.
+ * @capability intent.core.assertField
  *
  * @example
  * ```typescript
@@ -405,7 +405,7 @@ export async function assertField(
  * @returns An `IntentResult<void>` describing the outcome.
  *
  * @intent Confirm a dialog or message box and wait for the UI to settle.
- * @capability Handles both SAP standard 'OK' and custom 'Confirm' button labels.
+ * @capability intent.core.confirmAndWait
  *
  * @example
  * ```typescript
@@ -446,7 +446,7 @@ export async function confirmAndWait(ui5: UI5HandlerSlice): Promise<IntentResult
  * @returns An `IntentResult<void>` describing the outcome.
  *
  * @intent Wait for all pending UI5 rendering and data-binding to complete.
- * @capability Replaces brittle `page.waitForTimeout()` calls.
+ * @capability intent.core.waitForSave
  *
  * @example
  * ```typescript
@@ -489,7 +489,7 @@ export async function waitForSave(
  * @returns An `IntentResult<void>` describing the outcome.
  *
  * @intent Navigate to a list app and run a search with the given criteria.
- * @capability Reusable across all SAP domain search intents.
+ * @capability intent.core.navigateAndSearch
  *
  * @example
  * ```typescript

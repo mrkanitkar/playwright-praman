@@ -82,6 +82,8 @@ export interface FEFixtures {
 /**
  * Creates the FE fixture object with all four sub-namespaces.
  *
+ * @capability fe.listReport.getTable
+ *
  * @param page - Playwright page (or compatible minimal subset).
  * @returns Fully-constructed FioriElementsFixture with all sub-namespaces.
  *
@@ -140,6 +142,8 @@ export function createFEFixture(page: ListReportPage): FioriElementsFixture {
 
 /**
  * FE test — provides the `fe` fixture for Fiori Elements testing.
+ *
+ * @capability fe.listReport.getTable
  *
  * @example
  * ```typescript

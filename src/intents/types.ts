@@ -23,7 +23,7 @@
  * @typeParam T - Payload type for the `data` field (defaults to `void`).
  *
  * @intent Return a consistent result shape from every intent function.
- * @capability Carry execution metadata (duration, steps, SAP module) alongside business data.
+ * @capability intent.core.fillField
  *
  * @example
  * ```typescript
