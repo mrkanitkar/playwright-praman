@@ -117,6 +117,9 @@ export function createExecuteMethodScript(): string {
             var itemId = item.getId ? item.getId() : '';
 
             try {
+              // WARNING: UNDOCUMENTED SAP INTERNAL API — data('InputWithSuggestionsListItem')
+              // accesses SAP-internal custom data. No public alternative exists.
+              // See: plans/sap-ui5-api-fiction-audit-2026-04-07.md §6.2
               var domRef = item.getDomRef ? item.getDomRef() : null;
               if (domRef) {
                 var listItemData = null;
@@ -128,6 +131,8 @@ export function createExecuteMethodScript(): string {
                 }
               }
 
+              // WARNING: UNDOCUMENTED SAP INTERNAL CONVENTION — PlanningCalendar '-CLI' suffix.
+              // No public alternative exists. See: plans/sap-ui5-api-fiction-audit-2026-04-07.md §6.3
               if (itemId && itemId.indexOf('PlanningCalendar') !== -1
                   && itemId.indexOf('-CLI') === -1) {
                 itemId = itemId + '-CLI';
