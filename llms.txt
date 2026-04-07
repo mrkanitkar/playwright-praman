@@ -21,6 +21,51 @@
 - [SAP Control Cookbook](https://praman.dev/docs/guides/sap-control-cookbook): Recipes for common SAP UI5 controls in Praman tests
 - [AI Integration](https://praman.dev/docs/guides/ai-integration): LLM service, page discovery, agentic handler, capability registry
 
+## Interaction Decision Flowchart
+
+When clicking / pressing a control, choose the right method:
+
+```
+Is the element a UI5 control? (check: sap.ui.getCore().byId(id) !== undefined)
+│
+├─ YES → Use Praman fixture
+│  │
+│  ├─ Standard sap.m.* / sap.ui.comp.* / sap.uxap.*
+│  │  └─ await ui5.click({ id }) or await ui5.press({ id })
+│  │     Default strategy (ui5-native) fires: firePress → fireSelect → fireTap → DOM click
+│  │
+│  ├─ sap.m.IconTabFilter (FLP space/section tabs)
+│  │  └─ ⚠ firePress() is a NO-OP on this control
+│  │     Use: await page.getByText('Tab Label', { exact: true }).click()
+│  │     Or switch to: PRAMAN_INTERACTION_STRATEGY=dom-first
+│  │
+│  ├─ Custom composite controls (missing firePress)
+│  │  └─ Try ui5.click() first — ui5-native falls back to DOM click
+│  │     If that fails → switch to PRAMAN_INTERACTION_STRATEGY=dom-first
+│  │
+│  └─ UI5 Web Components (Shadow DOM: ui5-button, ui5-input)
+│     └─ Use page.getByRole() / page.getByText() + .click()
+│        Or switch to: PRAMAN_INTERACTION_STRATEGY=dom-first
+│
+└─ NO → Not a UI5 control (plain HTML, login pages, iframes)
+   └─ Use Playwright native: page.getByRole() / page.locator() + .click()
+      Praman fixtures do NOT apply here
+```
+
+Strategy summary (set via `PRAMAN_INTERACTION_STRATEGY` env var or config):
+
+| Strategy     | Fallback chain                                            | Best for                        |
+|------------- |---------------------------------------------------------- |-------------------------------- |
+| `ui5-native` | firePress → fireSelect → fireTap → DOM click (default)   | Standard Fiori apps             |
+| `dom-first`  | DOM click → firePress → fireSelect → fireTap             | Web Components, IconTabFilter   |
+| `opa5`       | RecordReplay.interactWithControl → firePress/fireSelect   | SAP compliance, UI5 >= 1.94     |
+
+Key rules:
+- `ui5.click()` and `ui5.press()` are **identical** (press delegates to click)
+- NEVER use `page.click('#__xmlview0--myBtn')` — raw UI5 IDs are banned (compliance check fails)
+- Auth/login pages are NOT UI5 — always use Playwright native there
+- For inputs: `setValue()` + `fireChange()` + `waitForUI5()` — never just `page.fill()`
+
 ## Examples
 
 - [Basic Test](https://praman.dev/docs/examples/basic-test): Control discovery by type and property, verification, press
