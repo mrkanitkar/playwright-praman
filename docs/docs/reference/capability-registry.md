@@ -1283,7 +1283,7 @@ These capabilities are on the roadmap and not yet available in the current relea
 
 ---
 
-## Appendix A: API Cross-Reference
+## Appendix A: API Cross-Reference {#appendix-a}
 
 Alphabetical list of every public API mapped to its capability ID. AI agents use this to map a method name to its behavioral context.
 
@@ -1449,7 +1449,7 @@ Alphabetical list of every public API mapped to its capability ID. AI agents use
 
 ---
 
-## Appendix B: Capability → SKILL.md Mapping
+## Appendix B: Capability → SKILL.md Mapping {#appendix-b}
 
 Maps each capability to its corresponding SKILL.md section. AI agents use this for progressive disclosure — load only the skill section relevant to the current task.
 
@@ -1499,7 +1499,7 @@ Maps each capability to its corresponding SKILL.md section. AI agents use this f
 
 ---
 
-## Appendix C: Failure → Resolution Quick Reference
+## Appendix C: Failure → Resolution Quick Reference {#appendix-c}
 
 For each common failure, the resolution and associated capability. AI agents use this for self-healing.
 

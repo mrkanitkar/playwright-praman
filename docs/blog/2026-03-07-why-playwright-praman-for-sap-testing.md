@@ -21,7 +21,7 @@ image: /img/docusaurus-social-card.jpg
 
 SAP UI5 applications break conventional Playwright selectors. Control IDs are generated, DOM structures change across UI5 versions, and themes swap entire subtrees. **playwright-praman** solves this by querying the UI5 runtime control registry directly — tests survive upgrades, theme changes, and custom CSS without maintenance.
 
-{/_ truncate _/}
+<!-- truncate -->
 
 ## The Problem with Standard Playwright on SAP
 
