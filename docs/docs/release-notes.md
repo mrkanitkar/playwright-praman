@@ -12,9 +12,9 @@ keywords:
 
 # Release Notes
 
-## Version 1.2.0 (Unreleased)
+## Version 1.2.0
 
-_Upcoming · Current npm version: [1.1.2](https://www.npmjs.com/package/playwright-praman)_
+_Released: April 2026 · [npm](https://www.npmjs.com/package/playwright-praman) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases)_
 
 ### 🎭 Playwright 1.59 Support
 
