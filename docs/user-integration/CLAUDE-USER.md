@@ -53,7 +53,7 @@ export default defineConfig({
 ```bash
 SAP_BASE_URL=https://your-sap-system.example.com
 SAP_USERNAME=TEST_USER
-SAP_PASSWORD=SecurePassword123
+SAP_PASSWORD=<your-password>
 SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'
 SAP_CLIENT=100             # OnPrem only
 ```

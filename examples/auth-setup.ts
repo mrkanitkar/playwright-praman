@@ -25,7 +25,7 @@
  * # Required environment variables (set in .env.test or CI secrets):
  * SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
  * SAP_CLOUD_USERNAME=TEST_USER
- * SAP_CLOUD_PASSWORD=SecurePassword123
+ * SAP_CLOUD_PASSWORD=<your-password>
  * SAP_AUTH_STRATEGY=btp-saml   # 'basic' | 'btp-saml' | 'office365'
  * SAP_CLIENT=100               # OnPrem only, optional
  * SAP_LANGUAGE=EN               # Optional, default EN
