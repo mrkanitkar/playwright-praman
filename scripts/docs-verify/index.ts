@@ -26,6 +26,8 @@ import { getChangedFiles } from './lib/git-diff.js';
 import { buildApiSurface } from './lib/api-surface.js';
 import { check1TypecheckSnippets } from './checks/check1-typecheck-snippets.js';
 import { check4ImportPaths } from './checks/check4-import-paths.js';
+import { check5ClaimTests } from './checks/check5-claim-tests.js';
+import { check6ExampleTestMap } from './checks/check6-example-test-map.js';
 
 /** Map check numbers to CheckName for --checks=1,4 CLI flag */
 const CHECK_NUMBER_MAP: Record<number, CheckName> = {
@@ -40,7 +42,12 @@ const CHECK_NUMBER_MAP: Record<number, CheckName> = {
 };
 
 /** All registered checks */
-const ALL_CHECKS: DocCheck[] = [check1TypecheckSnippets, check4ImportPaths];
+const ALL_CHECKS: DocCheck[] = [
+  check1TypecheckSnippets,
+  check4ImportPaths,
+  check5ClaimTests,
+  check6ExampleTestMap,
+];
 
 /**
  * Parse CLI arguments using Node.js built-in parseArgs.
