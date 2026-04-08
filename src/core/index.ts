@@ -33,6 +33,7 @@ export {
   PluginError,
   PramanError,
   SelectorError,
+  TelemetryError,
   TimeoutError,
 } from './errors/index.js';
 
@@ -40,8 +41,21 @@ export {
 export { createLogger, createRootLogger, REDACTION_PATHS } from './logging/index.js';
 
 // ── Telemetry ───────────────────────────────────────────────────────
-export { createSpanName, getNoOpTracer, initTelemetry, spanAttributes } from './telemetry/index.js';
-export type { SpanWrapper, TracerWrapper } from './telemetry/index.js';
+export {
+  createSpanName,
+  getNoOpMeter,
+  getNoOpTracer,
+  initMetrics,
+  initTelemetry,
+  spanAttributes,
+} from './telemetry/index.js';
+export type {
+  MeterWrapper,
+  MetricCounter,
+  MetricHistogram,
+  SpanWrapper,
+  TracerWrapper,
+} from './telemetry/index.js';
 
 // ── Utils ───────────────────────────────────────────────────────────
 export {

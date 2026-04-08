@@ -30,7 +30,7 @@
  * All Praman error codes as a frozen constant object.
  *
  * @remarks
- * Total: 72 error codes across 16 categories.
+ * Total: 77 error codes across 17 categories.
  *
  * Categories:
  * - Config (3): schema validation, file not found, parse failure
@@ -49,6 +49,7 @@
  * - Matcher (3): duplicate, invalid, frozen
  * - Bind (2): not supported, failed
  * - Screencast (3): not started, chapter failed, frame handler
+ * - Telemetry (5): init failed, peer dep missing, exporter failed, shutdown failed, metrics init failed
  */
 export const ErrorCode = Object.freeze({
   // ── Config errors ──────────────────────────────────────────────────
@@ -154,6 +155,13 @@ export const ErrorCode = Object.freeze({
   ERR_SCREENCAST_NOT_STARTED: 'ERR_SCREENCAST_NOT_STARTED',
   ERR_SCREENCAST_CHAPTER_FAILED: 'ERR_SCREENCAST_CHAPTER_FAILED',
   ERR_SCREENCAST_FRAME_HANDLER: 'ERR_SCREENCAST_FRAME_HANDLER',
+
+  // ── Telemetry errors ───────────────────────────────────────────────
+  ERR_TELEMETRY_INIT_FAILED: 'ERR_TELEMETRY_INIT_FAILED',
+  ERR_TELEMETRY_PEER_DEP_MISSING: 'ERR_TELEMETRY_PEER_DEP_MISSING',
+  ERR_TELEMETRY_EXPORTER_FAILED: 'ERR_TELEMETRY_EXPORTER_FAILED',
+  ERR_TELEMETRY_SHUTDOWN_FAILED: 'ERR_TELEMETRY_SHUTDOWN_FAILED',
+  ERR_TELEMETRY_METRICS_INIT_FAILED: 'ERR_TELEMETRY_METRICS_INIT_FAILED',
 } as const);
 
 /**
@@ -193,7 +201,8 @@ export type ErrorCategory =
   | 'FLP'
   | 'MATCHER'
   | 'BIND'
-  | 'SCREENCAST';
+  | 'SCREENCAST'
+  | 'TELEMETRY';
 
 /**
  * Template literal type enforcing the `ERR_<CATEGORY>_<REASON>` format.

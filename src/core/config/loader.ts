@@ -124,6 +124,42 @@ const NESTED_ENV_MAPPINGS: readonly NestedEnvMapping[] = [
     field: 'serviceName',
     type: 'string',
   },
+  {
+    envVar: 'PRAMAN_TELEMETRY_EXPORTER',
+    section: 'telemetry',
+    field: 'exporter',
+    type: 'string',
+  },
+  {
+    envVar: 'PRAMAN_TELEMETRY_PROTOCOL',
+    section: 'telemetry',
+    field: 'protocol',
+    type: 'string',
+  },
+  {
+    envVar: 'PRAMAN_TELEMETRY_METRICS_ENABLED',
+    section: 'telemetry',
+    field: 'metrics',
+    type: 'boolean',
+  },
+  {
+    envVar: 'PRAMAN_TELEMETRY_BATCH_TIMEOUT',
+    section: 'telemetry',
+    field: 'batchTimeout',
+    type: 'number',
+  },
+  {
+    envVar: 'PRAMAN_TELEMETRY_MAX_QUEUE_SIZE',
+    section: 'telemetry',
+    field: 'maxQueueSize',
+    type: 'number',
+  },
+  {
+    envVar: 'PRAMAN_TELEMETRY_CONNECTION_STRING',
+    section: 'telemetry',
+    field: 'connectionString',
+    type: 'string',
+  },
   // odataTracing section
   {
     envVar: 'PRAMAN_ODATA_TRACING_ENABLED',

@@ -111,6 +111,74 @@ describe('PramanConfigSchema', () => {
         expect(result.data.telemetry?.openTelemetry).toBe(false);
         expect(result.data.telemetry?.exporter).toBe('otlp');
         expect(result.data.telemetry?.serviceName).toBe('playwright-praman');
+        expect(result.data.telemetry?.protocol).toBe('http');
+        expect(result.data.telemetry?.metrics).toBe(false);
+        expect(result.data.telemetry?.batchTimeout).toBe(5_000);
+        expect(result.data.telemetry?.maxQueueSize).toBe(2_048);
+        expect(result.data.telemetry?.resourceAttributes).toEqual({});
+      }
+    });
+
+    it('accepts OTLP telemetry with endpoint when enabled', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: {
+          openTelemetry: true,
+          endpoint: 'http://localhost:4318',
+        },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('accepts Azure Monitor telemetry with connectionString when enabled', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: {
+          openTelemetry: true,
+          exporter: 'azure-monitor',
+          connectionString: 'InstrumentationKey=00000000-0000-0000-0000-000000000000',
+        },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('rejects openTelemetry true without endpoint (OTLP)', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: { openTelemetry: true },
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects Azure Monitor without connectionString', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: {
+          openTelemetry: true,
+          exporter: 'azure-monitor',
+        },
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('accepts Jaeger with endpoint when enabled', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: {
+          openTelemetry: true,
+          exporter: 'jaeger',
+          endpoint: 'http://localhost:4318',
+        },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('accepts custom resourceAttributes', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: {
+          resourceAttributes: { 'deployment.environment': 'staging' },
+        },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.telemetry?.resourceAttributes).toEqual({
+          'deployment.environment': 'staging',
+        });
       }
     });
 
@@ -321,6 +389,27 @@ describe('PramanConfigSchema', () => {
     it('rejects invalid telemetry exporter', () => {
       const result = PramanConfigSchema.safeParse({
         telemetry: { exporter: 'prometheus' },
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects invalid telemetry protocol', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: { protocol: 'websocket' },
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects non-integer batchTimeout', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: { batchTimeout: 1.5 },
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects zero maxQueueSize', () => {
+      const result = PramanConfigSchema.safeParse({
+        telemetry: { maxQueueSize: 0 },
       });
       expect(result.success).toBe(false);
     });

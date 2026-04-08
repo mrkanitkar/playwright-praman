@@ -125,15 +125,15 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 72 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(72);
+  it('has exactly 77 error codes', () => {
+    expect(Object.keys(ErrorCode)).toHaveLength(77);
   });
 
   it('documents the correct error code count in header comment', () => {
     // Dynamically count from the actual exports — NOT a hardcoded magic number.
     // If this snapshot breaks, update the header comment in codes.ts.
     const count = Object.keys(ErrorCode).length;
-    expect(count).toMatchInlineSnapshot(`72`);
+    expect(count).toMatchInlineSnapshot(`77`);
   });
 
   // ── Immutability test ────────────────────────────────────────────────
@@ -155,7 +155,7 @@ describe('ErrorCode', () => {
   });
 
   // ── Template literal type tests ─────────────────────────────────────
-  it('ErrorCategory covers all 13 categories', () => {
+  it('ErrorCategory covers all 17 categories', () => {
     expectTypeOf<'CONFIG'>().toExtend<ErrorCategory>();
     expectTypeOf<'BRIDGE'>().toExtend<ErrorCategory>();
     expectTypeOf<'CONTROL'>().toExtend<ErrorCategory>();
@@ -169,6 +169,10 @@ describe('ErrorCode', () => {
     expectTypeOf<'VOCAB'>().toExtend<ErrorCategory>();
     expectTypeOf<'INTENT'>().toExtend<ErrorCategory>();
     expectTypeOf<'FLP'>().toExtend<ErrorCategory>();
+    expectTypeOf<'MATCHER'>().toExtend<ErrorCategory>();
+    expectTypeOf<'BIND'>().toExtend<ErrorCategory>();
+    expectTypeOf<'SCREENCAST'>().toExtend<ErrorCategory>();
+    expectTypeOf<'TELEMETRY'>().toExtend<ErrorCategory>();
   });
 
   it('rejects invalid categories', () => {

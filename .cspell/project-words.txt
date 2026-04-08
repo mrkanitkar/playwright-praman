@@ -144,6 +144,14 @@ normalised
 npmjs
 opencode
 opentelemetry
+grpc
+jaeger
+Millis
+MeterProvider
+TracerProvider
+BatchSpanProcessor
+NodeSDK
+resourceFromAttributes
 optimised
 otel
 otlp

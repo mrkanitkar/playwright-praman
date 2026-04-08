@@ -17,7 +17,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { PramanConfigSchema } from '#core/config/schema.js';
-import { getNoOpTracer, initTelemetry } from '#core/telemetry/otel.js';
+import { getNoOpMeter, getNoOpTracer, initTelemetry } from '#core/telemetry/otel.js';
 
 const mockWarn = vi.fn();
 
@@ -48,21 +48,18 @@ describe('initTelemetry', () => {
     expect(typeof tracer.shutdown).toBe('function');
   });
 
-  it('returns NoOpTracer and logs warning when openTelemetry is enabled', async () => {
-    mockWarn.mockClear();
+  it('returns NoOpTracer when openTelemetry is not true', async () => {
     const config = PramanConfigSchema.parse({
-      telemetry: { openTelemetry: true },
+      telemetry: { openTelemetry: false },
     });
 
     const tracer = await initTelemetry(config);
 
-    // Should still return a valid NoOpTracer
+    // Should return a valid TracerWrapper with all required methods
     expect(typeof tracer.startSpan).toBe('function');
     expect(typeof tracer.withSpan).toBe('function');
-
-    // Should have logged a Phase 1 warning
-    expect(mockWarn).toHaveBeenCalledOnce();
-    expect(mockWarn.mock.calls[0]?.[0]).toContain('Phase 1');
+    expect(typeof tracer.recordException).toBe('function');
+    expect(typeof tracer.shutdown).toBe('function');
   });
 
   it('does not log warning when telemetry section is absent', async () => {
@@ -175,5 +172,101 @@ describe('NoOpSpanWrapper', () => {
     expect(() => {
       span.addEvent('event-name', { detail: 'value' });
     }).not.toThrow();
+  });
+});
+
+describe('getNoOpMeter', () => {
+  it('returns a MeterWrapper with all methods', () => {
+    const meter = getNoOpMeter();
+
+    expect(typeof meter.createCounter).toBe('function');
+    expect(typeof meter.createHistogram).toBe('function');
+    expect(typeof meter.shutdown).toBe('function');
+  });
+});
+
+describe('NoOpMeter.createCounter', () => {
+  it('returns a MetricCounter without errors', () => {
+    const meter = getNoOpMeter();
+    const counter = meter.createCounter('test-counter', 'A test counter');
+
+    expect(counter).toBeDefined();
+    expect(typeof counter.add).toBe('function');
+  });
+
+  it('add is a no-op', () => {
+    const meter = getNoOpMeter();
+    const counter = meter.createCounter('test-counter');
+
+    expect(() => {
+      counter.add(1);
+      counter.add(5, { key: 'value' });
+    }).not.toThrow();
+  });
+});
+
+describe('NoOpMeter.createHistogram', () => {
+  it('returns a MetricHistogram without errors', () => {
+    const meter = getNoOpMeter();
+    const histogram = meter.createHistogram('test-histogram', 'A test histogram');
+
+    expect(histogram).toBeDefined();
+    expect(typeof histogram.record).toBe('function');
+  });
+
+  it('record is a no-op', () => {
+    const meter = getNoOpMeter();
+    const histogram = meter.createHistogram('test-histogram');
+
+    expect(() => {
+      histogram.record(42.5);
+      histogram.record(100, { unit: 'ms' });
+    }).not.toThrow();
+  });
+});
+
+describe('NoOpTracer.getActiveTraceId', () => {
+  it('returns undefined', () => {
+    const tracer = getNoOpTracer();
+
+    expect(tracer.getActiveTraceId()).toBeUndefined();
+  });
+});
+
+describe('NoOpMeter.shutdown', () => {
+  it('resolves without error', async () => {
+    const meter = getNoOpMeter();
+
+    await expect(meter.shutdown()).resolves.toBeUndefined();
+  });
+});
+
+describe('NoOpSpanWrapper — setStatus variants', () => {
+  it('setStatus with error code is a no-op', () => {
+    const tracer = getNoOpTracer();
+    const span = tracer.startSpan('test-span');
+
+    expect(() => {
+      span.setStatus('error', 'something failed');
+    }).not.toThrow();
+  });
+
+  it('setStatus with ok code and no message is a no-op', () => {
+    const tracer = getNoOpTracer();
+    const span = tracer.startSpan('test-span');
+
+    expect(() => {
+      span.setStatus('ok');
+    }).not.toThrow();
+  });
+});
+
+describe('NoOpTracer — startSpan without attributes', () => {
+  it('returns a SpanWrapper when called with name only', () => {
+    const tracer = getNoOpTracer();
+    const span = tracer.startSpan('name-only');
+
+    expect(span).toBeDefined();
+    expect(typeof span.end).toBe('function');
   });
 });

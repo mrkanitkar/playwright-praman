@@ -42,6 +42,11 @@ export type {
   ODataTraceReporterOptions,
 } from './odata-trace-reporter.js';
 
+// ── OTel Reporter ────────────────────────────────────────────────────────────
+
+export { OTelReporter } from './otel-reporter.js';
+export type { OTelReporterOptions } from './otel-reporter.js';
+
 // ── Control Tree Reporter ───────────────────────────────────────────────────
 
 export { ControlTreeReporter } from './control-tree-reporter.js';
