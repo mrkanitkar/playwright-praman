@@ -41,6 +41,8 @@ open http://localhost:16686
 
 ### Via environment variables
 
+Add telemetry variables to your `.env` file (see [`.env.example`](https://github.com/nickshanks347/playwright-praman/blob/main/.env.example) for a complete template):
+
 ```bash
 # Enable tracing
 PRAMAN_TELEMETRY_ENABLED=true
@@ -53,11 +55,26 @@ PRAMAN_TELEMETRY_METRICS_ENABLED=true
 PRAMAN_TELEMETRY_ENABLED=false
 ```
 
-### Via config file
+### Via config file (`praman.config.ts`)
+
+Create a `praman.config.ts` file in your project root (or copy one of the shipped examples):
+
+| Example file                                  | Description                                  |
+| --------------------------------------------- | -------------------------------------------- |
+| `examples/praman.config.telemetry.ts`         | OTLP tracing + metrics (Jaeger, Tempo, etc.) |
+| `examples/praman.config.azure-monitor.ts`     | Azure Monitor / Application Insights         |
+| `examples/playwright.config.otel-reporter.ts` | Playwright config with OTel reporter         |
+
+```bash
+# Copy and rename to your project root
+cp node_modules/playwright-praman/examples/praman.config.telemetry.ts praman.config.ts
+```
 
 ```typescript
 // praman.config.ts
-export default {
+import { defineConfig } from 'playwright-praman';
+
+export default defineConfig({
   telemetry: {
     openTelemetry: true,
     endpoint: 'http://localhost:4318',
@@ -65,7 +82,7 @@ export default {
     exporter: 'otlp',
     serviceName: 'my-sap-tests',
   },
-};
+});
 ```
 
 Environment variables override config file values. If neither is set, telemetry stays disabled.
@@ -147,16 +164,18 @@ PRAMAN_TELEMETRY_EXPORTER=azure-monitor
 PRAMAN_TELEMETRY_CONNECTION_STRING="InstrumentationKey=abc-123-def;IngestionEndpoint=https://eastus.in.applicationinsights.azure.com"
 ```
 
-Or in config:
+Or in `praman.config.ts`:
 
 ```typescript
-export default {
+import { defineConfig } from 'playwright-praman';
+
+export default defineConfig({
   telemetry: {
     openTelemetry: true,
     exporter: 'azure-monitor',
     connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
   },
-};
+});
 ```
 
 :::warning

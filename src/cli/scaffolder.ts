@@ -23,7 +23,7 @@ import { access, copyFile, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import type { IDEDetection } from './ide-detector.js';
-import { scaffoldIDEFiles } from './ide-installer.js';
+import { scaffoldCliAgents, scaffoldIDEFiles } from './ide-installer.js';
 import { logWarn } from './logger.js';
 import { getPackageRoot } from './version.js';
 
@@ -220,6 +220,110 @@ export async function scaffoldDockerFiles(
   }
 }
 
+/** Telemetry example files copied from `examples/` into the user's project. */
+const TELEMETRY_EXAMPLE_FILES = [
+  'praman.config.telemetry.ts',
+  'praman.config.azure-monitor.ts',
+  'playwright.config.otel-reporter.ts',
+] as const;
+
+/**
+ * Copies telemetry example configs from the package `examples/` directory
+ * into the user's project at `examples/telemetry/`.
+ *
+ * @param targetDir - Absolute path to the user's project root.
+ * @param force - When `true`, overwrite existing destination files.
+ * @param created - Array to push created file paths into.
+ *
+ * @example
+ * ```typescript
+ * await scaffoldTelemetryExamples('/home/user/project', false, []);
+ * ```
+ */
+export async function scaffoldTelemetryExamples(
+  targetDir: string,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  const pkgRoot = getPackageRoot();
+  const destDir = join(targetDir, 'examples', 'telemetry');
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- destDir composed from targetDir + known constant path
+  await mkdir(destDir, { recursive: true });
+
+  for (const fileName of TELEMETRY_EXAMPLE_FILES) {
+    const srcPath = join(pkgRoot, 'examples', fileName);
+    const destPath = join(destDir, fileName);
+
+    if (!force) {
+      try {
+        await access(destPath);
+        continue; // file exists — skip
+      } catch {
+        // file does not exist — proceed to copy
+      }
+    }
+
+    try {
+      await access(srcPath);
+    } catch {
+      logWarn(`Telemetry example source not found: ${srcPath}`);
+      continue;
+    }
+
+    try {
+      await copyFile(srcPath, destPath);
+      created.push(destPath);
+    } catch {
+      logWarn(`Failed to copy telemetry example: ${srcPath}`);
+    }
+  }
+}
+
+/**
+ * Copies `.env.example` from the package root into the user's project.
+ *
+ * @param targetDir - Absolute path to the user's project root.
+ * @param force - When `true`, overwrite an existing `.env.example`.
+ * @param created - Array to push created file paths into.
+ *
+ * @example
+ * ```typescript
+ * await scaffoldEnvExample('/home/user/project', false, []);
+ * ```
+ */
+async function scaffoldEnvExample(
+  targetDir: string,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  const pkgRoot = getPackageRoot();
+  const srcPath = join(pkgRoot, '.env.example');
+  const destPath = join(targetDir, '.env.example');
+
+  if (!force) {
+    try {
+      await access(destPath);
+      return; // file exists — skip
+    } catch {
+      // file does not exist — proceed to copy
+    }
+  }
+
+  try {
+    await access(srcPath);
+  } catch {
+    logWarn(`Environment template source not found: ${srcPath}`);
+    return;
+  }
+
+  try {
+    await copyFile(srcPath, destPath);
+    created.push(destPath);
+  } catch {
+    logWarn(`Failed to copy environment template: ${srcPath}`);
+  }
+}
+
 /**
  * Scaffolds a new Praman project at the specified target directory.
  *
@@ -256,12 +360,21 @@ export async function scaffoldProject(options: ScaffoldOptions): Promise<Scaffol
   // Guard: check if directory already exists
   const exists = await directoryExists(targetDir);
   if (exists && !force) {
+    const earlyFiles: string[] = [];
+
     // Even in an existing project, install IDE-specific files when detected
     if (detection !== undefined) {
       const ideFiles = await scaffoldIDEFiles(targetDir, detection, force, cli);
-      if (ideFiles.length > 0) {
-        return { success: true, filesCreated: ideFiles };
-      }
+      earlyFiles.push(...ideFiles);
+    }
+
+    // CLI agents are installed even without IDE detection
+    if (cli && detection === undefined) {
+      await scaffoldCliAgents(targetDir, undefined, force, earlyFiles);
+    }
+
+    if (earlyFiles.length > 0) {
+      return { success: true, filesCreated: earlyFiles };
     }
     return { success: false, reason: 'directory-exists' };
   }
@@ -286,13 +399,24 @@ export async function scaffoldProject(options: ScaffoldOptions): Promise<Scaffol
     filesCreated.push(filePath);
   }
 
+  // Copy .env.example from the package into the user's project root
+  await scaffoldEnvExample(targetDir, force, filesCreated);
+
   // Copy Docker reference templates when Docker is available
   await scaffoldDockerFiles(targetDir, force, filesCreated);
+
+  // Copy telemetry example configs
+  await scaffoldTelemetryExamples(targetDir, force, filesCreated);
 
   // Install IDE-specific agent, seed, and config files
   if (detection !== undefined) {
     const ideFiles = await scaffoldIDEFiles(targetDir, detection, force, cli);
     filesCreated.push(...ideFiles);
+  }
+
+  // CLI agents are installed even without IDE detection
+  if (cli && detection === undefined) {
+    await scaffoldCliAgents(targetDir, undefined, force, filesCreated);
   }
 
   return { success: true, filesCreated };

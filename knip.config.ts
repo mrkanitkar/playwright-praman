@@ -45,6 +45,10 @@ const config: KnipConfig = {
     '@babel/plugin-proposal-decorators',
     // Used in scripts/capability-validation-utils.ts — outside knip's project scope
     'glob',
+    // Used in scripts/docs-verify/ — outside knip's project scope
+    'ts-morph',
+    'execa',
+    'typescript-docs-verifier',
   ],
   ignoreBinaries: ['docusaurus', 'playwright-praman'],
   rules: {

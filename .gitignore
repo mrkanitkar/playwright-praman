@@ -40,6 +40,11 @@ docs/api/
 docs/docs/api/
 docs/static/api-html/
 
+# Docs accuracy verification
+.docs-verify-cache/
+docs-verify-reports/
+.docs-verify-tmp/
+
 # CSpell cache
 .cspell/.cspellcache
 
