@@ -4,8 +4,9 @@ title: 'Custom Control Extension'
 
 # Custom Control Extension
 
-SAP projects frequently use custom UI5 controls that extend standard controls or create entirely new ones.
-This guide explains how to interact with custom controls through Praman when they are not part of the built-in type system.
+SAP projects frequently use custom UI5 controls that extend standard controls or create entirely
+new ones. This guide explains how to interact with custom controls through Praman when they are
+not part of the built-in type system.
 
 ## Finding Custom Controls by Type
 
