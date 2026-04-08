@@ -1,11 +1,7 @@
 # Changelog
 
-## [2.0.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.2...v2.0.0) (2026-04-08)
+## [1.2.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.2...v1.2.0) (2026-04-08)
 
-
-### ⚠ BREAKING CHANGES
-
-* **deps:** Minimum Node.js version raised from 20 to 22
 
 ### Features
 
