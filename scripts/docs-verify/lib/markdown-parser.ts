@@ -70,8 +70,8 @@ export function extractCodeBlocks(content: string, languages?: string[]): CodeBl
 
     if (inBlock) {
       blockCode += (blockCode ? '\n' : '') + line;
-    } else if (!commentMatch) {
-      // Reset preceding comment if we hit a non-comment, non-block line
+    } else if (!commentMatch && line.trim() !== '') {
+      // Reset preceding comment if we hit a non-comment, non-blank, non-block line
       precedingComment = undefined;
     }
   }
@@ -88,9 +88,43 @@ export function extractImportStatements(content: string): ImportStatement[] {
 
   const importRegex = /import\s*\{([^}]+)\}\s*from\s*['"]((playwright-praman)[^'"]*)['"]/g;
 
+  // Track whether we're inside an ignored code block
+  let insideIgnoredBlock = false;
+  let insideCodeBlock = false;
+  let precedingIgnore = false;
+
   for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+
+    // Detect docs-verify:ignore directive
+    if (line.includes('docs-verify:ignore')) {
+      precedingIgnore = true;
+      continue;
+    }
+
+    // Detect code block boundaries
+    if (line.startsWith('```')) {
+      if (!insideCodeBlock) {
+        insideCodeBlock = true;
+        insideIgnoredBlock = precedingIgnore;
+      } else {
+        insideCodeBlock = false;
+        insideIgnoredBlock = false;
+      }
+      precedingIgnore = false;
+      continue;
+    }
+
+    // Reset preceding ignore if non-empty, non-fence line is encountered outside code block
+    if (!insideCodeBlock && line.trim() !== '') {
+      precedingIgnore = false;
+    }
+
+    // Skip imports inside ignored code blocks
+    if (insideIgnoredBlock) continue;
+
     let match;
-    while ((match = importRegex.exec(lines[i]!)) !== null) {
+    while ((match = importRegex.exec(line)) !== null) {
       const specifiers = match[1]!
         .split(',')
         .map((s) => s.trim())

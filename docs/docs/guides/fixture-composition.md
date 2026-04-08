@@ -11,6 +11,8 @@ Playwright's `mergeTests()` combines multiple `test.extend()` definitions into o
 Each fixture module defines its own fixtures independently, and `mergeTests()` produces a unified
 test function that includes all of them.
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { mergeTests } from '@playwright/test';
 import { coreTest } from './core-fixtures.js';
@@ -95,6 +97,8 @@ that are not installed.
 
 Extend the merged test object with your own fixtures using `test.extend()`:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { test as base, expect } from 'playwright-praman';
 
@@ -123,6 +127,8 @@ export { test, expect };
 ## Composing Across Test Files
 
 For large test suites, create domain-specific test objects:
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 // fixtures/procurement-test.ts

@@ -68,6 +68,8 @@ by Tier 2 (`briefDOMSettle`). This is useful for:
 - Performance-sensitive scenarios where full stability is not required
 - Non-UI5 pages loaded within a UI5 shell
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { defineConfig } from 'playwright-praman';
 

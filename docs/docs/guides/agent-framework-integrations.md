@@ -68,6 +68,8 @@ onto this model — each UI5 operation is a node with clearly typed inputs and o
 
 ### What the Adapter Will Provide
 
+<!-- docs-verify:ignore -->
+
 ```typescript
 // Planned API — not yet available
 import { createLangGraphAdapter } from 'playwright-praman/ai/langgraph';
@@ -80,6 +82,8 @@ const tools = createLangGraphAdapter(page, ui5);
 ```
 
 ### Example Agent Flow (Planned)
+
+<!-- docs-verify:ignore -->
 
 ```typescript
 import { StateGraph } from '@langchain/langgraph';
@@ -126,6 +130,8 @@ conversational agent model aligns with Praman's planner → generator → healer
 
 ### What the Adapter Will Provide
 
+<!-- docs-verify:ignore -->
+
 ```typescript
 // Planned API — not yet available
 import { createAutoGenTools } from 'playwright-praman/ai/autogen';
@@ -167,6 +173,8 @@ registry and vocabulary system are designed to expose as Semantic Kernel plugins
 | Filters                 | Pre/post hooks map to Praman's `BeforeAction` / `AfterAction` lifecycle |
 
 ### What the Adapter Will Provide
+
+<!-- docs-verify:ignore -->
 
 ```typescript
 // Planned API — not yet available
@@ -212,6 +220,8 @@ registered tools. Praman tools map directly onto the SDK's function-tool model.
 | Tracing                   | Playwright `test.info().annotations` surface in OpenAI trace UI       |
 
 ### What the Adapter Will Provide
+
+<!-- docs-verify:ignore -->
 
 ```typescript
 // Planned API — not yet available
@@ -261,6 +271,8 @@ fit for Praman's typed SAP tools.
 | Session state      | Shared control map and vocabulary across agent steps       |
 
 ### What the Adapter Will Provide
+
+<!-- docs-verify:ignore -->
 
 ```typescript
 // Planned API — not yet available

@@ -115,6 +115,8 @@ Output:
 
 ### Benchmark Patterns for JSON Operations
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // tests/benchmarks/json-operations.bench.ts
 import { bench, describe } from 'vitest';
@@ -269,6 +271,8 @@ jobs:
 ```
 
 ### Regression Check Script
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 // scripts/check-bench-regression.ts
