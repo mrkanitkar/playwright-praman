@@ -540,6 +540,127 @@ div[class*='announcementBar'] {
   font-family: 'Courier New', monospace;
 }
 
+/* ── Use Case Cards (Playwright-style 3-column) ──────────── */
+.praman-usecase-outer {
+  padding: 3rem 2rem 2rem;
+  background: var(--praman-surface-alt);
+  border-bottom: 1px solid var(--praman-border);
+}
+
+.praman-usecase-section {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.praman-usecase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.praman-usecase-card {
+  background: var(--ifm-background-color);
+  border: 1px solid var(--praman-border);
+  border-radius: 12px;
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.praman-usecase-card:hover {
+  box-shadow: var(--praman-shadow-md);
+  border-color: var(--capgemini-blue);
+}
+
+.praman-usecase-card h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--praman-ink);
+  margin: 0 0 0.75rem;
+}
+
+.praman-usecase-card p {
+  font-size: 0.92rem;
+  color: var(--praman-ink-secondary);
+  line-height: 1.65;
+  margin: 0 0 1.25rem;
+  flex: 1;
+}
+
+.praman-usecase-install {
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.praman-usecase-install code {
+  color: #93c5fd;
+  font-size: 0.82rem;
+  font-family: 'Courier New', monospace;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.praman-usecase-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--capgemini-blue);
+  text-decoration: none;
+}
+
+.praman-usecase-link:hover {
+  text-decoration: underline;
+  color: var(--capgemini-blue);
+}
+
+.praman-usecase-footer {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  justify-content: center;
+  padding: 2rem 0 0.5rem;
+}
+
+.praman-usecase-blog-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--capgemini-blue);
+  text-decoration: none;
+}
+
+.praman-usecase-blog-link:hover {
+  text-decoration: underline;
+  color: var(--capgemini-blue);
+}
+
+[data-theme='dark'] .praman-usecase-outer {
+  background: var(--praman-surface-alt);
+}
+
+[data-theme='dark'] .praman-usecase-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .praman-usecase-card:hover {
+  border-color: rgba(0, 112, 173, 0.5);
+}
+
+[data-theme='dark'] .praman-usecase-card h3 {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .praman-usecase-card p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme='dark'] .praman-usecase-install {
+  background: #0d1117;
+}
+
 .praman-pitch-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1755,6 +1876,16 @@ main div[style*="border-top"] {
   .praman-info-cards {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  .praman-usecase-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .praman-usecase-footer {
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   .praman-pitch-grid {
