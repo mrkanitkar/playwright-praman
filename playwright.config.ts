@@ -33,7 +33,7 @@ export default defineConfig({
       timeout: 120_000,
       use: {
         ...devices['Desktop Chrome'],
-        headless: false,
+        headless: !!process.env['CI'],
         baseURL: process.env['SAP_CLOUD_BASE_URL'],
         actionTimeout: 30_000,
         navigationTimeout: 120_000,
@@ -63,8 +63,8 @@ export default defineConfig({
       timeout: 120_000,
       use: {
         ...devices['Desktop Chrome'],
-        headless: false,
-        launchOptions: { slowMo: 500 },
+        headless: !!process.env['CI'],
+        launchOptions: { slowMo: process.env['CI'] ? 0 : 500 },
       },
     },
     {
@@ -82,7 +82,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: '.auth/sap-session.json',
         baseURL: process.env['SAP_CLOUD_BASE_URL'],
-        headless: false,
+        headless: !!process.env['CI'],
         actionTimeout: 30_000,
         navigationTimeout: 120_000,
       },
