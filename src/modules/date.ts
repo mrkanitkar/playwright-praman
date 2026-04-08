@@ -83,10 +83,6 @@ export interface DateOptions {
   readonly timeout?: number;
   /** Whether to skip stability wait after setting. */
   readonly skipStabilityWait?: boolean;
-  /** Locale for formatting (reserved for future use). */
-  readonly locale?: string;
-  /** Timezone for formatting (reserved for future use). */
-  readonly timezone?: string;
 }
 
 /**

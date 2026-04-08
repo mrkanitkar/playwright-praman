@@ -393,24 +393,6 @@ describe('date module', () => {
 
   // ── locale/timezone options ───────────────────────────────────────────
 
-  describe('locale and timezone options', () => {
-    it('accepts locale option without error', async () => {
-      const page = createMockPage([{ valueFormat: 'yyyy-MM-dd' }, { success: true }, undefined]);
-
-      await expect(
-        setDatePickerValue(asPage(page), 'dp1', '2024-01-15', { locale: 'de-DE' }),
-      ).resolves.toBeUndefined();
-    });
-
-    it('accepts timezone option without error', async () => {
-      const page = createMockPage([{ valueFormat: 'yyyy-MM-dd' }, { success: true }, undefined]);
-
-      await expect(
-        setDatePickerValue(asPage(page), 'dp1', '2024-01-15', { timezone: 'Europe/Berlin' }),
-      ).resolves.toBeUndefined();
-    });
-  });
-
   // ── DATE_FORMATS constants ────────────────────────────────────────────
 
   describe('DATE_FORMATS constants', () => {
