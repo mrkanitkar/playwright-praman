@@ -287,8 +287,12 @@ interface RecipeEntry {
 
 Praman supports two AI modes (Decision D9):
 
-**Mode A -- SKILL.md for code-gen agents**: A strengthened skill file with typed API surface, capability/recipe registries, and usage examples. Agents like GitHub Copilot, Claude Code, and Cursor consume this to generate test code.
+**Mode A -- SKILL.md for code-gen agents**: A strengthened skill file with typed API surface,
+capability/recipe registries, and usage examples. Agents like GitHub Copilot, Claude Code,
+and Cursor consume this to generate test code.
 
-**Mode C -- Agentic fixture for in-test agents**: The `AgenticHandler` fixture with Zod-validated LLM output for autonomous test generation during test execution. The handler builds page context, generates test code, and validates the output against schemas.
+**Mode C -- Agentic fixture for in-test agents**: The `AgenticHandler` fixture with Zod-validated
+LLM output for autonomous test generation during test execution. The handler builds page context,
+generates test code, and validates the output against schemas.
 
 There is no MCP server -- Praman remains a Playwright plugin and does not duplicate browser management.

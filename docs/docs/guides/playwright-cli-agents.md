@@ -62,7 +62,8 @@ The key insight: `run-code` replaces `browser_evaluate`, `snapshot --filename` r
 
 Before using Praman CLI Agents, ensure you have the following in place:
 
-- **`@playwright/cli`** includes browser binaries — no separate `install-browser` step is needed in most cases. However, if using an older version or a global install, run `npx playwright-cli install-browser chromium` manually.
+- **`@playwright/cli`** includes browser binaries — no separate `install-browser` step is needed in most cases. However, if using an older
+  version or a global install, run `npx playwright-cli install-browser chromium` manually.
 - **Config file**: `.playwright/cli.config.json` auto-loads by default. Praman uses `.playwright/praman-cli.config.json`, which requires an explicit `--config` flag on every `open` command.
 - **`.env` format**: Use `KEY=value` only. Do **not** use `//` comments — they cause shell sourcing errors. Use `#` for comments.
 - **Agent skills**: Run `playwright-cli install --skills` to install the agent skill files into IDE-specific locations.
@@ -545,7 +546,8 @@ Enable `PRAMAN_BIND=1` to expose the test browser to CLI agents during test exec
 PRAMAN_BIND=1 npx playwright test tests/e2e/my-sap-test.spec.ts
 ```
 
-The test fixture calls `browser.bind('praman-agent')` and logs the endpoint URL. A CLI agent can then attach to the running test browser to inspect live UI state. See [Browser Bind & Screencast](./browser-bind.md) for details.
+The test fixture calls `browser.bind('praman-agent')` and logs the endpoint URL. A CLI agent can then attach to the running test browser
+to inspect live UI state. See [Browser Bind & Screencast](./browser-bind.md) for details.
 
 ### Environment Variables
 

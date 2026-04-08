@@ -21,7 +21,7 @@ Praman tests catch these regressions before they reach end users.
 
 ### Three-Phase Approach
 
-```
+```text
 Phase 1: Pre-Upgrade Baseline    → Run full regression, save results
 Phase 2: Post-Upgrade Validation → Run same suite on upgraded system
 Phase 3: Comparison              → Diff results, investigate failures

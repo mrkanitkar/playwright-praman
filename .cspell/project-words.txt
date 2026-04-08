@@ -43,6 +43,7 @@ BLACKLIST
 Behaviour
 Blacklist
 Codegen
+EACCES
 EBELN
 Embedder
 INTERACTABLE
@@ -188,6 +189,7 @@ stabilise
 stringifying
 summarising
 testlib
+totp
 testng
 testrail
 testuser

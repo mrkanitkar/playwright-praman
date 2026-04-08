@@ -687,7 +687,8 @@ playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/script
 
 These scripts use the `async page => { ... }` contract required by `run-code`. They are shell-safe (no `"`, backtick, or `$` in the script content) and return only JSON-serializable values.
 
-For parameterized operations (inspecting a specific control, filtering by type), use the inline `run-code` patterns shown above — pre-built scripts cannot accept parameters because `run-code` only exposes `page` in scope.
+For parameterized operations (inspecting a specific control, filtering by type), use the inline `run-code` patterns shown above — pre-built
+scripts cannot accept parameters because `run-code` only exposes `page` in scope.
 
 ## Troubleshooting
 

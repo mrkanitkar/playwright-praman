@@ -3,7 +3,9 @@ title: Debugging Agent Failures
 description: Step-by-step guide for diagnosing and fixing failures in AI-agent-generated Praman tests
 ---
 
-When an AI agent (`praman-sap-generate` or `praman-sap-heal`) generates a test and the test fails at runtime, use this guide to diagnose and fix the issue. For general troubleshooting not specific to agents, see the [Troubleshooting guide](./troubleshooting.md).
+When an AI agent (`praman-sap-generate` or `praman-sap-heal`) generates a test and the test fails at runtime,
+use this guide to diagnose and fix the issue. For general troubleshooting not specific to agents,
+see the [Troubleshooting guide](./troubleshooting.md).
 
 ## When to Use This Guide
 

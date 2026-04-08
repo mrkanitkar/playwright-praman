@@ -106,7 +106,7 @@ npx vitest bench tests/benchmarks/
 
 Output:
 
-```
+```text
  ✓ proxy creation
    name                                     hz       min       max      mean      p75      p99
    create proxy from discovery result   45,230    0.018ms   0.052ms  0.022ms  0.023ms  0.045ms

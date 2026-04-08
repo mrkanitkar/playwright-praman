@@ -315,7 +315,7 @@ const SECTIONS: Section[] = [
       {
         feature: 'Playwright fixture pattern',
         native: C('check', '✓ test.extend()'),
-        praman: C('check', '✓ 21 fixtures, 5 auto-fixtures'),
+        praman: C('check', '✓ 17 fixtures, 5 auto-fixtures'),
       },
     ],
   },

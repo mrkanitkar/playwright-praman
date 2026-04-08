@@ -13,7 +13,7 @@ covers adapter patterns for forwarding results.
 Each integration follows the same pattern: a custom Playwright reporter that transforms test
 results into the target tool's API format.
 
-```
+```text
 Playwright Test Run
        │
        ▼

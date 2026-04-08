@@ -50,7 +50,9 @@ The API is available at SAP API Business Hub:
 
 - [CALM_TEST_AUTOMATION API reference and tryout](https://api.sap.com/api/CALM_TEST_AUTOMATION/tryout)
 
-Authentication uses OAuth 2.0. You can use the [SAP Cloud SDK for JavaScript](https://sap.github.io/cloud-sdk/docs/js/getting-started) to handle the credential and token management if you are building a Node.js integration layer.
+Authentication uses OAuth 2.0. You can use the
+[SAP Cloud SDK for JavaScript](https://sap.github.io/cloud-sdk/docs/js/getting-started)
+to handle the credential and token management if you are building a Node.js integration layer.
 
 ### Generate JUnit XML from Playwright
 
@@ -69,7 +71,9 @@ This XML file is what Cloud ALM will pull from your tool's result endpoint — y
 
 ## Registering as a Test Automation Provider
 
-To connect Cloud ALM to your Playwright + Praman setup, you register your tool as a test automation provider in Cloud ALM's configuration. Cloud ALM then uses HTTP destination configuration to call your tool's endpoints.
+To connect Cloud ALM to your Playwright + Praman setup, you register your tool as a test
+automation provider in Cloud ALM's configuration. Cloud ALM then uses HTTP destination
+configuration to call your tool's endpoints.
 
 SAP documentation for this setup:
 

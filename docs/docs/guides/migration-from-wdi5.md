@@ -11,6 +11,26 @@ keywords:
 Migrate your wdi5 test suite to Playwright-Praman with minimal friction. This guide maps every
 wdi5 API to its Praman equivalent and highlights features that are new in Praman.
 
+:::info[In this guide]
+
+- Convert `browser.asControl()` calls to `ui5.control()` with minimal selector changes
+- Map wdi5 config (`wdio.conf.ts`) to Praman config (`praman.config.ts` + `playwright.config.ts`)
+- Replace OPA5 journey patterns with `test.step()` for structured test reporting
+- Adopt built-in auth, FLP navigation, and Fiori Elements helpers that wdi5 does not offer
+- Handle the `labelFor` selector difference using Praman's `:labeled()` pseudo-class
+
+:::
+
+## Coming from WebdriverIO (without wdi5)
+
+wdi5 is built on top of WebdriverIO, so if you are using WebdriverIO for SAP testing without
+the wdi5 plugin, this guide is still the right starting point. The main difference is that
+without wdi5, you are targeting raw DOM elements via WebdriverIO selectors (`$()`, `$$()`)
+rather than UI5 controls via `browser.asControl()`. In that case, your migration involves
+replacing WebdriverIO DOM selectors with Praman's `ui5.control()` for UI5 elements and
+`page.locator()` for non-UI5 elements. The config mapping, test structure guidance, and
+new features sections below all apply equally to WebdriverIO users.
+
 ## Quick Comparison
 
 | Aspect             | wdi5                                  | Praman                                          |
@@ -23,7 +43,7 @@ wdi5 API to its Praman equivalent and highlights features that are new in Praman
 | Auth management    | Manual login scripts                  | 6 built-in strategies + setup projects          |
 | AI integration     | None                                  | Built-in capabilities, recipes, agentic handler |
 | OData helpers      | None                                  | Model-level + HTTP-level CRUD                   |
-| FLP navigation     | Manual hash navigation                | 9 typed navigation methods                      |
+| FLP navigation     | Manual hash navigation                | 11 typed navigation methods                     |
 
 ## Core API Mapping
 
@@ -262,6 +282,13 @@ test('create a purchase order', async ({ ui5, ui5Navigation }) => {
 });
 ```
 
+:::warning[Common mistake]
+Do not wrap `ui5.control()` in a manual retry loop or `waitUntil()` call carried over from WebdriverIO.
+Praman's control discovery already includes multi-strategy retries with configurable timeouts
+(`controlDiscoveryTimeout`). Adding an outer retry loop causes duplicate waiting and makes tests
+slower and harder to debug.
+:::
+
 ## New in Praman vs wdi5
 
 Praman includes features that wdi5 does not offer. If you are migrating, these are worth
@@ -279,7 +306,7 @@ test('after auth', async ({ ui5Navigation }) => {
 });
 ```
 
-### 9 FLP Navigation Methods
+### 11 FLP Navigation Methods
 
 ```typescript
 test('navigation', async ({ ui5Navigation }) => {
@@ -368,3 +395,43 @@ array for self-healing tests. wdi5 errors are unstructured strings.
 7. **Structure tests**: Convert OPA5 journey `describe/it` blocks to `test` + `test.step()`
 8. **Adopt navigation**: Replace `browser.url('#/hash')` with `ui5Navigation` methods
 9. **Run and verify**: `npx playwright test`
+
+## FAQ
+
+<details>
+<summary>How similar are wdi5 selectors and Praman selectors?</summary>
+
+Very similar. Both use an object with `controlType`, `properties`, `bindingPath`, `ancestor`,
+`descendant`, `searchOpenDialogs`, and other fields. The main difference is that wdi5 wraps the
+selector inside `{ selector: {...} }` while Praman passes it directly: `ui5.control({...})`.
+Most selector fields are identical and require no changes beyond removing the `selector` wrapper.
+
+</details>
+
+<details>
+<summary>Does Praman support wdi5's labelFor selector?</summary>
+
+Not as a selector field. Instead, Praman offers the `:labeled()` pseudo-class in its CSS-style
+locator syntax: `page.locator('ui5=sap.m.Input:labeled("Vendor Name")')`. This checks both the
+label's `labelFor` association and the control's `ariaLabelledBy` association. See the
+"Selector Field Mapping" section above for the full conversion example.
+
+</details>
+
+<details>
+<summary>What does Praman offer that wdi5 does not?</summary>
+
+Praman adds 6 built-in auth strategies, 11 FLP navigation methods, Fiori Elements helpers
+(`fe.listReport`, `fe.objectPage`), OData model and HTTP operations, SM12 lock management,
+AI-powered test generation, 10 UI5-specific Playwright matchers, and structured error codes
+with recovery suggestions. See the "New in Praman vs wdi5" section above for details on each.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Getting Started](./getting-started.md)** -- Install Praman and run your first SAP UI5 test
+- **[Selectors](./selectors.md)** -- Learn the full `UI5Selector` syntax for targeting controls
+- **[Control Interactions](./control-interactions.md)** -- Click, fill, select, and assert on UI5 controls
+
+:::

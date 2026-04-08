@@ -10,6 +10,16 @@ keywords:
 
 # Discovery and Interaction Strategies
 
+:::info[In this guide]
+
+- Understand the 3 discovery strategies (direct-id, recordreplay, registry) and their tradeoffs
+- Choose between 3 interaction strategies (ui5-native, dom-first, opa5) for your app type
+- Configure strategies via environment variables or Praman config
+- Use the decision matrix to pick the right combination for your SAP application
+- Debug strategy selection with pino log output
+
+:::
+
 Praman uses two configurable strategy systems to find and interact with UI5 controls.
 **Discovery strategies** determine _how controls are located_ in the browser.
 **Interaction strategies** determine _how actions are performed_ on those controls.
@@ -22,7 +32,7 @@ a **priority chain** — it tries each configured strategy in order and stops at
 
 ### The Discovery Flow
 
-```
+```text
                         ┌──────────────────────┐
                         │  ui5.control(selector)│
                         └──────────┬───────────┘
@@ -192,7 +202,7 @@ The discovery factory at
 automatically promotes `direct-id` to first position for ID-only selectors, regardless of the
 configured order:
 
-```
+```text
 Config:   discoveryStrategies: ['recordreplay', 'direct-id']
 Selector: { id: 'btn1' }                    ← ID-only
 Actual:   ['cache', 'direct-id', 'recordreplay']  ← direct-id promoted
@@ -213,7 +223,7 @@ Actual:   ['cache', 'recordreplay', 'direct-id']  ← config order preserved
 
 ### UI5 Version Compatibility for Discovery
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │ UI5 Version    │ direct-id  │ registry   │ recordreplay             │
 │────────────────┼────────────┼────────────┼──────────────────────────│
@@ -241,7 +251,7 @@ own internal fallback chain.
 
 ### The Interaction Flow
 
-```
+```text
                     ┌─────────────────────────────┐
                     │  ui5.click({ id: 'btn1' })  │
                     └──────────────┬──────────────┘
@@ -312,7 +322,7 @@ applications because it triggers the same code paths that real user interactions
 
 **Fallback chains in code:**
 
-```
+```text
 press() — ui5-native-strategy.ts lines 65–97
   ├── firePress()     ─┐
   ├── fireSelect()    ─┤ both fire if available
@@ -365,7 +375,7 @@ expose `firePress()`.
 
 **Fallback chains in code:**
 
-```
+```text
 press() — dom-first-strategy.ts lines 79–135
   ├── getDomRef() → dom.click()     → done  (DOM first)
   ├── firePress()                   ─┐
@@ -427,7 +437,7 @@ ui5-native with reduced coverage.
 
 **Fallback chains in code:**
 
-```
+```text
 press() — opa5-strategy.ts lines 82–140
   if RecordReplay available:
   │ ├── RecordReplay.waitForUI5()
@@ -467,7 +477,7 @@ select() — opa5-strategy.ts lines 197–246
 
 Real SAP Fiori applications often render a mix of control types on the same page:
 
-```
+```text
 ┌─ SAP Fiori Launchpad (FLP) ────────────────────────────────┐
 │                                                             │
 │  ┌─ Shell Bar ──────────────────────────────────────────┐   │
@@ -528,7 +538,7 @@ common combinations.
 
 ### How Configuration Flows Through the Code
 
-```
+```text
   Environment Variable                    Zod Schema Defaults
   PRAMAN_INTERACTION_STRATEGY=dom-first   interactionStrategy: 'ui5-native'
   PRAMAN_DISCOVERY_STRATEGIES=...         discoveryStrategies: ['direct-id','recordreplay']
@@ -662,7 +672,7 @@ Verify your values match exactly: `direct-id`, `recordreplay`, `registry`, `ui5-
 
 #### Step 1: Choose Your Interaction Strategy
 
-```
+```text
 Is your app standard SAP Fiori (SAPUI5 controls only)?
   ├── YES → Does your team require SAP compliance audits?
   │          ├── YES → Use opa5 (SAP's official API)
@@ -677,7 +687,7 @@ Is your app standard SAP Fiori (SAPUI5 controls only)?
 
 #### Step 2: Choose Your Discovery Priorities
 
-```
+```text
 Do your selectors use stable IDs (e.g., { id: 'saveBtn' })?
   ├── YES → Include direct-id first: ['direct-id', 'recordreplay']
   │         (direct-id is auto-promoted for ID-only selectors anyway)
@@ -744,6 +754,39 @@ The pino logger will output which strategy was created and which discovery chain
 | No file to maintain                           | Team must document in CI config or README      |
 | Highest priority (overrides all other config) | Cannot set OPA5 sub-config (timeout, autoWait) |
 
+## FAQ
+
+<details>
+<summary>Which strategy combination should I start with?</summary>
+
+Start with the defaults: `ui5-native` interaction and `['direct-id', 'recordreplay']`
+discovery. This works for the majority of standard SAP Fiori applications. Only change
+strategies if you encounter specific issues, such as custom controls that lack `firePress()`
+(switch to `dom-first`) or older UI5 versions without RecordReplay (drop `recordreplay`).
+
+</details>
+
+<details>
+<summary>What happens if a typo in an environment variable name goes undetected?</summary>
+
+Praman only reads specific env var names (`PRAMAN_INTERACTION_STRATEGY`,
+`PRAMAN_DISCOVERY_STRATEGIES`). If you misspell the variable name, it is silently ignored and
+defaults are used. If you misspell a **value** (e.g., `recordreply` instead of
+`recordreplay`), Zod validation fails and **all** env var overrides are discarded — both
+discovery and interaction fall back to defaults.
+
+</details>
+
+<details>
+<summary>Can I use different strategies for different tests in the same run?</summary>
+
+Strategies are configured at the worker level (via `pramanConfig` fixture). To use different
+strategies for different tests, create separate Playwright projects in your config, each with
+different environment variables. Tests in each project will use that project's strategy
+configuration.
+
+</details>
+
 ## See Also
 
 - [Selector Reference](./selectors.md) — How to write `UI5Selector` objects
@@ -751,3 +794,11 @@ The pino logger will output which strategy was created and which discovery chain
 - [Control Interactions](./control-interactions.md) — `ui5.click()`, `ui5.fill()`, etc.
 - [Bridge Internals](./bridge-internals.md) — How the bridge injects into the browser
 - [Control Proxy](./control-proxy.md) — How discovered controls become proxy objects
+
+:::tip[Next steps]
+
+- **[Selector Reference →](./selectors.md)** — Learn all UI5Selector fields for finding controls
+- **[Control Interactions →](./control-interactions.md)** — How `ui5.click()`, `ui5.fill()`, and other methods work
+- **[Gold Standard Test Pattern →](./gold-standard-test.md)** — Complete reference test using best practices
+
+:::

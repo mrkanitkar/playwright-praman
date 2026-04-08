@@ -67,7 +67,7 @@ function PersonaGrid(): ReactNode {
       role: 'QA / Test Automation Engineer',
       title: 'Write SAP tests like a Playwright expert',
       challenge: 'Learning SAP UI5 internals on top of Playwright is overwhelming. SmartFields, OData bindings, FLP navigation — where do you start?',
-      solution: '21 typed fixtures with auto-complete. ui5, odata, sapAuth, flp — destructure and go. setValue() + fireChange() + waitForUI5() patterns built in.',
+      solution: '17 typed fixtures with auto-complete. ui5, odata, sapAuth, flp — destructure and go. setValue() + fireChange() + waitForUI5() patterns built in.',
       cta: 'Get Started',
     },
     {

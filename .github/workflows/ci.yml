@@ -205,6 +205,9 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx typedoc --validation
+      - name: Lint documentation markdown
+        working-directory: docs
+        run: npx markdownlint-cli2 "docs/guides/**/*.md" "docs/examples/**/*.md"
       - name: Install Docusaurus deps
         working-directory: docs
         run: npm ci

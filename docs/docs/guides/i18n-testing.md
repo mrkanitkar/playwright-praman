@@ -4,11 +4,13 @@ title: 'Localization & i18n Testing'
 
 # Localization & i18n Testing
 
-SAP applications serve a global user base. Testing across languages, locales, and text directions ensures that UI elements render correctly regardless of the user's language settings. This guide covers language-independent selectors, locale switching, RTL testing, and format validation.
+SAP applications serve a global user base. Testing across languages, locales, and text directions ensures that UI elements render correctly
+regardless of the user's language settings. This guide covers language-independent selectors, locale switching, RTL testing, and format validation.
 
 ## Language-Independent Selectors with i18NText
 
-Hardcoded text selectors like `{ text: 'Save' }` break when the app runs in German (`Sichern`) or Japanese. Praman's `i18NText` selector matches controls by their i18n resource bundle key instead of the displayed text:
+Hardcoded text selectors like `{ text: 'Save' }` break when the app runs in German (`Sichern`) or Japanese. Praman's `i18NText` selector
+matches controls by their i18n resource bundle key instead of the displayed text:
 
 ```typescript
 import { test, expect } from 'playwright-praman';
@@ -148,5 +150,6 @@ test('number format matches French locale', async ({ ui5, page }) => {
 - **Hardcoded text assertions**: Never assert against hardcoded display text in multi-locale tests. Use `i18NText` for selectors and verify the text only when explicitly testing a specific locale.
 - **Missing translations**: If an i18n key is missing from a locale's `.properties` file, UI5 falls back to the default (usually English). Your test might pass even though the translation is absent.
 - **RTL pseudo-mirrors**: Some CSS properties (like `margin-left`) are automatically mirrored by UI5's RTL support, but custom CSS may not be. Test RTL with actual RTL locales.
-- **sap-language vs. browser locale**: The `sap-language` URL parameter overrides the browser's `Accept-Language` header. If you need browser-locale-based behavior, set the locale in the Playwright browser context instead.
+- **sap-language vs. browser locale**: The `sap-language` URL parameter overrides the browser's `Accept-Language` header.
+  If you need browser-locale-based behavior, set the locale in the Playwright browser context instead.
 - **Session stickiness**: Once the FLP establishes a language, navigating to a different app preserves it. Close and reopen the browser context to reset the language cleanly.

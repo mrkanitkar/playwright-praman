@@ -34,7 +34,7 @@ test('all fixtures available', async ({ ui5, sapAuth, ui5Navigation }) => {
 
 Praman merges 13 fixture modules in a specific order:
 
-```
+```text
 moduleTest        → ui5.table, ui5.dialog, ui5.date, ui5.odata
 authTest          → sapAuth
 navTest           → ui5Navigation, btpWorkZone

@@ -1,6 +1,24 @@
 ---
 title: Business Process Examples
+description: 'End-to-end SAP test examples for Purchase Orders, Sales Orders, Journal Entries, and P2P flows using Praman and Playwright.'
+keywords:
+  - sap purchase order test automation
+  - sap sales order playwright test
+  - sap fiori e2e test example
+  - praman business process tests
 ---
+
+# Business Process Examples
+
+:::info[In this guide]
+
+- Test Purchase Order creation via classic GUI (ME21N) and Fiori Elements
+- Test Sales Order creation via VA01 and Fiori Elements
+- Test Journal Entry posting via FB50 and Fiori (F0718)
+- Run a full Purchase-to-Pay (P2P) cross-process end-to-end flow
+- Apply data cleanup strategies for repeatable test runs
+
+:::
 
 Complete end-to-end test examples for core SAP business processes. Each example is runnable
 with Praman fixtures and demonstrates real-world patterns for Purchase Orders, Sales Orders,
@@ -392,3 +410,56 @@ test.afterAll(async ({ ui5 }) => {
 
 See the [Gold Standard Test Pattern](./gold-standard-test.md) for a complete template that
 includes data cleanup, error handling, and all best practices.
+
+## FAQ
+
+<details>
+<summary>Can I run these examples against a real SAP system?</summary>
+
+Yes, but you need to update the control IDs and semantic objects to match your specific SAP
+configuration. The selector patterns (controlType + id RegExp) shown here are based on
+standard SAP Fiori apps. Your system may use different IDs depending on custom views,
+extensions, and UI5 versions. Use the Praman CLI or browser DevTools to discover the actual
+control IDs on your system.
+
+</details>
+
+<details>
+<summary>How do I capture document numbers created during a test?</summary>
+
+After a save action, find the success message strip and extract the number with a regex:
+
+```typescript
+const msg = await ui5.control({
+  controlType: 'sap.m.MessageStrip',
+  properties: { type: 'Success' },
+});
+const text = await msg.getText();
+const match = text.match(/Document (\d+)/);
+const docNumber = match?.[1] ?? '';
+expect(docNumber).toBeTruthy();
+```
+
+Store the number in a variable declared at the `describe` scope so subsequent steps and
+cleanup can reference it.
+
+</details>
+
+<details>
+<summary>Should I run P2P tests sequentially or in parallel?</summary>
+
+Run P2P and other cross-process tests sequentially (`workers: 1` in Playwright config).
+These tests create and reference data across multiple SAP transactions, so parallel execution
+would cause document number conflicts and race conditions. Single-process tests (like
+creating a standalone PO) can run in parallel if they use unique test data.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Gold Standard Test Pattern →](./gold-standard-test.md)** — Reference template with error handling, cleanup, and checklist
+- **[Navigation →](./navigation.md)** — All 11 FLP navigation methods used in these examples
+- **[Custom Matchers →](./custom-matchers.md)** — Assert UI5 control state after each business step
+- **[Selector Reference →](./selectors.md)** — Build resilient selectors for your SAP controls
+
+:::

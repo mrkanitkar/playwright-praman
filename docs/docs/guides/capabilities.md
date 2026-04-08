@@ -60,7 +60,9 @@ const value = await control.getValue();
 
 ### 10 Custom UI5 Matchers
 
-Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visible`, `toBeUI5Enabled`, `toHaveUI5Property`, `toHaveUI5ValueState`, `toHaveUI5Binding`, `toBeUI5ControlType`, `toHaveUI5RowCount`, `toHaveUI5CellText`, `toHaveUI5SelectedRows`.
+Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visible`,
+`toBeUI5Enabled`, `toHaveUI5Property`, `toHaveUI5ValueState`, `toHaveUI5Binding`,
+`toBeUI5ControlType`, `toHaveUI5RowCount`, `toHaveUI5CellText`, `toHaveUI5SelectedRows`.
 
 ## SAP UI5 Control Support
 
@@ -79,7 +81,7 @@ Extends `expect()` with UI5-specific assertions: `toHaveUI5Text`, `toBeUI5Visibl
 
 - **13 fixture modules** merged via `mergeTests()`
 - **6 authentication strategies**: basic, BTP SAML, Office 365, API, certificate, multi-tenant
-- **9 FLP navigation functions**: app, tile, intent, hash, home, back, forward, search, getCurrentHash
+- **11 FLP navigation functions**: app, tile, intent, hash, home, back, forward, search, getCurrentHash, space, sectionLink
 - **FLP shell & footer** interaction
 - **SM12 lock management** with auto-cleanup
 - **User settings** reader (language, date format, timezone)

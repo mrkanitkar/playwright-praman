@@ -21,7 +21,7 @@ import { test, expect } from 'playwright-praman';
 | Fixture         | Scope  | Type            | Description                                                                                |
 | --------------- | ------ | --------------- | ------------------------------------------------------------------------------------------ |
 | `ui5`           | test   | Core            | Control discovery, interaction, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces      |
-| `ui5Navigation` | test   | Navigation      | 9 FLP navigation methods                                                                   |
+| `ui5Navigation` | test   | Navigation      | 11 FLP navigation methods                                                                  |
 | `btpWorkZone`   | test   | Navigation      | Dual-frame BTP WorkZone manager                                                            |
 | `sapAuth`       | test   | Authentication  | SAP authentication (6 strategies)                                                          |
 | `fe`            | test   | Fiori Elements  | `.listReport`, `.objectPage`, `.table`, `.list` helpers                                    |

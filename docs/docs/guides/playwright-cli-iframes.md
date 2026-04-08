@@ -169,7 +169,7 @@ directly in a new browser context or tab.
 FLP renders a shell page and loads each Fiori app inside an iframe. The typical
 frame structure is:
 
-```
+```text
 Top-level: /sap/bc/ui2/flp  (FLP shell — has UI5, bridge injects here)
   └── iframe: /sap/bc/ui5_ui5/sap/<app>/  (Fiori app — has UI5, bridge injects here)
 ```
@@ -194,7 +194,7 @@ playwright-cli run-code "async page => {
 
 WorkZone uses a portal shell with apps in iframes:
 
-```
+```text
 Top-level: /cp.portal/site/  (WorkZone shell)
   └── iframe: /sap/bc/ui5_ui5/sap/<app>/  (Fiori app)
 ```
@@ -206,7 +206,7 @@ determine which frames are accessible.
 
 SAP GUI for HTML renders transactions in nested iframes:
 
-```
+```text
 Top-level: /sap/bc/gui/sap/its/webgui
   └── iframe: transaction content (same-origin, but NOT UI5)
 ```

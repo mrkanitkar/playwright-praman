@@ -1,9 +1,25 @@
 ---
 title: 'Migration from Vanilla Playwright'
+description: 'Layer Praman on top of your existing Playwright tests for SAP UI5 apps. Keep everything you have, add UI5 control registry access, auto-waiting, and SAP-specific fixtures.'
+keywords:
+  - playwright sap testing
+  - playwright ui5 plugin
+  - migrate playwright to praman
+  - sap fiori playwright
 ---
 
 Already using Playwright for web testing? This guide shows when and how to layer Praman on top
 of your existing Playwright tests for SAP UI5 applications.
+
+:::info[In this guide]
+
+- Keep all your existing Playwright tests running unchanged with a one-line import swap
+- Decide when to use `page.locator()` vs `ui5.control()` for each element
+- Add UI5-aware auto-waiting and stability checks to eliminate flaky tests
+- Adopt SAP navigation, authentication, and Fiori Elements fixtures incrementally
+- Run hybrid tests that mix Playwright locators and Praman selectors in the same file
+
+:::
 
 ## When to Use `page.locator()` vs `ui5.control()`
 
@@ -179,6 +195,12 @@ await ui5.click({
 });
 ```
 
+:::warning[Common mistake]
+Do not replace `page.locator()` calls for non-UI5 elements (login forms, iframes, file uploads) with `ui5.control()`.
+Praman extends Playwright -- it does not replace it. Use `ui5.control()` only for SAP UI5 controls that are registered
+in the UI5 control registry. For everything else, keep using standard Playwright locators.
+:::
+
 ### Phase 4: Adopt Navigation and Auth Fixtures
 
 Replace manual navigation and login scripts with built-in fixtures.
@@ -263,9 +285,54 @@ test('parallel-safe test', async ({ ui5, testData }) => {
 | UI5 stability waiting       | Manual polling loops      | Automatic `waitForUI5Stable()`     |
 | OData model access          | Manual `page.evaluate()`  | `ui5.odata.getModelData()`         |
 | SmartField handling         | Fragile inner-control CSS | `controlType` + `properties`       |
-| FLP navigation              | Manual URL construction   | 9 typed methods                    |
+| FLP navigation              | Manual URL construction   | 11 typed methods                   |
 | Authentication              | Custom login scripts      | 6 built-in strategies              |
 | UI5 assertions              | Generic `expect` only     | 10 custom matchers                 |
 | Error recovery              | Unstructured errors       | Structured codes + suggestions     |
 | Analytics blocking          | Manual route interception | Automatic request interceptor      |
 | Test data                   | Manual setup/teardown     | Template generation + auto-cleanup |
+
+## FAQ
+
+<details>
+<summary>Can I keep my existing Playwright tests?</summary>
+
+Yes. Praman's `test` and `expect` are extended versions of Playwright's. Change your import from
+`@playwright/test` to `playwright-praman` and every existing test continues to work unchanged.
+You do not need to modify a single locator or assertion.
+
+</details>
+
+<details>
+<summary>Do I need to rewrite everything?</summary>
+
+No. The recommended approach is incremental adoption. Start by swapping the import (Phase 1),
+then gradually introduce `ui5.control()` for SAP UI5 controls that have brittle CSS selectors.
+You can mix `page.locator()` and `ui5.control()` in the same test indefinitely.
+
+</details>
+
+<details>
+<summary>Does Praman slow down my tests?</summary>
+
+No. Praman adds UI5 stability checks (`waitForUI5Stable()`) that actually reduce flakiness and
+eliminate the need for manual `waitForTimeout()` calls. For non-UI5 elements, `page.locator()`
+runs at full Playwright speed with no overhead from Praman.
+
+</details>
+
+<details>
+<summary>Can I use Playwright fixtures alongside Praman fixtures?</summary>
+
+Yes. Praman fixtures (`ui5`, `ui5Navigation`, `fe`, etc.) are added alongside Playwright's built-in
+fixtures (`page`, `context`, `browser`, `request`). Destructure whichever ones you need in each test.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Getting Started](./getting-started.md)** -- Install Praman and run your first SAP UI5 test
+- **[Selectors](./selectors.md)** -- Learn the full `UI5Selector` syntax for targeting controls
+- **[Control Interactions](./control-interactions.md)** -- Click, fill, select, and assert on UI5 controls
+
+:::
