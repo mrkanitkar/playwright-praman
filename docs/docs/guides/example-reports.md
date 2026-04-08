@@ -4,7 +4,8 @@ title: Example Reports & Data Architecture
 
 # Example Reports & Data Architecture
 
-Praman generates 12 dashboard reports that provide a comprehensive view of SAP S/4HANA quality across functional testing, performance, accessibility, integration, and geographic readiness. This guide explains how each report gets its data and what Praman is responsible for producing.
+Praman generates 12 dashboard reports that provide a comprehensive view of SAP S/4HANA quality across functional testing, performance, accessibility,
+integration, and geographic readiness. This guide explains how each report gets its data and what Praman is responsible for producing.
 
 :::important
 These reports are examples of what you can design and develop. Please read the documentation help for more details.
@@ -503,16 +504,16 @@ Estimated across all ~180 unique data fields in the dashboard:
 
 ### Phase 2 — Depth (Reports 4, 8-9)
 
-4. **Migration validation queries** — CDS views for record counts and error detection
-5. **Focused Run / Web Analytics** — geographic profiles for realistic simulation
-6. **Locale/browser matrix testing** — multi-context Playwright execution
+1. **Migration validation queries** — CDS views for record counts and error detection
+2. **Focused Run / Web Analytics** — geographic profiles for realistic simulation
+3. **Locale/browser matrix testing** — multi-context Playwright execution
 
 ### Phase 3 — Enterprise (Reports 10-13)
 
-7. **axe-core integration** — accessibility scanning per Fiori app
-8. **CPI monitoring API** — interface health, message volumes, error rates
-9. **Third-party API health checks** — external system connectivity validation
-10. **E2E chain orchestration** — multi-system flow testing with Playwright as orchestrator
+1. **axe-core integration** — accessibility scanning per Fiori app
+2. **CPI monitoring API** — interface health, message volumes, error rates
+3. **Third-party API health checks** — external system connectivity validation
+4. **E2E chain orchestration** — multi-system flow testing with Playwright as orchestrator
 
 ## What Praman Needs to Ship
 

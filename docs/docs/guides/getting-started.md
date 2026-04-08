@@ -9,6 +9,16 @@ keywords:
   - playwright-praman
 ---
 
+:::info[In this guide]
+
+- Install Praman and scaffold a complete SAP test project with one command
+- Configure SAP credentials and authenticate against your system
+- Generate production-ready Playwright tests using AI agents (no manual scripting)
+- Run and verify tests against a live SAP Fiori application
+- Understand the plan-generate-heal pipeline for continuous test creation
+
+:::
+
 Two commands to get started. Then let AI agents generate your tests.
 
 ## Prerequisites
@@ -49,7 +59,7 @@ Praman has 3 direct dependencies and 5 peer dependencies:
 | `@opentelemetry/api`      | Peer (optional) | Observability and distributed tracing                     |
 | `@opentelemetry/sdk-node` | Peer (optional) | OpenTelemetry Node.js SDK                                 |
 
-#### IDE detection and agent installation
+### IDE detection and agent installation
 
 | IDE / Agent        | Detection Signal                                       | What gets installed                                     |
 | ------------------ | ------------------------------------------------------ | ------------------------------------------------------- |
@@ -131,7 +141,9 @@ For auth strategy details, see the [Authentication](./authentication) guide.
 ## Step 2: Generate Tests with AI Agents
 
 Submit a Signavio flow, a test case description, or a business process in plain language.
-Praman's AI agents connect to your live SAP system, discover every UI5 control, generate a structured test plan, and deliver production-ready Playwright scripts — covering SAP end-to-end quality from requirement to deployment evidence. No scripting. No selectors. No coding.
+Praman's AI agents connect to your live SAP system, discover every UI5 control, generate a structured
+test plan, and deliver production-ready Playwright scripts — covering SAP end-to-end quality from
+requirement to deployment evidence. No scripting. No selectors. No coding.
 
 ### Prompt template
 
@@ -197,7 +209,10 @@ Output:
 **GitHub Copilot / Cursor / Jules:** Use the agent definitions installed by `init` (see [Agent & IDE Setup](./agent-setup)).
 
 :::info Playwright CLI — token-efficient alternative
-Praman agents can also connect to the browser via the **Playwright CLI** (`@playwright/cli`) instead of MCP. The CLI uses shell commands instead of JSON-RPC tool calls, which reduces token usage in agent conversations. Both MCP and CLI are first-class options — see the [Playwright CLI Setup](./playwright-cli-setup) guide for installation and configuration.
+Praman agents can also connect to the browser via the **Playwright CLI** (`@playwright/cli`)
+instead of MCP. The CLI uses shell commands instead of JSON-RPC tool calls, which reduces token
+usage in agent conversations. Both MCP and CLI are first-class options — see the
+[Playwright CLI Setup](./playwright-cli-setup) guide for installation and configuration.
 :::
 
 ### The plan → generate → heal pipeline
@@ -345,10 +360,14 @@ test.describe('BOM Creation — Complete Flow', () => {
 });
 ```
 
-**Key patterns** — every generated test uses `ui5.control()` with typed proxies (not DOM selectors), `searchOpenDialogs: true` for dialog controls, `setValue()` + `fireChange()` + `waitForUI5()` for inputs, and `test.step()` for structured reporting.
+**Key patterns** — every generated test uses `ui5.control()` with typed proxies (not DOM selectors),
+`searchOpenDialogs: true` for dialog controls, `setValue()` + `fireChange()` + `waitForUI5()` for
+inputs, and `test.step()` for structured reporting.
 
 :::tip From business process to Playwright test — autonomously
-This is the core value of Praman: you describe **what** to test in business language, and the AI agents handle the **how** — discovering controls, generating code, and healing failures. No manual selector hunting, no brittle DOM queries, no test scripting.
+This is the core value of Praman: you describe **what** to test in business language, and the AI
+agents handle the **how** — discovering controls, generating code, and healing failures. No manual
+selector hunting, no brittle DOM queries, no test scripting.
 :::
 
 For detailed agent prompt templates, example output, and the full heal cycle, see [Running Your Agent for the First Time](./running-your-agent).
@@ -361,7 +380,11 @@ For detailed agent prompt templates, example output, and the full heal cycle, se
 <summary>Run the gold-standard verification test</summary>
 
 :::note SAP System Requirement
-The gold-standard BOM test requires access to an **SAP S/4HANA Public Cloud** system or an **SAP Fiori Launchpad** where the **Bill of Material (BOM) Maintenance** tile is available. If your system does not have this app, you can still verify your setup by writing a test against any SAP Fiori app available on your launchpad — the authentication and fixture wiring will work the same way.
+The gold-standard BOM test requires access to an **SAP S/4HANA Public Cloud** system or an
+**SAP Fiori Launchpad** where the **Bill of Material (BOM) Maintenance** tile is available.
+If your system does not have this app, you can still verify your setup by writing a test against
+any SAP Fiori app available on your launchpad — the authentication and fixture wiring will work
+the same way.
 :::
 
 ```bash
@@ -390,7 +413,10 @@ A passing test confirms: Playwright + Chromium installed, SAP credentials valid,
 | `ERR_CONTROL_NOT_FOUND`                        | Control ID differs on your system          | Use `controlType` + `properties` instead of `id`          |
 
 :::info Adapt the gold-standard test to your app
-The gold-standard test targets the "Maintain Bill Of Material" app. If your SAP system does not have this app, use it as a template: copy the file, change the tile name, control IDs, and test data to match your app. The patterns (auth, navigation, dialog handling, value help) are universal across SAP Fiori apps.
+The gold-standard test targets the "Maintain Bill Of Material" app. If your SAP system does not
+have this app, use it as a template: copy the file, change the tile name, control IDs, and test
+data to match your app. The patterns (auth, navigation, dialog handling, value help) are universal
+across SAP Fiori apps.
 :::
 
 </details>
@@ -441,7 +467,10 @@ test('navigate to Purchase Order app and verify table', async ({ ui5, ui5Navigat
 
 ## Real-World Example: BOM End-to-End Test
 
-Praman's AI agents follow a **plan → generate → heal** pipeline. The planner explores a live SAP system, discovers controls, and produces a structured test plan. The generator converts the plan into executable Playwright + Praman test code. Below is a real example from an SAP S/4HANA Cloud BOM application.
+Praman's AI agents follow a **plan → generate → heal** pipeline. The planner explores a live SAP
+system, discovers controls, and produces a structured test plan. The generator converts the plan
+into executable Playwright + Praman test code. Below is a real example from an SAP S/4HANA Cloud
+BOM application.
 
 ### AI-Generated Test Plan
 
@@ -906,7 +935,9 @@ test.describe('BOM End-to-End Flow', () => {
 | Graceful error recovery             | Close error dialogs and cancel without hard failure |
 
 :::info From plan to code
-Both the test plan and the gold standard test above were produced by Praman's AI agents against a live SAP S/4HANA Cloud system. Run the full **plan → generate → heal** pipeline on your own SAP app with the `/praman-sap-coverage` prompt.
+Both the test plan and the gold standard test above were produced by Praman's AI agents against a
+live SAP S/4HANA Cloud system. Run the full **plan → generate → heal** pipeline on your own SAP
+app with the `/praman-sap-coverage` prompt.
 :::
 
 ## Running Tests
@@ -1166,6 +1197,88 @@ my-sap-tests/
   package.json
 ```
 
+## FAQ
+
+<details>
+<summary>npm install fails with permission errors or EACCES</summary>
+
+Run with the correct permissions. On macOS/Linux, avoid `sudo npm install` — instead, fix npm
+permissions or use a Node version manager like `nvm`:
+
+```bash
+nvm install 22
+nvm use 22
+npm install playwright-praman
+```
+
+On Windows, run your terminal as Administrator if needed.
+
+</details>
+
+<details>
+<summary>How do I fix "browserType.launch: Executable doesn't exist"?</summary>
+
+Chromium is not installed. Run:
+
+```bash
+npx playwright install chromium
+```
+
+If you ran `npx playwright-praman init`, this should have been done automatically. Re-run `init`
+if the browser binary is missing.
+
+</details>
+
+<details>
+<summary>Auth setup fails with "ERR_AUTH_TIMEOUT" or wrong credentials</summary>
+
+Check your `.env` file:
+
+```bash
+# .env
+SAP_CLOUD_BASE_URL=https://your-system.s4hana.cloud.sap/
+SAP_CLOUD_USERNAME=your-user
+SAP_CLOUD_PASSWORD=your-password
+SAP_AUTH_STRATEGY=btp-saml
+```
+
+Common issues:
+
+- `SAP_CLOUD_BASE_URL` must point to the Fiori Launchpad URL, not the API endpoint
+- `SAP_AUTH_STRATEGY` must match your system type (`btp-saml`, `basic`, or `office365`)
+- Verify credentials work by logging in manually in a browser first
+
+See the [Authentication](./authentication) guide for strategy-specific troubleshooting.
+
+</details>
+
+<details>
+<summary>Can I use Praman without AI agents (manual test writing)?</summary>
+
+Yes. AI agents are optional. You can write tests manually using Praman fixtures:
+
+```typescript
+// tests/my-test.spec.ts
+import { test, expect } from 'playwright-praman';
+
+test('manual test', async ({ ui5, ui5Navigation }) => {
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+  const btn = await ui5.control({ controlType: 'sap.m.Button', properties: { text: 'Create' } });
+  await expect(btn).toBeUI5Enabled();
+});
+```
+
+Skip the agent setup steps and go directly to writing tests with fixtures. See the
+[Playwright Primer](./playwright-primer) for a ground-up introduction.
+
+</details>
+
+:::warning[Common mistake]
+Do not use `page.click()` or `page.fill()` for UI5 controls. These bypass the UI5 event model,
+causing OData bindings, validations, and value state updates to not trigger. Always use
+`ui5.press()`, `ui5.fill()`, and `ui5.control()` for UI5 elements.
+:::
+
 ## Next Steps
 
 | Topic                     | Documentation                                  |
@@ -1181,3 +1294,11 @@ my-sap-tests/
 | Intent API                | [Intent API](./intent-api)                     |
 | Examples                  | [Examples](../examples/)                       |
 | Architecture overview     | [Architecture](./architecture-overview)        |
+
+:::tip[Next steps]
+
+- **[Authentication Guide →](./authentication)** — Configure SAP login strategies (BTP SAML, Basic Auth, Office 365)
+- **[Selectors Guide →](./selectors)** — Learn how to find UI5 controls by ID, type, properties, and binding path
+- **[Agent & IDE Setup →](./agent-setup)** — Set up AI agents for Claude Code, Copilot, Cursor, and VS Code
+
+:::

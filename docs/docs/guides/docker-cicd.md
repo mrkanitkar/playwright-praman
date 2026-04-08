@@ -18,7 +18,7 @@ The CI workflow (`.github/workflows/ci.yml`) runs on every push to `main` and ev
 
 ### Job Overview
 
-```
+```text
 +--------------------+     +-------------------------+     +-----------------+
 | quality            |     | unit-tests              |     | build           |
 | (lint, typecheck,  |     | (3 OS x 3 Node)         |     | (3 OS)          |
@@ -270,7 +270,8 @@ Coverage thresholds are enforced per-file (not just project-wide):
 
 ## Praman-Specific Azure Playwright Configuration
 
-When running Praman tests with [Azure Playwright Testing](https://learn.microsoft.com/en-us/azure/playwright-testing/), the bridge must communicate with cloud-hosted browsers. This works out of the box because the bridge uses standard `page.evaluate()` calls that serialize across remote browser connections.
+When running Praman tests with [Azure Playwright Testing](https://learn.microsoft.com/en-us/azure/playwright-testing/), the bridge must communicate
+with cloud-hosted browsers. This works out of the box because the bridge uses standard `page.evaluate()` calls that serialize across remote browser connections.
 
 ### Service Configuration
 

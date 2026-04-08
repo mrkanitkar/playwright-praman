@@ -4,13 +4,17 @@ title: 'Azure Playwright Workspaces'
 
 # Azure Playwright Workspaces
 
-Run Praman SAP UI5 tests at scale using cloud-hosted browsers with **Azure Playwright Workspaces** — no local machine required. GitHub Actions runs your test code, Azure runs the browsers, and your SAP system is tested end-to-end.
+Run Praman SAP UI5 tests at scale using cloud-hosted browsers with **Azure Playwright Workspaces** —
+no local machine required. GitHub Actions runs your test code, Azure runs the browsers,
+and your SAP system is tested end-to-end.
 
 ## Overview
 
-Azure Playwright Workspaces is a Microsoft-managed service that provides cloud-hosted browsers for Playwright tests. Combined with GitHub Actions, it creates a **fully automated, zero-local-machine** testing pipeline for SAP applications.
+Azure Playwright Workspaces is a Microsoft-managed service that provides cloud-hosted browsers
+for Playwright tests. Combined with GitHub Actions, it creates a **fully automated,
+zero-local-machine** testing pipeline for SAP applications.
 
-```
+```text
 ┌───────────┐   push/PR/cron   ┌──────────────────────┐   WebSocket    ┌───────────────┐
 │  GitHub   │ ───────────────► │  GitHub Actions       │ ◄════════════► │  Azure Cloud  │
 │  Repo     │                  │  Runner (ubuntu)      │  Playwright    │  Browsers     │
@@ -45,7 +49,10 @@ Azure Playwright Workspaces is a Microsoft-managed service that provides cloud-h
 | **Your local machine**     | Not involved          | Push to GitHub and review results — that's it                 |
 
 :::info Key insight
-Playwright Workspaces uses `browserType.connect()` (full Playwright protocol over WebSocket). This means **all Playwright APIs work identically** — `page.evaluate()`, `addInitScript()`, `selectors.register()`, custom fixtures. Only the browser runs remotely; your test logic stays on the runner.
+Playwright Workspaces uses `browserType.connect()` (full Playwright protocol over WebSocket).
+This means **all Playwright APIs work identically** — `page.evaluate()`, `addInitScript()`,
+`selectors.register()`, custom fixtures. Only the browser runs remotely;
+your test logic stays on the runner.
 :::
 
 ## Architecture
@@ -61,7 +68,7 @@ This split is transparent to your tests. When your test calls `page.goto()` or `
 
 ### Data Flow: SAP E2E Test Execution
 
-```
+```text
 Step 1: GitHub Actions trigger (push / PR / cron / manual)
    │
    ▼
@@ -138,8 +145,8 @@ Every Praman feature works with remote browsers because the split is at the brow
 | **Name**           | e.g., `praman-sap-testing`                                       |
 | **Location**       | Choose closest to your SAP system (e.g., West Europe for EU BTP) |
 
-4. Select **Review + Create** → **Create**
-5. Once deployed, go to the resource → **Get Started** → copy the **endpoint URL**
+1. Select **Review + Create** → **Create**
+2. Once deployed, go to the resource → **Get Started** → copy the **endpoint URL**
 
 ### Step 2: Install Azure Packages
 
@@ -353,7 +360,7 @@ npx playwright test --config=playwright.service.config.ts --workers=20
 
 ### SAP BTP / S/4HANA Cloud (Public)
 
-```
+```text
 GitHub Runner ──WebSocket──► Azure Browsers ──HTTPS──► SAP BTP (public URL)
 ```
 
@@ -361,7 +368,7 @@ No special configuration needed. Cloud browsers have standard internet access.
 
 ### SAP On-Premise (Behind Firewall)
 
-```
+```text
 GitHub Runner ──WebSocket──► Azure Browsers ──tunnel──► GitHub Runner ──VPN──► SAP On-Prem
 ```
 
@@ -377,7 +384,7 @@ The runner must have network access to the SAP system (e.g., via a self-hosted G
 
 ### SAP on localhost (Development)
 
-```
+```text
 GitHub Runner ──WebSocket──► Azure Browsers ──tunnel──► GitHub Runner ──localhost──► SAP proxy
 ```
 
@@ -422,7 +429,7 @@ Free trial includes **100 test minutes/month**.
 
 ### Connection Timeout
 
-```
+```text
 Error: browserType.connect: Timeout 30000ms exceeded.
 ```
 
@@ -430,7 +437,7 @@ Increase `connectTimeout` in the service config. Check that `PLAYWRIGHT_SERVICE_
 
 ### SAP System Unreachable
 
-```
+```text
 Error: page.goto: net::ERR_CONNECTION_REFUSED
 ```
 

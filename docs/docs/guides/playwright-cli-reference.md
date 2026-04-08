@@ -182,10 +182,12 @@ playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/script
 
 :::note Windows users
 The `$(cat ...)` syntax is Bash-only. On Windows PowerShell, use:
+
 ```powershell
 $script = Get-Content node_modules/playwright-praman/dist/scripts/discover-all.js -Raw
 playwright-cli -s=sap run-code $script
 ```
+
 :::
 
 ---
@@ -378,7 +380,8 @@ For detailed iframe handling, see [CLI iFrame Guide](./playwright-cli-iframes.md
 
 ### Timeout Defaults
 
-CLI commands have a default timeout of 30 seconds. For slow SAP systems, some operations may need longer waits implemented via `run-code` with explicit `Promise` + `setTimeout` patterns rather than relying on the default timeout.
+CLI commands have a default timeout of 30 seconds. For slow SAP systems, some operations may need longer waits implemented via `run-code`
+with explicit `Promise` + `setTimeout` patterns rather than relying on the default timeout.
 
 ---
 
@@ -438,7 +441,8 @@ Then reference the output file in your CLI config:
 
 ### `snapshot`
 
-Captures a structured view of all UI5 controls from a running CLI session. Unlike `playwright snapshot` (which captures an accessibility tree), `praman snapshot` returns control IDs, types, properties, and OData bindings:
+Captures a structured view of all UI5 controls from a running CLI session. Unlike `playwright snapshot` (which captures an accessibility tree),
+`praman snapshot` returns control IDs, types, properties, and OData bindings:
 
 ```bash
 # JSON output (default)

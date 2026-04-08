@@ -205,7 +205,7 @@ export default {
 
 After a test run, the `reports/` directory contains:
 
-```
+```text
 reports/
   ├── compliance-report.json   ← Praman adoption metrics
   ├── odata-trace.json         ← OData performance data

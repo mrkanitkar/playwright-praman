@@ -223,7 +223,7 @@ function ArchitectureSVG(): ReactNode {
     },
     {
       label: 'Fixtures & Auth',
-      sub: '21 fixtures · SAP auth · OData · FLP',
+      sub: '17 fixtures · SAP auth · OData · FLP',
       fill: 'rgba(255,255,255,0.12)',
       stroke: 'rgba(255,255,255,0.35)',
     },

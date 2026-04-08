@@ -11,6 +11,16 @@ keywords:
 
 # Finding Controls with Locators
 
+:::info[In this guide]
+
+- Find UI5 controls using CSS-style `page.locator('ui5=...')` syntax
+- Match controls by type, ID, properties, labels, and position
+- Use combinators to scope searches within containers
+- Choose between `ui5.control()` and `page.locator()` for your use case
+- Debug selector issues with `ui5:debug-xml()`
+
+:::
+
 Praman registers a `ui5=` custom selector engine with Playwright. You can use it with
 `page.locator()` to find UI5 controls using CSS-like syntax. No setup is needed — the engine
 is registered automatically when you import from `playwright-praman`.
@@ -427,3 +437,42 @@ The engine is bundled by esbuild as a self-contained browser script and injected
 Playwright's `selectors.register('ui5', { content })` API as a worker-scoped auto-fixture.
 
 </details>
+
+## FAQ
+
+<details>
+<summary>Can I mix ui5= locators with standard Playwright locators?</summary>
+
+Yes. Use `page.locator('ui5=...')` for UI5 controls and standard Playwright locators
+(`page.getByRole()`, `page.getByText()`, `page.locator('css=...')`) for non-UI5 DOM elements.
+Both return standard Playwright `Locator` objects and work together in the same test.
+
+</details>
+
+<details>
+<summary>Why does my ui5= locator return no matches?</summary>
+
+The `ui5=` engine queries the UI5 control registry, not the DOM. If UI5 has not finished
+loading, the registry is empty. Ensure the page is ready by using the `ui5` fixture (which
+handles stability waits automatically) or by waiting for the UI5 core to exist before
+querying with `page.locator()`.
+
+</details>
+
+<details>
+<summary>Should I use CSS syntax or XPath syntax?</summary>
+
+Use CSS syntax for most cases — it is more readable and covers the majority of selector
+patterns (type, ID, properties, combinators, pseudo-classes). Use XPath only when you need
+features not available in CSS, such as `starts-with()` on property values or complex boolean
+logic with `and`/`or` operators.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Selector Reference →](./selectors.md)** — Use `UI5Selector` objects with `ui5.control()` for typed proxy access
+- **[Control Interactions →](./control-interactions.md)** — Click, fill, and read controls after finding them
+- **[Typed Control Returns →](./typed-controls.md)** — Get autocomplete for 199 control types
+
+:::

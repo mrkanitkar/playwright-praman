@@ -4,7 +4,8 @@ title: 'Intent API'
 
 # Intent API
 
-The `playwright-praman/intents` sub-path provides high-level, business-oriented test operations for SAP S/4HANA modules. Instead of interacting with individual UI5 controls, intent APIs express test steps in business terms.
+The `playwright-praman/intents` sub-path provides high-level, business-oriented test operations for SAP S/4HANA modules. Instead of interacting
+with individual UI5 controls, intent APIs express test steps in business terms.
 
 ## Overview
 
@@ -261,7 +262,7 @@ Each domain defines typed data interfaces:
 
 The intent layer follows strict dependency rules:
 
-```
+```text
 Domain functions (procurement.ts, sales.ts, etc.)
     |
     v

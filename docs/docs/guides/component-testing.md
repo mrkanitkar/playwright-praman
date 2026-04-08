@@ -25,7 +25,7 @@ the full Fiori Launchpad. This approach provides:
 
 ### UI5 App Structure
 
-```
+```text
 my-ui5-app/
   webapp/
     Component.js

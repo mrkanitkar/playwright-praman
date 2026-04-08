@@ -4,7 +4,8 @@ title: 'Vocabulary System'
 
 # Vocabulary System
 
-The `playwright-praman/vocabulary` sub-path provides a controlled vocabulary system for SAP S/4HANA business term resolution. It maps natural-language terms to UI5 selectors with fuzzy matching, synonym resolution, and cross-domain search.
+The `playwright-praman/vocabulary` sub-path provides a controlled vocabulary system for SAP S/4HANA business term resolution. It maps
+natural-language terms to UI5 selectors with fuzzy matching, synonym resolution, and cross-domain search.
 
 ## Overview
 
@@ -155,7 +156,7 @@ Before matching, both the query and term names are normalized:
 
 The fuzzy matching tier uses Levenshtein edit distance (standard DP matrix approach). Terms within 3 edits of the query are considered fuzzy matches:
 
-```
+```text
 levenshtein('vendor', 'vendro') = 2  --> Fuzzy match (0.5)
 levenshtein('vendor', 'vend')   = 2  --> Fuzzy match (0.5)
 levenshtein('vendor', 'xyz')    = 6  --> No match
@@ -170,7 +171,8 @@ When multiple terms match, results are sorted by:
 
 ### Disambiguation
 
-The `getFieldSelector()` method includes disambiguation logic. If there are multiple high-confidence matches (0.7-0.85 range) without a clear winner, the method returns `undefined` rather than guessing, allowing the caller to present options to the user or AI agent.
+The `getFieldSelector()` method includes disambiguation logic. If there are multiple high-confidence matches (0.7-0.85 range) without a clear
+winner, the method returns `undefined` rather than guessing, allowing the caller to present options to the user or AI agent.
 
 ## Integration with Intents
 

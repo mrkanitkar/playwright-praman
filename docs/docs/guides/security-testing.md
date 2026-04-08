@@ -4,7 +4,8 @@ title: 'Security Testing Patterns'
 
 # Security Testing Patterns
 
-SAP applications handle sensitive business data and must enforce strict security boundaries. This guide covers automated security testing patterns with Praman, including CSRF validation, XSS input testing, authorization boundaries, and session handling.
+SAP applications handle sensitive business data and must enforce strict security boundaries. This guide covers automated security testing patterns
+with Praman, including CSRF validation, XSS input testing, authorization boundaries, and session handling.
 
 ## CSRF Token Validation
 
@@ -143,4 +144,5 @@ test('session timeout redirects to login', async ({ page, ui5, context }) => {
 - **Testing with admin-only accounts**: Always test authorization boundaries from both sides -- verify that permitted actions work AND that forbidden actions are blocked.
 - **CSRF token caching**: SAP caches CSRF tokens per session. If your test clears cookies mid-test, the cached token becomes invalid. Re-fetch the token after any session manipulation.
 - **XSS in rich text editors**: SAP UI5's `RichTextEditor` intentionally allows HTML input. Do not flag this as an XSS vulnerability. Focus XSS tests on plain input fields.
-- **Session timeout values**: SAP session timeouts are server-configured (typically 30-60 minutes). Do not rely on waiting for actual timeout in tests. Simulate it by clearing cookies or manipulating session state.
+- **Session timeout values**: SAP session timeouts are server-configured (typically 30-60 minutes). Do not rely on waiting for actual timeout
+  in tests. Simulate it by clearing cookies or manipulating session state.

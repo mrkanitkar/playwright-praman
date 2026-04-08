@@ -1,11 +1,26 @@
 ---
 title: 'From Selenium WebDriver'
 description: 'Migrate from Selenium WebDriver to Playwright + Praman for SAP testing. Maps every Selenium concept (drivers, waits, locators, POM) to Playwright equivalents.'
+keywords:
+  - selenium to playwright
+  - migrate selenium sap
+  - webdriver vs playwright
+  - sap test automation selenium
 ---
 
 Migrating from Selenium WebDriver (Java, Python, C#, or JavaScript) to Playwright + Praman for
 SAP Fiori and UI5 web application testing. This guide maps every core Selenium concept to its
 Praman equivalent, compares configuration, and provides a step-by-step migration path.
+
+:::info[In this guide]
+
+- Replace WebDriver protocol, driver management, and Selenium Grid with zero-infrastructure Playwright
+- Convert `By.id()`, `By.xpath()`, and `By.css()` selectors to UI5-aware `UI5Selector` objects
+- Eliminate explicit waits and `Thread.sleep()` with automatic `waitForUI5Stable()`
+- Migrate Page Object Model classes to Playwright fixtures with dependency injection
+- Adopt SAP-specific capabilities that have no Selenium equivalent (auth, FLP navigation, OData)
+
+:::
 
 ## Quick Comparison
 
@@ -24,7 +39,7 @@ Praman equivalent, compares configuration, and provides a step-by-step migration
 | Reporting          | Allure, ExtentReports (third-party)                | Built-in HTML, JSON, JUnit reporters                    |
 | AI integration     | None                                               | Built-in capabilities, recipes, agentic handler         |
 | OData helpers      | None                                               | Model-level + HTTP-level CRUD                           |
-| FLP navigation     | Manual URL construction                            | 9 typed navigation methods                              |
+| FLP navigation     | Manual URL construction                            | 11 typed navigation methods                             |
 | Trace / debug      | Screenshots only                                   | Full trace (DOM snapshots, network, console, video)     |
 | Page Object Model  | Class-based POMs                                   | Playwright fixtures (dependency injection)              |
 
@@ -78,6 +93,12 @@ Thread.sleep(5000); // common anti-pattern
 const table = await ui5.control({ controlType: 'sap.m.Table', id: 'poTable' });
 await expect(table).toHaveUI5RowCount({ min: 1 });
 ```
+
+:::warning[Common mistake]
+Do not carry over Selenium's `implicitlyWait` pattern by adding `page.waitForTimeout()` calls in Praman tests.
+Praman's `ui5.control()` automatically waits for the UI5 framework to stabilize (pending OData requests, JS
+timeouts, DOM settle) before returning. Adding manual waits defeats this mechanism and slows your tests.
+:::
 
 ## Selector Mapping
 
@@ -277,7 +298,7 @@ test('after auth', async ({ ui5Navigation }) => {
 });
 ```
 
-### 9 FLP Navigation Methods
+### 11 FLP Navigation Methods
 
 ```typescript
 test('navigation', async ({ ui5Navigation }) => {
@@ -389,25 +410,25 @@ traces but no recovery guidance.
 
 ### Suggested Team Transition Plan
 
-**Week 1-2: Foundation**
+#### Week 1-2: Foundation
 
 - Install Node.js, VS Code, and Playwright on developer machines
 - Complete the [Playwright Primer](./playwright-primer) (2-3 hours per person)
 - Set up a Git repository for the test project
 
-**Week 3-4: First Tests**
+#### Week 3-4: First Tests
 
 - Convert 3-5 Selenium test classes from a single Fiori app to Praman tests
 - Set up authentication via setup projects (replaces Selenium login helpers)
 - Run tests locally and review the HTML report
 
-**Week 5-6: CI Integration**
+#### Week 5-6: CI Integration
 
 - Add `npx playwright test` to your CI/CD pipeline (replaces Grid + Maven Surefire)
 - Configure `screenshot: 'only-on-failure'` and `trace: 'on-first-retry'`
 - Set up environment variables for SAP credentials in CI secrets
 
-**Week 7-8: Scale**
+#### Week 7-8: Scale
 
 - Convert remaining Selenium test suites in priority order
 - Adopt Fiori Elements helpers (`fe.listReport`, `fe.objectPage`) for standard Fiori apps
@@ -423,3 +444,52 @@ traces but no recovery guidance.
 | Driver / Browser Manager   | Not needed (`npx playwright install`)                   |
 | Test Architect (POMs)      | Same role, designs fixtures and helper modules          |
 | QA Lead / Manager          | Reviews PRs, reads Playwright HTML reports, monitors CI |
+
+## FAQ
+
+<details>
+<summary>How does Playwright's architecture differ from Selenium WebDriver?</summary>
+
+Selenium communicates with the browser over the W3C WebDriver protocol via HTTP. Each command is a
+round-trip HTTP request to the driver server (ChromeDriver, GeckoDriver). Playwright uses the Chrome
+DevTools Protocol (CDP) or WebDriver BiDi over a persistent WebSocket connection. This means Playwright
+commands are faster, support event-driven waiting, and do not require separate driver binaries.
+
+</details>
+
+<details>
+<summary>Can I migrate incrementally or do I need to rewrite all tests at once?</summary>
+
+You can migrate incrementally. Start with a few high-value test classes, convert them to Praman tests,
+and run both Selenium and Playwright suites in parallel during the transition. Praman supports hybrid
+tests where `page.locator()` and `ui5.control()` coexist in the same file, so you can convert selectors
+one at a time.
+
+</details>
+
+<details>
+<summary>Do I still need Selenium Grid for parallel execution?</summary>
+
+No. Playwright has native parallel execution via the `workers` setting in `playwright.config.ts`. Each
+worker runs in its own isolated browser context. There is no grid infrastructure to install, configure,
+or maintain. Run `npx playwright test` on any machine or CI runner.
+
+</details>
+
+<details>
+<summary>What happens to my Page Object Model classes?</summary>
+
+Playwright uses fixtures instead of class-based Page Object Models. Fixtures provide dependency injection
+with automatic setup and teardown. You can extract reusable logic into helper functions (see the
+"Page Object Model to Fixtures" section above). The pattern is simpler and avoids the `@FindBy`
+annotation overhead.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Getting Started](./getting-started.md)** -- Install Praman and run your first SAP UI5 test
+- **[Selectors](./selectors.md)** -- Learn the full `UI5Selector` syntax for targeting controls
+- **[Control Interactions](./control-interactions.md)** -- Click, fill, select, and assert on UI5 controls
+
+:::

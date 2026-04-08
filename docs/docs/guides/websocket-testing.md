@@ -4,7 +4,8 @@ title: 'WebSocket & Real-Time Testing'
 
 # WebSocket & Real-Time Testing
 
-Some SAP applications use WebSocket connections for real-time features such as collaborative editing, live notifications, and push-based data updates. This guide covers how to monitor, intercept, and test WebSocket communication alongside Praman's UI5 bridge.
+Some SAP applications use WebSocket connections for real-time features such as collaborative editing, live notifications, and push-based data
+updates. This guide covers how to monitor, intercept, and test WebSocket communication alongside Praman's UI5 bridge.
 
 ## SAP WebSocket Scenarios
 
@@ -119,7 +120,8 @@ test('app handles WebSocket connection failure gracefully', async ({ page, ui5 }
 
 ## Combining WebSocket Testing with ui5.waitForUI5()
 
-The Praman bridge's `waitForUI5()` monitors the UI5 framework's internal pending request counter, but WebSocket messages are not tracked as pending requests by default. This means `waitForUI5()` may resolve before a WebSocket-triggered model update has been processed.
+The Praman bridge's `waitForUI5()` monitors the UI5 framework's internal pending request counter, but WebSocket messages are not tracked
+as pending requests by default. This means `waitForUI5()` may resolve before a WebSocket-triggered model update has been processed.
 
 To handle this, add an explicit wait for the expected UI change after `waitForUI5()`:
 
@@ -139,7 +141,8 @@ test('wait for WS-driven model update', async ({ page, ui5 }) => {
 
 ## Common Pitfalls
 
-- **waitForUI5() does not wait for WebSocket updates**: The UI5 stability check monitors XHR/fetch requests and setTimeout callbacks, not WebSocket frames. Always add an explicit wait for the expected DOM or model change after a WebSocket event.
+- **waitForUI5() does not wait for WebSocket updates**: The UI5 stability check monitors XHR/fetch requests and setTimeout callbacks,
+  not WebSocket frames. Always add an explicit wait for the expected DOM or model change after a WebSocket event.
 - **WebSocket timing in CI**: WebSocket connections may take longer to establish in CI environments. Use generous timeouts (10-15 seconds) for WebSocket-related waits.
 - **Binary WebSocket frames**: Some SAP services send binary WebSocket frames (e.g., for file collaboration). Use `frame.payload` as a `Buffer` instead of calling `.toString()`.
 - **Multiple WebSocket connections**: An SAP FLP page may open several WebSocket connections (notifications, collaboration, analytics). Filter by URL pattern to isolate the one you are testing.

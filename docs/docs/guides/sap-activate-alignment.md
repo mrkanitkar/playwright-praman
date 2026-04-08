@@ -73,7 +73,7 @@ test('SAP system connectivity check', async ({ ui5, ui5Navigation, page }) => {
 
 ### Project Structure
 
-```
+```text
 tests/
   auth-setup.ts              # Authentication setup project
   smoke/                     # Phase 3: Fit-to-standard

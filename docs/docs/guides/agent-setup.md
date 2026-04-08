@@ -1,8 +1,25 @@
 ---
 title: Agent & IDE Setup
+description: 'Set up AI agents and IDE integrations for Praman SAP test automation with Claude Code, Copilot, Cursor, and VS Code.'
+keywords:
+  - praman agent setup
+  - playwright sap ai agent
+  - claude code sap testing
+  - copilot sap test automation
+  - praman ide setup
 ---
 
 # Agent & IDE Setup
+
+:::info[In this guide]
+
+- Run `npx playwright-praman init` to scaffold your project with AI agents and IDE config
+- Understand which files are installed for each IDE (Claude Code, Copilot, Cursor, VS Code)
+- Install agents for a specific IDE using `init-agents --loop=<ide>`
+- Configure the seed file for AI agent SAP discovery
+- Set up debugging with VS Code, JetBrains, and Playwright Inspector
+
+:::
 
 `npx playwright-praman init` scaffolds your project and, based on the IDEs it detects,
 automatically installs AI agent definitions, seed files, and IDE configuration.
@@ -753,3 +770,109 @@ Most `doctor` failures include a `suggestion` field with the exact command to ru
 - Works on Windows 10/11, macOS, and Linux
 - `.auth/` uses `.gitignore` patterns — add `.auth/` to your `.gitignore`
 - The seed file uses `SAP_CLOUD_BASE_URL` (not `SAP_BASE_URL`) — check your `.env`
+
+## What If I Don't Use AI Agents?
+
+AI agents are optional. If you prefer writing tests manually, you can skip agent setup entirely
+and use Praman fixtures directly:
+
+```typescript
+// tests/manual-test.spec.ts
+import { test, expect } from 'playwright-praman';
+
+test('manual SAP test', async ({ ui5, ui5Navigation }) => {
+  await ui5Navigation.navigateToApp('PurchaseOrder-manage');
+  await ui5.waitForUI5();
+
+  const createBtn = await ui5.control({
+    controlType: 'sap.m.Button',
+    properties: { text: 'Create' },
+  });
+  await expect(createBtn).toBeUI5Enabled();
+});
+```
+
+You still need `playwright.config.ts`, `praman.config.ts`, and auth setup — but no agent
+definitions, seed files, or MCP server. Run `npx playwright-praman init` and ignore the
+agent-related output files, or use `--no-cli` and skip the agent prompt steps.
+
+See the [Playwright Primer](./playwright-primer) for a ground-up introduction to writing tests
+without AI agents.
+
+:::warning[Common mistake]
+Do not confuse MCP agents and CLI agents. MCP agents require `@playwright/mcp` (separate install
+on Playwright 1.59+). CLI agents use `@playwright/cli` and work without an MCP server. If you see
+"MCP connection failed" errors, either install `@playwright/mcp` or switch to CLI agents
+(files with `-cli` suffix).
+:::
+
+## FAQ
+
+<details>
+<summary>Do I need both MCP and CLI agents?</summary>
+
+No. Both are installed by default, but you only need one set. MCP agents use a persistent browser
+connection via JSON-RPC. CLI agents invoke shell commands and are 30-50% more token-efficient.
+
+Use MCP agents if your IDE has good MCP support (Claude Code, Copilot). Use CLI agents if you
+want lower token usage or the MCP server is unavailable. Pass `--no-cli` to `init` to skip
+CLI agent installation.
+
+See [MCP vs CLI](./mcp-vs-cli.md) for a detailed comparison.
+
+</details>
+
+<details>
+<summary>How do I add agents for a second IDE after initial setup?</summary>
+
+Use `init-agents` with the `--loop` flag:
+
+```bash
+# Add Claude Code agents to an existing project
+npx playwright-praman init-agents --loop=claude
+
+# Add Copilot agents
+npx playwright-praman init-agents --loop=copilot
+```
+
+This only installs agent files — it does not re-scaffold configs or run npm install.
+
+</details>
+
+<details>
+<summary>The seed file fails with "SAP_CLOUD_BASE_URL is not set"</summary>
+
+Create a `.env` file in your project root with your SAP credentials:
+
+```bash
+# .env
+SAP_CLOUD_BASE_URL=https://your-system.s4hana.cloud.sap/
+SAP_CLOUD_USERNAME=your-user
+SAP_CLOUD_PASSWORD=your-password
+```
+
+The seed file reads these variables at runtime. Make sure `dotenv` is loading the file —
+`init` installs `dotenv` automatically and configures `playwright.config.ts` to load it.
+
+</details>
+
+<details>
+<summary>Can I use Praman with JetBrains IDEs (WebStorm/IntelliJ)?</summary>
+
+Yes. While `init` does not auto-detect JetBrains IDEs, Praman tests work in WebStorm and
+IntelliJ with the Playwright plugin. See the [JetBrains IDEs](#jetbrains-ides-webstormintellij)
+section above for run configuration setup.
+
+AI agent definitions (planner, generator, healer) are IDE-specific and currently support
+Claude Code, Copilot, Cursor, and Jules. For JetBrains, write tests manually using Praman
+fixtures.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Running Your Agent →](./running-your-agent)** — Launch your first AI agent session and generate tests
+- **[Authentication Guide →](./authentication)** — Configure SAP login strategies for the seed file
+- **[Playwright CLI Setup →](./playwright-cli-setup)** — Set up the token-efficient CLI alternative to MCP
+
+:::

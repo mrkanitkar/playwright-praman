@@ -13,7 +13,7 @@ while documenting intentional divergences.
 Golden master testing (also called characterization testing or approval testing) captures the
 output of the reference implementation and compares it against the new implementation.
 
-```
+```text
 ┌──────────────────────┐    ┌──────────────────────┐
 │  wdi5 (reference)    │    │  Praman (new)         │
 │                      │    │                       │
@@ -231,7 +231,7 @@ for debuggability.
 Parity tests live in a dedicated directory and run both implementations against the same SAP
 system.
 
-```
+```text
 tests/
   parity/
     scenarios/

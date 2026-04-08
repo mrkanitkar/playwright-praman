@@ -48,7 +48,8 @@ export default defineConfig({
 });
 ```
 
-CI now runs a **three-channel integration matrix**: Playwright stable, Playwright `next` (canary), and the bundled Chromium baseline — so Praman validates against upcoming Playwright changes before they ship.
+CI now runs a **three-channel integration matrix**: Playwright stable, Playwright `next` (canary), and the bundled
+Chromium baseline — so Praman validates against upcoming Playwright changes before they ship.
 
 ### 🔷 TypeScript 6.x Support
 
@@ -64,9 +65,13 @@ See the [TypeScript 6.0 Compatibility Report](https://github.com/mrkanitkar/play
 
 ### 🔍 Unified `ui5=` Selector Engine
 
-The three separate selector parsers (CSS engine, XPath engine, legacy ui5-selector-engine) have been **replaced by a single unified engine** powered by [`fontoxpath`](https://github.com/nicktindall/fontoxpath) (XPath 3.1) and [`css-selector-parser`](https://github.com/nicktindall/css-selector-parser).
+The three separate selector parsers (CSS engine, XPath engine, legacy ui5-selector-engine) have been
+**replaced by a single unified engine** powered by [`fontoxpath`](https://github.com/nicktindall/fontoxpath)
+(XPath 3.1) and [`css-selector-parser`](https://github.com/nicktindall/css-selector-parser).
 
-CSS-style selectors like `sap.m.Button[text=Save]` are now parsed to an AST, converted to XPath 3.1, and evaluated against an in-memory XML DOM built from the live UI5 control tree. This is the same proven approach used by [`playwright-ui5`](https://github.com/SAP/ui5-tooling-transitive-dependencies/tree/main).
+CSS-style selectors like `sap.m.Button[text=Save]` are now parsed to an AST, converted to XPath 3.1, and evaluated
+against an in-memory XML DOM built from the live UI5 control tree. This is the same proven approach used by
+[`playwright-ui5`](https://github.com/SAP/ui5-tooling-transitive-dependencies/tree/main).
 
 **New pseudo-classes and combinators:**
 
@@ -113,7 +118,7 @@ npx praman inspect https://my-sap.example.com --auth .auth/user.json
 
 Click any element in the browser to see:
 
-```
+```text
 ━━━ Clicked: sap.m.Button ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   ID:      __button0--orderCreateBtn
@@ -137,13 +142,16 @@ Click any element in the browser to see:
     await ui5.control({ controlType: 'sap.m.Button', properties: { text: 'Create Order' } });
 ```
 
-Selectors are **ranked by stability** — stable semantic properties before IDs, IDs before composite selectors. The inspector highlights the matched control with a blue border overlay so you can confirm the selection.
+Selectors are **ranked by stability** — stable semantic properties before IDs, IDs before composite selectors.
+The inspector highlights the matched control with a blue border overlay so you can confirm the selection.
 
 Read more in the [Interactive Inspector guide](/docs/guides/inspect-command).
 
 ### ⚙️ `npx praman config` — Display Resolved Configuration
 
-New CLI command that prints the fully resolved `PramanConfig` to the terminal — including values sourced from environment variables, `playwright.config.ts`, and defaults. Useful for debugging authentication and AI configuration on CI without adding debug logging to tests.
+New CLI command that prints the fully resolved `PramanConfig` to the terminal — including values sourced from
+environment variables, `playwright.config.ts`, and defaults. Useful for debugging authentication and AI
+configuration on CI without adding debug logging to tests.
 
 ```bash
 npx praman config
@@ -151,7 +159,7 @@ npx praman config
 
 Output (example):
 
-```
+```text
 Praman Resolved Configuration
 ──────────────────────────────
 baseUrl:         https://my-sap.example.com
@@ -182,7 +190,8 @@ See the [Configuration guide](/docs/guides/configuration) for the full reference
 
 ### 🔌 Extension System & Custom Matcher Registry
 
-Praman now exposes a **plugin API** for registering custom control matchers and fixture extensions at initialization time. This enables shared testing libraries to ship Praman extensions without modifying the core:
+Praman now exposes a **plugin API** for registering custom control matchers and fixture extensions at initialization
+time. This enables shared testing libraries to ship Praman extensions without modifying the core:
 
 ```typescript
 // my-extension.ts
@@ -224,7 +233,7 @@ All typed `PramanError` subclasses now include a `docsUrl` field that links dire
 - The serialized JSON (for reporting and AI context)
 - The AI-envelope when Praman errors are surfaced to LLM agents
 
-```
+```text
 ControlError: Control not found: sap.m.Button[text=Save]
   code: ERR_CONTROL_NOT_FOUND
   docsUrl: https://praman.dev/docs/guides/errors#err-control-not-found
@@ -320,7 +329,7 @@ TypeDoc now reports **zero warnings** across all public exports. Every exported 
 
 ## Version 1.1.2
 
-_Released: March 7, 2026_
+Released: March 7, 2026
 
 ### Bug Fixes
 
@@ -330,7 +339,7 @@ _Released: March 7, 2026_
 
 ## Version 1.1.1
 
-_Released: March 7, 2026_
+Released: March 7, 2026
 
 ### Features
 
@@ -346,7 +355,7 @@ _Released: March 7, 2026_
 
 ## Version 1.1.0
 
-_Released: March 7, 2026_
+Released: March 7, 2026
 
 ### Features
 
@@ -360,7 +369,7 @@ _Released: March 7, 2026_
 
 ## Version 1.0.4
 
-_Released: March 7, 2026_
+Released: March 7, 2026
 
 ### Bug Fixes
 
@@ -371,7 +380,7 @@ _Released: March 7, 2026_
 
 ## Version 1.0.0
 
-_Released: February 16, 2026_
+Released: February 16, 2026
 
 Initial release of `playwright-praman` — Agent-First SAP UI5 Test Automation Plugin for Playwright.
 

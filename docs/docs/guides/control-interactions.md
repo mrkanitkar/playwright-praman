@@ -1,10 +1,44 @@
 ---
 title: UI5 Control Interactions
+description: 'Click, fill, select, check, and read UI5 controls with Praman. Auto-waiting, typed returns, and SAP event firing built in.'
+keywords:
+  - playwright ui5 click button
+  - sap ui5 fill input field
+  - praman control interactions
+  - sap ui5 test automation
 ---
+
+# UI5 Control Interactions
+
+:::info[In this guide]
+
+- Click buttons, fill inputs, and select dropdown values using the `ui5` fixture
+- Understand auto-waiting behavior and how it differs from Playwright's native auto-wait
+- Read control properties and text for assertions
+- Learn the three-tier wait sequence that runs during navigation
+- Skip stability waits for performance-critical paths
+
+:::
 
 The `ui5` fixture provides high-level methods for interacting with UI5 controls. Each method
 discovers the control, waits for UI5 stability, and performs the action through the configured
 interaction strategy.
+
+:::warning[Common mistake]
+Do not use Playwright's native `page.click()` with DOM selectors to interact with UI5 controls.
+UI5 controls manage their own event lifecycle, and DOM-level clicks can bypass OData model
+updates, validation handlers, and change events.
+
+```typescript
+// Wrong — bypasses UI5 event system
+await page.click('#__xmlview0--saveBtn');
+
+// Correct — fires UI5 events, waits for stability
+await ui5.click({ id: 'saveBtn' });
+```
+
+:::
+
 
 :::tip Typed Control Returns
 When you use `controlType` in your selector, the returned control is typed to the specific interface
@@ -190,3 +224,63 @@ Each interaction method follows this sequence:
 
 If the primary strategy method fails (e.g., `firePress()` not available), the strategy
 automatically falls back to its secondary method (e.g., DOM click).
+
+## FAQ
+
+<details>
+<summary>Can I use page.click() instead of ui5.click()?</summary>
+
+You can, but you should not for UI5 controls. `page.click()` performs a DOM-level click that
+bypasses the UI5 event system. This means OData model bindings may not update, `liveChange`
+and `change` events may not fire, and validation logic may be skipped. Use `ui5.click()` for
+all UI5 controls. Reserve `page.click()` for verified non-UI5 DOM elements (e.g., custom
+shell header buttons).
+
+</details>
+
+<details>
+<summary>How do I interact with controls inside a dialog?</summary>
+
+Pass `searchOpenDialogs: true` in your selector:
+
+```typescript
+await ui5.click({
+  controlType: 'sap.m.Button',
+  properties: { text: 'OK' },
+  searchOpenDialogs: true,
+});
+```
+
+Without this flag, Praman only searches the main view's control tree and will not find
+controls rendered inside dialog overlays.
+
+</details>
+
+<details>
+<summary>Why does ui5.fill() fire both liveChange and change events?</summary>
+
+SAP UI5 input controls use `liveChange` for character-by-character updates (e.g., search
+suggestions) and `change` for final value commits (e.g., OData model updates). Praman fires
+both to match real user behavior. Skipping either event can cause missing suggestions,
+incomplete validation, or stale OData bindings.
+
+</details>
+
+<details>
+<summary>What happens if waitForUI5Stable times out?</summary>
+
+A `TimeoutError` is thrown with details about which async operations were still pending
+(e.g., open XHR requests, unresolved promises). Check for long-running OData calls, infinite
+polling, or background model refresh timers. You can increase the timeout via
+`controlDiscoveryTimeout` in your Praman config.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Selector Reference →](./selectors.md)** — Learn all UI5Selector fields for finding controls
+- **[Typed Control Returns →](./typed-controls.md)** — Get full autocomplete for control-specific methods
+- **[Custom Matchers →](./custom-matchers.md)** — Assert UI5 control state with 10 built-in matchers
+- **[Discovery and Interaction Strategies →](./discovery-and-interaction.md)** — Configure how controls are found and acted on
+
+:::

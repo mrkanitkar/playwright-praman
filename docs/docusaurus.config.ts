@@ -24,7 +24,7 @@ const config: Config = {
 
   markdown: {
     hooks: {
-      onBrokenMarkdownLinks: 'warn',
+      onBrokenMarkdownLinks: 'throw',
     },
   },
 
@@ -77,7 +77,7 @@ const config: Config = {
         name: 'playwright-praman',
         description:
           'Agent-First SAP UI5 Test Automation Plugin for Playwright. ' +
-          'Enterprise-grade testing with agentic AI, typed proxies, and 21 fixtures.',
+          'Enterprise-grade testing with agentic AI, typed proxies, and 17 fixtures.',
         url: 'https://praman.dev',
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'Windows, macOS, Linux',
@@ -140,7 +140,7 @@ const config: Config = {
             name: 'Do I need access to SAP source code to use Praman?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'No. Praman interacts with UI5 controls through the public runtime API (sap.ui.getCore()). It queries the control registry at runtime, so you only need browser access to the application.',
+              text: 'No. Praman interacts with UI5 controls through the public runtime API (sap.ui.core.Element.registry for UI5 >= 1.67, with sap.ui.getCore() as a legacy fallback). It queries the control registry at runtime, so you only need browser access to the application.',
             },
           },
           {
@@ -172,7 +172,7 @@ const config: Config = {
             name: 'What authentication methods does Praman support for SAP?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Praman supports 6 authentication strategies: BTP SAML, Basic Auth, Office 365, Client Certificate, Custom IDP, and Manual login. Authentication is handled in seed tests and sessions are reused across test runs.',
+              text: 'Praman supports 6 authentication strategies: Cloud SAML (BTP), On-Premise (Basic/Form), Office 365, Client Certificate, API Token, and Multi-Tenant (BTP). Authentication is handled in seed tests and sessions are reused across test runs.',
             },
           },
           {
@@ -180,7 +180,7 @@ const config: Config = {
             name: 'How many SAP UI5 controls does Praman support?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Praman supports 199 UI5 control types across 8 SAP libraries: sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, sap.ui.mdc, sap.ui.unified, and sap.ui.core. Each control type has a fully typed proxy with IntelliSense.',
+              text: 'Praman supports 199 UI5 control types across 10 SAP libraries: sap.m, sap.ui.table, sap.ui.comp, sap.uxap, sap.f, sap.ui.mdc, sap.ui.unified, sap.ui.core, sap.ui.layout, and sap.tnt. Each control type has a fully typed proxy with IntelliSense.',
             },
           },
           {
@@ -188,7 +188,7 @@ const config: Config = {
             name: 'Is Praman free and open source?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Yes. Praman is licensed under Apache-2.0 and is completely free. It has only 3 production dependencies (commander, pino, zod), all MIT-licensed. The source code is available on GitHub.',
+              text: 'Yes. Praman is licensed under Apache-2.0 and is completely free. It has only 5 production dependencies (commander, css-selector-parser, fontoxpath, pino, zod), all MIT-licensed. The source code is available on GitHub.',
             },
           },
           {
@@ -220,7 +220,7 @@ const config: Config = {
             name: 'Can Praman test SAP Fiori Launchpad and Fiori Elements apps?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Yes. Praman provides dedicated fixtures for SAP Fiori Launchpad navigation (9 methods including semantic object routing and BTP WorkZone support) and Fiori Elements page-object helpers for List Report, Object Page, and Overview Page. It handles tile navigation, intent-based routing, and FLP shell interactions natively.',
+              text: 'Yes. Praman provides dedicated fixtures for SAP Fiori Launchpad navigation (11 methods including semantic object routing and BTP WorkZone support) and Fiori Elements page-object helpers for List Report and Object Page. It handles tile navigation, intent-based routing, and FLP shell interactions natively.',
             },
           },
         ],

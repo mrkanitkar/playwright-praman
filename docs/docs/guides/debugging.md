@@ -39,7 +39,8 @@ PRAMAN_LOG_LEVEL=debug npx playwright test
 ### Creating Module Loggers
 
 :::info[Contributor Only]
-The `createLogger` and `REDACTION_PATHS` APIs use internal path aliases (`#core/*`) and are only available when developing Praman itself. End users control logging via the `PRAMAN_LOG_LEVEL` environment variable.
+The `createLogger` and `REDACTION_PATHS` APIs use internal path aliases (`#core/*`) and are only available when developing Praman itself.
+End users control logging via the `PRAMAN_LOG_LEVEL` environment variable.
 :::
 
 ```typescript
@@ -97,7 +98,7 @@ The Playwright trace viewer has limitations when debugging bridge operations:
 
 3. **UI5 control state is not captured.** The trace viewer captures DOM snapshots but not UI5's in-memory control tree, bindings, or model data.
 
-**Workaround: Use test.step() for visibility**
+#### Workaround: Use test.step() for visibility
 
 Praman wraps operations in `test.step()` calls that appear in the trace timeline:
 
@@ -107,7 +108,7 @@ await test.step('Click submit button', async () => {
 });
 ```
 
-**Workaround: Enable debug logging**
+#### Workaround: Enable debug logging
 
 Set `PRAMAN_LOG_LEVEL=debug` to get detailed bridge communication logs alongside the trace.
 
@@ -151,7 +152,7 @@ export default {
 
 Spans are created for key operations:
 
-```
+```text
 praman.bridge.inject (bridge injection)
   praman.bridge.evaluate (page.evaluate call)
 praman.proxy.findControl (control discovery)
@@ -161,7 +162,8 @@ praman.auth.login (authentication)
 
 ## OData Request Tracing
 
-Praman includes automatic OData network request capture that feeds the `ODataTraceReporter`. When enabled, every browser-level OData request (XHR/fetch) is recorded with method, URL, status code, duration, and response size — no manual instrumentation needed.
+Praman includes automatic OData network request capture that feeds the `ODataTraceReporter`. When enabled, every browser-level OData request
+(XHR/fetch) is recorded with method, URL, status code, duration, and response size — no manual instrumentation needed.
 
 ### Enable automatic tracing
 
@@ -260,7 +262,8 @@ The auto-fixture does exactly this for you. Prefer `odataTracing: { enabled: tru
 
 ### Scope limitation
 
-Auto-tracing captures **browser-level traffic** (XHR/fetch from the SAP Fiori app running in the browser). Node-level `page.request.*` API calls (used by `ui5.odata.createEntity()`, `ui5.odata.queryEntities()`, etc.) operate outside the browser and are not captured by the auto-fixture.
+Auto-tracing captures **browser-level traffic** (XHR/fetch from the SAP Fiori app running in the browser). Node-level `page.request.*` API calls
+(used by `ui5.odata.createEntity()`, `ui5.odata.queryEntities()`, etc.) operate outside the browser and are not captured by the auto-fixture.
 
 ## Error Introspection: toUserMessage() and toAIContext()
 
