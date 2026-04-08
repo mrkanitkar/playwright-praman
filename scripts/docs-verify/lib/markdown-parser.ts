@@ -70,8 +70,8 @@ export function extractCodeBlocks(content: string, languages?: string[]): CodeBl
 
     if (inBlock) {
       blockCode += (blockCode ? '\n' : '') + line;
-    } else if (!commentMatch) {
-      // Reset preceding comment if we hit a non-comment, non-block line
+    } else if (!commentMatch && line.trim() !== '') {
+      // Reset preceding comment if we hit a non-comment, non-blank, non-block line
       precedingComment = undefined;
     }
   }
