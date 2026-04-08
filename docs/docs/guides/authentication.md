@@ -177,7 +177,7 @@ test('navigate after auth', async ({ ui5Navigation }) => {
 SAP_ACTIVE_SYSTEM=onprem
 SAP_ONPREM_BASE_URL=https://sapserver.example.com:8443/sap/bc/ui5_ui5/
 SAP_ONPREM_USERNAME=TESTUSER
-SAP_ONPREM_PASSWORD=secret
+SAP_ONPREM_PASSWORD=<your-password>
 SAP_CLIENT=100
 SAP_LANGUAGE=EN
 ```
@@ -189,7 +189,7 @@ SAP_LANGUAGE=EN
 SAP_ACTIVE_SYSTEM=cloud
 SAP_CLOUD_BASE_URL=https://tenant.launchpad.cfapps.eu10.hana.ondemand.com
 SAP_CLOUD_USERNAME=user@company.com
-SAP_CLOUD_PASSWORD=secret
+SAP_CLOUD_PASSWORD=<your-password>
 ```
 
 ### Office 365 SSO
@@ -200,7 +200,7 @@ SAP_ACTIVE_SYSTEM=cloud
 SAP_AUTH_STRATEGY=office365
 SAP_CLOUD_BASE_URL=https://tenant.launchpad.cfapps.eu10.hana.ondemand.com
 SAP_CLOUD_USERNAME=user@company.onmicrosoft.com
-SAP_CLOUD_PASSWORD=secret
+SAP_CLOUD_PASSWORD=<your-password>
 ```
 
 ## Using the `sapAuth` Fixture

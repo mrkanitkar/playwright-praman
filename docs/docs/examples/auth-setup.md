@@ -15,7 +15,7 @@ Copy this file into your project as `tests/auth-setup.ts` and configure it in `p
 # Required (set in .env.test or CI secrets)
 SAP_BASE_URL=https://your-sap-system.example.com
 SAP_USERNAME=TEST_USER
-SAP_PASSWORD=SecurePassword123
+SAP_PASSWORD=<your-password>
 
 # Optional
 SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'

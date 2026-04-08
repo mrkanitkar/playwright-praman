@@ -371,7 +371,7 @@ npx dotenv -e .env -- npx playwright test
 # Option 2: export in shell
 export SAP_BASE_URL=https://your-sap-system.example.com
 export SAP_CLOUD_USERNAME=testuser
-export SAP_CLOUD_PASSWORD=secret
+export SAP_CLOUD_PASSWORD=<your-password>
 npx playwright test
 
 # Option 3: inline (CI / one-off)
