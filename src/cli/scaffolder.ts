@@ -291,7 +291,7 @@ export async function scaffoldTelemetryExamples(
  * await scaffoldEnvExample('/home/user/project', false, []);
  * ```
  */
-export async function scaffoldEnvExample(
+async function scaffoldEnvExample(
   targetDir: string,
   force: boolean,
   created: string[],
