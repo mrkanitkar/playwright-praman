@@ -28,7 +28,7 @@ import {
 import type { PlaywrightFeatures } from '#core/compat/index.js';
 import type { PramanConfig } from '#core/config/schema.js';
 import { PramanConfigSchema } from '#core/config/schema.js';
-import type { TracerWrapper } from '#core/telemetry/index.js';
+import type { MeterWrapper, TracerWrapper } from '#core/telemetry/index.js';
 
 // ── Mock dependencies ────────────────────────────────────────────────
 
@@ -69,6 +69,13 @@ const mockTracerInstance: TracerWrapper = {
     .fn()
     .mockImplementation(async <T>(_name: string, fn: () => Promise<T>): Promise<T> => fn()),
   recordException: vi.fn(),
+  getActiveTraceId: vi.fn().mockReturnValue(undefined),
+  shutdown: vi.fn().mockResolvedValue(undefined),
+};
+
+const mockMeterInstance: MeterWrapper = {
+  createCounter: vi.fn().mockReturnValue({ add: vi.fn() }),
+  createHistogram: vi.fn().mockReturnValue({ record: vi.fn() }),
   shutdown: vi.fn().mockResolvedValue(undefined),
 };
 
@@ -92,6 +99,7 @@ const mockLoadConfig = vi.fn().mockResolvedValue(mockConfig);
 const mockCreateRootLogger = vi.fn().mockReturnValue(mockRootLoggerInstance);
 const mockCreateLogger = vi.fn().mockReturnValue(mockChildLogger);
 const mockInitTelemetry = vi.fn().mockResolvedValue(mockTracerInstance);
+const mockInitMetrics = vi.fn().mockResolvedValue(mockMeterInstance);
 const mockAssertMinVersion = vi.fn();
 const mockGetPlaywrightFeatures = vi.fn().mockReturnValue(mockFeatures);
 
@@ -155,6 +163,14 @@ class MockUI5HandlerClass {
 /** Mock Playwright page mainFrame sentinel */
 const mockMainFrame = { url: vi.fn().mockReturnValue('https://example.com') };
 
+/** Mock tracing context — typed for safe member access in assertions. */
+const mockTracingContext = {
+  tracing: {
+    startChunk: vi.fn().mockResolvedValue(undefined),
+    stopChunk: vi.fn().mockResolvedValue(undefined),
+  },
+};
+
 /** Mock Playwright page with on/off/mainFrame */
 const mockPage = {
   evaluate: vi.fn().mockResolvedValue(undefined),
@@ -162,6 +178,7 @@ const mockPage = {
   on: vi.fn(),
   off: vi.fn(),
   mainFrame: vi.fn().mockReturnValue(mockMainFrame),
+  context: vi.fn().mockReturnValue(mockTracingContext),
 };
 
 vi.mock('node:fs', async (importOriginal) => {
@@ -183,6 +200,7 @@ vi.mock('#core/logging/index.js', () => ({
 
 vi.mock('#core/telemetry/index.js', () => ({
   initTelemetry: mockInitTelemetry,
+  initMetrics: mockInitMetrics,
 }));
 
 vi.mock('#core/compat/index.js', () => ({
@@ -192,6 +210,18 @@ vi.mock('#core/compat/index.js', () => ({
 
 vi.mock('#bridge/injection.js', () => ({
   resetPageInjection: mockResetPageInjection,
+}));
+
+const mockApplyRegisteredMatchers = vi.fn().mockReturnValue({});
+
+vi.mock('../../../src/matchers/matcher-registry.js', () => ({
+  applyRegisteredMatchers: mockApplyRegisteredMatchers,
+}));
+
+const mockCreateObjectCleanupScript = vi.fn().mockReturnValue('cleanup();');
+
+vi.mock('#bridge/browser-scripts/object-map.js', () => ({
+  createObjectCleanupScript: mockCreateObjectCleanupScript,
 }));
 
 vi.mock('#bridge/interaction-strategies/strategy-factory.js', () => ({
@@ -303,12 +333,15 @@ function resetAllMockDefaults(): void {
   mockCreateRootLogger.mockReturnValue(mockRootLoggerInstance);
   mockCreateLogger.mockReturnValue(mockChildLogger);
   mockInitTelemetry.mockResolvedValue(mockTracerInstance);
+  mockInitMetrics.mockResolvedValue(mockMeterInstance);
   mockAssertMinVersion.mockImplementation(() => undefined);
   mockGetPlaywrightFeatures.mockReturnValue(mockFeatures);
   mockPage.on.mockImplementation(() => undefined);
   mockPage.off.mockImplementation(() => undefined);
   mockPage.mainFrame.mockReturnValue(mockMainFrame);
   mockCreateInteractionStrategy.mockReturnValue(mockInteractionStrategy);
+  mockApplyRegisteredMatchers.mockReturnValue({});
+  mockCreateObjectCleanupScript.mockReturnValue('cleanup();');
   lastUI5HandlerOptions = undefined;
 }
 
@@ -595,6 +628,16 @@ describe('core-fixtures worker-scoped fixture definitions', () => {
       // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
       await expect(runFixture<void>(fn, {})).resolves.toBeUndefined();
     });
+
+    it('extends expect with custom matchers when registered', async () => {
+      const customMatcher = vi.fn();
+      mockApplyRegisteredMatchers.mockReturnValue({ toHaveCustomStatus: customMatcher });
+
+      const fn = extractFixtureFn(fixtures['matcherRegistration']);
+
+      // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- testing void fixture
+      await expect(runFixture<void>(fn, {})).resolves.toBeUndefined();
+    });
   });
 
   describe('worker fixture identity (same instance per worker)', () => {
@@ -646,6 +689,45 @@ describe('core-fixtures test-scoped fixture definitions', () => {
     });
   });
 
+  describe('meter fixture', () => {
+    it('initializes metrics with pramanConfig', async () => {
+      const fn = extractFixtureFn(fixtures['meter']);
+      const meter = await runFixture(fn, { pramanConfig: mockConfig });
+
+      expect(mockInitMetrics).toHaveBeenCalledWith(mockConfig);
+      expect(meter).toBe(mockMeterInstance);
+    });
+
+    it('declares meter as worker-scoped', () => {
+      const options = extractFixtureOptions(fixtures['meter']);
+
+      expect(options).toBeDefined();
+      expect(options?.['scope']).toBe('worker');
+    });
+
+    it('calls meter.shutdown() during teardown', async () => {
+      const fn = extractFixtureFn(fixtures['meter']);
+
+      const shutdownSpy = vi.fn().mockResolvedValue(undefined);
+      const meterWithSpy: MeterWrapper = {
+        ...mockMeterInstance,
+        shutdown: shutdownSpy,
+      };
+      mockInitMetrics.mockResolvedValue(meterWithSpy);
+
+      let capturedMeter: MeterWrapper | undefined;
+      const useFn = async (value: MeterWrapper): Promise<void> => {
+        capturedMeter = value;
+        await Promise.resolve();
+      };
+
+      await fn({ pramanConfig: mockConfig }, useFn);
+
+      expect(capturedMeter).toBe(meterWithSpy);
+      expect(shutdownSpy).toHaveBeenCalledOnce();
+    });
+  });
+
   describe('ui5 fixture', () => {
     it('creates UI5Handler with page, interactionStrategy, and config', async () => {
       const fn = extractFixtureFn(fixtures['ui5']);
@@ -653,6 +735,8 @@ describe('core-fixtures test-scoped fixture definitions', () => {
         page: mockPage,
         pramanConfig: mockConfig,
         rootLogger: mockRootLoggerInstance,
+        tracer: mockTracerInstance,
+        meter: mockMeterInstance,
       });
 
       expect(mockCreateInteractionStrategy).toHaveBeenCalledWith(
@@ -681,6 +765,8 @@ describe('core-fixtures test-scoped fixture definitions', () => {
         page: mockPage,
         pramanConfig: mockConfig,
         rootLogger: mockRootLoggerInstance,
+        tracer: mockTracerInstance,
+        meter: mockMeterInstance,
       });
 
       expect(mockCreateLogger).toHaveBeenCalledWith('bridge', mockRootLoggerInstance);
@@ -692,6 +778,8 @@ describe('core-fixtures test-scoped fixture definitions', () => {
         page: mockPage,
         pramanConfig: mockConfig,
         rootLogger: mockRootLoggerInstance,
+        tracer: mockTracerInstance,
+        meter: mockMeterInstance,
       });
 
       expect(mockPage.on).toHaveBeenCalledWith('framenavigated', expect.any(Function));
@@ -710,6 +798,8 @@ describe('core-fixtures test-scoped fixture definitions', () => {
         page: mockPage,
         pramanConfig: mockConfig,
         rootLogger: mockRootLoggerInstance,
+        tracer: mockTracerInstance,
+        meter: mockMeterInstance,
       });
 
       expect(capturedListener).toBeDefined();
@@ -734,6 +824,8 @@ describe('core-fixtures test-scoped fixture definitions', () => {
         page: mockPage,
         pramanConfig: mockConfig,
         rootLogger: mockRootLoggerInstance,
+        tracer: mockTracerInstance,
+        meter: mockMeterInstance,
       });
 
       expect(capturedListener).toBeDefined();
@@ -754,11 +846,174 @@ describe('core-fixtures test-scoped fixture definitions', () => {
       };
 
       await fn(
-        { page: mockPage, pramanConfig: mockConfig, rootLogger: mockRootLoggerInstance },
+        {
+          page: mockPage,
+          pramanConfig: mockConfig,
+          rootLogger: mockRootLoggerInstance,
+          tracer: mockTracerInstance,
+          meter: mockMeterInstance,
+        },
         useFn,
       );
 
       expect(mockPage.off).toHaveBeenCalledWith('framenavigated', expect.any(Function));
+    });
+
+    it('starts Playwright trace chunk when traceId is available', async () => {
+      const mockGetActiveTraceId = vi.fn().mockReturnValue('abc123def456');
+      const tracerWithTraceId: TracerWrapper = {
+        ...mockTracerInstance,
+        getActiveTraceId: mockGetActiveTraceId,
+      };
+
+      const fn = extractFixtureFn(fixtures['ui5']);
+      await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockRootLoggerInstance,
+        tracer: tracerWithTraceId,
+        meter: mockMeterInstance,
+      });
+
+      expect(mockTracingContext.tracing.startChunk).toHaveBeenCalledWith({
+        title: 'praman-trace-abc123def456',
+      });
+    });
+
+    it('stops Playwright trace chunk during teardown when traceId was set', async () => {
+      const mockGetActiveTraceId = vi.fn().mockReturnValue('abc123def456');
+      const tracerWithTraceId: TracerWrapper = {
+        ...mockTracerInstance,
+        getActiveTraceId: mockGetActiveTraceId,
+      };
+
+      const fn = extractFixtureFn(fixtures['ui5']);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- callback signature requires parameter; only teardown behavior is tested
+      const useFn = async (_value: unknown): Promise<void> => {
+        await Promise.resolve();
+      };
+
+      await fn(
+        {
+          page: mockPage,
+          pramanConfig: mockConfig,
+          rootLogger: mockRootLoggerInstance,
+          tracer: tracerWithTraceId,
+          meter: mockMeterInstance,
+        },
+        useFn,
+      );
+
+      expect(mockTracingContext.tracing.stopChunk).toHaveBeenCalled();
+    });
+
+    it('handles page.evaluate rejection during cleanup gracefully', async () => {
+      mockPage.evaluate.mockRejectedValueOnce(new Error('Page crashed'));
+
+      const fn = extractFixtureFn(fixtures['ui5']);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- callback signature requires parameter; only teardown behavior is tested
+      const useFn = async (_value: unknown): Promise<void> => {
+        await Promise.resolve();
+      };
+
+      // Should not throw — error is caught and logged
+      await expect(
+        fn(
+          {
+            page: mockPage,
+            pramanConfig: mockConfig,
+            rootLogger: mockRootLoggerInstance,
+            tracer: mockTracerInstance,
+            meter: mockMeterInstance,
+          },
+          useFn,
+        ),
+      ).resolves.toBeUndefined();
+
+      expect(mockChildLogger.debug).toHaveBeenCalledWith(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- expect.any() returns any
+        expect.objectContaining({ err: expect.any(Error) }),
+        'Object map cleanup failed (non-fatal — page may have navigated away)',
+      );
+    });
+
+    it('does not start trace chunk when traceId is undefined', async () => {
+      const fn = extractFixtureFn(fixtures['ui5']);
+      await runFixture(fn, {
+        page: mockPage,
+        pramanConfig: mockConfig,
+        rootLogger: mockRootLoggerInstance,
+        tracer: mockTracerInstance,
+        meter: mockMeterInstance,
+      });
+
+      expect(mockTracingContext.tracing.startChunk).not.toHaveBeenCalled();
+    });
+
+    it('silently ignores startChunk rejection when tracing is not active', async () => {
+      const mockGetActiveTraceId = vi.fn().mockReturnValue('trace-id-123');
+      const tracerWithTraceId: TracerWrapper = {
+        ...mockTracerInstance,
+        getActiveTraceId: mockGetActiveTraceId,
+      };
+
+      const mockCtx = {
+        tracing: {
+          startChunk: vi.fn().mockRejectedValue(new Error('Tracing not started')),
+          stopChunk: vi.fn().mockResolvedValue(undefined),
+        },
+      };
+      mockPage.context.mockReturnValue(mockCtx);
+
+      const fn = extractFixtureFn(fixtures['ui5']);
+      await expect(
+        runFixture(fn, {
+          page: mockPage,
+          pramanConfig: mockConfig,
+          rootLogger: mockRootLoggerInstance,
+          tracer: tracerWithTraceId,
+          meter: mockMeterInstance,
+        }),
+      ).resolves.toBeDefined();
+    });
+
+    it('silently ignores stopChunk rejection during teardown', async () => {
+      const mockGetActiveTraceId = vi.fn().mockReturnValue('trace-id-456');
+      const tracerWithTraceId: TracerWrapper = {
+        ...mockTracerInstance,
+        getActiveTraceId: mockGetActiveTraceId,
+      };
+
+      const mockCtx = {
+        tracing: {
+          startChunk: vi.fn().mockResolvedValue(undefined),
+          stopChunk: vi.fn().mockRejectedValue(new Error('Tracing not started')),
+        },
+      };
+      mockPage.context.mockReturnValue(mockCtx);
+
+      const fn = extractFixtureFn(fixtures['ui5']);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- callback signature requires parameter; only teardown behavior is tested
+      const useFn = async (_value: unknown): Promise<void> => {
+        await Promise.resolve();
+      };
+
+      // Should not throw — catch swallows the error
+      await expect(
+        fn(
+          {
+            page: mockPage,
+            pramanConfig: mockConfig,
+            rootLogger: mockRootLoggerInstance,
+            tracer: tracerWithTraceId,
+            meter: mockMeterInstance,
+          },
+          useFn,
+        ),
+      ).resolves.toBeUndefined();
     });
 
     it('navigation listener logs debug message on main frame navigation', async () => {
@@ -774,6 +1029,8 @@ describe('core-fixtures test-scoped fixture definitions', () => {
         page: mockPage,
         pramanConfig: mockConfig,
         rootLogger: mockRootLoggerInstance,
+        tracer: mockTracerInstance,
+        meter: mockMeterInstance,
       });
 
       capturedListener?.(mockMainFrame);
@@ -795,6 +1052,7 @@ describe('core-fixtures type-level tests', () => {
     expect(fixtures).toHaveProperty('pramanConfig');
     expect(fixtures).toHaveProperty('rootLogger');
     expect(fixtures).toHaveProperty('tracer');
+    expect(fixtures).toHaveProperty('meter');
     expect(fixtures).toHaveProperty('playwrightCompat');
     expect(fixtures).toHaveProperty('selectorRegistration');
     expect(fixtures).toHaveProperty('matcherRegistration');

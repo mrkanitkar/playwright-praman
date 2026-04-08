@@ -47,17 +47,21 @@ npx playwright-praman init
 
 Praman has 3 direct dependencies and 5 peer dependencies:
 
-| Package                   | Type            | Purpose                                                   |
-| ------------------------- | --------------- | --------------------------------------------------------- |
-| `@playwright/test`        | Peer (required) | Playwright test runner (>=1.57.0) — auto-installed        |
-| `@playwright/cli`         | Peer (required) | Playwright CLI for agent browser control — auto-installed |
-| `commander`               | Dependency      | CLI framework for `npx playwright-praman` commands        |
-| `pino`                    | Dependency      | Structured JSON logging                                   |
-| `zod`                     | Dependency      | Configuration validation and type-safe schemas            |
-| `@anthropic-ai/sdk`       | Peer (optional) | AI test generation via Claude                             |
-| `openai`                  | Peer (optional) | AI test generation via OpenAI / Azure OpenAI              |
-| `@opentelemetry/api`      | Peer (optional) | Observability and distributed tracing                     |
-| `@opentelemetry/sdk-node` | Peer (optional) | OpenTelemetry Node.js SDK                                 |
+| Package                                     | Type            | Purpose                                                   |
+| ------------------------------------------- | --------------- | --------------------------------------------------------- |
+| `@playwright/test`                          | Peer (required) | Playwright test runner (>=1.57.0) — auto-installed        |
+| `@playwright/cli`                           | Peer (required) | Playwright CLI for agent browser control — auto-installed |
+| `commander`                                 | Dependency      | CLI framework for `npx playwright-praman` commands        |
+| `pino`                                      | Dependency      | Structured JSON logging                                   |
+| `zod`                                       | Dependency      | Configuration validation and type-safe schemas            |
+| `@anthropic-ai/sdk`                         | Peer (optional) | AI test generation via Claude                             |
+| `openai`                                    | Peer (optional) | AI test generation via OpenAI / Azure OpenAI              |
+| `@opentelemetry/api`                        | Peer (optional) | Observability and distributed tracing                     |
+| `@opentelemetry/sdk-node`                   | Peer (optional) | OpenTelemetry Node.js SDK                                 |
+| `@opentelemetry/exporter-trace-otlp-http`   | Peer (optional) | OTLP trace exporter (HTTP)                                |
+| `@opentelemetry/exporter-metrics-otlp-http` | Peer (optional) | OTLP metrics exporter (HTTP)                              |
+| `@opentelemetry/sdk-metrics`                | Peer (optional) | OTel metrics SDK                                          |
+| `@azure/monitor-opentelemetry-exporter`     | Peer (optional) | Azure Monitor exporter (beta)                             |
 
 ### IDE detection and agent installation
 
@@ -105,28 +109,34 @@ cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable
 <details>
 <summary>Environment variables reference</summary>
 
-| Variable                        | Required | Description                                     |
-| ------------------------------- | -------- | ----------------------------------------------- |
-| `SAP_CLOUD_BASE_URL`            | Yes      | SAP BTP or on-premise base URL                  |
-| `SAP_CLOUD_USERNAME`            | Yes      | SAP login username                              |
-| `SAP_CLOUD_PASSWORD`            | Yes      | SAP login password                              |
-| `SAP_AUTH_STRATEGY`             | Yes      | Auth strategy: `btp-saml`, `basic`, `office365` |
-| `SAP_CLIENT`                    | No       | SAP client number (default: from system)        |
-| `SAP_LANGUAGE`                  | No       | Display language (default: EN)                  |
-| `PRAMAN_LOG_LEVEL`              | No       | Log level: `debug`, `info`, `warn`, `error`     |
-| `PRAMAN_SKIP_VERSION_CHECK`     | No       | Set `true` to skip Playwright version check     |
-| `PRAMAN_AI_PROVIDER`            | No       | AI provider: `openai`, `azure`, `anthropic`     |
-| `PRAMAN_AI_API_KEY`             | No       | AI provider API key                             |
-| `PRAMAN_AI_MODEL`               | No       | AI model name                                   |
-| `PRAMAN_AI_TEMPERATURE`         | No       | AI temperature (number, e.g. `0.3`)             |
-| `PRAMAN_AI_ENDPOINT`            | No       | AI endpoint URL (Azure OpenAI)                  |
-| `PRAMAN_AI_DEPLOYMENT`          | No       | Azure OpenAI deployment name                    |
-| `PRAMAN_AI_API_VERSION`         | No       | Azure OpenAI API version                        |
-| `PRAMAN_AI_ANTHROPIC_API_KEY`   | No       | Anthropic API key (Claude models)               |
-| `PRAMAN_TELEMETRY_ENABLED`      | No       | Enable OpenTelemetry (`true`/`false`)           |
-| `PRAMAN_TELEMETRY_ENDPOINT`     | No       | OTel collector endpoint                         |
-| `PRAMAN_TELEMETRY_SERVICE_NAME` | No       | OTel service name                               |
-| `PRAMAN_ODATA_TRACING_ENABLED`  | No       | Enable OData request tracing (`true`/`false`)   |
+| Variable                             | Required | Description                                     |
+| ------------------------------------ | -------- | ----------------------------------------------- |
+| `SAP_CLOUD_BASE_URL`                 | Yes      | SAP BTP or on-premise base URL                  |
+| `SAP_CLOUD_USERNAME`                 | Yes      | SAP login username                              |
+| `SAP_CLOUD_PASSWORD`                 | Yes      | SAP login password                              |
+| `SAP_AUTH_STRATEGY`                  | Yes      | Auth strategy: `btp-saml`, `basic`, `office365` |
+| `SAP_CLIENT`                         | No       | SAP client number (default: from system)        |
+| `SAP_LANGUAGE`                       | No       | Display language (default: EN)                  |
+| `PRAMAN_LOG_LEVEL`                   | No       | Log level: `debug`, `info`, `warn`, `error`     |
+| `PRAMAN_SKIP_VERSION_CHECK`          | No       | Set `true` to skip Playwright version check     |
+| `PRAMAN_AI_PROVIDER`                 | No       | AI provider: `openai`, `azure`, `anthropic`     |
+| `PRAMAN_AI_API_KEY`                  | No       | AI provider API key                             |
+| `PRAMAN_AI_MODEL`                    | No       | AI model name                                   |
+| `PRAMAN_AI_TEMPERATURE`              | No       | AI temperature (number, e.g. `0.3`)             |
+| `PRAMAN_AI_ENDPOINT`                 | No       | AI endpoint URL (Azure OpenAI)                  |
+| `PRAMAN_AI_DEPLOYMENT`               | No       | Azure OpenAI deployment name                    |
+| `PRAMAN_AI_API_VERSION`              | No       | Azure OpenAI API version                        |
+| `PRAMAN_AI_ANTHROPIC_API_KEY`        | No       | Anthropic API key (Claude models)               |
+| `PRAMAN_TELEMETRY_ENABLED`           | No       | Enable OpenTelemetry (`true`/`false`)           |
+| `PRAMAN_TELEMETRY_ENDPOINT`          | No       | OTel collector endpoint URL                     |
+| `PRAMAN_TELEMETRY_SERVICE_NAME`      | No       | OTel service name                               |
+| `PRAMAN_TELEMETRY_EXPORTER`          | No       | Exporter: `otlp`, `jaeger`, `azure-monitor`     |
+| `PRAMAN_TELEMETRY_PROTOCOL`          | No       | Transport: `http` or `grpc`                     |
+| `PRAMAN_TELEMETRY_METRICS_ENABLED`   | No       | Enable metrics (`true`/`false`)                 |
+| `PRAMAN_TELEMETRY_BATCH_TIMEOUT`     | No       | Batch export timeout (ms)                       |
+| `PRAMAN_TELEMETRY_MAX_QUEUE_SIZE`    | No       | Max queued spans before dropping                |
+| `PRAMAN_TELEMETRY_CONNECTION_STRING` | No       | Azure Monitor connection string                 |
+| `PRAMAN_ODATA_TRACING_ENABLED`       | No       | Enable OData request tracing (`true`/`false`)   |
 
 For auth strategy details, see the [Authentication](./authentication) guide.
 

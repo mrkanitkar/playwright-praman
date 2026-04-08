@@ -169,7 +169,11 @@
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.78.0",
+    "@azure/monitor-opentelemetry-exporter": ">=1.0.0-beta.28",
     "@opentelemetry/api": ">=1.9.0",
+    "@opentelemetry/exporter-metrics-otlp-http": ">=0.214.0",
+    "@opentelemetry/exporter-trace-otlp-http": ">=0.214.0",
+    "@opentelemetry/sdk-metrics": ">=2.6.0",
     "@opentelemetry/sdk-node": ">=0.212.0",
     "@playwright/cli": ">=0.1.3",
     "@playwright/test": ">=1.57.0 <2.0.0",
@@ -179,7 +183,19 @@
     "@anthropic-ai/sdk": {
       "optional": true
     },
+    "@azure/monitor-opentelemetry-exporter": {
+      "optional": true
+    },
     "@opentelemetry/api": {
+      "optional": true
+    },
+    "@opentelemetry/exporter-metrics-otlp-http": {
+      "optional": true
+    },
+    "@opentelemetry/exporter-trace-otlp-http": {
+      "optional": true
+    },
+    "@opentelemetry/sdk-metrics": {
       "optional": true
     },
     "@opentelemetry/sdk-node": {
@@ -208,7 +224,12 @@
     "@microsoft/api-extractor": "7.58.1",
     "@microsoft/eslint-plugin-sdl": "1.1.0",
     "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/exporter-metrics-otlp-http": "0.214.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.214.0",
+    "@opentelemetry/resources": "2.6.1",
+    "@opentelemetry/sdk-metrics": "2.6.1",
     "@opentelemetry/sdk-node": "0.214.0",
+    "@opentelemetry/sdk-trace-base": "2.6.1",
     "@playwright/cli": "0.1.5",
     "@playwright/test": "1.59.1",
     "@rolldown/plugin-babel": "0.2.2",

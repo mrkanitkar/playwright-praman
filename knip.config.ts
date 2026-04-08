@@ -39,8 +39,6 @@ const config: KnipConfig = {
     'release-please',
     // MCP server used by Claude Code tooling, not by project code
     '@ui5/mcp-server',
-    // Optional peer dep kept in devDeps for testing telemetry integration
-    '@opentelemetry/sdk-node',
     // Peer dep + devDep used in CLI init commands; knip can't trace dynamic usage
     '@playwright/cli',
     // Loaded dynamically by @rolldown/plugin-babel via string name, not import

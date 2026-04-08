@@ -23,6 +23,10 @@ const config: Config = {
   onBrokenLinks: 'throw',
 
   markdown: {
+    // 'detect' treats .md files as plain Markdown and .mdx as MDX.
+    // This prevents MDX strict-mode errors (e.g. <!-- --> comments, {#id} anchors)
+    // in blog posts and docs written as .md files.
+    format: 'detect',
     hooks: {
       onBrokenMarkdownLinks: 'throw',
     },

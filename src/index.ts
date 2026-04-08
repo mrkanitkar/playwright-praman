@@ -80,6 +80,7 @@ export {
   PluginError,
   PramanError,
   SelectorError,
+  TelemetryError,
   TimeoutError,
   VocabularyError,
 } from './core/errors/index.js';

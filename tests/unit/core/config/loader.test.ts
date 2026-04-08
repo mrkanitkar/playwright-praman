@@ -231,6 +231,42 @@ describe('loadConfig', () => {
     });
   });
 
+  it('overrides telemetry.exporter from PRAMAN_TELEMETRY_EXPORTER', async () => {
+    vi.stubEnv('PRAMAN_TELEMETRY_EXPORTER', 'jaeger');
+    const config = await loadConfig();
+    expect(config.telemetry).toMatchObject({ exporter: 'jaeger' });
+  });
+
+  it('overrides telemetry.protocol from PRAMAN_TELEMETRY_PROTOCOL', async () => {
+    vi.stubEnv('PRAMAN_TELEMETRY_PROTOCOL', 'grpc');
+    const config = await loadConfig();
+    expect(config.telemetry).toMatchObject({ protocol: 'grpc' });
+  });
+
+  it('overrides telemetry.metrics from PRAMAN_TELEMETRY_METRICS_ENABLED', async () => {
+    vi.stubEnv('PRAMAN_TELEMETRY_METRICS_ENABLED', 'true');
+    const config = await loadConfig();
+    expect(config.telemetry).toMatchObject({ metrics: true });
+  });
+
+  it('overrides telemetry.batchTimeout from PRAMAN_TELEMETRY_BATCH_TIMEOUT', async () => {
+    vi.stubEnv('PRAMAN_TELEMETRY_BATCH_TIMEOUT', '10000');
+    const config = await loadConfig();
+    expect(config.telemetry).toMatchObject({ batchTimeout: 10_000 });
+  });
+
+  it('overrides telemetry.maxQueueSize from PRAMAN_TELEMETRY_MAX_QUEUE_SIZE', async () => {
+    vi.stubEnv('PRAMAN_TELEMETRY_MAX_QUEUE_SIZE', '4096');
+    const config = await loadConfig();
+    expect(config.telemetry).toMatchObject({ maxQueueSize: 4096 });
+  });
+
+  it('overrides telemetry.connectionString from PRAMAN_TELEMETRY_CONNECTION_STRING', async () => {
+    vi.stubEnv('PRAMAN_TELEMETRY_CONNECTION_STRING', 'InstrumentationKey=abc-123');
+    const config = await loadConfig();
+    expect(config.telemetry).toMatchObject({ connectionString: 'InstrumentationKey=abc-123' });
+  });
+
   it('overrides odataTracing.enabled from PRAMAN_ODATA_TRACING_ENABLED', async () => {
     vi.stubEnv('PRAMAN_ODATA_TRACING_ENABLED', 'true');
     const config = await loadConfig();

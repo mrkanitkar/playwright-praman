@@ -21,7 +21,8 @@
  * Worker-scoped fixtures (created once per worker process):
  * - `pramanConfig` — validated, frozen configuration
  * - `rootLogger` — pino root logger with redaction
- * - `tracer` — OpenTelemetry tracer (NoOp in Phase 1)
+ * - `tracer` — OpenTelemetry tracer (NoOp when telemetry disabled)
+ * - `meter` — OpenTelemetry meter for metrics (NoOp when metrics disabled)
  * - `playwrightCompat` — Playwright version feature flags (auto)
  * - `selectorRegistration` — registers `ui5=` selector engine (auto)
  * - `matcherRegistration` — registers custom UI5 matchers (auto)
@@ -79,8 +80,8 @@ import type { PlaywrightFeatures } from '#core/compat/index.js';
 import { loadConfig } from '#core/config/index.js';
 import type { PramanConfig } from '#core/config/index.js';
 import { createLogger, createRootLogger } from '#core/logging/index.js';
-import { initTelemetry } from '#core/telemetry/index.js';
-import type { TracerWrapper } from '#core/telemetry/index.js';
+import { initMetrics, initTelemetry } from '#core/telemetry/index.js';
+import type { MeterWrapper, TracerWrapper } from '#core/telemetry/index.js';
 
 /** Minimum Playwright version required by Praman. */
 const MIN_PLAYWRIGHT_VERSION = '1.57.0';
@@ -165,13 +166,22 @@ interface WorkerFixtures {
   rootLogger: Logger;
 
   /**
-   * OpenTelemetry tracer wrapper (NoOp in Phase 1).
+   * OpenTelemetry tracer wrapper (NoOp when telemetry disabled).
    *
    * @intent Enable distributed tracing instrumentation from day one so that bridge calls,
    * control discovery, and interactions can be traced end-to-end when a real exporter is
-   * configured. NoOp in Phase 1 ensures zero overhead until needed.
+   * configured. NoOp when disabled ensures zero overhead until needed.
    */
   tracer: TracerWrapper;
+
+  /**
+   * OpenTelemetry meter wrapper for metrics collection (NoOp when metrics disabled).
+   *
+   * @intent Provide metric counters and histograms for control discovery counts,
+   * bridge evaluation durations, and other operational metrics. NoOp when disabled
+   * ensures zero overhead until metrics are configured.
+   */
+  meter: MeterWrapper;
 
   /**
    * Playwright version feature flags, auto-initialized per worker.
@@ -244,6 +254,15 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
       const tracer = await initTelemetry(pramanConfig);
       await use(tracer);
       await tracer.shutdown();
+    },
+    { scope: 'worker' },
+  ],
+
+  meter: [
+    async ({ pramanConfig }, use) => {
+      const meter = await initMetrics(pramanConfig);
+      await use(meter);
+      await meter.shutdown();
     },
     { scope: 'worker' },
   ],
@@ -321,9 +340,24 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
     await use(logger);
   },
 
-  ui5: async ({ page, pramanConfig, rootLogger, tracer }, use) => {
+  ui5: async ({ page, pramanConfig, rootLogger, tracer, meter }, use) => {
     const logger = createLogger('bridge', rootLogger);
     const strategy = createInteractionStrategy(pramanConfig.interactionStrategy, pramanConfig.opa5);
+
+    // E1: Correlate OTel traceId with Playwright tracing.
+    // Start a root span so child spans share this traceId, then embed it
+    // in the Playwright trace title for cross-system correlation.
+    const rootSpan = tracer.startSpan('praman.test');
+    const traceId = tracer.getActiveTraceId();
+    if (traceId !== undefined) {
+      logger.debug({ traceId }, 'OTel ↔ Playwright trace correlation');
+      await page
+        .context()
+        .tracing.startChunk({ title: `praman-trace-${traceId}` })
+        .catch(() => {
+          // Tracing may not be active — silently ignore
+        });
+    }
 
     // Listen for main frame navigation to reset bridge injection state.
     // After navigation the injected bridge script is gone, so the next
@@ -351,11 +385,21 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
           pramanConfig.selectors?.skipStabilityWait ?? pramanConfig.skipStabilityWait,
       },
       tracer,
+      meter,
     });
 
     try {
       await use(handler);
     } finally {
+      rootSpan.end();
+      if (traceId !== undefined) {
+        await page
+          .context()
+          .tracing.stopChunk()
+          .catch(() => {
+            // Tracing may not be active — silently ignore
+          });
+      }
       // Teardown: remove navigation listener (always — even if use() throws)
       page.off('framenavigated', navigationListener);
       try {

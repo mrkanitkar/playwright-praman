@@ -97,7 +97,7 @@ sap_template_tc*.csv
 
 # Stale / orphan artifacts
 .git-corrupted/
-COMPLETENESS_AUDIT_REPORT.md
+COMPLETENESS_AUDIT_REPORT*.md
 ui5.yaml
 webapp/
 

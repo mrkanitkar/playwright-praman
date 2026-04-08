@@ -57,8 +57,13 @@ import { ControlError } from '#core/errors/control-error.js';
 import { SelectorError } from '#core/errors/selector-error.js';
 import { TimeoutError } from '#core/errors/timeout-error.js';
 import { createLogger } from '#core/logging/index.js';
-import type { TracerWrapper } from '#core/telemetry/otel.js';
-import { getNoOpTracer } from '#core/telemetry/otel.js';
+import type {
+  MeterWrapper,
+  MetricCounter,
+  MetricHistogram,
+  TracerWrapper,
+} from '#core/telemetry/otel.js';
+import { getNoOpMeter, getNoOpTracer } from '#core/telemetry/otel.js';
 import { createSpanName } from '#core/telemetry/spans.js';
 import type { UI5ControlBase, UI5ControlMap } from '#core/types/controls.js';
 import type { UI5Selector } from '#core/types/selectors.js';
@@ -105,6 +110,8 @@ export interface UI5HandlerOptions {
   };
   /** Optional tracer for OpenTelemetry instrumentation. Defaults to NoOpTracer. */
   readonly tracer?: TracerWrapper;
+  /** Optional meter for OpenTelemetry metrics collection. Defaults to NoOpMeter. */
+  readonly meter?: MeterWrapper;
 }
 
 /**
@@ -153,6 +160,10 @@ export class UI5Handler {
   private readonly preferVisibleControls: boolean;
   private readonly skipStabilityWait: boolean;
   private readonly tracer: TracerWrapper;
+  private readonly bridgeInjectionCounter: MetricCounter;
+  private readonly discoveryCounter: MetricCounter;
+  private readonly discoveryDuration: MetricHistogram;
+  private readonly bridgeEvalDuration: MetricHistogram;
   private cache: ControlProxyCache;
 
   constructor(options: UI5HandlerOptions) {
@@ -165,6 +176,24 @@ export class UI5Handler {
     this.skipStabilityWait = options.config?.skipStabilityWait ?? false;
     this.tracer = options.tracer ?? getNoOpTracer();
     this.cache = new ControlProxyCache();
+
+    const meter = options.meter ?? getNoOpMeter();
+    this.bridgeInjectionCounter = meter.createCounter(
+      'praman.bridge.injection',
+      'Number of bridge injection attempts',
+    );
+    this.discoveryCounter = meter.createCounter(
+      'praman.control.discovery',
+      'Number of control discovery attempts',
+    );
+    this.discoveryDuration = meter.createHistogram(
+      'praman.control.discovery.duration',
+      'Control discovery duration in milliseconds',
+    );
+    this.bridgeEvalDuration = meter.createHistogram(
+      'praman.bridge.evaluation.duration',
+      'Bridge page.evaluate() duration in milliseconds',
+    );
   }
 
   /**
@@ -174,6 +203,7 @@ export class UI5Handler {
    * Delegates to `ensureBridgeInjected()` which is idempotent.
    */
   private async ensureReady(): Promise<void> {
+    this.bridgeInjectionCounter.add(1);
     await ensureBridgeInjected(this.page);
   }
 
@@ -222,7 +252,9 @@ export class UI5Handler {
       /\)\(\)$/,
       `)(${JSON.stringify(selector)}, ${JSON.stringify(findOptions)})`,
     );
+    const evalStart = Date.now();
     const result = await this.page.evaluate<ControlDiscoveryResult>(withArgs);
+    this.bridgeEvalDuration.record(Date.now() - evalStart, { 'bridge.op': 'findControl' });
     if (result.id === '') return null;
     return { id: result.id, controlType: result.controlType };
   }
@@ -261,7 +293,9 @@ export class UI5Handler {
       /\)\(\)$/,
       `)(${JSON.stringify(controlId)}, ${JSON.stringify(methodName)}, ${JSON.stringify(args)})`,
     );
+    const evalStart = Date.now();
     const result = await this.page.evaluate<MethodExecutionResult>(withArgs);
+    this.bridgeEvalDuration.record(Date.now() - evalStart, { 'bridge.op': methodName });
     return result.value;
   }
 
@@ -863,6 +897,10 @@ export class UI5Handler {
       return cached;
     }
 
+    const startTime = Date.now();
+    const controlType = String(selector.controlType ?? selector.id ?? 'unknown');
+    this.discoveryCounter.add(1, { 'control.type': controlType });
+
     // Try each configured strategy in order
     let controlRef: BridgeControlRef | null = null;
     for (const strategyName of this.discoveryStrategies) {
@@ -878,6 +916,8 @@ export class UI5Handler {
       }
       if (controlRef !== null) break;
     }
+
+    this.discoveryDuration.record(Date.now() - startTime, { 'control.type': controlType });
 
     if (controlRef === null) {
       return null;
