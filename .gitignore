@@ -90,6 +90,17 @@ test-screenshots/
 # Scratch / temp files
 sap_template_tc*.csv
 
+# macOS Finder duplicates (stale " 2" copies)
+*\ 2.ts
+*\ 2.json
+.cspell/.cspellcache\ 2
+
+# Stale / orphan artifacts
+.git-corrupted/
+COMPLETENESS_AUDIT_REPORT.md
+ui5.yaml
+webapp/
+
 # Blog & social media drafts
 blog-*.md
 linkedin-*.md
