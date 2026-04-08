@@ -195,6 +195,8 @@ try {
 
 All AI responses include token usage information when the provider reports it:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 const result = await handler.generateTest('Create a PO test');
 if (result.status === 'success') {

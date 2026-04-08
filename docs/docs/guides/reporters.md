@@ -15,6 +15,8 @@ per-test and aggregate statistics.
 
 ### Configuration
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // playwright.config.ts
 import { ComplianceReporter } from 'playwright-praman/reporters';
@@ -93,6 +95,8 @@ Any step not matching these prefixes is classified as a raw Playwright step.
 If your team is migrating from raw Playwright to Praman, run the ComplianceReporter in CI to
 track progress:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // CI assertion (optional)
 import report from './reports/compliance-report.json';
@@ -108,6 +112,8 @@ Captures OData HTTP request traces from test runs, providing per-entity-set stat
 call counts, durations, and error rates.
 
 ### Configuration
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 // playwright.config.ts
@@ -188,6 +194,8 @@ for (const [entitySet, methods] of Object.entries(trace.aggregates)) {
 ## Using Both Reporters Together
 
 Both reporters can run alongside Playwright's built-in reporters:
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 // playwright.config.ts

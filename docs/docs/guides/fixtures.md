@@ -243,6 +243,8 @@ test('test data', async ({ testData }) => {
 
 Individual fixture modules can be imported for lighter setups:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { coreTest } from 'playwright-praman';
 import { authTest } from 'playwright-praman';

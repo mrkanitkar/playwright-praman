@@ -118,6 +118,7 @@ Fixtures available: `ui5`, `ui5Navigation`, `sapAuth`, `fe`, `ui5.table`, `ui5.d
 | Intent API                         | [Intents](https://praman.dev/docs/guides/intent-api)                   |
 | OData tracing                      | [OData Tracing](https://praman.dev/docs/guides/odata-tracing)          |
 | Error codes                        | [Errors](https://praman.dev/docs/guides/errors)                        |
+| Release notes                      | [Release Notes](https://praman.dev/docs/release-notes)                 |
 | API reference                      | [API Docs](https://praman.dev/docs/api/)                               |
 | LLM-friendly docs                  | [llms.txt](https://praman.dev/llms.txt)                                |
 

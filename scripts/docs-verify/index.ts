@@ -23,6 +23,7 @@ import type {
 import { buildReport, printSummary, writeReport } from './lib/report-writer.js';
 import { discoverDocs } from './lib/doc-registry.js';
 import { getChangedFiles } from './lib/git-diff.js';
+import { buildApiSurface } from './lib/api-surface.js';
 import { check1TypecheckSnippets } from './checks/check1-typecheck-snippets.js';
 import { check4ImportPaths } from './checks/check4-import-paths.js';
 
@@ -181,6 +182,9 @@ async function main(): Promise<void> {
 
   // Build shared context
   const context = buildSharedContext();
+
+  // Populate API surface for import-paths check
+  context.apiSurface = await buildApiSurface();
 
   // Get changed files for PR mode
   if (options.mode === 'pr') {

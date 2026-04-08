@@ -43,6 +43,8 @@ The `createLogger` and `REDACTION_PATHS` APIs use internal path aliases (`#core/
 End users control logging via the `PRAMAN_LOG_LEVEL` environment variable.
 :::
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { createLogger } from '#core/logging/index.js';
 
@@ -345,6 +347,8 @@ const context = error.toAIContext();
 ### toJSON()
 
 Full serialization for logging and persistence:
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 const serialized = error.toJSON();

@@ -63,8 +63,9 @@ export const check4ImportPaths: DocCheck = {
 
       // Validate each named specifier against the API surface
       for (const specifier of imp.specifiers) {
-        // Handle 'type' keyword in specifiers like 'type PramanConfig'
-        const cleanSpecifier = specifier.replace(/^type\s+/, '');
+        // Handle 'type' keyword and 'as alias' in specifiers
+        // e.g., 'type PramanConfig' → 'PramanConfig', 'test as base' → 'test'
+        const cleanSpecifier = specifier.replace(/^type\s+/, '').replace(/\s+as\s+\w+$/, '');
 
         if (!context.apiSurface.has(cleanSpecifier)) {
           const closest = findClosestMatch(cleanSpecifier, context.apiSurface);

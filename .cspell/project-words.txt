@@ -132,6 +132,7 @@ maheshwar
 mdlint
 mgmt
 microbenchmarks
+modelcontextprotocol
 mmpur
 mrkanitkar
 myapp
@@ -197,6 +198,7 @@ stabilise
 stringifying
 summarising
 testlib
+toequal
 totp
 testng
 testrail
@@ -214,9 +216,11 @@ vitems
 vitest
 vkey
 vtext
+waitforui
 wdi5
 wdio
 workitem
+worklist
 xclip
 xdist
 xsel

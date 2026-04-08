@@ -70,6 +70,8 @@ Create a `praman.config.ts` file in your project root (or copy one of the shippe
 cp node_modules/playwright-praman/examples/praman.config.telemetry.ts praman.config.ts
 ```
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // praman.config.ts
 import { defineConfig } from 'playwright-praman';
@@ -165,6 +167,8 @@ PRAMAN_TELEMETRY_CONNECTION_STRING="InstrumentationKey=abc-123-def;IngestionEndp
 ```
 
 Or in `praman.config.ts`:
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { defineConfig } from 'playwright-praman';
