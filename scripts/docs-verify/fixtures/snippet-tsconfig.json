@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "paths": {
+      "playwright-praman": ["./dist/index.d.ts"],
+      "playwright-praman/ai": ["./dist/ai/index.d.ts"],
+      "playwright-praman/intents": ["./dist/intents/index.d.ts"],
+      "playwright-praman/vocabulary": ["./dist/vocabulary/index.d.ts"],
+      "playwright-praman/fe": ["./dist/fe/index.d.ts"],
+      "playwright-praman/reporters": ["./dist/reporters/index.d.ts"]
+    }
+  },
+  "include": [".docs-verify-tmp/**/*.ts"]
+}

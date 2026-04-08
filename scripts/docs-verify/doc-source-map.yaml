@@ -1,0 +1,96 @@
+guides/getting-started.md:
+  - src/cli/init.ts
+  - src/core/config/schema.ts
+  - package.json
+
+guides/fixtures.md:
+  - src/fixtures/index.ts
+  - src/fixtures/core-fixtures.ts
+  - src/fixtures/auth-fixtures.ts
+  - src/fixtures/nav-fixtures.ts
+  - src/fixtures/fe-fixtures.ts
+
+guides/configuration.md:
+  - src/core/config/schema.ts
+  - src/core/config/presets.ts
+  - src/core/config/index.ts
+
+guides/selectors.md:
+  - src/selectors/
+
+guides/authentication.md:
+  - src/fixtures/auth-fixtures.ts
+  - src/auth/
+
+guides/typed-controls.md:
+  - src/proxy/
+  - capabilities.yaml
+
+guides/custom-matchers.md:
+  - src/matchers/
+
+guides/errors.md:
+  - src/core/errors/
+
+guides/odata-operations.md:
+  - src/modules/odata.ts
+  - src/modules/odata-http.ts
+  - src/fixtures/odata-trace-fixtures.ts
+
+guides/odata-mocking.md:
+  - src/modules/odata.ts
+  - src/modules/odata-http.ts
+
+guides/fiori-elements.md:
+  - src/fe/
+
+guides/navigation.md:
+  - src/fixtures/nav-fixtures.ts
+
+guides/bridge-internals.md:
+  - src/bridge/
+
+guides/architecture-overview.md:
+  - src/index.ts
+  - src/ai/index.ts
+  - src/fe/index.ts
+  - src/intents/index.ts
+
+guides/control-proxy.md:
+  - src/proxy/
+
+guides/intent-api.md:
+  - src/intents/
+
+guides/vocabulary-system.md:
+  - src/vocabulary/
+
+guides/reporters.md:
+  - src/reporters/
+
+guides/capabilities.md:
+  - capabilities.yaml
+  - src/ai/capability-registry.ts
+
+guides/capabilities-recipes.md:
+  - recipes.yaml
+  - src/ai/recipe-registry.ts
+
+guides/discovery-and-interaction.md:
+  - src/ai/
+  - src/bridge/
+
+guides/control-interactions.md:
+  - src/fixtures/core-fixtures.ts
+  - src/bridge/
+
+guides/sap-control-cookbook.md:
+  - src/proxy/
+  - capabilities.yaml
+
+guides/docker-cicd.md:
+  - package.json
+  - playwright.config.ts
+
+guides/fixture-composition.md:
+  - src/fixtures/index.ts

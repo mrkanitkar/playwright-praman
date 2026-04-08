@@ -44,6 +44,21 @@ If everything looks accurate, return an empty array: []
 
 IMPORTANT: Return ONLY the JSON array, no markdown fences, no explanation.`;
 
+/** Minimal interface for the Anthropic client (avoids type resolution issues in scripts/) */
+interface AnthropicClient {
+  messages: {
+    create(params: {
+      model: string;
+      max_tokens: number;
+      system: string;
+      messages: Array<{ role: string; content: string }>;
+    }): Promise<{
+      content: Array<{ type: string; text?: string }>;
+      usage?: { input_tokens: number; output_tokens: number };
+    }>;
+  };
+}
+
 interface AiFinding {
   severity: 'error' | 'warning';
   line: number | null;
@@ -58,7 +73,7 @@ export class Check7AiReview implements DocCheck {
   readonly name = 'ai-review' as const;
 
   private cumulativeCostUsd = 0;
-  private client: InstanceType<typeof Anthropic> | undefined;
+  private client: AnthropicClient | undefined;
   private model: string;
   private maxCostUsd: number;
 
@@ -109,7 +124,9 @@ export class Check7AiReview implements DocCheck {
 
     // Initialize client lazily
     if (!this.client) {
-      this.client = new Anthropic({ apiKey });
+      this.client = new (Anthropic as unknown as new (opts: { apiKey: string }) => AnthropicClient)(
+        { apiKey },
+      );
     }
 
     // Load source files
@@ -144,7 +161,8 @@ export class Check7AiReview implements DocCheck {
         (outputTokens / 1_000_000) * OUTPUT_COST_PER_M;
 
       // Parse response
-      const text = response.content[0]?.type === 'text' ? response.content[0].text : '';
+      const firstBlock = response.content[0];
+      const text = firstBlock?.type === 'text' && firstBlock.text ? firstBlock.text : '';
       const findings = this.parseFindings(text);
 
       const errors = findings.filter((f) => f.severity === 'error');
