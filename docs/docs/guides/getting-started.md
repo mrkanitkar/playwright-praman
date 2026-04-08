@@ -115,12 +115,6 @@ cat node_modules/playwright-praman/docs/user-integration/cursor-rules-appendable
 | `SAP_LANGUAGE`                  | No       | Display language (default: EN)                  |
 | `PRAMAN_LOG_LEVEL`              | No       | Log level: `debug`, `info`, `warn`, `error`     |
 | `PRAMAN_SKIP_VERSION_CHECK`     | No       | Set `true` to skip Playwright version check     |
-| `PRAMAN_AUTH_BASE_URL`          | No       | SAP base URL for Praman auth config             |
-| `PRAMAN_AUTH_STRATEGY`          | No       | Auth strategy override (`basic`, `btp-saml`)    |
-| `PRAMAN_AUTH_USERNAME`          | No       | Auth username override                          |
-| `PRAMAN_AUTH_PASSWORD`          | No       | Auth password override                          |
-| `PRAMAN_AUTH_CLIENT`            | No       | SAP client override                             |
-| `PRAMAN_AUTH_LANGUAGE`          | No       | Language override                               |
 | `PRAMAN_AI_PROVIDER`            | No       | AI provider: `openai`, `azure`, `anthropic`     |
 | `PRAMAN_AI_API_KEY`             | No       | AI provider API key                             |
 | `PRAMAN_AI_MODEL`               | No       | AI model name                                   |

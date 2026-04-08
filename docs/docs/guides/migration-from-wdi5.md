@@ -197,9 +197,9 @@ export default defineConfig({
   interactionStrategy: 'ui5-native',
   auth: {
     strategy: 'basic',
-    baseUrl: process.env.SAP_BASE_URL!,
-    username: process.env.SAP_USER!,
-    password: process.env.SAP_PASS!,
+    baseUrl: process.env.SAP_CLOUD_BASE_URL!,
+    username: process.env.SAP_CLOUD_USERNAME!,
+    password: process.env.SAP_CLOUD_PASSWORD!,
   },
 });
 ```
@@ -212,7 +212,7 @@ export default defineConfig({
   testDir: './tests',
   timeout: 120_000,
   use: {
-    baseURL: process.env.SAP_BASE_URL,
+    baseURL: process.env.SAP_CLOUD_BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },

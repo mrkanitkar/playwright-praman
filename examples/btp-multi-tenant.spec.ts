@@ -30,7 +30,7 @@
  *   - `BTP_WORKZONE_URL` -- Work Zone base URL
  *   - `BTP_TENANT_1` -- first tenant subdomain (e.g., 'acme-dev')
  *   - `BTP_TENANT_2` -- second tenant subdomain (e.g., 'globex-dev')
- *   - `SAP_USERNAME`, `SAP_PASSWORD` -- IDP credentials
+ *   - `SAP_CLOUD_USERNAME`, `SAP_CLOUD_PASSWORD` -- IDP credentials
  *
  * @example
  * ```bash
@@ -46,8 +46,8 @@ test.describe('BTP Work Zone Multi-Tenant Auth', () => {
       // btpWorkZone fixture handles the full SAML redirect flow
       await btpWorkZone.login({
         url: process.env['BTP_WORKZONE_URL']!,
-        username: process.env['SAP_USERNAME']!,
-        password: process.env['SAP_PASSWORD']!,
+        username: process.env['SAP_CLOUD_USERNAME']!,
+        password: process.env['SAP_CLOUD_PASSWORD']!,
         tenant: process.env['BTP_TENANT_1']!,
       });
 
@@ -108,8 +108,8 @@ test.describe('BTP Work Zone Multi-Tenant Auth', () => {
     await test.step('Login to first tenant', async () => {
       await btpWorkZone.login({
         url: process.env['BTP_WORKZONE_URL']!,
-        username: process.env['SAP_USERNAME']!,
-        password: process.env['SAP_PASSWORD']!,
+        username: process.env['SAP_CLOUD_USERNAME']!,
+        password: process.env['SAP_CLOUD_PASSWORD']!,
         tenant: process.env['BTP_TENANT_1']!,
       });
 
@@ -142,8 +142,8 @@ test.describe('BTP Work Zone Multi-Tenant Auth', () => {
       // btpWorkZone.switchTenant handles logout and re-auth to new tenant
       await btpWorkZone.switchTenant({
         tenant: process.env['BTP_TENANT_2']!,
-        username: process.env['SAP_USERNAME']!,
-        password: process.env['SAP_PASSWORD']!,
+        username: process.env['SAP_CLOUD_USERNAME']!,
+        password: process.env['SAP_CLOUD_PASSWORD']!,
       });
 
       await ui5.waitForUI5();
@@ -181,8 +181,8 @@ test.describe('BTP Work Zone Multi-Tenant Auth', () => {
     await test.step('Login to tenant', async () => {
       await btpWorkZone.login({
         url: process.env['BTP_WORKZONE_URL']!,
-        username: process.env['SAP_USERNAME']!,
-        password: process.env['SAP_PASSWORD']!,
+        username: process.env['SAP_CLOUD_USERNAME']!,
+        password: process.env['SAP_CLOUD_PASSWORD']!,
         tenant: process.env['BTP_TENANT_1']!,
       });
     });

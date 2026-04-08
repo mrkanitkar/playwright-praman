@@ -40,7 +40,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         storageState: '.auth/sap-session.json',
-        baseURL: process.env['SAP_BASE_URL'],
+        baseURL: process.env['SAP_CLOUD_BASE_URL'],
       },
       dependencies: ['auth'],
     },
@@ -51,11 +51,11 @@ export default defineConfig({
 ### 2. Environment Variables
 
 ```bash
-SAP_BASE_URL=https://your-sap-system.example.com
-SAP_USERNAME=TEST_USER
-SAP_PASSWORD=<your-password>
-SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'
-SAP_CLIENT=100             # OnPrem only
+SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
+SAP_CLOUD_USERNAME=TEST_USER
+SAP_CLOUD_PASSWORD=<your-password>
+SAP_AUTH_STRATEGY=btp-saml  # 'basic' | 'btp-saml' | 'office365'
+SAP_CLIENT=100              # Optional, default 100
 ```
 
 ### 3. Authentication Setup

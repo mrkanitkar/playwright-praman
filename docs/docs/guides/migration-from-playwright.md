@@ -90,7 +90,7 @@ import { test, expect } from 'playwright-praman';
 test('hybrid PW + Praman test', async ({ page, ui5, ui5Navigation, sapAuth }) => {
   // Step 1: Playwright handles login (before UI5 loads)
   await test.step('Login via SAP login page', async () => {
-    await page.goto(process.env.SAP_BASE_URL!);
+    await page.goto(process.env.SAP_CLOUD_BASE_URL!);
 
     // Plain Playwright locators for the login form
     await page.locator('#USERNAME_FIELD input').fill('TESTUSER');

@@ -349,7 +349,7 @@ export default defineConfig({
   workers: 1, // Sequential for SAP state-dependent tests
 
   use: {
-    baseURL: process.env.SAP_BASE_URL,
+    baseURL: process.env.SAP_CLOUD_BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',

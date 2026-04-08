@@ -322,23 +322,15 @@ const serialized = error.toJSON();
 Praman and its examples rely on environment variables for SAP system credentials. Set them before running tests:
 
 ```bash
-# .env or .env.test (gitignored — never commit credentials)
-SAP_BASE_URL=https://your-sap-system.example.com
-SAP_CLOUD_BASE_URL=https://your-sap-system.example.com   # alias used by seed files
+# .env (gitignored — never commit credentials)
+SAP_ACTIVE_SYSTEM=cloud                                   # 'cloud' or 'onprem'
+SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
 SAP_CLOUD_USERNAME=your-username
 SAP_CLOUD_PASSWORD=your-password
-SAP_AUTH_STRATEGY=basic       # 'basic' | 'btp-saml' | 'office365'
+SAP_AUTH_STRATEGY=btp-saml    # 'basic' | 'btp-saml' | 'office365'
 SAP_CLIENT=100                # optional, OnPrem only
 SAP_LANGUAGE=EN               # optional, default: EN
 PRAMAN_LOG_LEVEL=info         # optional: 'error' | 'warn' | 'info' | 'debug' | 'trace'
-
-# ── Praman auth config overrides ────────────────────────────────────
-# PRAMAN_AUTH_BASE_URL=https://your-sap-system.example.com
-# PRAMAN_AUTH_STRATEGY=basic
-# PRAMAN_AUTH_USERNAME=your-username
-# PRAMAN_AUTH_PASSWORD=your-password
-# PRAMAN_AUTH_CLIENT=100
-# PRAMAN_AUTH_LANGUAGE=EN
 
 # ── Praman AI config overrides ──────────────────────────────────────
 # PRAMAN_AI_PROVIDER=openai          # 'openai' | 'azure' | 'anthropic'
@@ -369,13 +361,13 @@ npm install -D dotenv-cli
 npx dotenv -e .env -- npx playwright test
 
 # Option 2: export in shell
-export SAP_BASE_URL=https://your-sap-system.example.com
+export SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
 export SAP_CLOUD_USERNAME=testuser
 export SAP_CLOUD_PASSWORD=<your-password>
 npx playwright test
 
 # Option 3: inline (CI / one-off)
-SAP_BASE_URL=https://host SAP_CLOUD_USERNAME=user SAP_CLOUD_PASSWORD=pw npx playwright test
+SAP_CLOUD_BASE_URL=https://host SAP_CLOUD_USERNAME=user SAP_CLOUD_PASSWORD=pw npx playwright test
 ```
 
 ### CI/CD secrets
@@ -384,7 +376,7 @@ In GitHub Actions, store credentials as repository secrets and pass them as envi
 
 ```yaml
 env:
-  SAP_BASE_URL: ${{ secrets.SAP_BASE_URL }}
+  SAP_CLOUD_BASE_URL: ${{ secrets.SAP_CLOUD_BASE_URL }}
   SAP_CLOUD_USERNAME: ${{ secrets.SAP_CLOUD_USERNAME }}
   SAP_CLOUD_PASSWORD: ${{ secrets.SAP_CLOUD_PASSWORD }}
 ```

@@ -15,7 +15,7 @@ import { test, expect } from 'playwright-praman';
 test.describe('Basic UI5 Control Discovery', () => {
   test('find a GenericTile by header text', async ({ page, ui5 }) => {
     await test.step('Navigate to Fiori Launchpad', async () => {
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
     });
