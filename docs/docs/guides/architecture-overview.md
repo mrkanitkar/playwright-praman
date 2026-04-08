@@ -48,8 +48,8 @@ Praman v1.0 ships as a single npm package (`playwright-praman`) with sub-path ex
 ┌──────────────────────────────────▼──────────────────────────────────────┐
 │  Layer 1 — Core Infrastructure                                          │
 │                                                                         │
-│  config (Zod)  ·  errors (13 subclasses)  ·  logging (pino)            │
-│  telemetry (OTel)  ·  types (199 interfaces)  ·  utils  ·  compat      │
+│  config (Zod)  ·  errors (14 subclasses)  ·  logging (pino)            │
+│  telemetry (OTel — real when enabled)  ·  types  ·  utils  ·  compat   │
 └──────────────────────────────────┬──────────────────────────────────────┘
                                    │
 ┌──────────────────────────────────▼──────────────────────────────────────┐
@@ -89,14 +89,14 @@ import { ensureBridgeInjected } from '#bridge/injection.js';
 
 Praman ships 6 sub-path exports, each targeting a specific concern:
 
-| Sub-Path Export                | Purpose                     | Key Modules                                        |
-| ------------------------------ | --------------------------- | -------------------------------------------------- |
-| `playwright-praman`            | Core fixtures, expect, test | Fixtures, selectors, matchers                      |
-| `playwright-praman/ai`         | AI agent integration        | CapabilityRegistry, RecipeRegistry, AgenticHandler |
-| `playwright-praman/intents`    | SAP domain intent APIs      | Core wrappers, 5 domain namespaces                 |
-| `playwright-praman/vocabulary` | Business term resolution    | VocabularyService, fuzzy matcher                   |
-| `playwright-praman/fe`         | Fiori Elements helpers      | ListReport, ObjectPage, FE tables                  |
-| `playwright-praman/reporters`  | Custom Playwright reporters | ComplianceReporter, ODataTraceReporter             |
+| Sub-Path Export                | Purpose                     | Key Modules                                          |
+| ------------------------------ | --------------------------- | ---------------------------------------------------- |
+| `playwright-praman`            | Core fixtures, expect, test | Fixtures, selectors, matchers                        |
+| `playwright-praman/ai`         | AI agent integration        | CapabilityRegistry, RecipeRegistry, AgenticHandler   |
+| `playwright-praman/intents`    | SAP domain intent APIs      | Core wrappers, 5 domain namespaces                   |
+| `playwright-praman/vocabulary` | Business term resolution    | VocabularyService, fuzzy matcher                     |
+| `playwright-praman/fe`         | Fiori Elements helpers      | ListReport, ObjectPage, FE tables                    |
+| `playwright-praman/reporters`  | Custom Playwright reporters | ComplianceReporter, ODataTraceReporter, OTelReporter |
 
 Each export provides both ESM and CJS outputs:
 

@@ -79,16 +79,39 @@ const aiSchema = z.object({
  * Telemetry configuration sub-schema.
  *
  * @remarks
- * Phase 1: All telemetry operations use a NoOpTracer regardless of configuration.
- * Setting `openTelemetry: true` will log a warning but produce no trace data.
- * Real OTel SDK integration (Phase 2) is tracked as milestone M2.
+ * When `openTelemetry: true`, the OTel SDK is dynamically loaded and initialized.
+ * When `false` (default), all operations use a zero-overhead NoOpTracer.
+ *
+ * OTLP and Jaeger exporters require `endpoint` (a URL).
+ * Azure Monitor requires `connectionString` (NOT a URL).
+ * The `.refine()` enforces the appropriate field is present when enabled.
  */
-const telemetrySchema = z.object({
-  openTelemetry: z.boolean().default(false),
-  exporter: z.enum(['otlp', 'azure-monitor', 'jaeger']).default('otlp'),
-  endpoint: z.url().optional(),
-  serviceName: z.string().default('playwright-praman'),
-});
+const telemetrySchema = z
+  .object({
+    openTelemetry: z.boolean().default(false),
+    exporter: z.enum(['otlp', 'azure-monitor', 'jaeger']).default('otlp'),
+    endpoint: z.url().optional(),
+    serviceName: z.string().default('playwright-praman'),
+    protocol: z.enum(['http', 'grpc']).default('http'),
+    metrics: z.boolean().default(false),
+    batchTimeout: z.number().int().positive().default(5_000),
+    maxQueueSize: z.number().int().positive().default(2_048),
+    resourceAttributes: z.record(z.string(), z.string()).default({}),
+    /** Azure Monitor connection string. Required when exporter is 'azure-monitor'. */
+    connectionString: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.openTelemetry) return true;
+      if (data.exporter === 'azure-monitor') return data.connectionString !== undefined;
+      return data.endpoint !== undefined;
+    },
+    {
+      message:
+        'telemetry.endpoint (or connectionString for azure-monitor) is required when openTelemetry is true',
+      path: ['endpoint'],
+    },
+  );
 
 // ── Selectors sub-schema ─────────────────────────────────────────────
 const selectorsSchema = z.object({

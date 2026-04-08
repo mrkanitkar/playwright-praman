@@ -35,7 +35,8 @@ import { test, expect } from 'playwright-praman';
 | `pramanConfig`  | worker | Infrastructure  | Frozen config (loaded once per worker)                                                     |
 | `pramanLogger`  | test   | Infrastructure  | Test-scoped pino logger                                                                    |
 | `rootLogger`    | worker | Infrastructure  | Worker-scoped root logger                                                                  |
-| `tracer`        | worker | Infrastructure  | OpenTelemetry tracer (NoOp when disabled)                                                  |
+| `tracer`        | worker | Infrastructure  | OpenTelemetry tracer (NoOp when disabled, real when `openTelemetry: true`)                 |
+| `meter`         | worker | Infrastructure  | OpenTelemetry meter for metrics (NoOp when disabled, real when `metrics: true`)            |
 | `browserBind`   | test   | CLI Integration | `PRAMAN_BIND=1` exposes browser to CLI agents via `browser.bind()` (Playwright 1.59+)      |
 | `screencast`    | test   | CLI Integration | Chapter markers, action overlays, frame streaming via `page.screencast` (Playwright 1.59+) |
 

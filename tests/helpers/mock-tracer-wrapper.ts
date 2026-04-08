@@ -150,6 +150,9 @@ export function createMockTracer(): MockTracerResult {
     recordException(span: SpanWrapper, error: Error): void {
       exceptions.push({ span, error });
     },
+    getActiveTraceId(): string | undefined {
+      return undefined;
+    },
     shutdown: shutdownFn as () => Promise<void>,
   };
 

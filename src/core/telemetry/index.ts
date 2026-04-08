@@ -8,15 +8,22 @@
  */
 
 /**
- * Telemetry module — OpenTelemetry wrappers and span utilities.
+ * Telemetry module — OpenTelemetry wrappers, metrics, and span utilities.
  *
  * @remarks
- * Re-exports tracer initialization, NoOp implementation, and span helpers.
- * Phase 1 provides only NoOp tracer; real OTel SDK integration is Phase 2.
+ * Re-exports tracer/meter initialization, NoOp implementations, and span helpers.
+ * When `openTelemetry: true`, the real OTel SDK is dynamically loaded.
+ * When disabled (default), all operations use zero-overhead NoOp implementations.
  *
  * @module telemetry
  */
 
-export { getNoOpTracer, initTelemetry } from './otel.js';
-export type { SpanWrapper, TracerWrapper } from './otel.js';
+export { getNoOpMeter, getNoOpTracer, initMetrics, initTelemetry } from './otel.js';
+export type {
+  MeterWrapper,
+  MetricCounter,
+  MetricHistogram,
+  SpanWrapper,
+  TracerWrapper,
+} from './otel.js';
 export { createSpanName, spanAttributes } from './spans.js';

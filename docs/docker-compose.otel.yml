@@ -1,0 +1,24 @@
+# docker-compose.otel.yml — Local OTel dev stack for Praman telemetry
+#
+# Usage:
+#   docker compose -f docs/docker-compose.otel.yml up -d
+#
+# Provides:
+#   - Jaeger UI: http://localhost:16686
+#   - OTLP HTTP receiver: http://localhost:4318
+#
+# Configure Praman:
+#   PRAMAN_TELEMETRY_ENABLED=true
+#   PRAMAN_TELEMETRY_ENDPOINT=http://localhost:4318
+#   PRAMAN_TELEMETRY_EXPORTER=jaeger
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.62
+    environment:
+      # API-6: Jaeger requires COLLECTOR_OTLP_ENABLED=true for OTLP ingestion
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - '16686:16686' # Jaeger UI
+      - '4318:4318' # OTLP HTTP receiver
+    restart: unless-stopped

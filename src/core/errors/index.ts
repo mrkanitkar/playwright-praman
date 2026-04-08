@@ -60,3 +60,6 @@ export type { VocabularyErrorOptions } from './vocabulary-error.js';
 
 export { IntentError } from './intent-error.js';
 export type { IntentErrorOptions } from './intent-error.js';
+
+export { TelemetryError } from './telemetry-error.js';
+export type { TelemetryErrorOptions } from './telemetry-error.js';

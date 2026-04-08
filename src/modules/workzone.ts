@@ -44,14 +44,20 @@ const APP_FRAME_URL_PATTERN = 'application';
  * Minimal subset of Playwright's Page used by WorkZone functions.
  */
 export interface WorkZonePage {
+  /** Executes a function or expression in the page context. */
   evaluate(pageFunction: string | ((...args: never[]) => unknown), arg?: unknown): Promise<unknown>;
+  /** Waits for a predicate function to return a truthy value. */
   waitForFunction(
     pageFunction: string | (() => unknown),
     options?: { readonly timeout?: number; readonly polling?: number },
   ): Promise<unknown>;
+  /** Returns a FrameLocator for the given CSS selector. */
   frameLocator(selector: string): WorkZoneFrameLocator;
+  /** Returns the first frame matching the given URL option, or null. */
   frame(options: { readonly url: RegExp | string }): WorkZoneFrame | null;
+  /** Returns all frames attached to this page. */
   frames(): readonly WorkZoneFrame[];
+  /** Returns the page's main frame. */
   mainFrame(): WorkZoneFrame;
 }
 
@@ -66,11 +72,14 @@ export interface WorkZoneFrameLocator {
  * Minimal subset of Playwright's Frame for evaluate and URL access.
  */
 export interface WorkZoneFrame {
+  /** Executes a function or expression in the frame context. */
   evaluate(pageFunction: string | ((...args: never[]) => unknown), arg?: unknown): Promise<unknown>;
+  /** Waits for a predicate function to return a truthy value. */
   waitForFunction(
     pageFunction: string | (() => unknown),
     options?: { readonly timeout?: number; readonly polling?: number },
   ): Promise<unknown>;
+  /** Returns the frame's current URL. */
   url(): string;
 }
 

@@ -8,21 +8,20 @@
  */
 
 /**
- * OpenTelemetry tracer wrapper with lazy loading and NoOp implementation.
+ * OpenTelemetry tracer and meter wrappers with NoOp fallback.
  *
  * @remarks
  * Provides a zero-overhead abstraction over OpenTelemetry. When telemetry is
- * disabled (default), all operations are no-ops with no performance impact.
- *
- * Phase 1 implements only the NoOpTracer. Real OTel SDK integration
- * (including exporter-specific validation such as Jaeger endpoint) is
- * deferred to Phase 2 (tracked as M2).
+ * disabled (default), all operations use NoOp implementations with no
+ * performance impact. Real OTel implementations live in `otel-real.ts` and
+ * are loaded dynamically when telemetry is enabled.
  *
  * @example
  * ```typescript
- * import { initTelemetry } from '#core/telemetry/otel.js';
+ * import { initTelemetry, initMetrics } from '#core/telemetry/otel.js';
  *
  * const tracer = await initTelemetry(config);
+ * const meter = await initMetrics(config);
  * const span = tracer.startSpan('my-operation');
  * span.setAttribute('key', 'value');
  * span.end();
@@ -30,9 +29,6 @@
  *
  * @module telemetry
  */
-
-import type { PramanConfig } from '#core/config/schema.js';
-import { createLogger } from '#core/logging/index.js';
 
 /**
  * Wrapper around an OpenTelemetry span for instrumented operations.
@@ -82,9 +78,101 @@ export interface TracerWrapper {
   withSpan<T>(name: string, fn: () => Promise<T>): Promise<T>;
   /** Records an exception on the given span. */
   recordException(span: SpanWrapper, error: Error): void;
+  /** Returns the active OTel trace ID, or `undefined` when telemetry is disabled. */
+  getActiveTraceId(): string | undefined;
   /** Shuts down the tracer, flushing any pending data. */
   shutdown(): Promise<void>;
 }
+
+/**
+ * Counter metric wrapper for recording monotonically increasing values.
+ *
+ * @remarks
+ * Wraps the OTel Counter API. The NoOp implementation is a safe no-op.
+ *
+ * @example
+ * ```typescript
+ * const counter = meter.createCounter('praman.test.pass');
+ * counter.add(1, { 'test.suite': 'smoke' });
+ * ```
+ */
+export interface MetricCounter {
+  /** Adds a value to the counter with optional attributes. */
+  add(value: number, attributes?: Record<string, string>): void;
+}
+
+/**
+ * Histogram metric wrapper for recording value distributions.
+ *
+ * @remarks
+ * Wraps the OTel Histogram API. The NoOp implementation is a safe no-op.
+ *
+ * @example
+ * ```typescript
+ * const histogram = meter.createHistogram('praman.control.discovery.duration');
+ * histogram.record(42.5, { 'control.type': 'sap.m.Button' });
+ * ```
+ */
+export interface MetricHistogram {
+  /** Records a value in the histogram with optional attributes. */
+  record(value: number, attributes?: Record<string, string>): void;
+}
+
+/**
+ * Wrapper around an OpenTelemetry meter for creating metric instruments.
+ *
+ * @remarks
+ * Provides a simplified API surface that abstracts over the full OTel Meter.
+ * The NoOp implementation makes all methods safe to call without side effects.
+ *
+ * @example
+ * ```typescript
+ * const meter = getNoOpMeter();
+ * const counter = meter.createCounter('praman.test.pass', 'Test pass count');
+ * counter.add(1);
+ * ```
+ */
+export interface MeterWrapper {
+  /** Creates a counter instrument with a name and optional description. */
+  createCounter(name: string, description?: string): MetricCounter;
+  /** Creates a histogram instrument with a name and optional description. */
+  createHistogram(name: string, description?: string): MetricHistogram;
+  /** Shuts down the meter, flushing any pending metric data. */
+  shutdown(): Promise<void>;
+}
+
+/** No-op counter: `add()` does nothing. */
+const NO_OP_COUNTER: MetricCounter = {
+  add(): void {
+    // No-op: counter recording disabled
+  },
+};
+
+/** No-op histogram: `record()` does nothing. */
+const NO_OP_HISTOGRAM: MetricHistogram = {
+  record(): void {
+    // No-op: histogram recording disabled
+  },
+};
+
+/**
+ * Singleton NoOpMeter: all methods are safe to call but do nothing.
+ *
+ * @remarks
+ * Used when metrics are disabled. All instrument creation returns
+ * no-op singletons with zero overhead.
+ */
+const NO_OP_METER: MeterWrapper = {
+  createCounter(): MetricCounter {
+    return NO_OP_COUNTER;
+  },
+  createHistogram(): MetricHistogram {
+    return NO_OP_HISTOGRAM;
+  },
+  async shutdown(): Promise<void> {
+    await Promise.resolve();
+  },
+};
 
 /** No-op span: all methods are safe to call but do nothing. */
 const NO_OP_SPAN: SpanWrapper = {
@@ -132,48 +220,14 @@ const NO_OP_TRACER: TracerWrapper = {
   recordException(): void {
     // No-op: exception recording disabled
   },
+  getActiveTraceId(): string | undefined {
+    return undefined;
+  },
   async shutdown(): Promise<void> {
     // No-op: nothing to flush
     await Promise.resolve();
   },
 };
-
-/**
- * Initializes telemetry based on the provided configuration.
- *
- * @remarks
- * If `config.telemetry?.openTelemetry` is not `true`, returns a NoOpTracer
- * immediately with zero overhead.
- *
- * Phase 1: Always returns NoOpTracer. Real OTel SDK initialization
- * (including exporter-specific validation such as Jaeger endpoint URL)
- * is deferred to Phase 2 (tracked as issue M2).
- *
- * @param config - The validated Praman configuration
- * @returns A TracerWrapper instance (NoOpTracer in Phase 1)
- *
- * @example
- * ```typescript
- * import { initTelemetry } from '#core/telemetry/otel.js';
- * import { PramanConfigSchema } from '#core/config/schema.js';
- *
- * const config = PramanConfigSchema.parse({});
- * const tracer = await initTelemetry(config);
- * ```
- */
-export async function initTelemetry(config: Readonly<PramanConfig>): Promise<TracerWrapper> {
-  if (config.telemetry?.openTelemetry === true) {
-    const log = createLogger('telemetry');
-    log.warn(
-      'OpenTelemetry enabled in config but real tracing is not yet available (Phase 1). ' +
-        'A NoOpTracer will be used. Real OTel SDK integration is tracked as M2.',
-    );
-  }
-  // Phase 1: Always return NoOpTracer regardless of config.
-  // Phase 2 (M2): Check config.telemetry?.openTelemetry and initialize real OTel SDK.
-  await Promise.resolve();
-  return NO_OP_TRACER;
-}
 
 /**
  * Returns a shared NoOpTracer instance.
@@ -196,3 +250,28 @@ export async function initTelemetry(config: Readonly<PramanConfig>): Promise<Tra
 export function getNoOpTracer(): TracerWrapper {
   return NO_OP_TRACER;
 }
+
+/**
+ * Returns a shared NoOpMeter instance.
+ *
+ * @remarks
+ * Useful for contexts where configuration is not available or metrics
+ * are known to be disabled. The returned meter is a singleton.
+ *
+ * @returns A MeterWrapper that performs no operations
+ *
+ * @example
+ * ```typescript
+ * import { getNoOpMeter } from '#core/telemetry/otel.js';
+ *
+ * const meter = getNoOpMeter();
+ * const counter = meter.createCounter('praman.test.pass');
+ * counter.add(1); // no-op
+ * ```
+ */
+export function getNoOpMeter(): MeterWrapper {
+  return NO_OP_METER;
+}
+
+// Re-export init functions from otel-real.ts (loaded dynamically when telemetry enabled)
+export { initTelemetry, initMetrics } from './otel-real.js';

@@ -59,7 +59,7 @@ const VALID_VARIANTS = [
  * Union of all 6 supported SAP UI5 table variant class names.
  *
  * @remarks
- * Derived from {@link VALID_VARIANTS} — the const tuple is the single source of truth.
+ * Derived from the `VALID_VARIANTS` const tuple — the single source of truth.
  *
  * @example `const v: TableVariant = 'sap.m.Table';`
  */
