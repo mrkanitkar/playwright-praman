@@ -170,14 +170,14 @@ describe('createWorkZoneManager', () => {
       await manager.enableDualBridge();
 
       // Bridge should be injected for main frame (page) and app frame
-      expect(ensureBridgeInjected).toHaveBeenCalled();
-      // The app frame evaluate should also have been called for injection
+      expect(ensureBridgeInjected).toHaveBeenCalledTimes(2);
+      // First call: main frame (page), second call: app iframe
       const allFrames = page.frames.mock.results[0]?.value as
         | ReturnType<typeof createMockFrame>[]
         | undefined;
       const appFrame = allFrames?.[1];
       expect(appFrame).toBeDefined();
-      expect(appFrame?.evaluate).toHaveBeenCalled();
+      expect(ensureBridgeInjected).toHaveBeenCalledWith(appFrame);
     });
   });
 

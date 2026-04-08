@@ -176,16 +176,10 @@ export function createWorkZoneManager(
       // Inject bridge in main frame (shell)
       await ensureBridgeInjected(page);
 
-      // Inject bridge in app iframe via Frame.evaluate
+      // Inject bridge in app iframe (same lazy mechanism as main frame)
       const appFrame = findAppFrame(page);
       if (appFrame !== undefined) {
-        await appFrame.evaluate(
-          /* v8 ignore start -- browser-context: bridge injection in iframe */
-          () => {
-            /* bridge injection placeholder for iframe context */
-          },
-          /* v8 ignore stop */
-        );
+        await ensureBridgeInjected(appFrame);
       }
     },
 

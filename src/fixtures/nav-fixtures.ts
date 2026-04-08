@@ -392,10 +392,13 @@ export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
   // ── btpWorkZone fixture ───────────────────────────────────────────
 
   btpWorkZone: async ({ page }, use) => {
-    // Create a minimal WorkZoneAdapter shim that delegates to page-level injection
+    // Create a minimal WorkZoneAdapter shim that delegates to page-level injection.
+    // @intent Lazy bridge injection — init() is a no-op because every UI5 operation
+    // calls ensureBridgeInjected() before executing, making eager init unnecessary.
     const adapterShim = {
       async init(): Promise<void> {
-        // No-op: bridge injection is handled lazily by ensureBridgeInjected
+        // No-op: bridge injection is lazy — ensureBridgeInjected() is called
+        // by each UI5 operation (ui5-handler, matchers, discovery) on first use.
       },
       resetInjectionState(): void {
         resetPageInjection(page);

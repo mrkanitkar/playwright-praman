@@ -102,7 +102,13 @@ export interface AuthDeps {
   readonly pramanConfig: Readonly<Record<string, unknown>>;
 }
 
-/** Minimal no-op logger for auth fixture construction. */
+/**
+ * Minimal no-op logger for auth fixture construction.
+ *
+ * @intent Suppress logging during fixture wiring — auth strategies receive a logger
+ * at construction time, but fixture setup should be silent. Real logging begins
+ * when the user calls `sapAuth.login()`, which uses the strategy's own logger.
+ */
 const fixtureLogger = {
   info(): void {
     /* no-op in fixture — lifecycle logging deferred to explicit login() */
