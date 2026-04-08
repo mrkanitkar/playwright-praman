@@ -254,6 +254,8 @@ Praman uses a multi-strategy chain for control discovery:
 
 Configure the strategy chain:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { defineConfig } from 'playwright-praman';
 

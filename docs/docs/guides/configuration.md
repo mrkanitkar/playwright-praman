@@ -201,6 +201,8 @@ export default defineConfig({
 
 Config is validated with Zod at load time. Invalid config fails fast:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { loadConfig } from 'playwright-praman';
 

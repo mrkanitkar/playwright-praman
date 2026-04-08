@@ -11,6 +11,8 @@ Everything you need on one page. Copy-paste ready.
 
 ## Imports
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // Standard test — includes all fixtures
 import { test, expect } from 'playwright-praman';

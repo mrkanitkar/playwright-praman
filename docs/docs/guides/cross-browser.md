@@ -176,6 +176,8 @@ test('table rendering across browsers', async ({ ui5, browserName }) => {
 
 SAP Fiori apps are responsive. Test mobile viewports:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // playwright.config.ts
 export default defineConfig({

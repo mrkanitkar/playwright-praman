@@ -51,7 +51,7 @@
 export { expect, test } from './fixtures/index.js';
 
 // ── Standalone fixture modules (for tree-shaking / selective merge) ──
-export { authTest, coreTest } from './fixtures/index.js';
+export { authTest, browserBindTest, coreTest, moduleTest } from './fixtures/index.js';
 export { screencastTest } from './fixtures/index.js';
 export type { ExtendedUI5Handler } from './fixtures/index.js';
 export type {
