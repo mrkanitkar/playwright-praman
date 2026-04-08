@@ -656,32 +656,23 @@ function GlanceSection(): ReactNode {
             <h4>When to Use?</h4>
             <ul className="praman-when-to-use-list">
               <li>
-                <strong>SAP RISE {'&'} Public Cloud migration</strong> — validate every Fiori app
-                before and after cutover
+                <strong>SAP RISE {'&'} Cloud migration</strong> — validate Fiori apps before and
+                after cutover
               </li>
               <li>
-                <strong>Frequent upgrade cycles</strong> — quarterly UI5 patches, feature packs, and
-                S/4HANA updates need continuous regression
+                <strong>Upgrade cycles</strong> — continuous regression for UI5 patches {'&'}{' '}
+                S/4HANA updates
               </li>
               <li>
                 <strong>No documentation</strong> — AI agents discover controls from your live
-                system, no specs required
+                system
               </li>
               <li>
-                <strong>Cost reduction</strong> — free open-source alternative to Tricentis,
-                Worksoft, and paid SAP testing tools
+                <strong>Cost reduction</strong> — free open-source, replace Tricentis {'&'}{' '}
+                Worksoft
               </li>
               <li>
-                <strong>Agentic automation</strong> — build a complete plan → generate → heal
-                pipeline with zero human scripting
-              </li>
-              <li>
-                <strong>Greenfield, brownfield, or bluefield</strong> — one plugin covers every
-                S/4HANA deployment model
-              </li>
-              <li>
-                <strong>Fiori Launchpad {'&'} WebGUI</strong> — SAP-native locators for UI5, Fiori
-                Elements, and SAP GUI for HTML
+                <strong>Agentic automation</strong> — plan → generate → heal with zero scripting
               </li>
             </ul>
           </div>
@@ -694,6 +685,77 @@ function GlanceSection(): ReactNode {
               (stdin/stdout) — both installed by default.
             </p>
           </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ── Three Ways to Use Praman (Playwright-style cards) ────── */
+
+function UseCaseCards(): ReactNode {
+  return (
+    <div className="praman-usecase-outer">
+      <section className="praman-usecase-section">
+        <div className="praman-usecase-grid">
+          {/* Card 1: Praman Plugin */}
+          <div className="praman-usecase-card">
+            <h3>Praman Plugin</h3>
+            <p>
+              Drop-in Playwright plugin for SAP test automation engineers. 199 typed control
+              proxies, OData fixtures, Fiori Elements support, and SAP auth — just destructure and
+              go.
+            </p>
+            <div className="praman-usecase-install">
+              <code>npm install playwright-praman</code>
+            </div>
+            <Link className="praman-usecase-link" to="/docs/guides/migration-from-playwright">
+              Migration from Playwright →
+            </Link>
+          </div>
+
+          {/* Card 2: Praman CLI Agents */}
+          <div className="praman-usecase-card">
+            <h3>Praman CLI Agents</h3>
+            <p>
+              Token-efficient browser automation for coding agents. Planner, Generator, and Healer
+              agents work via stdin/stdout — optimized for Claude Code, GitHub Copilot, and
+              Cursor.
+            </p>
+            <div className="praman-usecase-install">
+              <code>npx playwright-praman init</code>
+            </div>
+            <Link className="praman-usecase-link" to="/docs/guides/playwright-cli-agents">
+              CLI Agents Guide →
+            </Link>
+          </div>
+
+          {/* Card 3: Praman MCP Agents */}
+          <div className="praman-usecase-card">
+            <h3>Praman MCP Agents</h3>
+            <p>
+              Model Context Protocol server for AI agents with structured accessibility snapshots
+              and rich inline feedback. Ideal for VS Code Copilot, Cursor, and JetBrains AI
+              integrations.
+            </p>
+            <div className="praman-usecase-install">
+              <code>npx playwright-praman init</code>
+            </div>
+            <Link className="praman-usecase-link" to="/docs/guides/mcp-vs-cli">
+              MCP vs CLI Guide →
+            </Link>
+          </div>
+        </div>
+        <div className="praman-usecase-footer">
+          <Link className="praman-btn praman-btn-dark" to="/docs/guides/running-your-agent">
+            Running Your Agent →
+          </Link>
+          <Link
+            className="praman-usecase-blog-link"
+            to="/blog/2026/04/02/sap-test-automation-comparison"
+          >
+            Read: SAP Test Automation tool Comparison →
+          </Link>
         </div>
       </section>
     </div>
@@ -1300,19 +1362,22 @@ function Capabilities(): ReactNode {
           <div>
             <h3>Agent-First Architecture</h3>
             <p>
-              SKILL.md entry points, capabilities.list() discovery, compliance verification. Built
-              for Copilot, Claude, and Jules.
+              SKILL.md entry points, capabilities.list() discovery, compliance verification.
+              Planner, Generator {'&'} Healer agents via{' '}
+              <Link to="/docs/guides/playwright-cli-agents">CLI</Link> or{' '}
+              <Link to="/docs/guides/mcp-vs-cli">MCP</Link>. Built for Claude, Copilot, Cursor {'&'}{' '}
+              Jules.
             </p>
           </div>
         </li>
         <li>
           <div className="icon">&#x1F527;</div>
           <div>
-            <h3>21 Fixtures, 199 Typed Interfaces, 4,092 Methods</h3>
+            <h3>199 Typed Control Proxies {'&'} 21 Fixtures</h3>
             <p>
               199 UI5 control types across 8 libraries — sap.m, sap.ui.table, sap.ui.comp, sap.uxap,
-              sap.f, and more. OData CRUD, Fiori Elements, FLP navigation, SAP auth, SM12 locks, AI
-              discovery. Just destructure and go.
+              sap.f. OData V2/V4 interception, Fiori Elements, FLP navigation, 6 auth strategies,
+              SmartField handling. Just destructure and go.
             </p>
           </div>
         </li>
@@ -1321,19 +1386,20 @@ function Capabilities(): ReactNode {
           <div>
             <h3>SAP UI5 Native — LTS 1.108 &middot; 1.120 &middot; 1.136</h3>
             <p>
-              ui5.control() with auto-retry, self-healing, and 3-tier API resolution across UI5 LTS
-              versions. Uses UI5&apos;s own control APIs, not brittle DOM selectors.
+              Unified <code>ui5=</code> selector engine with pseudo-classes, combinators, and
+              positional selectors. Auto-retry, self-healing, and 3-tier API resolution. Uses
+              UI5&apos;s own control APIs, not brittle DOM selectors.
             </p>
           </div>
         </li>
         <li>
-          <div className="icon">&#x1F3D7;</div>
+          <div className="icon">&#x1F50D;</div>
           <div>
-            <h3>6-Layer Architecture</h3>
+            <h3>Interactive Inspector {'&'} Developer Tools</h3>
             <p>
-              Core Infrastructure &rarr; Selectors &amp; Matchers &rarr; Bridge &amp; Browser
-              Scripts &rarr; Control Proxy &rarr; Fixtures &amp; Auth &rarr; AI &amp; Intents. 3
-              interaction strategies, 7 return-type handlers, TTL+LRU caching, 10 error subclasses.
+              <code>npx praman inspect</code> — click any element to see UI5 metadata and ranked
+              selectors. <code>npx praman config</code> for resolved configuration. Extension system
+              for custom matchers {'&'} fixtures.
             </p>
           </div>
         </li>
@@ -1342,18 +1408,38 @@ function Capabilities(): ReactNode {
           <div>
             <h3>Enterprise Observability</h3>
             <p>
-              OpenTelemetry tracing with Azure and AWS, role-based quality reports, pino structured
-              logging, compliance reporters, defect video, logs. Full visibility into every action.
+              OpenTelemetry tracing {'&'} metrics (OTLP, Jaeger, Azure Monitor exporters),
+              role-based quality reports, pino structured logging, compliance reporters, defect
+              video. Full visibility into every action.
             </p>
           </div>
         </li>
         <li>
           <div className="icon">&#x26A1;</div>
           <div>
-            <h3>Playwright Native</h3>
+            <h3>Playwright 1.57+ Native</h3>
             <p>
-              Extends @playwright/test. Parallel execution, auto-wait, trace viewer, UI mode. Zero
-              compromise.
+              Extends @playwright/test. Parallel execution, auto-wait, trace viewer, UI mode.
+              Drop-in replacement —{' '}
+              <Link to="/docs/guides/migration-from-playwright">
+                existing Playwright tests work unchanged
+              </Link>
+              . Mix page.locator() and ui5.control() in the same test.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div className="icon">&#x1F6E1;&#xFE0F;</div>
+          <div>
+            <h3>Enterprise Security {'&'} Cross-Platform</h3>
+            <p>
+              Future-proof with TypeScript 6.x {'&'} 5.x support. CISO-approved, zero npm audit
+              vulnerabilities, SBOM + CodeQL scanning. Windows, macOS, Linux. ESM + CJS dual
+              build.{' '}
+              <Link to="/blog/2026/04/02/sap-test-automation-comparison">
+                See how Praman compares
+              </Link>
+              .
             </p>
           </div>
         </li>
@@ -1455,6 +1541,7 @@ export default function Home(): ReactNode {
       <main>
         <HeroCarousel />
         <GlanceSection />
+        <UseCaseCards />
         <AgentFlowSection />
         <ReportsSection />
         <div
