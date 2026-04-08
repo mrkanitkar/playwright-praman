@@ -19,6 +19,7 @@
  * This module has NO I/O and NO side effects — it is a pure function module
  * suitable for hermetic unit testing.
  *
+ * @internal
  * @module vocabulary
  */
 

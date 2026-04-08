@@ -15,6 +15,7 @@
  * provider API call and return a {@link CompletionResult}. Dynamic imports
  * are used so provider SDK packages remain optional dependencies.
  *
+ * @internal
  * @module ai
  */
 
