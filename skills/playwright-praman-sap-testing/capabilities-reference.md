@@ -1,6 +1,6 @@
 # Praman Capabilities Reference (Agent)
 
-> Generated: 2026-04-07 — do not edit manually, run `npm run generate:capabilities`
+> Generated: 2026-04-08 — do not edit manually, run `npm run generate:capabilities`
 > Total: 182 capabilities
 
 ---

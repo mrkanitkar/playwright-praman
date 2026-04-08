@@ -48,7 +48,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         storageState: '.auth/sap-session.json',
-        baseURL: process.env['SAP_BASE_URL'],
+        baseURL: process.env['SAP_CLOUD_BASE_URL'],
       },
       dependencies: ['auth'],
     },
@@ -68,25 +68,28 @@ cp node_modules/playwright-praman/examples/auth-setup.ts tests/auth-setup.ts
 Or create your own `tests/auth-setup.ts`. See `examples/auth-setup.ts` for a
 complete reference covering OnPrem, BTP Cloud SAML, and Office 365 strategies.
 
-Set environment variables (in `.env.test` or CI secrets):
+Set environment variables (in `.env` or CI secrets):
 
 ```bash
-SAP_BASE_URL=https://your-sap-system.example.com
-SAP_USERNAME=TEST_USER
-SAP_PASSWORD=<your-password>
-SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'
-SAP_CLIENT=100             # OnPrem only
+SAP_ACTIVE_SYSTEM=cloud     # 'cloud' or 'onprem'
+SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
+SAP_CLOUD_USERNAME=TEST_USER
+SAP_CLOUD_PASSWORD=<your-password>
+SAP_AUTH_STRATEGY=btp-saml   # 'basic' | 'btp-saml' | 'office365'
+SAP_CLIENT=100               # Optional, default 100
+SAP_LANGUAGE=EN              # Optional, default EN
 ```
 
-> **Tip:** `SAP_BASE_URL` should be the root URL of your SAP system (no trailing path).
+> **Tip:** `SAP_CLOUD_BASE_URL` should be the root URL of your SAP system (no trailing path).
 > For BTP, use the full Launchpad URL.
 
 #### Example: On-Premise (Basic Auth)
 
 ```bash
-SAP_BASE_URL=https://sap-dev.company.com:44300
-SAP_USERNAME=TEST_USER
-SAP_PASSWORD=SecureP@ss123
+SAP_ACTIVE_SYSTEM=onprem
+SAP_ONPREM_BASE_URL=https://sap-dev.company.com:44300
+SAP_ONPREM_USERNAME=TEST_USER
+SAP_ONPREM_PASSWORD=SecureP@ss123
 SAP_AUTH_STRATEGY=basic
 SAP_CLIENT=100
 ```
@@ -94,19 +97,21 @@ SAP_CLIENT=100
 #### Example: BTP Cloud (SAML)
 
 ```bash
-SAP_BASE_URL=https://my-tenant.launchpad.cfapps.eu10.hana.ondemand.com
-SAP_USERNAME=test.user@company.com
-SAP_PASSWORD=SecureP@ss123
+SAP_ACTIVE_SYSTEM=cloud
+SAP_CLOUD_BASE_URL=https://my-tenant.launchpad.cfapps.eu10.hana.ondemand.com
+SAP_CLOUD_USERNAME=test.user@company.com
+SAP_CLOUD_PASSWORD=SecureP@ss123
 SAP_AUTH_STRATEGY=btp-saml
 ```
 
 #### Example: Office 365
 
 ```bash
-SAP_BASE_URL=https://sap-portal.company.com
-SAP_USERNAME=test.user@company.onmicrosoft.com
-SAP_PASSWORD=SecureP@ss123
+SAP_ACTIVE_SYSTEM=cloud
 SAP_AUTH_STRATEGY=office365
+SAP_CLOUD_BASE_URL=https://sap-portal.company.com
+SAP_CLOUD_USERNAME=test.user@company.onmicrosoft.com
+SAP_CLOUD_PASSWORD=SecureP@ss123
 ```
 
 ### 3. Add .auth to .gitignore
@@ -170,7 +175,7 @@ npx playwright test tests/purchase-order.spec.ts --headed
 
 | Symptom                           | Likely Cause                           | Fix                                           |
 | --------------------------------- | -------------------------------------- | --------------------------------------------- |
-| Browser opens but stays blank     | `SAP_BASE_URL` is wrong or unreachable | Check URL in browser manually                 |
+| Browser opens but stays blank     | `SAP_CLOUD_BASE_URL` is wrong or unreachable | Check URL in browser manually             |
 | Login page appears but auth fails | Wrong credentials or strategy          | Verify `.env` values; try logging in manually |
 | Auth succeeds but test times out  | App tile not found or UI5 not loaded   | Run `npx playwright-praman doctor`            |
 | `ERR_BRIDGE_NOT_READY`            | UI5 framework not detected             | Ensure the page is a UI5 application          |

@@ -25,9 +25,9 @@ export default defineConfig({
   discoveryStrategies: ['direct-id', 'recordreplay'],
   auth: {
     strategy: 'basic',
-    baseUrl: process.env.SAP_BASE_URL!,
-    username: process.env.SAP_USER!,
-    password: process.env.SAP_PASS!,
+    baseUrl: process.env.SAP_CLOUD_BASE_URL!,
+    username: process.env.SAP_CLOUD_USERNAME!,
+    password: process.env.SAP_CLOUD_PASSWORD!,
     client: '100',
     language: 'EN',
   },
@@ -161,7 +161,7 @@ export default defineConfig({
     ['playwright-praman/reporters', { type: 'compliance', outputDir: 'reports' }],
   ],
   use: {
-    baseURL: process.env.SAP_BASE_URL,
+    baseURL: process.env.SAP_CLOUD_BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

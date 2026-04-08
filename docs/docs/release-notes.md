@@ -177,9 +177,6 @@ Configuration can now be injected at any nesting level via environment variables
 
 | Env variable                                    | Config path                       |
 | ----------------------------------------------- | --------------------------------- |
-| `PRAMAN_AUTH_STRATEGY`                          | `auth.strategy`                   |
-| `PRAMAN_AUTH_STORAGE_STATE_PATH`                | `auth.storageStatePath`           |
-| `PRAMAN_AUTH_USERNAME` / `PRAMAN_AUTH_PASSWORD` | `auth.username` / `auth.password` |
 | `PRAMAN_AI_PROVIDER`                            | `ai.provider`                     |
 | `PRAMAN_AI_MODEL`                               | `ai.model`                        |
 | `PRAMAN_AI_API_KEY`                             | `ai.apiKey`                       |

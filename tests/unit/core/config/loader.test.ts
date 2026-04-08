@@ -204,26 +204,7 @@ describe('loadConfig', () => {
     expect(Object.isFrozen(config)).toBe(true);
   });
 
-  // ── Nested env var overrides (auth, ai, telemetry, odataTracing) ────
-  it('overrides auth fields from PRAMAN_AUTH_* env vars', async () => {
-    vi.stubEnv('PRAMAN_AUTH_BASE_URL', 'https://sap.example.com');
-    vi.stubEnv('PRAMAN_AUTH_STRATEGY', 'basic');
-    vi.stubEnv('PRAMAN_AUTH_USERNAME', 'admin');
-    vi.stubEnv('PRAMAN_AUTH_PASSWORD', 'secret');
-    vi.stubEnv('PRAMAN_AUTH_CLIENT', '100');
-    vi.stubEnv('PRAMAN_AUTH_LANGUAGE', 'DE');
-    const config = await loadConfig();
-    expect(config.auth).toMatchObject({
-      baseUrl: 'https://sap.example.com',
-      strategy: 'basic',
-      username: 'admin',
-
-      password: 'secret',
-      client: '100',
-      language: 'DE',
-    });
-  });
-
+  // ── Nested env var overrides (ai, telemetry, odataTracing) ──────────
   it('overrides ai fields from PRAMAN_AI_* env vars', async () => {
     vi.stubEnv('PRAMAN_AI_PROVIDER', 'openai');
     vi.stubEnv('PRAMAN_AI_API_KEY', 'sk-test-key');
@@ -274,31 +255,20 @@ describe('loadConfig', () => {
   });
 
   it('deep-merges nested env vars without clobbering inline overrides', async () => {
-    vi.stubEnv('PRAMAN_AUTH_USERNAME', 'env-user');
+    vi.stubEnv('PRAMAN_AI_MODEL', 'gpt-4-turbo');
     const config = await loadConfig({
       overrides: {
-        auth: {
-          baseUrl: 'https://inline.example.com',
-          strategy: 'basic',
-
-          password: 'inline-pw',
+        ai: {
+          provider: 'openai',
+          apiKey: 'sk-inline-key',
         },
       },
     });
-    // Env var wins for username
-    expect(config.auth?.username).toBe('env-user');
+    // Env var wins for model
+    expect(config.ai?.model).toBe('gpt-4-turbo');
     // Inline overrides preserved for fields not in env
-    expect(config.auth?.baseUrl).toBe('https://inline.example.com');
-    expect(config.auth?.strategy).toBe('basic');
-    expect(config.auth?.password).toBe('inline-pw');
-  });
-
-  it('falls back gracefully when nested env vars cause validation failure', async () => {
-    // auth.baseUrl is required as a URL — set username without baseUrl
-    vi.stubEnv('PRAMAN_AUTH_USERNAME', 'just-user');
-    // Should fall back to overrides-only (no auth section) without throwing
-    const config = await loadConfig({ overrides: { logLevel: 'debug' } });
-    expect(config.logLevel).toBe('debug');
+    expect(config.ai?.provider).toBe('openai');
+    expect(config.ai?.apiKey).toBe('sk-inline-key');
   });
 
   // ── OPA5 env var overrides ──────────────────────────────────────────

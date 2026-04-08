@@ -26,7 +26,7 @@ test.describe('Hybrid Login Flow', () => {
     // PHASE 1: Playwright Native -- Login Form (NOT UI5)
     // ================================================================
     await test.step('Login via SAP IAS (Playwright native)', async () => {
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
 
       // IAS login form is plain HTML -- use Playwright locators
       await page.waitForSelector('input[name="j_username"], input[name="email"]', {

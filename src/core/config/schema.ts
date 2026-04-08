@@ -51,7 +51,7 @@ const authSchema = z.object({
    * authentication guide — these are configured programmatically.
    */
   strategy: z.enum(['btp-saml', 'basic', 'office365', 'custom']).default('basic'),
-  baseUrl: z.url(),
+  baseUrl: z.url().optional(),
   username: z.string().optional(),
   password: z.string().optional(),
   client: z.string().default('100'),

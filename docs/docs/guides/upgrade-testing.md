@@ -51,7 +51,7 @@ Run the identical test suite against the upgraded system:
 
 ```bash
 # Run same tests against upgraded system
-SAP_BASE_URL=https://upgraded-system.example.com \
+SAP_CLOUD_BASE_URL=https://upgraded-system.example.com \
 npx playwright test \
   --project=regression \
   --reporter=json \

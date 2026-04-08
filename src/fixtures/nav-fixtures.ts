@@ -34,6 +34,8 @@
  * @module fixtures
  */
 
+import process from 'node:process';
+
 import { test as base } from '@playwright/test';
 import type { Logger } from 'pino';
 
@@ -342,7 +344,7 @@ export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
     const log = createLogger('nav', rootLogger);
     log.debug('Initializing ui5Navigation fixture');
 
-    const baseURL = pramanConfig.auth?.baseUrl;
+    const baseURL = pramanConfig.auth?.baseUrl ?? process.env['SAP_CLOUD_BASE_URL'];
 
     const nav: UI5NavigationAPI = {
       navigateToApp: async (appId, options?) =>
