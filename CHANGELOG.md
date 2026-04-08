@@ -94,40 +94,6 @@
 * **tests:** fix integration tests and enforce headless CI ([#97](https://github.com/mrkanitkar/playwright-praman/issues/97)) ([26beabe](https://github.com/mrkanitkar/playwright-praman/commit/26beabe1f20c9042a6fc4a8b46cea85b619cb362))
 * **test:** update config test to match simplified CLI template ([b786342](https://github.com/mrkanitkar/playwright-praman/commit/b7863420338b6f8e23eaac40a40f03ca10652cd1))
 
-## [1.2.0] (2026-04-01)
-
-### Features
-
-* **deps:** upgrade Playwright to 1.59.0, add feature flags for screencast, ariaSnapshotDepth, setStorageState, locatorNormalize, urlPatternMatcher ([295e984](https://github.com/mrkanitkar/playwright-praman/commit/295e984))
-* **deps:** upgrade TypeScript 5.9.3 → 6.0.2, add TS 5.9/6.0 compat CI matrix ([f6204bd](https://github.com/mrkanitkar/playwright-praman/commit/f6204bd))
-* **deps:** raise minimum Node.js to 22, drop EOL Node 20 ([87aeba9](https://github.com/mrkanitkar/playwright-praman/commit/87aeba9))
-* **selectors:** unify UI5 selector engine with fontoxpath + css-selector-parser ([4b3fda8](https://github.com/mrkanitkar/playwright-praman/commit/4b3fda8))
-* **selectors:** add :not(), :labeled(), positional and sibling selectors ([dc5961d](https://github.com/mrkanitkar/playwright-praman/commit/dc5961d))
-* **cli:** implement interactive inspect command ([9bfbeb8](https://github.com/mrkanitkar/playwright-praman/commit/9bfbeb8))
-* **cli:** add 'config' command to display resolved configuration ([4beafd7](https://github.com/mrkanitkar/playwright-praman/commit/4beafd7))
-* **cli:** add init-agents command for lightweight IDE-specific agent installation ([6519f28](https://github.com/mrkanitkar/playwright-praman/commit/6519f28))
-* **cli:** install Playwright CLI agents by default; add --no-cli opt-out for init and init-agents
-* **cli:** auto-install @playwright/test, @playwright/cli, dotenv when missing during init
-* **config:** add nested env var support for auth, ai, telemetry, odataTracing ([cbb67a4](https://github.com/mrkanitkar/playwright-praman/commit/cbb67a4))
-* **errors:** add docs url to error messages, JSON, and AI context ([0754979](https://github.com/mrkanitkar/playwright-praman/commit/0754979))
-* **core:** add extension system and matcher registry ([64903fb](https://github.com/mrkanitkar/playwright-praman/commit/64903fb))
-* **ci:** add Playwright canary (next) to integration matrix ([afe0bb6](https://github.com/mrkanitkar/playwright-praman/commit/afe0bb6))
-
-### Bug Fixes
-
-* **deps:** resolve all npm audit vulnerabilities (0 remaining) ([1df96dc](https://github.com/mrkanitkar/playwright-praman/commit/1df96dc))
-* **deps:** resolve docs vulnerabilities (0 remaining) ([f2a0f70](https://github.com/mrkanitkar/playwright-praman/commit/f2a0f70))
-* **selectors:** preserve array types, align area node name, handle negative nth-child ([737dafd](https://github.com/mrkanitkar/playwright-praman/commit/737dafd))
-* **selectors:** fix ui5:property() type fidelity, error surfacing, and tree builder gaps ([7eaebeb](https://github.com/mrkanitkar/playwright-praman/commit/7eaebeb))
-* **ci:** add missing commit scopes (deps, release, adapter) ([0c202aa](https://github.com/mrkanitkar/playwright-praman/commit/0c202aa))
-* **ci:** handle corrupted npm on macOS ARM64 runners ([87aeba9](https://github.com/mrkanitkar/playwright-praman/commit/87aeba9))
-* **docs:** fix documentation accuracy — eliminate fictional APIs across 42 files ([973a779](https://github.com/mrkanitkar/playwright-praman/commit/973a779))
-
-### Breaking Changes
-
-* `enableXpathEngine` config field removed — unified engine replaces it automatically
-* Minimum Node.js raised from 20 → 22 (Node 20 is EOL)
-
 ## [1.1.2](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.1...v1.1.2) (2026-03-07)
 
 
