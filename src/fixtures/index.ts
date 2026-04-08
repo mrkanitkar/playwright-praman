@@ -35,6 +35,7 @@ import { expect, mergeTests } from '@playwright/test';
 
 import { aiTest } from './ai-fixtures.js';
 import { authTest } from './auth-fixtures.js';
+import { browserBindTest } from './browser-bind-fixture.js';
 import { controlTreeTest } from './control-tree-fixtures.js';
 import { failureArtifactsTest } from './failure-artifacts-fixture.js';
 import { feTest } from './fe-fixtures.js';
@@ -44,6 +45,7 @@ import { intentTest } from './intent-fixtures.js';
 import { moduleTest } from './module-fixtures.js';
 import { navTest } from './nav-fixtures.js';
 import { odataTraceTest } from './odata-trace-fixtures.js';
+import { screencastTest } from './screencast-fixture.js';
 import { shellFooterTest } from './shell-footer-fixtures.js';
 import { stabilityTest } from './stability-fixtures.js';
 import { testDataTest } from './test-data-fixtures.js';
@@ -104,6 +106,8 @@ export const test = mergeTests(
   flpSettingsTest,
   testDataTest,
   odataTraceTest,
+  browserBindTest,
+  screencastTest,
 );
 
 export { expect };
