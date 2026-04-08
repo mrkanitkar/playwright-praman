@@ -8,7 +8,7 @@
 import { mkdirSync, writeFileSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import type {
   DocCheck,
   CheckResult,
@@ -40,7 +40,8 @@ export function rewriteImports(code: string): string {
   let result = code;
   for (const [pkg, distPath] of Object.entries(IMPORT_REWRITES)) {
     // Match both single and double quoted imports
-    const regex = new RegExp(`(from\\s+)(['"])${pkg.replace(/\//g, '\\/')}\\2`, 'g');
+    const escaped = pkg.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
+    const regex = new RegExp(`(from\\s+)(['"])${escaped}\\2`, 'g');
     result = result.replace(regex, `$1$2${distPath}$2`);
   }
   return result;
@@ -104,7 +105,7 @@ function typecheckBlock(block: CodeBlock, index: number): CheckFinding[] {
 
     // Run tsc with the snippet tsconfig
     try {
-      execSync(`npx tsc --project ${TSCONFIG_PATH} --noEmit`, {
+      execFileSync('npx', ['tsc', '--project', TSCONFIG_PATH, '--noEmit'], {
         encoding: 'utf-8',
         timeout: 30_000,
         cwd: resolve('.'),
@@ -155,7 +156,7 @@ function executeBlock(block: CodeBlock, index: number): CheckFinding[] {
     const rewritten = rewriteImports(block.code);
     writeFileSync(filePath, rewritten, 'utf-8');
 
-    execSync(`npx tsx ${filePath}`, {
+    execFileSync('npx', ['tsx', filePath], {
       encoding: 'utf-8',
       timeout: EXECUTION_TIMEOUT_MS,
       cwd: resolve('.'),

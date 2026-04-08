@@ -72,7 +72,8 @@ interface CachedEntry {
  * Read from file cache. Returns undefined if not cached or expired.
  */
 function readCache(controlType: string): UI5ControlMetadata | null | undefined {
-  const cacheFile = join(CACHE_DIR, `${controlType}.json`);
+  const safeName = controlType.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const cacheFile = join(CACHE_DIR, `${safeName}.json`);
   if (!existsSync(cacheFile)) return undefined;
 
   try {
@@ -91,7 +92,9 @@ function readCache(controlType: string): UI5ControlMetadata | null | undefined {
  */
 function writeCache(controlType: string, data: UI5ControlMetadata | null): void {
   mkdirSync(CACHE_DIR, { recursive: true });
-  const cacheFile = join(CACHE_DIR, `${controlType}.json`);
+  // Sanitize controlType to prevent path traversal (e.g., "../../etc/passwd")
+  const safeName = controlType.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const cacheFile = join(CACHE_DIR, `${safeName}.json`);
   const entry: CachedEntry = {
     _fetchedAt: new Date().toISOString(),
     data,
