@@ -46,7 +46,7 @@ This post compares **playwright-ui5**, **playwright-sap**, **wdi5**, and **playw
 
 > **Legend:** ✓ = Full support | ✓+ = Enhanced/extra features | ⚠ = Partial/limited | ✗ = Not supported
 
-<!-- truncate -->
+{/_ truncate _/}
 
 ---
 

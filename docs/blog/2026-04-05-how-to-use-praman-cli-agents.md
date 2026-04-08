@@ -26,7 +26,7 @@ keywords:
 
 Praman ships two variants of its SAP test agents: **MCP agents** that communicate through a WebSocket-based MCP server, and **CLI agents** that use `playwright-cli` over stdin/stdout. This post walks through the CLI variant end-to-end, based on a real session testing a "Maintain Bill of Material (Version 2)" app on SAP S/4HANA Cloud. The session required 8 iterations to get a passing test, and the debugging process revealed important patterns around FLP navigation, dialog handling, and V4 Fiori Elements ID structures that apply to any SAP testing project.
 
-<!-- truncate -->
+{/_ truncate _/}
 
 ---
 

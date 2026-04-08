@@ -6,6 +6,25 @@ title: Changelog
 
 # Changelog
 
+## [1.3.0] - 2026-04-08
+
+### Features
+
+- **telemetry:** full OpenTelemetry tracing and metrics integration (OTLP, Jaeger, Azure Monitor)
+- **telemetry:** `OTelReporter` Playwright reporter emits spans for test lifecycle (test.run, step-level spans)
+- **telemetry:** `meter` worker-scoped fixture for metric counters and histograms
+- **telemetry:** Playwright live tracing correlation via OTel traceId
+- **telemetry:** dynamic import of OTel dependencies — zero overhead when disabled
+- **config:** 6 new `PRAMAN_TELEMETRY_*` env vars (exporter, protocol, metrics, batchTimeout, maxQueueSize, connectionString)
+- **config:** Zod refine validation — `endpoint` or `connectionString` required when telemetry enabled
+- **errors:** `TelemetryError` class with 5 error codes (`ERR_TELEMETRY_INIT_FAILED`, `ERR_TELEMETRY_PEER_DEP_MISSING`, `ERR_TELEMETRY_EXPORTER_FAILED`, `ERR_TELEMETRY_SHUTDOWN_FAILED`, `ERR_TELEMETRY_METRICS_INIT_FAILED`)
+- **docs:** new Telemetry Setup Guide (`docs/guides/telemetry.md`)
+- **docs:** `docker-compose.otel.yml` for local Jaeger development
+
+### Breaking Changes
+
+- None — `openTelemetry: false` (default) behavior unchanged
+
 ## [1.2.0] - 2026-04-01
 
 ### Features

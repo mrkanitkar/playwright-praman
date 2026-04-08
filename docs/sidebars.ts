@@ -102,6 +102,7 @@ const sidebars: SidebarsConfig = {
         'guides/troubleshooting',
         'guides/debugging-agent-failures',
         'guides/reporters',
+        'guides/telemetry',
         'guides/performance-benchmarks',
         {
           type: 'doc',

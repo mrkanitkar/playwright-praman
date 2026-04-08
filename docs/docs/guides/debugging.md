@@ -114,16 +114,9 @@ Set `PRAMAN_LOG_LEVEL=debug` to get detailed bridge communication logs alongside
 
 ## OpenTelemetry Integration
 
-Praman includes an OpenTelemetry (OTel) tracing layer for distributed observability.
+Praman includes full OpenTelemetry (OTel) tracing and metrics for distributed observability. Telemetry is **disabled by default** with zero overhead — all operations use NoOp wrappers until you opt in.
 
-:::info[Contributor Only]
-The telemetry APIs below use internal path aliases (`#core/*`) and are only available when developing Praman itself. End users enable OTel via configuration (see below).
-:::
-
-```typescript
-import { initTelemetry, getNoOpTracer } from '#core/telemetry/index.js';
-import { createSpanName, spanAttributes } from '#core/telemetry/index.js';
-```
+For the complete setup guide, see [Telemetry Setup](./telemetry).
 
 ### 4-Layer Observability Stack
 
@@ -131,34 +124,75 @@ import { createSpanName, spanAttributes } from '#core/telemetry/index.js';
 | ----- | ----------------------- | ---------------------------------------------- |
 | L1    | Playwright Reporter API | Test events via `test.step()`                  |
 | L2    | pino structured logging | JSON logs with correlation IDs                 |
-| L3    | OpenTelemetry (opt-in)  | Spans for bridge/proxy/auth operations         |
+| L3    | OpenTelemetry (opt-in)  | Spans + metrics for bridge/proxy/discovery     |
 | L4    | AI Agent Telemetry      | Capability introspection, deterministic replay |
 
-### OTel Configuration
+### Quick Start
 
-OTel is zero-overhead when disabled (NoOp tracer). To enable:
+```bash
+# 1. Install OTel dependencies
+npm install @opentelemetry/api @opentelemetry/sdk-node @opentelemetry/exporter-trace-otlp-http
+
+# 2. Start Jaeger (local collector)
+docker compose -f docs/docker-compose.otel.yml up -d
+
+# 3. Enable telemetry
+export PRAMAN_TELEMETRY_ENABLED=true
+export PRAMAN_TELEMETRY_ENDPOINT=http://localhost:4318
+
+# 4. Run tests — spans appear in Jaeger UI at http://localhost:16686
+npx playwright test
+```
+
+Or configure via `praman.config.ts`:
 
 ```typescript
-// praman.config.ts
 export default {
   telemetry: {
-    enabled: true,
-    serviceName: 'praman-tests',
+    openTelemetry: true,
+    endpoint: 'http://localhost:4318',
     exporter: 'otlp', // or 'jaeger', 'azure-monitor'
-    endpoint: 'http://localhost:4317',
+    serviceName: 'my-sap-tests',
+    metrics: true, // enable counters and histograms
   },
 };
 ```
 
-Spans are created for key operations:
+### OTel Reporter
+
+The `OTelReporter` runs in the Playwright reporter process (separate from test workers) and emits spans for the test lifecycle:
 
 ```text
-praman.bridge.inject (bridge injection)
-  praman.bridge.evaluate (page.evaluate call)
-praman.proxy.findControl (control discovery)
-  praman.proxy.executeMethod (method invocation)
-praman.auth.login (authentication)
+test.run ("should create purchase order")
+  hook: "auth.setup"
+  fixture: "ui5"
+  test.step: "Fill header fields"
+    pw:api: "locator.click"
+    expect: "expect.toBeVisible"
 ```
+
+Configure in `playwright.config.ts`:
+
+```typescript
+reporter: [
+  ['playwright-praman/reporters', { otel: true, endpoint: 'http://localhost:4318' }],
+],
+```
+
+### Metrics
+
+When metrics are enabled, Praman records:
+
+| Metric                              | Type      | Description                            |
+| ----------------------------------- | --------- | -------------------------------------- |
+| `praman.test.pass`                  | Counter   | Tests passed                           |
+| `praman.test.fail`                  | Counter   | Tests failed                           |
+| `praman.test.skip`                  | Counter   | Tests skipped                          |
+| `praman.test.duration`              | Histogram | Test duration (ms)                     |
+| `praman.control.discovery`          | Counter   | Control discovery attempts             |
+| `praman.control.discovery.duration` | Histogram | Discovery duration (ms)                |
+| `praman.bridge.injection`           | Counter   | Bridge injection attempts              |
+| `praman.bridge.evaluation.duration` | Histogram | Bridge `page.evaluate()` duration (ms) |
 
 ## OData Request Tracing
 
@@ -346,6 +380,12 @@ PRAMAN_LOG_LEVEL=info         # optional: 'error' | 'warn' | 'info' | 'debug' | 
 # PRAMAN_TELEMETRY_ENABLED=true
 # PRAMAN_TELEMETRY_ENDPOINT=http://localhost:4318
 # PRAMAN_TELEMETRY_SERVICE_NAME=praman-tests
+# PRAMAN_TELEMETRY_EXPORTER=otlp
+# PRAMAN_TELEMETRY_PROTOCOL=http
+# PRAMAN_TELEMETRY_METRICS_ENABLED=true
+# PRAMAN_TELEMETRY_BATCH_TIMEOUT=5000
+# PRAMAN_TELEMETRY_MAX_QUEUE_SIZE=2048
+# PRAMAN_TELEMETRY_CONNECTION_STRING=InstrumentationKey=...
 
 # ── Praman OData tracing ───────────────────────────────────────────
 # PRAMAN_ODATA_TRACING_ENABLED=true

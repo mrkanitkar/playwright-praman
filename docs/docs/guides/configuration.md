@@ -38,10 +38,11 @@ export default defineConfig({
     deployment: 'gpt-4o',
   },
   telemetry: {
-    openTelemetry: false,
+    openTelemetry: true,
     exporter: 'otlp',
     endpoint: 'http://localhost:4318',
     serviceName: 'sap-e2e-tests',
+    metrics: true,
   },
 });
 ```
@@ -86,12 +87,20 @@ export default defineConfig({
 
 ## Telemetry Sub-Schema
 
-| Field           | Type                                    | Default               | Description                  |
-| --------------- | --------------------------------------- | --------------------- | ---------------------------- |
-| `openTelemetry` | `boolean`                               | `false`               | Enable OpenTelemetry tracing |
-| `exporter`      | `'otlp' \| 'azure-monitor' \| 'jaeger'` | `'otlp'`              | Trace exporter               |
-| `endpoint`      | `string` (URL)                          | —                     | Exporter endpoint URL        |
-| `serviceName`   | `string`                                | `'playwright-praman'` | Service name in traces       |
+Telemetry is disabled by default with zero overhead. See [Telemetry Setup](./telemetry) for the full guide.
+
+| Field                | Type                                    | Default               | Description                                          |
+| -------------------- | --------------------------------------- | --------------------- | ---------------------------------------------------- |
+| `openTelemetry`      | `boolean`                               | `false`               | Enable OpenTelemetry tracing                         |
+| `exporter`           | `'otlp' \| 'azure-monitor' \| 'jaeger'` | `'otlp'`              | Trace exporter                                       |
+| `endpoint`           | `string` (URL)                          | —                     | OTLP/Jaeger endpoint URL (required when enabled)     |
+| `serviceName`        | `string`                                | `'playwright-praman'` | Service name in traces                               |
+| `protocol`           | `'http' \| 'grpc'`                      | `'http'`              | OTel transport protocol                              |
+| `metrics`            | `boolean`                               | `false`               | Enable metric counters and histograms                |
+| `batchTimeout`       | `number`                                | `5000`                | Span batch export timeout (ms)                       |
+| `maxQueueSize`       | `number`                                | `2048`                | Max queued spans before dropping                     |
+| `resourceAttributes` | `Record<string, string>`                | `{}`                  | Additional OTel resource attributes                  |
+| `connectionString`   | `string`                                | —                     | Azure Monitor connection string (required for Azure) |
 
 ## Selectors Sub-Schema
 

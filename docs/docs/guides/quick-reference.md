@@ -113,23 +113,23 @@ page.locator('ui5=sap.m.Input:labeled("Vendor")');
 
 ## Common Control Types
 
-| Control | Type String |
-|---------|------------|
-| Button | `sap.m.Button` |
-| Input | `sap.m.Input` |
-| Select | `sap.m.Select` |
-| ComboBox | `sap.m.ComboBox` |
-| DatePicker | `sap.m.DatePicker` |
-| CheckBox | `sap.m.CheckBox` |
-| TextArea | `sap.m.TextArea` |
-| Responsive Table | `sap.m.Table` |
-| Grid Table | `sap.ui.table.Table` |
-| SmartTable | `sap.ui.comp.smarttable.SmartTable` |
-| SmartField | `sap.ui.comp.smartfield.SmartField` |
-| Dialog | `sap.m.Dialog` |
-| GenericTile | `sap.m.GenericTile` |
-| IconTabBar | `sap.m.IconTabBar` |
-| List | `sap.m.List` |
+| Control          | Type String                         |
+| ---------------- | ----------------------------------- |
+| Button           | `sap.m.Button`                      |
+| Input            | `sap.m.Input`                       |
+| Select           | `sap.m.Select`                      |
+| ComboBox         | `sap.m.ComboBox`                    |
+| DatePicker       | `sap.m.DatePicker`                  |
+| CheckBox         | `sap.m.CheckBox`                    |
+| TextArea         | `sap.m.TextArea`                    |
+| Responsive Table | `sap.m.Table`                       |
+| Grid Table       | `sap.ui.table.Table`                |
+| SmartTable       | `sap.ui.comp.smarttable.SmartTable` |
+| SmartField       | `sap.ui.comp.smartfield.SmartField` |
+| Dialog           | `sap.m.Dialog`                      |
+| GenericTile      | `sap.m.GenericTile`                 |
+| IconTabBar       | `sap.m.IconTabBar`                  |
+| List             | `sap.m.List`                        |
 
 ---
 
@@ -166,36 +166,37 @@ Never call `setValue()` alone — UI5 change events won't fire.
 
 ### Core (test-scoped)
 
-| Fixture | Purpose |
-|---------|---------|
-| `ui5` | Control discovery, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces |
-| `ui5Navigation` | FLP navigation (9 methods) |
-| `btpWorkZone` | Dual-frame WorkZone manager |
-| `sapAuth` | Authentication (6 strategies) |
-| `fe` | Fiori Elements (`.listReport`, `.objectPage`, `.table`, `.list`) |
-| `pramanAI` | AI discovery, agentic handler, vocabulary |
-| `intent` | Business intents (`.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`) |
-| `ui5Shell` | Shell header (home, user menu) |
-| `ui5Footer` | Footer bar (Save, Edit, Delete) |
-| `flpLocks` | SM12 lock management + auto-cleanup |
-| `flpSettings` | User settings (language, date format) |
-| `testData` | Template-based data generation + auto-cleanup |
-| `pramanLogger` | Test-scoped pino logger |
+| Fixture         | Purpose                                                                                  |
+| --------------- | ---------------------------------------------------------------------------------------- |
+| `ui5`           | Control discovery, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces                 |
+| `ui5Navigation` | FLP navigation (9 methods)                                                               |
+| `btpWorkZone`   | Dual-frame WorkZone manager                                                              |
+| `sapAuth`       | Authentication (6 strategies)                                                            |
+| `fe`            | Fiori Elements (`.listReport`, `.objectPage`, `.table`, `.list`)                         |
+| `pramanAI`      | AI discovery, agentic handler, vocabulary                                                |
+| `intent`        | Business intents (`.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`) |
+| `ui5Shell`      | Shell header (home, user menu)                                                           |
+| `ui5Footer`     | Footer bar (Save, Edit, Delete)                                                          |
+| `flpLocks`      | SM12 lock management + auto-cleanup                                                      |
+| `flpSettings`   | User settings (language, date format)                                                    |
+| `testData`      | Template-based data generation + auto-cleanup                                            |
+| `pramanLogger`  | Test-scoped pino logger                                                                  |
 
 ### Infrastructure (worker-scoped)
 
-| Fixture | Purpose |
-|---------|---------|
-| `pramanConfig` | Frozen config (loaded once per worker) |
-| `rootLogger` | Worker-scoped root logger |
-| `tracer` | OpenTelemetry tracer (NoOp when disabled) |
+| Fixture        | Purpose                                                                 |
+| -------------- | ----------------------------------------------------------------------- |
+| `pramanConfig` | Frozen config (loaded once per worker)                                  |
+| `rootLogger`   | Worker-scoped root logger                                               |
+| `tracer`       | OpenTelemetry tracer (real when enabled, NoOp when disabled)            |
+| `meter`        | OpenTelemetry meter for metrics (real when enabled, NoOp when disabled) |
 
 ### CLI Integration (test-scoped)
 
-| Fixture | Purpose |
-|---------|---------|
+| Fixture       | Purpose                                        |
+| ------------- | ---------------------------------------------- |
 | `browserBind` | Expose browser to CLI agents (`PRAMAN_BIND=1`) |
-| `screencast` | Chapter markers, action overlays |
+| `screencast`  | Chapter markers, action overlays               |
 
 ### Auto-Fixtures (fire automatically)
 
@@ -283,15 +284,12 @@ test('dialogs', async ({ ui5 }) => {
   await ui5.dialog.waitForDialog();
 
   // Interact (always use searchOpenDialogs!)
-  await ui5.fill(
-    { id: 'dialog--nameInput', searchOpenDialogs: true },
-    'Test Value',
-  );
+  await ui5.fill({ id: 'dialog--nameInput', searchOpenDialogs: true }, 'Test Value');
 
   // Confirm or dismiss
-  await ui5.dialog.confirm();       // Clicks primary action
-  await ui5.dialog.dismiss();       // Clicks cancel/close
-  await ui5.dialog.confirmDialog('OK');  // Specific button text
+  await ui5.dialog.confirm(); // Clicks primary action
+  await ui5.dialog.dismiss(); // Clicks cancel/close
+  await ui5.dialog.confirmDialog('OK'); // Specific button text
 
   // Query state
   const isOpen = await ui5.dialog.isDialogOpen();
@@ -397,16 +395,16 @@ await expect(control).not.toBeUI5Visible();
 
 Every error includes `code`, `message`, `attempted`, `retryable`, `suggestions[]`, and `docsUrl`.
 
-| Category | Codes | Common Causes |
-|----------|-------|---------------|
-| **Config** | `ERR_CONFIG_INVALID`, `_NOT_FOUND`, `_PARSE` | Bad config file, missing file, syntax error |
-| **Bridge** | `ERR_BRIDGE_TIMEOUT`, `_INJECTION`, `_NOT_READY` | UI5 not loaded, injection failed, version mismatch |
-| **Control** | `ERR_CONTROL_NOT_FOUND`, `_NOT_VISIBLE`, `_NOT_ENABLED` | Wrong selector, element hidden/disabled |
-| **Auth** | `ERR_AUTH_FAILED`, `_TIMEOUT`, `_SESSION_EXPIRED` | Bad credentials, slow login, session expired |
-| **Navigation** | `ERR_NAV_TILE_NOT_FOUND`, `_ROUTE_FAILED`, `_TIMEOUT` | Wrong tile name, FLP not loaded |
-| **OData** | `ERR_ODATA_REQUEST_FAILED`, `_PARSE`, `_CSRF` | Service error, bad response, token expired |
-| **Selector** | `ERR_SELECTOR_INVALID`, `_AMBIGUOUS`, `_PARSE` | Bad syntax, multiple matches |
-| **Timeout** | `ERR_TIMEOUT_UI5_STABLE`, `_CONTROL_DISCOVERY` | Slow app, long-running OData calls |
+| Category       | Codes                                                   | Common Causes                                      |
+| -------------- | ------------------------------------------------------- | -------------------------------------------------- |
+| **Config**     | `ERR_CONFIG_INVALID`, `_NOT_FOUND`, `_PARSE`            | Bad config file, missing file, syntax error        |
+| **Bridge**     | `ERR_BRIDGE_TIMEOUT`, `_INJECTION`, `_NOT_READY`        | UI5 not loaded, injection failed, version mismatch |
+| **Control**    | `ERR_CONTROL_NOT_FOUND`, `_NOT_VISIBLE`, `_NOT_ENABLED` | Wrong selector, element hidden/disabled            |
+| **Auth**       | `ERR_AUTH_FAILED`, `_TIMEOUT`, `_SESSION_EXPIRED`       | Bad credentials, slow login, session expired       |
+| **Navigation** | `ERR_NAV_TILE_NOT_FOUND`, `_ROUTE_FAILED`, `_TIMEOUT`   | Wrong tile name, FLP not loaded                    |
+| **OData**      | `ERR_ODATA_REQUEST_FAILED`, `_PARSE`, `_CSRF`           | Service error, bad response, token expired         |
+| **Selector**   | `ERR_SELECTOR_INVALID`, `_AMBIGUOUS`, `_PARSE`          | Bad syntax, multiple matches                       |
+| **Timeout**    | `ERR_TIMEOUT_UI5_STABLE`, `_CONTROL_DISCOVERY`          | Slow app, long-running OData calls                 |
 
 ```typescript
 import { ControlError, TimeoutError } from 'playwright-praman';
@@ -417,8 +415,8 @@ try {
   if (error instanceof ControlError && error.retryable) {
     // retry logic
   }
-  console.error(error.toUserMessage());  // Human-readable
-  const ctx = error.toAIContext();       // AI-consumable
+  console.error(error.toUserMessage()); // Human-readable
+  const ctx = error.toAIContext(); // AI-consumable
 }
 ```
 
@@ -449,13 +447,13 @@ export default defineConfig({
 
 ### Environment Variable Overrides
 
-| Variable | Default |
-|----------|---------|
-| `PRAMAN_LOG_LEVEL` | `info` |
-| `PRAMAN_UI5_WAIT_TIMEOUT` | `30000` |
-| `PRAMAN_CONTROL_DISCOVERY_TIMEOUT` | `10000` |
-| `PRAMAN_INTERACTION_STRATEGY` | `ui5-native` |
-| `PRAMAN_SKIP_STABILITY_WAIT` | `false` |
+| Variable                           | Default      |
+| ---------------------------------- | ------------ |
+| `PRAMAN_LOG_LEVEL`                 | `info`       |
+| `PRAMAN_UI5_WAIT_TIMEOUT`          | `30000`      |
+| `PRAMAN_CONTROL_DISCOVERY_TIMEOUT` | `10000`      |
+| `PRAMAN_INTERACTION_STRATEGY`      | `ui5-native` |
+| `PRAMAN_SKIP_STABILITY_WAIT`       | `false`      |
 
 ### Precedence (highest wins)
 
@@ -468,14 +466,14 @@ export default defineConfig({
 
 ## Auth Strategies
 
-| Strategy | Use Case |
-|----------|----------|
-| `basic` | SAP GUI / Fiori on-premise (user + password + client) |
-| `btp-saml` | BTP with SAML/IDP |
-| `office365` | Azure AD / Entra ID |
-| `certificate` | X.509 client certificate |
-| `api-key` | API-only authentication |
-| `custom` | Custom login flow |
+| Strategy      | Use Case                                              |
+| ------------- | ----------------------------------------------------- |
+| `basic`       | SAP GUI / Fiori on-premise (user + password + client) |
+| `btp-saml`    | BTP with SAML/IDP                                     |
+| `office365`   | Azure AD / Entra ID                                   |
+| `certificate` | X.509 client certificate                              |
+| `api-key`     | API-only authentication                               |
+| `custom`      | Custom login flow                                     |
 
 ---
 

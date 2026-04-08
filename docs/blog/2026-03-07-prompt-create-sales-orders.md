@@ -22,7 +22,7 @@ the complete SAP Sales Order lifecycle — from order creation through
 delivery, picking, goods issue, and billing — using Praman fixtures
 and OData-first selectors.
 
-<!-- truncate -->
+{/_ truncate _/}
 
 ## Overview
 

@@ -24,7 +24,7 @@ BPMN 2.0 XML files and generate comprehensive test cases in SAP Cloud ALM CSV
 format — applying Happy Path, Negative Path, Boundary Value, and End-to-End
 test design techniques.
 
-<!-- truncate -->
+{/_ truncate _/}
 
 ## Overview
 
