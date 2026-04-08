@@ -187,3 +187,44 @@ requested in the test signature:
 ```
 
 You never destructure these — they just work.
+
+## Cross-Fixture Dependencies (PW-MERGE-1 Pattern)
+
+When a fixture module like `navTest` needs a fixture from another module (e.g., `pramanConfig`
+from `coreTest`), it cannot import that fixture directly — Playwright's `test.extend()` only
+sees fixtures within the same call. The solution is the **option placeholder pattern**:
+
+```typescript
+// In nav-fixtures.ts
+export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
+  // Declare as option placeholder — will be provided by mergeTests()
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  rootLogger: [undefined!, { option: true, scope: 'worker' }],
+
+  ui5Navigation: async ({ page, pramanConfig, rootLogger }, use) => {
+    // pramanConfig and rootLogger are available here at runtime
+    // because mergeTests(coreTest, navTest) wires them together
+  },
+});
+```
+
+**How it works:**
+
+1. **`undefined!`** — TypeScript requires an initial value, but this placeholder is never
+   used at runtime. The `!` (non-null assertion) satisfies the type checker.
+2. **`{ option: true }`** — tells Playwright this fixture can be overridden. When
+   `mergeTests(coreTest, navTest)` runs, `coreTest`'s real `pramanConfig` fixture
+   replaces the placeholder.
+3. **`scope: 'worker'`** — matches the scope of the providing fixture in `coreTest`.
+
+This pattern is used across all fixture modules that depend on `pramanConfig` or `rootLogger`
+(10 files, ~37 instances). The `eslint-disable` comments suppress the `no-non-null-assertion`
+rule since `undefined!` is intentional here, not a code smell.
+
+:::tip
+If you're adding a new fixture module that needs `pramanConfig` or `rootLogger`, copy this
+pattern from any existing fixture file (e.g., `nav-fixtures.ts`) and add your module to
+the `mergeTests()` call in `src/fixtures/index.ts`.
+:::
