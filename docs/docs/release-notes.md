@@ -51,6 +51,10 @@ export default defineConfig({
 CI now runs a **three-channel integration matrix**: Playwright stable, Playwright `next` (canary), and the bundled
 Chromium baseline — so Praman validates against upcoming Playwright changes before they ship.
 
+### 🤖 Praman CLI Agents for Playwright
+
+Praman now supports [Playwright CLI Agents](/docs/guides/playwright-cli-agents) — plan, generate, and heal SAP UI5 tests directly from the command line using Claude Code's `playwright-cli` skill. No MCP server required.
+
 ### 🔷 TypeScript 6.x Support
 
 Praman source and its published types are now compiled with **TypeScript 6.0.2**. The CI matrix validates against both TS 5.9 and TS 6.0 on every push.
