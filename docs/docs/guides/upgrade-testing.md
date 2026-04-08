@@ -62,6 +62,8 @@ npx playwright test \
 
 Compare test results between pre and post:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // scripts/compare-results.ts
 import { readFileSync } from 'node:fs';

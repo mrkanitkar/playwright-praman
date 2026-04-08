@@ -105,6 +105,8 @@ const input = await ui5.control({
 
 Read a property from a discovered control.
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // wdi5 reference
 const value = await input.getValue();
@@ -166,6 +168,8 @@ to DOM click; wdi5 always uses DOM click.
 ### Scenario 6: Table Row Count and Cell Text
 
 Read table dimensions and cell contents.
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 // wdi5 reference

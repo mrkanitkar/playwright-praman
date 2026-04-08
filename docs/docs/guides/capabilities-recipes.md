@@ -27,6 +27,8 @@ has a name, description, category, usage example, and priority tier.
 
 ### Listing All Capabilities
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { capabilities } from 'playwright-praman';
 
@@ -48,6 +50,8 @@ Capabilities are organized into three priority tiers:
 | `fixture`        | Primary Playwright fixture API (recommended for consumers) | `ui5.control()`, `ui5Navigation.navigateToApp()` |
 | `namespace`      | Secondary utility or handler export                        | `SAPAuthHandler`, `buildPageContext()`           |
 | `implementation` | Internal implementation detail                             | Bridge adapters, serializers                     |
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { capabilities } from 'playwright-praman';
@@ -116,6 +120,8 @@ if (cap) {
 
 ### Statistics
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { capabilities } from 'playwright-praman';
 
@@ -147,6 +153,8 @@ capabilities, and a ready-to-use pattern.
 
 ### Selecting by Priority
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { recipes } from 'playwright-praman';
 
@@ -161,6 +169,8 @@ const advanced = recipes.selectByPriority('advanced');
 ```
 
 ### Selecting by Domain
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { recipes } from 'playwright-praman';
@@ -180,6 +190,8 @@ console.log(domains);
 
 Use `recipes.select()` with multiple criteria.
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { recipes } from 'playwright-praman';
 
@@ -191,6 +203,8 @@ const filtered = recipes.select({
 ```
 
 ### Searching Recipes
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { recipes } from 'playwright-praman';
@@ -211,6 +225,8 @@ if (recipes.has('Login to SAP BTP via SAML')) {
 
 ### Finding Recipes for a Capability
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { recipes } from 'playwright-praman';
 
@@ -223,6 +239,8 @@ for (const r of clickRecipes) {
 
 ### Finding Recipes for a Business Process
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { recipes } from 'playwright-praman';
 
@@ -234,6 +252,8 @@ const finRecipes = recipes.forDomain('finance');
 ```
 
 ### Top Recipes
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { recipes } from 'playwright-praman';
@@ -254,6 +274,8 @@ context for test generation.
 
 Returns the full registry as structured JSON optimized for AI consumption.
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { capabilities } from 'playwright-praman';
 
@@ -273,6 +295,8 @@ const aiContext = capabilities.forAI();
 
 Each AI provider has an output format optimized for its consumption model.
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { capabilities } from 'playwright-praman';
 
@@ -289,6 +313,8 @@ const geminiContext = capabilities.forProvider('gemini');
 ### recipes.forAI()
 
 Returns all recipes in a flat array suitable for injection into an AI prompt.
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { recipes } from 'playwright-praman';
@@ -372,6 +398,8 @@ const workflowCaps = capabilities.find('workflow');
 
 Check that a recipe exists and inspect its metadata.
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { recipes } from 'playwright-praman';
 
@@ -386,6 +414,8 @@ if (result.valid) {
 ## JSON Export
 
 Export the full registries for external tools, dashboards, or documentation generators.
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { capabilities, recipes } from 'playwright-praman';

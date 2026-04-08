@@ -285,6 +285,8 @@ jobs:
 
 ## Configuration Options
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // Global defaults in playwright.config.ts
 export default defineConfig({

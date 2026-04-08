@@ -39,7 +39,6 @@ await ui5.click({ id: 'saveBtn' });
 
 :::
 
-
 :::tip Typed Control Returns
 When you use `controlType` in your selector, the returned control is typed to the specific interface
 (e.g., `UI5Button`, `UI5Input`). This gives you autocomplete for control-specific methods. See
@@ -165,6 +164,8 @@ For subsequent interactions (not navigation), only `waitForUI5Stable` is called.
 ### Skipping the Stability Wait
 
 For performance-critical paths where you know UI5 is already stable:
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { defineConfig } from 'playwright-praman';

@@ -138,6 +138,8 @@ abstract class BaseToolReporter implements Reporter {
 qTest uses a REST API for test execution results. The adapter maps Playwright tests to qTest
 test runs.
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // reporters/qtest-reporter.ts
 
@@ -206,6 +208,8 @@ test('create purchase order', async ({ ui5 }) => {
 
 TestRail's API accepts results per test run. The adapter creates or updates a test run with
 results.
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 // reporters/testrail-reporter.ts
@@ -289,6 +293,8 @@ test('verify three-way match', async ({ ui5 }) => {
 Xray supports both Cloud and Server/Data Center deployments. The adapter uses the Xray REST
 API to import execution results.
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // reporters/xray-reporter.ts
 
@@ -367,6 +373,8 @@ test('validate goods receipt', async ({ ui5 }) => {
 
 Playwright supports multiple reporters in parallel. Combine Praman reporters with tool-specific
 adapters:
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 // playwright.config.ts

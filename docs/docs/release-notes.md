@@ -12,53 +12,9 @@ keywords:
 
 # Release Notes
 
-## Version 1.3.0
-
-_Released: April 2026 · [npm (latest)](https://www.npmjs.com/package/playwright-praman) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases)_
-
-### OpenTelemetry Tracing & Metrics
-
-Praman now ships with **full OpenTelemetry integration** for distributed observability. Telemetry is disabled by default with zero overhead — enable it when you need end-to-end visibility into test execution.
-
-| Feature              | What it does                                                              |
-| -------------------- | ------------------------------------------------------------------------- |
-| **Tracing**          | Spans for control discovery, bridge evaluation, test lifecycle            |
-| **Metrics**          | Counters (pass/fail/skip, discovery, injection) and histograms (duration) |
-| **OTel Reporter**    | Playwright reporter emitting nested spans per test step                   |
-| **Live correlation** | OTel traceId embedded in Playwright trace titles                          |
-
-**Three exporters supported:**
-
-- **OTLP** (default) — works with Jaeger, Grafana Tempo, any OTLP collector
-- **Jaeger** — via OTLP protocol (Jaeger accepts OTLP natively)
-- **Azure Monitor** — via connection string from Application Insights
-
-**Quick start:**
-
-```bash
-npm install @opentelemetry/api @opentelemetry/sdk-node @opentelemetry/exporter-trace-otlp-http
-docker compose -f docs/docker-compose.otel.yml up -d
-PRAMAN_TELEMETRY_ENABLED=true PRAMAN_TELEMETRY_ENDPOINT=http://localhost:4318 npx playwright test
-# Open Jaeger UI at http://localhost:16686
-```
-
-Dependencies are **optional peer deps** — not installed unless you opt in. When disabled, all telemetry calls are no-ops with negligible overhead.
-
-See the [Telemetry Setup Guide](./guides/telemetry) for detailed configuration, Azure Monitor setup, and troubleshooting.
-
-### New Error Class
-
-`TelemetryError` with 5 error codes provides actionable messages when OTel initialization fails (e.g., missing peer dependencies, unreachable endpoints).
-
-### No Breaking Changes
-
-This is a non-breaking release. `openTelemetry: false` (the default) preserves existing behavior.
-
----
-
 ## Version 1.2.0
 
-_Released: April 2026 · [npm (latest)](https://www.npmjs.com/package/playwright-praman) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases)_
+_Released: April 2026 · [npm](https://www.npmjs.com/package/playwright-praman) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases)_
 
 ### 🎭 Playwright 1.59 Support
 
@@ -359,12 +315,43 @@ TypeDoc now reports **zero warnings** across all public exports. Every exported 
 - `@throws` listing typed error classes
 - `@example` with a working code snippet
 
+### 📡 OpenTelemetry Tracing & Metrics
+
+Praman now ships with **full OpenTelemetry integration** for distributed observability. Telemetry is disabled by default with zero overhead — enable it when you need end-to-end visibility into test execution.
+
+| Feature              | What it does                                                              |
+| -------------------- | ------------------------------------------------------------------------- |
+| **Tracing**          | Spans for control discovery, bridge evaluation, test lifecycle            |
+| **Metrics**          | Counters (pass/fail/skip, discovery, injection) and histograms (duration) |
+| **OTel Reporter**    | Playwright reporter emitting nested spans per test step                   |
+| **Live correlation** | OTel traceId embedded in Playwright trace titles                          |
+
+**Three exporters supported:**
+
+- **OTLP** (default) — works with Jaeger, Grafana Tempo, any OTLP collector
+- **Jaeger** — via OTLP protocol (Jaeger accepts OTLP natively)
+- **Azure Monitor** — via connection string from Application Insights
+
+**Quick start:**
+
+```bash
+npm install @opentelemetry/api @opentelemetry/sdk-node @opentelemetry/exporter-trace-otlp-http
+docker compose -f docs/docker-compose.otel.yml up -d
+PRAMAN_TELEMETRY_ENABLED=true PRAMAN_TELEMETRY_ENDPOINT=http://localhost:4318 npx playwright test
+# Open Jaeger UI at http://localhost:16686
+```
+
+Dependencies are **optional peer deps** — not installed unless you opt in. When disabled, all telemetry calls are no-ops with negligible overhead. `TelemetryError` with 5 error codes provides actionable messages when OTel initialization fails (e.g., missing peer dependencies, unreachable endpoints).
+
+See the [Telemetry Setup Guide](./guides/telemetry) for detailed configuration, Azure Monitor setup, and troubleshooting.
+
 ### Other Improvements
 
 - **Playwright Canary CI**: Integration tests now run against `@playwright/test@next` in a separate matrix job, catching regressions before Playwright stable releases.
 - **ADR-030 added**: Architecture Decision Record for OPA5 migration strategy with code samples for hybrid OPA5 + Praman test suites.
 - **100% documentation accuracy**: Eliminated fictional APIs and mismatched examples across 42 documentation files in the accuracy audit.
 - **Locator Selector Syntax guide**: New comprehensive guide for the `ui5=` custom engine covering all selector forms, pseudo-classes, and combinators.
+- **Docs verification pipeline**: 6 automated checks (typecheck snippets, API references, config defaults, import paths, AI review, SAP UI5 API) validate documentation accuracy on every PR.
 
 ---
 

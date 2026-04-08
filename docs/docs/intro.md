@@ -56,8 +56,10 @@ test('discover a UI5 control', async ({ ui5, ui5Navigation }) => {
 - [Agent & IDE Setup](./guides/agent-setup.md) — AI agents, seed file, and IDE configs installed by `init`
 
 **Your Background** — start from what you already know:
-[From Playwright](./guides/migration-from-playwright.md) | [From Selenium](./guides/migration-from-selenium.md) |
-[From wdi5](./guides/migration-from-wdi5.md) | [From Tosca](./guides/migration-from-tosca.md) |
+[From Playwright](./guides/migration-from-playwright.md) |
+[From Selenium](./guides/migration-from-selenium.md) |
+[From wdi5](./guides/migration-from-wdi5.md) |
+[From Tosca](./guides/migration-from-tosca.md) |
 [For Business Analysts](./guides/sap-business-analyst-guide.md)
 
 ### Core References

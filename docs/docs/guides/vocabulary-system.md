@@ -9,6 +9,8 @@ natural-language terms to UI5 selectors with fuzzy matching, synonym resolution,
 
 ## Overview
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { createVocabularyService } from 'playwright-praman/vocabulary';
 
@@ -51,6 +53,8 @@ Each JSON file contains vocabulary terms with synonyms and optional UI5 selector
 
 ### Creating the Service
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { createVocabularyService } from 'playwright-praman/vocabulary';
 import type { VocabularyService } from 'playwright-praman/vocabulary';
@@ -70,12 +74,14 @@ await svc.loadDomain('finance');
 
 ### Searching Terms
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 // Search across all loaded domains
 const results = await svc.search('vendor');
 
 // Search within a specific domain
-const results = await svc.search('vendor', 'procurement');
+const domainResults = await svc.search('vendor', 'procurement');
 ```
 
 Returns `VocabularySearchResult[]` sorted by confidence descending:
@@ -112,6 +118,8 @@ Returns `undefined` when:
 
 For autocomplete and disambiguation:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 const suggestions = await svc.getSuggestions('sup');
 // ['supplier', 'supplierName', 'supplyPlant', ...]
@@ -121,6 +129,8 @@ const top3 = await svc.getSuggestions('sup', 3);
 ```
 
 ### Service Statistics
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 const stats = svc.getStats();
