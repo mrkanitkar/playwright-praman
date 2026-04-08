@@ -87,6 +87,7 @@ interface FileCopySpec {
 
 /** Shared path segment for user-integration docs inside the package. */
 const USER_INTEGRATION_DIR = 'user-integration';
+const CLI_SKILL_DIR = 'praman-sap-cli';
 
 // ── IDE installation specs ────────────────────────────────────────────────────
 
@@ -440,7 +441,7 @@ async function scaffoldExampleFiles(
     created,
   );
 
-  // .env.example → project root
+  // .env.example → project root (also in scaffolder.ts; copyIfMissing is idempotent)
   await copyIfMissing(pkgPath('.env.example'), join(targetDir, '.env.example'), force, created);
 }
 
@@ -577,7 +578,6 @@ async function scaffoldCliSkillFiles(
   force: boolean,
   created: string[],
 ): Promise<void> {
-  const CLI_SKILL_DIR = 'praman-sap-cli';
   const srcDir = pkgPath('skills', CLI_SKILL_DIR);
 
   // 1. Project root: skills/praman-sap-cli/ (all files)
@@ -723,10 +723,52 @@ export async function scaffoldIDEFiles(
 
   // ── CLI-based agent definitions (opt-in via --cli flag) ──
   if (cli) {
-    await installCliAgentFiles(targetDir, detection, force, created);
-    await scaffoldCliConfig(targetDir, force, created);
-    await scaffoldCliSkillFiles(targetDir, detection, force, created);
+    await scaffoldCliAgents(targetDir, detection, force, created);
   }
 
   return created;
+}
+
+/**
+ * Installs CLI-based agent files, config, and skills.
+ *
+ * @remarks
+ * Can be called **without** IDE detection — copies CLI config and
+ * project-root skill files unconditionally. IDE-specific agent files
+ * (e.g., `.claude/agents/`) are only copied when the matching IDE is
+ * detected.
+ *
+ * @param targetDir - Absolute path to the user's project root.
+ * @param detection - IDE detection result (or `undefined` if no IDE detected).
+ * @param force - When `true`, overwrite existing destination files.
+ * @param created - Array to push created file paths into.
+ *
+ * @example
+ * ```typescript
+ * // With IDE detection
+ * await scaffoldCliAgents('/home/user/project', detection, false, []);
+ *
+ * // Without IDE detection — still copies config + skills
+ * await scaffoldCliAgents('/home/user/project', undefined, false, []);
+ * ```
+ */
+export async function scaffoldCliAgents(
+  targetDir: string,
+  detection: IDEDetection | undefined,
+  force: boolean,
+  created: string[],
+): Promise<void> {
+  // IDE-specific agent files — only when detection is available
+  if (detection !== undefined) {
+    await installCliAgentFiles(targetDir, detection, force, created);
+    await scaffoldCliSkillFiles(targetDir, detection, force, created);
+  } else {
+    // No IDE detected — still copy project-root skill files
+    const srcDir = pkgPath('skills', CLI_SKILL_DIR);
+    const destDir = join(targetDir, 'skills', CLI_SKILL_DIR);
+    await copySkillTree(srcDir, destDir, undefined, force, created);
+  }
+
+  // CLI config is always useful regardless of IDE
+  await scaffoldCliConfig(targetDir, force, created);
 }
