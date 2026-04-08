@@ -24,6 +24,7 @@
  *
  * No external dependencies beyond `node:fs/promises` and `node:path`.
  *
+ * @internal
  * @module vocabulary
  */
 

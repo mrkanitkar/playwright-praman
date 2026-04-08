@@ -13,6 +13,7 @@
  * @remarks
  * Extracted from `agentic-handler.ts` to keep each module under 300 LOC.
  *
+ * @internal
  * @module ai
  */
 
