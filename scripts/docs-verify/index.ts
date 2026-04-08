@@ -25,10 +25,16 @@ import { discoverDocs } from './lib/doc-registry.js';
 import { getChangedFiles } from './lib/git-diff.js';
 import { buildApiSurface } from './lib/api-surface.js';
 import { check1TypecheckSnippets } from './checks/check1-typecheck-snippets.js';
+import { check2ApiReferences } from './checks/check2-api-references.js';
+import { check3ConfigDefaults } from './checks/check3-config-defaults.js';
 import { check4ImportPaths } from './checks/check4-import-paths.js';
+import { check5ClaimTests } from './checks/check5-claim-tests.js';
+import { check6ExampleTestMap } from './checks/check6-example-test-map.js';
+import { check7AiReview } from './checks/check7-ai-review.js';
+import { check8SapUi5Api } from './checks/check8-sap-ui5-api.js';
 
 /** Map check numbers to CheckName for --checks=1,4 CLI flag */
-const CHECK_NUMBER_MAP: Record<number, CheckName> = {
+export const CHECK_NUMBER_MAP: Record<number, CheckName> = {
   1: 'typecheck-snippets',
   2: 'api-references',
   3: 'config-defaults',
@@ -39,8 +45,17 @@ const CHECK_NUMBER_MAP: Record<number, CheckName> = {
   8: 'sap-ui5-api',
 };
 
-/** All registered checks */
-const ALL_CHECKS: DocCheck[] = [check1TypecheckSnippets, check4ImportPaths];
+/** All registered checks — all 8 checks in pipeline order */
+const ALL_CHECKS: DocCheck[] = [
+  check1TypecheckSnippets,
+  check2ApiReferences,
+  check3ConfigDefaults,
+  check4ImportPaths,
+  check5ClaimTests,
+  check6ExampleTestMap,
+  check7AiReview,
+  check8SapUi5Api,
+];
 
 /**
  * Parse CLI arguments using Node.js built-in parseArgs.
