@@ -12,15 +12,15 @@ Copy this file into your project as `tests/auth-setup.ts` and configure it in `p
 ## Environment Variables
 
 ```bash
-# Required (set in .env.test or CI secrets)
-SAP_BASE_URL=https://your-sap-system.example.com
-SAP_USERNAME=TEST_USER
-SAP_PASSWORD=<your-password>
+# Required (set in .env or CI secrets)
+SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
+SAP_CLOUD_USERNAME=TEST_USER
+SAP_CLOUD_PASSWORD=<your-password>
 
 # Optional
-SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'
-SAP_CLIENT=100             # OnPrem only
-SAP_LANGUAGE=EN            # Default: EN
+SAP_AUTH_STRATEGY=btp-saml  # 'basic' | 'btp-saml' | 'office365'
+SAP_CLIENT=100              # OnPrem only
+SAP_LANGUAGE=EN             # Default: EN
 ```
 
 ## Playwright Config
@@ -75,10 +75,10 @@ function requireEnv(name: string): string {
 }
 
 setup('SAP authentication', async ({ page, context }) => {
-  const baseUrl = requireEnv('SAP_BASE_URL');
-  const username = requireEnv('SAP_USERNAME');
-  const password = requireEnv('SAP_PASSWORD');
-  const strategy = process.env['SAP_AUTH_STRATEGY'] ?? 'basic';
+  const baseUrl = requireEnv('SAP_CLOUD_BASE_URL');
+  const username = requireEnv('SAP_CLOUD_USERNAME');
+  const password = requireEnv('SAP_CLOUD_PASSWORD');
+  const strategy = process.env['SAP_AUTH_STRATEGY'] ?? 'btp-saml';
   const client = process.env['SAP_CLIENT'] ?? '100';
   const language = process.env['SAP_LANGUAGE'] ?? 'EN';
 

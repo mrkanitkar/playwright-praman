@@ -16,7 +16,7 @@ All examples assume:
 - Praman is installed (`npm install -D playwright-praman @playwright/test`)
 - Authentication is handled via a [setup project](/docs/guides/authentication)
 - `storageState` is configured in `playwright.config.ts`
-- Environment variables (`SAP_BASE_URL`, `SAP_USERNAME`, `SAP_PASSWORD`) are set
+- Environment variables (`SAP_CLOUD_BASE_URL`, `SAP_CLOUD_USERNAME`, `SAP_CLOUD_PASSWORD`) are set
 
 ## Available Examples
 

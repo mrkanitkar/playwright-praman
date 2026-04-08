@@ -38,7 +38,7 @@ import { test, expect } from 'playwright-praman';
 test.describe('Dialog Handling', () => {
   test('open dialog, fill fields, and dismiss', async ({ page, ui5 }) => {
     await test.step('Navigate to app', async () => {
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
 
@@ -135,7 +135,7 @@ test.describe('Dialog Handling', () => {
 
   test('confirm dialog with value help', async ({ page, ui5 }) => {
     await test.step('Navigate to app', async () => {
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
 

@@ -41,7 +41,7 @@ test.describe('Hybrid Login Flow', () => {
     // ================================================================
     await test.step('Login via SAP IAS (Playwright native)', async () => {
       // Navigate to the SAP system -- this triggers an IDP redirect
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
 
       // The IAS login form is plain HTML -- use Playwright locators
       await page.waitForSelector('input[name="j_username"], input[name="email"]', {
@@ -50,10 +50,10 @@ test.describe('Hybrid Login Flow', () => {
 
       // Fill credentials using Playwright native (NOT ui5.fill -- this is not a UI5 control)
       await page.locator('input[name="j_username"], input[name="email"]').fill(
-        process.env['SAP_USERNAME']!,
+        process.env['SAP_CLOUD_USERNAME']!,
       );
       await page.locator('input[name="j_password"], input[name="password"]').fill(
-        process.env['SAP_PASSWORD']!,
+        process.env['SAP_CLOUD_PASSWORD']!,
       );
 
       // Submit the form

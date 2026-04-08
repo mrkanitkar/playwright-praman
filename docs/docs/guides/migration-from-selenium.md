@@ -147,7 +147,7 @@ export default defineConfig({
   retries: 1,
   workers: process.env.CI ? 2 : 1,
   use: {
-    baseURL: process.env.SAP_BASE_URL,
+    baseURL: process.env.SAP_CLOUD_BASE_URL,
     headless: true, // --headless
     viewport: { width: 1920, height: 1080 }, // --window-size
     trace: 'on-first-retry',
@@ -176,9 +176,9 @@ export default defineConfig({
   interactionStrategy: 'ui5-native',
   auth: {
     strategy: 'basic',
-    baseUrl: process.env.SAP_BASE_URL!,
-    username: process.env.SAP_USER!,
-    password: process.env.SAP_PASS!,
+    baseUrl: process.env.SAP_CLOUD_BASE_URL!,
+    username: process.env.SAP_CLOUD_USERNAME!,
+    password: process.env.SAP_CLOUD_PASSWORD!,
   },
 });
 ```
@@ -265,7 +265,7 @@ import { test, expect } from 'playwright-praman';
 test('hybrid test', async ({ page, ui5, ui5Navigation }) => {
   // Playwright handles login (before UI5 loads)
   await test.step('Login', async () => {
-    await page.goto(process.env.SAP_BASE_URL!);
+    await page.goto(process.env.SAP_CLOUD_BASE_URL!);
     await page.locator('#USERNAME_FIELD input').fill('TESTUSER');
     await page.locator('#PASSWORD_FIELD input').fill('secret');
     await page.locator('#LOGIN_LINK').click();

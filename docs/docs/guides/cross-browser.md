@@ -263,9 +263,9 @@ jobs:
       - run: npx playwright install ${{ matrix.browser }}
       - run: npx playwright test --project=${{ matrix.browser }}
         env:
-          SAP_BASE_URL: ${{ secrets.SAP_QA_URL }}
-          SAP_USERNAME: ${{ secrets.SAP_QA_USER }}
-          SAP_PASSWORD: ${{ secrets.SAP_QA_PASS }}
+          SAP_CLOUD_BASE_URL: ${{ secrets.SAP_QA_URL }}
+          SAP_CLOUD_USERNAME: ${{ secrets.SAP_QA_USER }}
+          SAP_CLOUD_PASSWORD: ${{ secrets.SAP_QA_PASS }}
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

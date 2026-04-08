@@ -39,7 +39,7 @@ import { test, expect } from 'playwright-praman';
 test.describe('Table Operations', () => {
   test('read table rows and OData binding data', async ({ page, ui5 }) => {
     await test.step('Navigate to app with table', async () => {
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
 

@@ -536,9 +536,9 @@ Create `.vscode/launch.json`:
       "console": "integratedTerminal",
       "env": {
         "PWDEBUG": "1",
-        "SAP_BASE_URL": "https://your-sap-system.example.com",
-        "SAP_USERNAME": "your-user",
-        "SAP_PASSWORD": "your-password"
+        "SAP_CLOUD_BASE_URL": "https://your-sap-system.example.com",
+        "SAP_CLOUD_USERNAME": "your-user",
+        "SAP_CLOUD_PASSWORD": "your-password"
       }
     },
     {
@@ -600,9 +600,9 @@ Create a `.env` file in your project root (add to `.gitignore`):
 
 ```bash
 # .env
-SAP_BASE_URL=https://your-sap-system.example.com
-SAP_USERNAME=test-user
-SAP_PASSWORD=test-password
+SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
+SAP_CLOUD_USERNAME=test-user
+SAP_CLOUD_PASSWORD=test-password
 SAP_CLIENT=100
 SAP_LANGUAGE=EN
 ```
@@ -618,7 +618,7 @@ config(); // Load .env file
 
 export default defineConfig({
   use: {
-    baseURL: process.env.SAP_BASE_URL,
+    baseURL: process.env.SAP_CLOUD_BASE_URL,
   },
 });
 ```
@@ -693,7 +693,7 @@ Add Praman-specific code snippets to `.vscode/praman.code-snippets`:
 2. Go to **Run > Edit Configurations**, add a **Node.js** configuration:
    - **JavaScript file**: `node_modules/.bin/playwright`
    - **Application parameters**: `test tests/my-test.spec.ts --headed --workers=1`
-   - **Environment variables**: `PWDEBUG=1;SAP_BASE_URL=...`
+   - **Environment variables**: `PWDEBUG=1;SAP_CLOUD_BASE_URL=...`
 3. JetBrains IDEs resolve `tsconfig.json` paths automatically — no additional configuration needed
 
 ### IDE Troubleshooting
@@ -769,7 +769,7 @@ Most `doctor` failures include a `suggestion` field with the exact command to ru
 - All file operations use `node:path` — no hardcoded `/` or `\` separators
 - Works on Windows 10/11, macOS, and Linux
 - `.auth/` uses `.gitignore` patterns — add `.auth/` to your `.gitignore`
-- The seed file uses `SAP_CLOUD_BASE_URL` (not `SAP_BASE_URL`) — check your `.env`
+- All SAP env vars use the `SAP_CLOUD_*` prefix (e.g. `SAP_CLOUD_BASE_URL`) — see `.env.example`
 
 ## What If I Don't Use AI Agents?
 

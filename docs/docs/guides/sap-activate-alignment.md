@@ -291,9 +291,9 @@ jobs:
       - run: npx playwright install chromium
       - run: npx playwright test tests/smoke/ --project=regression
         env:
-          SAP_BASE_URL: ${{ secrets.SAP_QA_URL }}
-          SAP_USERNAME: ${{ secrets.SAP_QA_USER }}
-          SAP_PASSWORD: ${{ secrets.SAP_QA_PASS }}
+          SAP_CLOUD_BASE_URL: ${{ secrets.SAP_QA_URL }}
+          SAP_CLOUD_USERNAME: ${{ secrets.SAP_QA_USER }}
+          SAP_CLOUD_PASSWORD: ${{ secrets.SAP_QA_PASS }}
 ```
 
 ## Phase-to-Praman Mapping Summary

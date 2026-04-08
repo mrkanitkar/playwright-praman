@@ -96,13 +96,6 @@ const ENV_MAPPINGS: readonly EnvMapping[] = [
 ];
 
 const NESTED_ENV_MAPPINGS: readonly NestedEnvMapping[] = [
-  // auth section
-  { envVar: 'PRAMAN_AUTH_BASE_URL', section: 'auth', field: 'baseUrl', type: 'string' },
-  { envVar: 'PRAMAN_AUTH_STRATEGY', section: 'auth', field: 'strategy', type: 'string' },
-  { envVar: 'PRAMAN_AUTH_USERNAME', section: 'auth', field: 'username', type: 'string' },
-  { envVar: 'PRAMAN_AUTH_PASSWORD', section: 'auth', field: 'password', type: 'string' },
-  { envVar: 'PRAMAN_AUTH_CLIENT', section: 'auth', field: 'client', type: 'string' },
-  { envVar: 'PRAMAN_AUTH_LANGUAGE', section: 'auth', field: 'language', type: 'string' },
   // ai section
   { envVar: 'PRAMAN_AI_PROVIDER', section: 'ai', field: 'provider', type: 'string' },
   { envVar: 'PRAMAN_AI_API_KEY', section: 'ai', field: 'apiKey', type: 'string' },

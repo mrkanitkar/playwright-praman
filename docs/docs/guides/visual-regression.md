@@ -132,7 +132,7 @@ export default defineConfig({
 test.beforeEach(async ({ page }) => {
   // Apply the UI5 theme via URL parameter
   const theme = test.info().project.metadata.theme ?? 'sap_horizon';
-  const baseUrl = process.env.SAP_BASE_URL ?? '';
+  const baseUrl = process.env.SAP_CLOUD_BASE_URL ?? '';
   await page.goto(`${baseUrl}?sap-ui-theme=${theme}`);
 });
 
@@ -154,7 +154,7 @@ compliance:
 ```typescript
 test('high contrast black theme renders correctly', async ({ ui5Navigation, page }) => {
   // Apply high contrast theme
-  await page.goto(`${process.env.SAP_BASE_URL}?sap-ui-theme=sap_horizon_hcb`);
+  await page.goto(`${process.env.SAP_CLOUD_BASE_URL}?sap-ui-theme=sap_horizon_hcb`);
   await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
   await expect(page).toHaveScreenshot('po-list-hcb.png', {
@@ -180,7 +180,7 @@ const locales = [
 
 for (const locale of locales) {
   test(`list report renders correctly in ${locale.name}`, async ({ ui5Navigation, page }) => {
-    await page.goto(`${process.env.SAP_BASE_URL}?sap-language=${locale.code}`);
+    await page.goto(`${process.env.SAP_CLOUD_BASE_URL}?sap-language=${locale.code}`);
     await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
     await expect(page).toHaveScreenshot(`po-list-${locale.code}.png`, {
@@ -194,7 +194,7 @@ for (const locale of locales) {
 
 ```typescript
 test('RTL layout renders correctly for Arabic', async ({ ui5Navigation, page }) => {
-  await page.goto(`${process.env.SAP_BASE_URL}?sap-language=ar`);
+  await page.goto(`${process.env.SAP_CLOUD_BASE_URL}?sap-language=ar`);
   await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'manage' });
 
   // Verify RTL direction is applied
@@ -270,9 +270,9 @@ jobs:
 
       - run: npx playwright test tests/visual/ --project=visual-sap_horizon
         env:
-          SAP_BASE_URL: ${{ secrets.SAP_QA_URL }}
-          SAP_USERNAME: ${{ secrets.SAP_QA_USER }}
-          SAP_PASSWORD: ${{ secrets.SAP_QA_PASS }}
+          SAP_CLOUD_BASE_URL: ${{ secrets.SAP_QA_URL }}
+          SAP_CLOUD_USERNAME: ${{ secrets.SAP_QA_USER }}
+          SAP_CLOUD_PASSWORD: ${{ secrets.SAP_QA_PASS }}
 
       - uses: actions/upload-artifact@v4
         if: failure()
