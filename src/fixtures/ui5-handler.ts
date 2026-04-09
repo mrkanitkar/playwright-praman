@@ -851,10 +851,18 @@ export class UI5Handler {
   private async tryLocatorFallback(selector: UI5Selector): Promise<Locator | null> {
     // Check for non-UI5 id (no '--' separator)
     if (typeof selector.id === 'string' && !selector.id.includes('--')) {
-      const locator = this.page.locator(`#${selector.id}`);
-      const count = await locator.count();
-      if (count > 0) {
-        return locator;
+      try {
+        // Use attribute selector [id="..."] instead of #id to safely handle IDs
+        // containing CSS-special characters like "::" (e.g., V4 APD IDs "APD_::Material")
+        const escapedId = selector.id.replaceAll('"', '\\"');
+        const locator = this.page.locator(`[id="${escapedId}"]`);
+        const count = await locator.count();
+        if (count > 0) {
+          return locator;
+        }
+      } catch {
+        // CSS selector parsing failed — ID contains characters that can't be
+        // represented even in attribute selectors. Not a DOM element.
       }
       return null;
     }
