@@ -396,7 +396,7 @@ describe('auto-fallback', () => {
 
       // Should be a locator shim, not a UI5 proxy
       expect(result.controlType).toBe('dom-element');
-      expect(page.locator).toHaveBeenCalledWith('#loginBtn');
+      expect(page.locator).toHaveBeenCalledWith('[id="loginBtn"]');
     });
 
     it('returns null (rethrows) when selector has no id/css/xpath hints', async () => {

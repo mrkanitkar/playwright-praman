@@ -439,6 +439,91 @@ function PersonaSVG(): ReactNode {
   );
 }
 
+function ClaudeCodeSVG(): ReactNode {
+  const agents = [
+    { y: 10, label: 'Explorer', color: 'rgba(255,215,0,0.85)' },
+    { y: 46, label: 'Architect', color: 'rgba(100,180,240,0.85)' },
+    { y: 82, label: 'Generator', color: 'rgba(134,239,172,0.85)' },
+    { y: 118, label: 'Healer', color: 'rgba(239,68,68,0.85)' },
+    { y: 154, label: 'Reviewer', color: 'rgba(196,181,253,0.85)' },
+  ];
+  return (
+    <svg
+      viewBox="0 0 280 185"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      style={{ width: '100%', maxWidth: 300 }}
+    >
+      {/* Claude Code terminal frame */}
+      <rect x="8" y="0" width="264" height="185" rx="10" fill="rgba(16,32,64,0.75)" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" />
+      <rect x="8" y="0" width="264" height="22" rx="10" fill="rgba(255,255,255,0.08)" />
+      <rect x="8" y="14" width="264" height="8" fill="rgba(255,255,255,0.08)" />
+      <circle cx="22" cy="11" r="4" fill="#ef4444" opacity="0.85" />
+      <circle cx="34" cy="11" r="4" fill="#f59e0b" opacity="0.85" />
+      <circle cx="46" cy="11" r="4" fill="#22c55e" opacity="0.85" />
+      <text x="140" y="14" textAnchor="middle" fill="rgba(255,255,255,0.45)" fontSize="7.5">claude · praman-sap-testing</text>
+      {/* Agent pipeline */}
+      {agents.map(({ y: ay, label, color }, i) => {
+        const yOff = ay + 26;
+        return (
+          <g key={label}>
+            <rect x="18" y={yOff} width="120" height="28" rx="5" fill="rgba(255,255,255,0.06)" stroke={color} strokeWidth="1" />
+            <circle cx="34" cy={yOff + 14} r="8" fill={color} opacity="0.2" />
+            <text x="34" y={yOff + 17} textAnchor="middle" fill={color} fontSize="8" fontWeight="700">{i + 1}</text>
+            <text x="50" y={yOff + 17} fill="rgba(255,255,255,0.88)" fontSize="8.5" fontWeight="600">{label}</text>
+            {i < 4 && <line x1="78" y1={yOff + 28} x2="78" y2={yOff + 36} stroke="rgba(255,255,255,0.25)" strokeWidth="1" strokeDasharray="3 2" />}
+          </g>
+        );
+      })}
+      {/* Right side: slash commands */}
+      <text x="160" y="46" fill="rgba(255,215,0,0.9)" fontSize="8" fontWeight="700">/praman-plan</text>
+      <text x="160" y="82" fill="rgba(134,239,172,0.9)" fontSize="8" fontWeight="700">/praman-generate</text>
+      <text x="160" y="118" fill="rgba(239,68,68,0.9)" fontSize="8" fontWeight="700">/praman-heal</text>
+      <text x="160" y="154" fill="rgba(255,255,255,0.6)" fontSize="8" fontWeight="700">/praman-coverage</text>
+      {/* Connecting lines */}
+      <line x1="138" y1="50" x2="156" y2="44" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+      <line x1="138" y1="118" x2="156" y2="116" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+    </svg>
+  );
+}
+
+function CoworkSVG(): ReactNode {
+  const steps = [
+    { label: 'Describe Test', icon: '💬', desc: 'Natural language' },
+    { label: 'AI Plans', icon: '📋', desc: 'Test strategy' },
+    { label: 'AI Generates', icon: '⚡', desc: 'Playwright tests' },
+    { label: 'AI Heals', icon: '🔧', desc: 'Auto-fix failures' },
+  ];
+  return (
+    <svg
+      viewBox="0 0 280 185"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      style={{ width: '100%', maxWidth: 300 }}
+    >
+      {/* Cowork chat-style frame */}
+      <rect x="8" y="4" width="264" height="174" rx="14" fill="rgba(16,32,64,0.65)" stroke="rgba(196,181,253,0.4)" strokeWidth="1.5" />
+      {/* Header */}
+      <rect x="8" y="4" width="264" height="28" rx="14" fill="rgba(196,181,253,0.12)" />
+      <rect x="8" y="24" width="264" height="8" fill="rgba(196,181,253,0.12)" />
+      <text x="140" y="22" textAnchor="middle" fill="rgba(196,181,253,0.9)" fontSize="9" fontWeight="700">Claude Cowork · SAP Testing</text>
+      {/* Pipeline steps */}
+      {steps.map(({ label, icon, desc }, i) => {
+        const y = 42 + i * 34;
+        return (
+          <g key={label}>
+            <rect x="20" y={y} width="240" height="28" rx="8" fill={i === 2 ? 'rgba(134,239,172,0.08)' : 'rgba(255,255,255,0.04)'} stroke={i === 2 ? 'rgba(134,239,172,0.4)' : 'rgba(255,255,255,0.15)'} strokeWidth="1" />
+            <text x="40" y={y + 18} fill="rgba(255,255,255,0.9)" fontSize="11">{icon}</text>
+            <text x="58" y={y + 15} fill="rgba(255,255,255,0.88)" fontSize="9" fontWeight="600">{label}</text>
+            <text x="58" y={y + 24} fill="rgba(255,255,255,0.45)" fontSize="7">{desc}</text>
+            <text x="240" y={y + 18} textAnchor="end" fill="rgba(134,239,172,0.75)" fontSize="8" fontWeight="600">{i < 3 ? '→' : '✓'}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 /* ── Carousel Data ─────────────────────────────────────────── */
 
 interface CarouselSlide {
@@ -474,6 +559,28 @@ const SLIDES: CarouselSlide[] = [
     primaryCta: { label: 'View Personas', to: '/personas' },
     secondaryCta: { label: 'Documentation', to: '/docs' },
     Visual: PersonaSVG,
+  },
+  {
+    id: 'claude-code',
+    badge: 'Claude Code Plugin',
+    title: '5 AI agents. 4 commands. One install.',
+    subtitle:
+      'The Praman Claude Code Plugin brings plan-generate-heal pipeline to Claude Code. 7 mandatory rules, 19 forbidden patterns, and confidence-scored healing — all enforced automatically.',
+    tags: ['Claude Code', '5 Agents', '8 Skills'],
+    primaryCta: { label: 'Plugin Docs', to: '/docs/guides/claude-code-plugin-overview' },
+    secondaryCta: { label: 'Read Blog', to: '/blog/2026/04/10/praman-claude-code-plugin' },
+    Visual: ClaudeCodeSVG,
+  },
+  {
+    id: 'claude-cowork',
+    badge: 'Claude Cowork Plugin',
+    title: 'SAP test automation in Claude Cowork.',
+    subtitle:
+      'Same 5-agent pipeline, same compliance rules — now available as a Claude Cowork plugin. Drag-and-drop install, chat-first interface, and collaborative test reviews with your team.',
+    tags: ['Claude Cowork', 'Chat-First', 'Team Collaboration'],
+    primaryCta: { label: 'Cowork Docs', to: '/docs/guides/claude-cowork-plugin' },
+    secondaryCta: { label: 'Read Blog', to: '/blog/2026/04/10/praman-claude-code-plugin' },
+    Visual: CoworkSVG,
   },
   {
     id: 'ui5',
@@ -642,15 +749,24 @@ function GlanceSection(): ReactNode {
   return (
     <div className="praman-glance-outer">
       <section className="praman-glance-section">
-        <h2 className="praman-glance-title">Praman Plugin at a Glance</h2>
+        <h2 className="praman-glance-title">Praman at a Glance</h2>
         <div className="praman-info-cards">
           <div className="praman-info-card">
-            <h4>What is Praman Plugin?</h4>
-            <p>
-              Open-source Playwright plugin for SAP S/4HANA end-to-end testing and automation.
-              Describe your business process — AI agents deliver production-ready test scripts. Free
-              alternative to Tricentis Tosca, Worksoft, and SAP CBTA with zero vendor lock-in.
-            </p>
+            <h4>What is Praman?</h4>
+            <ul className="praman-when-to-use-list">
+              <li>
+                <strong>Playwright Plugin</strong> — open-source npm package with 199 typed control
+                proxies, OData fixtures, and SAP auth for test automation engineers
+              </li>
+              <li>
+                <strong>Claude Code Plugin</strong> — 5 AI agents with plan-generate-heal pipeline
+                for autonomous SAP test automation in Claude Code
+              </li>
+              <li>
+                <strong>Claude Cowork Plugin</strong> — same agent pipeline with chat-first
+                interface for collaborative SAP test automation in Claude Cowork
+              </li>
+            </ul>
           </div>
           <div className="praman-info-card">
             <h4>When to Use?</h4>
@@ -743,6 +859,38 @@ function UseCaseCards(): ReactNode {
             </div>
             <Link className="praman-usecase-link" to="/docs/guides/mcp-vs-cli">
               MCP vs CLI Guide →
+            </Link>
+          </div>
+
+          {/* Card 4: Claude Code Plugin */}
+          <div className="praman-usecase-card">
+            <h3>Claude Code Plugin</h3>
+            <p>
+              5 AI agents with plan-generate-heal pipeline for SAP test automation in Claude Code.
+              7 mandatory rules, 19 forbidden patterns, 8 skills, and confidence-scored healing —
+              all enforced automatically.
+            </p>
+            <div className="praman-usecase-install">
+              <code>claude plugin add praman-sap-testing</code>
+            </div>
+            <Link className="praman-usecase-link" to="/docs/guides/claude-code-plugin-overview">
+              Claude Code Plugin Docs →
+            </Link>
+          </div>
+
+          {/* Card 5: Claude Cowork Plugin */}
+          <div className="praman-usecase-card">
+            <h3>Claude Cowork Plugin</h3>
+            <p>
+              Same 5-agent pipeline and compliance rules — available as a Claude Cowork plugin with
+              chat-first interface. Drag-and-drop install for collaborative SAP test automation
+              with your team.
+            </p>
+            <div className="praman-usecase-install">
+              <code>Install .plugin from Cowork chat</code>
+            </div>
+            <Link className="praman-usecase-link" to="/docs/guides/claude-cowork-plugin">
+              Cowork Plugin Docs →
             </Link>
           </div>
         </div>
