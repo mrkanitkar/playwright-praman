@@ -60,6 +60,23 @@ const sidebars: SidebarsConfig = {
       ],
     },
 
+    // ── Claude Code Plugin ──
+    {
+      type: 'category',
+      label: 'Claude Code Plugin',
+      items: [
+        'guides/claude-code-plugin-overview',
+        'guides/claude-code-plugin-installation',
+        'guides/claude-code-plugin-commands',
+        'guides/claude-code-plugin-agents-skills',
+        'guides/claude-code-plugin-mandatory-rules',
+        'guides/claude-code-plugin-forbidden-patterns',
+        'guides/claude-code-plugin-walkthrough',
+        'guides/claude-code-plugin-troubleshooting',
+        'guides/claude-cowork-plugin',
+      ],
+    },
+
     // ── Writing Tests ──
     {
       type: 'category',
