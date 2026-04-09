@@ -117,3 +117,13 @@ selectors:
   label: Selectors
   permalink: /selectors
   description: UI5 control selector strategies, tips, and best practices.
+
+claude-code:
+  label: Claude Code
+  permalink: /claude-code
+  description: Claude Code integration, plugin development, and AI-powered SAP testing with Anthropic Claude.
+
+plugin:
+  label: Plugin
+  permalink: /plugin
+  description: Praman plugin ecosystem — Claude Code plugins, agent extensions, and skill packages.

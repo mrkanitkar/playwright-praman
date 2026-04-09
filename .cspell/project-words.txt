@@ -82,6 +82,7 @@ certuser
 checkmark
 cidx
 codegen
+cowork
 combinators
 commitizen
 commitlint
@@ -132,6 +133,7 @@ maheshwar
 mdlint
 mgmt
 microbenchmarks
+microtasks
 modelcontextprotocol
 mmpur
 mrkanitkar
@@ -210,6 +212,7 @@ unminified
 unparseable
 unredacted
 upvote
+valuehelp
 usernamehw
 viewports
 vitems
