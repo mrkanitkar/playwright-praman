@@ -100,7 +100,7 @@ the same project.
 
 | Aspect                 | Plugin                                       | CLI Agents                          | MCP Agents                              |
 | ---------------------- | -------------------------------------------- | ----------------------------------- | --------------------------------------- |
-| **Installation**       | `claude plugin add praman-sap-testing`       | `.md` files in `.claude/agents/`    | `@playwright/mcp` server in `.mcp.json` |
+| **Installation**       | `claude plugin install` via marketplace      | `.md` files in `.claude/agents/`    | `@playwright/mcp` server in `.mcp.json` |
 | **Shared rules**       | Yes (plugin enforces 7 rules, 19 patterns)   | No (each agent file is standalone)  | No (rules embedded per-agent)           |
 | **Command pipeline**   | Yes (`/praman-coverage` chains all stages)   | Manual (run each agent separately)  | Manual (invoke MCP tools individually)  |
 | **Session hooks**      | Yes (pre/post hooks for auth, cleanup)       | No                                  | No                                      |
@@ -121,7 +121,8 @@ the same project.
 
 :::warning[Common mistake]
 Trying to use plugin commands (`/praman-plan`, `/praman-generate`) without installing the
-plugin first. These commands are not available until you run `claude plugin add praman-sap-testing`.
+plugin first. These commands are not available until you install the plugin via the marketplace
+(see [Installation](./claude-code-plugin-installation)).
 If you only have CLI agent `.md` files in `.claude/agents/`, use the CLI commands instead
 (`/praman-cli-plan`, `/praman-cli-generate`).
 :::

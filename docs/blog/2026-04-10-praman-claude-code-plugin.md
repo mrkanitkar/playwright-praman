@@ -29,10 +29,11 @@ The [Praman CLI agents](/blog/2026/04/05/how-to-use-praman-cli-agents) showed th
 Today we're releasing **two plugins** that change that — one for **Claude Code** and one for **Claude Cowork**. Same 5-agent pipeline, same compliance rules, two interfaces.
 
 ```bash
-# Claude Code — CLI-first
-claude plugin add praman-sap-testing
+# Claude Code — CLI
+claude plugin marketplace add mrkanitkar/praman-sap-testing
+claude plugin install praman-sap-testing@praman-sap-testing
 
-# Claude Cowork — install the .plugin file from the chat interface
+# Claude Cowork — Customize → Browse plugins → Install
 ```
 
 <!-- truncate -->
@@ -55,7 +56,7 @@ For developers and test automation engineers who work in the terminal. Install v
 
 ### Claude Cowork Plugin
 
-For teams that prefer a chat-first, collaborative interface. Install by dragging the `.plugin` file into Cowork. Same agents, same rules — but with collaborative review, shared sessions, and team-visible test results.
+For teams that prefer a chat-first, collaborative interface. Install from **Customize → Browse plugins** in Claude Cowork. Same agents, same rules — but with collaborative review, shared sessions, and team-visible test results.
 
 Both plugins are the orchestration layer that CLI agents lacked.
 
@@ -213,16 +214,16 @@ The quality gate greps for `page.click(` in every generated file. A single match
 
 If you've read the [CLI agents walkthrough](/blog/2026/04/05/how-to-use-praman-cli-agents), you might wonder: what's different?
 
-| Aspect            | CLI Agents                            | Claude Code Plugin                     | Claude Cowork Plugin            |
-| ----------------- | ------------------------------------- | -------------------------------------- | ------------------------------- |
-| **Installation**  | Copy `.md` files to `.claude/agents/` | `claude plugin add praman-sap-testing` | Drag-and-drop `.plugin` file    |
-| **Shared rules**  | None — standalone                     | `CLAUDE.md` + 7 rules                  | `CLAUDE.md` + 7 rules           |
-| **Commands**      | None — invoke by name                 | 4 slash commands                       | Chat-based invocation           |
-| **Quality gate**  | Manual                                | Automatic                              | Automatic                       |
-| **Session hook**  | None                                  | Rules reminder on every session        | Rules reminder on every session |
-| **Skill routing** | Agent reads its own file              | 8 skills auto-activate                 | 8 skills auto-activate          |
-| **Pipeline**      | Manual — one by one                   | `/praman-coverage` runs all            | Chat-driven pipeline            |
-| **Collaboration** | Single user                           | Single user                            | Team-visible reviews            |
+| Aspect            | CLI Agents                            | Claude Code Plugin              | Claude Cowork Plugin            |
+| ----------------- | ------------------------------------- | ------------------------------- | ------------------------------- |
+| **Installation**  | Copy `.md` files to `.claude/agents/` | `claude plugin install` via CLI | GUI: Customize → Browse plugins |
+| **Shared rules**  | None — standalone                     | `CLAUDE.md` + 7 rules           | `CLAUDE.md` + 7 rules           |
+| **Commands**      | None — invoke by name                 | 4 slash commands                | Chat-based invocation           |
+| **Quality gate**  | Manual                                | Automatic                       | Automatic                       |
+| **Session hook**  | None                                  | Rules reminder on every session | Rules reminder on every session |
+| **Skill routing** | Agent reads its own file              | 8 skills auto-activate          | 8 skills auto-activate          |
+| **Pipeline**      | Manual — one by one                   | `/praman-coverage` runs all     | Chat-driven pipeline            |
+| **Collaboration** | Single user                           | Single user                     | Team-visible reviews            |
 
 **When to use CLI agents**: Custom agent setups, per-project files, environments where plugins aren't supported.
 
@@ -238,7 +239,8 @@ If you've read the [CLI agents walkthrough](/blog/2026/04/05/how-to-use-praman-c
 
 ```bash
 # 1. Install the plugin
-claude plugin add praman-sap-testing
+claude plugin marketplace add mrkanitkar/praman-sap-testing
+claude plugin install praman-sap-testing@praman-sap-testing
 
 # 2. Set up environment variables
 export SAP_CLOUD_BASE_URL="https://your-system.s4hana.cloud.sap/"
@@ -255,8 +257,8 @@ npm install -D playwright-praman @playwright/test
 
 ### Claude Cowork
 
-1. Download the `praman-sap-testing.plugin` file
-2. Drag-and-drop into Claude Cowork chat interface
+1. Open Claude Desktop → **Cowork** tab → **Customize** → **Browse plugins**
+2. Search for **praman-sap-testing** and click **Install**
 3. Set SAP environment variables in your project
 4. Ask: "Plan and generate tests for Manage Purchase Orders"
 

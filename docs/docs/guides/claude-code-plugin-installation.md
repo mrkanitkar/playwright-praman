@@ -46,20 +46,34 @@ npm install -g @playwright/cli@latest
 
 ## Step 1: Install the Plugin
 
+### Claude Code (CLI)
+
 ```bash
-claude plugin add praman-sap-testing
+# Add the marketplace (one-time)
+claude plugin marketplace add mrkanitkar/praman-sap-testing
+
+# Install the plugin
+claude plugin install praman-sap-testing@praman-sap-testing
 ```
 
 This registers the plugin with Claude Code and makes the four slash commands available:
 `/praman-plan`, `/praman-generate`, `/praman-heal`, and `/praman-coverage`.
 
-Verify the plugin loaded:
+### Claude Cowork (Desktop App)
 
-```bash
-claude plugin list
-```
+1. Open Claude Desktop and switch to the **Cowork** tab
+2. Click **Customize** in the left sidebar
+3. Click **Browse plugins**
+4. Search for **praman-sap-testing** and click **Install**
 
-You should see `praman-sap-testing` in the output with status `active`.
+For organizations not on the public marketplace, an admin can upload the plugin via
+**Organization settings → Plugins → Add plugins → Upload a file**. Download
+`praman-sap-testing.zip` from the
+[latest release](https://github.com/mrkanitkar/praman-sap-testing/releases/latest).
+
+### Verify
+
+Type `/praman-` in Claude Code or Cowork and autocomplete should show 4 commands.
 
 ## Step 2: Configure Environment Variables
 
@@ -309,20 +323,20 @@ This is separate from `npx playwright install chromium`, which installs browsers
 Run through this checklist after completing setup. Every item should pass before using
 the plugin commands.
 
-| Check                     | Command                                                                 | Expected Result                           |
-| ------------------------- | ----------------------------------------------------------------------- | ----------------------------------------- |
-| Plugin installed          | `claude plugin list`                                                    | `praman-sap-testing` with status `active` |
-| Node.js version           | `node --version`                                                        | `v20.x.x` or higher                       |
-| Playwright installed      | `npx playwright --version`                                              | `1.48.0` or higher                        |
-| CLI installed             | `npx @playwright/cli --version`                                         | Version number (no error)                 |
-| npm package installed     | `npm ls playwright-praman`                                              | Package listed with version               |
-| Bridge script exists      | `ls node_modules/playwright-praman/dist/browser/praman-bridge-init.js`  | File exists                               |
-| CLI config exists         | `ls .playwright/praman-cli.config.json`                                 | File exists                               |
-| Env vars set              | `grep SAP_CLOUD_BASE_URL .env.test`                                     | URL present                               |
-| Auth state exists         | `ls .auth/sap-session.json`                                             | File exists (after running auth setup)    |
-| Doctor passes             | `npx playwright-praman doctor`                                          | All checks green                          |
-| Bridge loads              | `npx @playwright/cli eval "() => window.__praman_bridge !== undefined"` | `true`                                    |
-| Plugin commands available | Type `/praman-` in Claude Code                                          | Autocomplete shows 4 commands             |
+| Check                     | Command                                                                 | Expected Result                        |
+| ------------------------- | ----------------------------------------------------------------------- | -------------------------------------- |
+| Plugin installed          | Type `/praman-` in Claude Code                                          | Autocomplete shows 4 commands          |
+| Node.js version           | `node --version`                                                        | `v20.x.x` or higher                    |
+| Playwright installed      | `npx playwright --version`                                              | `1.48.0` or higher                     |
+| CLI installed             | `npx @playwright/cli --version`                                         | Version number (no error)              |
+| npm package installed     | `npm ls playwright-praman`                                              | Package listed with version            |
+| Bridge script exists      | `ls node_modules/playwright-praman/dist/browser/praman-bridge-init.js`  | File exists                            |
+| CLI config exists         | `ls .playwright/praman-cli.config.json`                                 | File exists                            |
+| Env vars set              | `grep SAP_CLOUD_BASE_URL .env.test`                                     | URL present                            |
+| Auth state exists         | `ls .auth/sap-session.json`                                             | File exists (after running auth setup) |
+| Doctor passes             | `npx playwright-praman doctor`                                          | All checks green                       |
+| Bridge loads              | `npx @playwright/cli eval "() => window.__praman_bridge !== undefined"` | `true`                                 |
+| Plugin commands available | Type `/praman-` in Claude Code                                          | Autocomplete shows 4 commands          |
 
 ## FAQ
 
@@ -352,13 +366,12 @@ registering the strategy with the `sapAuth` fixture.
 
 Three checks confirm the plugin is active:
 
-1. `claude plugin list` shows `praman-sap-testing` with status `active`
-2. Typing `/praman-` in Claude Code shows autocomplete for the four commands
-3. Running `/praman-plan` with a prompt starts the sap-explorer agent (you will see
+1. Typing `/praman-` in Claude Code shows autocomplete for the four commands
+2. Running `/praman-plan` with a prompt starts the sap-explorer agent (you will see
    yellow-colored agent output in the Claude Code terminal)
 
-If the plugin does not appear, reinstall with `claude plugin add praman-sap-testing` and
-restart Claude Code.
+If the plugin does not appear, reinstall with
+`claude plugin install praman-sap-testing@praman-sap-testing` and restart Claude Code.
 
 </details>
 
