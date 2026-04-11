@@ -14,7 +14,7 @@ keywords:
 
 :::info[In this guide]
 
-- Install the Praman plugin in Claude Cowork via drag-and-drop
+- Install the Praman plugin in Claude Cowork via the Customize menu
 - Understand how the same 5-agent pipeline works in a chat-first interface
 - Run plan-generate-heal through natural language requests
 - Collaborate with your team on test reviews and approvals
@@ -30,14 +30,14 @@ confidence-scored healing — but with a chat-first interface designed for team 
 
 Both plugins share identical internals. The difference is the interface and collaboration model.
 
-| Aspect            | Claude Code Plugin                     | Claude Cowork Plugin                     |
-| ----------------- | -------------------------------------- | ---------------------------------------- |
-| **Interface**     | Terminal / CLI                         | Chat / conversational                    |
-| **Installation**  | `claude plugin add praman-sap-testing` | Drag-and-drop `.plugin` file             |
-| **Invocation**    | Slash commands (`/praman-plan`)        | Natural language requests                |
-| **Collaboration** | Single user                            | Team-visible sessions                    |
-| **Review**        | User gates in terminal                 | Collaborative review in chat             |
-| **Best for**      | Developers, CI pipelines               | Teams, business analysts, shared reviews |
+| Aspect            | Claude Code Plugin              | Claude Cowork Plugin                     |
+| ----------------- | ------------------------------- | ---------------------------------------- |
+| **Interface**     | Terminal / CLI                  | Chat / conversational                    |
+| **Installation**  | `claude plugin install` via CLI | GUI: Customize → Browse plugins          |
+| **Invocation**    | Slash commands (`/praman-plan`) | Natural language requests                |
+| **Collaboration** | Single user                     | Team-visible sessions                    |
+| **Review**        | User gates in terminal          | Collaborative review in chat             |
+| **Best for**      | Developers, CI pipelines        | Teams, business analysts, shared reviews |
 
 :::tip
 If you're already familiar with the [Claude Code Plugin](/docs/guides/claude-code-plugin-overview),
@@ -69,18 +69,19 @@ export SAP_CLOUD_PASSWORD="your-password"
 
 ### Install the Plugin
 
-1. Download or build the `praman-sap-testing.plugin` file:
+1. Open Claude Desktop and switch to the **Cowork** tab
+2. Click **Customize** in the left sidebar
+3. Click **Browse plugins**
+4. Search for **praman-sap-testing** and click **Install**
 
-```bash
-# From the plugin source directory
-bash scripts/package-cowork.sh
-# Output: dist/praman-sap-testing.plugin
-```
+For organizations not on the public marketplace, an admin can upload the plugin:
 
-1. In Claude Cowork, drag-and-drop the `.plugin` file into the chat interface — or use the
-   plugin installer from the Cowork menu.
+1. Download `praman-sap-testing.zip` from the
+   [latest release](https://github.com/mrkanitkar/praman-sap-testing/releases/latest)
+2. Go to **Organization settings → Plugins → Add plugins → Upload a file**
+3. Select the downloaded `.zip` file
 
-1. Verify the plugin loaded by asking:
+Verify the plugin loaded by asking:
 
 ```text
 What Praman agents and skills are available?
@@ -259,22 +260,18 @@ how you invoke the pipeline and review results.
 ## Troubleshooting
 
 <details>
-<summary>Plugin not loading after drag-and-drop?</summary>
+<summary>Plugin not appearing in Browse plugins?</summary>
 
-Ensure the `.plugin` file was packaged correctly:
+If the plugin is not listed in the marketplace, install it manually:
 
-```bash
-cd plugins/praman-sap-testing
-bash scripts/package-cowork.sh
-```
+1. Download `praman-sap-testing.zip` from the
+   [latest release](https://github.com/mrkanitkar/praman-sap-testing/releases/latest)
+2. Ask your organization admin to upload it via
+   **Organization settings → Plugins → Add plugins → Upload a file**
 
-The output should be `dist/praman-sap-testing.plugin`. Verify it contains the expected files:
-
-```bash
-unzip -l dist/praman-sap-testing.plugin | head -20
-```
-
-You should see `.claude-plugin/plugin.json`, `agents/`, `skills/`, `commands/`, and `CLAUDE.md`.
+The `.zip` must contain `.claude-plugin/plugin.json`, `agents/`, `skills/`, and `commands/`
+at the root level. Note: Cowork's upload dialog accepts `.zip` files only — if you have a
+`.plugin` file, rename it to `.zip` before uploading.
 
 </details>
 
@@ -300,15 +297,10 @@ failures in Claude Code. The generated test files are identical and interchangea
 <details>
 <summary>How do I update the Cowork plugin?</summary>
 
-Re-package the plugin from the latest source and drag-and-drop the new `.plugin` file into
-Cowork. It replaces the existing installation.
-
-```bash
-cd plugins/praman-sap-testing
-git pull
-bash scripts/package-cowork.sh
-# Drag dist/praman-sap-testing.plugin into Cowork
-```
+If the plugin is in a marketplace, go to **Customize → Browse plugins** and check for
+updates. For manual uploads, download the latest `.zip` from the
+[releases page](https://github.com/mrkanitkar/praman-sap-testing/releases/latest)
+and re-upload via **Organization settings → Plugins → Add plugins → Upload a file**.
 
 </details>
 
