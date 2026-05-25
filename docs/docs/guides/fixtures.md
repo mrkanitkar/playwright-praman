@@ -18,27 +18,27 @@ import { test, expect } from 'playwright-praman';
 
 ## Fixture Summary
 
-| Fixture         | Scope  | Type            | Description                                                                                |
-| --------------- | ------ | --------------- | ------------------------------------------------------------------------------------------ |
-| `ui5`           | test   | Core            | Control discovery, interaction, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces      |
-| `ui5Navigation` | test   | Navigation      | 11 FLP navigation methods                                                                  |
-| `btpWorkZone`   | test   | Navigation      | Dual-frame BTP WorkZone manager                                                            |
-| `sapAuth`       | test   | Authentication  | SAP authentication (6 strategies)                                                          |
-| `fe`            | test   | Fiori Elements  | `.listReport`, `.objectPage`, `.table`, `.list` helpers                                    |
-| `pramanAI`      | test   | AI              | Page discovery, agentic handler, LLM, vocabulary                                           |
-| `intent`        | test   | Business        | `.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`                      |
-| `ui5Shell`      | test   | FLP             | Shell header (home, user menu)                                                             |
-| `ui5Footer`     | test   | FLP             | Page footer bar (Save, Edit, Delete, etc.)                                                 |
-| `flpLocks`      | test   | FLP             | SM12 lock management with auto-cleanup                                                     |
-| `flpSettings`   | test   | FLP             | User settings reader (language, date format)                                               |
-| `testData`      | test   | Data            | Template-based data generation with auto-cleanup                                           |
-| `pramanConfig`  | worker | Infrastructure  | Frozen config (loaded once per worker)                                                     |
-| `pramanLogger`  | test   | Infrastructure  | Test-scoped pino logger                                                                    |
-| `rootLogger`    | worker | Infrastructure  | Worker-scoped root logger                                                                  |
-| `tracer`        | worker | Infrastructure  | OpenTelemetry tracer (NoOp when disabled, real when `openTelemetry: true`)                 |
-| `meter`         | worker | Infrastructure  | OpenTelemetry meter for metrics (NoOp when disabled, real when `metrics: true`)            |
-| `browserBind`   | test   | CLI Integration | `PRAMAN_BIND=1` exposes browser to CLI agents via `browser.bind()` (Playwright 1.59+)      |
-| `screencast`    | test   | CLI Integration | Chapter markers, action overlays, frame streaming via `page.screencast` (Playwright 1.59+) |
+| Fixture         | Scope  | Type            | Description                                                                                                      |
+| --------------- | ------ | --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `ui5`           | test   | Core            | Control discovery, interaction, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces                            |
+| `ui5Navigation` | test   | Navigation      | 11 FLP navigation methods                                                                                        |
+| `btpWorkZone`   | test   | Navigation      | Dual-frame BTP WorkZone manager                                                                                  |
+| `sapAuth`       | test   | Authentication  | SAP authentication (6 strategies)                                                                                |
+| `fe`            | test   | Fiori Elements  | `.listReport`, `.objectPage`, `.table`, `.list` helpers                                                          |
+| `pramanAI`      | test   | AI              | Page discovery, agentic handler, LLM, vocabulary                                                                 |
+| `intent`        | test   | Business        | `.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`                                            |
+| `ui5Shell`      | test   | FLP             | Shell header (home, user menu)                                                                                   |
+| `ui5Footer`     | test   | FLP             | Page footer bar (Save, Edit, Delete, etc.)                                                                       |
+| `flpLocks`      | test   | FLP             | SM12 lock management with auto-cleanup                                                                           |
+| `flpSettings`   | test   | FLP             | User settings reader (language, date format)                                                                     |
+| `testData`      | test   | Data            | Template-based data generation with auto-cleanup                                                                 |
+| `pramanConfig`  | worker | Infrastructure  | Frozen config (loaded once per worker)                                                                           |
+| `pramanLogger`  | test   | Infrastructure  | Test-scoped pino logger                                                                                          |
+| `rootLogger`    | worker | Infrastructure  | Worker-scoped root logger                                                                                        |
+| `tracer`        | worker | Infrastructure  | OpenTelemetry tracer (NoOp when disabled, real when `openTelemetry: true`)                                       |
+| `meter`         | worker | Infrastructure  | OpenTelemetry meter for metrics (NoOp when disabled, real when `metrics: true`)                                  |
+| `browserBind`   | test   | CLI Integration | `PRAMAN_BIND=1` exposes browser to CLI agents via `browser.bind()` (Playwright 1.59+)                            |
+| `screencast`    | test   | CLI Integration | Chapter markers, action overlays, control highlighting, frame streaming via `page.screencast` (Playwright 1.59+) |
 
 ## Auto-Fixtures
 

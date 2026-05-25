@@ -11,6 +11,8 @@ keywords:
   - playwright 1.59
   - agentic testing
   - sap ui5 video recording
+  - screencast highlight controls
+  - playwright control highlighting
 ---
 
 # Browser Bind & Screencast Fixtures
@@ -213,6 +215,64 @@ screencast.onFrame(async ({ buffer, timestamp }) => {
 :::tip Multiple handlers
 You can register multiple frame handlers. They are called in registration order.
 Errors from handlers are caught and logged at `debug` level (non-fatal to the test).
+:::
+
+### Control Highlighting
+
+:::note Added in v1.3.0
+:::
+
+`highlightControls(enabled, style?)` draws a visible overlay on UI5 controls as they
+are interacted with — useful for video recordings, demos, and AI vision pipelines that
+need to see which control is active.
+
+```typescript
+import { screencastTest } from 'playwright-praman';
+
+screencastTest('highlighted workflow', async ({ screencast, ui5 }) => {
+  // Enable highlighting with the default Praman accent outline
+  screencast.highlightControls(true);
+
+  // Every press(), enterText(), and select() now highlights the control
+  const saveBtn = await ui5.control({ controlType: 'sap.m.Button', properties: { text: 'Save' } });
+  await saveBtn.press(); // Control is highlighted before the press
+
+  // Disable when done
+  screencast.highlightControls(false);
+});
+```
+
+#### Custom Highlight Styles
+
+Pass a CSS string or property map as the second argument:
+
+```typescript
+// CSS string
+screencast.highlightControls(true, 'outline: 3px solid blue; background: rgba(0,0,255,0.1)');
+
+// CSS property map
+screencast.highlightControls(true, {
+  outline: '3px solid #e8482b',
+  outlineOffset: '2px',
+  background: 'rgba(232, 72, 43, 0.05)',
+});
+```
+
+The default style is `outline: 3px solid #e8482b; outline-offset: 2px` (Praman accent
+red outline). Each interaction clears the previous highlight before applying the new one.
+
+#### How It Works
+
+When highlighting is enabled, Praman's control proxy calls `locator.highlight({ style })`
+before every `press()`, `enterText()`, and `select()` interaction. The highlight is:
+
+- **Page-scoped** — each page tracks its own highlight state independently
+- **Best-effort** — highlighting never breaks an interaction; failures are silently caught
+- **Automatic cleanup** — `page.hideHighlight()` is called before each new highlight
+
+:::warning Playwright 1.60+ required
+`highlightControls()` requires Playwright 1.60+ (which introduced `locator.highlight({ style })`).
+On older versions, the method is a silent no-op.
 :::
 
 ---

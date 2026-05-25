@@ -63,7 +63,8 @@ src/proxy/typed/*.generated.ts
 *.sbom.json
 license-report.json
 plans/
-!docs/superpowers/plans/
+docs/superpowers/specs/
+docs/superpowers/plans/
 seo/
 mk2/
 
