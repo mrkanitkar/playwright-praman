@@ -266,7 +266,7 @@
     "prettier": "3.8.1",
     "release-please": "17.3.0",
     "size-limit": "12.0.1",
-    "ts-morph": "24.0.0",
+    "ts-morph": "28.0.0",
     "tsup": "8.5.1",
     "tsx": "4.21.0",
     "typedoc": "0.28.18",
