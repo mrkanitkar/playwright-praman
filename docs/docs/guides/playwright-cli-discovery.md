@@ -662,12 +662,12 @@ consume without reading the full DOM.
 
 Praman ships 4 parameter-free scripts in `node_modules/playwright-praman/dist/scripts/` for the most common operations. These avoid composing inline `run-code` for standard tasks:
 
-| Script               | Purpose                                          | Returns                                                    |
-| -------------------- | ------------------------------------------------ | ---------------------------------------------------------- |
-| `discover-all.js`    | All controls with IDs, types, methods (max 100)  | `{ total, showing, controls: [...] }`                      |
-| `wait-for-ui5.js`    | Poll for UI5 stability (30s timeout, 500ms poll) | `{ stable: boolean, elapsed: number }`                     |
-| `bridge-status.js`   | Bridge readiness diagnostics                     | `{ ready, ui5Version, bridgeVersion, controlCount, ... }`  |
-| `dialog-controls.js` | Controls inside open dialogs, grouped by dialog  | `{ dialogs: [...], totalControls: number }`                |
+| Script               | Purpose                                          | Returns                                                   |
+| -------------------- | ------------------------------------------------ | --------------------------------------------------------- |
+| `discover-all.js`    | All controls with IDs, types, methods (max 100)  | `{ total, showing, controls: [...] }`                     |
+| `wait-for-ui5.js`    | Poll for UI5 stability (30s timeout, 500ms poll) | `{ stable: boolean, elapsed: number }`                    |
+| `bridge-status.js`   | Bridge readiness diagnostics                     | `{ ready, ui5Version, bridgeVersion, controlCount, ... }` |
+| `dialog-controls.js` | Controls inside open dialogs, grouped by dialog  | `{ dialogs: [...], totalControls: number }`               |
 
 ### Usage
 

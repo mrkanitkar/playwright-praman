@@ -43,7 +43,10 @@ describe('Opa5Strategy', () => {
     await strategy.press(page, 'btn1');
     expect(evaluateFn).toHaveBeenCalled();
     // Verify function-form: first arg is a function, second is an args object
-    const call: [unknown, Record<string, unknown>] = evaluateFn.mock.calls[0] as [unknown, Record<string, unknown>];
+    const call: [unknown, Record<string, unknown>] = evaluateFn.mock.calls[0] as [
+      unknown,
+      Record<string, unknown>,
+    ];
     expect(typeof call[0]).toBe('function');
     expect(call[1]).toEqual(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- expect.any() returns any
@@ -104,9 +107,7 @@ describe('Opa5Strategy', () => {
     expect(evaluateFn).toHaveBeenCalled();
     const [fn, args] = evaluateFn.mock.calls[0] as [unknown, unknown];
     expect(typeof fn).toBe('function');
-    expect(args).toEqual(
-      expect.objectContaining({ controlId: 'input1', text: 'hello' }),
-    );
+    expect(args).toEqual(expect.objectContaining({ controlId: 'input1', text: 'hello' }));
   });
 
   it('enterText throws ControlError on failure (BF-007)', async () => {
@@ -126,9 +127,7 @@ describe('Opa5Strategy', () => {
     expect(evaluateFn).toHaveBeenCalled();
     const [fn, args] = evaluateFn.mock.calls[0] as [unknown, unknown];
     expect(typeof fn).toBe('function');
-    expect(args).toEqual(
-      expect.objectContaining({ controlId: 'combo1', itemId: 'item1' }),
-    );
+    expect(args).toEqual(expect.objectContaining({ controlId: 'combo1', itemId: 'item1' }));
   });
 
   it('select throws ControlError on failure (BF-007)', async () => {

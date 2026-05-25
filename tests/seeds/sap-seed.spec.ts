@@ -134,8 +134,9 @@ test.describe('SAP Agent Seed', () => {
           }
 
           // Method 2: Element.registry.all() — modern control enumeration (UI5 >= 1.67)
-          const registry = (window as any).sap?.ui?.core?.Element?.registry
-            ?? (window as any).sap?.ui?.core?.ElementRegistry;
+          const registry =
+            (window as any).sap?.ui?.core?.Element?.registry ??
+            (window as any).sap?.ui?.core?.ElementRegistry;
           const allControls = registry?.all ? Object.values(registry.all()) : [];
           if (allControls.length > 0) {
             return allControls.length;
@@ -187,9 +188,10 @@ test.describe('SAP Agent Seed', () => {
           });
         } else {
           // Method 2: Element.registry.all() — modern control enumeration (UI5 >= 1.67)
-          const reg = (window as any).sap?.ui?.core?.Element?.registry
-            ?? (window as any).sap?.ui?.core?.ElementRegistry;
-          const allControls = reg?.all ? Object.values(reg.all()) as unknown[] : [];
+          const reg =
+            (window as any).sap?.ui?.core?.Element?.registry ??
+            (window as any).sap?.ui?.core?.ElementRegistry;
+          const allControls = reg?.all ? (Object.values(reg.all()) as unknown[]) : [];
           if (allControls.length > 0) {
             totalControls = allControls.length;
             allControls.forEach((ctrl: unknown) => {

@@ -23,9 +23,10 @@ keywords: [praman, playwright, sap, relevant-topic]
 # Page Title
 
 :::info[In this guide]
+
 - What the reader will learn (3-5 bullet points)
 - Each bullet is a concrete outcome, not a topic
-:::
+  :::
 
 ## Introduction
 
@@ -54,9 +55,10 @@ Answer with code example if applicable.
 </details>
 
 :::tip[Next steps]
+
 - **[Related Guide →](./related-guide.md)** — One-line description
 - **[Another Guide →](./another-guide.md)** — One-line description
-:::
+  :::
 ```
 
 ## Code Examples
@@ -116,14 +118,14 @@ test('click a button', async ({ ui5 }) => {
 
 Use Docusaurus admonitions with consistent naming:
 
-| Pattern | Admonition | When to use |
-|---------|-----------|-------------|
-| Learning objectives | `:::info[In this guide]` | Top of every guide page |
-| Tips and shortcuts | `:::tip` | Helpful but not essential |
-| Common mistakes | `:::warning[Common mistake]` | Things users frequently get wrong |
-| Breaking patterns | `:::danger` | Anti-patterns that cause test failures |
-| Next steps | `:::tip[Next steps]` | Bottom of every guide page |
-| Prerequisites | `:::info[Prerequisites]` | When prior setup is needed |
+| Pattern             | Admonition                   | When to use                            |
+| ------------------- | ---------------------------- | -------------------------------------- |
+| Learning objectives | `:::info[In this guide]`     | Top of every guide page                |
+| Tips and shortcuts  | `:::tip`                     | Helpful but not essential              |
+| Common mistakes     | `:::warning[Common mistake]` | Things users frequently get wrong      |
+| Breaking patterns   | `:::danger`                  | Anti-patterns that cause test failures |
+| Next steps          | `:::tip[Next steps]`         | Bottom of every guide page             |
+| Prerequisites       | `:::info[Prerequisites]`     | When prior setup is needed             |
 
 ## FAQ Sections
 

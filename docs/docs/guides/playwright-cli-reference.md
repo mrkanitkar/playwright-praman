@@ -17,27 +17,27 @@ This page is a compact reference for every Playwright CLI command used with Pram
 
 ## Command Reference
 
-| Command                                    | Description                                           |
-| ------------------------------------------ | ----------------------------------------------------- |
-| `npx playwright open <url>`                | Launch browser and navigate to URL                    |
-| `npx playwright goto <url>`                | Navigate the current page to a new URL                |
-| `npx playwright snapshot`                  | Capture an accessibility snapshot of the current page |
-| `npx playwright run-code <js>`             | Execute JavaScript in the browser context             |
-| `npx playwright fill <selector> <value>`   | Fill an input field with a value                      |
-| `npx playwright click <selector>`          | Click an element on the page                          |
-| `npx playwright hover <selector>`          | Hover over an element                                 |
-| `npx playwright type <selector> <text>`    | Type text character-by-character into an element      |
-| `npx playwright press <selector> <key>`    | Press a keyboard key on an element                    |
-| `npx playwright select <selector> <value>` | Select an option from a dropdown                      |
-| `npx playwright screenshot`                | Capture a screenshot of the current page              |
-| `npx playwright state-save <name>`         | Save browser state (cookies, storage) to a file       |
-| `npx playwright state-load <name>`         | Restore browser state from a saved file               |
-| `npx playwright close`                     | Close the browser                                     |
-| `npx playwright delete-data`               | Delete all saved browser state data                   |
-| `npx playwright-praman bridge-script`      | Export bridge init script for CLI config              |
-| `npx playwright-praman snapshot`           | Capture structured SAP UI5 control tree snapshot      |
-| `npx playwright-praman doctor`             | Validate CLI setup (includes 4 CLI-specific checks)   |
-| `npx playwright-praman capabilities`       | Show machine-readable capability manifest for agents  |
+| Command                                    | Description                                             |
+| ------------------------------------------ | ------------------------------------------------------- |
+| `npx playwright open <url>`                | Launch browser and navigate to URL                      |
+| `npx playwright goto <url>`                | Navigate the current page to a new URL                  |
+| `npx playwright snapshot`                  | Capture an accessibility snapshot of the current page   |
+| `npx playwright run-code <js>`             | Execute JavaScript in the browser context               |
+| `npx playwright fill <selector> <value>`   | Fill an input field with a value                        |
+| `npx playwright click <selector>`          | Click an element on the page                            |
+| `npx playwright hover <selector>`          | Hover over an element                                   |
+| `npx playwright type <selector> <text>`    | Type text character-by-character into an element        |
+| `npx playwright press <selector> <key>`    | Press a keyboard key on an element                      |
+| `npx playwright select <selector> <value>` | Select an option from a dropdown                        |
+| `npx playwright screenshot`                | Capture a screenshot of the current page                |
+| `npx playwright state-save <name>`         | Save browser state (cookies, storage) to a file         |
+| `npx playwright state-load <name>`         | Restore browser state from a saved file                 |
+| `npx playwright close`                     | Close the browser                                       |
+| `npx playwright delete-data`               | Delete all saved browser state data                     |
+| `npx playwright-praman bridge-script`      | Export bridge init script for CLI config                |
+| `npx playwright-praman snapshot`           | Capture structured SAP UI5 control tree snapshot        |
+| `npx playwright-praman doctor`             | Validate CLI setup (includes 4 CLI-specific checks)     |
+| `npx playwright-praman capabilities`       | Show machine-readable capability manifest for agents    |
 | `npx playwright-praman verify-spec <file>` | Verify a generated .spec.ts against gold-standard rules |
 
 ---
@@ -157,12 +157,12 @@ Use `eval` for quick one-liner checks. Use `run-code` for multi-step operations 
 
 Praman ships 4 parameter-free scripts in `node_modules/playwright-praman/dist/scripts/` for common operations. Use them with `run-code` and shell substitution:
 
-| Script               | Purpose                                     |
-| -------------------- | ------------------------------------------- |
-| `discover-all.js`    | All controls with types, methods (max 100)  |
-| `wait-for-ui5.js`    | Poll for UI5 stability                      |
-| `bridge-status.js`   | Bridge readiness diagnostics                |
-| `dialog-controls.js` | Controls inside open dialogs                |
+| Script               | Purpose                                    |
+| -------------------- | ------------------------------------------ |
+| `discover-all.js`    | All controls with types, methods (max 100) |
+| `wait-for-ui5.js`    | Poll for UI5 stability                     |
+| `bridge-status.js`   | Bridge readiness diagnostics               |
+| `dialog-controls.js` | Controls inside open dialogs               |
 
 ### Usage
 
@@ -519,10 +519,10 @@ npx playwright-praman capabilities --agent
 npx playwright-praman capabilities --format table
 ```
 
-| Option           | Default | Description                              |
-| ---------------- | ------- | ---------------------------------------- |
-| `--format <fmt>` | `json`  | Output format: `json`, `table`, `agent`  |
-| `--agent`        | —       | Shortcut for `--format=agent`            |
+| Option           | Default | Description                             |
+| ---------------- | ------- | --------------------------------------- |
+| `--format <fmt>` | `json`  | Output format: `json`, `table`, `agent` |
+| `--agent`        | —       | Shortcut for `--format=agent`           |
 
 Example agent output:
 
@@ -554,14 +554,14 @@ npx playwright-praman verify-spec tests/e2e/my-app.spec.ts
 
 Checks performed:
 
-| Check             | What It Validates                                           |
-| ----------------- | ----------------------------------------------------------- |
-| Import check      | Uses `import { test, expect } from 'playwright-praman'`    |
-| IDS pattern       | Has a `const IDS = { ... }` object for control IDs         |
-| test.step usage   | Uses `test.step()` for multi-step flows                    |
-| Banned patterns   | No `page.waitForTimeout()` or `page.click('#__...')`       |
-| TSDoc header      | Has a compliance header with `@status` or `@version` tags  |
-| ESLint            | Passes ESLint lint check                                   |
+| Check           | What It Validates                                         |
+| --------------- | --------------------------------------------------------- |
+| Import check    | Uses `import { test, expect } from 'playwright-praman'`   |
+| IDS pattern     | Has a `const IDS = { ... }` object for control IDs        |
+| test.step usage | Uses `test.step()` for multi-step flows                   |
+| Banned patterns | No `page.waitForTimeout()` or `page.click('#__...')`      |
+| TSDoc header    | Has a compliance header with `@status` or `@version` tags |
+| ESLint          | Passes ESLint lint check                                  |
 
 Exit code is `1` if any check fails.
 
