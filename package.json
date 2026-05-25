@@ -168,7 +168,7 @@
     "css-selector-parser": "3.3.0",
     "fontoxpath": "3.34.0",
     "pino": "10.3.1",
-    "zod": "4.3.6"
+    "zod": "4.4.3"
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.78.0",
@@ -244,7 +244,7 @@
     "@vitest/coverage-v8": "4.1.7",
     "@vitest/ui": "4.1.7",
     "cspell": "10.0.0",
-    "dotenv": "^17.4.1",
+    "dotenv": "^17.4.2",
     "esbuild": "0.28.0",
     "eslint": "10.4.0",
     "eslint-config-prettier": "10.1.8",
