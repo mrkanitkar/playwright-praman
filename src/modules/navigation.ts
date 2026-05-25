@@ -107,11 +107,11 @@ async function stabilityWait(page: NavigationPage, options?: NavigationOptions):
 async function setHash(page: NavigationPage, hash: string): Promise<void> {
   await page.evaluate(
     /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
-    ((h: string) => {
+    (h: string) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: window.hasher is an FLP runtime global (Hasher.js) with no Node.js type declarations
       const w = (window as any).hasher as { setHash?: (hash: string) => void } | undefined;
       w?.setHash?.(h);
-    }) as (...args: never[]) => unknown,
+    },
     /* v8 ignore stop */
     hash,
   );
@@ -249,7 +249,7 @@ export async function navigateToIntent(
   let hash = `${intent.semanticObject}-${intent.action}`;
   if (params !== undefined && Object.keys(params).length > 0) {
     // Type assertion: URLSearchParams constructor does not accept Readonly<Record<>>, but does not mutate input
-    const queryString = new URLSearchParams(params as Record<string, string>).toString();
+    const queryString = new URLSearchParams(params).toString();
     hash = `${hash}?${queryString}`;
   }
   await setHash(page, hash);
@@ -422,7 +422,7 @@ export async function searchAndOpenApp(
 export async function getCurrentHash(page: NavigationPage): Promise<string> {
   const hash = await page.evaluate(
     /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
-    (() => window.location.hash.replace('#', '')) as (...args: never[]) => unknown,
+    () => window.location.hash.replace('#', ''),
     /* v8 ignore stop */
   );
   // Type assertion: page.evaluate returns unknown; browser lambda always returns a string

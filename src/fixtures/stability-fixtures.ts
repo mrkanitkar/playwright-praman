@@ -156,7 +156,7 @@ export const stabilityTest = base.extend<StabilityFixtures, StabilityDeps>({
         void (async () => {
           try {
             // Type assertion: Playwright Page satisfies WaitPage structurally; Parameters<> avoids importing the internal WaitPage type
-            await waitForUI5Stable(page as Parameters<typeof waitForUI5Stable>[0], {
+            await waitForUI5Stable(page, {
               timeout: pramanConfig.ui5WaitTimeout,
             });
           } catch (error: unknown) {

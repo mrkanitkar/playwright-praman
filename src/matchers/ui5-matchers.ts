@@ -41,7 +41,7 @@ import {
   getUI5ControlType,
   pollUntilPass,
 } from './matcher-utils.js';
-import type { MatcherPage, PollableMatcherResult } from './matcher-utils.js';
+import type { PollableMatcherResult } from './matcher-utils.js';
 
 /**
  * Result of a matcher check.
@@ -323,7 +323,7 @@ export async function checkUI5Binding(
   options?: MatcherOptions,
 ): Promise<MatcherResult> {
   return pollUntilPass(async (): Promise<PollableMatcherResult> => {
-    const info = await getUI5BindingInfo(page as MatcherPage, controlId, propertyName);
+    const info = await getUI5BindingInfo(page, controlId, propertyName);
 
     if (info === null) {
       return {
@@ -384,7 +384,7 @@ export async function checkUI5ControlType(
   options?: MatcherOptions,
 ): Promise<MatcherResult> {
   return pollUntilPass(async (): Promise<PollableMatcherResult> => {
-    const actual = await getUI5ControlType(page as MatcherPage, controlId);
+    const actual = await getUI5ControlType(page, controlId);
 
     if (actual === null) {
       return {

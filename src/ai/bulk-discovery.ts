@@ -498,8 +498,8 @@ export async function discoverPage(
 
     const rawResult = await page.evaluate(
       /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- page.evaluate() requires compatible signature; browser function has typed args that are serialized by Playwright
-      browserDiscoverControls as any,
+
+      browserDiscoverControls,
       /* v8 ignore stop */
       { interactiveOnly, includeHidden },
     );

@@ -60,7 +60,7 @@ function sdResult<T>(params: {
       sapModule: 'SD',
       stepsExecuted: params.stepsExecuted,
     },
-  } as IntentResult<T>;
+  };
 }
 
 // ── Public intent functions ────────────────────────────────────────────────

@@ -133,7 +133,7 @@ describe('FLPLocksHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     page = createMockPage();
-    handler = new FLPLocksHandler({ page: page as unknown as Page });
+    handler = new FLPLocksHandler({ page: page });
   });
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -149,7 +149,7 @@ describe('FLPLocksHandler', () => {
 
     it('accepts custom serviceUrl and timeout', () => {
       const custom = new FLPLocksHandler({
-        page: page as unknown as Page,
+        page: page,
         serviceUrl: '/custom/odata/svc',
         timeout: 5000,
       });
@@ -483,7 +483,7 @@ describe('FLPLocksHandler', () => {
 
     it('uses custom serviceUrl when provided', async () => {
       const customHandler = new FLPLocksHandler({
-        page: page as unknown as Page,
+        page: page,
         serviceUrl: '/custom/SM12',
       });
 
@@ -663,7 +663,7 @@ describe('FLPLocksHandler', () => {
 
     it('uses custom timeout value in requests', async () => {
       const customHandler = new FLPLocksHandler({
-        page: page as unknown as Page,
+        page: page,
         timeout: 5000,
       });
       page.request.get.mockResolvedValue(createMockResponse(200, EMPTY_ENTRIES));
@@ -678,7 +678,7 @@ describe('FLPLocksHandler', () => {
 
     it('includes timeout value in error message', async () => {
       const customHandler = new FLPLocksHandler({
-        page: page as unknown as Page,
+        page: page,
         timeout: 3000,
       });
       page.request.get.mockRejectedValue(new Error('Request timeout'));

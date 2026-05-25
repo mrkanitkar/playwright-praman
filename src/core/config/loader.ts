@@ -353,10 +353,7 @@ export async function loadConfig(options?: LoadConfigOptions): Promise<Readonly<
   // Deep-merge: defaults ← inline overrides ← env overrides
   // Nested sections (auth, ai, telemetry, etc.) are merged per-field,
   // so env vars don't clobber entire sections from inline overrides.
-  const merged = deepMergeConfig(
-    (options?.overrides ?? {}) as Record<string, unknown>,
-    envOverrides,
-  );
+  const merged = deepMergeConfig(options?.overrides ?? {}, envOverrides);
 
   // Validate with Zod — safeParse to handle invalid env values gracefully
   const result = PramanConfigSchema.safeParse(merged);

@@ -153,7 +153,7 @@ export function extendUI5Handler<T extends ExtensionMethods>(
     });
   }
 
-  registry.push({ name, factory: factory as ExtensionFactory<ExtensionMethods> });
+  registry.push({ name, factory: factory });
   logger.debug({ extensionName: name }, 'Extension registered');
 }
 

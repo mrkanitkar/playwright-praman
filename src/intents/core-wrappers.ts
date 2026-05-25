@@ -150,7 +150,7 @@ function makeIntentResult<T>(params: {
       sapModule: params.sapModule,
       stepsExecuted: params.stepsExecuted,
     },
-  } as IntentResult<T>;
+  };
 }
 
 // ── Public core wrappers ───────────────────────────────────────────────────

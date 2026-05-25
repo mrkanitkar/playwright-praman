@@ -66,7 +66,7 @@ function fiResult<T>(params: {
       sapModule: 'FI',
       stepsExecuted: params.stepsExecuted,
     },
-  } as IntentResult<T>;
+  };
 }
 
 // ── Public intent functions ────────────────────────────────────────────────

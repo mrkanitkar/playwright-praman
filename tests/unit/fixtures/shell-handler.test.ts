@@ -71,7 +71,7 @@ describe('ShellHandler', () => {
       waitForFunction: ReturnType<typeof vi.fn>;
     };
 
-    handler = new ShellHandler({ page: page as unknown as Page });
+    handler = new ShellHandler({ page: page });
   });
 
   // ═══════════════════════════════════════════════════════════════════════
