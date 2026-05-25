@@ -110,6 +110,36 @@ describe('detectFeatures', () => {
   });
 });
 
+describe('detectFeatures — 1.60 capabilities', () => {
+  it('returns all 1.60 flags true for version 1.60.0', () => {
+    const version = { major: 1, minor: 60, patch: 0, raw: '1.60.0' };
+    const features = detectFeatures(version);
+
+    expect(features.hasTestAbort).toBe(true);
+    expect(features.hasGetByRoleDescription).toBe(true);
+    expect(features.hasPageAriaSnapshot).toBe(true);
+    expect(features.hasAriaSnapshotBoxes).toBe(true);
+    expect(features.hasTracingHAR).toBe(true);
+    expect(features.hasLocatorDrop).toBe(true);
+    expect(features.hasLocatorHighlightStyle).toBe(true);
+    expect(features.hasBrowserContextEvent).toBe(true);
+  });
+
+  it('returns all 1.60 flags false for version 1.59.0', () => {
+    const version = { major: 1, minor: 59, patch: 0, raw: '1.59.0' };
+    const features = detectFeatures(version);
+
+    expect(features.hasTestAbort).toBe(false);
+    expect(features.hasGetByRoleDescription).toBe(false);
+    expect(features.hasPageAriaSnapshot).toBe(false);
+    expect(features.hasAriaSnapshotBoxes).toBe(false);
+    expect(features.hasTracingHAR).toBe(false);
+    expect(features.hasLocatorDrop).toBe(false);
+    expect(features.hasLocatorHighlightStyle).toBe(false);
+    expect(features.hasBrowserContextEvent).toBe(false);
+  });
+});
+
 describe('hasFeature', () => {
   it('returns correct boolean for installed Playwright version', () => {
     // Playwright 1.59.0 is installed — all features should be true
@@ -178,5 +208,13 @@ describe('getPlaywrightFeatures', () => {
     expect(typeof features.hasSetStorageState).toBe('boolean');
     expect(typeof features.hasLocatorNormalize).toBe('boolean');
     expect(typeof features.hasURLPatternMatcher).toBe('boolean');
+    expect(typeof features.hasTestAbort).toBe('boolean');
+    expect(typeof features.hasGetByRoleDescription).toBe('boolean');
+    expect(typeof features.hasPageAriaSnapshot).toBe('boolean');
+    expect(typeof features.hasAriaSnapshotBoxes).toBe('boolean');
+    expect(typeof features.hasTracingHAR).toBe('boolean');
+    expect(typeof features.hasLocatorDrop).toBe('boolean');
+    expect(typeof features.hasLocatorHighlightStyle).toBe('boolean');
+    expect(typeof features.hasBrowserContextEvent).toBe('boolean');
   });
 });

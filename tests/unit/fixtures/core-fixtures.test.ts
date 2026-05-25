@@ -93,6 +93,14 @@ const mockFeatures: PlaywrightFeatures = {
   hasSetStorageState: true,
   hasLocatorNormalize: true,
   hasURLPatternMatcher: true,
+  hasTestAbort: true,
+  hasGetByRoleDescription: true,
+  hasPageAriaSnapshot: true,
+  hasAriaSnapshotBoxes: true,
+  hasTracingHAR: true,
+  hasLocatorDrop: true,
+  hasLocatorHighlightStyle: true,
+  hasBrowserContextEvent: true,
 };
 
 const mockLoadConfig = vi.fn().mockResolvedValue(mockConfig);
