@@ -41,7 +41,7 @@ async function readUi5Version(page: DiscoveryPage): Promise<string | undefined> 
   try {
     const rawVersion = await page.evaluate(
       /* v8 ignore start -- browser-context: executed in Chromium, not Node.js */
-      (() => {
+      () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- browser context: window.sap is a UI5 runtime global with no Node.js type declarations
         const sapUi = (window as any).sap?.ui as
           | { version?: string; getVersionInfo?: () => { version?: string } | undefined }
@@ -56,7 +56,7 @@ async function readUi5Version(page: DiscoveryPage): Promise<string | undefined> 
           // ignore
         }
         return undefined;
-      }) as (...args: never[]) => unknown,
+      },
       /* v8 ignore stop */
     );
     return typeof rawVersion === 'string' ? rawVersion : undefined;

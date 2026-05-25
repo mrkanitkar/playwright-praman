@@ -174,7 +174,7 @@ describe('UI5Handler', () => {
     mockFilterMethods.mockImplementation((methods: readonly string[]) => methods);
 
     handler = new UI5Handler({
-      page: page as unknown as Page,
+      page: page,
       interactionStrategy: strategy,
       discoveryStrategies: ['direct-id', 'recordreplay'],
     });
@@ -365,7 +365,7 @@ describe('UI5Handler', () => {
 
     it('waitForUI5() uses default timeout from config when none specified', async () => {
       const handlerWithConfig = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         config: { ui5WaitTimeout: 15_000 },
@@ -458,7 +458,7 @@ describe('UI5Handler', () => {
     it('click() on non-existent control throws TimeoutError', async () => {
       // click() delegates to control() which now polls — use short-timeout handler
       const shortHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         config: { controlDiscoveryTimeout: 100 },
@@ -528,7 +528,7 @@ describe('UI5Handler', () => {
     it('control() creates a span named praman.ui5.findControl', async () => {
       const { tracer, spans } = createMockTracer();
       const tracedHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         tracer,
@@ -547,7 +547,7 @@ describe('UI5Handler', () => {
     it('click() creates a span named praman.ui5.click', async () => {
       const { tracer, spans } = createMockTracer();
       const tracedHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         tracer,
@@ -564,7 +564,7 @@ describe('UI5Handler', () => {
     it('controls() creates a span named praman.ui5.findControls', async () => {
       const { tracer, spans } = createMockTracer();
       const tracedHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         tracer,
@@ -583,7 +583,7 @@ describe('UI5Handler', () => {
     it('fill() creates a span named praman.ui5.fill', async () => {
       const { tracer, spans } = createMockTracer();
       const tracedHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         tracer,
@@ -600,7 +600,7 @@ describe('UI5Handler', () => {
     it('waitForUI5() creates a span named praman.ui5.waitForUI5', async () => {
       const { tracer, spans } = createMockTracer();
       const tracedHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         tracer,
@@ -617,7 +617,7 @@ describe('UI5Handler', () => {
     it('waitFor() creates a span named praman.ui5.waitFor', async () => {
       const { tracer, spans } = createMockTracer();
       const tracedHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         tracer,
@@ -644,7 +644,7 @@ describe('UI5Handler', () => {
     it('span records error status when method throws', async () => {
       const { tracer, spans } = createMockTracer();
       const tracedHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         config: { controlDiscoveryTimeout: 100 },
@@ -782,7 +782,7 @@ describe('UI5Handler', () => {
     it('creates a span named praman.ui5.inspect when tracer is provided', async () => {
       const { tracer, spans } = createMockTracer();
       const tracedHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         tracer,
@@ -808,7 +808,7 @@ describe('UI5Handler', () => {
   describe('tryLocatorFallback — non-UI5 element fallback', () => {
     it('control() falls back to locator for non-UI5 id (no --) when DOM element exists', async () => {
       const shortHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id'],
         config: { controlDiscoveryTimeout: 100 },
@@ -835,7 +835,7 @@ describe('UI5Handler', () => {
 
     it('control() falls back to locator for css selector when DOM element exists', async () => {
       const shortHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id'],
         config: { controlDiscoveryTimeout: 100 },
@@ -863,7 +863,7 @@ describe('UI5Handler', () => {
 
     it('control() falls back to locator for xpath selector when DOM element exists', async () => {
       const shortHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id'],
         config: { controlDiscoveryTimeout: 100 },
@@ -891,7 +891,7 @@ describe('UI5Handler', () => {
 
     it('non-UI5 id fallback returns null when locator count is 0', async () => {
       const shortHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id'],
         config: { controlDiscoveryTimeout: 100 },
@@ -912,7 +912,7 @@ describe('UI5Handler', () => {
 
     it('css fallback returns null when locator count is 0', async () => {
       const shortHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id'],
         config: { controlDiscoveryTimeout: 100 },
@@ -933,7 +933,7 @@ describe('UI5Handler', () => {
 
     it('xpath fallback returns null when locator count is 0', async () => {
       const shortHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id'],
         config: { controlDiscoveryTimeout: 100 },
@@ -954,7 +954,7 @@ describe('UI5Handler', () => {
 
     it('UI5-style id with -- does not trigger locator fallback', async () => {
       const shortHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id'],
         config: { controlDiscoveryTimeout: 100 },
@@ -976,7 +976,7 @@ describe('UI5Handler', () => {
   describe('discoverSingleControl — strategy chain branches', () => {
     it('registry strategy uses forceRegistryScan when direct-id and recordreplay fail', async () => {
       const registryHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay', 'registry'],
       });
@@ -1007,7 +1007,7 @@ describe('UI5Handler', () => {
 
     it('direct-id strategy is skipped when selector has no id', async () => {
       const idlessHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
       });
@@ -1037,7 +1037,7 @@ describe('UI5Handler', () => {
   describe('control() — option branches', () => {
     it('skipStabilityWait option skips waitForUI5Stable', async () => {
       const skipHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
       });
@@ -1052,7 +1052,7 @@ describe('UI5Handler', () => {
 
     it('skipStabilityWait from config is used when option not provided', async () => {
       const skipConfigHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id', 'recordreplay'],
         config: { skipStabilityWait: true },
@@ -1089,7 +1089,7 @@ describe('UI5Handler', () => {
   describe('constructor — config defaults', () => {
     it('uses default values when config options are partially provided', () => {
       const partialHandler = new UI5Handler({
-        page: page as unknown as Page,
+        page: page,
         interactionStrategy: strategy,
         discoveryStrategies: ['direct-id'],
         config: { preferVisibleControls: false },

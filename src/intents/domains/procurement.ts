@@ -78,7 +78,7 @@ function mmResult<T>(params: {
       sapModule: 'MM',
       stepsExecuted: params.stepsExecuted,
     },
-  } as IntentResult<T>;
+  };
 }
 
 // ── Public intent functions ────────────────────────────────────────────────

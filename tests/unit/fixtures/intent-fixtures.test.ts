@@ -430,7 +430,7 @@ describe('intent-fixtures fixture definitions', () => {
         await Promise.resolve();
       };
 
-      await fn({ ui5: mockUi5, ui5Navigation: mockUi5Navigation }, captureUse as never);
+      await fn({ ui5: mockUi5, ui5Navigation: mockUi5Navigation }, captureUse);
 
       expect(domainsLoadedBeforeUse).toBe(true);
     });

@@ -273,7 +273,7 @@ describe('GAP-07: return detection alignment (browserExecuteControlMethod)', () 
           getId: () => 'ctrl1',
           getParent: () => null,
           getData: () => serializableObj,
-        } as Record<string, unknown>,
+        },
       ],
     ]);
     const bridge = createMockBridge({ controlMap });
@@ -306,7 +306,7 @@ describe('GAP-07: return detection alignment (browserExecuteControlMethod)', () 
           getId: () => 'ctrl1',
           getParent: () => null,
           getContext: () => circularObj,
-        } as Record<string, unknown>,
+        },
       ],
     ]);
     const bridge = createMockBridge({ controlMap });
@@ -343,7 +343,7 @@ describe('GAP-07: return detection alignment (browserExecuteControlMethod)', () 
           getId: () => 'ctrl1',
           getParent: () => null,
           getBindingContext: () => bindingCtx,
-        } as Record<string, unknown>,
+        },
       ],
     ]);
     // getById returns null for 'ctx-id-1' — it's not a registered element
@@ -375,7 +375,7 @@ describe('GAP-07: return detection alignment (browserExecuteControlMethod)', () 
           getId: () => 'ctrl1',
           getParent: () => null,
           getObj: () => plainObj,
-        } as Record<string, unknown>,
+        },
       ],
     ]);
     const bridge = createMockBridge({ controlMap });
@@ -408,7 +408,7 @@ describe('GAP-07: return detection alignment (browserExecuteObjectMethod)', () =
   });
 
   it('returns empty array as empty type', () => {
-    const objectMap = new Map([['uuid-1', { getItems: () => [] } as Record<string, unknown>]]);
+    const objectMap = new Map([['uuid-1', { getItems: () => [] }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -426,7 +426,7 @@ describe('GAP-07: return detection alignment (browserExecuteObjectMethod)', () =
 
   it('returns serializable array as result type', () => {
     const items = [1, 2, 3];
-    const objectMap = new Map([['uuid-1', { getItems: () => items } as Record<string, unknown>]]);
+    const objectMap = new Map([['uuid-1', { getItems: () => items }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -445,7 +445,7 @@ describe('GAP-07: return detection alignment (browserExecuteObjectMethod)', () =
 
   it('returns serializable object as result type (JSON.stringify check)', () => {
     const data = { name: 'test', count: 5 };
-    const objectMap = new Map([['uuid-1', { getData: () => data } as Record<string, unknown>]]);
+    const objectMap = new Map([['uuid-1', { getData: () => data }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -467,9 +467,7 @@ describe('GAP-07: return detection alignment (browserExecuteObjectMethod)', () =
     };
     circularObj['self'] = circularObj;
 
-    const objectMap = new Map([
-      ['uuid-1', { getModel: () => circularObj } as Record<string, unknown>],
-    ]);
+    const objectMap = new Map([['uuid-1', { getModel: () => circularObj }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -487,9 +485,7 @@ describe('GAP-07: return detection alignment (browserExecuteObjectMethod)', () =
   });
 
   it('returns primitive results correctly', () => {
-    const objectMap = new Map([
-      ['uuid-1', { getName: () => 'TestName' } as Record<string, unknown>],
-    ]);
+    const objectMap = new Map([['uuid-1', { getName: () => 'TestName' }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -506,9 +502,7 @@ describe('GAP-07: return detection alignment (browserExecuteObjectMethod)', () =
   });
 
   it('returns none for null/undefined results', () => {
-    const objectMap = new Map([
-      ['uuid-1', { doSomething: () => undefined } as Record<string, unknown>],
-    ]);
+    const objectMap = new Map([['uuid-1', { doSomething: () => undefined }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -547,9 +541,7 @@ describe('GAP-11: objectArray return type (browserExecuteObjectMethod)', () => {
     };
     item2['ref'] = item2;
 
-    const objectMap = new Map([
-      ['uuid-1', { getFilters: () => [item1, item2] } as Record<string, unknown>],
-    ]);
+    const objectMap = new Map([['uuid-1', { getFilters: () => [item1, item2] }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -581,7 +573,7 @@ describe('GAP-11: objectArray return type (browserExecuteObjectMethod)', () => {
         'uuid-1',
         {
           getMixed: () => [objItem, funcItem],
-        } as Record<string, unknown>,
+        },
       ],
     ]);
     const bridge = createMockBridge({ objectMap });
@@ -608,9 +600,7 @@ describe('GAP-11: objectArray return type (browserExecuteObjectMethod)', () => {
     const item2: Record<string, unknown> = { data: 'b' };
     item2['self'] = item2;
 
-    const objectMap = new Map([
-      ['uuid-1', { getItems: () => [item1, item2] } as Record<string, unknown>],
-    ]);
+    const objectMap = new Map([['uuid-1', { getItems: () => [item1, item2] }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -631,7 +621,7 @@ describe('GAP-11: objectArray return type (browserExecuteObjectMethod)', () => {
       { id: 1, name: 'a' },
       { id: 2, name: 'b' },
     ];
-    const objectMap = new Map([['uuid-1', { getItems: () => items } as Record<string, unknown>]]);
+    const objectMap = new Map([['uuid-1', { getItems: () => items }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 
@@ -652,7 +642,7 @@ describe('GAP-11: objectArray return type (browserExecuteObjectMethod)', () => {
     const item: Record<string, unknown> = { data: 'test' };
     item['self'] = item; // non-serializable
 
-    const objectMap = new Map([['uuid-1', { getItems: () => [item] } as Record<string, unknown>]]);
+    const objectMap = new Map([['uuid-1', { getItems: () => [item] }]]);
     const bridge = createMockBridge({ objectMap });
     Reflect.set(globalThis, bridgeNs, bridge);
 

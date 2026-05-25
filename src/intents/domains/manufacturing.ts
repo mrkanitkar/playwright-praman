@@ -65,7 +65,7 @@ function ppResult<T>(params: {
       sapModule: 'PP',
       stepsExecuted: params.stepsExecuted,
     },
-  } as IntentResult<T>;
+  };
 }
 
 // ── Public intent functions ────────────────────────────────────────────────

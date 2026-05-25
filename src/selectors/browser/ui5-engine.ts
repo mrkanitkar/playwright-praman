@@ -653,8 +653,7 @@ function checkLabeledBy(element: Element, labelText: string): boolean {
     try {
       if (!candidate.isA('sap.m.Label')) continue;
       const rawText: unknown = candidate.getProperty('text');
-      const text =
-        rawText === null || rawText === undefined ? '' : String(rawText as string | number);
+      const text = typeof rawText === 'string' ? rawText : '';
       if (text !== labelText) continue;
       const labelFor = candidate.getAssociation?.('labelFor');
       if (labelFor === id) return true;
@@ -672,10 +671,7 @@ function checkLabeledBy(element: Element, labelText: string): boolean {
         const label = controlMap.get(String(labelId as string | number));
         if (label === undefined) continue;
         const rawLabelText: unknown = label.getProperty('text');
-        const text =
-          rawLabelText === null || rawLabelText === undefined
-            ? ''
-            : String(rawLabelText as string | number);
+        const text = typeof rawLabelText === 'string' ? rawLabelText : '';
         if (text === labelText) return true;
       }
     }

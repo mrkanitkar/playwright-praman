@@ -120,7 +120,7 @@ describe('OTelReporter', () => {
     const test = mockTestCase();
     const result = mockTestResult({
       status: 'failed',
-      errors: [{ message: 'Expected visible' } as TestResult['errors'][0]],
+      errors: [{ message: 'Expected visible' }],
     });
 
     expect(() => {
@@ -220,7 +220,7 @@ describe('OTelReporter', () => {
     const test = mockTestCase();
     const result = mockTestResult({
       status: 'failed',
-      errors: [{ message: '' } as TestResult['errors'][0]],
+      errors: [{ message: '' }],
     });
 
     expect(() => {
@@ -267,10 +267,7 @@ describe('OTelReporter', () => {
     const test = mockTestCase();
     const result = mockTestResult({
       status: 'failed',
-      errors: [
-        { message: 'Error one' } as TestResult['errors'][0],
-        { message: 'Error two' } as TestResult['errors'][0],
-      ],
+      errors: [{ message: 'Error one' }, { message: 'Error two' }],
     });
 
     expect(() => {
@@ -283,7 +280,7 @@ describe('OTelReporter', () => {
     const test = mockTestCase();
     const result = mockTestResult({
       status: 'timedOut',
-      errors: [{ message: 'Timeout exceeded' } as TestResult['errors'][0]],
+      errors: [{ message: 'Timeout exceeded' }],
     });
 
     expect(() => {
@@ -296,7 +293,7 @@ describe('OTelReporter', () => {
     const test = mockTestCase();
     const result = mockTestResult({
       status: 'timedOut',
-      errors: [{ message: '' } as TestResult['errors'][0]],
+      errors: [{ message: '' }],
     });
 
     expect(() => {
