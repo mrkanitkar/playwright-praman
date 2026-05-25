@@ -323,10 +323,12 @@ Use `toHaveUI5Property` for any named property, or `expect.poll()` for fully cus
 await expect(page).toHaveUI5Property('myInput', 'placeholder', 'Enter value');
 
 // Custom poll
-await expect.poll(async () => {
-  const ctrl = await ui5.control({ id: 'myInput' });
-  return ctrl.getProperty('valueStateText');
-}).toBe('Required field');
+await expect
+  .poll(async () => {
+    const ctrl = await ui5.control({ id: 'myInput' });
+    return ctrl.getProperty('valueStateText');
+  })
+  .toBe('Required field');
 ```
 
 </details>

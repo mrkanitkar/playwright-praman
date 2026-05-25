@@ -142,10 +142,19 @@ function browserPressFallback(bridge: BrowserBridge | undefined, controlId: stri
   const ctrl = bridge?.getById?.(controlId) ?? null;
   if (ctrl === null) return { success: false, error: `Control not found: ${controlId}` };
   let fired = false;
-  if (typeof ctrl.firePress === 'function') { ctrl.firePress(); fired = true; }
-  if (typeof ctrl.fireSelect === 'function') { ctrl.fireSelect(); fired = true; }
+  if (typeof ctrl.firePress === 'function') {
+    ctrl.firePress();
+    fired = true;
+  }
+  if (typeof ctrl.fireSelect === 'function') {
+    ctrl.fireSelect();
+    fired = true;
+  }
   if (fired) return { success: true };
-  return { success: false, error: `RecordReplay not available and no fire* methods on: ${controlId}` };
+  return {
+    success: false,
+    error: `RecordReplay not available and no fire* methods on: ${controlId}`,
+  };
 }
 
 /**
@@ -161,13 +170,20 @@ async function browserPress(args: PressArgs): Promise<BridgeResult> {
       selector: { id: args.controlId },
       interactionType: 'PRESS',
     });
-    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
-    if (args.debug) console.log(OPA5_LOG_PREFIX, 'press', args.controlId, JSON.stringify({ success: true }));
+    if (args.debug)
+      // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+      console.log(OPA5_LOG_PREFIX, 'press', args.controlId, JSON.stringify({ success: true }));
     return { success: true };
   } catch (e: unknown) {
     const errMsg = e instanceof Error ? e.message : String(e);
-    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
-    if (args.debug) console.log(OPA5_LOG_PREFIX, 'press', args.controlId, JSON.stringify({ success: false, error: errMsg }));
+    if (args.debug)
+      // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+      console.log(
+        OPA5_LOG_PREFIX,
+        'press',
+        args.controlId,
+        JSON.stringify({ success: false, error: errMsg }),
+      );
     return { success: false, error: errMsg };
   }
 }
@@ -193,13 +209,25 @@ async function browserEnterText(args: EnterTextArgs): Promise<BridgeResult> {
       interactionType: 'ENTER_TEXT',
       enterText: args.text,
     });
-    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
-    if (args.debug) console.log(OPA5_LOG_PREFIX, 'enterText', args.controlId, JSON.stringify({ success: true, text: args.text }));
+    if (args.debug)
+      // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+      console.log(
+        OPA5_LOG_PREFIX,
+        'enterText',
+        args.controlId,
+        JSON.stringify({ success: true, text: args.text }),
+      );
     return { success: true };
   } catch (e: unknown) {
     const errMsg = e instanceof Error ? e.message : String(e);
-    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
-    if (args.debug) console.log(OPA5_LOG_PREFIX, 'enterText', args.controlId, JSON.stringify({ success: false, error: errMsg }));
+    if (args.debug)
+      // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+      console.log(
+        OPA5_LOG_PREFIX,
+        'enterText',
+        args.controlId,
+        JSON.stringify({ success: false, error: errMsg }),
+      );
     return { success: false, error: errMsg };
   }
 }
@@ -224,13 +252,25 @@ async function browserSelect(args: SelectArgs): Promise<BridgeResult> {
       selector: { id: args.controlId },
       interactionType: 'PRESS',
     });
-    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
-    if (args.debug) console.log(OPA5_LOG_PREFIX, 'select', args.controlId, JSON.stringify({ success: true, itemId: args.itemId }));
+    if (args.debug)
+      // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+      console.log(
+        OPA5_LOG_PREFIX,
+        'select',
+        args.controlId,
+        JSON.stringify({ success: true, itemId: args.itemId }),
+      );
     return { success: true };
   } catch (e: unknown) {
     const errMsg = e instanceof Error ? e.message : String(e);
-    // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
-    if (args.debug) console.log(OPA5_LOG_PREFIX, 'select', args.controlId, JSON.stringify({ success: false, error: errMsg }));
+    if (args.debug)
+      // eslint-disable-next-line no-console -- browser-context debug logging, gated by debug flag
+      console.log(
+        OPA5_LOG_PREFIX,
+        'select',
+        args.controlId,
+        JSON.stringify({ success: false, error: errMsg }),
+      );
     return { success: false, error: errMsg };
   }
 }

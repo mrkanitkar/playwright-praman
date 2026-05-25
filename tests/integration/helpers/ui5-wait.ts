@@ -34,7 +34,8 @@ export async function navigateAndWaitForUI5(
   // UI5 apps load async: ComponentContainer → XMLView → actual controls.
   // Infrastructure controls (ComponentContainer, XMLView, TitleProvider) appear early;
   // real UI controls (sap.m.*, sap.f.*) appear only after the component bootstraps its views.
-  await page.waitForFunction(`(function() {
+  await page.waitForFunction(
+    `(function() {
     if (!sap.ui.core || !sap.ui.core.Element) return false;
     var reg = sap.ui.core.Element.registry;
     if (!reg || !reg.all) return false;
@@ -49,5 +50,7 @@ export async function navigateAndWaitForUI5(
       }
     }
     return false;
-  })()`, { timeout });
+  })()`,
+    { timeout },
+  );
 }

@@ -14,8 +14,8 @@
  * against the Browse Orders demo app (sap.m.Table with mock data).
  */
 
-import { test, expect  } from '@playwright/test';
-import type {Page} from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 import { injectBridge } from '../../../src/bridge/injection.js';
 import { getRowCount } from '../../../src/modules/table-operations.js';
@@ -38,7 +38,8 @@ test.describe.serial('Table Operations — Worklist', () => {
     await injectBridge(page);
 
     // Wait for a sap.m.Table to appear in the registry (mock data may load async)
-    await page.waitForFunction(`(function() {
+    await page.waitForFunction(
+      `(function() {
       var registry = sap.ui.core.Element.registry;
       if (!registry || !registry.all) return false;
       var all = registry.all();
@@ -49,7 +50,9 @@ test.describe.serial('Table Operations — Worklist', () => {
         }
       }
       return false;
-    })()`, { timeout: 15_000 });
+    })()`,
+      { timeout: 15_000 },
+    );
 
     // Discover the first sap.m.Table on the page
     const found = await page.evaluate(`(function() {

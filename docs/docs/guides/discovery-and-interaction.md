@@ -308,16 +308,16 @@ applications because it triggers the same code paths that real user interactions
 
 **SAP UI5 APIs used:**
 
-| API                                 | Operation | What It Does                                  | Reference                                                                          |
-| ----------------------------------- | --------- | --------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `control.firePress()`               | press     | Fires the press event on buttons, links       | [API Reference](https://ui5.sap.com/#/api/sap.m.Button%23events/press)             |
-| `control.fireSelect()`              | press     | Fires the select event on selectable controls | [API Reference](https://ui5.sap.com/#/api/sap.m.Select%23events/change)            |
-| `control.fireTap()`                 | press     | Fires tap event (legacy, pre-1.50 controls)   | —                                                                                  |
-| `control.getDomRef()`               | press     | Gets the DOM element for DOM click fallback   | [API Reference](https://ui5.sap.com/#/api/sap.ui.core.Element%23methods/getDomRef) |
-| `control.setValue(text)`            | enterText | Sets text value on input controls             | [API Reference](https://ui5.sap.com/#/api/sap.m.InputBase%23methods/setValue)      |
-| `control.fireLiveChange({ value })` | enterText | Fires live change as user types               | [API Reference](https://ui5.sap.com/#/api/sap.m.Input%23events/liveChange)         |
-| `control.fireChange({ value })`     | enterText | Fires change when input loses focus           | [API Reference](https://ui5.sap.com/#/api/sap.m.InputBase%23events/change)         |
-| `control.setSelectedKey(key)`       | select    | Sets the selected key on dropdowns            | [API Reference](https://ui5.sap.com/#/api/sap.m.Select%23methods/setSelectedKey)   |
+| API                                 | Operation | What It Does                                                | Reference                                                                          |
+| ----------------------------------- | --------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `control.firePress()`               | press     | Fires the press event on buttons, links                     | [API Reference](https://ui5.sap.com/#/api/sap.m.Button%23events/press)             |
+| `control.fireSelect()`              | press     | Fires the select event on selectable controls               | [API Reference](https://ui5.sap.com/#/api/sap.m.Select%23events/change)            |
+| `control.fireTap()`                 | press     | Fires tap event (legacy, pre-1.50 controls)                 | —                                                                                  |
+| `control.getDomRef()`               | press     | Gets the DOM element for DOM click fallback                 | [API Reference](https://ui5.sap.com/#/api/sap.ui.core.Element%23methods/getDomRef) |
+| `control.setValue(text)`            | enterText | Sets text value on input controls                           | [API Reference](https://ui5.sap.com/#/api/sap.m.InputBase%23methods/setValue)      |
+| `control.fireLiveChange({ value })` | enterText | Fires live change as user types                             | [API Reference](https://ui5.sap.com/#/api/sap.m.Input%23events/liveChange)         |
+| `control.fireChange({ value })`     | enterText | Fires change when input loses focus                         | [API Reference](https://ui5.sap.com/#/api/sap.m.InputBase%23events/change)         |
+| `control.setSelectedKey(key)`       | select    | Sets the selected key on dropdowns                          | [API Reference](https://ui5.sap.com/#/api/sap.m.Select%23methods/setSelectedKey)   |
 | `control.fireSelectionChange()`     | select    | Fires selection change (List, Table, ComboBox — not Select) | [API Reference](https://ui5.sap.com/#/api/sap.m.ComboBox%23events/selectionChange) |
 
 **Fallback chains in code:**
@@ -417,23 +417,23 @@ ui5-native with reduced coverage.
 
 **SAP UI5 APIs used:**
 
-| API                                  | Operation | What It Does                                    | Reference                                                                                                                  |
-| ------------------------------------ | --------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `RecordReplay.interactWithControl()` | all       | SAP's official control interaction API          | [API Reference](https://ui5.sap.com/#/api/sap.ui.test.RecordReplay%23methods/sap.ui.test.RecordReplay.interactWithControl) |
-| `RecordReplay.waitForUI5()`           | all       | Waits for UI5 to finish pending async operations | [API Reference](https://ui5.sap.com/#/api/sap.ui.test.RecordReplay%23methods/sap.ui.test.RecordReplay.waitForUI5)          |
-| `control.firePress()`                | press     | Fallback if RecordReplay unavailable            | [API Reference](https://ui5.sap.com/#/api/sap.m.Button%23events/press)                                                     |
-| `control.fireSelect()`               | press     | Fallback if RecordReplay unavailable            | —                                                                                                                          |
-| `control.setValue(text)`             | enterText | Fallback if RecordReplay unavailable            | [API Reference](https://ui5.sap.com/#/api/sap.m.InputBase%23methods/setValue)                                              |
-| `control.setSelectedKey(key)`        | select    | Fallback if RecordReplay unavailable            | [API Reference](https://ui5.sap.com/#/api/sap.m.Select%23methods/setSelectedKey)                                           |
+| API                                  | Operation | What It Does                                     | Reference                                                                                                                  |
+| ------------------------------------ | --------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `RecordReplay.interactWithControl()` | all       | SAP's official control interaction API           | [API Reference](https://ui5.sap.com/#/api/sap.ui.test.RecordReplay%23methods/sap.ui.test.RecordReplay.interactWithControl) |
+| `RecordReplay.waitForUI5()`          | all       | Waits for UI5 to finish pending async operations | [API Reference](https://ui5.sap.com/#/api/sap.ui.test.RecordReplay%23methods/sap.ui.test.RecordReplay.waitForUI5)          |
+| `control.firePress()`                | press     | Fallback if RecordReplay unavailable             | [API Reference](https://ui5.sap.com/#/api/sap.m.Button%23events/press)                                                     |
+| `control.fireSelect()`               | press     | Fallback if RecordReplay unavailable             | —                                                                                                                          |
+| `control.setValue(text)`             | enterText | Fallback if RecordReplay unavailable             | [API Reference](https://ui5.sap.com/#/api/sap.m.InputBase%23methods/setValue)                                              |
+| `control.setSelectedKey(key)`        | select    | Fallback if RecordReplay unavailable             | [API Reference](https://ui5.sap.com/#/api/sap.m.Select%23methods/setSelectedKey)                                           |
 
 **OPA5-specific configuration** — defined in
 [schema.ts:119–123](https://github.com/nicheui/praman/blob/main/src/core/config/schema.ts#L119-L123):
 
-| Field                | Default | Description                                            |
-| -------------------- | ------- | ------------------------------------------------------ |
+| Field                | Default | Description                                                              |
+| -------------------- | ------- | ------------------------------------------------------------------------ |
 | `interactionTimeout` | `5000`  | Internal OPA5 interaction timeout in ms (not passed to RecordReplay API) |
-| `autoWait`           | `true`  | Call `waitForUI5()` before each interaction             |
-| `debug`              | `false` | Log `[praman:opa5]` messages to browser console        |
+| `autoWait`           | `true`  | Call `waitForUI5()` before each interaction                              |
+| `debug`              | `false` | Log `[praman:opa5]` messages to browser console                          |
 
 **Fallback chains in code:**
 
@@ -520,17 +520,17 @@ common combinations.
 
 ### Comparison Table
 
-|                           | `ui5-native`              | `dom-first`                  | `opa5`                       |
-| ------------------------- | ------------------------- | ---------------------------- | ---------------------------- |
-| **Speed**                 | Fast                      | Fast                         | Medium (waitForUI5 call)     |
-| **Standard UI5 controls** | Best                      | Good (via fallback)          | Best (SAP official)          |
-| **Custom composites**     | May fail (no `firePress`) | Best                         | May fail                     |
-| **UI5 Web Components**    | Does not work             | Works (DOM events)           | Does not work                |
-| **Plain DOM elements**    | Falls back to DOM click   | Works natively               | Does not work                |
-| **OData model updates**   | `setValue` + events       | DOM events may miss bindings | RecordReplay handles         |
-| **UI5 version**           | All                       | All                          | >= 1.94                      |
-| **SAP compliance**        | No official API           | No official API              | Yes (`RecordReplay`)         |
-| **Fallback chain depth**  | 4 levels                  | 4 levels                     | 2 levels + RecordReplay      |
+|                           | `ui5-native`              | `dom-first`                  | `opa5`                   |
+| ------------------------- | ------------------------- | ---------------------------- | ------------------------ |
+| **Speed**                 | Fast                      | Fast                         | Medium (waitForUI5 call) |
+| **Standard UI5 controls** | Best                      | Good (via fallback)          | Best (SAP official)      |
+| **Custom composites**     | May fail (no `firePress`) | Best                         | May fail                 |
+| **UI5 Web Components**    | Does not work             | Works (DOM events)           | Does not work            |
+| **Plain DOM elements**    | Falls back to DOM click   | Works natively               | Does not work            |
+| **OData model updates**   | `setValue` + events       | DOM events may miss bindings | RecordReplay handles     |
+| **UI5 version**           | All                       | All                          | >= 1.94                  |
+| **SAP compliance**        | No official API           | No official API              | Yes (`RecordReplay`)     |
+| **Fallback chain depth**  | 4 levels                  | 4 levels                     | 2 levels + RecordReplay  |
 
 ---
 
