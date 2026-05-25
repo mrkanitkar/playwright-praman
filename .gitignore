@@ -129,6 +129,34 @@ docs/playwright-cli-*.md
 docs/review-implementation-plan-*.md
 docs/typescript-*-compatibility-report.md
 
+# SAP test plan snapshots (MCP planner/browser output in root)
+/*.yml
+
+# SAP auth credentials
+sap-auth.json
+
+# Binary documents & diagrams
+*.docx
+/*.svg
+
+# Draft / working documents
+anmol-sop-draft.md
+praman-sap-azure-architecture.md
+
+# Plugin binaries (source dir already ignored)
+plugins/*.plugin
+
+# WIP e2e tests (commit individually when ready)
+tests/e2e/create-bom-v2-error.spec.ts
+tests/e2e/create-bom-v2-happy.spec.ts
+tests/e2e/create-purchase-order-e2e-praman-gold-standard.spec.ts
+tests/e2e/create-purchase-order-test-plan.md
+tests/e2e/flp-navigation.spec.ts
+tests/e2e/sap-cloud/bom-create-cancel-flow.spec.ts
+tests/e2e/sap-cloud/bom-create-validation-error.spec.ts
+tests/e2e/sap-cloud/bom-list-report-smoke.spec.ts
+tests/e2e/sap-cloud/bom-maintain-v2-test-plan.md
+
 # Strict TypeScript Project
 # WARNING: JavaScript files (.js, .jsx, .mjs, .cjs) are NOT allowed in src/
 # This is enforced by pre-commit hooks. Config files like eslint.config.mjs
