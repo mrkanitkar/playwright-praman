@@ -49,7 +49,7 @@ function createMockStrategy(): InteractionStrategy {
     press: vi.fn(),
     enterText: vi.fn(),
     select: vi.fn(),
-  } as unknown as InteractionStrategy;
+  };
 }
 
 /** Creates a successful ControlDiscoveryResult. */

@@ -76,9 +76,7 @@ describe('config-show', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    stdoutSpy = vi.spyOn(process.stdout, 'write').mockReturnValue(true) as MockInstance<
-      (chunk: string | Uint8Array) => boolean
-    >;
+    stdoutSpy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
     mockedLoadConfig.mockResolvedValue(makeConfig());
   });
 

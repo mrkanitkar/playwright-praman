@@ -268,13 +268,13 @@ describe('PramanError', () => {
     it('derives correct docs URL for different error categories', () => {
       const controlError = new PramanError({
         ...SAMPLE_OPTIONS,
-        code: 'ERR_CONTROL_NOT_FOUND' as ErrorCode,
+        code: 'ERR_CONTROL_NOT_FOUND',
       });
       expect(controlError.toUserMessage()).toContain('#control-errors');
 
       const bridgeError = new PramanError({
         ...SAMPLE_OPTIONS,
-        code: 'ERR_BRIDGE_TIMEOUT' as ErrorCode,
+        code: 'ERR_BRIDGE_TIMEOUT',
       });
       expect(bridgeError.toUserMessage()).toContain('#bridge-errors');
     });

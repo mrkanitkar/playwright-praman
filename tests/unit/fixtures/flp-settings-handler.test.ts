@@ -63,7 +63,7 @@ describe('FLPSettingsHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     page = createMockPage();
-    handler = new FLPSettingsHandler({ page: page as unknown as Page });
+    handler = new FLPSettingsHandler({ page: page });
   });
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -77,7 +77,7 @@ describe('FLPSettingsHandler', () => {
 
     it('accepts a custom timeout option', () => {
       const customHandler = new FLPSettingsHandler({
-        page: page as unknown as Page,
+        page: page,
         timeout: 5000,
       });
       // Handler should construct without error

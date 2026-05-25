@@ -22,12 +22,7 @@
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type {
-  DialogInfo,
-  DialogButtonInfo,
-  DialogPage,
-  FindDialogOptions,
-} from '../../../src/modules/dialog.js';
+import type { DialogInfo, DialogButtonInfo, DialogPage } from '../../../src/modules/dialog.js';
 
 import { ControlError } from '#core/errors/control-error.js';
 
@@ -317,9 +312,7 @@ describe('dialog module', () => {
       const page = createMockPage();
       page.evaluate.mockResolvedValueOnce([MOCK_DIALOG]).mockResolvedValueOnce(true);
 
-      await confirmDialog(asPage(page), { buttonText: 'Delete' } as FindDialogOptions & {
-        readonly buttonText?: string;
-      });
+      await confirmDialog(asPage(page), { buttonText: 'Delete' });
 
       const pressScript = (page.evaluate.mock.calls[1] as unknown[])[0] as string;
       expect(pressScript).toContain('Delete');

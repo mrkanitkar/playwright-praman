@@ -163,7 +163,7 @@ export function executeEnricherScript(session: string): ControlSnapshot[] {
     !Array.isArray(parsed) &&
     '__error' in parsed
   ) {
-    const errObj = parsed as { __error: unknown };
+    const errObj = parsed;
     throw new SnapshotError({
       message: `Enricher script threw an error: ${String(errObj.__error)}`,
       attempted: 'Read UI5 ElementRegistry in browser context',

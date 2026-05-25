@@ -58,7 +58,7 @@ describe('FooterHandler', () => {
       mainFrame: vi.fn(),
     } as unknown as Page & { evaluate: ReturnType<typeof vi.fn> };
 
-    handler = new FooterHandler({ page: page as unknown as Page });
+    handler = new FooterHandler({ page: page });
   });
 
   // ═══════════════════════════════════════════════════════════════════════

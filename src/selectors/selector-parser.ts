@@ -392,8 +392,14 @@ export function serializeUI5Selector(selector: UI5Selector): string {
 
   if (selector.properties !== undefined) {
     for (const [key, value] of Object.entries(selector.properties)) {
-      const stringValue =
-        value instanceof RegExp ? value.source : escapePropertyValue(String(value as CoercedValue));
+      let stringValue: string;
+      if (value instanceof RegExp) {
+        stringValue = value.source;
+      } else if (typeof value === 'object') {
+        stringValue = escapePropertyValue(JSON.stringify(value));
+      } else {
+        stringValue = escapePropertyValue(String(value));
+      }
       result += `[${key}=${stringValue}]`;
     }
   }
@@ -514,12 +520,12 @@ function operatorToPseudo(operator: NonNullable<PropertyMatcher['operator']>): s
 function serializePropertyEntry(key: string, value: unknown): string {
   if (isPropertyMatcherObject(value)) {
     const pseudo = operatorToPseudo(value.operator ?? 'equals');
-    return `:${pseudo}(${key}, "${String(value.value as CoercedValue)}")`;
+    return `:${pseudo}(${key}, "${String(value.value)}")`;
   }
   if (value instanceof RegExp) {
     return `:prop-regex(${key}, "${value.source}")`;
   }
-  return `:prop(${key}, "${String(value as CoercedValue)}")`;
+  return `:prop(${key}, "${String(value)}")`;
 }
 
 /**
