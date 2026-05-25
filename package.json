@@ -234,7 +234,7 @@
     "@opentelemetry/sdk-node": "0.214.0",
     "@opentelemetry/sdk-trace-base": "2.6.1",
     "@playwright/cli": "0.1.5",
-    "@playwright/test": "1.59.1",
+    "@playwright/test": "1.60.0",
     "@rolldown/plugin-babel": "0.2.2",
     "@size-limit/file": "12.0.1",
     "@ui5/mcp-server": "0.2.10",
