@@ -1,4 +1,4 @@
-// eslint.config.mjs — ESLint 9 flat config
+// eslint.config.mjs — ESLint 10 flat config
 // Single source of truth for all lint rules. No .eslintrc files.
 // Configured for: TypeScript, Playwright, Node.js, Security (Microsoft SDL + OWASP)
 // Best practices: Microsoft, Node.js, Google, SonarJS quality rules
