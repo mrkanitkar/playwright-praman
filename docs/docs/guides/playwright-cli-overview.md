@@ -159,12 +159,12 @@ See [CLI Agents](./playwright-cli-agents.md) for skill file details.
 
 In addition to standard Playwright CLI commands, Praman provides:
 
-| Command                               | Purpose                                          |
-| ------------------------------------- | ------------------------------------------------ |
-| `npx playwright-praman bridge-script` | Export bridge init script for CLI config         |
-| `npx playwright-praman snapshot`      | Capture structured SAP UI5 control tree snapshot |
-| `npx playwright-praman doctor`        | Validate complete setup (12 checks)              |
-| `npx playwright-praman capabilities`  | Show capability manifest for agent preflight     |
+| Command                                    | Purpose                                                 |
+| ------------------------------------------ | ------------------------------------------------------- |
+| `npx playwright-praman bridge-script`      | Export bridge init script for CLI config                |
+| `npx playwright-praman snapshot`           | Capture structured SAP UI5 control tree snapshot        |
+| `npx playwright-praman doctor`             | Validate complete setup (12 checks)                     |
+| `npx playwright-praman capabilities`       | Show capability manifest for agent preflight            |
 | `npx playwright-praman verify-spec <file>` | Validate generated .spec.ts against gold-standard rules |
 
 See [CLI Quick Reference](./playwright-cli-reference.md) for full option tables.

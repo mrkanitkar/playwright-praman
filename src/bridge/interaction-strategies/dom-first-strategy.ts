@@ -166,9 +166,7 @@ export class DomFirstStrategy implements InteractionStrategy {
         if (setValue !== undefined) {
           setValue.call(ctrl, args.text);
         }
-        const fireChange = ctrl['fireChange'] as
-          | ((params: { value: string }) => void)
-          | undefined;
+        const fireChange = ctrl['fireChange'] as ((params: { value: string }) => void) | undefined;
         if (fireChange !== undefined) {
           fireChange.call(ctrl, { value: args.text });
         }

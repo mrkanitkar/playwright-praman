@@ -14,8 +14,8 @@
  * classification against the Worklist demo app.
  */
 
-import { test, expect  } from '@playwright/test';
-import type {Page} from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 import { UI5NativeStrategy } from '../../../src/bridge/interaction-strategies/ui5-native-strategy.js';
 import { UI5Handler } from '../../../src/fixtures/ui5-handler.js';

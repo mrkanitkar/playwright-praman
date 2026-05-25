@@ -45,7 +45,13 @@ import { getVersion } from './version.js';
 export interface Capability {
   readonly id: string;
   readonly name: string;
-  readonly category: 'discovery' | 'introspection' | 'interaction' | 'navigation' | 'stability' | 'generation';
+  readonly category:
+    | 'discovery'
+    | 'introspection'
+    | 'interaction'
+    | 'navigation'
+    | 'stability'
+    | 'generation';
   readonly mechanism: 'run-code' | 'eval' | 'offline';
   readonly parameterized: boolean;
   readonly parameters?: readonly string[];
@@ -99,7 +105,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: false,
     prebuiltScript: 'discover-all.js',
     agentHint: 'Enumerate all UI5 controls with types, properties, and methods (max 100)',
-    usageExample: 'playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/discover-all.js)"',
+    usageExample:
+      'playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/discover-all.js)"',
   },
   {
     id: 'UI5-DISC-002',
@@ -109,7 +116,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: true,
     parameters: ['controlType'],
     agentHint: 'Filter controls by sap.ui type name (e.g. sap.m.Input)',
-    usageExample: 'playwright-cli -s=sap run-code "async page => { return await page.evaluate(() => sap.ui.core.Element.registry.filter(e => e.getMetadata().getName() === \'sap.m.Input\').map(c => c.getId())); }"',
+    usageExample:
+      'playwright-cli -s=sap run-code "async page => { return await page.evaluate(() => sap.ui.core.Element.registry.filter(e => e.getMetadata().getName() === \'sap.m.Input\').map(c => c.getId())); }"',
   },
   {
     id: 'UI5-DISC-003',
@@ -119,7 +127,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: false,
     prebuiltScript: 'dialog-controls.js',
     agentHint: 'Find controls inside open SAP dialogs, grouped by dialog',
-    usageExample: 'playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/dialog-controls.js)"',
+    usageExample:
+      'playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/dialog-controls.js)"',
   },
   // ── Introspection (1) ──
   {
@@ -130,7 +139,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: true,
     parameters: ['controlId'],
     agentHint: 'Get full metadata, methods, bindings for one control by ID',
-    usageExample: 'playwright-cli -s=sap run-code "async page => { return await page.evaluate(id => { const b = window.__praman_bridge; const c = b.getById(id); return { id: c.getId(), type: c.getMetadata().getName(), methods: b.utils.retrieveControlMethods(id) }; }, \'CONTROL_ID\'); }"',
+    usageExample:
+      'playwright-cli -s=sap run-code "async page => { return await page.evaluate(id => { const b = window.__praman_bridge; const c = b.getById(id); return { id: c.getId(), type: c.getMetadata().getName(), methods: b.utils.retrieveControlMethods(id) }; }, \'CONTROL_ID\'); }"',
   },
   // ── Interaction (2) ──
   {
@@ -141,7 +151,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: true,
     parameters: ['controlId', 'value'],
     agentHint: 'Mandatory three-step pattern: setValue + fireChange + waitForUI5',
-    usageExample: 'playwright-cli -s=sap run-code "async page => { return await page.evaluate(([id, val]) => { const c = sap.ui.getCore().byId(id); c.setValue(val); c.fireChange({ value: val }); return \'done\'; }, [\'CONTROL_ID\', \'VALUE\']); }"',
+    usageExample:
+      "playwright-cli -s=sap run-code \"async page => { return await page.evaluate(([id, val]) => { const c = sap.ui.getCore().byId(id); c.setValue(val); c.fireChange({ value: val }); return 'done'; }, ['CONTROL_ID', 'VALUE']); }\"",
   },
   {
     id: 'UI5-ACT-002',
@@ -151,7 +162,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: true,
     parameters: ['controlId'],
     agentHint: 'Trigger firePress on a sap.m.Button control',
-    usageExample: 'playwright-cli -s=sap run-code "async page => { return await page.evaluate(id => { const b = sap.ui.getCore().byId(id); b.firePress(); return \'pressed\'; }, \'BUTTON_ID\'); }"',
+    usageExample:
+      "playwright-cli -s=sap run-code \"async page => { return await page.evaluate(id => { const b = sap.ui.getCore().byId(id); b.firePress(); return 'pressed'; }, 'BUTTON_ID'); }\"",
   },
   // ── Navigation (1) ──
   {
@@ -162,7 +174,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: true,
     parameters: ['semanticObject', 'action'],
     agentHint: 'Navigate via Fiori Launchpad cross-app navigation',
-    usageExample: 'playwright-cli -s=sap run-code "async page => { return await page.evaluate(hash => { window.location.hash = hash; return \'navigated\'; }, \'#PurchaseOrder-manage\'); }"',
+    usageExample:
+      "playwright-cli -s=sap run-code \"async page => { return await page.evaluate(hash => { window.location.hash = hash; return 'navigated'; }, '#PurchaseOrder-manage'); }\"",
   },
   // ── Stability (2) ──
   {
@@ -173,7 +186,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: false,
     prebuiltScript: 'wait-for-ui5.js',
     agentHint: 'Poll for UI5 stability (bridge ready, BusyIndicator inactive, no pending XHR)',
-    usageExample: 'playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/wait-for-ui5.js)"',
+    usageExample:
+      'playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/wait-for-ui5.js)"',
   },
   {
     id: 'UI5-STB-002',
@@ -183,7 +197,8 @@ const CAPABILITY_REGISTRY: readonly Capability[] = [
     parameterized: false,
     prebuiltScript: 'bridge-status.js',
     agentHint: 'Quick bridge diagnostics: version, readiness, control count',
-    usageExample: 'playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/bridge-status.js)"',
+    usageExample:
+      'playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/scripts/bridge-status.js)"',
   },
   // ── Generation (4) ──
   {
@@ -294,8 +309,7 @@ export function formatManifestTable(manifest: CapabilityManifest): string {
   const header = 'ID             | Name                       | Category       | Mechanism';
   const divider = '---------------|----------------------------|----------------|----------';
   const rows = manifest.capabilities.map(
-    (c) =>
-      `${c.id.padEnd(15)}| ${c.name.padEnd(27)}| ${c.category.padEnd(15)}| ${c.mechanism}`,
+    (c) => `${c.id.padEnd(15)}| ${c.name.padEnd(27)}| ${c.category.padEnd(15)}| ${c.mechanism}`,
   );
   return [header, divider, ...rows].join('\n');
 }
@@ -313,10 +327,16 @@ export function formatManifestTable(manifest: CapabilityManifest): string {
  */
 export function formatManifestAgent(manifest: CapabilityManifest): string {
   const lines = manifest.capabilities.map((c) => {
-    const scriptSuffix = c.prebuiltScript !== undefined ? ' (script: ' + c.prebuiltScript + ')' : '';
+    const scriptSuffix =
+      c.prebuiltScript !== undefined ? ' (script: ' + c.prebuiltScript + ')' : '';
     return c.id + ' [' + c.mechanism + '] ' + c.agentHint + scriptSuffix;
   });
-  const header = 'Praman v' + manifest.cliVersion + ' — ' + String(manifest.capabilities.length) + ' capabilities';
+  const header =
+    'Praman v' +
+    manifest.cliVersion +
+    ' — ' +
+    String(manifest.capabilities.length) +
+    ' capabilities';
   return [header, '', ...lines].join('\n');
 }
 

@@ -20,12 +20,12 @@ This plan now runs in **two phases with a hard approval gate** between them (per
 
 ### Phase A — Local implementation ✅ COMPLETE (branch `chore/playwright-1.60-upgrade`)
 
-| Commit | Task |
-| --- | --- |
-| `2307c5d` | Task 0 — branch + exclude `docs/superpowers/**` from markdownlint & cspell (+ `.gitignore` negation) |
-| `2dd4e86` | Task 1 — `@playwright/test` → 1.60.0 |
-| `1baa3ee` | Task 1b — `@playwright/cli` → 0.1.13 |
-| `c6a7f41` | Task 3 — 8 new `PlaywrightFeatures` flags (Vitest 72 pass, tsc clean) |
+| Commit    | Task                                                                                                        |
+| --------- | ----------------------------------------------------------------------------------------------------------- |
+| `2307c5d` | Task 0 — branch + exclude `docs/superpowers/**` from markdownlint & cspell (+ `.gitignore` negation)        |
+| `2dd4e86` | Task 1 — `@playwright/test` → 1.60.0                                                                        |
+| `1baa3ee` | Task 1b — `@playwright/cli` → 0.1.13                                                                        |
+| `c6a7f41` | Task 3 — 8 new `PlaywrightFeatures` flags (Vitest 72 pass, tsc clean)                                       |
 | `786d625` | Task 4 — `getByRole({ description })` adoption + main test + mocked-branch test (Vitest 20 pass, tsc clean) |
 
 Task 2 (browser install: Chromium 148 / FF 150.0.2 / WebKit 26.4; `playwright test --list` = 77 tests) is done — no commit (binaries gitignored).

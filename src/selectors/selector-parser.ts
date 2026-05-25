@@ -395,8 +395,8 @@ export function serializeUI5Selector(selector: UI5Selector): string {
       let stringValue: string;
       if (value instanceof RegExp) {
         stringValue = value.source;
-      } else if (typeof value === 'object') {
-        stringValue = escapePropertyValue(JSON.stringify(value));
+      } else if (typeof value === 'object' && 'value' in value) {
+        stringValue = escapePropertyValue(String(value.value));
       } else {
         stringValue = escapePropertyValue(String(value));
       }
