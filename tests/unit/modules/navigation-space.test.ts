@@ -181,6 +181,22 @@ describe('navigation-space module', () => {
       });
     });
 
+    it('forwards description to getByRole when provided (PW 1.60+)', async () => {
+      const mockLocator = createMockLocator();
+      const page = createMockPage();
+      page.getByRole.mockReturnValue(mockLocator);
+
+      await navigateToSectionLink(asPage(page), 'Manage', {
+        description: 'Supplier list',
+      });
+
+      expect(page.getByRole).toHaveBeenCalledWith('link', {
+        name: 'Manage',
+        description: 'Supplier list',
+      });
+      expect(mockLocator.click).toHaveBeenCalledTimes(1);
+    });
+
     it('waits for UI5 stability after clicking the section link', async () => {
       const page = createMockPage();
 
