@@ -16,7 +16,7 @@
 import { Buffer } from 'node:buffer';
 import { join } from 'node:path';
 
-import type { Reporter } from '@playwright/test/reporter';
+import type { Reporter, TestError, WorkerInfo } from '@playwright/test/reporter';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { ODataTraceReport } from '../../../src/reporters/odata-trace-reporter.js';
@@ -521,5 +521,24 @@ describe('parseODataQueryParams', () => {
   it('returns empty object for URL without OData query params', () => {
     const params = parseODataQueryParams('/Products');
     expect(params).toEqual({});
+  });
+});
+
+describe('ODataTraceReporter.onError', () => {
+  it('does not throw with workerInfo', () => {
+    const reporter = new ODataTraceReporter();
+    const error: TestError = { message: 'boom' };
+    const workerInfo = { workerIndex: 2, parallelIndex: 1 } as unknown as WorkerInfo;
+    expect(() => {
+      reporter.onError(error, workerInfo);
+    }).not.toThrow();
+  });
+
+  it('does not throw when workerInfo is undefined (pre-1.60)', () => {
+    const reporter = new ODataTraceReporter();
+    const error: TestError = { message: 'boom' };
+    expect(() => {
+      reporter.onError(error);
+    }).not.toThrow();
   });
 });

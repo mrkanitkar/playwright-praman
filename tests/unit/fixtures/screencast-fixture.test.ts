@@ -36,12 +36,16 @@ const mocks = vi.hoisted(() => {
     child: vi.fn(),
   });
 
-  return { createLogger };
+  return { createLogger, hasFeature: vi.fn<(f: string) => boolean>() };
 });
 
 vi.mock('#core/logging/index.js', () => ({
   createLogger: mocks.createLogger,
   createRootLogger: vi.fn(),
+}));
+
+vi.mock('#core/compat/index.js', () => ({
+  hasFeature: mocks.hasFeature,
 }));
 
 const mockTestExtend = createMockTestExtend();
@@ -54,6 +58,9 @@ vi.mock('@playwright/test', () => ({
 // ── Import after mocks ───────────────────────────────────────────────────────
 
 const { screencastTest } = await import('#fixtures/screencast-fixture.js');
+const { getHighlightState } = await import('#core/highlight/highlight-controller.js');
+
+type FakePage = Parameters<typeof getHighlightState>[0];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -179,6 +186,7 @@ interface ScreencastAPI {
   }) => Promise<void>;
   showUI5ControlTree: (enabled?: boolean) => void;
   onFrame: (handler: (frame: { buffer: Buffer; timestamp: number }) => Promise<void>) => void;
+  highlightControls: (enabled: boolean, style?: string | Record<string, string | number>) => void;
 }
 
 // ── Fixture definitions reference ─────────────────────────────────────────────
@@ -927,5 +935,36 @@ describe('screencast-fixture — type-level assertions', () => {
   it('fixture definitions have expected keys', () => {
     expect(Object.keys(fixtures)).toContain('screencast');
     expect(Object.keys(fixtures)).toContain('rootLogger');
+  });
+});
+
+describe('screencast-fixture — highlightControls', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('writes enabled state with the given style when hasLocatorHighlightStyle', async () => {
+    mocks.hasFeature.mockReturnValue(true);
+    const fn = extractFixtureFn(fixtures['screencast']);
+    const page = makeMockPage(makeMockScreencast());
+    const api = await runFixture<ScreencastAPI>(fn, { page, rootLogger: mockRootLogger });
+
+    api.highlightControls(true, 'outline: 1px');
+
+    expect(getHighlightState(page as unknown as FakePage)).toEqual({
+      enabled: true,
+      style: 'outline: 1px',
+    });
+  });
+
+  it('is a no-op (no state written) when hasLocatorHighlightStyle is false', async () => {
+    mocks.hasFeature.mockReturnValue(false);
+    const fn = extractFixtureFn(fixtures['screencast']);
+    const page = makeMockPage(makeMockScreencast());
+    const api = await runFixture<ScreencastAPI>(fn, { page, rootLogger: mockRootLogger });
+
+    api.highlightControls(true);
+
+    expect(getHighlightState(page as unknown as FakePage)).toBeUndefined();
   });
 });

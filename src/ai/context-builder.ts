@@ -23,8 +23,10 @@ import { discoverPage } from './bulk-discovery.js';
 import type { DiscoveryPage } from './bulk-discovery.js';
 import type { AiResponse, DiscoveredControl, PageContext } from './types.js';
 
+import { hasFeature } from '#core/compat/index.js';
 import type { PramanConfig } from '#core/config/schema.js';
 import { detectObjectCategory } from '#core/constants/object-categories.js';
+import { createLogger } from '#core/logging/index.js';
 
 // ── Helper: read UI5 version from browser ─────────────────────────────────
 
@@ -87,6 +89,37 @@ function enrichObjectCategory(control: DiscoveredControl): DiscoveredControl {
   return { ...control, objectCategory: category };
 }
 
+// ── Helper: best-effort aria snapshot for AI grounding ─────────────────────
+
+/**
+ * Captures a best-effort aria snapshot for AI grounding. Returns `undefined`
+ * (never throws) when disabled, unsupported, or on capture failure.
+ *
+ * @param page - Discovery page (structural Playwright page subset).
+ * @param config - Praman config (reads `ai.includeAriaSnapshot`; on unless `false`).
+ * @returns Aria-snapshot string, or `undefined`.
+ */
+async function readAriaSnapshot(
+  page: DiscoveryPage,
+  config: Readonly<PramanConfig>,
+): Promise<string | undefined> {
+  if (config.ai?.includeAriaSnapshot === false) return undefined;
+  try {
+    if (hasFeature('hasAriaSnapshotBoxes') && typeof page.ariaSnapshot === 'function') {
+      return await page.ariaSnapshot({ boxes: true, mode: 'ai' });
+    }
+    if (hasFeature('hasAriaSnapshot') && typeof page.locator === 'function') {
+      return await page.locator('body').ariaSnapshot();
+    }
+  } catch (error: unknown) {
+    createLogger('context-builder').debug(
+      { err: error },
+      'aria snapshot capture failed (non-fatal)',
+    );
+  }
+  return undefined;
+}
+
 // ── Main export ────────────────────────────────────────────────────────────
 
 /**
@@ -136,6 +169,7 @@ export async function buildPageContext(
 
   // ── Step 2: UI5 version detection (best-effort) ────────────────────────
   const ui5Version = await readUi5Version(page);
+  const ariaSnapshot = await readAriaSnapshot(page, config);
 
   // ── Step 3: Enrich controls with canonical object categories ───────────
   const data = discoveryResult.data;
@@ -155,6 +189,7 @@ export async function buildPageContext(
     navigationElements,
     timestamp: data.timestamp,
     ...(ui5Version !== undefined && { ui5Version }),
+    ...(ariaSnapshot !== undefined && { ariaSnapshot }),
   };
 
   return {

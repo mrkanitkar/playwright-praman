@@ -421,6 +421,13 @@ export interface PageContext {
   readonly navigationElements: DiscoveredControl[];
   /** ISO 8601 timestamp when the page context was captured. */
   readonly timestamp: string;
+  /**
+   * Aria snapshot of the page for AI grounding (Playwright 1.60+). Includes
+   * element references (`[ref=e2]`), `<iframe>` snapshots (`mode:'ai'`), and
+   * bounding boxes (`[box=x,y,w,h]`). Absent when Playwright lacks aria
+   * snapshots, when `ai.includeAriaSnapshot` is `false`, or when capture fails.
+   */
+  readonly ariaSnapshot?: string;
 }
 
 // ── AI Generated Test ──────────────────────────────────────────────────────

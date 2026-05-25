@@ -99,7 +99,7 @@ Fixtures available: `ui5`, `ui5Navigation`, `sapAuth`, `fe`, `ui5.table`, `ui5.d
 - **Test Fiori Elements apps without boilerplate** — List Report, Object Page, and Overview Page helpers included
 - **Assert SAP state natively** — 10 UI5-specific matchers extend Playwright's `expect()`
 - **Express tests in business language** — Vocabulary & Intent API maps SAP field names to selectors automatically
-- **Run anywhere** — Windows, macOS, Linux · Node.js 22+ · TypeScript 5.x & 6.x
+- **Run anywhere** — Windows, macOS, Linux · Node.js 22+ · TypeScript 6.x & 7.x
 
 → [Full capability reference](https://praman.dev/docs)
 
@@ -141,9 +141,24 @@ SAPUI5, and OpenUI5 — both Fiori Elements and freestyle apps.
 
 → [Full FAQ](https://praman.dev/docs/faq)
 
+## Tech Stack
+
+| Component   | Version                      |
+| ----------- | ---------------------------- |
+| Playwright  | 1.60.0 (peer: ≥1.57.0)       |
+| TypeScript  | 6.0.3 (supports 7.x)         |
+| Node.js     | ≥22                          |
+| ESLint      | 10.4.0 (11 plugins)          |
+| Build       | tsup (ESM + CJS)             |
+| Test Runner | Vitest                       |
+| AI SDKs     | Anthropic, OpenAI (optional) |
+| Telemetry   | OpenTelemetry (optional)     |
+
+→ [Compatibility Matrix](https://praman.dev/docs/guides/compatibility)
+
 ## Security
 
-- 3 production dependencies (`commander`, `pino`, `zod` — all MIT)
+- 5 production dependencies (`commander`, `css-selector-parser`, `fontoxpath`, `pino`, `zod`)
 - npm provenance attestation on every release
 - SHA-pinned GitHub Actions · CycloneDX SBOM per release
 

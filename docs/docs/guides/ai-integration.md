@@ -6,6 +6,8 @@ keywords:
   - ai test generation playwright
   - ai powered sap test generation
   - sap test automation ai
+  - aria snapshot ai grounding
+  - playwright aria snapshot
 ---
 
 # AI Integration
@@ -167,8 +169,74 @@ interface PageContext {
   readonly tables: DiscoveredControl[]; // Data tables and lists
   readonly navigationElements: DiscoveredControl[];
   readonly timestamp: string;
+  /** Aria snapshot for AI grounding (Playwright 1.60+). */
+  readonly ariaSnapshot?: string;
 }
 ```
+
+### ARIA Snapshot AI Grounding
+
+:::note Added in v1.3.0
+:::
+
+When running on Playwright 1.60+, `buildPageContext()` captures a full-page ARIA
+accessibility snapshot and includes it as `PageContext.ariaSnapshot`. This gives
+LLM agents a structural view of the page — element roles, names, states, bounding
+boxes, and iframe content — alongside the UI5 control data.
+
+#### Enabling ARIA Snapshots
+
+ARIA snapshots are captured by default on Playwright 1.60+. To disable them, set
+`ai.includeAriaSnapshot` to `false` in your Praman config:
+
+```typescript
+// praman.config.ts
+export default {
+  ai: {
+    provider: 'openai',
+    model: 'gpt-4o',
+    includeAriaSnapshot: false, // Disable ARIA snapshot capture
+  },
+};
+```
+
+#### Playwright Version Behavior
+
+| Playwright Version | Behavior                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| 1.60+              | `page.ariaSnapshot({ boxes: true, mode: 'ai' })` — full snapshot with bounding boxes and iframe content |
+| 1.49 – 1.59        | `page.locator('body').ariaSnapshot()` — basic ARIA tree without boxes or AI mode                        |
+| < 1.49             | Skipped silently — `ariaSnapshot` field is `undefined`                                                  |
+
+#### Using ARIA Snapshots with LLM Agents
+
+The `ariaSnapshot` string is included in the `PageContext` returned by `buildPageContext()`.
+Pass it to your LLM as additional grounding context:
+
+```typescript
+const context = await buildPageContext(page, config);
+if (context.status === 'success' && context.data.ariaSnapshot) {
+  const prompt = [
+    'Page controls:',
+    JSON.stringify(context.data.controls, null, 2),
+    '',
+    'ARIA snapshot (element refs, roles, bounding boxes):',
+    context.data.ariaSnapshot,
+  ].join('\n');
+
+  const response = await llm.complete(prompt, schema);
+}
+```
+
+The snapshot includes element references (`[ref=e2]`), role information, and bounding
+boxes (`[box=x,y,w,h]`) that agents can use to correlate UI5 controls with their
+visual position on the page.
+
+:::tip Capture is non-fatal
+If ARIA snapshot capture fails (e.g., navigation in progress), the error is logged at
+`debug` level and `ariaSnapshot` is `undefined`. The rest of the `PageContext` is
+unaffected.
+:::
 
 ### toAIContext() on Errors
 

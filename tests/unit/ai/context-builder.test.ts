@@ -24,13 +24,20 @@ vi.mock('../../../src/ai/bulk-discovery.js', () => ({
   discoverPage: vi.fn(),
 }));
 
+vi.mock('#core/compat/index.js', () => ({
+  hasFeature: vi.fn(),
+}));
+
 import { discoverPage } from '../../../src/ai/bulk-discovery.js';
 import { buildPageContext } from '../../../src/ai/context-builder.js';
 import type { AiResponse, PageContext } from '../../../src/ai/types.js';
 
+import { hasFeature } from '#core/compat/index.js';
+
 // ── Typed mock ───────────────────────────────────────────────────────────────
 
 const mockDiscoverPage = vi.mocked(discoverPage);
+const mockHasFeature = vi.mocked(hasFeature);
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -371,5 +378,77 @@ describe('buildPageContext', () => {
         objectCategory: 'component',
       });
     }
+  });
+});
+
+describe('buildPageContext — ariaSnapshot grounding', () => {
+  function makeAriaConfig(includeAriaSnapshot?: boolean): Parameters<typeof buildPageContext>[1] {
+    return {
+      ...makeMinimalConfig(),
+      ai: includeAriaSnapshot === undefined ? {} : { includeAriaSnapshot },
+    } as unknown as Parameters<typeof buildPageContext>[1];
+  }
+
+  function makeAriaPage(
+    overrides: Record<string, unknown> = {},
+  ): Parameters<typeof buildPageContext>[0] {
+    return {
+      evaluate: vi.fn().mockResolvedValue(undefined),
+      ariaSnapshot: vi.fn().mockResolvedValue('- document [box=0,0,100,50]'),
+      locator: vi.fn().mockReturnValue({ ariaSnapshot: vi.fn().mockResolvedValue('- document') }),
+      ...overrides,
+    } as unknown as Parameters<typeof buildPageContext>[0];
+  }
+
+  beforeEach(() => {
+    mockDiscoverPage.mockResolvedValue(successResponse);
+  });
+
+  it('captures page.ariaSnapshot({boxes,mode:ai}) when hasAriaSnapshotBoxes', async () => {
+    mockHasFeature.mockImplementation(
+      (f) => f === 'hasAriaSnapshotBoxes' || f === 'hasAriaSnapshot',
+    );
+    const page = makeAriaPage();
+    const res = await buildPageContext(page, makeAriaConfig());
+    expect(res.status).toBe('success');
+    if (res.status === 'success') expect(res.data.ariaSnapshot).toContain('[box=');
+    expect(
+      (page as unknown as { ariaSnapshot: ReturnType<typeof vi.fn> }).ariaSnapshot,
+    ).toHaveBeenCalledWith({ boxes: true, mode: 'ai' });
+  });
+
+  it('falls back to locator(body).ariaSnapshot() when only hasAriaSnapshot', async () => {
+    mockHasFeature.mockImplementation((f) => f === 'hasAriaSnapshot');
+    const page = makeAriaPage();
+    const res = await buildPageContext(page, makeAriaConfig());
+    if (res.status === 'success') expect(res.data.ariaSnapshot).toBe('- document');
+    expect((page as unknown as { locator: ReturnType<typeof vi.fn> }).locator).toHaveBeenCalledWith(
+      'body',
+    );
+  });
+
+  it('omits ariaSnapshot when unsupported', async () => {
+    mockHasFeature.mockReturnValue(false);
+    const page = makeAriaPage();
+    const res = await buildPageContext(page, makeAriaConfig());
+    if (res.status === 'success') expect(res.data.ariaSnapshot).toBeUndefined();
+  });
+
+  it('omits ariaSnapshot when ai.includeAriaSnapshot is false', async () => {
+    mockHasFeature.mockReturnValue(true);
+    const page = makeAriaPage();
+    const res = await buildPageContext(page, makeAriaConfig(false));
+    if (res.status === 'success') expect(res.data.ariaSnapshot).toBeUndefined();
+    expect(
+      (page as unknown as { ariaSnapshot: ReturnType<typeof vi.fn> }).ariaSnapshot,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('omits ariaSnapshot (non-fatal) when capture throws', async () => {
+    mockHasFeature.mockReturnValue(true);
+    const page = makeAriaPage({ ariaSnapshot: vi.fn().mockRejectedValue(new Error('x')) });
+    const res = await buildPageContext(page, makeAriaConfig());
+    expect(res.status).toBe('success');
+    if (res.status === 'success') expect(res.data.ariaSnapshot).toBeUndefined();
   });
 });
