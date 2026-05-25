@@ -4,7 +4,7 @@
   "description": "Capability manifest for Praman SAP UI5 test automation",
   "registryVersion": 1,
   "generatedAt": "2026-05-25",
-  "totalCapabilities": 182,
+  "totalCapabilities": 183,
   "categories": {
     "ui5": {
       "prefix": "UI5",
@@ -2008,7 +2008,7 @@
       "id": "UI5-AI-002",
       "qualifiedName": "pramanAI.buildContext",
       "name": "buildContext",
-      "description": "Builds a complete AI page context from the current Playwright page state.",
+      "description": "Builds a complete AI page context, including an optional aria snapshot for grounding (Playwright 1.60+).",
       "category": "ai",
       "priority": "fixture",
       "usageExample": "const context = await pramanAI.buildContext();",
@@ -2442,6 +2442,16 @@
       "usageExample": "import { serializeUI5SelectorToCSS } from 'playwright-praman';\nconst css = serializeUI5SelectorToCSS({ id: 'btn1' });",
       "registryVersion": 1,
       "aiSteering": "Use ui5.control() to discover controls by selector instead of manually serializing selectors to CSS."
+    },
+    {
+      "id": "UI5-UI5-023",
+      "qualifiedName": "screencast.highlightControls",
+      "name": "highlightControls",
+      "description": "Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).",
+      "category": "ui5",
+      "priority": "fixture",
+      "usageExample": "screencast.highlightControls(true);\nawait ui5.button({ text: 'Save' }).press();",
+      "registryVersion": 1
     },
     {
       "id": "UI5-ASSERT-008",

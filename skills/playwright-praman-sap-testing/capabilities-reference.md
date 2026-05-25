@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
 > Generated: 2026-05-25 — do not edit manually, run `npm run generate:capabilities`
-> Total: 182 capabilities
+> Total: 183 capabilities
 
 ---
 
@@ -29,6 +29,7 @@
 - **control.close** — Close a control via proxy.
 - **control.setSelectedKey** — Set selected key on selection control via proxy.
 - **selectors.serializeUI5SelectorToCSS** — Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.
+- **screencast.highlightControls** — Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).
 
 ## table — Table discovery, reading, and manipulation
 
@@ -204,7 +205,7 @@
 ## ai — AI-powered discovery and context building
 
 - **pramanAI.discoverPage** — Discovers the current page context using AI-powered analysis.
-- **pramanAI.buildContext** — Builds a complete AI page context from the current Playwright page state.
+- **pramanAI.buildContext** — Builds a complete AI page context, including an optional aria snapshot for grounding (Playwright 1.60+).
 - **pramanAI.capabilities** — The CapabilityRegistry instance for querying available capabilities.
 - **pramanAI.recipes** — The RecipeRegistry instance for querying available test recipes.
 - **pramanAI.agentic** — The AgenticHandler instance for autonomous test operations with checkpoint-based resumability.
