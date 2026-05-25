@@ -97,7 +97,7 @@ export interface SectionLinkNavigationOptions {
   /** Whether to wait for UI5 stability after navigation. Defaults to `true`. */
   readonly waitForStable?: boolean;
   /**
-   * Accessible description (`aria-describedby` text) used to disambiguate
+   * Accessible description used to disambiguate
    * section links that share the same visible name. Forwarded to
    * `getByRole('link', { description })`. Ignored on Playwright versions
    * before 1.60, which lack the `description` option.
