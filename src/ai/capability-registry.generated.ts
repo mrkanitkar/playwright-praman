@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-04-08 with 182 entries.
+ * Generated on 2026-05-25 with 182 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {

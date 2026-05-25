@@ -1,6 +1,6 @@
 # Praman Capabilities Reference
 
-> **Generated**: 2026-04-08 — do not edit manually, run `npm run generate:capabilities`
+> **Generated**: 2026-05-25 — do not edit manually, run `npm run generate:capabilities`
 > **Total**: 182 capabilities across 15 categories
 
 ---

@@ -71,8 +71,74 @@ function trimPatterns(entries: readonly RecipeEntry[]): RecipeEntry[] {
   }));
 }
 
+const PRINT_WIDTH = 98;
+
 /**
- * Serialize a capability entry to JSON, omitting undefined optional fields.
+ * Quote a string value using single quotes, falling back to double quotes
+ * when the value contains single quotes (matching Prettier singleQuote).
+ * Escape sequences (\n, \t, \\) are preserved as literals in the output.
+ */
+function quoteString(value: string): string {
+  let escaped = value
+    .replace(/\\/g, '\\\\')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t');
+
+  if (value.includes("'")) {
+    escaped = escaped.replace(/"/g, '\\"');
+    return `"${escaped}"`;
+  }
+  return `'${escaped}'`;
+}
+
+/**
+ * Serialize a JS value as a Prettier-compatible literal (single quotes,
+ * unquoted keys, trailing commas, printWidth-aware array wrapping).
+ */
+function toJsLiteral(value: unknown, indent: number): string {
+  if (value === null || value === undefined) return 'undefined';
+  if (typeof value === 'boolean' || typeof value === 'number') return String(value);
+  if (typeof value === 'string') return quoteString(value);
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) return '[]';
+    const items = value.map((item: unknown) => toJsLiteral(item, indent + 2));
+    const inline = `[${items.join(', ')}]`;
+    if (indent + inline.length <= PRINT_WIDTH) return inline;
+    const pad = ' '.repeat(indent + 2);
+    return `[\n${items.map((item) => `${pad}${item},`).join('\n')}\n${' '.repeat(indent)}]`;
+  }
+
+  if (typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    const pad = ' '.repeat(indent + 2);
+    const lines: string[] = [];
+    for (const [key, val] of Object.entries(obj)) {
+      if (val === undefined) continue;
+      const serializedVal = toJsLiteral(val, indent + 2);
+      const line = `${pad}${key}: ${serializedVal},`;
+      if (line.length <= PRINT_WIDTH) {
+        lines.push(line);
+      } else if (Array.isArray(val)) {
+        const items = val.map((item: unknown) => toJsLiteral(item, indent + 4));
+        const innerPad = ' '.repeat(indent + 4);
+        lines.push(
+          `${pad}${key}: [\n${items.map((item) => `${innerPad}${item},`).join('\n')}\n${pad}],`,
+        );
+      } else {
+        lines.push(`${pad}${key}:\n${pad}  ${serializedVal},`);
+      }
+    }
+    return `{\n${lines.join('\n')}\n${' '.repeat(indent)}}`;
+  }
+
+  return String(value);
+}
+
+/**
+ * Serialize a capability entry to a Prettier-formatted JS object literal,
+ * omitting undefined optional fields.
  */
 function serializeEntry(entry: CapabilityEntry): string {
   const ordered: Record<string, unknown> = {
@@ -90,7 +156,14 @@ function serializeEntry(entry: CapabilityEntry): string {
   if (entry.controlTypes !== undefined) ordered['controlTypes'] = entry.controlTypes;
   if (entry.async !== undefined) ordered['async'] = entry.async;
   if (entry.aiSteering !== undefined) ordered['aiSteering'] = entry.aiSteering;
-  return JSON.stringify(ordered, null, 2);
+  return toJsLiteral(ordered, 0);
+}
+
+/**
+ * Serialize a recipe entry to a Prettier-formatted JS object literal.
+ */
+function serializeRecipeEntry(entry: RecipeEntry): string {
+  return toJsLiteral(entry, 0);
 }
 
 /**
@@ -106,14 +179,12 @@ async function ensureDir(filePath: string): Promise<void> {
  * Generate `capability-registry.generated.ts`.
  */
 function generateCapabilityRegistryTs(entries: readonly CapabilityEntry[]): string {
-  const serialized = entries.map((entry) => serializeEntry(entry));
-  const arrayBody = serialized.map((json) => {
-    // Indent each line of JSON by 2 spaces
-    const indented = json
+  const arrayBody = entries.map((entry) => {
+    const literal = serializeEntry(entry);
+    return literal
       .split('\n')
       .map((line) => `  ${line}`)
       .join('\n');
-    return indented;
   });
 
   return `/**
@@ -155,8 +226,8 @@ ${arrayBody.join(',\n')},
  */
 function generateRecipeRegistryTs(entries: readonly RecipeEntry[]): string {
   const serialized = entries.map((entry) => {
-    const json = JSON.stringify(entry, null, 2);
-    return json
+    const literal = serializeRecipeEntry(entry);
+    return literal
       .split('\n')
       .map((line) => `  ${line}`)
       .join('\n');

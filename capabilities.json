@@ -3,7 +3,7 @@
   "name": "playwright-praman",
   "description": "Capability manifest for Praman SAP UI5 test automation",
   "registryVersion": 1,
-  "generatedAt": "2026-04-08",
+  "generatedAt": "2026-05-25",
   "totalCapabilities": 182,
   "categories": {
     "ui5": {
