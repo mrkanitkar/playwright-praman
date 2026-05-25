@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        playwright-version: ['1.57.0', '1.59.0']
+        playwright-version: ['1.57.0', '1.60.0']
         include:
           - playwright-version: 'next'
             canary: true
