@@ -32,6 +32,7 @@
     ".auth",
     "docs/build",
     "docs/node_modules",
+    "docs/superpowers/**",
     "*.tgz",
     "*.snap",
     ".cspell"

@@ -54,12 +54,16 @@ docs-verify-reports/
 # Workspace files
 *.code-workspace
 
+# Claude Code Plugin (separate git repo)
+plugins/praman-sap-testing/
+
 # Generated
 skills/playwright-praman-sap-testing/SKILL.md
 src/proxy/typed/*.generated.ts
 *.sbom.json
 license-report.json
 plans/
+!docs/superpowers/plans/
 seo/
 mk2/
 
