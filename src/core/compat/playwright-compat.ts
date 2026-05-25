@@ -82,6 +82,14 @@ export interface PlaywrightFeatures {
   readonly hasSetStorageState: boolean;
   readonly hasLocatorNormalize: boolean;
   readonly hasURLPatternMatcher: boolean;
+  readonly hasTestAbort: boolean;
+  readonly hasGetByRoleDescription: boolean;
+  readonly hasPageAriaSnapshot: boolean;
+  readonly hasAriaSnapshotBoxes: boolean;
+  readonly hasTracingHAR: boolean;
+  readonly hasLocatorDrop: boolean;
+  readonly hasLocatorHighlightStyle: boolean;
+  readonly hasBrowserContextEvent: boolean;
 }
 
 /**
@@ -135,6 +143,14 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
     hasSetStorageState: isAtLeast(ver, '1.59.0'),
     hasLocatorNormalize: isAtLeast(ver, '1.59.0'),
     hasURLPatternMatcher: isAtLeast(ver, '1.59.0'),
+    hasTestAbort: isAtLeast(ver, '1.60.0'),
+    hasGetByRoleDescription: isAtLeast(ver, '1.60.0'),
+    hasPageAriaSnapshot: isAtLeast(ver, '1.60.0'),
+    hasAriaSnapshotBoxes: isAtLeast(ver, '1.60.0'),
+    hasTracingHAR: isAtLeast(ver, '1.60.0'),
+    hasLocatorDrop: isAtLeast(ver, '1.60.0'),
+    hasLocatorHighlightStyle: isAtLeast(ver, '1.60.0'),
+    hasBrowserContextEvent: isAtLeast(ver, '1.60.0'),
   };
 }
 
