@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.2.0...v1.3.0) (2026-05-25)
+
+
+### Features
+
+* **docs-verify:** add checks 5-6, CI workflow, register all 8 checks ([#111](https://github.com/mrkanitkar/playwright-praman/issues/111)) ([ac06c43](https://github.com/mrkanitkar/playwright-praman/commit/ac06c43e3592ec7b0044b70305bf369673a1877f))
+* Playwright 1.60 quick-win cluster (aria grounding, screencast highlight, OData onError) ([#145](https://github.com/mrkanitkar/playwright-praman/issues/145)) ([c844e31](https://github.com/mrkanitkar/playwright-praman/commit/c844e31e75e9f2056b51957e29b234fbf89b4e4d))
+
+
+### Bug Fixes
+
+* **deps:** restore zod 4.4.3, bump dotenv 17.4.2 ([#143](https://github.com/mrkanitkar/playwright-praman/issues/143)) ([7376f3e](https://github.com/mrkanitkar/playwright-praman/commit/7376f3e30d15442132ca9d93e607294cbf6f5dff))
+
 ## [1.2.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.1.2...v1.2.0) (2026-04-08)
 
 
