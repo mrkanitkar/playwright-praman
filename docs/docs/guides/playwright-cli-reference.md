@@ -496,7 +496,7 @@ npx playwright-praman doctor
 
 ```text
 ✓ @playwright/test        installed
-✓ Playwright version      v1.59.0
+✓ Playwright version      v1.60.0
 ✓ SAP_CLOUD_BASE_URL      set
 ✓ @playwright/cli         installed
 ✓ praman-cli.config.json  found

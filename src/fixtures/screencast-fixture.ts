@@ -63,8 +63,14 @@ import { test as base } from '@playwright/test';
 import type { Page, Screencast } from '@playwright/test';
 import type { Logger } from 'pino';
 
+import { hasFeature } from '#core/compat/index.js';
 import { PramanError } from '#core/errors/base.js';
 import { ErrorCode } from '#core/errors/codes.js';
+import {
+  clearHighlightState,
+  DEFAULT_HIGHLIGHT_STYLE,
+  setHighlightState,
+} from '#core/highlight/highlight-controller.js';
 import { createLogger } from '#core/logging/index.js';
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -206,6 +212,22 @@ export interface ScreencastFixture {
    * ```
    */
   onFrame: (handler: ScreencastFrameHandler) => void;
+
+  /**
+   * Toggles auto-highlighting of UI5 control interactions during recording.
+   * No-op on Playwright &lt; 1.60. When enabled, each control interaction
+   * highlights the control (the highlight persists until the next interaction).
+   *
+   * @param enabled - Whether to auto-highlight interactions.
+   * @param style - Optional inline CSS string or CSS-property map for the overlay.
+   *
+   * @example
+   * ```typescript
+   * screencast.highlightControls(true);
+   * await ui5.button({ text: 'Save' }).press();
+   * ```
+   */
+  highlightControls: (enabled: boolean, style?: string | Record<string, string | number>) => void;
 }
 
 /**
@@ -415,9 +437,33 @@ export const screencastTest = base.extend<ScreencastFixtures, ScreencastWorkerDe
       }
     };
 
+    const highlightControls = (
+      enabled: boolean,
+      style?: string | Record<string, string | number>,
+    ): void => {
+      if (!hasFeature('hasLocatorHighlightStyle')) {
+        log.debug(
+          { enabled },
+          'highlightControls unavailable (Playwright 1.60+ required) — skipped',
+        );
+        return;
+      }
+      setHighlightState(page, { enabled, style: style ?? DEFAULT_HIGHLIGHT_STYLE });
+    };
+
     try {
-      await use({ showChapter, showActions, showUI5ControlTree, onFrame });
+      await use({ showChapter, showActions, showUI5ControlTree, onFrame, highlightControls });
     } finally {
+      // Teardown: clear highlight state and any lingering overlay
+      clearHighlightState(page);
+      if (hasFeature('hasLocatorHighlightStyle')) {
+        try {
+          await page.hideHighlight();
+        } catch (error: unknown) {
+          log.debug({ err: error }, 'page.hideHighlight() failed during teardown (non-fatal)');
+        }
+      }
+
       // Teardown: stop screencast if started
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, eqeqeq -- runtime check for optional Playwright 1.59 API
       if (screencastStarted && pwScreencast?.stop != null) {

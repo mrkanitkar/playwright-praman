@@ -43,6 +43,19 @@ export interface DiscoveryPage {
   url(): string;
   /** Evaluates a function in the browser context. */
   evaluate(pageFunction: string | ((...args: never[]) => unknown), arg?: unknown): Promise<unknown>;
+  /**
+   * Captures the page aria snapshot (Playwright 1.60+). Optional — absent on
+   * older Playwright or in minimal test doubles.
+   */
+  ariaSnapshot?(options?: {
+    readonly boxes?: boolean;
+    readonly mode?: 'ai' | 'default';
+  }): Promise<string>;
+  /**
+   * Returns a locator for the given selector. Used for the pre-1.60 aria-snapshot
+   * fallback (`locator('body').ariaSnapshot()`). Optional.
+   */
+  locator?(selector: string): { ariaSnapshot(): Promise<string> };
 }
 
 // ── Options ────────────────────────────────────────────────────────────────

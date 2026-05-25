@@ -226,7 +226,34 @@ Both reporters implement Playwright's `Reporter` interface:
 
 - `onBegin()` — initialization, create output directory
 - `onTestEnd()` — process test steps and attachments
+- `onError()` — capture worker-level errors _(ODataTraceReporter only, Playwright 1.60+)_
 - `onEnd()` — aggregate data, write JSON output
 
 They run passively alongside tests — no test code changes are needed. Add them to
 `playwright.config.ts` and they start collecting data on the next test run.
+
+### ODataTraceReporter: onError Hook
+
+:::note Added in v1.3.0
+:::
+
+The OData trace reporter implements Playwright's `onError(error, workerInfo)` hook
+to capture worker-level errors — runtime failures or fixture teardown errors that occur
+outside individual test boundaries.
+
+When triggered, the reporter logs the error at `debug` level with worker context:
+
+```json
+{
+  "err": "TypeError: Cannot read properties of undefined",
+  "workerIndex": 0,
+  "parallelIndex": 2
+}
+```
+
+The `workerInfo` parameter (containing `workerIndex` and `parallelIndex`) is available
+on Playwright 1.60+. On older versions the hook still fires but `workerInfo` is `undefined`.
+
+This is useful for diagnosing errors that don't surface in individual test results —
+for example, a shared fixture that fails during teardown after all tests in a worker
+have completed.

@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-04-08 with 182 entries.
+ * Generated on 2026-05-25 with 183 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {
@@ -1879,7 +1879,8 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     id: 'UI5-AI-002',
     qualifiedName: 'pramanAI.buildContext',
     name: 'buildContext',
-    description: 'Builds a complete AI page context from the current Playwright page state.',
+    description:
+      'Builds a complete AI page context, including an optional aria snapshot for grounding (Playwright 1.60+).',
     category: 'ai',
     priority: 'fixture',
     usageExample: 'const context = await pramanAI.buildContext();',
@@ -2297,6 +2298,18 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     registryVersion: 1,
     aiSteering:
       'Use ui5.control() to discover controls by selector instead of manually serializing selectors to CSS.',
+  },
+  {
+    id: 'UI5-UI5-023',
+    qualifiedName: 'screencast.highlightControls',
+    name: 'highlightControls',
+    description:
+      'Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).',
+    category: 'ui5',
+    priority: 'fixture',
+    usageExample:
+      "screencast.highlightControls(true);\nawait ui5.button({ text: 'Save' }).press();",
+    registryVersion: 1,
   },
   {
     id: 'UI5-ASSERT-008',

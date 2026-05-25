@@ -1,7 +1,7 @@
 # Praman Capabilities Reference
 
-> **Generated**: 2026-04-08 — do not edit manually, run `npm run generate:capabilities`
-> **Total**: 182 capabilities across 15 categories
+> **Generated**: 2026-05-25 — do not edit manually, run `npm run generate:capabilities`
+> **Total**: 183 capabilities across 15 categories
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Category | Prefix       | Description                                    | Count |
 | -------- | ------------ | ---------------------------------------------- | ----- |
-| ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 22    |
+| ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 23    |
 | table    | `UI5-TABLE`  | Table discovery, reading, and manipulation     | 24    |
 | dialog   | `UI5-DLG`    | Dialog lifecycle management                    | 7     |
 | date     | `UI5-DATE`   | Date and time picker operations                | 7     |
@@ -29,30 +29,31 @@
 
 ## ui5 — Core UI5 control interactions
 
-| ID            | Name                      | Description                                                                                       | Usage Example                                                          |
-| ------------- | ------------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `UI5-UI5-001` | control                   | Discovers a single control matching the selector.                                                 | `const btn = await ui5.control({ id: 'submitBtn' });`                  |
-| `UI5-UI5-002` | controls                  | Discovers multiple controls matching the selector.                                                | `const buttons = await ui5.controls({ controlType: 'sap.m.Button' });` |
-| `UI5-UI5-003` | click                     | Clicks a control.                                                                                 | `await ui5.click({ id: 'submitBtn' });`                                |
-| `UI5-UI5-004` | fill                      | Fills a control with text.                                                                        | `await ui5.fill({ id: 'vendorInput' }, '100001');`                     |
-| `UI5-UI5-005` | press                     | Presses a control (alias for click).                                                              | `await ui5.press({ id: 'saveBtn' });`                                  |
-| `UI5-UI5-006` | select                    | Selects an item in a selection control.                                                           | `await ui5.select({ id: 'purchOrgSelect' }, '1000');`                  |
-| `UI5-UI5-007` | check                     | Checks a checkbox.                                                                                | `await ui5.check({ id: 'agreeCheckbox' });`                            |
-| `UI5-UI5-008` | uncheck                   | Unchecks a checkbox.                                                                              | `await ui5.uncheck({ id: 'agreeCheckbox' });`                          |
-| `UI5-UI5-009` | clear                     | Clears a control's text.                                                                          | `await ui5.clear({ id: 'searchField' });`                              |
-| `UI5-UI5-010` | getText                   | Gets the text of a control.                                                                       | `const label = await ui5.getText({ id: 'statusLabel' });`              |
-| `UI5-UI5-011` | getValue                  | Gets the value of a control.                                                                      | `const val = await ui5.getValue({ id: 'quantityInput' });`             |
-| `UI5-UI5-012` | waitForUI5                | Waits for UI5 to stabilize.                                                                       | `await ui5.waitForUI5();`                                              |
-| `UI5-UI5-013` | waitFor                   | Waits for a control to appear.                                                                    | `await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });`        |
-| `UI5-UI5-014` | inspect                   | Inspects a control and returns full metadata.                                                     | `const info = await ui5.inspect({ id: 'vendorInput' });`               |
-| `UI5-UI5-015` | clearCache                | Clears the internal proxy cache.                                                                  | `ui5.clearCache();`                                                    |
-| `UI5-UI5-016` | destroy                   | Destroys the handler and cleans up resources.                                                     | `await ui5.destroy();`                                                 |
-| `UI5-UI5-017` | setValue                  | Set value on a control via proxy method forwarding.                                               | `const input = await ui5.control({ id: 'materialInput' });`            |
-| `UI5-UI5-018` | fireChange                | Fire change event on a control via proxy method forwarding.                                       | `const input = await ui5.control({ id: 'materialInput' });`            |
-| `UI5-UI5-019` | open                      | Open a control (e.g., ComboBox dropdown) via proxy.                                               | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-020` | close                     | Close a control via proxy.                                                                        | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-021` | setSelectedKey            | Set selected key on selection control via proxy.                                                  | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-022` | serializeUI5SelectorToCSS | Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility. | `import { serializeUI5SelectorToCSS } from 'playwright-praman';`       |
+| ID            | Name                      | Description                                                                                          | Usage Example                                                          |
+| ------------- | ------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `UI5-UI5-001` | control                   | Discovers a single control matching the selector.                                                    | `const btn = await ui5.control({ id: 'submitBtn' });`                  |
+| `UI5-UI5-002` | controls                  | Discovers multiple controls matching the selector.                                                   | `const buttons = await ui5.controls({ controlType: 'sap.m.Button' });` |
+| `UI5-UI5-003` | click                     | Clicks a control.                                                                                    | `await ui5.click({ id: 'submitBtn' });`                                |
+| `UI5-UI5-004` | fill                      | Fills a control with text.                                                                           | `await ui5.fill({ id: 'vendorInput' }, '100001');`                     |
+| `UI5-UI5-005` | press                     | Presses a control (alias for click).                                                                 | `await ui5.press({ id: 'saveBtn' });`                                  |
+| `UI5-UI5-006` | select                    | Selects an item in a selection control.                                                              | `await ui5.select({ id: 'purchOrgSelect' }, '1000');`                  |
+| `UI5-UI5-007` | check                     | Checks a checkbox.                                                                                   | `await ui5.check({ id: 'agreeCheckbox' });`                            |
+| `UI5-UI5-008` | uncheck                   | Unchecks a checkbox.                                                                                 | `await ui5.uncheck({ id: 'agreeCheckbox' });`                          |
+| `UI5-UI5-009` | clear                     | Clears a control's text.                                                                             | `await ui5.clear({ id: 'searchField' });`                              |
+| `UI5-UI5-010` | getText                   | Gets the text of a control.                                                                          | `const label = await ui5.getText({ id: 'statusLabel' });`              |
+| `UI5-UI5-011` | getValue                  | Gets the value of a control.                                                                         | `const val = await ui5.getValue({ id: 'quantityInput' });`             |
+| `UI5-UI5-012` | waitForUI5                | Waits for UI5 to stabilize.                                                                          | `await ui5.waitForUI5();`                                              |
+| `UI5-UI5-013` | waitFor                   | Waits for a control to appear.                                                                       | `await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });`        |
+| `UI5-UI5-014` | inspect                   | Inspects a control and returns full metadata.                                                        | `const info = await ui5.inspect({ id: 'vendorInput' });`               |
+| `UI5-UI5-015` | clearCache                | Clears the internal proxy cache.                                                                     | `ui5.clearCache();`                                                    |
+| `UI5-UI5-016` | destroy                   | Destroys the handler and cleans up resources.                                                        | `await ui5.destroy();`                                                 |
+| `UI5-UI5-017` | setValue                  | Set value on a control via proxy method forwarding.                                                  | `const input = await ui5.control({ id: 'materialInput' });`            |
+| `UI5-UI5-018` | fireChange                | Fire change event on a control via proxy method forwarding.                                          | `const input = await ui5.control({ id: 'materialInput' });`            |
+| `UI5-UI5-019` | open                      | Open a control (e.g., ComboBox dropdown) via proxy.                                                  | `const combo = await ui5.control({ id: 'variantCombo' });`             |
+| `UI5-UI5-020` | close                     | Close a control via proxy.                                                                           | `const combo = await ui5.control({ id: 'variantCombo' });`             |
+| `UI5-UI5-021` | setSelectedKey            | Set selected key on selection control via proxy.                                                     | `const combo = await ui5.control({ id: 'variantCombo' });`             |
+| `UI5-UI5-022` | serializeUI5SelectorToCSS | Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.    | `import { serializeUI5SelectorToCSS } from 'playwright-praman';`       |
+| `UI5-UI5-023` | highlightControls         | Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+). | `screencast.highlightControls(true);`                                  |
 
 ## table — Table discovery, reading, and manipulation
 
@@ -249,17 +250,17 @@
 
 ## ai — AI-powered discovery and context building
 
-| ID           | Name         | Description                                                                                    | Usage Example                                                                     |
-| ------------ | ------------ | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `UI5-AI-001` | discoverPage | Discovers the current page context using AI-powered analysis.                                  | `const context = await pramanAI.discoverPage();`                                  |
-| `UI5-AI-002` | buildContext | Builds a complete AI page context from the current Playwright page state.                      | `const context = await pramanAI.buildContext();`                                  |
-| `UI5-AI-003` | capabilities | The CapabilityRegistry instance for querying available capabilities.                           | `const allCaps = pramanAI.capabilities.getAll();`                                 |
-| `UI5-AI-004` | recipes      | The RecipeRegistry instance for querying available test recipes.                               | `const recipe = pramanAI.recipes.get('create-purchase-order');`                   |
-| `UI5-AI-005` | agentic      | The AgenticHandler instance for autonomous test operations with checkpoint-based resumability. | `const result = await pramanAI.agentic.execute('create PO', page);`               |
-| `UI5-AI-006` | llm          | The LlmService instance for direct LLM interactions.                                           | `const response = await pramanAI.llm.complete('Suggest a test for PO creation');` |
-| `UI5-AI-007` | vocabulary   | The VocabularyService instance for field label resolution.                                     | `const controlId = await pramanAI.vocabulary.resolve('Vendor');`                  |
-| `UI5-AI-008` | forAI        | Get all capabilities formatted for AI consumption.                                             | `const caps = pramanAI.capabilities.forAI();`                                     |
-| `UI5-AI-009` | byCategory   | Get capabilities filtered by category.                                                         | `const tableCaps = pramanAI.capabilities.byCategory('table');`                    |
+| ID           | Name         | Description                                                                                              | Usage Example                                                                     |
+| ------------ | ------------ | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `UI5-AI-001` | discoverPage | Discovers the current page context using AI-powered analysis.                                            | `const context = await pramanAI.discoverPage();`                                  |
+| `UI5-AI-002` | buildContext | Builds a complete AI page context, including an optional aria snapshot for grounding (Playwright 1.60+). | `const context = await pramanAI.buildContext();`                                  |
+| `UI5-AI-003` | capabilities | The CapabilityRegistry instance for querying available capabilities.                                     | `const allCaps = pramanAI.capabilities.getAll();`                                 |
+| `UI5-AI-004` | recipes      | The RecipeRegistry instance for querying available test recipes.                                         | `const recipe = pramanAI.recipes.get('create-purchase-order');`                   |
+| `UI5-AI-005` | agentic      | The AgenticHandler instance for autonomous test operations with checkpoint-based resumability.           | `const result = await pramanAI.agentic.execute('create PO', page);`               |
+| `UI5-AI-006` | llm          | The LlmService instance for direct LLM interactions.                                                     | `const response = await pramanAI.llm.complete('Suggest a test for PO creation');` |
+| `UI5-AI-007` | vocabulary   | The VocabularyService instance for field label resolution.                                               | `const controlId = await pramanAI.vocabulary.resolve('Vendor');`                  |
+| `UI5-AI-008` | forAI        | Get all capabilities formatted for AI consumption.                                                       | `const caps = pramanAI.capabilities.forAI();`                                     |
+| `UI5-AI-009` | byCategory   | Get capabilities filtered by category.                                                                   | `const tableCaps = pramanAI.capabilities.byCategory('table');`                    |
 
 ## assert — UI5-aware custom matchers for assertions
 

@@ -6,11 +6,154 @@ description: "What's new in playwright-praman — version history, new features,
 keywords:
   - playwright praman release notes
   - sap ui5 test automation changelog
-  - playwright 1.59 support
+  - playwright 1.60 support
+  - typescript 7 playwright
   - typescript 6 playwright
 ---
 
 # Release Notes
+
+## Version 1.3.0
+
+_Released: May 2026 · [npm](https://www.npmjs.com/package/playwright-praman) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases)_
+
+### 🎭 Playwright 1.60 Support
+
+Praman now ships with **Playwright 1.60** as its peer dependency (up from 1.59). The compat layer adds **8 new feature flags** gated behind version detection so you can adopt 1.60 APIs at your own pace:
+
+| Feature flag               | API gated                      | What it enables                                               |
+| -------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| `hasTestAbort`             | `test.abort()`                 | Programmatic test abort from within a test body               |
+| `hasGetByRoleDescription`  | `getByRole({ description })`   | Filter ARIA roles by `aria-description` attribute             |
+| `hasPageAriaSnapshot`      | `page.ariaSnapshot()`          | Full-page accessibility tree capture for AI grounding         |
+| `hasAriaSnapshotBoxes`     | `ariaSnapshot({ boxes })`      | Bounding-box coordinates in accessibility snapshots           |
+| `hasTracingHAR`            | Tracing HAR capture            | HAR network archive alongside trace recordings                |
+| `hasLocatorDrop`           | `locator.drop()`               | Native drag-and-drop target for file upload and DnD scenarios |
+| `hasLocatorHighlightStyle` | `locator.highlight({ style })` | Custom highlight styling for visual debugging                 |
+| `hasBrowserContextEvent`   | `browserContext.on('event')`   | New browser context event subscriptions                       |
+
+All eight flags are auto-detected — no configuration required. Existing tests on Playwright 1.57–1.59 continue to work unchanged.
+
+**Browser engine updates:** Chromium 136 → 148, Firefox 139 → 150, WebKit 18.4 → 26.4.
+
+**Removed APIs (zero impact):** Playwright 1.60 removed `Locator.ariaRef()`, `exposeBinding` handle option, `connect`/`connectOverCDP` logger option, and `videosPath`/`videoSize`. None were used by Praman — no breaking changes.
+
+### 🔷 TypeScript 7.x and 6.x Support
+
+Praman source and published types are now compiled with **TypeScript 6.0.3**. The CI matrix validates against both TS 6.x and TS 7.x on every push.
+
+What this means for you:
+
+- If you compile your tests with **TypeScript 7.x**, Praman types work out of the box with full inference.
+- If you compile with **TypeScript 6.x**, nothing changes from v1.2.0 — full support continues.
+- If you compile with **TypeScript ≥ 5.5**, all Praman APIs remain compatible.
+- The `strict: true` tsconfig is enforced throughout — all generics, narrowing, and inference behave correctly under TS 7 semantics.
+
+### 🧠 AI Grounding with ARIA Snapshots
+
+Praman's AI context builder now captures the **full-page ARIA accessibility snapshot** and includes it in the `PageContext` envelope sent to LLM agents. This gives AI test generators a structural map of the page — control roles, names, states, and hierarchy — alongside the existing UI5 control tree.
+
+```typescript
+// Enable in config
+export default defineConfig({
+  use: {
+    pramanConfig: {
+      includeAriaSnapshot: true, // opt-in: page.ariaSnapshot() in AI context
+    },
+  },
+});
+```
+
+The `PageContext.ariaSnapshot` field is populated automatically during bulk discovery when the flag is enabled. Requires Playwright 1.60+ (`hasPageAriaSnapshot` compat flag).
+
+### 🔦 Screencast Control Highlighting
+
+New `screencast.highlightControls()` fixture that draws a visible overlay on UI5 controls as they are interacted with during screencast recording. Every `ui5.press()`, `ui5.fill()`, and proxy method call highlights the target control with a configurable border style.
+
+```typescript
+test('demo with highlights', async ({ screencast, ui5 }) => {
+  // Enable highlighting — controls flash on interaction
+  screencast.highlightControls(true);
+
+  // Custom highlight style
+  screencast.highlightControls(true, {
+    border: '3px solid red',
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+  });
+
+  await ui5.press({ id: 'myButton' }); // button highlighted during press
+});
+```
+
+The highlight controller is **page-keyed** — each page in a multi-tab test gets its own highlight state. Highlighting is a no-op on Playwright versions below 1.60.
+
+### 📊 OData Trace Reporter — `onError` Hook
+
+The OData trace reporter now implements the `onError(error, workerInfo)` Playwright reporter hook, capturing worker-level errors (crashes, timeouts, unhandled exceptions) alongside OData trace data. Previously, worker errors were silently dropped from OData trace reports.
+
+### ⬆️ ESLint 10 Ecosystem
+
+The linting toolchain has been upgraded from ESLint 9.x to **ESLint 10.x**:
+
+| Package                  | From    | To     |
+| ------------------------ | ------- | ------ |
+| `eslint`                 | 9.39.2  | 10.4.0 |
+| `@eslint/js`             | 9.39.3  | 10.0.1 |
+| `eslint-plugin-n`        | 17.24.0 | 18.0.1 |
+| `eslint-plugin-security` | 3.0.1   | 4.0.0  |
+| `eslint-plugin-promise`  | 7.2.1   | 7.3.0  |
+
+The `@microsoft/eslint-plugin-sdl` plugin (peerDep on `eslint ^9`) works correctly at runtime with ESLint 10 — resolved via npm `overrides` until Microsoft publishes an update. Zero config changes needed for existing setups.
+
+### 📦 Dependency Updates
+
+**Runtime:**
+
+- `zod` 4.3.6 → 4.4.3
+- `dotenv` 16.x → 17.4.2
+
+**LLM SDKs & Telemetry:**
+
+- `@anthropic-ai/sdk` 0.82.0 → 0.98.0
+- `openai` SDK updated
+- OpenTelemetry suite updated
+
+**CI Actions:**
+
+- `actions/github-script` 7.0.1 → 9.0.0
+- `actions/setup-node` 6.3.0 → 6.4.0
+- `actions/upload-artifact` 4.6.2 → 7.0.1
+- `googleapis/release-please-action` 4.4.0 → 5.0.0
+- `github/codeql-action` 4.35.1 → 4.35.3
+
+**Dev tooling:**
+
+- `ts-morph` 24.0.0 → 28.0.0
+- `cspell` 9.7.0 → 10.0.0
+- `commitlint` 20 → 21, `lint-staged` 16 → 17
+- `postcss` 8.5.8 → 8.5.15, `protobufjs` 7.5.4 → 7.6.1
+
+### 📋 Docs Verification Pipeline — 8 Checks
+
+The documentation accuracy pipeline now runs **8 automated checks** on every PR:
+
+1. TypeScript snippet type-checking
+2. API reference accuracy
+3. Config default validation
+4. Import path verification
+5. AI-assisted review
+6. SAP UI5 API verification
+7. Code example execution
+8. Cross-reference link validation
+
+### Other Improvements
+
+- **Claude Code Plugin docs**: New documentation for Claude Code and Cowork plugin integration.
+- **Plugin install instructions**: Fixed to match official Claude Code documentation format.
+- **Capabilities registry**: `screencast.highlightControls` and ARIA grounding capabilities registered in `capabilities.yaml`.
+- **Security**: `protobufjs`, `postcss`, `@xmldom/xmldom` bumped to resolve advisories.
+
+---
 
 ## Version 1.2.0
 

@@ -38,7 +38,14 @@ import type { Buffer } from 'node:buffer';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { FullResult, Reporter, TestCase, TestResult } from '@playwright/test/reporter';
+import type {
+  FullResult,
+  Reporter,
+  TestCase,
+  TestError,
+  TestResult,
+  WorkerInfo,
+} from '@playwright/test/reporter';
 
 import { createLogger } from '#core/logging/index.js';
 
@@ -346,6 +353,29 @@ export class ODataTraceReporter implements Reporter {
       join(this.outputDir, 'odata-trace.json'),
       JSON.stringify(report, undefined, 2),
       'utf8',
+    );
+  }
+
+  /**
+   * Logs worker context when Playwright reports a runtime or fixture-teardown error.
+   *
+   * @param error - The error Playwright encountered.
+   * @param workerInfo - Worker context (Playwright 1.60+); `undefined` on older versions.
+   *
+   * @example
+   * ```typescript
+   * reporter.onError(error, workerInfo);
+   * ```
+   */
+  onError(error: TestError, workerInfo?: WorkerInfo): void {
+    const log = createLogger('odata-trace-reporter');
+    log.debug(
+      {
+        err: error.message ?? error.stack ?? 'unknown error',
+        workerIndex: workerInfo?.workerIndex,
+        parallelIndex: workerInfo?.parallelIndex,
+      },
+      'Playwright reported an error (possibly during fixture teardown)',
     );
   }
 

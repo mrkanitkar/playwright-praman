@@ -6,24 +6,41 @@ title: Changelog
 
 # Changelog
 
-## [1.3.0] - 2026-04-08
+## [1.3.0] - 2026-05-25
 
 ### Features
 
-- **telemetry:** full OpenTelemetry tracing and metrics integration (OTLP, Jaeger, Azure Monitor)
-- **telemetry:** `OTelReporter` Playwright reporter emits spans for test lifecycle (test.run, step-level spans)
-- **telemetry:** `meter` worker-scoped fixture for metric counters and histograms
-- **telemetry:** Playwright live tracing correlation via OTel traceId
-- **telemetry:** dynamic import of OTel dependencies — zero overhead when disabled
-- **config:** 6 new `PRAMAN_TELEMETRY_*` env vars (exporter, protocol, metrics, batchTimeout, maxQueueSize, connectionString)
-- **config:** Zod refine validation — `endpoint` or `connectionString` required when telemetry enabled
-- **errors:** `TelemetryError` class with 5 error codes (`ERR_TELEMETRY_INIT_FAILED`, `ERR_TELEMETRY_PEER_DEP_MISSING`, `ERR_TELEMETRY_EXPORTER_FAILED`, `ERR_TELEMETRY_SHUTDOWN_FAILED`, `ERR_TELEMETRY_METRICS_INIT_FAILED`)
-- **docs:** new Telemetry Setup Guide (`docs/guides/telemetry.md`)
-- **docs:** `docker-compose.otel.yml` for local Jaeger development
+- **deps:** upgrade Playwright to 1.60.0, add 8 new compat feature flags (`hasTestAbort`, `hasGetByRoleDescription`, `hasPageAriaSnapshot`, `hasAriaSnapshotBoxes`, `hasTracingHAR`, `hasLocatorDrop`, `hasLocatorHighlightStyle`, `hasBrowserContextEvent`)
+- **deps:** add TypeScript 7.x support; CI matrix validates TS 6.x and TS 7.x
+- **ai:** populate `PageContext.ariaSnapshot` for AI grounding via `page.ariaSnapshot()` (Playwright 1.60+)
+- **ai:** add `includeAriaSnapshot` config flag to opt in to ARIA snapshot capture
+- **fixtures:** add `screencast.highlightControls()` toggle for visual overlay on UI5 control interactions
+- **proxy:** highlight controls on interaction when screencast highlighting is enabled
+- **core:** add page-keyed highlight controller for multi-tab highlight state isolation
+- **reporters:** add `onError(error, workerInfo)` hook to OData trace reporter for worker-level error capture
+- **deps:** upgrade to ESLint 10 ecosystem (`eslint` 9.x → 10.4.0, `eslint-plugin-n` 18.x, `eslint-plugin-security` 4.x)
+- **deps:** bump LLM SDKs (`@anthropic-ai/sdk` 0.82.0 → 0.98.0, `openai` updated) and OpenTelemetry suite
+- **docs-verify:** expand documentation accuracy pipeline from 6 to 8 automated checks with CI workflow
+- **docs:** Claude Code and Cowork Plugin documentation
+- **capabilities:** register `screencast.highlightControls` and ARIA grounding capabilities
+
+### Bug Fixes
+
+- **deps:** restore `zod` 4.4.3, bump `dotenv` to 17.4.2
+- **docs:** fix plugin install instructions to match official Claude Code documentation
+
+### Dependency Updates
+
+- `zod` 4.3.6 → 4.4.3, `dotenv` → 17.4.2
+- `ts-morph` 24.0.0 → 28.0.0, `cspell` 9.7.0 → 10.0.0
+- `commitlint` 20 → 21, `lint-staged` 16 → 17
+- `postcss` 8.5.8 → 8.5.15, `protobufjs` 7.5.4 → 7.6.1
+- `actions/github-script` 7.0.1 → 9.0.0, `actions/setup-node` 6.3.0 → 6.4.0
+- `actions/upload-artifact` 4.6.2 → 7.0.1, `release-please-action` 4.4.0 → 5.0.0
 
 ### Breaking Changes
 
-- None — `openTelemetry: false` (default) behavior unchanged
+- None — all new features are opt-in or auto-detected via compat flags
 
 ## [1.2.0] - 2026-04-01
 

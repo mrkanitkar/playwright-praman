@@ -61,6 +61,8 @@ const authSchema = z.object({
 // ── AI sub-schema ────────────────────────────────────────────────────
 const aiSchema = z.object({
   provider: z.enum(['azure-openai', 'openai', 'anthropic']).default('azure-openai'),
+  /** Include an aria snapshot in `pramanAI.buildContext()` output (Playwright 1.60+). On unless set to `false`. */
+  includeAriaSnapshot: z.boolean().optional(),
   apiKey: z.string().optional(),
   model: z.string().optional(),
   temperature: z.number().min(0).max(2).default(0.3),

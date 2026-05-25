@@ -85,5 +85,5 @@ published npm package (`files` field + `.npmignore`).
 | npm provenance     | `npm publish --provenance` in release workflow                                                                |
 | GitHub Actions     | All actions SHA-pinned (not tag-referenced)                                                                   |
 | ESLint security    | 3 security-focused plugins: `eslint-plugin-security`, `@microsoft/eslint-plugin-sdl`, `eslint-plugin-sonarjs` |
-| Dependency count   | 2 production dependencies (`pino`, `zod`); 4 optional                                                         |
+| Dependency count   | 5 production dependencies (`commander`, `css-selector-parser`, `fontoxpath`, `pino`, `zod`); 4 optional       |
 | License compliance | `license-report.json` generated; all deps MIT or Apache-2.0 compatible                                        |
