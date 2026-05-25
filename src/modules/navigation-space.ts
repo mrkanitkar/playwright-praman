@@ -34,6 +34,7 @@
  * @module modules
  */
 
+import { hasFeature } from '#core/compat/index.js';
 import { ErrorCode } from '#core/errors/codes.js';
 import { NavigationError } from '#core/errors/navigation-error.js';
 import { DEFAULT_TIMEOUTS } from '#core/utils/constants.js';
@@ -54,7 +55,10 @@ export interface SpaceNavigationPage {
     options?: { readonly timeout?: number; readonly polling?: number },
   ): Promise<unknown>;
   getByText(text: string, options?: { readonly exact?: boolean }): SpaceNavigationLocator;
-  getByRole(role: string, options?: { readonly name?: string }): SpaceNavigationLocator;
+  getByRole(
+    role: string,
+    options?: { readonly name?: string; readonly description?: string },
+  ): SpaceNavigationLocator;
 }
 
 /** Minimal locator interface for Space/Section navigation interactions. */
@@ -92,6 +96,13 @@ export interface SectionLinkNavigationOptions {
   readonly timeout?: number;
   /** Whether to wait for UI5 stability after navigation. Defaults to `true`. */
   readonly waitForStable?: boolean;
+  /**
+   * Accessible description used to disambiguate
+   * section links that share the same visible name. Forwarded to
+   * `getByRole('link', { description })`. Ignored on Playwright versions
+   * before 1.60, which lack the `description` option.
+   */
+  readonly description?: string;
 }
 
 /** Performs the stability wait after navigation unless `waitForStable: false`. */
@@ -227,7 +238,11 @@ export async function navigateToSectionLink(
 
   const timeout = options?.timeout ?? DEFAULT_TIMEOUTS.UI5_WAIT;
 
-  const linkLocator = page.getByRole('link', { name: linkName });
+  const roleOptions: { name: string; description?: string } = { name: linkName };
+  if (options?.description !== undefined && hasFeature('hasGetByRoleDescription')) {
+    roleOptions.description = options.description;
+  }
+  const linkLocator = page.getByRole('link', roleOptions);
   await linkLocator.click({ timeout });
   await stabilityWait(page, timeout, options?.waitForStable);
 }

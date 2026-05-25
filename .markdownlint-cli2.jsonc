@@ -5,6 +5,7 @@
   "ignores": [
     "plans/**",
     "specs/**",
+    "docs/superpowers/**",
     ".claude/**",
     ".github/agents/**",
     ".github/skills/**",
