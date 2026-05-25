@@ -59,8 +59,10 @@ import type { MethodExecutionResult } from '#bridge/bridge-types.js';
 import { browserExecuteControlMethod } from '#bridge/browser-scripts/execute-method-fn.js';
 import type { InteractionStrategy } from '#bridge/interaction-strategies/strategy.js';
 import { isBlacklisted } from '#bridge/method-blacklist.js';
+import { hasFeature } from '#core/compat/index.js';
 import { BridgeError } from '#core/errors/bridge-error.js';
 import { ControlError } from '#core/errors/control-error.js';
+import { getHighlightState } from '#core/highlight/highlight-controller.js';
 import type { UI5ControlBase } from '#core/types/controls.js';
 import { assertNever } from '#core/utils/assert-never.js';
 
@@ -392,6 +394,63 @@ function proxyToString(state: ControlProxyState): string {
 }
 
 /**
+ * Resolves a control's DOM id without throwing (returns `null` if unavailable).
+ *
+ * @remarks
+ * Mirrors the resolution used by the `toLocator` handler, but is safe for
+ * best-effort callers (e.g., highlighting) — it never throws.
+ */
+async function resolveControlDomId(state: ControlProxyState): Promise<string | null> {
+  const domId = await state.page.evaluate(
+    /* v8 ignore start -- browser-context function: runs in Chromium, not Node.js */
+    ({ controlId, bridgeNs }) => {
+      const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
+      if (bridge === undefined) return null;
+      const getById = bridge['getById'] as
+        | ((id: string) => Record<string, unknown> | null)
+        | undefined;
+      if (getById === undefined) return null;
+      const ctrl = getById(controlId);
+      if (ctrl === null) return null;
+      const getDomRef = ctrl['getDomRef'] as (() => HTMLElement | null) | undefined;
+      if (getDomRef === undefined) return null;
+      const domRef = getDomRef.call(ctrl);
+      return domRef?.id ?? null;
+    },
+    /* v8 ignore stop */
+    { controlId: state.id, bridgeNs: BRIDGE_GLOBALS.NAMESPACE },
+  );
+  return typeof domId === 'string' ? domId : null;
+}
+
+/**
+ * Highlights the control before an interaction when screencast highlighting is
+ * enabled for the page (Playwright 1.60+).
+ *
+ * @remarks
+ * Best-effort and non-fatal — highlighting must never break an interaction. The
+ * highlight persists until the next interaction clears it (no artificial wait —
+ * Principle 8). Uses a Node-safe `[id="..."]` attribute selector (no `CSS.escape`,
+ * which is not available in the Node test/runner environment).
+ */
+async function highlightForInteraction(state: ControlProxyState): Promise<void> {
+  const hl = getHighlightState(state.page);
+  if (hl?.enabled !== true || !hasFeature('hasLocatorHighlightStyle')) return;
+  try {
+    await state.page.hideHighlight();
+    const domId = await resolveControlDomId(state);
+    if (domId !== null) {
+      const selector = `[id="${domId.replaceAll(/(["\\])/gu, '\\$1')}"]`;
+      const options: { style?: string | Record<string, string | number> } = {};
+      if (hl.style !== undefined) options.style = hl.style;
+      await state.page.locator(selector).highlight(options);
+    }
+  } catch {
+    // best-effort — highlighting must never break an interaction
+  }
+}
+
+/**
  * Resolves known property names to their handlers.
  *
  * @remarks
@@ -454,13 +513,20 @@ function resolveKnownProperty(
     case 'toJSON':
       return () => proxyToString(state);
     case 'press':
-      return async () => state.interactionStrategy.press(state.page, state.id);
+      return async () => {
+        await highlightForInteraction(state);
+        return state.interactionStrategy.press(state.page, state.id);
+      };
     case 'enterText':
-      return async (text: string) =>
-        state.interactionStrategy.enterText(state.page, state.id, text);
+      return async (text: string) => {
+        await highlightForInteraction(state);
+        return state.interactionStrategy.enterText(state.page, state.id, text);
+      };
     case 'select':
-      return async (itemId: string) =>
-        state.interactionStrategy.select(state.page, state.id, itemId);
+      return async (itemId: string) => {
+        await highlightForInteraction(state);
+        return state.interactionStrategy.select(state.page, state.id, itemId);
+      };
     case 'exec':
       // Security: exec() serializes `fn` via .toString() and reconstructs it in the
       // browser via new Function(). This is safe in the Playwright test context because
