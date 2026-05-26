@@ -14,6 +14,8 @@
 [![Ask AI about Praman](https://img.shields.io/badge/Ask_AI-about_Praman-8B5CF6?logo=openai&logoColor=white)](https://chatgpt.com/?hints=search&temporary-chat=true&q=I%20am%20reading%20the%20Praman%20documentation%20%E2%80%94%20an%20Agent-First%20SAP%20UI5%20Test%20Automation%20Plugin%20for%20Playwright.%20For%20full%20documentation%20context%2C%20read%3A%20https%3A%2F%2Fpraman.dev%2Fllms-full.txt%0A%0AMy%20question%3A%20)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/playwright-praman)](https://bundlephobia.com/package/playwright-praman)
 
+Praman Plan-Generate-Heal Agents for SAP GUI, UI5, WebGUI, and Fiori apps.
+
 Praman extends [Playwright](https://playwright.dev/) with deep SAP UI5 awareness — querying controls through
 the **UI5 runtime registry**, not fragile DOM selectors, so tests survive upgrades and theme changes.
 Describe your business process; AI agents deliver production-ready test scripts.
