@@ -127,3 +127,48 @@ plugin:
   label: Plugin
   permalink: /plugin
   description: Praman plugin ecosystem — Claude Code plugins, agent extensions, and skill packages.
+
+v1.3:
+  label: v1.3
+  permalink: /v-1-3
+  description: Praman v1.3 release — Playwright 1.60, TypeScript 7, ARIA grounding, screencast highlights, ESLint 10.
+
+playwright-1.60:
+  label: Playwright 1.60
+  permalink: /playwright-1-60
+  description: Playwright 1.60 compatibility, feature flags, and browser engine updates.
+
+typescript-7:
+  label: TypeScript 7
+  permalink: /typescript-7
+  description: TypeScript 7 compatibility and migration guidance.
+
+aria:
+  label: ARIA
+  permalink: /aria
+  description: ARIA accessibility snapshots, grounding, and accessibility-driven test automation.
+
+eslint-10:
+  label: ESLint 10
+  permalink: /eslint-10
+  description: ESLint 10 ecosystem upgrade, plugin compatibility, and linting toolchain updates.
+
+playwright-1.57:
+  label: Playwright 1.57
+  permalink: /playwright-1-57
+  description: Playwright 1.57 compatibility, ui5= selector engine, and browser engine updates.
+
+typescript-5:
+  label: TypeScript 5
+  permalink: /typescript-5
+  description: TypeScript 5.5+ compatibility and type inference support.
+
+mcp:
+  label: MCP
+  permalink: /mcp
+  description: Model Context Protocol integration for AI-assisted SAP test automation agents.
+
+opentelemetry:
+  label: OpenTelemetry
+  permalink: /opentelemetry
+  description: OpenTelemetry observability integration for SAP test execution tracing and metrics.

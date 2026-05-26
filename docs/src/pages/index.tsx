@@ -755,8 +755,9 @@ function GlanceSection(): ReactNode {
             <h4>What is Praman?</h4>
             <ul className="praman-when-to-use-list">
               <li>
-                <strong>Playwright Plugin</strong> — open-source npm package with 199 typed control
-                proxies, OData fixtures, and SAP auth for test automation engineers
+                <strong>Playwright Plugin</strong> with Plan-Generate-Heal Agents with 199 typed
+                control proxies, OData fixtures with native support for SAP UI5, WebGUI, and Fiori
+                apps
               </li>
               <li>
                 <strong>Claude Code Plugin</strong> — 5 AI agents with plan-generate-heal pipeline
