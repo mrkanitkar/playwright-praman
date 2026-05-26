@@ -147,7 +147,10 @@
       "Bash(du -sh /Users/maheshwar/Documents/projects/mk1/*)",
       "Bash(git rebase origin/main)",
       "Skill(playwright-cli)",
-      "Skill(playwright-cli:*)"
+      "Skill(playwright-cli:*)",
+      "Bash(gh secret *)",
+      "Bash(pkill -f 'docusaurus build')",
+      "Bash(gtimeout 60 npm run build)"
     ],
     "additionalDirectories": [
       "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",
