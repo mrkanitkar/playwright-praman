@@ -62,6 +62,7 @@ codegen
 combinators
 commitizen
 commitlint
+commitlintrc
 connectionfailed
 cori
 costcenter
@@ -113,6 +114,7 @@ kohler
 KUNNR
 langchain
 langgraph
+lintstagedrc
 llms
 llmstxt
 maheshwar
@@ -133,6 +135,8 @@ networkidle
 nocol
 nodenext
 NodeSDK
+msapp
+noassert
 normalised
 npmjs
 opencode
@@ -148,6 +152,7 @@ pcontrol
 pfill
 pino
 playwright-praman
+postmessage
 praman
 prebuilt
 preuninstall
@@ -181,6 +186,7 @@ SDET
 Segoe
 semver
 serialisable
+smol
 serialisation
 serialise
 serialiser
@@ -220,6 +226,7 @@ vkey
 vtext
 waitforui
 wdi5
+winjs
 WDIO
 wdio
 workitem
