@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/mrkanitkar/playwright-praman/compare/v1.3.0...v1.3.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* use generic placeholder for SAP system URL in examples and tests ([c68ae03](https://github.com/mrkanitkar/playwright-praman/commit/c68ae0381fd66505b15d8d25543160deb1ad1889))
+
 ## [1.3.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.2.0...v1.3.0) (2026-05-25)
 
 
