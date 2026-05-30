@@ -2,20 +2,20 @@
 
 ## Application Overview
 
-| Property          | Value                                                                  |
-| ----------------- | ---------------------------------------------------------------------- |
-| System            | SAP S/4HANA Cloud — Partner Demo Customizing LXG/100, Client 100       |
+| Property          | Value                                                                       |
+| ----------------- | --------------------------------------------------------------------------- |
+| System            | SAP S/4HANA Cloud — Partner Demo Customizing LXG/100, Client 100            |
 | URL               | `https://<your-system>.s4hana.cloud.sap/ui#MaterialBOM-maintainMaterialBOM` |
-| UI5 Version       | 1.142.6                                                                |
-| OData Version     | V4                                                                     |
-| Control Framework | MDC (`sap.ui.mdc.*`) — NOT Smart controls                              |
-| Service Namespace | `com.sap.gateway.srvd.ui_billofmaterial_maintain.v0001`                |
-| Fiori Floorplan   | List Report + Object Page (Fiori Elements V4)                          |
-| App Component     | `pise.mi.plm.bom.core::BOMHeaderList`                                  |
-| FLP Space Tab     | Bills Of Material                                                      |
-| Tile Header       | Maintain Bill Of Material (Version 2)                                  |
-| Seed File         | `tests/seeds/sap-seed.spec.ts`                                         |
-| Discovery Date    | Live exploration session                                               |
+| UI5 Version       | 1.142.6                                                                     |
+| OData Version     | V4                                                                          |
+| Control Framework | MDC (`sap.ui.mdc.*`) — NOT Smart controls                                   |
+| Service Namespace | `com.sap.gateway.srvd.ui_billofmaterial_maintain.v0001`                     |
+| Fiori Floorplan   | List Report + Object Page (Fiori Elements V4)                               |
+| App Component     | `pise.mi.plm.bom.core::BOMHeaderList`                                       |
+| FLP Space Tab     | Bills Of Material                                                           |
+| Tile Header       | Maintain Bill Of Material (Version 2)                                       |
+| Seed File         | `tests/seeds/sap-seed.spec.ts`                                              |
+| Discovery Date    | Live exploration session                                                    |
 
 ### Control IDs Discovered
 

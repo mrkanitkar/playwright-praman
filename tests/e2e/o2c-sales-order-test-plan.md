@@ -5,7 +5,7 @@
 | Property         | Value                                       |
 | ---------------- | ------------------------------------------- |
 | System           | SAP S/4HANA Cloud                           |
-| Host             | `<your-system>.s4hana.cloud.sap`                 |
+| Host             | `<your-system>.s4hana.cloud.sap`            |
 | System ID        | LXG/100 (Partner Demo Customizing)          |
 | App Type         | SAP GUI for HTML (ABAP freestyle in iframe) |
 | Iframe           | `__container158-iframe`                     |
