@@ -920,6 +920,8 @@ npm install --save-dev cspell@^10
 
 ### Configure — `cspell.json`
 
+<!-- cspell:disable -->
+
 ```json
 {
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
@@ -945,6 +947,8 @@ npm install --save-dev cspell@^10
   "suggestWords": ["allowlist", "denylist", "main", "replica"]
 }
 ```
+
+<!-- cspell:enable -->
 
 ### Create dictionary file
 
