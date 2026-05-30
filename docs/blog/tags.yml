@@ -172,3 +172,13 @@ opentelemetry:
   label: OpenTelemetry
   permalink: /opentelemetry
   description: OpenTelemetry observability integration for SAP test execution tracing and metrics.
+
+nodejs:
+  label: Node.js
+  permalink: /nodejs
+  description: Node.js runtime compatibility, version support, and ESM/CJS dual-format guidance.
+
+compatibility:
+  label: Compatibility
+  permalink: /compatibility
+  description: Version compatibility guides for Node.js, TypeScript, Playwright, and toolchain updates.
