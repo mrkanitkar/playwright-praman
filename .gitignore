@@ -103,7 +103,13 @@ sap_template_tc*.csv
 # macOS Finder duplicates (stale " 2" copies)
 *\ 2.ts
 *\ 2.json
+*\ 2.md
+*\ 2.yaml
 .cspell/.cspellcache\ 2
+
+# Local dev artifacts
+mk1
+playwright-headed.config.ts
 
 # Stale / orphan artifacts
 .git-corrupted/
