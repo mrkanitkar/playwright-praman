@@ -171,10 +171,10 @@ function initBridge(): void {
         if (
           win.sap.ui &&
           win.sap.ui.core &&
-          win.sap.ui.core.ElementRegistry &&
-          win.sap.ui.core.ElementRegistry.get
+          win.sap.ui.require('sap/ui/core/ElementRegistry') &&
+          win.sap.ui.require('sap/ui/core/ElementRegistry').get
         ) {
-          const el2 = win.sap.ui.core.ElementRegistry.get(id);
+          const el2 = win.sap.ui.require('sap/ui/core/ElementRegistry').get(id);
           if (el2) return el2;
         }
 

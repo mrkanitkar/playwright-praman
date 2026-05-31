@@ -12,7 +12,7 @@
  *
  * @remarks
  * Uses Playwright's `page.evaluate()` to enumerate all registered UI5 controls
- * on the current page via `sap.ui.core.ElementRegistry`. The browser-side
+ * on the current page via `sap.ui.require('sap/ui/core/ElementRegistry')`. The browser-side
  * callback is fully self-contained — all helper logic is inlined as inner
  * function declarations because `page.evaluate()` serializes only the function
  * body; module-level imports and closures are not available in the browser.
@@ -466,7 +466,7 @@ function browserDiscoverControls(args: BrowserArgs): {
  * Discovers all UI5 controls on the current Playwright page.
  *
  * @remarks
- * Calls `sap.ui.core.ElementRegistry.all()` (UI5 ≥ 1.106) in the browser,
+ * Calls `sap.ui.require('sap/ui/core/ElementRegistry').all()` (UI5 ≥ 1.106) in the browser,
  * falling back to `sap.ui.getCore().mElements` for older runtimes. Each
  * discovered control is classified by interactivity, container membership, and
  * object category. The result is partitioned into `buttons`, `formFields`,

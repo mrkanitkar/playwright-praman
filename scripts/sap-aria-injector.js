@@ -117,9 +117,9 @@
         typeof sap !== 'undefined' &&
         sap.ui &&
         sap.ui.core &&
-        sap.ui.core.ElementRegistry
+        sap.ui.require('sap/ui/core/ElementRegistry')
       ) {
-        registry = sap.ui.core.ElementRegistry;
+        registry = sap.ui.require('sap/ui/core/ElementRegistry');
       } else if (typeof sap !== 'undefined' && sap.ui && sap.ui.getCore) {
         var core = sap.ui.getCore();
         registry = core && core.getElements ? { all: function () { return core.getElements(); } } : null;

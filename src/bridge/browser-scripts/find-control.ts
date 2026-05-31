@@ -285,7 +285,7 @@ export function createFindControlScript(): string {
       if (typeof sap !== 'undefined' && sap.ui && sap.ui.core) {
         var registry = sap.ui.core.Element && sap.ui.core.Element.registry
           ? sap.ui.core.Element.registry
-          : (sap.ui.core.ElementRegistry || null);
+          : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
         if (registry && registry.all) {
           var suffix = selectorId ? '--' + selectorId : null;
           var isRegExp = selectorId && typeof selectorId === 'string'

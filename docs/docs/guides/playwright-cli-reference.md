@@ -59,7 +59,7 @@ playwright-cli run-code "async page => {
 ```bash
 playwright-cli run-code "async page => {
   return await page.evaluate(() => {
-    const controls = Object.values(sap.ui.core.ElementRegistry.all()).filter(
+    const controls = Object.values(sap.ui.require('sap/ui/core/ElementRegistry').all()).filter(
       el => el.getMetadata().getName() === 'sap.m.Input'
     );
     return controls.map(c => ({ id: c.getId(), value: c.getValue?.() }));
@@ -109,7 +109,7 @@ playwright-cli run-code "async page => {
 ```bash
 playwright-cli run-code "async page => {
   return await page.evaluate(() => {
-    return Object.values(sap.ui.core.ElementRegistry.all()).slice(0, 50).map(c => ({
+    return Object.values(sap.ui.require('sap/ui/core/ElementRegistry').all()).slice(0, 50).map(c => ({
       id: c.getId(),
       type: c.getMetadata().getName()
     }));
@@ -143,7 +143,7 @@ playwright-cli eval "() => window.__praman_bridge ? window.__praman_bridge.ready
 playwright-cli eval "() => typeof sap !== 'undefined' ? sap.ui.version : 'UI5 not loaded'"
 
 # Control count
-playwright-cli eval "() => Object.keys(sap.ui.core.ElementRegistry.all()).length"
+playwright-cli eval "() => Object.keys(sap.ui.require('sap/ui/core/ElementRegistry').all()).length"
 
 # Single control text
 playwright-cli eval "() => sap.ui.getCore().byId('myButton')?.getText()"

@@ -183,7 +183,7 @@ The fix is a 2-second check:
 ```bash
 playwright-cli -s=sap run-code "async page => {
   return await page.evaluate((id) => {
-    const ctrl = sap.ui.core.ElementRegistry.get(id);
+    const ctrl = sap.ui.require('sap/ui/core/ElementRegistry').get(id);
     const methods = ['press', 'firePress', 'setValue', 'fireChange', 'fireSelect'];
     return methods.filter(m => typeof ctrl[m] === 'function');
   }, 'application--iconTabBar-filter1');

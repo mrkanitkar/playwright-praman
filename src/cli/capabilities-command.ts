@@ -262,7 +262,7 @@ export function buildCapabilityManifest(): CapabilityManifest {
       'window.__praman_bridge.ready',
       'window.__praman_bridge.utils.retrieveControlMethods(id)',
       'window.__praman_bridge.getById(id)',
-      'sap.ui.core.ElementRegistry.all()',
+      'sap.ui.require("sap/ui/core/ElementRegistry").all()',
       'sap.ui.core.BusyIndicator.isActive()',
     ],
     offlineCommands: [

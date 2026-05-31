@@ -229,7 +229,7 @@ UI5 controls. Create the config file at `.playwright/praman-cli.config.json`:
 ```
 
 The `initScript` array tells the CLI to inject the Praman bridge (`window.__praman_bridge`)
-into every page. This enables `run-code` discovery of `sap.ui.core.ElementRegistry` and
+into every page. This enables `run-code` discovery of `sap.ui.require('sap/ui/core/ElementRegistry')` and
 all bridge-level control operations.
 
 Alternatively, export the bridge script to a local file:

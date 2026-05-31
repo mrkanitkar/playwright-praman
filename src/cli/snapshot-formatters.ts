@@ -132,8 +132,8 @@ export function buildEnricherScript(): string {
   try {
     function getRegistry() {
       if (typeof sap === 'undefined' || !sap.ui) return null;
-      if (sap.ui.core && sap.ui.core.ElementRegistry) {
-        return sap.ui.core.ElementRegistry;
+      if (sap.ui.core && sap.ui.require('sap/ui/core/ElementRegistry')) {
+        return sap.ui.require('sap/ui/core/ElementRegistry');
       }
       if (sap.ui.getCore) {
         var core = sap.ui.getCore();

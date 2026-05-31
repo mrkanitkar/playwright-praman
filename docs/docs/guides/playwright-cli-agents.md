@@ -154,7 +154,7 @@ The planner agent will:
 1. Open the SAP system in a persistent CLI session
 2. Authenticate using saved state or credentials
 3. Navigate to the Fiori app via FLP
-4. Discover UI5 controls using `run-code` with `sap.ui.core.ElementRegistry`
+4. Discover UI5 controls using `run-code` with `sap.ui.require('sap/ui/core/ElementRegistry')`
 5. Capture page snapshots at each step
 6. Write a test plan and gold-standard `.spec.ts` file
 
@@ -261,7 +261,7 @@ playwright-cli -s=sap state-load sap-auth.json
 playwright-cli -s=sap snapshot --filename=flp-snapshot.yml
 playwright-cli -s=sap run-code "async page => {
   return await page.evaluate(() => {
-    const registry = sap.ui.core.ElementRegistry.all();
+    const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
     return Object.keys(registry).map(id => ({
       id, type: registry[id].getMetadata().getName()
     }));

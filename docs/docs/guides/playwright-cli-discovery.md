@@ -73,7 +73,7 @@ and BTP systems.
 ## Single Control Discovery by ID
 
 Look up a single control using its stable DOM ID via `bridge.getById()`. This calls
-`sap.ui.core.ElementRegistry.get()` live — it reflects the current DOM state, not
+`sap.ui.require('sap/ui/core/ElementRegistry').get()` live — it reflects the current DOM state, not
 a cached snapshot.
 
 ```bash

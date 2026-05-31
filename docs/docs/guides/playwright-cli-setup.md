@@ -122,7 +122,7 @@ The `eval` command requires a function wrapper: `"() => expression"`, not a bare
 
 ```bash
 npx @playwright/cli eval "() => {
-  const reg = sap.ui.core.ElementRegistry.all();
+  const reg = sap.ui.require('sap/ui/core/ElementRegistry').all();
   const btn = Object.values(reg).find(c => c.getMetadata().getName() === 'sap.m.Button');
   return btn ? { id: btn.getId(), text: btn.getText ? btn.getText() : '' } : null;
 }"

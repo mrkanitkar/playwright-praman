@@ -34,7 +34,7 @@ export const LR_FIND_TABLE_SCRIPT = `(function() {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var all = registry && registry.all ? Object.values(registry.all()) : [];
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
@@ -70,7 +70,7 @@ export const LR_FIND_FILTER_BAR_SCRIPT = `(function() {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var all = registry && registry.all ? Object.values(registry.all()) : [];
     for (var i = 0; i < all.length; i++) {
       var el = all[i];
@@ -295,7 +295,7 @@ export const LR_GET_VARIANTS_SCRIPT = `(function() {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var all = registry && registry.all ? Object.values(registry.all()) : [];
     var vmControl = null;
     for (var i = 0; i < all.length; i++) {
@@ -345,7 +345,7 @@ export const LR_SELECT_VARIANT_SCRIPT = `(function(variantName) {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var all = registry && registry.all ? Object.values(registry.all()) : [];
     var vmControl = null;
     for (var i = 0; i < all.length; i++) {
