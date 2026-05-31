@@ -351,6 +351,12 @@ div[class*='announcementBar'] {
   opacity: 0.9;
 }
 
+.praman-carousel-visual .praman-video-container {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 10px;
+}
+
 /* ── Carousel nav arrows ────────────────────────────────────── */
 .praman-carousel-arrow {
   position: absolute;
