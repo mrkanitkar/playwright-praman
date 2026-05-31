@@ -559,7 +559,7 @@ const SLIDES: CarouselSlide[] = [
     tags: ['AI Agents', 'Test Engineers', 'Business Analysts'],
     primaryCta: { label: 'View Personas', to: '/personas' },
     secondaryCta: { label: 'Documentation', to: '/docs' },
-    Visual: PersonaSVG,
+    Visual: () => <VideoEmbed videoId="mHsYAZZWnSw" title="Praman — Video 2" />,
   },
   {
     id: 'claude-code',
