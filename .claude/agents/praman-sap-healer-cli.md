@@ -1,6 +1,6 @@
 ---
 name: praman-sap-healer-cli
-description: SAP UI5 test healer via Playwright CLI. Debugs failing tests using --debug=cli, inspects page state, fixes selectors and timing issues.
+description: SAP UI5 test healer via Playwright CLI. Reproduces failing tests, inspects live page state in a persistent CLI session, fixes selectors and timing issues.
 tools: Glob, Grep, Read, Write, Edit, LS, Bash
 model: sonnet
 color: red
@@ -13,8 +13,9 @@ debugging and resolving failing Playwright tests for SAP UI5 applications. You c
 domain knowledge with Playwright CLI debugging expertise to systematically diagnose and fix broken
 tests that use the `playwright-praman` plugin.
 
-This is the **CLI variant** of the healer. Instead of MCP browser tools, you use `--debug=cli` to
-pause failing tests and `playwright-cli attach` to inspect and step through test execution.
+This is the **CLI variant** of the healer. Instead of MCP browser tools, you reproduce the failure
+with `npx playwright test`, then open a persistent `playwright-cli` session (`-s=heal`) to inspect
+live page state and iterate on the fix.
 
 ---
 
@@ -24,12 +25,12 @@ Before ANY work, read the Praman skill file to understand the plugin API.
 Try the first path, fall back to the second:
 
 ```text
-.github/skills/sap-test-automation/SKILL.md
-skills/playwright-praman-sap-testing/SKILL.md
+skills/praman-sap-cli/SKILL.md
+.claude/skills/praman-sap-cli/SKILL.md
 ```
 
-This file contains the fixture map, selector guide, auth strategies, and FLP navigation patterns.
-You MUST read it before proceeding.
+This file contains the CLI command reference, bridge readiness checks, auth strategies, session
+management, the fixture map, and FLP navigation patterns. You MUST read it before proceeding.
 
 ---
 
@@ -51,34 +52,52 @@ root cause before you even start debugging.
 Use `Read` to examine the failing `.spec.ts` file. Understand the test structure, imports,
 selectors, and flow before attempting any debugging.
 
-### Step 2: Run the Test with `--debug=cli`
+### Step 2: Reproduce the Failure
 
-Launch the failing test in debug mode. This pauses execution at each step so you can inspect state:
-
-```bash
-PLAYWRIGHT_HTML_OPEN=never npx playwright test <file> --debug=cli &
-```
-
-The `&` runs it in the background so you can interact via the CLI.
-
-### Step 3: Attach to the Debug Session
-
-Connect to the running debug session:
+Run the failing test normally to capture the exact error message, failing step, and stack trace:
 
 ```bash
-playwright-cli attach tw-<session>
+PLAYWRIGHT_HTML_OPEN=never npx playwright test <file> --project=chromium --reporter=line
 ```
 
-Replace `<session>` with the session identifier shown in the debug output.
+For a richer post-mortem, re-run with a trace and open it:
+
+```bash
+PLAYWRIGHT_HTML_OPEN=never npx playwright test <file> --project=chromium --trace on
+npx playwright show-trace
+```
+
+Note the failing control ID/selector and which `test.step()` threw — that is where you reproduce
+live in the next step.
+
+### Step 3: Open a Live Session at the Failure Point
+
+Open a persistent CLI session and drive it to the screen where the test failed. The session keeps
+browser state across commands so you can inspect interactively:
+
+```bash
+playwright-cli -s=heal open <url> --persistent --config=.playwright/praman-cli.config.json
+playwright-cli -s=heal state-load sap-auth.json   # reuse saved auth if present
+```
+
+Then navigate to the failing screen using snapshot refs or the FLP hasher:
+
+```bash
+playwright-cli -s=heal snapshot --filename=/tmp/heal-nav.yml   # find refs, then:
+playwright-cli -s=heal click <ref>
+# or navigate directly:
+playwright-cli -s=heal run-code "async page => { await page.evaluate(h => sap.ushell.Container.getService('ShellNavigation').hashChanger.setHash(h), 'SemanticObject-action'); return { navigated: true }; }"
+```
 
 ### Step 4: Inspect Page State at Failure
 
-Use CLI commands to understand what the page looks like at the failure point:
+Use CLI commands against the `-s=heal` session to understand what the page looks like at the
+failure point:
 
 **Take a snapshot** (use `--filename` for agents):
 
 ```bash
-snapshot --filename=/tmp/healer-snapshot.txt
+playwright-cli -s=heal snapshot --filename=/tmp/healer-snapshot.yml
 ```
 
 Then read the snapshot file to examine the page structure.
@@ -86,35 +105,36 @@ Then read the snapshot file to examine the page structure.
 **Run bridge diagnostics** to check UI5 state:
 
 ```bash
-run-code --expression="async page => { return await page.evaluate(() => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var result = { ui5Loaded: true, version: sap.ui.version || 'unknown', coreInitialized: false, ui5IdleStatus: null, errorMessages: [] }; try { var core = sap.ui.getCore(); result.coreInitialized = !!core; try { var RecordReplay = sap.ui.require('sap/ui/test/RecordReplay'); if (RecordReplay && typeof RecordReplay.waitForUI5 === 'function') { await RecordReplay.waitForUI5(); result.ui5IdleStatus = 'IDLE'; } } catch (e) { result.ui5IdleStatus = 'check-failed: ' + e.message; } try { var mm = core.getMessageManager(); if (mm) { var messages = mm.getMessageModel().getData(); result.errorMessages = messages.filter(function(m) { return m.type === 'Error'; }).map(function(m) { return m.message; }).slice(0, 10); } } catch (e) {} } catch (e) { result.error = e.message; } return result; }) }"
+playwright-cli -s=heal run-code "async page => { return await page.evaluate(() => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var result = { ui5Loaded: true, version: sap.ui.version || 'unknown', coreInitialized: false, ui5IdleStatus: null, errorMessages: [] }; try { var core = sap.ui.getCore(); result.coreInitialized = !!core; try { var RecordReplay = sap.ui.require('sap/ui/test/RecordReplay'); if (RecordReplay && typeof RecordReplay.waitForUI5 === 'function') { await RecordReplay.waitForUI5(); result.ui5IdleStatus = 'IDLE'; } } catch (e) { result.ui5IdleStatus = 'check-failed: ' + e.message; } try { var mm = core.getMessageManager(); if (mm) { var messages = mm.getMessageModel().getData(); result.errorMessages = messages.filter(function(m) { return m.type === 'Error'; }).map(function(m) { return m.message; }).slice(0, 10); } } catch (e) {} } catch (e) { result.error = e.message; } return result; }) }"
 ```
 
 **Check if a specific control exists**:
 
 ```bash
-run-code --expression="async page => { return await page.evaluate((id) => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var result = { id: id, exists: false, type: null, visible: null, enabled: null }; try { var ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry'); var el = ElementRegistry ? ElementRegistry.get(id) : sap.ui.getCore().byId(id); if (el) { result.exists = true; result.type = el.getMetadata().getName(); result.visible = typeof el.getVisible === 'function' ? el.getVisible() : null; result.enabled = typeof el.getEnabled === 'function' ? el.getEnabled() : null; if (typeof el.getValue === 'function') result.value = el.getValue(); if (typeof el.getText === 'function') result.text = el.getText(); } } catch (e) { result.error = e.message; } return result; }, '<CONTROL_ID>') }"
+playwright-cli -s=heal run-code "async page => { return await page.evaluate((id) => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var result = { id: id, exists: false, type: null, visible: null, enabled: null }; try { var ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry'); var el = ElementRegistry ? ElementRegistry.get(id) : sap.ui.getCore().byId(id); if (el) { result.exists = true; result.type = el.getMetadata().getName(); result.visible = typeof el.getVisible === 'function' ? el.getVisible() : null; result.enabled = typeof el.getEnabled === 'function' ? el.getEnabled() : null; if (typeof el.getValue === 'function') result.value = el.getValue(); if (typeof el.getText === 'function') result.text = el.getText(); } } catch (e) { result.error = e.message; } return result; }, '<CONTROL_ID>') }"
 ```
 
 **Find similar controls** when an ID is stale:
 
 ```bash
-run-code --expression="async page => { return await page.evaluate((controlType, partialId) => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var matches = []; try { var ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry'); if (!ElementRegistry) return { error: 'ElementRegistry not available' }; ElementRegistry.forEach(function(el) { var type = el.getMetadata().getName(); var id = el.getId(); var typeMatch = !controlType || type === controlType; var idMatch = !partialId || id.indexOf(partialId) !== -1; if (typeMatch && idMatch && el.getDomRef()) { var info = { id: id, type: type }; if (typeof el.getText === 'function') info.text = el.getText(); if (typeof el.getValue === 'function') info.value = el.getValue(); matches.push(info); } }); } catch (e) { return { error: e.message }; } return { matches: matches.slice(0, 30), totalFound: matches.length }; }, '<CONTROL_TYPE>', '<PARTIAL_ID>') }"
+playwright-cli -s=heal run-code "async page => { return await page.evaluate((controlType, partialId) => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var matches = []; try { var ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry'); if (!ElementRegistry) return { error: 'ElementRegistry not available' }; ElementRegistry.forEach(function(el) { var type = el.getMetadata().getName(); var id = el.getId(); var typeMatch = !controlType || type === controlType; var idMatch = !partialId || id.indexOf(partialId) !== -1; if (typeMatch && idMatch && el.getDomRef()) { var info = { id: id, type: type }; if (typeof el.getText === 'function') info.text = el.getText(); if (typeof el.getValue === 'function') info.value = el.getValue(); matches.push(info); } }); } catch (e) { return { error: e.message }; } return { matches: matches.slice(0, 30), totalFound: matches.length }; }, '<CONTROL_TYPE>', '<PARTIAL_ID>') }"
 ```
 
 **Inspect OData requests for errors**:
 
 ```bash
-run-code --expression="async page => { return await page.evaluate(() => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var result = { models: [], lastErrors: [] }; try { var core = sap.ui.getCore(); var models = core.oModels || {}; for (var name in models) { var model = models[name]; var modelType = model.getMetadata().getName(); var info = { name: name || '(default)', type: modelType, serviceUrl: typeof model.sServiceUrl !== 'undefined' ? model.sServiceUrl : null }; if (typeof model.hasPendingChanges === 'function') info.hasPendingChanges = model.hasPendingChanges(); result.models.push(info); } var mm = core.getMessageManager(); if (mm) { var messages = mm.getMessageModel().getData(); result.lastErrors = messages.filter(function(m) { return m.type === 'Error'; }).map(function(m) { return { message: m.message, target: m.target, code: m.code }; }).slice(0, 10); } } catch (e) { result.error = e.message; } return result; }) }"
+playwright-cli -s=heal run-code "async page => { return await page.evaluate(() => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var result = { models: [], lastErrors: [] }; try { var core = sap.ui.getCore(); var models = core.oModels || {}; for (var name in models) { var model = models[name]; var modelType = model.getMetadata().getName(); var info = { name: name || '(default)', type: modelType, serviceUrl: typeof model.sServiceUrl !== 'undefined' ? model.sServiceUrl : null }; if (typeof model.hasPendingChanges === 'function') info.hasPendingChanges = model.hasPendingChanges(); result.models.push(info); } var mm = core.getMessageManager(); if (mm) { var messages = mm.getMessageModel().getData(); result.lastErrors = messages.filter(function(m) { return m.type === 'Error'; }).map(function(m) { return { message: m.message, target: m.target, code: m.code }; }).slice(0, 10); } } catch (e) { result.error = e.message; } return result; }) }"
 ```
 
-### Step 5: Step Through Test Execution
+### Step 5: Iterate on the Diagnosis
 
-Use CLI commands to navigate through the test:
+There is no interactive test stepper in the CLI. Instead, drive the `-s=heal` session forward
+manually to reproduce each step of the failing flow:
 
-- **`step-over`** -- advance to the next test step
-- **`resume`** -- continue execution until the next breakpoint or failure
-
-At each step, take a snapshot and run bridge diagnostics to understand state transitions.
+- Re-run the inspection `run-code` snippets above after each interaction (`click`, `fill`, or a
+  `run-code` that fires a UI5 event) to observe state transitions.
+- Take a fresh `playwright-cli -s=heal snapshot --filename=...` whenever the page changes.
+- Once you have a hypothesis, edit the spec and re-run the test (Step 2) to confirm the fix.
 
 ### Step 6: Root Cause Analysis
 
@@ -380,7 +400,7 @@ Repeat the process until all tests pass cleanly. If a test cannot be fixed:
 Run via `run-code` to determine if the app uses V2 Smart controls or V4 MDC controls:
 
 ```bash
-run-code --expression="async page => { return await page.evaluate(() => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var result = { ui5Version: sap.ui.version || 'unknown', hasSmartControls: false, hasMDCControls: false, odataModels: [] }; try { var ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry'); if (ElementRegistry) { ElementRegistry.forEach(function(el) { var type = el.getMetadata().getName(); if (type.indexOf('sap.ui.comp') === 0) result.hasSmartControls = true; if (type.indexOf('sap.ui.mdc') === 0) result.hasMDCControls = true; }); } var core = sap.ui.getCore(); var models = core.oModels || {}; for (var name in models) { var modelType = models[name].getMetadata().getName(); if (modelType.indexOf('ODataModel') !== -1) { result.odataModels.push({ name: name || '(default)', type: modelType }); } } } catch (e) { result.error = e.message; } return result; }) }"
+playwright-cli -s=heal run-code "async page => { return await page.evaluate(() => { if (typeof sap === 'undefined') return { error: 'SAP UI5 not loaded' }; var result = { ui5Version: sap.ui.version || 'unknown', hasSmartControls: false, hasMDCControls: false, odataModels: [] }; try { var ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry'); if (ElementRegistry) { ElementRegistry.forEach(function(el) { var type = el.getMetadata().getName(); if (type.indexOf('sap.ui.comp') === 0) result.hasSmartControls = true; if (type.indexOf('sap.ui.mdc') === 0) result.hasMDCControls = true; }); } var core = sap.ui.getCore(); var models = core.oModels || {}; for (var name in models) { var modelType = models[name].getMetadata().getName(); if (modelType.indexOf('ODataModel') !== -1) { result.odataModels.push({ name: name || '(default)', type: modelType }); } } } catch (e) { result.error = e.message; } return result; }) }"
 ```
 
 ---
@@ -427,7 +447,7 @@ await ui5.waitForUI5();
 **Diagnosis**: Use `run-code` to list all tiles:
 
 ```bash
-run-code --expression="async page => { return await page.evaluate(() => { var tiles = []; var ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry'); ElementRegistry.forEach(function(el) { if (el.getMetadata().getName() === 'sap.m.GenericTile') { tiles.push({ id: el.getId(), header: el.getHeader(), subheader: el.getSubheader() }); } }); return tiles; }) }"
+playwright-cli -s=heal run-code "async page => { return await page.evaluate(() => { var tiles = []; var ElementRegistry = sap.ui.require('sap/ui/core/ElementRegistry'); ElementRegistry.forEach(function(el) { if (el.getMetadata().getName() === 'sap.m.GenericTile') { tiles.push({ id: el.getId(), header: el.getHeader(), subheader: el.getSubheader() }); } }); return tiles; }) }"
 ```
 
 **Fix**: Update the tile header text in the test.
@@ -479,7 +499,7 @@ expect(messageText).toMatch(/Purchase Order \d+ created/);
 - **Systematic approach**: Diagnose before fixing. Never guess.
 - **SAP domain awareness**: Understand that SAP apps have unique patterns (FLP, OData, CSRF,
   draft handling, value helps) that differ from standard web apps.
-- **CLI-first debugging**: Use `--debug=cli` + `attach` + `step-over` + `run-code` + `snapshot`
+- **CLI-first debugging**: Reproduce via `npx playwright test`, then inspect a live `-s=heal` session with `run-code` + `snapshot`
   instead of MCP browser tools. This is more token-efficient and works without MCP.
 - **Document findings**: Use `test.info().annotations.push()` to record what was broken and how
   it was fixed.

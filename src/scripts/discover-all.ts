@@ -33,7 +33,7 @@ const MAX_CONTROLS = 100;
  * A pre-built browser script string that discovers all UI5 controls with methods.
  *
  * @remarks
- * Uses `sap.ui.core.ElementRegistry.all()` to enumerate controls and
+ * Uses `sap.ui.require('sap/ui/core/ElementRegistry').all()` to enumerate controls and
  * `bridge.utils.retrieveControlMethods()` to get available methods per control.
  * Shell-safe: contains no double quotes, backticks, or dollar signs.
  *
@@ -46,7 +46,7 @@ export const DISCOVER_ALL_SCRIPT = `async page => {
   return await page.evaluate(() => {
     const bridge = window.__praman_bridge;
     if (!bridge || !bridge.ready) return { error: 'Bridge not ready. Ensure --config includes initScript.' };
-    const registry = sap.ui.core.ElementRegistry.all();
+    const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
     const controls = Object.values(registry);
     return {
       total: controls.length,

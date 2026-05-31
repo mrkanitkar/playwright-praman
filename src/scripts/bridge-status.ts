@@ -43,7 +43,8 @@ export const BRIDGE_STATUS_SCRIPT = `async page => {
     var bridgeVersion = bridge && bridge.version ? bridge.version : 'unknown';
     var objectMapSize = bridge && bridge.objectMap ? Object.keys(bridge.objectMap).length : 0;
     var hasRecordReplay = bridge && bridge.recordReplay ? true : false;
-    var registry = sap.ui.core.ElementRegistry ? sap.ui.core.ElementRegistry.all() : {};
+    var ER = sap.ui.require('sap/ui/core/ElementRegistry');
+    var registry = ER ? ER.all() : {};
     var controlCount = Object.keys(registry).length;
     return {
       ready: ready,

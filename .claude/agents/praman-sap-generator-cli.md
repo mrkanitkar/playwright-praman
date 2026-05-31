@@ -126,7 +126,7 @@ For each test scenario in the plan:
    # Discover a specific control
    playwright-cli -s=gen run-code "async page => {
      const control = await page.evaluate(() => {
-       const ctrl = sap.ui.core.ElementRegistry.get('materialInput');
+       const ctrl = sap.ui.require('sap/ui/core/ElementRegistry').get('materialInput');
        if (!ctrl) return null;
        return {
          id: ctrl.getId(),
@@ -142,7 +142,7 @@ For each test scenario in the plan:
    # Bulk-discover controls on current page
    playwright-cli -s=gen run-code "async page => {
      const controls = await page.evaluate(() => {
-       const registry = sap.ui.core.ElementRegistry.all();
+       const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
        return Object.keys(registry).map(id => {
          const ctrl = registry[id];
          return { id, type: ctrl.getMetadata().getName() };
@@ -162,7 +162,7 @@ For each test scenario in the plan:
    # Example: fill an input field (setValue + fireChange + waitForUI5)
    playwright-cli -s=gen run-code "async page => {
      await page.evaluate(() => {
-       const input = sap.ui.core.ElementRegistry.get('materialInput');
+       const input = sap.ui.require('sap/ui/core/ElementRegistry').get('materialInput');
        input.setValue('MAT-001');
        input.fireChange({ value: 'MAT-001' });
      });
