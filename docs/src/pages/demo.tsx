@@ -28,21 +28,15 @@ const VIDEOS = [
 ];
 
 function VideoSeries(): ReactNode {
-  const [featured, ...rest] = VIDEOS;
   return (
-    <section style={{ padding: '3rem 2rem', maxWidth: 800, margin: '0 auto' }}>
+    <section style={{ padding: '3rem 2rem', maxWidth: 900, margin: '0 auto' }}>
       <p className="praman-section-label" style={{ textAlign: 'center' }}>Watch</p>
       <h2 className="praman-section-title" style={{ textAlign: 'center' }}>Praman in Action</h2>
-      <div style={{ marginTop: '2rem' }}>
-        <VideoEmbed videoId={featured.id} title={featured.title} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginTop: '2rem' }}>
+        {VIDEOS.map((v) => (
+          <VideoEmbed key={v.id} videoId={v.id} title={v.title} />
+        ))}
       </div>
-      {rest.length > 0 && (
-        <div className="praman-video-grid">
-          {rest.map((v) => (
-            <VideoEmbed key={v.id} videoId={v.id} title={v.title} />
-          ))}
-        </div>
-      )}
     </section>
   );
 }
