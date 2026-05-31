@@ -2,6 +2,7 @@ import { Fragment, useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
+import VideoEmbed from '../components/VideoEmbed';
 
 /* ── SVG Slide Illustrations ──────────────────────────────── */
 
@@ -547,7 +548,7 @@ const SLIDES: CarouselSlide[] = [
     tags: ['Your Environment', 'Any Agent', 'Any LLM'],
     primaryCta: { label: 'Get Started', to: '/docs' },
     secondaryCta: { label: 'API Reference', to: '/docs/api' },
-    Visual: AgenticSVG,
+    Visual: () => <VideoEmbed videoId="Q1EqVPy4-QQ" title="Getting Started with Praman" />,
   },
   {
     id: 'personas',

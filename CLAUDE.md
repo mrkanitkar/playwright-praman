@@ -6,9 +6,8 @@ Agent-First SAP UI5 Test Automation Plugin for Playwright.
 Single npm package `playwright-praman` with sub-path exports.
 Ground-up rewrite — NO copy-paste from v2.5.0.
 
-## Architecture (read plan.md for full details)
+## Architecture (read `plans/plan.md` for full details)
 
-- Single npm package with sub-path exports
 - 6-layer: Core Infrastructure → Bridge Adapters → Typed Proxy → Fixtures → AI → Reporters
 - Layer dependency: lower layers NEVER import from higher layers
 
@@ -51,7 +50,7 @@ For multi-skill tasks, load primary + supporting skill(s). Example:
 3. Every module ≤ 300 LOC (document exceptions)
 4. Every error: `extends PramanError`, includes `code`, `attempted`, `retryable`, `suggestions[]`
 5. No `console.log` — use pino: `import { logger } from '#core/logging';`
-6. No `page.waitForTimeout()` — banned (Principle 8)
+6. No `page.waitForTimeout()` — banned; use Playwright auto-waiting or `waitForUI5Stable()`
 7. Unit tests: hermetic, use Vitest, mock bridge interactions
 8. Config is `Readonly<PramanConfig>` — never mutate
 9. Imports: use `#core/*`, `#bridge/*`, `#proxy/*` path aliases
@@ -141,7 +140,6 @@ throw new ControlError({
 
 - **Supported OS**: Windows 10/11, macOS, Linux (Ubuntu/Debian)
 - Always use `node:path` methods — never hardcoded `/` or `\` separators
-- Always use `node:fs/promises` for async file operations
 - Use `import.meta.url` + `fileURLToPath` for `__dirname` equivalent (see `src/core/compat/path-helpers.ts`)
 - No bash-only npm scripts — use Node.js built-ins (`fs.rmSync`, not `rm -rf`)
 - Use `.gitattributes` with `* text=auto eol=lf` for consistent line endings
@@ -149,15 +147,14 @@ throw new ControlError({
 
 ## Supported IDEs & AI Agents
 
-| IDE / Agent           | Config Location                                                              |
-| --------------------- | ---------------------------------------------------------------------------- |
-| VS Code + Copilot     | `.github/copilot-instructions.md`, `.vscode/`                                |
-| JetBrains / IntelliJ  | `.idea/runConfigurations/`, `.idea/codeStyles/`, `.idea/inspectionProfiles/` |
-| Cursor                | `.cursor/rules/praman.mdc`, `.cursor/rules/tests.mdc`                        |
-| Google Antigravity    | `.antigravity/rules.md`                                                      |
-| Claude Code           | `CLAUDE.md` (this file)                                                      |
-| OpenAI Codex / Jules  | `AGENTS.md`, `.jules/setup.md`                                               |
-| Copilot Coding Agents | `.github/agents/` (Playwright MCP)                                           |
+| IDE / Agent          | Config Location                                                              |
+| -------------------- | ---------------------------------------------------------------------------- |
+| VS Code + Copilot    | `.github/copilot-instructions.md`, `.vscode/`                                |
+| JetBrains / IntelliJ | `.idea/runConfigurations/`, `.idea/codeStyles/`, `.idea/inspectionProfiles/` |
+| Cursor               | `.cursor/rules/praman.mdc`, `.cursor/rules/tests.mdc`                        |
+| Google Antigravity   | `.antigravity/rules.md`                                                      |
+| Claude Code          | `CLAUDE.md` (this file)                                                      |
+| OpenAI Codex / Jules | `AGENTS.md`, `.jules/setup.md`                                               |
 
 ## Commands
 
@@ -168,35 +165,39 @@ throw new ControlError({
 - `npm run check:exports` — attw export validation
 - `npm run ci` — lint + typecheck + test:unit + build
 
-## Best Practice Alignment
-
-- **Playwright**: Web-first assertions, fixture DI, project dependencies for auth, `test.step()`
-- **Microsoft**: TSDoc, API Extractor, SDL security, OTel, SHA-pinned Actions, cross-platform CI
-- **Google TS Style**: `Readonly<>` config, no barrel re-exports of internals
-- **Google SRE**: Exponential backoff + jitter, structured error codes
-- **Google Testing**: Tiered coverage (100% errors, 95% core, 90% global), per-file enforcement
-- **Node.js**: ESM-first with CJS fallback, `node:` prefix, engines field, files field, dual package exports
-- **Claude/Anthropic**: `retryable` + `suggestions[]` on errors, AI response envelope, checkpoint serialization
-- **npm**: Dual ESM+CJS via conditional exports, validated with attw
-
 ## Praman SAP Testing Agents
 
 ### Available Agents (`.claude/agents/`)
 
-| Agent                  | Purpose                                                  |
-| ---------------------- | -------------------------------------------------------- |
-| `praman-sap-planner`   | Explore SAP app + produce test plan + gold-standard spec |
-| `praman-sap-generator` | Generate compliant tests from plan                       |
-| `praman-sap-healer`    | Fix failing tests, enforce compliance                    |
+| Agent                       | Purpose                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `praman-sap-planner`        | Explore SAP app + produce test plan + gold-standard spec |
+| `praman-sap-generator`      | Generate compliant tests from plan                       |
+| `praman-sap-healer`         | Fix failing tests, enforce compliance                    |
+| `praman-sap-planner-cli`    | CLI variant of planner (token-efficient, no MCP)         |
+| `praman-sap-generator-cli`  | CLI variant of generator                                 |
+| `praman-sap-healer-cli`     | CLI variant of healer                                    |
+| `playwright-test-planner`   | Generic Playwright test planner (non-SAP)                |
+| `playwright-test-generator` | Generic Playwright test generator                        |
+| `playwright-test-healer`    | Generic Playwright test healer                           |
 
 ### Prompts (`.claude/prompts/`)
 
-| Prompt                | Purpose                               |
-| --------------------- | ------------------------------------- |
-| `praman-sap-plan`     | Run planner on SAP app                |
-| `praman-sap-generate` | Generate tests from plan              |
-| `praman-sap-heal`     | Fix failing tests                     |
-| `praman-sap-coverage` | Full pipeline: plan + generate + heal |
+| Prompt                     | Purpose                               |
+| -------------------------- | ------------------------------------- |
+| `praman-sap-plan`          | Run planner on SAP app                |
+| `praman-sap-generate`      | Generate tests from plan              |
+| `praman-sap-heal`          | Fix failing tests                     |
+| `praman-sap-coverage`      | Full pipeline: plan + generate + heal |
+| `praman-cli-plan`          | CLI planner variant                   |
+| `praman-cli-generate`      | CLI generator variant                 |
+| `praman-cli-heal`          | CLI healer variant                    |
+| `praman-cli-coverage`      | CLI full pipeline variant             |
+| `playwright-test-plan`     | Generic Playwright test planning      |
+| `playwright-test-generate` | Generic Playwright test generation    |
+| `playwright-test-heal`     | Generic Playwright test healing       |
+| `playwright-test-coverage` | Generic Playwright full pipeline      |
+| `wdi5-to-praman-migrate`   | Migrate wdi5 tests to Praman          |
 
 ### Seed & Config
 

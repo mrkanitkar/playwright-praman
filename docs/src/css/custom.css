@@ -351,6 +351,12 @@ div[class*='announcementBar'] {
   opacity: 0.9;
 }
 
+.praman-carousel-visual .praman-video-container {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 10px;
+}
+
 /* ── Carousel nav arrows ────────────────────────────────────── */
 .praman-carousel-arrow {
   position: absolute;
@@ -702,6 +708,34 @@ div[class*='announcementBar'] {
   color: var(--praman-ink-secondary);
   font-size: 0.88rem;
   margin-bottom: 0;
+}
+
+/* ── Video Embed ─────────────────────────────────────────── */
+
+.praman-video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--praman-shadow-md);
+  background: #000;
+}
+
+.praman-video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.praman-video-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 /* ── Agent Flow: Signavio → Test Plan → Playwright ─────────── */
@@ -1892,7 +1926,8 @@ main div[style*="border-top"] {
     gap: 0.75rem;
   }
 
-  .praman-pitch-grid {
+  .praman-pitch-grid,
+  .praman-video-grid {
     grid-template-columns: 1fr;
   }
 

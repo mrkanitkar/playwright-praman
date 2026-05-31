@@ -151,13 +151,18 @@
       "Bash(gh secret *)",
       "Bash(pkill -f 'docusaurus build')",
       "Bash(gtimeout 60 npm run build)",
-      "Bash(npm whoami *)"
+      "Bash(npm whoami *)",
+      "Bash(npx tsgo *)",
+      "Bash(rm \".git/refs/remotes/origin/release-please--branches--main--components--playwright-praman 2\")",
+      "Bash(awk '$1 > 1 {print $1, $2}')",
+      "Bash(awk '$1 > 1 {print}')"
     ],
     "additionalDirectories": [
       "/Users/maheshwar/Documents/projects/mk1/praman-audit-report",
       "/Users/maheshwar/Documents/projects/mk1/dist",
       "/Users/maheshwar/Documents/projects/mk1",
-      "/tmp"
+      "/tmp",
+      "/Users/maheshwar/Developer/pro/mk1/.git/refs/remotes/origin"
     ]
   },
   "model": "claude-opus-4-6",

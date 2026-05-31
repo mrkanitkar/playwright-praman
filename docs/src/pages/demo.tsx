@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
+import VideoEmbed from '../components/VideoEmbed';
 
 function DemoStep({ step, title, desc }: { step: string; title: string; desc: string }): ReactNode {
   return (
@@ -18,6 +19,30 @@ function DemoStep({ step, title, desc }: { step: string; title: string; desc: st
         <p style={{ color: 'var(--praman-ink-secondary)', fontSize: '0.88rem', marginBottom: 0 }}>{desc}</p>
       </div>
     </div>
+  );
+}
+
+const VIDEOS = [
+  { id: 'Q1EqVPy4-QQ', title: 'Praman — Getting Started' },
+];
+
+function VideoSeries(): ReactNode {
+  const [featured, ...rest] = VIDEOS;
+  return (
+    <section style={{ padding: '3rem 2rem', maxWidth: 800, margin: '0 auto' }}>
+      <p className="praman-section-label" style={{ textAlign: 'center' }}>Watch</p>
+      <h2 className="praman-section-title" style={{ textAlign: 'center' }}>Praman in Action</h2>
+      <div style={{ marginTop: '2rem' }}>
+        <VideoEmbed videoId={featured.id} title={featured.title} />
+      </div>
+      {rest.length > 0 && (
+        <div className="praman-video-grid">
+          {rest.map((v) => (
+            <VideoEmbed key={v.id} videoId={v.id} title={v.title} />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -126,6 +151,8 @@ export default function Demo(): ReactNode {
             From npm install to compliance evidence — watch how Praman transforms SAP testing.
           </p>
         </section>
+        <VideoSeries />
+        <div style={{ width: 48, height: 1, background: 'var(--praman-border)', margin: '0 auto' }} />
         <HowItWorks />
         <div style={{ width: 48, height: 1, background: 'var(--praman-border)', margin: '0 auto' }} />
         <CodeExample />
