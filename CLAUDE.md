@@ -157,7 +157,7 @@ throw new ControlError({
 | Google Antigravity    | `.antigravity/rules.md`                                                      |
 | Claude Code           | `CLAUDE.md` (this file)                                                      |
 | OpenAI Codex / Jules  | `AGENTS.md`, `.jules/setup.md`                                               |
-| Copilot Coding Agents | `.github/agents/` (Playwright MCP)                                           |
+| Copilot Coding Agents | `.claude/agents/` (shared with Claude Code)                                  |
 
 ## Commands
 
