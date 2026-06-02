@@ -46,7 +46,9 @@ export const DISCOVER_ALL_SCRIPT = `async page => {
   return await page.evaluate(() => {
     const bridge = window.__praman_bridge;
     if (!bridge || !bridge.ready) return { error: 'Bridge not ready. Ensure --config includes initScript.' };
-    const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
+    const ER = sap.ui.require('sap/ui/core/ElementRegistry');
+    if (!ER) return { error: 'ElementRegistry not available. Check UI5 version.' };
+    const registry = ER.all();
     const controls = Object.values(registry);
     return {
       total: controls.length,

@@ -40,7 +40,9 @@ export const DIALOG_CONTROLS_SCRIPT = `async page => {
   return await page.evaluate(() => {
     var bridge = window.__praman_bridge;
     if (!bridge || !bridge.ready) return { error: 'Bridge not ready. Ensure --config includes initScript.' };
-    var registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
+    var ER = sap.ui.require('sap/ui/core/ElementRegistry');
+    if (!ER) return { error: 'ElementRegistry not available. Check UI5 version.' };
+    var registry = ER.all();
     var controls = Object.values(registry);
     var dialogs = {};
     controls.forEach(function(ctrl) {
