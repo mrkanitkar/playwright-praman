@@ -168,14 +168,12 @@ function initBridge(): void {
         }
 
         // Tier 2: ElementRegistry.get (UI5 1.67+)
-        if (
-          win.sap.ui &&
-          win.sap.ui.core &&
-          win.sap.ui.require('sap/ui/core/ElementRegistry') &&
-          win.sap.ui.require('sap/ui/core/ElementRegistry').get
-        ) {
-          const el2 = win.sap.ui.require('sap/ui/core/ElementRegistry').get(id);
-          if (el2) return el2;
+        if (win.sap.ui && win.sap.ui.core) {
+          const ER = win.sap.ui.require('sap/ui/core/ElementRegistry');
+          if (ER && ER.get) {
+            const el2 = ER.get(id);
+            if (el2) return el2;
+          }
         }
 
         // Tier 3: Core.byId (legacy, all versions)
