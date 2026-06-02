@@ -133,8 +133,8 @@ in a `finally` block regardless of test outcome.
 PRAMAN_BIND=1 npx playwright test tests/e2e/purchase-order.spec.ts
 
 # Terminal 2: CLI agent connects to the bound browser
-playwright-cli attach praman-agent
-playwright-cli snapshot --filename=live-state.yml
+playwright-cli -s=praman-agent open "$URL" --persistent --config=playwright.config.ts
+playwright-cli -s=praman-agent snapshot --filename=live-state.yml
 ```
 
 ---

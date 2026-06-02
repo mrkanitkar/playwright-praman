@@ -358,7 +358,7 @@ Each skill directory includes a `references/` subdirectory with:
 
 - `sap-test-generation.md` — gold-standard test template
 - `screenshot-patterns.md` — dual screenshot pattern
-- `debug-cli.md` — `--debug=cli` workflow
+- `debug-cli.md` — persistent `-s=heal` session workflow
 - `trace-cli.md` — trace viewer usage
 
 Pass `--no-cli` to skip CLI skill installation.

@@ -171,9 +171,9 @@ file. The **code-reviewer** agent validates the output against all 7 mandatory r
 
 ### Stage 3: Heal (`/praman-heal`)
 
-If tests fail, the **test-healer** agent runs the failing test with `--debug=cli`, attaches
-to the browser session, inspects live page state at the failure point, and fixes selectors,
-timing, or logic issues. The healer iterates until all tests pass or reports an unresolvable
+If tests fail, the **test-healer** agent reproduces the failure with `npx playwright test`,
+then opens a persistent `-s=heal` CLI session to inspect live page state at the failure
+point, and fixes selectors, timing, or logic issues. The healer iterates until all tests pass or reports an unresolvable
 issue.
 
 **Output**: `app.spec.ts` (fixed)
