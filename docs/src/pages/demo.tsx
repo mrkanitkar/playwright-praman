@@ -25,6 +25,7 @@ function DemoStep({ step, title, desc }: { step: string; title: string; desc: st
 const VIDEOS = [
   { id: 'Q1EqVPy4-QQ', title: 'Praman — Getting Started' },
   { id: 'mHsYAZZWnSw', title: 'Praman — Video 2' },
+  { id: 'RFRXkVi2pho', title: 'Praman — Video 3' },
 ];
 
 function VideoSeries(): ReactNode {

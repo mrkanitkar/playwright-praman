@@ -598,6 +598,7 @@ div[class*='announcementBar'] {
   background: #1a1a2e;
   border-radius: 8px;
   padding: 0.7rem 1rem;
+  margin-top: auto;
   margin-bottom: 1rem;
 }
 
