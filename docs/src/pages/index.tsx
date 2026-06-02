@@ -1692,6 +1692,9 @@ export default function Home(): ReactNode {
         <HeroCarousel />
         <GlanceSection />
         <UseCaseCards />
+        <section style={{ padding: '3rem 2rem 2rem', maxWidth: 900, margin: '0 auto' }}>
+          <VideoEmbed videoId="RFRXkVi2pho" title="Praman — SAP Test Automation Demo" />
+        </section>
         <AgentFlowSection />
         <ReportsSection />
         <div

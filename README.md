@@ -22,6 +22,8 @@ Describe your business process; AI agents deliver production-ready test scripts.
 
 > **[Comparing SAP test automation tools →](https://mrkanitkar.github.io/playwright-praman/blog/2026/04/02/sap-test-automation-comparison)**
 
+[![Watch the demo](https://img.youtube.com/vi/RFRXkVi2pho/maxresdefault.jpg)](https://youtu.be/RFRXkVi2pho)
+
 ## Who is Praman for?
 
 | Stakeholder                                                | Value                                                                                                    |
