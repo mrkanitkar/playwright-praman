@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.4.0](https://github.com/mrkanitkar/playwright-praman/compare/v1.3.1...v1.4.0) (2026-06-02)
+
+
+### Features
+
+* **docs:** add second demo video to carousel and demo page ([#153](https://github.com/mrkanitkar/playwright-praman/issues/153)) ([2f7c4ef](https://github.com/mrkanitkar/playwright-praman/commit/2f7c4ef24570607cc57171716903e3faefa00936))
+* **docs:** add third demo video and fix card alignment ([#156](https://github.com/mrkanitkar/playwright-praman/issues/156)) ([6753eec](https://github.com/mrkanitkar/playwright-praman/commit/6753eeca1ed7c73ad0ff492d939a65dc163b1c51))
+
+
+### Bug Fixes
+
+* **docs:** stack demo videos vertically with equal size ([#155](https://github.com/mrkanitkar/playwright-praman/issues/155)) ([fad6d2a](https://github.com/mrkanitkar/playwright-praman/commit/fad6d2a960a4c701b768e25f0f6b30aa8ca2796d))
+* migrate remaining ElementRegistry direct-access to sap.ui.require ([#157](https://github.com/mrkanitkar/playwright-praman/issues/157)) ([4a38998](https://github.com/mrkanitkar/playwright-praman/commit/4a389981f4069a4a2d0bc8509697128fca72599c))
+* UI5 1.136+ ElementRegistry access + CLI bridge config path ([#152](https://github.com/mrkanitkar/playwright-praman/issues/152)) ([d3ff24f](https://github.com/mrkanitkar/playwright-praman/commit/d3ff24f9e7db7639d3ecd4a6c167c7ebe5e9c871))
+
 ## [1.3.1](https://github.com/mrkanitkar/playwright-praman/compare/v1.3.0...v1.3.1) (2026-05-30)
 
 
