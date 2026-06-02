@@ -75,7 +75,7 @@ Generate a **SINGLE `.spec.ts` file** with `test.step()` pattern that:
 
 ```
 BEFORE clicking, typing, or interacting with ANY element:
-   1. Query UI5 controls using run-code with sap.ui.core.ElementRegistry
+   1. Query UI5 controls using run-code with sap.ui.require('sap/ui/core/ElementRegistry')
    2. Check if element has a UI5 control ID (data-sap-ui attribute)
    3. If YES -> MUST use ui5.control() + proxy method (press, setValue, etc.)
    4. If NO UI5 -> ONLY THEN use page.click() or page.fill()
@@ -94,7 +94,7 @@ playwright-cli -s=sap run-code "async page => {
 
       const ui5Id = el.getAttribute('data-sap-ui') || el.closest('[data-sap-ui]')?.getAttribute('data-sap-ui');
       if (ui5Id) {
-        const ctrl = sap.ui.core.ElementRegistry.get(ui5Id);
+        const ctrl = sap.ui.require('sap/ui/core/ElementRegistry').get(ui5Id);
         return {
           found: true, isUI5: true,
           controlId: ui5Id,
@@ -262,7 +262,7 @@ playwright-cli run-code "async page => {
 # CORRECT - Use ElementRegistry
 playwright-cli run-code "async page => {
   return await page.evaluate(() => {
-    const registry = sap.ui.core.ElementRegistry.all();
+    const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
     return Object.keys(registry).slice(0, 20).map(id => ({
       id,
       type: registry[id].getMetadata().getName()
@@ -313,7 +313,7 @@ playwright-cli -s=sap run-code "async page => {
   return await page.evaluate(() => {
     try {
       const version = sap.ui.version;
-      const registry = sap.ui.core.ElementRegistry.all();
+      const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
       return { version, controlCount: Object.keys(registry).length };
     } catch (e) {
       return { error: e.message };
@@ -338,7 +338,7 @@ playwright-cli -s=sap run-code "async page => {
 ```javascript
 // ALWAYS use UI5-first approach inside page.evaluate()
 await page.evaluate(() => {
-  const registry = sap.ui.core.ElementRegistry.all();
+  const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
   // Use UI5 methods: ctrl.getText(), ctrl.getValue(), ctrl.getEnabled()
 });
 ```
@@ -356,7 +356,7 @@ in agent context. Use raw SAP APIs via `run-code`:
 
 | Task             | CLI Command                    | SAP API                             |
 | ---------------- | ------------------------------ | ----------------------------------- |
-| Find controls    | `run-code "async page => ..."` | `sap.ui.core.ElementRegistry.get()` |
+| Find controls    | `run-code "async page => ..."` | `sap.ui.require('sap/ui/core/ElementRegistry').get()` |
 | Read properties  | `run-code "async page => ..."` | `ctrl.getProperty('name')`          |
 | Check visibility | `run-code "async page => ..."` | `ctrl.getVisible()`                 |
 | Navigate         | `click e7` (snapshot ref)      | Click tiles/buttons                 |
@@ -422,7 +422,7 @@ playwright-cli -s=sap state-save sap-auth.json
 playwright-cli -s=sap run-code "async page => {
   return await page.evaluate(() => {
     try {
-      const registry = sap.ui.core.ElementRegistry.all();
+      const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
       const controls = [];
 
       for (const id of Object.keys(registry)) {
@@ -445,7 +445,7 @@ playwright-cli -s=sap run-code "async page => {
         const innerControls = [];
         if (type.includes('SmartField')) {
           ['-input', '-comboBoxEdit', '-picker', '-inner'].forEach(suffix => {
-            const inner = sap.ui.core.ElementRegistry.get(id + suffix);
+            const inner = sap.ui.require('sap/ui/core/ElementRegistry').get(id + suffix);
             if (inner) innerControls.push({ id: id + suffix, type: inner.getMetadata().getName() });
           });
         }
@@ -509,7 +509,7 @@ playwright-cli -s=sap run-code "async page => {
       } catch(e) {}
 
       // Detect Smart vs MDC controls
-      const registry = sap.ui.core.ElementRegistry.all();
+      const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
       for (const id of Object.keys(registry)) {
         const ctrl = registry[id];
         if (!ctrl) continue;
@@ -549,7 +549,7 @@ playwright-cli -s=sap run-code "async page => {
 playwright-cli -s=sap run-code "async page => {
   return await page.evaluate(() => {
     try {
-      const registry = sap.ui.core.ElementRegistry.all();
+      const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
       const mdcFields = [];
       const mdcValueHelps = [];
       const mdcTables = [];
@@ -609,8 +609,8 @@ playwright-cli -s=sap run-code "async page => {
       const dialogId = inputId + '-valueHelpDialog';
       const tableId = dialogId + '-table';
 
-      const dialog = sap.ui.core.ElementRegistry.get(dialogId);
-      const table = sap.ui.core.ElementRegistry.get(tableId);
+      const dialog = sap.ui.require('sap/ui/core/ElementRegistry').get(dialogId);
+      const table = sap.ui.require('sap/ui/core/ElementRegistry').get(tableId);
 
       if (!dialog || !table) {
         return {

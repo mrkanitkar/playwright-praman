@@ -46,7 +46,7 @@ playwright-cli -s=sap state-save sap-auth.json
 # Discover UI5 controls via bridge
 playwright-cli -s=sap run-code "async page => {
   return await page.evaluate(() => {
-    const registry = sap.ui.core.ElementRegistry.all();
+    const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
     return Object.keys(registry).slice(0, 20).map(id => ({
       id, type: registry[id].getMetadata().getName()
     }));

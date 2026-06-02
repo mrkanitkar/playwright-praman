@@ -123,7 +123,7 @@ Each skill directory also includes a `references/` subdirectory with additional 
 
 - `sap-test-generation.md` — gold-standard code template and forbidden patterns
 - `screenshot-patterns.md` — dual screenshot pattern (assertions vs error evidence)
-- `debug-cli.md` — `--debug=cli` workflow reference
+- `debug-cli.md` — persistent `-s=heal` session workflow reference
 - `trace-cli.md` — `npx playwright trace` usage
 
 ---
@@ -154,7 +154,7 @@ The planner agent will:
 1. Open the SAP system in a persistent CLI session
 2. Authenticate using saved state or credentials
 3. Navigate to the Fiori app via FLP
-4. Discover UI5 controls using `run-code` with `sap.ui.core.ElementRegistry`
+4. Discover UI5 controls using `run-code` with `sap.ui.require('sap/ui/core/ElementRegistry')`
 5. Capture page snapshots at each step
 6. Write a test plan and gold-standard `.spec.ts` file
 
@@ -240,8 +240,8 @@ The three Praman CLI Agents form a pipeline that produces production-ready tests
 │  1. PLAN         2. GENERATE       3. HEAL              │
 │                                                         │
 │  Planner CLI     Generator CLI     Healer CLI           │
-│  opens browser   reads plan        runs test with       │
-│  discovers UI5   validates live    --debug=cli           │
+│  opens browser   reads plan        reproduces failure   │
+│  discovers UI5   validates live    live -s=heal         │
 │  writes plan     writes .spec.ts   fixes failures       │
 │                                                         │
 │  Output:         Output:           Output:              │
@@ -261,7 +261,7 @@ playwright-cli -s=sap state-load sap-auth.json
 playwright-cli -s=sap snapshot --filename=flp-snapshot.yml
 playwright-cli -s=sap run-code "async page => {
   return await page.evaluate(() => {
-    const registry = sap.ui.core.ElementRegistry.all();
+    const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
     return Object.keys(registry).map(id => ({
       id, type: registry[id].getMetadata().getName()
     }));
@@ -276,14 +276,15 @@ and produces a `.spec.ts` file using Praman fixtures exclusively.
 
 ### Step 3: Heal
 
-The healer runs the generated test with `--debug=cli`, attaches to the debug session, inspects
-page state at the failure point, and fixes selectors, timing, or logic issues.
+The healer reproduces the failure with `npx playwright test`, then opens a persistent `-s=heal`
+CLI session to inspect live page state at the failure point, and fixes selectors, timing, or
+logic issues.
 
 ```bash
 # What the healer does internally:
-PLAYWRIGHT_HTML_OPEN=never npx playwright test tests/e2e/app.spec.ts --debug=cli &
-playwright-cli attach tw-<session>
-playwright-cli snapshot --filename=failure-state.yml
+npx playwright test tests/e2e/app.spec.ts --project=chromium --reporter=line
+playwright-cli -s=heal open "$URL" --persistent --config=playwright.config.ts
+playwright-cli -s=heal snapshot --filename=failure-state.yml
 ```
 
 ---

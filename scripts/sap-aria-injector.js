@@ -113,13 +113,11 @@
   function decorateAll() {
     try {
       var registry = null;
-      if (
-        typeof sap !== 'undefined' &&
-        sap.ui &&
-        sap.ui.core &&
-        sap.ui.core.ElementRegistry
-      ) {
-        registry = sap.ui.core.ElementRegistry;
+      if (typeof sap !== 'undefined' && sap.ui && sap.ui.core) {
+        var _ER = sap.ui.require('sap/ui/core/ElementRegistry');
+        if (_ER) {
+          registry = _ER;
+        }
       } else if (typeof sap !== 'undefined' && sap.ui && sap.ui.getCore) {
         var core = sap.ui.getCore();
         registry = core && core.getElements ? { all: function () { return core.getElements(); } } : null;

@@ -98,7 +98,7 @@ For agent-driven SAP test generation using the Playwright CLI (`@playwright/cli`
 Key patterns:
 
 - Always use `--config=.playwright/praman-cli.config.json` on `open` command (injects praman bridge)
-- Use `run-code` with `page.evaluate()` to discover UI5 controls via `ElementRegistry`
+- Use `run-code` with `page.evaluate()` to discover UI5 controls via `sap.ui.require('sap/ui/core/ElementRegistry')`
 - `return` is the ONLY way to get output from `run-code` — `console.log()` is invisible
 - Three-step input: `setValue()` + `fireChange()` + `waitForUI5()`
 - Use `searchOpenDialogs: true` for dialog controls

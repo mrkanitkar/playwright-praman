@@ -443,9 +443,9 @@ Three approaches, from least to most detailed:
 2. **Inspect saved snapshots** — The planner saves `.yml` snapshots at each step. Read them
    with `cat flp-snapshot.yml` to see exactly what the agent saw.
 
-3. **Attach to the debug session** — Run the test with `--debug=cli` and use
-   `playwright-cli attach` to inspect the live browser state at the failure point. The healer
-   does this automatically, but you can do it manually for deeper investigation.
+3. **Open a persistent heal session** — Open a persistent `-s=heal` session to the same URL
+   and use `playwright-cli -s=heal snapshot` to inspect the live browser state at the failure
+   point. The healer does this automatically, but you can do it manually for deeper investigation.
 
 </details>
 

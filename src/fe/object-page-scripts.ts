@@ -33,7 +33,7 @@ export const OP_FIND_LAYOUT_SCRIPT = `(function() {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var allElements = registry && registry.all ? Object.values(registry.all()) : [];
     for (var i = 0; i < allElements.length; i++) {
       var el = allElements[i];
@@ -63,7 +63,7 @@ export const OP_NAVIGATE_SECTION_SCRIPT = `(function(identifier) {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var allElements = registry && registry.all ? Object.values(registry.all()) : [];
     var layout = null;
     for (var i = 0; i < allElements.length; i++) {
@@ -104,7 +104,7 @@ export const OP_GET_SECTION_DATA_SCRIPT = `(function(identifier) {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var allElements = registry && registry.all ? Object.values(registry.all()) : [];
     var layout = null;
     for (var i = 0; i < allElements.length; i++) {
@@ -171,7 +171,7 @@ export const OP_CLICK_BUTTON_SCRIPT = `(function(name) {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var allElements = registry && registry.all ? Object.values(registry.all()) : [];
     var layout = null;
     for (var i = 0; i < allElements.length; i++) {
@@ -222,7 +222,7 @@ export const OP_GET_SECTIONS_SCRIPT = `(function() {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var allElements = registry && registry.all ? Object.values(registry.all()) : [];
     var layout = null;
     for (var i = 0; i < allElements.length; i++) {
@@ -271,7 +271,7 @@ export const OP_GET_HEADER_TITLE_SCRIPT = `(function() {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var allElements = registry && registry.all ? Object.values(registry.all()) : [];
     var layout = null;
     for (var i = 0; i < allElements.length; i++) {
@@ -306,7 +306,7 @@ export const OP_IS_EDIT_MODE_SCRIPT = `(function() {
   try {
     var registry = sap.ui.core.Element && sap.ui.core.Element.registry
       ? sap.ui.core.Element.registry
-      : (sap.ui.core.ElementRegistry || null);
+      : (sap.ui.require('sap/ui/core/ElementRegistry') || null);
     var allElements = registry && registry.all ? Object.values(registry.all()) : [];
     var layout = null;
     for (var i = 0; i < allElements.length; i++) {

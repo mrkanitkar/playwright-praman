@@ -210,13 +210,13 @@ window.__praman_bridge = {
 }
 ```
 
-### Claim: Bridge handles `sap.ui.core.ElementRegistry`
+### Claim: Bridge handles `sap.ui.require('sap/ui/core/ElementRegistry')`
 
 **VERIFIED ✅**
 
 Visible in minified code:
 - Checks for `sap.ui.core.Element.getElementById`
-- Checks for `sap.ui.core.ElementRegistry.get`
+- Checks for `sap.ui.require('sap/ui/core/ElementRegistry').get`
 - Checks for `sap.ui.getCore().byId()`
 - Sets `n.ready = true` when UI5 modules load
 

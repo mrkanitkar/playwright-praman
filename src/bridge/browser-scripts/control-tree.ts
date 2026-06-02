@@ -93,7 +93,7 @@ const VERSION_DETECTION_SNIPPET = `
  * @remarks
  * Dual-path resolution matching `find-control-fn.ts`:
  * - `sap.ui.core.Element.registry` (UI5 \>= 1.67)
- * - `sap.ui.core.ElementRegistry` (alternative path)
+ * - `sap.ui.require('sap/ui/core/ElementRegistry')` (alternative path)
  * Returns the registry map via `.all()`, or `null` if unavailable.
  */
 const REGISTRY_RESOLUTION_SNIPPET = `
@@ -103,7 +103,7 @@ const REGISTRY_RESOLUTION_SNIPPET = `
         var element = sap.ui.core.Element;
         var registry = element ? element.registry : undefined;
         if (!registry) {
-          registry = sap.ui.core.ElementRegistry;
+          registry = sap.ui.require('sap/ui/core/ElementRegistry');
         }
         if (!registry || typeof registry.all !== 'function') return null;
         return registry.all();

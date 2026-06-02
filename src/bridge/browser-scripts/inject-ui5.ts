@@ -131,10 +131,12 @@ export function createBridgeInjectionScript(): string {
               var el = sap.ui.core.Element.getElementById(id);
               if (el) return el;
             }
-            if (sap.ui && sap.ui.core && sap.ui.core.ElementRegistry
-                && sap.ui.core.ElementRegistry.get) {
-              var el2 = sap.ui.core.ElementRegistry.get(id);
-              if (el2) return el2;
+            if (sap.ui && sap.ui.core) {
+              var _ER = sap.ui.require('sap/ui/core/ElementRegistry');
+              if (_ER && _ER.get) {
+                var el2 = _ER.get(id);
+                if (el2) return el2;
+              }
             }
             if (sap.ui && sap.ui.getCore) {
               var core = sap.ui.getCore();

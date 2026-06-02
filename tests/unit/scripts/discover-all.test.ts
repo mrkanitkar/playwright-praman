@@ -33,8 +33,9 @@ describe('discover-all script', () => {
     expect(DISCOVER_ALL_SCRIPT).toContain('retrieveControlMethods');
   });
 
-  it('uses ElementRegistry.all()', () => {
-    expect(DISCOVER_ALL_SCRIPT).toContain('ElementRegistry.all()');
+  it('uses ElementRegistry via sap.ui.require()', () => {
+    expect(DISCOVER_ALL_SCRIPT).toContain("sap.ui.require('sap/ui/core/ElementRegistry')");
+    expect(DISCOVER_ALL_SCRIPT).toContain('ER.all()');
   });
 
   it('does not use optional chaining inside script body', () => {

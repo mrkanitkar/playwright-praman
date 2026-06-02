@@ -352,7 +352,7 @@ Agent must manually compose 25-line `run-code` scripts from SKILL.md patterns:
 ```bash
 playwright-cli run-code "async page => {
   return await page.evaluate(() => {
-    const registry = sap.ui.core.ElementRegistry.all();
+    const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
     return Object.keys(registry).map(id => {
       const ctrl = registry[id];
       const meta = ctrl.getMetadata().getName();
@@ -712,7 +712,7 @@ async page => {
       ready: b.ready,
       version: b.version,
       ui5Version: b.ui5Version,
-      controlCount: Object.keys(sap.ui.core.ElementRegistry.all()).length,
+      controlCount: Object.keys(sap.ui.require('sap/ui/core/ElementRegistry').all()).length,
       injectionTime: b.injectionTime
     };
   });
@@ -907,7 +907,7 @@ Step 2: [Opens browser, logs in] ✅
 
 Step 3: [Discovers controls]
 playwright-cli run-code "async page => {
-  const registry = sap.ui.core.ElementRegistry.all();
+  const registry = sap.ui.require('sap/ui/core/ElementRegistry').all();
   return Object.keys(registry).map(...);
 }"
 Result: 423 controls discovered
@@ -920,7 +920,7 @@ Agent: [Cannot determine which is for input — must inspect each]
 
 Step 5: [Inspects first candidate]
 playwright-cli run-code "async page => {
-  const ctrl = sap.ui.core.ElementRegistry.get('vendorInput');
+  const ctrl = sap.ui.require('sap/ui/core/ElementRegistry').get('vendorInput');
   if (!ctrl) return { error: 'Not found' };
   return { type: ctrl.getMetadata().getName(), methods: [...] };
 }"
@@ -933,7 +933,7 @@ Agent: [Does not know if:]
 
 Agent: [Tries next candidate]
 playwright-cli run-code "async page => {
-  const ctrl = sap.ui.core.ElementRegistry.get('vendorLookup');
+  const ctrl = sap.ui.require('sap/ui/core/ElementRegistry').get('vendorLookup');
   ...
 }"
 Result: { type: 'sap.m.Input', methods: ['setValue', 'fireChange', ...] }
@@ -946,7 +946,7 @@ await ui5.waitForUI5();
 
 Step 7: [Tries to click "Create" button]
 playwright-cli run-code "async page => {
-  const btn = sap.ui.core.ElementRegistry.get('createButton');
+  const btn = sap.ui.require('sap/ui/core/ElementRegistry').get('createButton');
   btn.firePress();
 }"
 Result: { error: 'firePress is not a function' }

@@ -271,7 +271,7 @@ revise as many times as needed before proceeding to generation.
 <summary>Can I run commands on a non-SAP Playwright app?</summary>
 
 No. The Praman commands are designed specifically for SAP UI5 and Fiori applications.
-They rely on the UI5 control tree, `sap.ui.core.ElementRegistry`, and Praman bridge
+They rely on the UI5 control tree, `sap.ui.require('sap/ui/core/ElementRegistry')`, and Praman bridge
 injection. For non-SAP apps, use standard Playwright test authoring instead.
 
 </details>

@@ -38,7 +38,7 @@ Both MCP and CLI are **first-class, coexisting options**. They produce identical
 │                                                               │
 │  ┌─────────────┐    ┌──────────────┐    ┌─────────────────┐  │
 │  │ Plan        │ →  │ Generate     │ →  │ Heal            │  │
-│  │ CLI session │    │ Validate     │    │ --debug=cli     │  │
+│  │ CLI session │    │ Validate     │    │ live -s=heal    │  │
 │  │ + discovery │    │ live browser │    │ fix selectors   │  │
 │  └─────────────┘    └──────────────┘    └─────────────────┘  │
 │         │                  │                    │              │
@@ -52,15 +52,15 @@ Both MCP and CLI are **first-class, coexisting options**. They produce identical
 │  ─────────────────────────────────────  │
 │  open / snapshot / run-code / fill /    │
 │  click / state-save / state-load        │
-│  + sap.ui.core.ElementRegistry          │
+│  + sap.ui.require('sap/ui/core/ElementRegistry')          │
 │  + window.__praman_bridge               │
 └─────────────────────────────────────────┘
 ```
 
 1. **Agent opens a CLI session** with the Praman bridge injected via `initScript`
-2. **Bridge exposes UI5 controls** — `run-code` calls `sap.ui.core.ElementRegistry` for discovery
+2. **Bridge exposes UI5 controls** — `run-code` calls `sap.ui.require('sap/ui/core/ElementRegistry')` for discovery
 3. **Agent generates tests** using Praman fixtures exclusively (`ui5.control()`, `ui5.click()`)
-4. **Tests are healed** by attaching to `--debug=cli` sessions and inspecting live page state
+4. **Tests are healed** by opening a persistent `-s=heal` CLI session to inspect live page state
 
 ## Quick Start
 
