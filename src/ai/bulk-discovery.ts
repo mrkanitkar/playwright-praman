@@ -401,9 +401,8 @@ function browserDiscoverControls(args: BrowserArgs): {
   const sapWindow = window as any;
   let elementsMap: Record<string, unknown> = {};
   try {
-    const elementRegistry = (sapWindow.sap?.ui?.core?.ElementRegistry ?? undefined) as
-      | { all?: () => Record<string, unknown> }
-      | undefined;
+    const elementRegistry = (sapWindow.sap?.ui?.require?.('sap/ui/core/ElementRegistry') ??
+      undefined) as { all?: () => Record<string, unknown> } | undefined;
     if (typeof elementRegistry?.all === 'function') {
       elementsMap = elementRegistry.all();
     } else {

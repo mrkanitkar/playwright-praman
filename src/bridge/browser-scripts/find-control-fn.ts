@@ -383,9 +383,16 @@ function getElementRegistry(): UI5Record | undefined {
   const core = ui['core'] as UI5Record | undefined;
   if (core === undefined) return undefined;
   const element = core['Element'] as UI5Record | undefined;
-  return element !== undefined
-    ? (element['registry'] as UI5Record | undefined)
-    : (core['ElementRegistry'] as UI5Record | undefined);
+  if (element !== undefined) {
+    const registry = element['registry'] as UI5Record | undefined;
+    if (registry !== undefined) return registry;
+  }
+  const requireFn = ui['require'] as ((mod: string) => UI5Record | null) | undefined;
+  if (typeof requireFn === 'function') {
+    const er = requireFn('sap/ui/core/ElementRegistry');
+    if (er !== null) return er;
+  }
+  return undefined;
 }
 
 /** Checks whether a control's ID matches via exact or suffix match. */
