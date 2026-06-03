@@ -13,6 +13,36 @@ keywords:
 
 # Release Notes
 
+## Version 1.3.3
+
+_Released: June 2026 · [npm](https://www.npmjs.com/package/playwright-praman/v/1.3.3) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases/tag/playwright-praman-v1.3.2)_
+
+### 🐛 UI5 1.136+ Compatibility Fix
+
+Praman now works correctly on **SAP UI5 1.136+**, which removed the global `sap.ui.core.ElementRegistry` accessor. All internal code paths have been migrated to `sap.ui.require('sap/ui/core/ElementRegistry')` — the modular API that works across all UI5 versions.
+
+**Three files were affected:**
+
+| File                                            | Impact                                                |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| `src/ai/bulk-discovery.ts`                      | AI control discovery failed silently on UI5 1.136+    |
+| `src/bridge/browser-scripts/find-control-fn.ts` | Control lookup fallback path used deprecated accessor |
+| `tests/seeds/sap-seed.spec.ts`                  | Seed control counting fallback broke on 1.136+        |
+
+**Who is affected:** Anyone running Praman against an SAP system on UI5 1.136 or later. Older UI5 versions are unaffected.
+
+**Upgrade:** `npm install playwright-praman@1.3.3` — no config changes needed.
+
+### 🔒 Zero npm Audit Vulnerabilities
+
+Updated `@ui5/mcp-server` 0.2.11 → 0.2.12, resolving all 9 previously reported vulnerabilities (2 high, 7 moderate). `npm audit` now reports **0 vulnerabilities** for the main package.
+
+### 📹 Docs: Demo Videos
+
+The [documentation site](https://praman.dev) now includes three demo videos showing Praman in action — AI test generation, control discovery, and end-to-end SAP testing workflows.
+
+---
+
 ## Version 1.3.0
 
 _Released: May 2026 · [npm](https://www.npmjs.com/package/playwright-praman) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases)_
