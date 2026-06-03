@@ -164,7 +164,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "commander": "14.0.3",
+    "commander": "15.0.0",
     "css-selector-parser": "3.3.0",
     "fontoxpath": "3.34.0",
     "pino": "10.3.1",
