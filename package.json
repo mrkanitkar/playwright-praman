@@ -240,7 +240,7 @@
     "@playwright/test": "1.60.0",
     "@rolldown/plugin-babel": "0.2.3",
     "@size-limit/file": "12.1.0",
-    "@ui5/mcp-server": "0.2.11",
+    "@ui5/mcp-server": "0.2.12",
     "@vitest/coverage-v8": "4.1.7",
     "@vitest/ui": "4.1.7",
     "cspell": "10.0.0",
@@ -320,5 +320,10 @@
   "bugs": {
     "url": "https://github.com/mrkanitkar/playwright-praman/issues"
   },
-  "homepage": "https://praman.dev"
+  "homepage": "https://praman.dev",
+  "allowScripts": {
+    "esbuild@0.28.0": true,
+    "esbuild@0.27.7": true,
+    "protobufjs@7.6.1": true
+  }
 }
