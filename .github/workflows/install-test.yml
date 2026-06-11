@@ -69,6 +69,24 @@ jobs:
       - name: ESM import test
         shell: bash
         run: cd test-project && node --input-type=module -e "import('playwright-praman').then(m => console.log('OK', Object.keys(m).length))"
+      - name: ESM subpath imports
+        shell: bash
+        run: |
+          cd test-project
+          node --input-type=module -e "
+            const subpaths = [
+              'playwright-praman',
+              'playwright-praman/ai',
+              'playwright-praman/intents',
+              'playwright-praman/vocabulary',
+              'playwright-praman/fe',
+              'playwright-praman/reporters',
+            ];
+            for (const sp of subpaths) {
+              await import(sp);
+              console.log('✅', sp);
+            }
+          "
       - name: CLI smoke test
         shell: bash
         run: cd test-project && npx playwright-praman --version
