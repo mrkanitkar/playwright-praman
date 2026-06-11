@@ -1,5 +1,9 @@
 # Changelog
 
+> **Semver note:** v1.3.3 inadvertently shipped breaking changes (Node 20→22 floor,
+> CJS output format) as a patch. See [versioning.md](docs/versioning.md) for the
+> full history and the semver contract from v1.3.4 onward.
+
 ## [1.3.2](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.1...playwright-praman-v1.3.2) (2026-06-02)
 
 

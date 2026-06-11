@@ -33,6 +33,12 @@ Describe your business process; AI agents deliver production-ready test scripts.
 | **AI coding agents** (Claude Code, Copilot, Cursor, Jules) | Generate production-ready SAP tests from a business process description, no source code or specs needed  |
 | **Program leads & delivery managers**                      | Ship SAP go-lives with deployment evidence — not manual sign-off and hope                                |
 
+## Platform &amp; Engine Support
+
+- **Node.js:** ≥22 (Active LTS). See [versioning policy](docs/versioning.md).
+- **Playwright:** ≥1.57.0 (CI-tested against 1.57.0, 1.60.0, and `next`).
+- **OS:** Windows 10/11, macOS, Linux (Ubuntu/Debian). CI runs a 3-OS matrix.
+
 ## Quick Start
 
 ```bash
