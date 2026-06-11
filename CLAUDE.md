@@ -47,7 +47,7 @@ For multi-skill tasks, load primary + supporting skill(s). Example:
 
 1. TypeScript strict mode — no `any`, no `as unknown as T` shortcuts
 2. Every public function: TSDoc + `@example` tag (TSDoc only, NOT JSDoc)
-3. Every module ≤ 300 LOC (document exceptions)
+3. New modules ≤ 300 LOC; existing exceptions documented in file header
 4. Every error: `extends PramanError`, includes `code`, `attempted`, `retryable`, `suggestions[]`
 5. No `console.log` — use pino: `import { logger } from '#core/logging';`
 6. No `page.waitForTimeout()` — banned; use Playwright auto-waiting or `waitForUI5Stable()`
