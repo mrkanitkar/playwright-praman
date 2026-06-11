@@ -14,6 +14,7 @@ const MARKDOWNLINT_IGNORE = [
   /\/prompts\//,
   /\/temp\//,
   /\/examples\//,
+  /\/docs\/internal\//,
   /\/node_modules\//,
 ];
 
