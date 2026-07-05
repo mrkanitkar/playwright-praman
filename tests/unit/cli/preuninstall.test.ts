@@ -109,17 +109,16 @@ describe('cli/preuninstall', () => {
     });
 
     it('strips trailing forward slash from resolved root', () => {
-      // On posix, join produces /home/user/project/node_modules/playwright-praman
-      // The slash before node_modules remains after slicing at marker index
-      vi.spyOn(process, 'cwd').mockReturnValue(
-        '/home/user/project/node_modules/playwright-praman',
-      );
+      // Use join() so the marker matches the platform separator
+      const mockCwd = join('/home/user/project', 'node_modules', 'playwright-praman');
+      vi.spyOn(process, 'cwd').mockReturnValue(mockCwd);
 
       const result = resolveProjectRoot();
 
-      // Verify no trailing slash
-      expect(result).toBe('/home/user/project');
+      // Verify no trailing separator
+      expect(result).toBe(join('/home/user/project'));
       expect(result?.endsWith('/')).toBe(false);
+      expect(result?.endsWith('\\')).toBe(false);
     });
 
     it('strips trailing backslash from resolved root (Windows paths)', () => {
@@ -152,7 +151,11 @@ describe('cli/preuninstall', () => {
       );
 
       const fakeFiles = [
-        { relativePath: 'playwright.config.ts', category: 'config' as const, label: 'Playwright config' },
+        {
+          relativePath: 'playwright.config.ts',
+          category: 'config' as const,
+          label: 'Playwright config',
+        },
         { relativePath: 'praman.config.ts', category: 'config' as const, label: 'Praman config' },
       ];
       mockGetScaffoldedFiles.mockReturnValue(fakeFiles);
@@ -187,10 +190,10 @@ describe('cli/preuninstall', () => {
       expect(loggerMod.logWarn).toHaveBeenCalledWith(
         expect.stringContaining('Moving 2 Praman scaffolded file(s)'),
       );
-      expect(loggerMod.logWarn).toHaveBeenCalledWith(expect.stringContaining('playwright.config.ts'));
-      expect(loggerMod.logSuccess).toHaveBeenCalledWith(
-        expect.stringContaining('2 of 2'),
+      expect(loggerMod.logWarn).toHaveBeenCalledWith(
+        expect.stringContaining('playwright.config.ts'),
       );
+      expect(loggerMod.logSuccess).toHaveBeenCalledWith(expect.stringContaining('2 of 2'));
     });
 
     it('does nothing when project root cannot be resolved', async () => {
@@ -296,7 +299,11 @@ describe('cli/preuninstall', () => {
       );
 
       const fakeFiles = [
-        { relativePath: '.vscode/settings.json', category: 'ide' as const, label: 'VS Code settings' },
+        {
+          relativePath: '.vscode/settings.json',
+          category: 'ide' as const,
+          label: 'VS Code settings',
+        },
       ];
 
       vi.resetModules();
@@ -322,7 +329,9 @@ describe('cli/preuninstall', () => {
         setTimeout(resolve, 50);
       });
 
-      expect(loggerMod.logWarn).toHaveBeenCalledWith(expect.stringContaining('.vscode/settings.json'));
+      expect(loggerMod.logWarn).toHaveBeenCalledWith(
+        expect.stringContaining('.vscode/settings.json'),
+      );
     });
 
     it('logs preservation message after successful move', async () => {
@@ -332,7 +341,11 @@ describe('cli/preuninstall', () => {
       );
 
       const fakeFiles = [
-        { relativePath: 'playwright.config.ts', category: 'config' as const, label: 'Playwright config' },
+        {
+          relativePath: 'playwright.config.ts',
+          category: 'config' as const,
+          label: 'Playwright config',
+        },
       ];
 
       vi.resetModules();
