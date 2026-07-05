@@ -1,6 +1,6 @@
 ---
 title: Error Code Reference
-description: 'Complete reference for all 77 Praman ERR_* codes across 17 categories, with troubleshooting guidance for each.'
+description: 'Complete reference for all 78 Praman ERR_* codes across 17 categories, with troubleshooting guidance for each.'
 sidebar_position: 99
 keywords:
   - praman error codes
@@ -12,7 +12,7 @@ keywords:
 # Error Code Reference
 
 Every Praman error carries a machine-readable `code` field on the error object.
-This page maps each of the 77 `ERR_*` codes to its meaning and troubleshooting steps.
+This page maps each of the 78 `ERR_*` codes to its meaning and troubleshooting steps.
 
 For the broader error system (hierarchy, properties, serialization), see
 [Error Reference](./errors.md). For step-by-step diagnostics, see
@@ -237,6 +237,16 @@ These errors occur in the screencast/video chapter recording feature.
 | `ERR_SCREENCAST_NOT_STARTED`    | A screencast chapter was marked without an active screencast session | Ensure `screencast: true` is set in your Playwright context options and Praman is configured to use it    |
 | `ERR_SCREENCAST_CHAPTER_FAILED` | Adding a chapter marker to the screencast failed                     | Check that the screencast session is still active; inspect `error.details.cause` for the underlying error |
 | `ERR_SCREENCAST_FRAME_HANDLER`  | The screencast frame handler threw an error during capture           | Likely a transient issue; retry the test; if persistent, disable screencast to isolate the problem        |
+
+---
+
+## Compatibility Errors
+
+These errors occur when a Playwright feature is required but not available in the installed Playwright version.
+
+| Code                             | Meaning                                                           | Fix                                                                                                                                    |
+| -------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `ERR_COMPAT_FEATURE_UNAVAILABLE` | A required Playwright API is not available in the current version | Upgrade Playwright to the minimum version that supports this feature; check the `playwright-praman` changelog for version requirements |
 
 ---
 

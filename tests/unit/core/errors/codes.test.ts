@@ -125,15 +125,15 @@ describe('ErrorCode', () => {
   });
 
   // ── Count test (detect accidental additions/removals) ────────────────
-  it('has exactly 77 error codes', () => {
-    expect(Object.keys(ErrorCode)).toHaveLength(77);
+  it('has exactly 78 error codes', () => {
+    expect(Object.keys(ErrorCode)).toHaveLength(78);
   });
 
   it('documents the correct error code count in header comment', () => {
     // Dynamically count from the actual exports — NOT a hardcoded magic number.
     // If this snapshot breaks, update the header comment in codes.ts.
     const count = Object.keys(ErrorCode).length;
-    expect(count).toMatchInlineSnapshot(`77`);
+    expect(count).toMatchInlineSnapshot(`78`);
   });
 
   // ── Immutability test ────────────────────────────────────────────────

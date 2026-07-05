@@ -49,6 +49,7 @@ import { screencastTest } from './screencast-fixture.js';
 import { shellFooterTest } from './shell-footer-fixtures.js';
 import { stabilityTest } from './stability-fixtures.js';
 import { testDataTest } from './test-data-fixtures.js';
+import { webStorageTest } from './web-storage-fixture.js';
 
 // ── Merged test fixture ─────────────────────────────────────────────
 
@@ -94,6 +95,7 @@ import { testDataTest } from './test-data-fixtures.js';
 export const test = mergeTests(
   moduleTest,
   authTest,
+  webStorageTest,
   navTest,
   stabilityTest,
   controlTreeTest,
@@ -441,6 +443,26 @@ export type {
   ScreencastFrameHandler,
   ScreencastWorkerDeps,
 } from './screencast-fixture.js';
+
+/**
+ * Web Storage fixture providing typed localStorage and sessionStorage access.
+ *
+ * @remarks
+ * Wraps Playwright 1.61+ `page.localStorage` and `page.sessionStorage` APIs with
+ * a typed helper interface. Feature-gated via `hasWebStorageAPI` — throws on
+ * older Playwright versions. Available as `webStorage` in test fixtures.
+ *
+ * @example
+ * ```typescript
+ * import { webStorageTest } from 'playwright-praman';
+ *
+ * webStorageTest('seed localStorage', async ({ webStorage }) => {
+ *   await webStorage.localStorage.seed({ theme: 'dark', lang: 'en' });
+ * });
+ * ```
+ */
+export { webStorageTest } from './web-storage-fixture.js';
+export type { WebStorageFixture, WebStorageHelper } from './web-storage-fixture.js';
 
 /**
  * Failure artifacts fixture for auto-capturing diagnostics on test failure.

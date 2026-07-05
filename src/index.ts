@@ -53,6 +53,7 @@ export { expect, test } from './fixtures/index.js';
 // ── Standalone fixture modules (for tree-shaking / selective merge) ──
 export { authTest, browserBindTest, coreTest, moduleTest } from './fixtures/index.js';
 export { screencastTest } from './fixtures/index.js';
+export { webStorageTest } from './fixtures/index.js';
 export type { ExtendedUI5Handler } from './fixtures/index.js';
 export type {
   ScreencastFixture,
@@ -60,6 +61,7 @@ export type {
   ScreencastFrame,
   ScreencastFrameHandler,
 } from './fixtures/index.js';
+export type { WebStorageFixture, WebStorageHelper } from './fixtures/index.js';
 
 // ── Config ──────────────────────────────────────────────────────────
 export { defineConfig, loadConfig, presets } from './core/config/index.js';
