@@ -370,8 +370,7 @@ async function handleReturn(
     }
     case 'newElement': {
       const ref = result.value as
-        | { readonly id: string; readonly controlType?: string }
-        | undefined;
+        { readonly id: string; readonly controlType?: string } | undefined;
       if (ref === undefined) return undefined;
       return createControlProxy({
         id: ref.id,
@@ -440,8 +439,7 @@ async function resolveControlDomId(state: ControlProxyState): Promise<string | n
       const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
       if (bridge === undefined) return null;
       const getById = bridge['getById'] as
-        | ((id: string) => Record<string, unknown> | null)
-        | undefined;
+        ((id: string) => Record<string, unknown> | null) | undefined;
       if (getById === undefined) return null;
       const ctrl = getById(controlId);
       if (ctrl === null) return null;
@@ -470,13 +468,14 @@ async function highlightForInteraction(state: ControlProxyState): Promise<void> 
   const hl = getHighlightState(state.page);
   if (hl?.enabled !== true || !hasFeature('hasLocatorHighlightStyle')) return;
   try {
-    await state.page.hideHighlight();
+    await (state.page as Page & { hideHighlight(): Promise<void> }).hideHighlight();
     const domId = await resolveControlDomId(state);
     if (domId !== null) {
       const selector = `[id="${domId.replaceAll(/(["\\])/gu, '\\$1')}"]`;
-      const options: { style?: string | Record<string, string | number> } = {};
-      if (hl.style !== undefined) options.style = hl.style;
-      await state.page.locator(selector).highlight(options);
+      const locator = state.page.locator(selector) as Locator & {
+        highlight(opts?: { style?: string | Record<string, string | number> }): Promise<void>;
+      };
+      await locator.highlight(hl.style !== undefined ? { style: hl.style } : undefined);
     }
   } catch {
     // best-effort — highlighting must never break an interaction
@@ -515,8 +514,7 @@ function resolveKnownProperty(
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) return null;
             const getById = bridge['getById'] as
-              | ((id: string) => Record<string, unknown> | null)
-              | undefined;
+              ((id: string) => Record<string, unknown> | null) | undefined;
             if (getById === undefined) return null;
             const ctrl = getById(controlId);
             if (ctrl === null) return null;
@@ -579,8 +577,7 @@ function resolveKnownProperty(
             // eslint-disable-next-line sonarjs/no-duplicate-string -- self-contained browser function cannot reference Node-side constants
             if (bridge === undefined) throw new Error('Bridge not initialized');
             const getById = bridge['getById'] as
-              | ((id: string) => Record<string, unknown> | null)
-              | undefined;
+              ((id: string) => Record<string, unknown> | null) | undefined;
             // eslint-disable-next-line sonarjs/no-duplicate-string -- self-contained browser function cannot reference Node-side constants
             if (getById === undefined) throw new Error('Bridge getById not available');
             const ctrl = getById(controlId);
@@ -609,8 +606,7 @@ function resolveKnownProperty(
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) return false;
             const getById = bridge['getById'] as
-              | ((id: string) => Record<string, unknown> | null)
-              | undefined;
+              ((id: string) => Record<string, unknown> | null) | undefined;
             if (getById === undefined) return false;
             const ctrl = getById(controlId);
             return ctrl !== null;
@@ -642,8 +638,7 @@ function resolveKnownProperty(
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) throw new Error('Bridge not initialized');
             const getById = bridge['getById'] as
-              | ((id: string) => Record<string, unknown> | null)
-              | undefined;
+              ((id: string) => Record<string, unknown> | null) | undefined;
             if (getById === undefined) throw new Error('Bridge getById not available');
             const ctrl = getById(controlId);
             if (ctrl === null) throw new Error('Control not found: ' + controlId);
@@ -652,14 +647,11 @@ function resolveKnownProperty(
             const meta = getMetadata.call(ctrl);
             const getName = meta['getName'] as (() => string) | undefined;
             const getAllProperties = meta['getAllProperties'] as
-              | (() => Record<string, unknown>)
-              | undefined;
+              (() => Record<string, unknown>) | undefined;
             const getAllAggregations = meta['getAllAggregations'] as
-              | (() => Record<string, unknown>)
-              | undefined;
+              (() => Record<string, unknown>) | undefined;
             const getAllEvents = meta['getAllEvents'] as
-              | (() => Record<string, unknown>)
-              | undefined;
+              (() => Record<string, unknown>) | undefined;
             return {
               className: getName !== undefined ? getName.call(meta) : 'unknown',
               properties:
@@ -683,8 +675,7 @@ function resolveKnownProperty(
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) throw new Error('Bridge not initialized');
             const getById = bridge['getById'] as
-              | ((id: string) => Record<string, unknown> | null)
-              | undefined;
+              ((id: string) => Record<string, unknown> | null) | undefined;
             if (getById === undefined) throw new Error('Bridge getById not available');
             const ctrl = getById(controlId);
             if (ctrl === null) throw new Error('Control not found: ' + controlId);
@@ -693,14 +684,11 @@ function resolveKnownProperty(
             const meta = getMetadata.call(ctrl);
             const getName = meta['getName'] as (() => string) | undefined;
             const getAllProperties = meta['getAllProperties'] as
-              | (() => Record<string, unknown>)
-              | undefined;
+              (() => Record<string, unknown>) | undefined;
             const getAllAggregations = meta['getAllAggregations'] as
-              | (() => Record<string, unknown>)
-              | undefined;
+              (() => Record<string, unknown>) | undefined;
             const getAllEvents = meta['getAllEvents'] as
-              | (() => Record<string, unknown>)
-              | undefined;
+              (() => Record<string, unknown>) | undefined;
             const methods = collectPrototypeMethods(ctrl);
             return {
               id: controlId,
@@ -754,8 +742,7 @@ function resolveKnownProperty(
             const bridge = Reflect.get(window, bridgeNs) as Record<string, unknown> | undefined;
             if (bridge === undefined) throw new Error('Bridge not initialized');
             const getById = bridge['getById'] as
-              | ((id: string) => Record<string, unknown> | null)
-              | undefined;
+              ((id: string) => Record<string, unknown> | null) | undefined;
             if (getById === undefined) throw new Error('Bridge getById not available');
             const ctrl = getById(controlId);
             if (ctrl === null) throw new Error('Control not found: ' + controlId);

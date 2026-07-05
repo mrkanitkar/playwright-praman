@@ -60,7 +60,7 @@
 import type { Buffer } from 'node:buffer';
 
 import { test as base } from '@playwright/test';
-import type { Page, Screencast } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import type { Logger } from 'pino';
 
 import { hasFeature } from '#core/compat/index.js';
@@ -257,11 +257,16 @@ export interface ScreencastWorkerDeps {
  * Minimal safe structural accessor for the Playwright Screencast object.
  *
  * @remarks
- * Used only to check for the presence of methods at runtime without
- * extending the actual `Screencast` interface (which would trigger
- * `TS2430` if signatures differ from the real Playwright types).
+ * Defined structurally so that the module compiles against Playwright
+ * versions that predate the Screencast type export (prior to 1.59).
+ * Runtime availability is gated by feature flags.
  */
-type ScreencastApi = Pick<Screencast, 'showChapter' | 'showActions' | 'start' | 'stop'>;
+interface ScreencastApi {
+  showChapter(title: string): void;
+  showActions(options?: ShowActionsOptions): Promise<void> | void;
+  start(options?: Record<string, unknown>): Promise<void>;
+  stop(): Promise<void>;
+}
 
 // ── Fixture definition ──────────────────────────────────────────────────────
 
@@ -461,7 +466,7 @@ export const screencastTest = base.extend<ScreencastFixtures, ScreencastWorkerDe
       clearHighlightState(page);
       if (hasFeature('hasLocatorHighlightStyle')) {
         try {
-          await page.hideHighlight();
+          await (page as Page & { hideHighlight(): Promise<void> }).hideHighlight();
         } catch (error: unknown) {
           log.debug({ err: error }, 'page.hideHighlight() failed during teardown (non-fatal)');
         }
