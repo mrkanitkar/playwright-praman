@@ -4,6 +4,14 @@
 > CJS output format) as a patch. See [versioning.md](docs/versioning.md) for the
 > full history and the semver contract from v1.3.4 onward.
 
+## [1.3.5](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.4...playwright-praman-v1.3.5) (2026-07-05)
+
+
+### Bug Fixes
+
+* align CodeQL action SHAs to resolve version mismatch ([#191](https://github.com/mrkanitkar/playwright-praman/issues/191)) ([6ef3a5e](https://github.com/mrkanitkar/playwright-praman/commit/6ef3a5e8add29e52ea63b484f7f7cecfb6262fa3))
+* resolve CI failures and remove release-as pin ([#189](https://github.com/mrkanitkar/playwright-praman/issues/189)) ([d2c9e4d](https://github.com/mrkanitkar/playwright-praman/commit/d2c9e4d8f362903deb53a099d2c56e6f21ba6083))
+
 ## [1.3.4](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.3...playwright-praman-v1.3.4) (2026-07-05)
 
 
