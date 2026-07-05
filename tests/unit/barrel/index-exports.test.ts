@@ -54,10 +54,13 @@ describe('src/index.ts barrel', () => {
     expect(b['initTelemetry']).toBeUndefined();
   });
 
-  it('does NOT export compat internals', () => {
-    const b = barrel as Record<string, unknown>;
-    expect(b['getPlaywrightVersion']).toBeUndefined();
-    expect(b['hasFeature']).toBeUndefined();
+  it('exports compat version detection and feature flags', () => {
+    expect(typeof barrel.parsePlaywrightVersion).toBe('function');
+    expect(typeof barrel.detectFeatures).toBe('function');
+    expect(typeof barrel.getPlaywrightVersion).toBe('function');
+    expect(typeof barrel.getPlaywrightFeatures).toBe('function');
+    expect(typeof barrel.hasFeature).toBe('function');
+    expect(typeof barrel.assertMinVersion).toBe('function');
   });
 
   // ── Removed selector engine internals ───────────────────────────────
