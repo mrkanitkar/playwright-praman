@@ -16,7 +16,7 @@
 import { Buffer } from 'node:buffer';
 import { join } from 'node:path';
 
-import type { Reporter, TestError, WorkerInfo } from '@playwright/test/reporter';
+import type { Reporter, TestError } from '@playwright/test/reporter';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { ODataTraceReport } from '../../../src/reporters/odata-trace-reporter.js';
@@ -528,7 +528,9 @@ describe('ODataTraceReporter.onError', () => {
   it('does not throw with workerInfo', () => {
     const reporter = new ODataTraceReporter();
     const error: TestError = { message: 'boom' };
-    const workerInfo = { workerIndex: 2, parallelIndex: 1 } as unknown as WorkerInfo;
+    const workerInfo = { workerIndex: 2, parallelIndex: 1 } as Parameters<
+      typeof reporter.onError
+    >[1];
     expect(() => {
       reporter.onError(error, workerInfo);
     }).not.toThrow();

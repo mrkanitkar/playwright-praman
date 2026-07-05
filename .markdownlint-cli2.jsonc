@@ -42,5 +42,6 @@
     "docs/playwright-cli-integration-review.md",
     "docs/review-implementation-plan-playwright-cli.md",
     "docs/typescript-6.0-compatibility-report.md",
+    "PRAMAN_CODE_REVIEW.md",
   ],
 }

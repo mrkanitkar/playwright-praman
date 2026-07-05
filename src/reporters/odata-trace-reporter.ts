@@ -44,8 +44,15 @@ import type {
   TestCase,
   TestError,
   TestResult,
-  WorkerInfo,
 } from '@playwright/test/reporter';
+
+/** Inline type for Playwright 1.58+ WorkerInfo (not exported in 1.57). */
+interface PramanWorkerInfo {
+  workerIndex: number;
+  parallelIndex: number;
+  project: unknown;
+  config: unknown;
+}
 
 import { createLogger } from '#core/logging/index.js';
 
@@ -367,7 +374,7 @@ export class ODataTraceReporter implements Reporter {
    * reporter.onError(error, workerInfo);
    * ```
    */
-  onError(error: TestError, workerInfo?: WorkerInfo): void {
+  onError(error: TestError, workerInfo?: PramanWorkerInfo): void {
     const log = createLogger('odata-trace-reporter');
     log.debug(
       {
