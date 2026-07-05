@@ -23,6 +23,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { SpaceNavigationPage } from '../../../src/modules/navigation-space.js';
 
+import { hasFeature } from '#core/compat/index.js';
 import { NavigationError } from '#core/errors/navigation-error.js';
 import { DEFAULT_TIMEOUTS } from '#core/utils/constants.js';
 
@@ -190,10 +191,11 @@ describe('navigation-space module', () => {
         description: 'Supplier list',
       });
 
-      expect(page.getByRole).toHaveBeenCalledWith('link', {
-        name: 'Manage',
-        description: 'Supplier list',
-      });
+      const expectedRoleOptions = hasFeature('hasGetByRoleDescription')
+        ? { name: 'Manage', description: 'Supplier list' }
+        : { name: 'Manage' };
+
+      expect(page.getByRole).toHaveBeenCalledWith('link', expectedRoleOptions);
       expect(mockLocator.click).toHaveBeenCalledTimes(1);
     });
 

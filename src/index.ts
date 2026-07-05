@@ -87,6 +87,17 @@ export {
   VocabularyError,
 } from './core/errors/index.js';
 
+// ── Compat (version detection + feature flags) ────────────────────
+export type { PlaywrightVersion, PlaywrightFeatures } from './core/compat/index.js';
+export {
+  parsePlaywrightVersion,
+  detectFeatures,
+  getPlaywrightVersion,
+  getPlaywrightFeatures,
+  hasFeature,
+  assertMinVersion,
+} from './core/compat/index.js';
+
 // ── Utils ───────────────────────────────────────────────────────────
 export {
   DEFAULT_TIMEOUTS,

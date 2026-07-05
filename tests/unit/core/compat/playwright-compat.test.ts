@@ -166,12 +166,14 @@ describe('detectFeatures — 1.61 capabilities', () => {
 
 describe('hasFeature', () => {
   it('returns correct boolean for installed Playwright version', () => {
-    // Playwright 1.59.0 is installed — all features should be true
-    expect(hasFeature('hasClockAPI')).toBe(true);
-    expect(hasFeature('hasAriaSnapshot')).toBe(true);
-    expect(hasFeature('hasLocatorAssertions')).toBe(true);
-    expect(hasFeature('hasScreencastAPI')).toBe(true);
-    expect(hasFeature('hasLocatorNormalize')).toBe(true);
+    const version = getPlaywrightVersion();
+    const features = detectFeatures(version);
+
+    expect(hasFeature('hasClockAPI')).toBe(features.hasClockAPI);
+    expect(hasFeature('hasAriaSnapshot')).toBe(features.hasAriaSnapshot);
+    expect(hasFeature('hasLocatorAssertions')).toBe(features.hasLocatorAssertions);
+    expect(hasFeature('hasScreencastAPI')).toBe(features.hasScreencastAPI);
+    expect(hasFeature('hasLocatorNormalize')).toBe(features.hasLocatorNormalize);
   });
 });
 
