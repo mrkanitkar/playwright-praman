@@ -6,12 +6,108 @@ description: "What's new in playwright-praman — version history, new features,
 keywords:
   - playwright praman release notes
   - sap ui5 test automation changelog
+  - playwright 1.61 support
   - playwright 1.60 support
+  - web storage fixture
   - typescript 7 playwright
   - typescript 6 playwright
 ---
 
 # Release Notes
+
+## Version 1.3.4
+
+_Released: July 2026 · [npm](https://www.npmjs.com/package/playwright-praman/v/1.3.4) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases/tag/playwright-praman-v1.3.4)_
+
+### 🎭 Playwright 1.61 Support — 5 New Feature Flags
+
+Praman now detects and gates **Playwright 1.61** APIs via 5 new feature flags, auto-detected at runtime:
+
+| Feature flag             | API gated                              | What it enables                                    |
+| ------------------------ | -------------------------------------- | -------------------------------------------------- |
+| `hasWebAuthnCredentials` | `browserContext.credentials`           | WebAuthn credential management for passkey testing |
+| `hasWebStorageAPI`       | `page.localStorage` / `sessionStorage` | Typed access to browser storage without evaluate() |
+| `hasSoftPoll`            | `expect.soft.poll()`                   | Soft assertion polling for non-blocking checks     |
+| `hasScreencastTimestamp` | Native `onFrame` timestamps            | Microsecond-precise frame timing from the browser  |
+| `hasVideoRetainModes`    | `on-all-retries`, `retain-on-*`        | Granular video recording retention strategies      |
+
+All flags return `false` on Playwright < 1.61 — zero behavior change for existing users.
+
+**Peer dependency unchanged:** `"@playwright/test": ">=1.57.0 <2.0.0"` — Playwright 1.61 already falls within range.
+
+### 💾 New: Web Storage Fixture
+
+A typed fixture for seeding and inspecting browser storage — no more `page.evaluate()` for localStorage/sessionStorage operations:
+
+```typescript
+import { test } from 'playwright-praman';
+
+test('seed localStorage before navigation', async ({ webStorage }) => {
+  await webStorage.localStorage.seed({ theme: 'dark', lang: 'en' });
+  await webStorage.localStorage.setItem('token', 'abc123');
+
+  const all = await webStorage.sessionStorage.items();
+  const count = await webStorage.localStorage.size();
+  await webStorage.localStorage.clear();
+});
+```
+
+**API surface:** `setItem`, `getItem`, `removeItem`, `items`, `seed`, `clear`, `size` — available on both `webStorage.localStorage` and `webStorage.sessionStorage`.
+
+**Feature-gated:** Throws `ERR_COMPAT_FEATURE_UNAVAILABLE` with clear upgrade guidance on Playwright < 1.61.
+The error includes suggestions for both upgrading and using `page.evaluate()` as a fallback.
+
+### 📹 Native Screencast Frame Timestamps
+
+The screencast fixture now uses **native browser-provided frame timestamps** (microsecond-aligned)
+on Playwright 1.61+, instead of synthetic `Date.now()` timestamps. This improves timing precision
+for frame-level analysis without any API changes — `ScreencastFrame.timestamp` remains `number`
+(milliseconds since recording start).
+
+Falls back to synthetic timestamps on Playwright < 1.61.
+
+### 🛡️ Security Fixes
+
+Resolved **5 vulnerabilities** through direct upgrades and npm overrides:
+
+| Package      | From   | To     | Severity | Fix type       |
+| ------------ | ------ | ------ | -------- | -------------- |
+| `vite`       | 8.0.6  | 8.1.3  | High     | audit fix      |
+| `tar`        | 7.5.15 | 7.5.16 | Moderate | audit fix      |
+| `esbuild`    | 0.27.7 | 0.28.1 | High     | npm override   |
+| `undici`     | 7.24.7 | 7.28.0 | High     | docs workspace |
+| `linkify-it` | 5.0.0  | 5.0.2  | High     | docs workspace |
+
+Remaining 8 vulnerabilities are all in `@ui5/mcp-server`'s transitive `@sigstore/core` chain — no fix available until SAP publishes an update.
+
+### 🔧 New Error Category: Compat
+
+Added `ERR_COMPAT_FEATURE_UNAVAILABLE` error code under a new **Compat** error category. Used when a fixture requires a Playwright version newer than what's installed. The error includes specific upgrade instructions and fallback suggestions.
+
+Total: **78 error codes** across **18 categories** (up from 77/17).
+
+### ⚡ CI Improvements
+
+- **Playwright ceiling test**: new CI job installs `@playwright/test@latest` and explicitly verifies PW 1.61 feature flags are active
+- **actions/checkout** upgraded v5 → v7 across all workflows
+- **github/codeql-action** upgraded to 4.36.2
+- **Floor + ceiling validation**: CI now validates both minimum (1.57.0) and latest Playwright compatibility on every push
+
+### 📦 Dependency Updates
+
+**Dev dependencies (35 packages upgraded):**
+
+- `@playwright/test` 1.60.0 → 1.61.1
+- `@anthropic-ai/sdk` 0.100.1 → 0.110.0
+- `commander` 14.0.3 → 15.0.0
+- `@commitlint/cli` 21.0.2 → 21.2.0
+- `vitest` + `@vitest/coverage-v8` → 4.1.9
+- `@opentelemetry/*` suite updated
+- `@ui5/mcp-server` 0.2.12 → 0.2.14
+
+**Upgrade:** `npm install playwright-praman@1.3.4` — no config changes needed.
+
+---
 
 ## Version 1.3.3
 
