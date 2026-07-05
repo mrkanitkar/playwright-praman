@@ -22,15 +22,18 @@ The integration plan is **MOSTLY ACCURATE** with critical exceptions. Key claims
 ### Claim: `@playwright/cli@0.1.3` installed
 
 **VERIFIED ✅**
+
 ```
 npm ls @playwright/cli
 └── @playwright/cli@0.1.3
 ```
+
 Source: `/sessions/relaxed-confident-cori/mnt/mk1/node_modules/@playwright/cli/package.json` confirms version 0.1.3
 
 ### Claim: `@playwright/test@1.59.0` installed
 
 **VERIFIED ✅**
+
 ```
 npm ls @playwright/test
 └── @playwright/test@1.59.0
@@ -45,6 +48,7 @@ npm ls @playwright/test
 **VERIFIED ✅**
 File exists at `/sessions/relaxed-confident-cori/mnt/mk1/.claude/skills/playwright-cli/SKILL.md`
 Frontmatter format (Claude Code style):
+
 ```markdown
 ---
 name: playwright-cli
@@ -81,16 +85,17 @@ Lines: 613
 
 **VERIFICATION RESULTS:**
 
-| File | Path Claimed | Actual Path | Status |
-|---|---|---|---|
-| `.playwright/praman-cli.config.json` | Actual source of truth | EXISTS ✅ | Correct |
-| `skills/praman-sap-cli/SKILL.md` line 66 | `--config=praman-cli.json` | ❌ WRONG | Line 66 confirmed: `playwright-cli open --config=praman-cli.json` |
-| `.claude/agents/praman-sap-generator-cli.md` line 45 | `--config=praman-cli.json` | ❌ WRONG | Confirmed in grep results |
-| `.claude/agents/praman-sap-generator-cli.md` line 73 | `--config=praman-cli.json` | ❌ WRONG | Confirmed in grep results |
-| `.claude/agents/praman-sap-planner-cli.md` line 369 | `--config=.playwright/praman-cli.config.json` | ✅ CORRECT | Confirmed |
-| `.claude/agents/praman-sap-planner-cli.md` line 897 | `--config=.playwright/praman-cli.config.json` | ✅ CORRECT | Confirmed |
+| File                                                 | Path Claimed                                  | Actual Path | Status                                                            |
+| ---------------------------------------------------- | --------------------------------------------- | ----------- | ----------------------------------------------------------------- |
+| `.playwright/praman-cli.config.json`                 | Actual source of truth                        | EXISTS ✅   | Correct                                                           |
+| `skills/praman-sap-cli/SKILL.md` line 66             | `--config=praman-cli.json`                    | ❌ WRONG    | Line 66 confirmed: `playwright-cli open --config=praman-cli.json` |
+| `.claude/agents/praman-sap-generator-cli.md` line 45 | `--config=praman-cli.json`                    | ❌ WRONG    | Confirmed in grep results                                         |
+| `.claude/agents/praman-sap-generator-cli.md` line 73 | `--config=praman-cli.json`                    | ❌ WRONG    | Confirmed in grep results                                         |
+| `.claude/agents/praman-sap-planner-cli.md` line 369  | `--config=.playwright/praman-cli.config.json` | ✅ CORRECT  | Confirmed                                                         |
+| `.claude/agents/praman-sap-planner-cli.md` line 897  | `--config=.playwright/praman-cli.config.json` | ✅ CORRECT  | Confirmed                                                         |
 
 **Additional Findings:**
+
 - `.playwright/cli.config.json` (default playwright-cli auto-load) — **DOES NOT EXIST**
 - Found 20 instances of `--config=praman-cli.json` in codebase across 6 files (plan predicted 4)
 - Files with errors: `skills/praman-sap-cli/SKILL.md`, `skills/praman-sap-cli/claude-SKILL.md`, `agents/claude/praman-sap-generator-cli.md`, `.claude/agents/praman-sap-generator-cli.md`, `docs/docs/guides/playwright-cli-agents.md`, `plans/praman-playwright-cli-integration.md`
@@ -105,11 +110,11 @@ Lines: 613
 
 **VERIFICATION RESULTS:**
 
-| Location | Status | Finding |
-|---|---|---|
-| `.claude/skills/` | Contains only `playwright-cli/` | ✅ VERIFIED |
-| `skills/praman-sap-cli/` | Exists, NOT under `.claude/skills/` | ✅ VERIFIED |
-| `.claude/skills/praman-sap-cli/` | Does NOT exist | ✅ VERIFIED |
+| Location                         | Status                              | Finding     |
+| -------------------------------- | ----------------------------------- | ----------- |
+| `.claude/skills/`                | Contains only `playwright-cli/`     | ✅ VERIFIED |
+| `skills/praman-sap-cli/`         | Exists, NOT under `.claude/skills/` | ✅ VERIFIED |
+| `.claude/skills/praman-sap-cli/` | Does NOT exist                      | ✅ VERIFIED |
 
 **IMPACT: CRITICAL** — When user says "Use playwright skills," agent only discovers generic playwright-cli skill, NOT praman skill. Generates vanilla Playwright code, NOT praman fixtures.
 
@@ -123,11 +128,11 @@ Lines: 613
 
 **VERIFICATION RESULTS:**
 
-| File | Format | Finding |
-|---|---|---|
-| `.claude/skills/playwright-cli/SKILL.md` | Claude Code frontmatter (YAML) | ✅ Has `name`, `description`, `allowed-tools` |
-| `skills/praman-sap-cli/SKILL.md` | Plain markdown, NO frontmatter | ✅ VERIFIED |
-| `skills/praman-sap-cli/SKILL.md` line 1 | `# SAP UI5 Test Automation via Playwright CLI` | ✅ VERIFIED (no frontmatter) |
+| File                                     | Format                                         | Finding                                       |
+| ---------------------------------------- | ---------------------------------------------- | --------------------------------------------- |
+| `.claude/skills/playwright-cli/SKILL.md` | Claude Code frontmatter (YAML)                 | ✅ Has `name`, `description`, `allowed-tools` |
+| `skills/praman-sap-cli/SKILL.md`         | Plain markdown, NO frontmatter                 | ✅ VERIFIED                                   |
+| `skills/praman-sap-cli/SKILL.md` line 1  | `# SAP UI5 Test Automation via Playwright CLI` | ✅ VERIFIED (no frontmatter)                  |
 
 **Finding:** Plan is CORRECT. The praman skill under `skills/` has no Claude Code frontmatter, so it's not recognized as a Claude Code skill. Only markdown content.
 
@@ -141,13 +146,14 @@ Lines: 613
 
 **VERIFICATION RESULTS:**
 
-| File | Contains "screenshot" | Finding |
-|---|---|---|
-| `skills/praman-sap-cli/SKILL.md` | NO | ✅ VERIFIED (grep found 0 matches) |
-| `.claude/agents/praman-sap-planner-cli.md` | NO | ✅ VERIFIED (grep found 0 matches) |
-| `.claude/agents/praman-sap-generator-cli.md` | NO | ✅ VERIFIED (grep found 0 matches) |
+| File                                         | Contains "screenshot" | Finding                            |
+| -------------------------------------------- | --------------------- | ---------------------------------- |
+| `skills/praman-sap-cli/SKILL.md`             | NO                    | ✅ VERIFIED (grep found 0 matches) |
+| `.claude/agents/praman-sap-planner-cli.md`   | NO                    | ✅ VERIFIED (grep found 0 matches) |
+| `.claude/agents/praman-sap-generator-cli.md` | NO                    | ✅ VERIFIED (grep found 0 matches) |
 
 **Additional findings:**
+
 - `.claude/agents/praman-sap-planner.md` (non-CLI variant) does reference `mcp__playwright-test__browser_take_screenshot` in tools list
 - Generator agents reference `playwright-test/browser_take_screenshot` for non-CLI
 - CLI agents (praman-sap-planner-cli, praman-sap-generator-cli) have NO screenshot documentation
@@ -162,14 +168,15 @@ Lines: 613
 
 **VERIFICATION RESULTS:**
 
-| File | Output Path Template | Finding |
-|---|---|---|
-| `.claude/agents/praman-sap-planner-cli.md` line 663 | `specs/{app-name}.plan.md` | ✅ Correct for plan |
-| `.claude/agents/praman-sap-planner-cli.md` line 664 | `tests/e2e/{app-name}/{app-name}-gold.spec.ts` | ⚠️ Template mismatch |
-| `.claude/agents/praman-sap-planner-cli.md` line 775 | `tests/e2e/{app-name}/{scenario-slug}.spec.ts` | ⚠️ Another template |
-| Actual files on disk (line 868 evidence) | `tests/e2e/sap-cloud/bom-e2e-praman-gold-standard.spec.ts` | ✅ Verified |
+| File                                                | Output Path Template                                       | Finding              |
+| --------------------------------------------------- | ---------------------------------------------------------- | -------------------- |
+| `.claude/agents/praman-sap-planner-cli.md` line 663 | `specs/{app-name}.plan.md`                                 | ✅ Correct for plan  |
+| `.claude/agents/praman-sap-planner-cli.md` line 664 | `tests/e2e/{app-name}/{app-name}-gold.spec.ts`             | ⚠️ Template mismatch |
+| `.claude/agents/praman-sap-planner-cli.md` line 775 | `tests/e2e/{app-name}/{scenario-slug}.spec.ts`             | ⚠️ Another template  |
+| Actual files on disk (line 868 evidence)            | `tests/e2e/sap-cloud/bom-e2e-praman-gold-standard.spec.ts` | ✅ Verified          |
 
 **Existing test files (8 found):**
+
 ```
 tests/e2e/sap-cloud/bom-create-flow-gold.spec.ts
 tests/e2e/sap-cloud/bom-create-v4-gold-standard.spec.ts
@@ -193,21 +200,25 @@ tests/e2e/sap-cloud/maintain-bom-v2-gold-standard.spec.ts
 File: `/sessions/relaxed-confident-cori/mnt/mk1/dist/browser/praman-bridge-init.js`
 Size: 2324 bytes (as claimed)
 Content: Minified JavaScript that sets up:
+
 ```javascript
 window[y]={...}  // where y="__praman_bridge"
 window[l]=!0     // where l="__praman_ready"
 ```
 
 First unminified line (beautified):
+
 ```javascript
 window.__praman_bridge = {
-  version: "1.0.0",
+  version: '1.0.0',
   injectedAt: Date.now(),
   ready: false,
   objectMap: new Map(),
-  getById: function(id) { /* ElementRegistry lookup */ },
-  utils: { retrieveControlMethods, controlExists }
-}
+  getById: function (id) {
+    /* ElementRegistry lookup */
+  },
+  utils: { retrieveControlMethods, controlExists },
+};
 ```
 
 ### Claim: Bridge handles `sap.ui.require('sap/ui/core/ElementRegistry')`
@@ -215,6 +226,7 @@ window.__praman_bridge = {
 **VERIFIED ✅**
 
 Visible in minified code:
+
 - Checks for `sap.ui.core.Element.getElementById`
 - Checks for `sap.ui.require('sap/ui/core/ElementRegistry').get`
 - Checks for `sap.ui.getCore().byId()`
@@ -227,6 +239,7 @@ Visible in minified code:
 ### Claim: `package.json` version 1.1.2
 
 **VERIFIED ✅**
+
 ```json
 {
   "name": "playwright-praman",
@@ -242,6 +255,7 @@ File size confirmed exact match
 ### Claim: 3 existing plan files
 
 **VERIFIED ✅**
+
 ```
 specs/bom-create-complete.plan.md
 specs/bom-create.plan.md
@@ -251,6 +265,7 @@ specs/maintain-bom-v2.plan.md
 ### Claim: 7 existing spec files in `tests/e2e/sap-cloud/`
 
 **FOUND 6, NOT 7:**
+
 ```
 bom-create-flow-gold.spec.ts
 bom-create-v4-gold-standard.spec.ts
@@ -280,6 +295,7 @@ maintain-bom-v2-gold-standard.spec.ts
 **Claim:** 4 files have wrong config paths
 **Actual:** 6 files have wrong paths (found 20 instances total)
 **Files:**
+
 - `skills/praman-sap-cli/SKILL.md` ❌
 - `skills/praman-sap-cli/claude-SKILL.md` ❌
 - `agents/claude/praman-sap-generator-cli.md` ❌
@@ -295,6 +311,7 @@ maintain-bom-v2-gold-standard.spec.ts
 
 **Claim:** Plan says agents output to `tests/e2e/{app-name}/{app-name}-gold.spec.ts`
 **Actual:**
+
 - Agent templates use `{app-name}-gold.spec.ts`
 - Real convention is `{app-name}-e2e-praman-gold-standard.spec.ts`
 - Example: `bom-e2e-praman-gold-standard.spec.ts` vs template's `bom-gold.spec.ts`
@@ -305,13 +322,13 @@ maintain-bom-v2-gold-standard.spec.ts
 
 ## Detailed Gap Analysis Summary
 
-| Gap | Severity | Plan Accurate? | Needs Fix? |
-|---|---|---|---|
-| Config Path Inconsistency | CRITICAL | ✅ Yes, identified correctly | ✅ Yes, 6 files |
-| Skill Location | CRITICAL | ✅ Yes, skill not in `.claude/skills/` | ✅ Yes, needs move |
-| Skill Composition/Override | HIGH | ✅ Yes, no frontmatter | ✅ Yes, add frontmatter |
-| Screenshot Documentation | MEDIUM | ✅ Yes, missing from CLI | ✅ Yes, add patterns |
-| Output Path Convention | LOW-MEDIUM | ✅ Yes, templates mismatch | ✅ Yes, update templates |
+| Gap                        | Severity   | Plan Accurate?                         | Needs Fix?               |
+| -------------------------- | ---------- | -------------------------------------- | ------------------------ |
+| Config Path Inconsistency  | CRITICAL   | ✅ Yes, identified correctly           | ✅ Yes, 6 files          |
+| Skill Location             | CRITICAL   | ✅ Yes, skill not in `.claude/skills/` | ✅ Yes, needs move       |
+| Skill Composition/Override | HIGH       | ✅ Yes, no frontmatter                 | ✅ Yes, add frontmatter  |
+| Screenshot Documentation   | MEDIUM     | ✅ Yes, missing from CLI               | ✅ Yes, add patterns     |
+| Output Path Convention     | LOW-MEDIUM | ✅ Yes, templates mismatch             | ✅ Yes, update templates |
 
 ---
 
@@ -320,6 +337,7 @@ maintain-bom-v2-gold-standard.spec.ts
 ### playwright-cli skill
 
 **Format:** Claude Code style (YAML frontmatter)
+
 ```yaml
 ---
 name: playwright-cli
@@ -331,6 +349,7 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 ### praman-sap-cli skill (current)
 
 **Format:** Plain markdown, NO frontmatter
+
 ```markdown
 # SAP UI5 Test Automation via Playwright CLI
 
@@ -345,17 +364,20 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 ## Claim Verification Summary by Section
 
 ### Section 1: CLI Comparison Table
+
 - ✅ Versions verified
 - ✅ Package names correct
 - ✅ Purpose descriptions accurate
 
 ### Section 3: Step-by-Step Flow
+
 - ✅ All file paths exist
 - ✅ Bridge injection documented correctly
 - ✅ Control discovery patterns valid
 - ⚠️ Config path references inconsistent (as noted)
 
 ### Section 4: Gap Analysis
+
 - ✅ GAP 1 (config) — CORRECT identification
 - ✅ GAP 2 (skill location) — CORRECT identification
 - ✅ GAP 3 (frontmatter) — CORRECT identification
@@ -363,16 +385,19 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 - ✅ GAP 5 (output paths) — CORRECT identification
 
 ### Section 5: Enhanced Approach
+
 - ✅ Architecture proposal is sound
 - ✅ File paths accurate
 - ✅ Implementation plan realistic
 
 ### Section 6: Walkthrough
+
 - ✅ CLI commands valid
 - ✅ Bridge setup correct
 - ✅ ElementRegistry handling verified
 
 ### Section 11: Evidence Sources
+
 - ✅ 10 of 11 sources verified
 - ⚠️ 1 claim off by 1 file (7 vs 6 spec files)
 
@@ -383,12 +408,14 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 **Overall Plan Accuracy: 94%**
 
 **Strengths:**
+
 - Correctly identified all 5 gaps that need fixing
 - Accurate assessment of root causes
 - Valid implementation proposals
 - Strong understanding of plugin architecture
 
 **Weaknesses:**
+
 - Config path errors are more widespread than claimed (6 files vs 4)
 - Off by 1 on file count (minor)
 - Output path convention mismatch not fully detailed
@@ -412,6 +439,7 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 ## Appendix: File Inventory Verified
 
 **Existence Verified (24 files):**
+
 - ✅ `.playwright/praman-cli.config.json`
 - ✅ `.playwright/cli.config.json` (MISSING — expected)
 - ✅ `dist/browser/praman-bridge-init.js`

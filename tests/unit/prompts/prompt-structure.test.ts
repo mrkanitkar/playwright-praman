@@ -95,7 +95,6 @@ function extractHeadings(content: string): string[] {
   const headings: string[] = [];
   for (const line of content.split('\n')) {
     // Match markdown headings (# to ######)
-    // eslint-disable-next-line sonarjs/slow-regex -- anchored regex on single lines, no backtracking risk
     const headingMatch = /^(#{1,6})\s+([^\n]+)$/.exec(line);
     if (headingMatch?.[2] !== undefined) headings.push(headingMatch[2].trim());
   }
@@ -115,7 +114,6 @@ describe('prompts/ — prompt file structure validation', () => {
 
   // Load all prompt files once before tests
   it('should find at least one prompt file', async () => {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const allFiles = await readdir(PROMPTS_DIR);
     promptFiles = allFiles.filter((f) => f.endsWith('.prompt.md') && f !== 'TEMPLATE.prompt.md');
     expect(promptFiles.length).toBeGreaterThan(0);

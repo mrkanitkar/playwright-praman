@@ -72,8 +72,41 @@ const ANTI_THENABLE = new Set(['then', 'catch', 'finally']);
 /** Max retries for page.evaluate when execution context is destroyed. */
 const MAX_CONTEXT_RETRIES = 3;
 
-/** Delay between retries in ms — long enough for SAP to establish new context. */
-const CONTEXT_RETRY_DELAY = 2500;
+/**
+ * Exponential backoff steps in ms for context-retry.
+ *
+ * @remarks
+ * Starts fast (500 ms) and ramps up to 2500 ms, giving SAP environments
+ * time to re-establish execution context after IAS token refresh,
+ * WalkMe injection, or FLP analytics context switches.
+ */
+const BACKOFF_STEPS_MS = [500, 1000, 2500] as const;
+
+/**
+ * Computes the retry delay for a context-destroyed retry attempt using
+ * exponential backoff with 20 % jitter.
+ *
+ * @capability proxy.contextRetryDelay
+ *
+ * @param attempt - Zero-based retry attempt index.
+ * @returns Delay in milliseconds (base + random jitter up to 20 % of base).
+ *
+ * @example
+ * ```typescript
+ * import { contextRetryDelay } from '#proxy/control-proxy.js';
+ *
+ * const delay = contextRetryDelay(0); // 500–600 ms
+ * const delay2 = contextRetryDelay(2); // 2500–3000 ms
+ * ```
+ */
+export function contextRetryDelay(attempt: number): number {
+  const clampedIndex = Math.min(attempt, BACKOFF_STEPS_MS.length - 1);
+  // eslint-disable-next-line security/detect-object-injection -- clampedIndex is clamped to valid array bounds above
+  const base = BACKOFF_STEPS_MS[clampedIndex] ?? BACKOFF_STEPS_MS[BACKOFF_STEPS_MS.length - 1];
+  // eslint-disable-next-line sonarjs/pseudo-random -- jitter for retry delay; not security-sensitive
+  const jitter = Math.random() * (base ?? 0) * 0.2;
+  return (base ?? 0) + jitter;
+}
 
 /**
  * Detects "execution context destroyed" errors from Playwright.
@@ -866,7 +899,7 @@ export function createControlProxy(state: ControlProxyState): UI5ControlBase {
         }
         lastError = error;
         await new Promise<void>((resolve) => {
-          setTimeout(resolve, CONTEXT_RETRY_DELAY);
+          setTimeout(resolve, contextRetryDelay(attempt));
         });
       }
     }

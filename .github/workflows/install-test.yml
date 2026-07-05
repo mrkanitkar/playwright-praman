@@ -69,9 +69,38 @@ jobs:
       - name: ESM import test
         shell: bash
         run: cd test-project && node --input-type=module -e "import('playwright-praman').then(m => console.log('OK', Object.keys(m).length))"
+      - name: ESM subpath imports
+        shell: bash
+        run: |
+          cd test-project
+          node --input-type=module -e "
+            const subpaths = [
+              'playwright-praman',
+              'playwright-praman/ai',
+              'playwright-praman/intents',
+              'playwright-praman/vocabulary',
+              'playwright-praman/fe',
+              'playwright-praman/reporters',
+            ];
+            for (const sp of subpaths) {
+              await import(sp);
+              console.log('✅', sp);
+            }
+          "
       - name: CLI smoke test
         shell: bash
         run: cd test-project && npx playwright-praman --version
+      - name: Uninstall test (preuninstall hook)
+        shell: bash
+        run: |
+          cd test-project
+          if [ "${{ matrix.pm }}" = "npm" ]; then
+            npm uninstall playwright-praman
+          elif [ "${{ matrix.pm }}" = "yarn" ]; then
+            yarn remove playwright-praman
+          elif [ "${{ matrix.pm }}" = "pnpm" ]; then
+            pnpm remove playwright-praman
+          fi
 
   monorepo-test:
     name: Monorepo (npm workspaces)

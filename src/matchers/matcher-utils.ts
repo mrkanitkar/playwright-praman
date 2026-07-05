@@ -308,8 +308,20 @@ export async function getUI5ControlType(
 /** Default polling interval for auto-retry matchers (ms). */
 const MATCHER_POLL_INTERVAL = 100;
 
-/** Default timeout for auto-retry matchers (ms). */
-const MATCHER_DEFAULT_TIMEOUT = 5000;
+/**
+ * Default timeout for auto-retry matchers (ms).
+ *
+ * @remarks
+ * Used as the final fallback when neither the Playwright expect context timeout
+ * nor an explicit `timeout` option is provided.
+ *
+ * @example
+ * ```typescript
+ * import { MATCHER_DEFAULT_TIMEOUT } from './matcher-utils.js';
+ * const timeout = contextTimeout ?? MATCHER_DEFAULT_TIMEOUT; // 5000
+ * ```
+ */
+export const MATCHER_DEFAULT_TIMEOUT = 5000;
 
 /**
  * Result shape for matcher check functions (avoids circular import).

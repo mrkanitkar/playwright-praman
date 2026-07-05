@@ -29,9 +29,7 @@
     "playwright-report/**",
     "seo/**",
     "CHANGELOG.md",
-    "ARCHITECTURE_REVIEW_CLI_INTEGRATION.md",
-    "REVIEW_ARCHITECTURE.md",
-    "VERIFICATION_REPORT.md",
+    "docs/internal/**",
     "blog-praman-discovery-interaction.md",
     "capability-query-implementation.md",
     "dx-audit-report.md",
@@ -44,5 +42,6 @@
     "docs/playwright-cli-integration-review.md",
     "docs/review-implementation-plan-playwright-cli.md",
     "docs/typescript-6.0-compatibility-report.md",
+    "PRAMAN_CODE_REVIEW.md",
   ],
 }

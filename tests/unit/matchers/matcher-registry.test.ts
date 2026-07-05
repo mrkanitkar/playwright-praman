@@ -158,6 +158,77 @@ describe('matcher-registry', () => {
 
       expect(result.pass).toBe(true);
     });
+
+    it('inherits timeout from Playwright ExpectMatcherState context', async () => {
+      let callCount = 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await -- Sync mock with counter
+      const checkFn: MatcherCheckFn<[string]> = async (_page, _cid, _exp) => {
+        callCount++;
+        return {
+          pass: callCount > 2,
+          message: () => 'msg',
+        };
+      };
+      const matcher = createUI5Matcher(checkFn);
+      const page = createMockPage();
+
+      // Simulate Playwright binding `this` to ExpectMatcherState with custom timeout
+      const boundMatcher = matcher.bind({ timeout: 500 });
+      const result = await boundMatcher(page, 'ctrl1', 'val');
+
+      expect(result.pass).toBe(true);
+      expect(callCount).toBeGreaterThan(2);
+    });
+
+    it('explicit timeout option takes priority over context timeout', async () => {
+      let callCount = 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await -- Sync mock with counter
+      const checkFn: MatcherCheckFn<[string]> = async (_page, _cid, _exp) => {
+        callCount++;
+        // Never passes — we rely on timeout expiring
+        return { pass: false, message: () => 'fail' };
+      };
+      const matcher = createUI5Matcher(checkFn);
+      const page = createMockPage();
+
+      // Context timeout is 10s but explicit option is 0ms — explicit wins
+      const boundMatcher = matcher.bind({ timeout: 10_000 });
+      const result = await boundMatcher(page, 'ctrl1', 'val', { timeout: 0 });
+
+      expect(result.pass).toBe(false);
+      // With 0ms timeout, should only call once (no retries)
+      expect(callCount).toBe(1);
+    });
+
+    it('uses default 5000ms when no context and no explicit timeout', async () => {
+      const checkFn = createSimpleCheck(true);
+      const matcher = createUI5Matcher(checkFn);
+      const page = createMockPage();
+
+      // No `this` binding, no options — falls through to MATCHER_DEFAULT_TIMEOUT
+      const result = await matcher(page, 'ctrl1', 'val');
+
+      // Should pass immediately (check passes on first call)
+      expect(result.pass).toBe(true);
+    });
+
+    it('falls back to default timeout when context has no timeout property', async () => {
+      let callCount = 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await -- Sync mock with counter
+      const checkFn: MatcherCheckFn<[string]> = async (_page, _cid, _exp) => {
+        callCount++;
+        return { pass: callCount > 1, message: () => 'msg' };
+      };
+      const matcher = createUI5Matcher(checkFn);
+      const page = createMockPage();
+
+      // Bind with object that has no timeout (e.g., incomplete context)
+      const boundMatcher = matcher.bind({ isNot: false, promise: '' });
+      const result = await boundMatcher(page, 'ctrl1', 'val');
+
+      expect(result.pass).toBe(true);
+      expect(callCount).toBeGreaterThan(1);
+    });
   });
 
   // ── registerUI5Matcher ───────────────────────────────────────────────

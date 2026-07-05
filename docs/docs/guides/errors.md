@@ -198,6 +198,43 @@ Every `PramanError` includes:
 | `details`     | `Record`    | Additional context (selector, timeout, etc.)            |
 | `timestamp`   | `string`    | ISO-8601 timestamp                                      |
 
+### Domain-Specific Context Fields
+
+Some error classes extend the base fields with additional diagnostic context:
+
+**`ControlError`** adds:
+
+```typescript
+{
+  availableControls: ['btn1', 'btn2', 'input3'],  // Controls discovered on the page
+  suggestedSelector: { id: 'btn1' },               // Best fuzzy match
+  lastKnownSelector: { id: 'oldBtn' },             // Selector that was attempted
+}
+```
+
+**`SelectorError`** adds:
+
+```typescript
+{
+  ambiguousMatches: [{ id: 'hdr1', type: 'sap.m.Title' }, { id: 'hdr2', type: 'sap.m.Title' }],
+  receivedSelector: { controlType: 'sap.m.Title' },
+}
+```
+
+**`BridgeError`** adds:
+
+```typescript
+{
+  ui5Version: '1.120.4',     // Detected UI5 version at failure time
+  injectionAttempt: 3,       // How many times injection was tried
+}
+```
+
+These fields surface automatically in Playwright's HTML reporter and trace viewer when failure
+artifacts are enabled (default: on). You can inspect them without modifying your test code —
+open the failing step in the trace viewer and the structured error data appears in the error
+details panel.
+
 ### Serialization
 
 ```typescript

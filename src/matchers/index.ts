@@ -25,6 +25,7 @@ export {
   checkUI5Visible,
 } from './ui5-matchers.js';
 export type { MatcherOptions, MatcherResult } from './ui5-matchers.js';
+export { MATCHER_DEFAULT_TIMEOUT } from './matcher-utils.js';
 export type { MatcherPage, UI5BindingInfo } from './matcher-utils.js';
 export { checkUI5CellText, checkUI5RowCount, checkUI5SelectedRows } from './table-matchers.js';
 

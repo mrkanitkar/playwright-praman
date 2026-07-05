@@ -514,6 +514,125 @@ describe('cli/uninstall', () => {
       expect(mockRmdir).toHaveBeenCalledWith(join(TEST_DIR, 'skills/praman-sap-cli/'));
     });
 
+    it('copies files inside directories and removes source files', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, 'skills/playwright-praman-sap-testing/'),
+      );
+      // Simulate directory with a file entry
+      const mockFileEntry = { name: 'SKILL.md', isDirectory: () => false };
+      mockReaddir.mockImplementation(async (dirPath: string, opts?: { withFileTypes?: boolean }) => {
+        if (opts?.withFileTypes === true) {
+          // readdir with withFileTypes for copyDirRecursive
+          if (dirPath === join(TEST_DIR, 'skills/playwright-praman-sap-testing/')) {
+            return await Promise.resolve([mockFileEntry]);
+          }
+          return await Promise.resolve([]);
+        }
+        // readdir without withFileTypes for cleanEmptyDirs
+        return await Promise.resolve([]);
+      });
+
+      await runUninstall({
+        targetDir: TEST_DIR,
+        confirm: true,
+        keepConfig: false,
+        keepAgents: false,
+        removeBrowsers: false,
+      });
+
+      // Should copy the file to dest
+      expect(mockCopyFile).toHaveBeenCalledWith(
+        join(TEST_DIR, 'skills/playwright-praman-sap-testing/', 'SKILL.md'),
+        join(TEST_DIR, TRASH_DIR_NAME, 'skills/playwright-praman-sap-testing/', 'SKILL.md'),
+      );
+      // Should unlink the source file after copy
+      expect(mockUnlink).toHaveBeenCalledWith(
+        join(TEST_DIR, 'skills/playwright-praman-sap-testing/', 'SKILL.md'),
+      );
+    });
+
+    it('recursively copies subdirectories within directory entries', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, 'skills/playwright-praman-sap-testing/'),
+      );
+      // Simulate directory with a nested subdirectory containing a file
+      const mockSubDir = { name: 'sub', isDirectory: () => true };
+      const mockNestedFile = { name: 'nested.md', isDirectory: () => false };
+      mockReaddir.mockImplementation(async (dirPath: string, opts?: { withFileTypes?: boolean }) => {
+        if (opts?.withFileTypes === true) {
+          if (dirPath === join(TEST_DIR, 'skills/playwright-praman-sap-testing/')) {
+            return await Promise.resolve([mockSubDir]);
+          }
+          if (dirPath === join(TEST_DIR, 'skills/playwright-praman-sap-testing/', 'sub')) {
+            return await Promise.resolve([mockNestedFile]);
+          }
+          return await Promise.resolve([]);
+        }
+        return await Promise.resolve([]);
+      });
+
+      await runUninstall({
+        targetDir: TEST_DIR,
+        confirm: true,
+        keepConfig: false,
+        keepAgents: false,
+        removeBrowsers: false,
+      });
+
+      // Should create the subdirectory in dest
+      expect(mockMkdir).toHaveBeenCalledWith(
+        join(TEST_DIR, TRASH_DIR_NAME, 'skills/playwright-praman-sap-testing/', 'sub'),
+        expect.objectContaining({ recursive: true }),
+      );
+      // Should copy the nested file
+      expect(mockCopyFile).toHaveBeenCalledWith(
+        join(TEST_DIR, 'skills/playwright-praman-sap-testing/', 'sub', 'nested.md'),
+        join(TEST_DIR, TRASH_DIR_NAME, 'skills/playwright-praman-sap-testing/', 'sub', 'nested.md'),
+      );
+      // Should rmdir the nested sub directory (empty after file removal)
+      expect(mockRmdir).toHaveBeenCalledWith(
+        join(TEST_DIR, 'skills/playwright-praman-sap-testing/', 'sub'),
+      );
+    });
+
+    it('stops cleaning dirs when directory is not empty', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, '.vscode', 'settings.json'),
+      );
+      // cleanEmptyDirs: first call returns non-empty entries (stop walking up)
+      mockReaddir.mockResolvedValue(['remaining-file.json']);
+
+      await runUninstall({
+        targetDir: TEST_DIR,
+        confirm: true,
+        keepConfig: false,
+        keepAgents: false,
+        removeBrowsers: false,
+      });
+
+      // Should NOT rmdir the non-empty directory
+      expect(mockRmdir).not.toHaveBeenCalledWith(join(TEST_DIR, '.vscode'));
+    });
+
+    it('handles cleanEmptyDirs readdir error gracefully', async () => {
+      mockExistsSync.mockImplementation(
+        (p: string) => p === join(TEST_DIR, '.vscode', 'settings.json'),
+      );
+      // cleanEmptyDirs: readdir throws error (should break the loop)
+      mockReaddir.mockRejectedValue(new Error('ENOENT'));
+
+      await runUninstall({
+        targetDir: TEST_DIR,
+        confirm: true,
+        keepConfig: false,
+        keepAgents: false,
+        removeBrowsers: false,
+      });
+
+      // Should not throw — error is swallowed
+      expect(mockRmdir).not.toHaveBeenCalledWith(join(TEST_DIR, '.vscode'));
+    });
+
     it('calls execSync for browser removal when removeBrowsers is true', async () => {
       mockExistsSync.mockImplementation(
         (p: string) => p === join(TEST_DIR, 'playwright.config.ts'),

@@ -51,7 +51,6 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { expect, test as base } from '@playwright/test';
-import type { Frame } from '@playwright/test';
 import type { Logger } from 'pino';
 
 import { applyRegisteredMatchers } from '../matchers/matcher-registry.js';
@@ -70,10 +69,10 @@ import {
   checkUI5Visible,
 } from '../matchers/ui5-matchers.js';
 
+import { attachBridgeNavigationReset } from './navigation-reset.js';
 import { UI5Handler } from './ui5-handler.js';
 
 import { createObjectCleanupScript } from '#bridge/browser-scripts/object-map.js';
-import { resetPageInjection } from '#bridge/injection.js';
 import { createInteractionStrategy } from '#bridge/interaction-strategies/strategy-factory.js';
 import { assertMinVersion, getPlaywrightFeatures } from '#core/compat/index.js';
 import type { PlaywrightFeatures } from '#core/compat/index.js';
@@ -362,13 +361,7 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
     // Listen for main frame navigation to reset bridge injection state.
     // After navigation the injected bridge script is gone, so the next
     // bridge operation must re-inject.
-    const navigationListener = (frame: Frame): void => {
-      if (frame === page.mainFrame()) {
-        logger.debug('Main frame navigated — clearing bridge injection state');
-        resetPageInjection(page);
-      }
-    };
-    page.on('framenavigated', navigationListener);
+    const detachNavigationReset = attachBridgeNavigationReset(page, logger);
 
     const handler = new UI5Handler({
       page,
@@ -401,7 +394,7 @@ export const coreTest = base.extend<TestFixtures, WorkerFixtures>({
           });
       }
       // Teardown: remove navigation listener (always — even if use() throws)
-      page.off('framenavigated', navigationListener);
+      detachNavigationReset();
       try {
         // Clean up browser-side object map to prevent memory leaks
         const cleanupScript = createObjectCleanupScript();

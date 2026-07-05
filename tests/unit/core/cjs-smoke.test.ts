@@ -18,7 +18,6 @@ const testDir = dirname(fileURLToPath(import.meta.url));
 describe('CJS compatibility smoke test', () => {
   it('should load the main entry point via require()', () => {
     const distPath = resolve(testDir, '..', '..', '..', 'dist', 'index.cjs');
-    // eslint-disable-next-line sonarjs/os-command -- intentional: smoke test verifying CJS module loading
     const result = execSync(
       `node -e "const m = require('${distPath.replaceAll('\\', '\\\\')}'); process.stdout.write(JSON.stringify(Object.keys(m)))"`,
       { encoding: 'utf-8' },
@@ -38,7 +37,6 @@ describe('CJS compatibility smoke test', () => {
 
     for (const subPath of subPaths) {
       const distPath = resolve(testDir, '..', '..', '..', 'dist', `${subPath}.cjs`);
-      // eslint-disable-next-line sonarjs/os-command -- intentional: smoke test verifying CJS sub-path loading
       const result = execSync(
         `node -e "require('${distPath.replaceAll('\\', '\\\\')}'); process.stdout.write('ok')"`,
         { encoding: 'utf-8' },

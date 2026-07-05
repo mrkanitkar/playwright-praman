@@ -2575,3 +2575,16 @@ capabilities:
       import { getControlAggregation } from 'playwright-praman';
       const items = await getControlAggregation(page, '__list0', 'items');
     registryVersion: 1
+
+  - id: UI5-OTHER-001
+    qualifiedName: fixtures.attachBridgeNavigationReset
+    name: attachBridgeNavigationReset
+    description: 'Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener.'
+    category: assert
+    priority: implementation
+    aiSteering: 'Use this helper inside fixture setUp to ensure the bridge is re-injected after every full-page navigation.'
+    usageExample: |
+      const detach = attachBridgeNavigationReset(page, logger);
+      await use(handler);
+      detach();
+    registryVersion: 1

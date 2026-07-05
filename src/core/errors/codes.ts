@@ -30,7 +30,7 @@
  * All Praman error codes as a frozen constant object.
  *
  * @remarks
- * Total: 77 error codes across 17 categories.
+ * Total: 78 error codes across 18 categories.
  *
  * Categories:
  * - Config (3): schema validation, file not found, parse failure
@@ -50,6 +50,7 @@
  * - Bind (2): not supported, failed
  * - Screencast (3): not started, chapter failed, frame handler
  * - Telemetry (5): init failed, peer dep missing, exporter failed, shutdown failed, metrics init failed
+ * - Compat (1): feature unavailable (Playwright version too old)
  */
 export const ErrorCode = Object.freeze({
   // ── Config errors ──────────────────────────────────────────────────
@@ -162,6 +163,9 @@ export const ErrorCode = Object.freeze({
   ERR_TELEMETRY_EXPORTER_FAILED: 'ERR_TELEMETRY_EXPORTER_FAILED',
   ERR_TELEMETRY_SHUTDOWN_FAILED: 'ERR_TELEMETRY_SHUTDOWN_FAILED',
   ERR_TELEMETRY_METRICS_INIT_FAILED: 'ERR_TELEMETRY_METRICS_INIT_FAILED',
+
+  // ── Compat errors ─────────────────────────────────────────────────
+  ERR_COMPAT_FEATURE_UNAVAILABLE: 'ERR_COMPAT_FEATURE_UNAVAILABLE',
 } as const);
 
 /**
@@ -202,7 +206,8 @@ export type ErrorCategory =
   | 'MATCHER'
   | 'BIND'
   | 'SCREENCAST'
-  | 'TELEMETRY';
+  | 'TELEMETRY'
+  | 'COMPAT';
 
 /**
  * Template literal type enforcing the `ERR_<CATEGORY>_<REASON>` format.

@@ -101,6 +101,11 @@ const mockFeatures: PlaywrightFeatures = {
   hasLocatorDrop: true,
   hasLocatorHighlightStyle: true,
   hasBrowserContextEvent: true,
+  hasWebAuthnCredentials: true,
+  hasWebStorageAPI: true,
+  hasSoftPoll: true,
+  hasScreencastTimestamp: true,
+  hasVideoRetainModes: true,
 };
 
 const mockLoadConfig = vi.fn().mockResolvedValue(mockConfig);

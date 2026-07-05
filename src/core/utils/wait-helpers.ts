@@ -145,14 +145,21 @@ export async function waitForUI5Stable(
 }
 
 /**
- * Performs a brief DOM settle wait using `page.evaluate` with `setTimeout`.
+ * Performs a brief DOM settle wait using a MutationObserver quiet-window pattern.
  *
  * @remarks
- * Uses `page.evaluate()` to create a browser-side `setTimeout` promise.
+ * Observes `document.body` for mutations (childList, subtree, attributes).
+ * Resolves when no mutation fires for 50 ms (the "quiet window"), indicating
+ * the DOM has stabilised. A hard cap at `durationMs` prevents indefinite
+ * blocking when the DOM mutates continuously (e.g., during animations).
+ *
+ * Falls back to a plain `setTimeout` when `MutationObserver` is unavailable
+ * (e.g., older or headless environments without the API).
+ *
  * This is the approved alternative to the banned `page.waitForTimeout()`.
  *
  * @param page - Playwright Page (or compatible subset).
- * @param durationMs - Settle duration in ms. Defaults to {@link DEFAULT_TIMEOUTS.DOM_SETTLE}.
+ * @param durationMs - Hard-cap duration in ms. Defaults to {@link DEFAULT_TIMEOUTS.DOM_SETTLE}.
  *
  * @example
  * ```typescript
@@ -166,7 +173,30 @@ export async function briefDOMSettle(page: WaitPage, durationMs?: number): Promi
     // eslint-disable-next-line @typescript-eslint/promise-function-async -- browser-evaluated function cannot be async
     (timeout: number) =>
       new Promise<void>((resolve) => {
-        setTimeout(resolve, timeout);
+        const QUIET_WINDOW_MS = 50;
+        if (typeof MutationObserver === 'undefined') {
+          setTimeout(resolve, timeout);
+          return;
+        }
+        let quietTimer: ReturnType<typeof setTimeout> | null = null;
+        let capTimer: ReturnType<typeof setTimeout> | null = null;
+
+        const cleanup = (): void => {
+          if (capTimer !== null) clearTimeout(capTimer);
+          if (quietTimer !== null) clearTimeout(quietTimer);
+          observer.disconnect();
+          resolve();
+        };
+
+        const resetQuietTimer = (): void => {
+          if (quietTimer !== null) clearTimeout(quietTimer);
+          quietTimer = setTimeout(cleanup, QUIET_WINDOW_MS);
+        };
+
+        const observer = new MutationObserver(resetQuietTimer);
+        capTimer = setTimeout(cleanup, timeout);
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+        resetQuietTimer();
       }),
     /* v8 ignore stop */
     ms,
