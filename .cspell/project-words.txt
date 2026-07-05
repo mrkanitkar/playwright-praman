@@ -1,23 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Abbreviated identifiers (proxy API)
 # AI / LLM
 # Auth / security tokens
@@ -45,10 +26,7 @@ appendable
 attw
 BatchSpanProcessor
 Behaviour
-behaviour
 BLACKLIST
-Blacklist
-blacklist
 blacklisted
 blocklist
 camelcase
@@ -56,9 +34,9 @@ categorisation
 categorise
 certuser
 checkmark
+cicd
 cidx
 Codegen
-codegen
 combinators
 commitizen
 commitlint
@@ -83,7 +61,6 @@ EACCES
 eamodio
 EBELN
 Embedder
-embedder
 endo
 errorlens
 esbenp
@@ -103,12 +80,12 @@ initialisation
 initialise
 initialised
 INTERACTABLE
-interactable
 introspectable
 introspection
 jaeger
 JSESSIONID
 Kanitkar
+Kbps
 kebabcase
 kohler
 KUNNR
@@ -122,21 +99,21 @@ mdlint
 MeterProvider
 mgmt
 Microbenchmarks
-microbenchmarks
 microtasks
 Millis
 mmpur
 modelcontextprotocol
+modularizes
 mrkanitkar
+msapp
 myapp
 mycompany
 navigations
 networkidle
+noassert
 nocol
 nodenext
 NodeSDK
-msapp
-noassert
 normalised
 npmjs
 opencode
@@ -165,7 +142,6 @@ pwuser
 Pydantic
 pytest
 QTEST
-qtest
 readymade
 recordreplay
 recordreply
@@ -186,7 +162,6 @@ SDET
 Segoe
 semver
 serialisable
-smol
 serialisation
 serialise
 serialiser
@@ -195,17 +170,19 @@ serializability
 serializable
 SESSIONID
 Signavio
+smol
 SOGE
 stabilise
+stabilised
 stringifying
+subdirs
+subpaths
 summarising
 Sxxxxxxxx
 testlib
 testng
 TESTRAIL
-testrail
 TESTUSER
-testuser
 thenable
 toequal
 totp
@@ -215,6 +192,7 @@ tsyringe
 unminified
 unparseable
 unredacted
+unvalidated
 upvote
 usernamehw
 valuehelp
@@ -226,9 +204,8 @@ vkey
 vtext
 waitforui
 wdi5
-winjs
 WDIO
-wdio
+winjs
 workitem
 worklist
 xclip
@@ -240,5 +217,3 @@ yoavbls
 yzhang
 zestest
 zzznomatch
-Kbps
-modularizes
