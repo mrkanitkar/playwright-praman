@@ -4,6 +4,13 @@
 > CJS output format) as a patch. See [versioning.md](docs/versioning.md) for the
 > full history and the semver contract from v1.3.4 onward.
 
+## [1.3.4](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.3...playwright-praman-v1.3.4) (2026-07-05)
+
+
+### Features
+
+* Playwright 1.61 support + security fixes + dep upgrades ([#182](https://github.com/mrkanitkar/playwright-praman/issues/182)) ([1716a2a](https://github.com/mrkanitkar/playwright-praman/commit/1716a2a91eb6088cd10dcf267bca9e4e9fb10e47))
+
 ## [1.3.2](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.1...playwright-praman-v1.3.2) (2026-06-02)
 
 
