@@ -90,6 +90,17 @@ jobs:
       - name: CLI smoke test
         shell: bash
         run: cd test-project && npx playwright-praman --version
+      - name: Uninstall test (preuninstall hook)
+        shell: bash
+        run: |
+          cd test-project
+          if [ "${{ matrix.pm }}" = "npm" ]; then
+            npm uninstall playwright-praman
+          elif [ "${{ matrix.pm }}" = "yarn" ]; then
+            yarn remove playwright-praman
+          elif [ "${{ matrix.pm }}" = "pnpm" ]; then
+            pnpm remove playwright-praman
+          fi
 
   monorepo-test:
     name: Monorepo (npm workspaces)
