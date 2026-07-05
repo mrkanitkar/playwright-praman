@@ -18,6 +18,7 @@
  */
 
 import { join } from 'node:path';
+import process from 'node:process';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -554,7 +555,8 @@ describe('cli/ide-installer — scaffoldIDEFiles', () => {
 
       // Override readdir to throw ENOENT for the skills directory
       const skillsSrcDir = join(pkgPrefix, 'skills', 'playwright-praman-sap-testing');
-      mockFs.mocks.readdir.mockImplementation((dirPath: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      mockFs.mocks.readdir.mockImplementation(async (dirPath: string) => {
         if (dirPath === skillsSrcDir) {
           return Promise.reject(
             Object.assign(new Error('ENOENT: no such directory'), { code: 'ENOENT' }),
@@ -585,7 +587,8 @@ describe('cli/ide-installer — scaffoldIDEFiles', () => {
 
       // Override readdir to throw ENOENT for the prompts directory
       const promptsSrcDir = join(pkgPrefix, 'prompts');
-      mockFs.mocks.readdir.mockImplementation((dirPath: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      mockFs.mocks.readdir.mockImplementation(async (dirPath: string) => {
         if (dirPath === promptsSrcDir) {
           return Promise.reject(
             Object.assign(new Error('ENOENT: no such directory'), { code: 'ENOENT' }),
@@ -853,7 +856,8 @@ describe('cli/ide-installer — scaffoldCliAgents', () => {
 
     // Override readdir to throw ENOENT for the CLI skills directory
     const cliSkillSrcDir = join(pkgPrefix, 'skills', 'praman-sap-cli');
-    mockFs.mocks.readdir.mockImplementation((dirPath: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      mockFs.mocks.readdir.mockImplementation(async (dirPath: string) => {
       if (dirPath === cliSkillSrcDir) {
         return Promise.reject(
           Object.assign(new Error('ENOENT: no such directory'), { code: 'ENOENT' }),
@@ -884,7 +888,8 @@ describe('cli/ide-installer — scaffoldCliAgents', () => {
     const created: string[] = [];
 
     // Override readdir to throw ENOENT ONLY for paths ending with /references
-    mockFs.mocks.readdir.mockImplementation((dirPath: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      mockFs.mocks.readdir.mockImplementation(async (dirPath: string) => {
       if (dirPath.endsWith(join('praman-sap-cli', 'references'))) {
         return Promise.reject(
           Object.assign(new Error('ENOENT: no such directory'), { code: 'ENOENT' }),
@@ -986,7 +991,8 @@ describe('cli/ide-installer — copyIfMissing failure path', () => {
     mockFs.files.set(julesSrc, 'jules-content');
 
     // Override copyFile to fail for this pair
-    mockFs.mocks.copyFile.mockImplementation((src: string, dest: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    mockFs.mocks.copyFile.mockImplementation(async (src: string, dest: string) => {
       if (dest.includes('.jules')) {
         return Promise.reject(new Error('EPERM: permission denied'));
       }
