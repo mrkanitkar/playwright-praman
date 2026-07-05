@@ -1,6 +1,6 @@
 
-# Abbreviated identifiers (proxy API)
 # AI / LLM
+# Abbreviated identifiers (proxy API)
 # Auth / security tokens
 # British English variants
 # Build & tooling
@@ -19,14 +19,44 @@
 # TypeScript / code terms
 # VS Code extension IDs
 # XPath error codes
-agentic
 Aggs
+BLACKLIST
+BatchSpanProcessor
+Behaviour
+Codegen
+EACCES
+EBELN
+Embedder
+INTERACTABLE
+JSESSIONID
+KUNNR
+Kanitkar
+Kbps
+MeterProvider
+Microbenchmarks
+Millis
+NodeSDK
+Outb
+PWDEBUG
+Pydantic
+QTEST
+SAPGUI
+SDET
+SESSIONID
+SOGE
+Segoe
+Signavio
+Sxxxxxxxx
+TESTRAIL
+TESTUSER
+TracerProvider
+Visio
+WDIO
+XPST
+agentic
 apos
 appendable
 attw
-BatchSpanProcessor
-Behaviour
-BLACKLIST
 blacklisted
 blocklist
 camelcase
@@ -36,7 +66,6 @@ certuser
 checkmark
 cicd
 cidx
-Codegen
 combinators
 commitizen
 commitlint
@@ -57,10 +86,7 @@ dhikraft
 dlgs
 docusaurus
 domcontentloaded
-EACCES
 eamodio
-EBELN
-Embedder
 endo
 errorlens
 esbenp
@@ -79,28 +105,21 @@ hermetic
 initialisation
 initialise
 initialised
-INTERACTABLE
 introspectable
 introspection
 jaeger
-JSESSIONID
-Kanitkar
-Kbps
 kebabcase
 kohler
-KUNNR
 langchain
 langgraph
+linkify
 lintstagedrc
 llms
 llmstxt
 maheshwar
 mdlint
-MeterProvider
 mgmt
-Microbenchmarks
 microtasks
-Millis
 mmpur
 modelcontextprotocol
 modularizes
@@ -113,7 +132,6 @@ networkidle
 noassert
 nocol
 nodenext
-NodeSDK
 normalised
 npmjs
 opencode
@@ -121,7 +139,6 @@ opentelemetry
 optimised
 otel
 otlp
-Outb
 pageobject
 parallelizable
 pclick
@@ -136,12 +153,9 @@ preuninstall
 provenance
 pstep
 ptest
-PWDEBUG
 pwtest
 pwuser
-Pydantic
 pytest
-QTEST
 readymade
 recordreplay
 recordreply
@@ -151,15 +165,12 @@ resumability
 rgba
 roundtrips
 sapbw
-SAPGUI
 sapmbutton
 sbom
 scaffolder
 screencast
 screencasts
 scriptable
-SDET
-Segoe
 semver
 serialisable
 serialisation
@@ -168,25 +179,19 @@ serialiser
 serialises
 serializability
 serializable
-SESSIONID
-Signavio
+sigstore
 smol
-SOGE
 stabilise
 stabilised
 stringifying
 subdirs
 subpaths
 summarising
-Sxxxxxxxx
 testlib
 testng
-TESTRAIL
-TESTUSER
 thenable
 toequal
 totp
-TracerProvider
 tsup
 tsyringe
 unminified
@@ -197,20 +202,17 @@ upvote
 usernamehw
 valuehelp
 viewports
-Visio
 vitems
 vitest
 vkey
 vtext
 waitforui
 wdi5
-WDIO
 winjs
 workitem
 worklist
 xclip
 xdist
-XPST
 xsel
 xyznonexistent
 yoavbls
