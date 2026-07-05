@@ -12,8 +12,8 @@
  *
  * @ai
  * @aiContext Auto-enabled fixture that captures screenshot, UI5 control tree,
- * and page context when a test fails. Artifacts appear in the Playwright HTML
- * reporter and trace viewer alongside other test attachments.
+ * page context, and PramanError suggestions when a test fails. Artifacts appear
+ * in the Playwright HTML reporter and trace viewer alongside other test attachments.
  *
  * @remarks
  * Provides one auto test-scoped fixture:
@@ -22,6 +22,7 @@
  *   1. Screenshot (PNG) as `'failure-screenshot'`
  *   2. UI5 control tree snapshot (JSON) as `'failure-control-tree'`
  *   3. Page URL and title (JSON) as `'failure-context'`
+ *   4. PramanError suggestions (text) as `'praman-failure-suggestions'`
  *
  * All capture logic is wrapped in try/catch — failure artifacts NEVER cause
  * secondary test failures. If capture itself fails, a debug log is emitted.
@@ -96,6 +97,37 @@ export interface FailureArtifactsFixtures {
 export interface FailureArtifactsDeps {
   /** Validated, frozen Praman configuration (from coreTest). */
   pramanConfig: Readonly<PramanConfig>;
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────
+
+/** Pattern to match PramanError `Suggestions:` blocks in error messages. */
+const SUGGESTIONS_PATTERN = /Suggestions:\n([\s\S]*?)(?:\n\n|$)/;
+
+/**
+ * Extracts suggestions text from Playwright TestInfo error objects.
+ *
+ * @remarks
+ * PramanError serializes its `suggestions[]` array into the error message
+ * using the format `Suggestions:\n bullet 1\n bullet 2`. This function
+ * extracts those blocks from all errors and returns them as trimmed strings.
+ *
+ * @param errors - Array of TestInfo error objects (with optional `message`)
+ * @returns Array of extracted suggestion text blocks (may be empty)
+ */
+function extractSuggestionsFromErrors(errors: readonly { message?: string }[]): string[] {
+  const suggestions: string[] = [];
+  for (const error of errors) {
+    const message = error.message;
+    if (message === undefined || message === '') {
+      continue;
+    }
+    const captured = SUGGESTIONS_PATTERN.exec(message)?.[1];
+    if (captured !== undefined) {
+      suggestions.push(captured.trim());
+    }
+  }
+  return suggestions;
 }
 
 // ── Fixture ──────────────────────────────────────────────────────────
@@ -193,6 +225,20 @@ export const failureArtifactsTest = base.extend<FailureArtifactsFixtures, Failur
         log.debug('Failure page context attached to test artifacts');
       } catch (contextError: unknown) {
         log.debug({ err: contextError }, 'Failure page context capture failed (non-fatal)');
+      }
+
+      // 4. PramanError suggestions extraction
+      try {
+        const suggestions = extractSuggestionsFromErrors(testInfo.errors);
+        if (suggestions.length > 0) {
+          await testInfo.attach('praman-failure-suggestions', {
+            contentType: 'text/plain',
+            body: Buffer.from(suggestions.join('\n\n---\n\n'), 'utf8'),
+          });
+          log.debug('Failure suggestions attached to test artifacts');
+        }
+      } catch (suggestionsError: unknown) {
+        log.debug({ err: suggestionsError }, 'Failure suggestions capture failed (non-fatal)');
       }
     },
     { auto: true },

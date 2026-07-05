@@ -107,17 +107,23 @@ function createMockPage(): {
   };
 }
 
-function createMockTestInfo(overrides?: { status?: string; expectedStatus?: string }): {
+function createMockTestInfo(overrides?: {
+  status?: string;
+  expectedStatus?: string;
+  errors?: { message?: string }[];
+}): {
   attach: ReturnType<typeof vi.fn>;
   outputDir: string;
   status: string;
   expectedStatus: string;
+  errors: { message?: string }[];
 } {
   return {
     attach: vi.fn().mockResolvedValue(undefined),
     outputDir: `${tmpdir()}/test-output`,
     status: overrides?.status ?? 'failed',
     expectedStatus: overrides?.expectedStatus ?? 'passed',
+    errors: overrides?.errors ?? [],
   };
 }
 
@@ -272,5 +278,160 @@ describe('failureArtifactsCapture fixture', () => {
       'failure-context',
       expect.objectContaining({ contentType: 'application/json' }),
     );
+  });
+
+  describe('PramanError suggestions extraction', () => {
+    it('attaches suggestions when testInfo.errors contains a PramanError message', async () => {
+      const fixtureFn = getFixtureFn('failureArtifactsCapture');
+      const page = createMockPage();
+      const testInfo = createMockTestInfo({
+        status: 'failed',
+        expectedStatus: 'passed',
+        errors: [
+          {
+            message: `Control not found: #myButton\n\nSuggestions:\n• Verify the control ID exists in the UI5 view\n• Check if the page has fully loaded (waitForUI5Stable)\n• Try using controlType + properties instead of ID\n\n`,
+          },
+        ],
+      });
+      const pramanConfig = { captureFailureArtifacts: true };
+
+      const use = vi.fn();
+      await fixtureFn({ page, pramanConfig }, use, testInfo);
+
+      // Verify suggestions artifact was attached
+      expect(testInfo.attach).toHaveBeenCalledWith(
+        'praman-failure-suggestions',
+        expect.objectContaining({ contentType: 'text/plain' }),
+      );
+
+      // Verify the body content includes all suggestions
+      const suggestionsCall = testInfo.attach.mock.calls.find(
+        (call: unknown[]) => call[0] === 'praman-failure-suggestions',
+      ) as [string, { body: Buffer }] | undefined;
+      expect(suggestionsCall).toBeDefined();
+      const body = suggestionsCall?.[1].body.toString('utf8') ?? '';
+      expect(body).toContain('Verify the control ID exists in the UI5 view');
+      expect(body).toContain('Check if the page has fully loaded');
+      expect(body).toContain('Try using controlType + properties instead of ID');
+    });
+
+    it('combines suggestions from multiple errors with separator', async () => {
+      const fixtureFn = getFixtureFn('failureArtifactsCapture');
+      const page = createMockPage();
+      const testInfo = createMockTestInfo({
+        status: 'failed',
+        expectedStatus: 'passed',
+        errors: [
+          {
+            message: `Error 1\n\nSuggestions:\n• First suggestion\n• Second suggestion\n\n`,
+          },
+          {
+            message: `Error 2\n\nSuggestions:\n• Third suggestion\n\n`,
+          },
+        ],
+      });
+      const pramanConfig = { captureFailureArtifacts: true };
+
+      const use = vi.fn();
+      await fixtureFn({ page, pramanConfig }, use, testInfo);
+
+      const suggestionsCall = testInfo.attach.mock.calls.find(
+        (call: unknown[]) => call[0] === 'praman-failure-suggestions',
+      ) as [string, { body: Buffer }] | undefined;
+      expect(suggestionsCall).toBeDefined();
+      const body = suggestionsCall?.[1].body.toString('utf8') ?? '';
+      expect(body).toContain('First suggestion');
+      expect(body).toContain('Third suggestion');
+      expect(body).toContain('---'); // separator between multiple error suggestions
+    });
+
+    it('does not attach suggestions when errors have no Suggestions section', async () => {
+      const fixtureFn = getFixtureFn('failureArtifactsCapture');
+      const page = createMockPage();
+      const testInfo = createMockTestInfo({
+        status: 'failed',
+        expectedStatus: 'passed',
+        errors: [{ message: 'Some generic error without suggestions' }],
+      });
+      const pramanConfig = { captureFailureArtifacts: true };
+
+      const use = vi.fn();
+      await fixtureFn({ page, pramanConfig }, use, testInfo);
+
+      // Should NOT have suggestions attachment
+      expect(testInfo.attach).not.toHaveBeenCalledWith(
+        'praman-failure-suggestions',
+        expect.anything(),
+      );
+
+      // 3 attachments total (screenshot + control tree + context, no suggestions)
+      expect(testInfo.attach).toHaveBeenCalledTimes(3);
+    });
+
+    it('does not attach suggestions when testInfo.errors is empty', async () => {
+      const fixtureFn = getFixtureFn('failureArtifactsCapture');
+      const page = createMockPage();
+      const testInfo = createMockTestInfo({
+        status: 'failed',
+        expectedStatus: 'passed',
+        errors: [],
+      });
+      const pramanConfig = { captureFailureArtifacts: true };
+
+      const use = vi.fn();
+      await fixtureFn({ page, pramanConfig }, use, testInfo);
+
+      expect(testInfo.attach).not.toHaveBeenCalledWith(
+        'praman-failure-suggestions',
+        expect.anything(),
+      );
+    });
+
+    it('handles suggestions extraction failure gracefully', async () => {
+      const fixtureFn = getFixtureFn('failureArtifactsCapture');
+      const page = createMockPage();
+      // Create a testInfo where accessing errors throws
+      const testInfo = createMockTestInfo({
+        status: 'failed',
+        expectedStatus: 'passed',
+      });
+      Object.defineProperty(testInfo, 'errors', {
+        get() {
+          throw new Error('Cannot access errors');
+        },
+      });
+      const pramanConfig = { captureFailureArtifacts: true };
+
+      const use = vi.fn();
+
+      // Should NOT throw — suggestions capture failures are swallowed
+      await expect(fixtureFn({ page, pramanConfig }, use, testInfo)).resolves.toBeUndefined();
+    });
+
+    it('skips errors with no message property', async () => {
+      const fixtureFn = getFixtureFn('failureArtifactsCapture');
+      const page = createMockPage();
+      const testInfo = createMockTestInfo({
+        status: 'failed',
+        expectedStatus: 'passed',
+        errors: [
+          {},
+          {
+            message: `Found it\n\nSuggestions:\n• Valid suggestion\n\n`,
+          },
+        ],
+      });
+      const pramanConfig = { captureFailureArtifacts: true };
+
+      const use = vi.fn();
+      await fixtureFn({ page, pramanConfig }, use, testInfo);
+
+      const suggestionsCall = testInfo.attach.mock.calls.find(
+        (call: unknown[]) => call[0] === 'praman-failure-suggestions',
+      ) as [string, { body: Buffer }] | undefined;
+      expect(suggestionsCall).toBeDefined();
+      const body = suggestionsCall?.[1].body.toString('utf8') ?? '';
+      expect(body).toContain('Valid suggestion');
+    });
   });
 });
