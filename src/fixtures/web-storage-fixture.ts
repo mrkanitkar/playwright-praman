@@ -288,6 +288,7 @@ function createWebStorageHelper(storageArea: StorageArea): WebStorageHelper {
  * });
  * ```
  */
+/* v8 ignore start -- fixture setup runs inside Playwright runner, not vitest */
 export const webStorageTest = base.extend<{ webStorage: WebStorageFixture }>({
   webStorage: async ({ page }, use) => {
     assertWebStorageAvailable();
@@ -300,6 +301,7 @@ export const webStorageTest = base.extend<{ webStorage: WebStorageFixture }>({
     await use({ localStorage: local, sessionStorage: session });
   },
 });
+/* v8 ignore stop */
 
 // ── Test-only exports ─────────────────────────────────────────────────────────
 
