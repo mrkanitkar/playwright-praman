@@ -165,6 +165,134 @@ describe('briefDOMSettle', () => {
   });
 });
 
+describe('browser-script shape: MutationObserver quiet-window logic', () => {
+  it('resolves immediately via quiet-window when DOM is already stable (setTimeout fallback)', async () => {
+    vi.useFakeTimers();
+    try {
+      const page = createMockPage();
+      // Capture the browser function passed to page.evaluate and run it directly
+      // In Node, MutationObserver exists but document.body does not, so the function
+      // exercises the setTimeout fallback path when document is unavailable.
+      page.evaluate.mockImplementation(
+        // eslint-disable-next-line @typescript-eslint/promise-function-async -- mirror browser-evaluated signature
+        (fn: unknown, arg: unknown): Promise<void> => {
+          // Temporarily remove MutationObserver to exercise the fallback path
+          const saved = globalThis.MutationObserver;
+          Reflect.deleteProperty(globalThis, 'MutationObserver');
+          try {
+            return (fn as (timeout: number) => Promise<void>)(arg as number);
+          } finally {
+            globalThis.MutationObserver = saved;
+          }
+        },
+      );
+
+      const settlePromise = briefDOMSettle(page, 200);
+      // The fallback setTimeout(resolve, 200) should be pending
+      await vi.advanceTimersByTimeAsync(200);
+      await settlePromise;
+
+      expect(page.evaluate).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('resolves via quiet-window when MutationObserver is available', async () => {
+    vi.useFakeTimers();
+    try {
+      let observeCalledWith: MutationObserverInit | undefined;
+      let disconnected = false;
+
+      // Stub MutationObserver and document for browser-like environment in Node
+      const FakeMO = function fakeMutationObserver(this: Record<string, unknown>): void {
+        this['observe'] = (_target: unknown, init?: MutationObserverInit): void => {
+          observeCalledWith = init;
+        };
+        this['disconnect'] = (): void => {
+          disconnected = true;
+        };
+        this['takeRecords'] = (): MutationRecord[] => [];
+      };
+      vi.stubGlobal('MutationObserver', FakeMO);
+      vi.stubGlobal('document', { body: {} });
+
+      const page = createMockPage();
+      page.evaluate.mockImplementation(
+        // eslint-disable-next-line @typescript-eslint/promise-function-async -- mirror browser-evaluated signature
+        (fn: unknown, arg: unknown): Promise<void> =>
+          (fn as (timeout: number) => Promise<void>)(arg as number),
+      );
+
+      const settlePromise = briefDOMSettle(page, 300);
+      // The initial quiet timer fires after 50ms
+      await vi.advanceTimersByTimeAsync(50);
+      await settlePromise;
+
+      expect(observeCalledWith).toEqual({
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
+      expect(disconnected).toBe(true);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.useRealTimers();
+    }
+  });
+
+  it('resolves via cap timer when DOM mutates continuously', async () => {
+    vi.useFakeTimers();
+    try {
+      let observerCallback: MutationCallback | undefined;
+      let disconnected = false;
+
+      // Stub MutationObserver to capture the callback for simulating mutations
+      const FakeMO = function fakeMutationObserver(
+        this: Record<string, unknown>,
+        callback: MutationCallback,
+      ): void {
+        observerCallback = callback;
+        this['observe'] = (): void => {
+          // no-op
+        };
+        this['disconnect'] = (): void => {
+          disconnected = true;
+        };
+        this['takeRecords'] = (): MutationRecord[] => [];
+      };
+      vi.stubGlobal('MutationObserver', FakeMO);
+      vi.stubGlobal('document', { body: {} });
+
+      const page = createMockPage();
+      page.evaluate.mockImplementation(
+        // eslint-disable-next-line @typescript-eslint/promise-function-async -- mirror browser-evaluated signature
+        (fn: unknown, arg: unknown): Promise<void> =>
+          (fn as (timeout: number) => Promise<void>)(arg as number),
+      );
+
+      const settlePromise = briefDOMSettle(page, 200);
+
+      // Simulate continuous mutations that keep resetting the quiet timer
+      for (let i = 0; i < 10; i++) {
+        await vi.advanceTimersByTimeAsync(30);
+        if (observerCallback !== undefined) {
+          observerCallback([], {} as MutationObserver);
+        }
+      }
+
+      // Cap timer fires at 200ms total
+      await vi.advanceTimersByTimeAsync(200);
+      await settlePromise;
+
+      expect(disconnected).toBe(true);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe('waitForUI5Bootstrap', () => {
   it('calls page.waitForFunction with bootstrap condition', async () => {
     const page = createMockPage();

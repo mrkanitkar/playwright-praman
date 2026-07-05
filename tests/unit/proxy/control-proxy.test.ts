@@ -27,7 +27,7 @@ import type {
   ControlMetadataResult,
   ControlProxyState,
 } from '#proxy/control-proxy.js';
-import { createControlProxy } from '#proxy/control-proxy.js';
+import { contextRetryDelay, createControlProxy } from '#proxy/control-proxy.js';
 
 /** Extended interface for testing dynamic method calls on the proxy. */
 interface TestProxy extends UI5ControlBase {
@@ -1146,7 +1146,7 @@ describe('control-proxy', () => {
         const proxy = createControlProxy(state) as TestProxy;
 
         const promise = proxy.getText();
-        // Advance past the retry delay (2500ms)
+        // Advance past the first backoff step (max ~600ms for attempt 0)
         await vi.advanceTimersByTimeAsync(3000);
         const result = await promise;
 
@@ -1597,6 +1597,43 @@ describe('control-proxy', () => {
     it('blacklisted error includes control type and id', () => {
       const proxy = toRecord(createControlProxy(createTestState()));
       expect(() => proxy['init']).toThrow(/sap\.m\.Button#saveBtn/);
+    });
+  });
+
+  // ── contextRetryDelay backoff ─────────────────────────────────────
+  describe('contextRetryDelay', () => {
+    it('returns a value in [500, 600) for attempt 0', () => {
+      for (let i = 0; i < 50; i++) {
+        const d = contextRetryDelay(0);
+        expect(d).toBeGreaterThanOrEqual(500);
+        expect(d).toBeLessThan(600);
+      }
+    });
+    it('returns a value in [1000, 1200) for attempt 1', () => {
+      for (let i = 0; i < 50; i++) {
+        const d = contextRetryDelay(1);
+        expect(d).toBeGreaterThanOrEqual(1000);
+        expect(d).toBeLessThan(1200);
+      }
+    });
+    it('returns a value in [2500, 3000) for attempt 2', () => {
+      for (let i = 0; i < 50; i++) {
+        const d = contextRetryDelay(2);
+        expect(d).toBeGreaterThanOrEqual(2500);
+        expect(d).toBeLessThan(3000);
+      }
+    });
+    it('clamps to the last step for out-of-range attempt indices', () => {
+      for (let i = 0; i < 50; i++) {
+        const d = contextRetryDelay(99);
+        expect(d).toBeGreaterThanOrEqual(2500);
+        expect(d).toBeLessThan(3000);
+      }
+    });
+    it('each call returns a different value (jitter is non-deterministic)', () => {
+      const values = Array.from({ length: 20 }, () => contextRetryDelay(0));
+      const unique = new Set(values);
+      expect(unique.size).toBeGreaterThan(1);
     });
   });
 
