@@ -225,7 +225,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version-file: '.nvmrc'
@@ -234,3 +234,35 @@ jobs:
       - run: npm install @playwright/test@1.57.0
       - run: npm run build
       - run: npm run test:unit
+
+  playwright-ceiling:
+    name: Playwright Ceiling (1.61.x)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm install @playwright/test@latest
+      - run: npm run build
+      - run: npm run test:unit
+      - name: Verify PW 1.61+ feature flags active
+        run: |
+          node -e "
+            const { detectFeatures, parsePlaywrightVersion } = require('./dist/index.cjs');
+            const pkg = require('@playwright/test/package.json');
+            const ver = parsePlaywrightVersion(pkg.version);
+            const features = detectFeatures(ver);
+            console.log('Playwright version:', pkg.version);
+            console.log('hasWebStorageAPI:', features.hasWebStorageAPI);
+            console.log('hasScreencastTimestamp:', features.hasScreencastTimestamp);
+            console.log('hasSoftPoll:', features.hasSoftPoll);
+            if (!features.hasWebStorageAPI) {
+              console.error('ERROR: PW 1.61 features not detected');
+              process.exit(1);
+            }
+            console.log('✓ All PW 1.61 feature flags active');
+          "
