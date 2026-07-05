@@ -28,7 +28,7 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   target: 'node22',
-  splitting: false,
+  splitting: true,
   treeshake: true,
   cjsInterop: true,
   shims: true,
