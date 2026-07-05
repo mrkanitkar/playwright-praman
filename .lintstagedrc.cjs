@@ -16,6 +16,7 @@ const MARKDOWNLINT_IGNORE = [
   /\/examples\//,
   /\/docs\/internal\//,
   /\/node_modules\//,
+  /PRAMAN_CODE_REVIEW\.md$/,
 ];
 
 /** @param {string[]} files */
