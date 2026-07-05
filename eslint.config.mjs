@@ -205,7 +205,7 @@ export default tseslint.config(
     plugins: { unicorn },
     rules: {
       'unicorn/prefer-node-protocol': 'error',
-      'unicorn/no-array-for-each': 'error',
+      'unicorn/no-for-each': 'error',
       'unicorn/prefer-top-level-await': 'error',
       'unicorn/no-abusive-eslint-disable': 'error',
       'unicorn/prefer-string-replace-all': 'error',
@@ -337,6 +337,11 @@ export default tseslint.config(
       'jsdoc/require-jsdoc': 'off',
       'security/detect-object-injection': 'off',
       'sonarjs/no-duplicate-string': 'off',
+      'sonarjs/no-hardcoded-passwords': 'off',
+      'sonarjs/no-floating-point-equality': 'off',
+      'sonarjs/no-trivial-assertions': 'off',
+      'sonarjs/assertions-in-tests': 'off',
+      'sonarjs/super-linear-regex': 'off',
 
       // Playwright best practices (enforced)
       'playwright/no-wait-for-timeout': 'error', // Aligns with Principle 8

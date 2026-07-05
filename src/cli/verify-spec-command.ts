@@ -144,7 +144,7 @@ export function checkBannedPatterns(content: string): CheckResult {
  * ```
  */
 export function checkTsDocHeader(content: string): CheckResult {
-  // eslint-disable-next-line sonarjs/slow-regex -- bounded input (file content); anchored match with `m` flag
+  // eslint-disable-next-line sonarjs/super-linear-regex -- bounded input (file content); anchored match with `m` flag
   const pass = /^\/\*\*\s*\n[^@]*@(status|marker|version)/m.test(content);
   return {
     pass,
@@ -168,7 +168,6 @@ export function checkTsDocHeader(content: string): CheckResult {
  */
 function runEslintCheck(filePath: string): CheckResult {
   try {
-    // eslint-disable-next-line sonarjs/os-command -- filePath is validated by commander arg parser
     execSync(`npx eslint --no-warn-ignored ${filePath}`, {
       stdio: 'pipe',
       encoding: 'utf8',

@@ -124,7 +124,6 @@ export function executeEnricherScript(session: string): ControlSnapshot[] {
 
   let raw: string;
   try {
-    // eslint-disable-next-line sonarjs/os-command -- intentional: spawns playwright-cli, session name validated by Commander option parser
     raw = execSync(cmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   } catch (error: unknown) {
     const msg =
