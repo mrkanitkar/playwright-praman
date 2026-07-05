@@ -323,11 +323,14 @@ export const screencastTest = base.extend<ScreencastFixtures, ScreencastWorkerDe
      * Internal frame dispatcher — called by the Playwright `onFrame` callback.
      * Forwards frames to all registered handlers in registration order.
      */
-    const dispatchFrame = (data: { data: Buffer }): void => {
+    const dispatchFrame = (data: { data: Buffer; timestamp?: number }): void => {
       if (frameHandlers.length === 0) return;
       const frame: ScreencastFrame = {
         buffer: data.data,
-        timestamp: Date.now() - startTimestamp,
+        timestamp:
+          hasFeature('hasScreencastTimestamp') && data.timestamp !== undefined
+            ? data.timestamp - startTimestamp
+            : Date.now() - startTimestamp,
       };
       for (const handler of frameHandlers) {
         void (async () => {
