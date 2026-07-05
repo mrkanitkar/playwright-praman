@@ -25,6 +25,7 @@ import {
   getControlProperty,
   getUI5BindingInfo,
   getUI5ControlType,
+  MATCHER_DEFAULT_TIMEOUT,
   pollUntilPass,
 } from '../../../src/matchers/matcher-utils.js';
 
@@ -328,6 +329,12 @@ describe('UI5BindingInfo type', () => {
     expectTypeOf<UI5BindingInfo>().toHaveProperty('path');
     expectTypeOf<UI5BindingInfo>().toHaveProperty('model');
     expectTypeOf<UI5BindingInfo>().toHaveProperty('value');
+  });
+});
+
+describe('MATCHER_DEFAULT_TIMEOUT', () => {
+  it('is exported and equals 5000ms', () => {
+    expect(MATCHER_DEFAULT_TIMEOUT).toBe(5000);
   });
 });
 

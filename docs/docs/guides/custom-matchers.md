@@ -180,29 +180,39 @@ await expect(page).toHaveUI5SelectedRows('poTable', []); // No selection
 
 ## Auto-Retry Semantics
 
-All Praman matchers — built-in and custom — automatically retry using web-first polling.
-They query the UI5 runtime via `page.evaluate()` on each poll iteration, and Playwright's
-`expect()` auto-retries failed assertions until timeout. You do not need manual retry loops.
+All Praman matchers are registered as async custom matchers. They query the UI5 runtime via
+`page.evaluate()` on each poll iteration. Praman auto-retries failed assertions until the
+configured timeout expires.
 
 | Setting         | Value    | Override                                |
 | --------------- | -------- | --------------------------------------- |
 | Poll interval   | 100 ms   | Not configurable (internal)             |
 | Default timeout | 5,000 ms | Pass `{ timeout }` option per assertion |
 
-**Important:** Praman's matcher timeout (5 s default) is **independent** of Playwright's global
-`expect.configure({ timeout })`. If you have set a custom global expect timeout, Praman matchers
-still use their own 5 s default unless you pass an explicit `timeout` option per assertion.
+### Timeout Priority
+
+Praman matchers resolve their timeout using this priority (highest wins):
+
+1. **Explicit option** — a `{ timeout }` object passed as the last matcher argument
+2. **Playwright expect timeout** — configured via `expect.configure({ timeout })` or
+   `use: { expect: { timeout } }` in `playwright.config.ts`
+3. **Default** — 5000 ms
 
 ```typescript
-// This auto-retries every 100 ms for up to 5 seconds:
-await expect(page).toHaveUI5Text('statusField', 'Approved');
-
-// Override timeout for slow OData operations:
+// 1. Explicit: always wins
 await expect(page).toHaveUI5Text('statusField', 'Approved', { timeout: 15_000 });
 
-// Even if Playwright's global expect timeout is different, the matcher above
-// uses the explicitly passed 15 s — not the global setting.
+// 2. Playwright config: honored automatically
+// playwright.config.ts: use: { expect: { timeout: 10_000 } }
+await expect(page).toHaveUI5Text('statusField', 'Approved'); // uses 10s
+
+// 3. Default: 5000ms when nothing else is configured
+await expect(page).toHaveUI5Text('statusField', 'Approved'); // uses 5s
 ```
+
+This means users who configure `expect.configure({ timeout: 10_000 })` or set
+`expect: { timeout: 10_000 }` in their Playwright config will see Praman matchers honor that
+timeout without any additional configuration.
 
 ## Using expect.poll() With UI5 Methods
 
@@ -304,10 +314,11 @@ import { test, expect } from 'playwright-praman';
 <summary>Do Praman matchers auto-retry like Playwright matchers?</summary>
 
 Yes. All 10 matchers are registered as async custom matchers. They query the UI5 runtime via
-`page.evaluate()` every 100 ms, and Playwright's `expect()` auto-retries until timeout (default
-5 seconds). The 5 s default is **independent** of Playwright's `expect.configure({ timeout })`
-global setting — pass a per-assertion option to override it:
-`await expect(page).toHaveUI5Text('field', 'value', { timeout: 15_000 })`.
+`page.evaluate()` on each poll iteration, retrying until the timeout expires. The timeout is
+resolved in this order: explicit `{ timeout }` option > Playwright's `expect.configure({ timeout })`
+
+> 5000 ms default. You can increase the timeout per assertion:
+> `await expect(page).toHaveUI5Text('field', 'value', { timeout: 15_000 })`.
 
 </details>
 

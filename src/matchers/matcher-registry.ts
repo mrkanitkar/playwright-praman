@@ -43,12 +43,32 @@
  * @module matchers
  */
 
-import { pollUntilPass } from './matcher-utils.js';
+import { MATCHER_DEFAULT_TIMEOUT, pollUntilPass } from './matcher-utils.js';
 import type { MatcherPage, PollableMatcherResult } from './matcher-utils.js';
 import type { MatcherOptions, MatcherResult } from './ui5-matchers.js';
 
 import { PramanError } from '#core/errors/base.js';
 import { ErrorCode } from '#core/errors/codes.js';
+
+/**
+ * Subset of Playwright's `ExpectMatcherState` that we read from `this` context.
+ *
+ * @remarks
+ * Playwright binds custom matchers with `this` set to `ExpectMatcherState`.
+ * We only depend on the `timeout` field to inherit `expect.configure({ timeout })`.
+ *
+ * @example
+ * ```typescript
+ * // Inside a matcher registered via expect.extend():
+ * function myMatcher(this: MatcherContext, ...args) {
+ *   const timeout = this.timeout; // from expect.configure()
+ * }
+ * ```
+ */
+interface MatcherContext {
+  /** Timeout in milliseconds from Playwright's expect configuration. */
+  readonly timeout?: number;
+}
 
 /**
  * A raw check function that evaluates a UI5 control assertion without retry.
@@ -181,11 +201,14 @@ export function createUI5Matcher<TArgs extends readonly unknown[] = readonly unk
   // runtime args are always unknown[]. This avoids double-cast assertions.
   const erased = checkFn as MatcherCheckFn;
 
-  return async (
+  // Must be a regular function (not arrow) so Playwright can bind `this`
+  // to ExpectMatcherState when calling via expect.extend().
+  return async function (
+    this: MatcherContext | undefined,
     page: MatcherPage,
     controlId: string,
     ...args: readonly unknown[]
-  ): Promise<MatcherResult> => {
+  ): Promise<MatcherResult> {
     // Extract optional trailing MatcherOptions
     const lastArg = args.length > 0 ? args[args.length - 1] : undefined;
     const hasOptions =
@@ -197,7 +220,11 @@ export function createUI5Matcher<TArgs extends readonly unknown[] = readonly unk
     const options = hasOptions ? (lastArg as MatcherOptions) : undefined;
     const checkArgs = hasOptions ? args.slice(0, -1) : args;
 
-    return pollUntilPass(async () => erased(page, controlId, ...checkArgs), options?.timeout);
+    // Timeout priority: explicit option > Playwright context > default
+    const contextTimeout = this !== undefined && 'timeout' in this ? this.timeout : undefined;
+    const timeout = options?.timeout ?? contextTimeout ?? MATCHER_DEFAULT_TIMEOUT;
+
+    return pollUntilPass(async () => erased(page, controlId, ...checkArgs), timeout);
   };
 }
 
