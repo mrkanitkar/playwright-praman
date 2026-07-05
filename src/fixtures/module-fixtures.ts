@@ -23,8 +23,6 @@
  * @module fixtures
  */
 
-import type { Frame } from '@playwright/test';
-
 import type { DateInput, DateOptions, DatePage } from '../modules/date.js';
 import {
   getDatePickerValue,
@@ -101,10 +99,10 @@ import {
 } from '../modules/table.js';
 
 import { coreTest } from './core-fixtures.js';
+import { attachBridgeNavigationReset } from './navigation-reset.js';
 import { UI5Handler } from './ui5-handler.js';
 
 import { createObjectCleanupScript } from '#bridge/browser-scripts/object-map.js';
-import { resetPageInjection } from '#bridge/injection.js';
 import { createInteractionStrategy } from '#bridge/interaction-strategies/strategy-factory.js';
 import { createLogger } from '#core/logging/index.js';
 import { withStep } from '#core/utils/step-decorator.js';
@@ -364,13 +362,7 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
     const logger = createLogger('bridge', rootLogger);
     const strategy = createInteractionStrategy(pramanConfig.interactionStrategy, pramanConfig.opa5);
 
-    const navigationListener = (frame: Frame): void => {
-      if (frame === page.mainFrame()) {
-        logger.debug('Main frame navigated — clearing bridge injection state');
-        resetPageInjection(page);
-      }
-    };
-    page.on('framenavigated', navigationListener);
+    const detachNavigationReset = attachBridgeNavigationReset(page, logger);
 
     const handler = new UI5Handler({
       page,
@@ -416,7 +408,7 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
       await use(extended);
     } finally {
       // Teardown: remove navigation listener (always — even if use() throws)
-      page.off('framenavigated', navigationListener);
+      detachNavigationReset();
       try {
         // Clean up browser-side object map to prevent memory leaks
         const cleanupScript = createObjectCleanupScript();
