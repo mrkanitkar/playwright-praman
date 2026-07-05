@@ -90,6 +90,11 @@ export interface PlaywrightFeatures {
   readonly hasLocatorDrop: boolean;
   readonly hasLocatorHighlightStyle: boolean;
   readonly hasBrowserContextEvent: boolean;
+  readonly hasWebAuthnCredentials: boolean;
+  readonly hasWebStorageAPI: boolean;
+  readonly hasSoftPoll: boolean;
+  readonly hasScreencastTimestamp: boolean;
+  readonly hasVideoRetainModes: boolean;
 }
 
 /**
@@ -151,6 +156,11 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
     hasLocatorDrop: isAtLeast(ver, '1.60.0'),
     hasLocatorHighlightStyle: isAtLeast(ver, '1.60.0'),
     hasBrowserContextEvent: isAtLeast(ver, '1.60.0'),
+    hasWebAuthnCredentials: isAtLeast(ver, '1.61.0'),
+    hasWebStorageAPI: isAtLeast(ver, '1.61.0'),
+    hasSoftPoll: isAtLeast(ver, '1.61.0'),
+    hasScreencastTimestamp: isAtLeast(ver, '1.61.0'),
+    hasVideoRetainModes: isAtLeast(ver, '1.61.0'),
   };
 }
 
