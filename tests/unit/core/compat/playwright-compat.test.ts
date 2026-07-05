@@ -140,6 +140,30 @@ describe('detectFeatures — 1.60 capabilities', () => {
   });
 });
 
+describe('detectFeatures — 1.61 capabilities', () => {
+  it('returns all 1.61 flags true for version 1.61.0', () => {
+    const version = { major: 1, minor: 61, patch: 0, raw: '1.61.0' };
+    const features = detectFeatures(version);
+
+    expect(features.hasWebAuthnCredentials).toBe(true);
+    expect(features.hasWebStorageAPI).toBe(true);
+    expect(features.hasSoftPoll).toBe(true);
+    expect(features.hasScreencastTimestamp).toBe(true);
+    expect(features.hasVideoRetainModes).toBe(true);
+  });
+
+  it('returns all 1.61 flags false for version 1.60.0', () => {
+    const version = { major: 1, minor: 60, patch: 0, raw: '1.60.0' };
+    const features = detectFeatures(version);
+
+    expect(features.hasWebAuthnCredentials).toBe(false);
+    expect(features.hasWebStorageAPI).toBe(false);
+    expect(features.hasSoftPoll).toBe(false);
+    expect(features.hasScreencastTimestamp).toBe(false);
+    expect(features.hasVideoRetainModes).toBe(false);
+  });
+});
+
 describe('hasFeature', () => {
   it('returns correct boolean for installed Playwright version', () => {
     // Playwright 1.59.0 is installed — all features should be true
@@ -216,5 +240,10 @@ describe('getPlaywrightFeatures', () => {
     expect(typeof features.hasLocatorDrop).toBe('boolean');
     expect(typeof features.hasLocatorHighlightStyle).toBe('boolean');
     expect(typeof features.hasBrowserContextEvent).toBe('boolean');
+    expect(typeof features.hasWebAuthnCredentials).toBe('boolean');
+    expect(typeof features.hasWebStorageAPI).toBe('boolean');
+    expect(typeof features.hasSoftPoll).toBe('boolean');
+    expect(typeof features.hasScreencastTimestamp).toBe('boolean');
+    expect(typeof features.hasVideoRetainModes).toBe('boolean');
   });
 });
