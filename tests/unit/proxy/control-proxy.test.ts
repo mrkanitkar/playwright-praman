@@ -1548,9 +1548,7 @@ describe('control-proxy', () => {
   describe('getAggregation forwarding', () => {
     it('getAggregation returns cached forwarder', () => {
       const proxy = createControlProxy(createTestState());
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- testing proxy returns same cached forwarder reference
       const fn1 = proxy.getAggregation;
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- testing proxy returns same cached forwarder reference
       const fn2 = proxy.getAggregation;
       expect(fn1).toBe(fn2);
     });

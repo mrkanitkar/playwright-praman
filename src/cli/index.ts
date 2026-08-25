@@ -29,7 +29,6 @@
 
 import process from 'node:process';
 
-// eslint-disable-next-line unicorn/prefer-top-level-await -- IIFE needed for dynamic import fallback
 void (async () => {
   // Load .env file if dotenv is available (devDependency)
   try {

@@ -27,7 +27,6 @@ describe('fixtures/index (assembly)', () => {
 
     it('should export test with extend method', async () => {
       const mod = await import('../../../src/fixtures/index.js');
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- checking existence of method on imported object
       expect(mod.test.extend).toBeDefined();
       expect(typeof mod.test.extend).toBe('function');
     });
