@@ -47,8 +47,6 @@ const config: KnipConfig = {
     'glob',
     // Used in scripts/docs-verify/ — outside knip's project scope
     'ts-morph',
-    'execa',
-    'typescript-docs-verifier',
   ],
   ignoreBinaries: ['docusaurus', 'playwright-praman'],
   rules: {

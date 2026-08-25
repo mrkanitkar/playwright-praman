@@ -76,7 +76,6 @@ describe('PramanError', () => {
     });
 
     it('still creates error when captureStackTrace is unavailable', () => {
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       const original = Error.captureStackTrace;
       // Temporarily remove captureStackTrace to exercise the guard branch
       Object.defineProperty(Error, 'captureStackTrace', { value: undefined, configurable: true });

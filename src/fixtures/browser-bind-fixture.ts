@@ -197,9 +197,13 @@ export const browserBindTest = base.extend<BrowserBindFixtures, BrowserBindWorke
     // Playwright 1.59 introduced browser.bind() — guard for older versions at runtime.
     // The Browser type from playwright-core 1.59 includes bind() in its interface.
     // We use a safe runtime check to handle older Playwright versions gracefully.
+    // Extracted only for a runtime `typeof` feature-check; always invoked via
+    // bindFn.call(browser, …), so `this` is preserved.
+    /* eslint-disable @typescript-eslint/unbound-method */
     const bindFn = (
       browser as Browser & { bind?: (title: string) => Promise<{ endpoint: string }> }
     ).bind;
+    /* eslint-enable @typescript-eslint/unbound-method */
     if (typeof bindFn !== 'function') {
       throw new PramanError({
         code: ErrorCode.ERR_BIND_NOT_SUPPORTED,
@@ -240,6 +244,9 @@ export const browserBindTest = base.extend<BrowserBindFixtures, BrowserBindWorke
     try {
       await use({ bound: true, endpointUrl, bindTitle: title });
     } finally {
+      // Extracted only for a runtime `typeof` feature-check; always invoked via
+      // unbindFn.call(browser), so `this` is preserved.
+      /* eslint-disable-next-line @typescript-eslint/unbound-method */
       const unbindFn = (browser as Browser & { unbind?: () => Promise<void> }).unbind;
       if (typeof unbindFn === 'function') {
         try {

@@ -236,7 +236,7 @@ jobs:
       - run: npm run test:unit
 
   playwright-ceiling:
-    name: Playwright Ceiling (1.61.x)
+    name: Playwright Ceiling (1.62.x)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

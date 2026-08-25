@@ -343,6 +343,14 @@ export default tseslint.config(
       'sonarjs/assertions-in-tests': 'off',
       'sonarjs/super-linear-regex': 'off',
 
+      // Vitest mock objects (vi.fn()) are plain functions, not class methods —
+      // `expect(mock.method)` is the documented assertion style and is safe here.
+      // Required by typescript-eslint >= 8.63 (stricter unbound-method detection).
+      '@typescript-eslint/unbound-method': 'off',
+      // New rules in eslint-plugin-sonarjs 4.2 — stylistic, not applicable here.
+      'sonarjs/parameterized-tests': 'off',
+      'sonarjs/no-debug-commands-in-ui-tests': 'off',
+
       // Playwright best practices (enforced)
       'playwright/no-wait-for-timeout': 'error', // Aligns with Principle 8
       'playwright/missing-playwright-await': 'error',
