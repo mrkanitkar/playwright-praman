@@ -205,7 +205,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ts-version: ['5.9.3', '6.0.2']
+        ts-version: ['5.9.3', '6.0.2', '6.0.3', '7.0.2']
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -219,6 +219,71 @@ jobs:
         run: npx tsc --noEmit
       - name: Build (JS only — DTS validated in main build job)
         run: npx tsup --no-dts
+
+  type-compat:
+    name: Consumer Types (TypeScript ${{ matrix.ts-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        ts-version: ['5.9.3', '6.0.2', '6.0.3', '7.0.2']
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: Pack the tarball consumers receive
+        run: npm pack --pack-destination "$RUNNER_TEMP"
+      - name: Install tarball into consumer fixture
+        working-directory: tests/type-compat
+        run: |
+          npm install --no-audit --no-fund \
+            "$RUNNER_TEMP"/playwright-praman-*.tgz \
+            @playwright/test \
+            @types/node \
+            typescript@${{ matrix.ts-version }}
+      - name: Typecheck consumer against shipped .d.ts
+        working-directory: tests/type-compat
+        run: |
+          for mr in node16 nodenext bundler; do
+            echo "::group::moduleResolution=$mr"
+            npx tsc -p "tsconfig.$mr.json"
+            echo "::endgroup::"
+          done
+
+  type-compat-strict:
+    # Non-blocking. skipLibCheck:false surfaces type errors in TRANSITIVE
+    # dependencies as well as our own. Currently thread-stream (via pino) is
+    # incompatible with @types/node 26 and has no upstream fix; this job exists
+    # so we find out automatically when that lands. See TROUBLESHOOTING.md.
+    name: Consumer Types (strict, non-blocking)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - run: npm pack --pack-destination "$RUNNER_TEMP"
+      - name: Install tarball into consumer fixture
+        working-directory: tests/type-compat
+        run: |
+          npm install --no-audit --no-fund \
+            "$RUNNER_TEMP"/playwright-praman-*.tgz \
+            @playwright/test \
+            @types/node \
+            typescript@6.0.3
+      - name: Typecheck with skipLibCheck disabled
+        working-directory: tests/type-compat
+        run: npx tsc -p tsconfig.node16.strict.json
 
   playwright-floor:
     name: Playwright Floor (1.57.0)

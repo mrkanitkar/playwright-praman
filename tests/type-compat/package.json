@@ -1,0 +1,13 @@
+{
+  "name": "praman-type-compat-fixture",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Compiles against the packed playwright-praman tarball to verify shipped .d.ts compatibility. Not part of the test suite.",
+  "dependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.3.0",
+    "playwright-praman": "file:../../../../../../../var/folders/62/8zg3v5hn24321xnnt3t6f8gc0000gp/T/tmp.Q9RMKVE65T/playwright-praman-1.3.5.tgz",
+    "typescript": "^6.0.3"
+  }
+}

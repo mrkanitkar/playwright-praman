@@ -169,3 +169,8 @@ tests/e2e/sap-cloud/bom-maintain-v2-test-plan.md
 # This is enforced by pre-commit hooks. Config files like eslint.config.mjs
 # should remain in the project root.
 
+
+# Consumer type-compat fixture (installs the packed tarball at CI time)
+tests/type-compat/node_modules/
+tests/type-compat/package-lock.json
+*.tgz
