@@ -194,10 +194,10 @@ describe('cli/validator — CLI checks', () => {
   // ── validate() total check count ─────────────────────────────────────────
 
   describe('validate() with new checks registered', () => {
-    it('returns a report with exactly 11 checks', () => {
+    it('returns a report with exactly 12 checks', () => {
       const report = validate();
 
-      expect(report.checks).toHaveLength(11);
+      expect(report.checks).toHaveLength(12);
     });
 
     it('all 3 CLI checks have required name, status, and message fields', () => {
@@ -217,10 +217,10 @@ describe('cli/validator — CLI checks', () => {
       }
     });
 
-    it('passed + failed + warnings equals 11 with new checks', () => {
+    it('passed + failed + warnings equals 12 with new checks', () => {
       const report = validate();
 
-      expect(report.passed + report.failed + report.warnings).toBe(11);
+      expect(report.passed + report.failed + report.warnings).toBe(12);
     });
   });
 });

@@ -69,13 +69,21 @@ export interface ScaffoldOptions {
  * ```
  */
 export type ScaffoldResult =
-  | { readonly success: true; readonly filesCreated: readonly string[] }
+  | {
+      readonly success: true;
+      readonly filesCreated: readonly string[];
+      /**
+       * Files that already existed and were left untouched because `force` was
+       * not set. Reported so callers never claim to have written them.
+       */
+      readonly filesSkipped: readonly string[];
+    }
   | { readonly success: false; readonly reason: string };
 
-/** Checks whether a directory exists at the given path. */
-async function directoryExists(dirPath: string): Promise<boolean> {
+/** Checks whether a file already exists at the given path. */
+async function fileExists(filePath: string): Promise<boolean> {
   try {
-    await access(dirPath);
+    await access(filePath);
     return true;
   } catch {
     return false;
@@ -357,27 +365,15 @@ async function scaffoldEnvExample(
 export async function scaffoldProject(options: ScaffoldOptions): Promise<ScaffoldResult> {
   const { targetDir, force = false, detection, cli = false } = options;
 
-  // Guard: check if directory already exists
-  const exists = await directoryExists(targetDir);
-  if (exists && !force) {
-    const earlyFiles: string[] = [];
-
-    // Even in an existing project, install IDE-specific files when detected
-    if (detection !== undefined) {
-      const ideFiles = await scaffoldIDEFiles(targetDir, detection, force, cli);
-      earlyFiles.push(...ideFiles);
-    }
-
-    // CLI agents are installed even without IDE detection
-    if (cli && detection === undefined) {
-      await scaffoldCliAgents(targetDir, undefined, force, earlyFiles);
-    }
-
-    if (earlyFiles.length > 0) {
-      return { success: true, filesCreated: earlyFiles };
-    }
-    return { success: false, reason: 'directory-exists' };
-  }
+  // NOTE: there is deliberately no "directory already exists" guard here.
+  //
+  // The documented workflow is to run `npx playwright-praman init` inside an
+  // existing project, so targetDir is normally the current working directory
+  // and therefore always exists. A blanket guard aborted the entire scaffold in
+  // that case, which is what made init silently produce nothing (issue #224).
+  //
+  // Not clobbering the user's files is still a requirement — it is enforced
+  // per file instead, by skipping any that already exist unless `force` is set.
 
   // Create target directory (recursive handles both new and existing)
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- path is caller-controlled targetDir
@@ -390,10 +386,15 @@ export async function scaffoldProject(options: ScaffoldOptions): Promise<Scaffol
     await mkdir(fullPath, { recursive: true });
   }
 
-  // Write template files
+  // Write template files, never overwriting existing ones unless force is set
   const filesCreated: string[] = [];
+  const filesSkipped: string[] = [];
   for (const [fileName, content] of TEMPLATE_FILES) {
     const filePath = join(targetDir, fileName);
+    if (!force && (await fileExists(filePath))) {
+      filesSkipped.push(filePath);
+      continue;
+    }
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- path composed from targetDir + known template file names
     await writeFile(filePath, content, 'utf8');
     filesCreated.push(filePath);
@@ -419,5 +420,5 @@ export async function scaffoldProject(options: ScaffoldOptions): Promise<Scaffol
     await scaffoldCliAgents(targetDir, undefined, force, filesCreated);
   }
 
-  return { success: true, filesCreated };
+  return { success: true, filesCreated, filesSkipped };
 }
