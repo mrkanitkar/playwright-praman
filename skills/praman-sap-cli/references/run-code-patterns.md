@@ -257,12 +257,12 @@ playwright-cli -s=sap run-code "async page => {
 
 ## 8. Pre-Built Scripts Reference
 
-| Script          | File                              | Purpose                             |
-| --------------- | --------------------------------- | ----------------------------------- |
-| Discover All    | `dist/scripts/discover-all.js`    | All controls with methods (max 100) |
-| Wait for UI5    | `dist/scripts/wait-for-ui5.js`    | Poll for UI5 stability              |
-| Bridge Status   | `dist/scripts/bridge-status.js`   | Quick diagnostics                   |
-| Dialog Controls | `dist/scripts/dialog-controls.js` | Controls inside open dialogs        |
+| Script | File | Purpose |
+|--------|------|---------|
+| Discover All | `dist/scripts/discover-all.js` | All controls with methods (max 100) |
+| Wait for UI5 | `dist/scripts/wait-for-ui5.js` | Poll for UI5 stability |
+| Bridge Status | `dist/scripts/bridge-status.js` | Quick diagnostics |
+| Dialog Controls | `dist/scripts/dialog-controls.js` | Controls inside open dialogs |
 
 Usage pattern:
 
@@ -277,13 +277,11 @@ playwright-cli -s=sap run-code "$(cat node_modules/playwright-praman/dist/script
 `run-code` returns ONLY the value from the last `return` statement.
 
 **Allowed return types:**
-
 - Strings, numbers, booleans, null
 - Plain objects (no class instances)
 - Arrays of the above
 
 **NOT allowed (will fail silently or throw):**
-
 - Functions
 - DOM nodes / elements
 - Symbols

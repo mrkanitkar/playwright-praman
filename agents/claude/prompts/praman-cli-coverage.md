@@ -17,7 +17,6 @@ Read node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.m
 ```
 
 Wait for the planner to complete. It will produce:
-
 - `specs/{app}.plan.md` -- structured test plan
 - `tests/e2e/{app}/{app}-gold.spec.ts` -- gold-standard test
 
@@ -43,7 +42,6 @@ Read node_modules/playwright-praman/skills/playwright-praman-sap-testing/SKILL.m
 ```
 
 The healer will:
-
 1. Run tests with `--debug=cli` to pause at failures
 2. Attach and inspect page state via CLI
 3. Diagnose root causes (selector, timing, dialog, V2/V4)
@@ -66,7 +64,6 @@ Then verify overall compliance:
 - [ ] `npm run lint` passes
 
 Summarize results:
-
 - Total scenarios planned
 - Total tests generated
 - Tests passing on first run

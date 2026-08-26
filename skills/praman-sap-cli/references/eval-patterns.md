@@ -72,11 +72,11 @@ playwright-cli -s=sap eval "() => { const c = sap.ui.getCore().byId('myInput'); 
 
 ## When to Use eval vs run-code
 
-| Scenario                      | Use                              |
-| ----------------------------- | -------------------------------- |
-| Single expression check       | `eval`                           |
-| Read one property             | `eval`                           |
-| Multi-step operation          | `run-code`                       |
-| Page.evaluate with parameters | `run-code`                       |
-| Async operations              | `run-code`                       |
-| Complex control discovery     | `run-code` (or pre-built script) |
+| Scenario | Use |
+|----------|-----|
+| Single expression check | `eval` |
+| Read one property | `eval` |
+| Multi-step operation | `run-code` |
+| Page.evaluate with parameters | `run-code` |
+| Async operations | `run-code` |
+| Complex control discovery | `run-code` (or pre-built script) |

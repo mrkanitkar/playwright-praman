@@ -7,3 +7,10 @@ docs/build/
 !.prettierrc.json
 !.commitlintrc.json
 CHANGELOG.md
+
+# Generated distribution trees — must stay byte-identical to their .claude/
+# sources so validate:agent-assets can detect real drift. Reformatting these
+# creates permanent false drift (they are copies, not hand-edited files).
+agents/
+seeds/
+skills/praman-sap-cli/
