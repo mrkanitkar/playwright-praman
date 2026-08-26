@@ -256,14 +256,23 @@ jobs:
           done
 
   type-compat-strict:
-    # Non-blocking. skipLibCheck:false surfaces type errors in TRANSITIVE
-    # dependencies as well as our own. Currently thread-stream (via pino) is
-    # incompatible with @types/node 26 and has no upstream fix; this job exists
-    # so we find out automatically when that lands. See TROUBLESHOOTING.md.
-    name: Consumer Types (strict, non-blocking)
+    # Asserts that the ONLY strict-mode type error is the known upstream one.
+    #
+    # skipLibCheck:false surfaces type errors in transitive dependencies as well
+    # as our own. thread-stream (via pino) references TransferListItem, which
+    # @types/node 26 removed; there is no upstream fix and it is not correctable
+    # from here. See TROUBLESHOOTING.md.
+    #
+    # The logic is deliberately inverted so the board stays green while that
+    # holds, and turns red only when something actually needs a human:
+    #   - only the known thread-stream error  -> pass (nothing to do)
+    #   - no errors at all                    -> FAIL (fixed upstream; drop the
+    #                                            workaround, this job, and the
+    #                                            TROUBLESHOOTING entry)
+    #   - any other error                     -> FAIL (a real new regression)
+    name: Consumer Types (strict)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    continue-on-error: true
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -281,9 +290,38 @@ jobs:
             @playwright/test \
             @types/node \
             typescript@6.0.3
-      - name: Typecheck with skipLibCheck disabled
+      - name: Assert only the known upstream error remains
         working-directory: tests/type-compat
-        run: npx tsc -p tsconfig.node16.strict.json
+        run: |
+          set +e
+          # --pretty false is REQUIRED: the workflow sets FORCE_COLOR=1, and
+          # pretty output splits "error" and "TS2694" with ANSI escapes, so
+          # grep would silently match nothing and mask real regressions.
+          out=$(npx tsc -p tsconfig.node16.strict.json --pretty false 2>&1)
+          rc=$?
+          set -e
+          echo "$out"
+
+          if [ "$rc" -eq 0 ]; then
+            echo "::error::thread-stream no longer breaks under @types/node 26. \
+          Remove the type-compat-strict job, fold tsconfig.*.strict.json into the \
+          blocking matrix, and delete the TypeScript section from TROUBLESHOOTING.md."
+            exit 1
+          fi
+
+          unexpected=$(echo "$out" \
+            | grep -E "error TS" \
+            | grep -v "thread-stream/index.d.ts.*TS2694.*TransferListItem" \
+            || true)
+
+          if [ -n "$unexpected" ]; then
+            echo "::error::Strict typecheck reported errors beyond the known \
+          thread-stream issue. These are new and need investigation:"
+            echo "$unexpected"
+            exit 1
+          fi
+
+          echo "OK: only the known thread-stream/@types/node 26 error is present."
 
   playwright-floor:
     name: Playwright Floor (1.57.0)
