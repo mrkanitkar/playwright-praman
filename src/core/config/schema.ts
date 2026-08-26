@@ -175,6 +175,18 @@ const controlTreeCaptureSchema = z.object({
   maxControls: z.number().int().positive().default(5_000),
 });
 
+// ── Overlay interruption sub-schema ──────────────────────────────────
+const overlaysSchema = z.object({
+  /**
+   * Whether to register the built-in overlay rules.
+   *
+   * @remarks
+   * The built-ins are detect-only — they never dismiss anything. Disable this
+   * to register nothing automatically and drive `overlays.register()` yourself.
+   */
+  enabled: z.boolean().default(true),
+});
+
 // ── OPA5 sub-schema (D7) ────────────────────────────────────────────
 const opa5Schema = z.object({
   interactionTimeout: z.number().int().positive().default(5_000),
@@ -217,6 +229,7 @@ export const PramanConfigSchema = z
     opa5: opa5Schema.optional(),
     odataTracing: odataTracingSchema.optional(),
     controlTreeCapture: controlTreeCaptureSchema.optional(),
+    overlays: overlaysSchema.optional(),
     /** Default value for matchSubclasses on selectors that don't specify it. */
     defaultMatchSubclasses: z.boolean().default(false),
     /**
