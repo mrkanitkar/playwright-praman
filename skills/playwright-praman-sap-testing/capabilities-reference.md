@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
-> Generated: 2026-05-25 — do not edit manually, run `npm run generate:capabilities`
-> Total: 183 capabilities
+> Generated: 2026-08-26 — do not edit manually, run `npm run generate:capabilities`
+> Total: 187 capabilities
 
 ---
 
@@ -67,6 +67,9 @@
 - **ui5.dialog.confirm** — Confirms a dialog by clicking its confirmation button.
 - **ui5.dialog.waitForClosed** — Waits for a specific dialog to close.
 - **ui5.dialog.getButtons** — Returns the buttons available in a specific dialog.
+- **ui5Overlays.register** — Registers a rule for an SAP overlay that can interrupt an action. Detects and reports by default; pass a dismiss function to opt into auto-dismissal.
+- **ui5Overlays.registerAll** — Registers several overlay rules in one call.
+- **ui5Overlays.dispose** — Unregisters every overlay rule this handler registered. Called automatically by the overlays fixture on teardown.
 
 ## date — Date and time picker operations
 
@@ -225,6 +228,7 @@
 - **matchers.toHaveUI5CellText** — Assert table cell contains expected text.
 - **matchers.getControlProperty** — Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.
 - **matchers.getControlAggregation** — Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.
+- **fixtures.attachBridgeNavigationReset** — Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener.
 
 ## data — Test data generation, persistence, and cleanup
 

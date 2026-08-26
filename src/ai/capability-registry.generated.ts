@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-05-25 with 183 entries.
+ * Generated on 2026-08-26 with 187 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {
@@ -2338,5 +2338,54 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     registryVersion: 1,
     aiSteering:
       'Use ui5.table methods or expect(table).toHaveUI5RowCount(n) matcher for table assertions instead.',
+  },
+  {
+    id: 'UI5-DLG-090',
+    qualifiedName: 'ui5Overlays.register',
+    name: 'register',
+    description:
+      'Registers a rule for an SAP overlay that can interrupt an action. Detects and reports by default; pass a dismiss function to opt into auto-dismissal.',
+    category: 'dialog',
+    priority: 'fixture',
+    usageExample:
+      "await overlays.register({\n  name: 'cookie-consent',\n  selector: '#cookieBanner',\n  dismiss: async (overlay) => overlay.getByRole('button', { name: 'Accept' }).click(),\n});",
+    registryVersion: 1,
+    aiSteering:
+      'Prefer detect-only rules. Only supply a dismiss function when answering the overlay cannot change what the test asserts.',
+  },
+  {
+    id: 'UI5-DLG-091',
+    qualifiedName: 'ui5Overlays.registerAll',
+    name: 'registerAll',
+    description: 'Registers several overlay rules in one call.',
+    category: 'dialog',
+    priority: 'fixture',
+    usageExample: 'await overlays.registerAll(BUILT_IN_OVERLAY_RULES);',
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DLG-092',
+    qualifiedName: 'ui5Overlays.dispose',
+    name: 'dispose',
+    description:
+      'Unregisters every overlay rule this handler registered. Called automatically by the overlays fixture on teardown.',
+    category: 'dialog',
+    priority: 'fixture',
+    usageExample: 'await overlays.dispose();',
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-OTHER-001',
+    qualifiedName: 'fixtures.attachBridgeNavigationReset',
+    name: 'attachBridgeNavigationReset',
+    description:
+      'Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener.',
+    category: 'assert',
+    priority: 'implementation',
+    usageExample:
+      'const detach = attachBridgeNavigationReset(page, logger);\nawait use(handler);\ndetach();',
+    registryVersion: 1,
+    aiSteering:
+      'Use this helper inside fixture setUp to ensure the bridge is re-injected after every full-page navigation.',
   },
 ] as const;
