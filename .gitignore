@@ -185,3 +185,14 @@ tests/type-compat/package-lock.json
 !seeds/**
 !skills/praman-sap-cli/
 !skills/praman-sap-cli/**
+
+# Artifacts of running `playwright-praman init` inside this repo itself.
+# Each duplicates a tracked source, so committing them would create a second
+# copy that silently drifts:
+#   praman-prompts/     <- scaffolded copy of tracked prompts/
+#   examples/telemetry/ <- scaffolded copy of tracked examples/*.ts
+# Root-anchored so consumer projects are unaffected.
+/praman-prompts/
+/examples/telemetry/
+/bom-e2e-praman-gold-standard.spec.ts
+/playwright.config.original.ts
