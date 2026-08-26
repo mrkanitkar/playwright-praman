@@ -245,6 +245,23 @@ describe('fixtures/overlay-handler', () => {
     });
   });
 
+  describe('non-Error failures', () => {
+    it('records a non-Error dismissal rejection as a string', async () => {
+      const page = createMockPage();
+      const handler = new OverlayHandler({ page });
+      await handler.register({
+        name: 'odd',
+        selector: '.o',
+        dismiss: vi.fn<DismissFn>().mockRejectedValue('boom'),
+      });
+
+      await handlerFor(page)(createMockLocator());
+
+      expect(handler.detections[0]?.dismissed).toBe(false);
+      expect(handler.detections[0]?.error).toBe('boom');
+    });
+  });
+
   describe('dispose', () => {
     it('unregisters every rule', async () => {
       const page = createMockPage();
@@ -257,6 +274,15 @@ describe('fixtures/overlay-handler', () => {
       expect(page.removeLocatorHandler).toHaveBeenCalledTimes(2);
     });
 
+    it('survives a non-Error rejection during removal', async () => {
+      const page = createMockPage();
+      page.removeLocatorHandler.mockRejectedValue('target closed');
+      const handler = new OverlayHandler({ page });
+      await handler.register({ name: 'a', selector: '.a' });
+
+      await expect(handler.dispose()).resolves.toBeUndefined();
+    });
+
     it('survives a page that has already closed', async () => {
       const page = createMockPage();
       page.removeLocatorHandler.mockRejectedValue(new Error('Target page closed'));
@@ -264,6 +290,70 @@ describe('fixtures/overlay-handler', () => {
       await handler.register({ name: 'a', selector: '.a' });
 
       await expect(handler.dispose()).resolves.toBeUndefined();
+    });
+  });
+
+  describe('registerAll', () => {
+    it('registers every rule in the list', async () => {
+      const page = createMockPage();
+      const handler = new OverlayHandler({ page });
+
+      await handler.registerAll([
+        { name: 'a', selector: '.a' },
+        { name: 'b', selector: '.b' },
+      ]);
+
+      expect(page.addLocatorHandler).toHaveBeenCalledTimes(2);
+    });
+
+    it('registers the built-in rules', async () => {
+      const page = createMockPage();
+      const handler = new OverlayHandler({ page });
+
+      await handler.registerAll(BUILT_IN_OVERLAY_RULES);
+
+      expect(page.addLocatorHandler).toHaveBeenCalledTimes(BUILT_IN_OVERLAY_RULES.length);
+    });
+  });
+
+  describe('overlay text capture', () => {
+    it('records empty text when the overlay detaches before it can be read', async () => {
+      // Diagnosis is best-effort: a racing overlay must not break the handler.
+      const page = createMockPage();
+      const handler = new OverlayHandler({ page });
+      await handler.register({ name: 'racing', selector: '.r' });
+
+      const overlay = createMockLocator();
+      (overlay.first as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
+        throw new Error('element is not attached to the DOM');
+      });
+
+      await handlerFor(page)(overlay);
+
+      expect(handler.detections[0]?.text).toBe('');
+    });
+
+    it('truncates very long overlay text', async () => {
+      const page = createMockPage();
+      const handler = new OverlayHandler({ page });
+      await handler.register({ name: 'verbose', selector: '.v' });
+
+      await handlerFor(page)(createMockLocator('x'.repeat(500)));
+
+      expect(handler.detections[0]?.text.length).toBeLessThanOrEqual(200);
+    });
+
+    it('handles an overlay with no text at all', async () => {
+      const page = createMockPage();
+      const handler = new OverlayHandler({ page });
+      await handler.register({ name: 'blank', selector: '.b' });
+
+      const overlay = createMockLocator();
+      (overlay.textContent as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+
+      await handlerFor(page)(overlay);
+
+      expect(handler.detections[0]?.text).toBe('');
     });
   });
 
