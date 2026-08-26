@@ -354,15 +354,15 @@ The agent (you) and the Praman fixture (`ui5`) operate in **different phases**:
 You explore the live SAP app using CLI commands. Praman fixtures (`ui5`, `sapAuth`) do NOT exist
 in agent context. Use raw SAP APIs via `run-code`:
 
-| Task             | CLI Command                    | SAP API                                               |
-| ---------------- | ------------------------------ | ----------------------------------------------------- |
+| Task             | CLI Command                    | SAP API                             |
+| ---------------- | ------------------------------ | ----------------------------------- |
 | Find controls    | `run-code "async page => ..."` | `sap.ui.require('sap/ui/core/ElementRegistry').get()` |
-| Read properties  | `run-code "async page => ..."` | `ctrl.getProperty('name')`                            |
-| Check visibility | `run-code "async page => ..."` | `ctrl.getVisible()`                                   |
-| Navigate         | `click e7` (snapshot ref)      | Click tiles/buttons                                   |
-| Take snapshot    | `snapshot --filename=snap.yml` | Visual verification                                   |
-| Fill form        | `fill e3 "value"`              | Fill input fields                                     |
-| Save auth        | `state-save sap-auth.json`     | Persist cookies + storage                             |
+| Read properties  | `run-code "async page => ..."` | `ctrl.getProperty('name')`          |
+| Check visibility | `run-code "async page => ..."` | `ctrl.getVisible()`                 |
+| Navigate         | `click e7` (snapshot ref)      | Click tiles/buttons                 |
+| Take snapshot    | `snapshot --filename=snap.yml` | Visual verification                 |
+| Fill form        | `fill e3 "value"`              | Fill input fields                   |
+| Save auth        | `state-save sap-auth.json`     | Persist cookies + storage           |
 
 ### Test Phase (Generated .spec.ts -- LATER)
 
