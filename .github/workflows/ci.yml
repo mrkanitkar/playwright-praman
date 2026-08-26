@@ -205,7 +205,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ts-version: ['5.9.3', '6.0.2']
+        ts-version: ['5.9.3', '6.0.2', '6.0.3', '7.0.2']
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -219,6 +219,109 @@ jobs:
         run: npx tsc --noEmit
       - name: Build (JS only — DTS validated in main build job)
         run: npx tsup --no-dts
+
+  type-compat:
+    name: Consumer Types (TypeScript ${{ matrix.ts-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        ts-version: ['5.9.3', '6.0.2', '6.0.3', '7.0.2']
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: Pack the tarball consumers receive
+        run: npm pack --pack-destination "$RUNNER_TEMP"
+      - name: Install tarball into consumer fixture
+        working-directory: tests/type-compat
+        run: |
+          npm install --no-audit --no-fund \
+            "$RUNNER_TEMP"/playwright-praman-*.tgz \
+            @playwright/test \
+            @types/node \
+            typescript@${{ matrix.ts-version }}
+      - name: Typecheck consumer against shipped .d.ts
+        working-directory: tests/type-compat
+        run: |
+          for mr in node16 nodenext bundler; do
+            echo "::group::moduleResolution=$mr"
+            npx tsc -p "tsconfig.$mr.json"
+            echo "::endgroup::"
+          done
+
+  type-compat-strict:
+    # Asserts that the ONLY strict-mode type error is the known upstream one.
+    #
+    # skipLibCheck:false surfaces type errors in transitive dependencies as well
+    # as our own. thread-stream (via pino) references TransferListItem, which
+    # @types/node 26 removed; there is no upstream fix and it is not correctable
+    # from here. See TROUBLESHOOTING.md.
+    #
+    # The logic is deliberately inverted so the board stays green while that
+    # holds, and turns red only when something actually needs a human:
+    #   - only the known thread-stream error  -> pass (nothing to do)
+    #   - no errors at all                    -> FAIL (fixed upstream; drop the
+    #                                            workaround, this job, and the
+    #                                            TROUBLESHOOTING entry)
+    #   - any other error                     -> FAIL (a real new regression)
+    name: Consumer Types (strict)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - run: npm pack --pack-destination "$RUNNER_TEMP"
+      - name: Install tarball into consumer fixture
+        working-directory: tests/type-compat
+        run: |
+          npm install --no-audit --no-fund \
+            "$RUNNER_TEMP"/playwright-praman-*.tgz \
+            @playwright/test \
+            @types/node \
+            typescript@6.0.3
+      - name: Assert only the known upstream error remains
+        working-directory: tests/type-compat
+        run: |
+          set +e
+          # --pretty false is REQUIRED: the workflow sets FORCE_COLOR=1, and
+          # pretty output splits "error" and "TS2694" with ANSI escapes, so
+          # grep would silently match nothing and mask real regressions.
+          out=$(npx tsc -p tsconfig.node16.strict.json --pretty false 2>&1)
+          rc=$?
+          set -e
+          echo "$out"
+
+          if [ "$rc" -eq 0 ]; then
+            echo "::error::thread-stream no longer breaks under @types/node 26. \
+          Remove the type-compat-strict job, fold tsconfig.*.strict.json into the \
+          blocking matrix, and delete the TypeScript section from TROUBLESHOOTING.md."
+            exit 1
+          fi
+
+          unexpected=$(echo "$out" \
+            | grep -E "error TS" \
+            | grep -v "thread-stream/index.d.ts.*TS2694.*TransferListItem" \
+            || true)
+
+          if [ -n "$unexpected" ]; then
+            echo "::error::Strict typecheck reported errors beyond the known \
+          thread-stream issue. These are new and need investigation:"
+            echo "$unexpected"
+            exit 1
+          fi
+
+          echo "OK: only the known thread-stream/@types/node 26 error is present."
 
   playwright-floor:
     name: Playwright Floor (1.57.0)

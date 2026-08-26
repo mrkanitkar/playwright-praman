@@ -323,6 +323,56 @@ For a comprehensive guide, see [Debugging Agent Failures](docs/docs/guides/debug
 2. Check if the app uses V2 (SmartField) or V4 (MDC) controls — they have different type names.
 3. Re-run `praman-sap-heal` which auto-detects the correct control types.
 
+## TypeScript Issues
+
+### `error TS2694: Namespace '"worker_threads"' has no exported member 'TransferListItem'`
+
+You will only see this if **both** are true:
+
+- your `tsconfig.json` sets `"skipLibCheck": false`, and
+- you have `@types/node` v26 or newer installed.
+
+The error points at `node_modules/thread-stream/index.d.ts`, not at Praman. It
+comes from `thread-stream`, a transitive dependency of `pino` (Praman's logger).
+`@types/node` v26 removed `TransferListItem` from the `worker_threads` module
+declaration, and `thread-stream` has not yet been updated. There is no released
+fix upstream, and it cannot be corrected from inside Praman.
+
+Praman's own shipped type declarations are unaffected — they compile cleanly on
+TypeScript 5.9 through 7.0 under `node16`, `nodenext`, and `bundler` resolution,
+which CI verifies on every commit.
+
+Pick whichever workaround suits your project:
+
+```jsonc
+// tsconfig.json — recommended, and the default in most TS setups
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+  },
+}
+```
+
+```jsonc
+// package.json — if you must keep skipLibCheck: false, pin @types/node below v26
+{
+  "overrides": {
+    "@types/node": "^24",
+  },
+}
+```
+
+### Which TypeScript versions are supported?
+
+Praman's published types are tested against **5.9.3, 6.0.2, 6.0.3, and 7.0.2**,
+each under `node16`, `nodenext`, and `bundler` module resolution.
+
+TypeScript 7.0 is supported for _consuming_ Praman. Note that TS 7.0 does not
+yet ship the classic compiler API (`import ts from 'typescript'` returns only a
+version stub; the programmatic API returns in 7.1), so tools such as
+typescript-eslint, typedoc, and declaration bundlers still require a TypeScript
+6.0 install. That affects your own toolchain, not your ability to use Praman.
+
 ## General Debugging
 
 When no specific error code is available, use these general debugging techniques.
