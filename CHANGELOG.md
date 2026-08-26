@@ -4,6 +4,14 @@
 > CJS output format) as a patch. See [versioning.md](docs/versioning.md) for the
 > full history and the semver contract from v1.3.4 onward.
 
+## [1.3.6](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.5...playwright-praman-v1.3.6) (2026-08-26)
+
+
+### Bug Fixes
+
+* **ci:** actually run agent-asset validation, and stop prettier corrupting it ([#228](https://github.com/mrkanitkar/playwright-praman/issues/228)) ([df9a07f](https://github.com/mrkanitkar/playwright-praman/commit/df9a07f9d1846df1901f6962aba5b4ce7424b5c9))
+* **cli:** make init actually scaffold a project ([#226](https://github.com/mrkanitkar/playwright-praman/issues/226)) ([d956111](https://github.com/mrkanitkar/playwright-praman/commit/d956111c1dd20677690753a54e68047ae67908da))
+
 ## [1.3.5](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.4...playwright-praman-v1.3.5) (2026-07-05)
 
 
