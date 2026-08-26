@@ -148,41 +148,46 @@ describe('cli/scaffolder', () => {
 
   // ── scaffoldProject — directory-exists guard ──────────────────────────────
 
-  describe('scaffoldProject — directory-exists guard', () => {
-    it('returns error when directory exists and force is false', async () => {
+  // Regression: issue #224. `init` is documented as being run inside an
+  // existing project, so targetDir almost always exists. A blanket
+  // directory-exists guard aborted the whole scaffold and produced nothing.
+  describe('scaffoldProject — existing target directory (issue #224)', () => {
+    it('still scaffolds when the target directory already exists', async () => {
       mockFs.dirs.add(EXISTING_DIR);
 
       const options: ScaffoldOptions = { targetDir: EXISTING_DIR };
 
       const result = await scaffoldProject(options);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.reason).toBe('directory-exists');
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.filesCreated.length).toBeGreaterThan(0);
       }
     });
 
-    it('returns error when directory exists and force is not provided', async () => {
+    it('writes template files into an existing directory without force', async () => {
       mockFs.dirs.add(EXISTING_DIR);
 
-      const options: ScaffoldOptions = { targetDir: EXISTING_DIR };
+      await scaffoldProject({ targetDir: EXISTING_DIR });
 
-      const result = await scaffoldProject(options);
-
-      expect(result.success).toBe(false);
+      expect(mockFs.written.size).toBeGreaterThan(0);
+      expect([...mockFs.written.keys()].some((p) => p.endsWith('tsconfig.json'))).toBe(true);
+      expect([...mockFs.written.keys()].some((p) => p.endsWith('.gitignore'))).toBe(true);
     });
 
-    it('does not create any files when directory exists and force is false', async () => {
+    it('never overwrites an existing file when force is false', async () => {
       mockFs.dirs.add(EXISTING_DIR);
+      const existingTsconfig = join(EXISTING_DIR, 'tsconfig.json');
+      mockFs.files.set(existingTsconfig, '{"existing":true}');
 
-      const options: ScaffoldOptions = {
-        targetDir: EXISTING_DIR,
-        force: false,
-      };
+      const result = await scaffoldProject({ targetDir: EXISTING_DIR, force: false });
 
-      await scaffoldProject(options);
-
-      expect(mockFs.written.size).toBe(0);
+      expect(mockFs.written.has(existingTsconfig)).toBe(false);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.filesSkipped).toContain(existingTsconfig);
+        expect(result.filesCreated).not.toContain(existingTsconfig);
+      }
     });
   });
 

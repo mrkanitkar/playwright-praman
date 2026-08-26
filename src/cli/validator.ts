@@ -14,7 +14,7 @@
  * Runs environment checks before init/doctor commands execute.
  * Returns a structured report with pass/fail/warn status per check.
  *
- * This file exceeds 300 LOC due to twelve self-contained check functions with
+ * This file exceeds 300 LOC due to thirteen self-contained check functions with
  * individual TSDoc. A follow-up decomposition is planned.
  *
  * @module cli/validator
@@ -140,6 +140,43 @@ function isVersionAtLeast(version: string, minimum: string): boolean {
   if (vMajor !== mMajor) return vMajor > mMajor;
   if (vMinor !== mMinor) return vMinor > mMinor;
   return vPatch >= mPatch;
+}
+
+/**
+ * Checks for packages that the scaffolded templates import at build time.
+ *
+ * @remarks
+ * `playwright.config.ts` does `import 'dotenv/config'` and `tests/auth.setup.ts`
+ * imports from `node:fs`. Neither `dotenv` nor `@types/node` is a runtime
+ * dependency of this package, so a fresh project resolves neither and the
+ * scaffolded files show import errors in the editor (issue #224). Surfacing a
+ * single install command is friendlier than shipping both as dependencies of
+ * every consumer.
+ *
+ * @example
+ * ```typescript
+ * const result = checkTemplatePeerPackages();
+ * // { name: 'Template dependencies', status: 'warn', message: 'missing: dotenv' }
+ * ```
+ */
+function checkTemplatePeerPackages(): CheckResult {
+  const required = ['dotenv', join('@types', 'node')];
+  const missing = required.filter(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path is cwd() + fixed package names
+    (pkg) => !existsSync(join(process.cwd(), 'node_modules', pkg)),
+  );
+
+  if (missing.length === 0) {
+    return { name: 'Template dependencies', status: 'pass', message: 'dotenv, @types/node' };
+  }
+
+  const names = missing.map((m) => m.replaceAll('\\', '/')).join(', ');
+  return {
+    name: 'Template dependencies',
+    status: 'warn',
+    message: `not installed: ${names}`,
+    suggestion: 'npm install -D dotenv @types/node',
+  };
 }
 
 /**
@@ -397,6 +434,7 @@ export function validate(): ValidationReport {
     checkNpmAvailable(),
     checkPlaywrightInstalled(),
     checkPlaywrightVersion(),
+    checkTemplatePeerPackages(),
     checkSapBaseUrl(),
     checkSapUsername(),
     checkPlaywrightConfig(),

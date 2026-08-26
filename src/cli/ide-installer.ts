@@ -512,6 +512,28 @@ async function scaffoldCliConfig(
  * a `references/` subdirectory. Used by {@link scaffoldCliSkillFiles} for
  * each target location.
  */
+/**
+ * Resolves which source file should become an IDE's `SKILL.md`.
+ *
+ * @remarks
+ * Returns `undefined` when the whole tree should be copied verbatim. When an
+ * IDE-specific variant is requested but not published, falls back to the
+ * generic `SKILL.md` — without the fallback that IDE received a skill directory
+ * containing no `SKILL.md` at all (issue #224).
+ *
+ * @param sourceFile - Requested variant filename, if any.
+ * @param entries - Filenames present in the source skill directory.
+ * @returns The filename to publish as `SKILL.md`, or `undefined` to copy all.
+ */
+function resolveSkillVariant(
+  sourceFile: string | undefined,
+  entries: readonly string[],
+): string | undefined {
+  if (sourceFile === undefined || sourceFile === '') return undefined;
+  if (entries.includes(sourceFile)) return sourceFile;
+  return entries.includes('SKILL.md') ? 'SKILL.md' : sourceFile;
+}
+
 async function copySkillTree(
   srcDir: string,
   destDir: string,
@@ -532,13 +554,15 @@ async function copySkillTree(
     return;
   }
 
+  const variant = resolveSkillVariant(sourceFile, entries);
+
   for (const entry of entries) {
     if (entry === 'references') continue; // handle subdirectory separately
-    // When sourceFile is set, copy that specific file as SKILL.md
-    if (sourceFile !== undefined && sourceFile !== '' && entry === sourceFile) {
-      await copyIfMissing(join(srcDir, entry), join(destDir, 'SKILL.md'), force, created);
-    } else if (sourceFile === undefined || sourceFile === '') {
+    if (variant === undefined) {
       await copyIfMissing(join(srcDir, entry), join(destDir, entry), force, created);
+    } else if (entry === variant) {
+      // The IDE-specific variant is published as that IDE's SKILL.md
+      await copyIfMissing(join(srcDir, entry), join(destDir, 'SKILL.md'), force, created);
     }
   }
 

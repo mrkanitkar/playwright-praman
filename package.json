@@ -136,7 +136,7 @@
     "test:integration": "playwright test",
     "test:integration:demo": "playwright test --config tests/integration/playwright.integration.config.ts",
     "test:integration:ui": "playwright test --ui",
-    "ci": "npm run validate:no-js && npm run lint && npm run typecheck && npm run test:unit && npm run build && npm run check:dist-imports && npm run lint:ui5-deprecated && npm run validate:capabilities",
+    "ci": "npm run validate:no-js && npm run lint && npm run typecheck && npm run test:unit && npm run build && npm run check:dist-imports && npm run lint:ui5-deprecated && npm run validate:capabilities && npm run validate:agent-assets",
     "ci:full": "npm run ci && npm run test:integration && npm run spellcheck && npm run deadcode && npm run mdlint",
     "docs:dev": "cd docs && npx docusaurus start",
     "docs:build": "cd docs && npx docusaurus build",
@@ -152,7 +152,7 @@
     "docs:verify:pr": "tsx scripts/docs-verify/index.ts --mode=pr",
     "docs:verify:doc": "tsx scripts/docs-verify/index.ts --doc",
     "build:browser": "tsx scripts/build-browser-bundles.ts",
-    "build:full": "npm run generate:capabilities && npm run generate:skill-md && npm run build && npm run generate:llms-txt",
+    "build:full": "npm run generate:capabilities && npm run generate:skill-md && npm run generate:agent-assets && npm run build && npm run generate:llms-txt",
     "generate:proxies": "tsx scripts/generate-typed-proxies.ts",
     "generate:sbom": "cyclonedx-npm --output-file playwright-praman.sbom.json --spec-version 1.5 --ignore-npm-errors",
     "generate:llms-txt": "tsx scripts/generate-llms-txt.ts",
@@ -162,7 +162,10 @@
     "audit:fix": "npm audit fix",
     "prepublishOnly": "npm run ci",
     "preuninstall": "node dist/cli/preuninstall.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate:agent-assets": "tsx scripts/generate-agent-assets.ts",
+    "validate:agent-assets": "tsx scripts/generate-agent-assets.ts --check",
+    "smoke:init": "tsx scripts/smoke-init.ts"
   },
   "dependencies": {
     "commander": "15.0.0",

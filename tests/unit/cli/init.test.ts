@@ -97,8 +97,11 @@ function makeReport(checks: readonly CheckResult[]): ValidationReport {
   };
 }
 
-function makeSuccessResult(files: readonly string[] = []): ScaffoldResult {
-  return { success: true, filesCreated: files };
+function makeSuccessResult(
+  files: readonly string[] = [],
+  skipped: readonly string[] = [],
+): ScaffoldResult {
+  return { success: true, filesCreated: files, filesSkipped: skipped };
 }
 
 function makeFailureResult(reason: string): ScaffoldResult {
@@ -310,7 +313,40 @@ describe('cli/init', () => {
       const { runInit } = await loadInit();
       await runInit(DEFAULT_OPTS);
 
-      expect(mockedLogWarn).toHaveBeenCalledWith('No IDEs detected');
+      expect(mockedLogWarn).toHaveBeenCalledWith(
+        'No IDEs detected — installing the default agent set',
+      );
+    });
+
+    // Regression: issue #224. IDE markers cannot exist in a fresh project, so
+    // detection returns nothing and the documented agent/skill files were never
+    // installed. Fall back to the documented defaults instead of writing none.
+    it('falls back to copilot + claude when no IDEs are detected', async () => {
+      mockedDetectIDEs.mockReturnValue(makeDetection());
+      mockedGetIDELabels.mockReturnValue([]);
+
+      const { runInit } = await loadInit();
+      await runInit(DEFAULT_OPTS);
+
+      expect(mockedScaffoldProject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detection: expect.objectContaining({ copilot: true, claude: true }) as unknown,
+        }),
+      );
+    });
+
+    it('does not override a genuinely detected IDE set', async () => {
+      mockedDetectIDEs.mockReturnValue(makeDetection({ cursor: true }));
+      mockedGetIDELabels.mockReturnValue(['Cursor']);
+
+      const { runInit } = await loadInit();
+      await runInit(DEFAULT_OPTS);
+
+      expect(mockedScaffoldProject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          detection: expect.objectContaining({ cursor: true, copilot: false }) as unknown,
+        }),
+      );
     });
   });
 
@@ -348,15 +384,37 @@ describe('cli/init', () => {
       expect(mockedLogSuccess).toHaveBeenCalledWith('Created: praman.config.ts');
     });
 
-    it('shows error and exits early on scaffold failure', async () => {
-      mockedScaffoldProject.mockResolvedValue(makeFailureResult('directory-exists'));
+    // Regression: issue #224. A failed scaffold used to log an error, return,
+    // and still exit 0. program.ts maps a thrown error to exitCode 1, so the
+    // failure has to propagate.
+    it('throws on scaffold failure so the process exits non-zero', async () => {
+      mockedScaffoldProject.mockResolvedValue(makeFailureResult('permission-denied'));
+
+      const { runInit } = await loadInit();
+
+      await expect(runInit(DEFAULT_OPTS)).rejects.toThrow('Scaffold failed: permission-denied');
+      // Should not reach next steps section
+      expect(mockedLogSection).not.toHaveBeenCalledWith('Next Steps');
+    });
+
+    it('throws when the scaffold produced no files at all', async () => {
+      mockedScaffoldProject.mockResolvedValue(makeSuccessResult([], []));
+
+      const { runInit } = await loadInit();
+
+      await expect(runInit(DEFAULT_OPTS)).rejects.toThrow('Scaffold produced no files');
+      expect(mockedLogSection).not.toHaveBeenCalledWith('Next Steps');
+    });
+
+    it('reports skipped files rather than claiming to have created them', async () => {
+      mockedScaffoldProject.mockResolvedValue(makeSuccessResult(['/p/new.ts'], ['/p/existing.ts']));
 
       const { runInit } = await loadInit();
       await runInit(DEFAULT_OPTS);
 
-      expect(mockedLogError).toHaveBeenCalledWith('Scaffold failed: directory-exists');
-      // Should not reach next steps section
-      expect(mockedLogSection).not.toHaveBeenCalledWith('Next Steps');
+      expect(mockedLogSuccess).toHaveBeenCalledWith('Created: /p/new.ts');
+      expect(mockedLogWarn).toHaveBeenCalledWith('Exists, left unchanged: /p/existing.ts');
+      expect(mockedLogSuccess).not.toHaveBeenCalledWith('Created: /p/existing.ts');
     });
 
     it('passes force=false by default', async () => {

@@ -174,3 +174,14 @@ tests/e2e/sap-cloud/bom-maintain-v2-test-plan.md
 tests/type-compat/node_modules/
 tests/type-compat/package-lock.json
 *.tgz
+
+# Distribution trees consumed by `playwright-praman init`. These are published
+# via package.json "files" and MUST be tracked — they are copied into the user's
+# project at init time. The broad `prompts/` rule above would otherwise swallow
+# agents/claude/prompts/, which is how issue #224 shipped with no agent assets.
+!agents/
+!agents/**
+!seeds/
+!seeds/**
+!skills/praman-sap-cli/
+!skills/praman-sap-cli/**

@@ -18,6 +18,9 @@
  * @module cli/init
  */
 
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
 import type { IDEDetection } from './ide-detector.js';
 import { detectIDEs, getIDELabels } from './ide-detector.js';
 import { logBanner, logError, logSection, logStep, logSuccess, logWarn } from './logger.js';
@@ -47,6 +50,78 @@ export interface InitOptions {
 
 /** Total number of init steps displayed to the user. */
 const TOTAL_STEPS = 4;
+
+/**
+ * Detects the project's IDEs, falling back to the documented default set.
+ *
+ * @remarks
+ * IDEs are detected by marker files (`.vscode/`, `CLAUDE.md`, `.github/agents/`
+ * ...) which by definition cannot exist in a fresh project. Without a fallback,
+ * the agent and skill files promised by the Getting Started guide were never
+ * installed (issue #224). Every scaffold write is skip-if-exists, so defaulting
+ * cannot clobber an existing project.
+ *
+ * @param targetDir - The project directory to inspect.
+ * @returns Detected IDEs, or the documented defaults when none were found.
+ */
+function resolveDetection(targetDir: string): IDEDetection {
+  const detected = detectIDEs(targetDir);
+  const labels = getIDELabels(detected);
+
+  if (labels.length > 0) {
+    for (const label of labels) {
+      logSuccess(`Detected: ${label}`);
+    }
+    return detected;
+  }
+
+  logWarn('No IDEs detected — installing the default agent set');
+  logWarn('  GitHub Copilot (.github/) and Claude Code (.claude/)');
+  return { ...detected, copilot: true, claude: true };
+}
+
+/**
+ * Prints the post-init "Next Steps" list, including only steps whose files
+ * actually exist.
+ *
+ * @remarks
+ * The list used to be hard-coded, so it happily told users to copy a
+ * `.env.example` and browse a `praman-prompts/` folder that had never been
+ * created (issue #224). Each step is now gated on the artefact it refers to.
+ *
+ * @param targetDir - The project directory that was scaffolded.
+ */
+function printNextSteps(targetDir: string): void {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- paths composed from the caller-supplied targetDir + hard-coded names
+  const has = (...segments: string[]): boolean => existsSync(join(targetDir, ...segments));
+
+  const steps: string[] = [];
+  // The scaffolded playwright.config.ts imports 'dotenv/config' and
+  // tests/auth.setup.ts imports from 'node:fs', so a fresh project needs both
+  // before those files typecheck (issue #224).
+  const needsDeps = ['dotenv', join('@types', 'node')].some(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path is targetDir + fixed package names
+    (pkg) => !existsSync(join(targetDir, 'node_modules', pkg)),
+  );
+  if (needsDeps) {
+    steps.push('Install template dependencies: npm install -D dotenv @types/node');
+  }
+  if (has('.env.example')) {
+    steps.push('Copy .env.example to .env and fill in SAP credentials');
+  }
+  steps.push('Run tests: npx playwright test --project=chromium --headed');
+  if (has('praman-prompts')) {
+    steps.push('Browse readymade prompts in praman-prompts/ folder');
+  }
+
+  for (const [index, step] of steps.entries()) {
+    logSuccess(`${String(index + 1)}. ${step}`);
+  }
+
+  if (has('tests', 'auth.setup.ts')) {
+    logWarn('Auth setup (tests/auth.setup.ts) runs automatically before tests');
+  }
+}
 
 /**
  * Prints IDE-specific post-init instructions for each detected IDE.
@@ -138,16 +213,7 @@ export async function runInit(options: InitOptions): Promise<void> {
 
   // ── Step 2: Detect IDEs ──────────────────────────────────────────────────
   logStep(2, TOTAL_STEPS, 'Detecting IDEs');
-  const detection = detectIDEs(options.targetDir);
-  const labels = getIDELabels(detection);
-
-  if (labels.length > 0) {
-    for (const label of labels) {
-      logSuccess(`Detected: ${label}`);
-    }
-  } else {
-    logWarn('No IDEs detected');
-  }
+  const detection = resolveDetection(options.targetDir);
 
   // ── Step 3: Scaffold project ─────────────────────────────────────────────
   logStep(3, TOTAL_STEPS, 'Scaffolding project');
@@ -158,22 +224,31 @@ export async function runInit(options: InitOptions): Promise<void> {
     cli: options.cli ?? true,
   });
 
-  if (result.success) {
-    for (const filePath of result.filesCreated) {
-      logSuccess(`Created: ${filePath}`);
-    }
-  } else {
-    logError(`Scaffold failed: ${result.reason}`);
-    return;
+  if (!result.success) {
+    // Throwing (rather than returning) is what makes the process exit non-zero
+    // — program.ts maps a thrown error to process.exitCode = 1.
+    throw new Error(`Scaffold failed: ${result.reason}`);
+  }
+
+  for (const filePath of result.filesCreated) {
+    logSuccess(`Created: ${filePath}`);
+  }
+  for (const filePath of result.filesSkipped) {
+    logWarn(`Exists, left unchanged: ${filePath}`);
+  }
+
+  if (result.filesCreated.length === 0 && result.filesSkipped.length === 0) {
+    throw new Error(
+      'Scaffold produced no files. This usually means the installed package is ' +
+        'missing its bundled assets — please report it at ' +
+        'https://github.com/mrkanitkar/playwright-praman/issues',
+    );
   }
 
   // ── Step 4: Next steps ───────────────────────────────────────────────────
   logStep(4, TOTAL_STEPS, 'Done!');
   logSection('Next Steps');
-  logSuccess('1. Copy .env.example to .env and fill in SAP credentials');
-  logSuccess('2. Run tests: npx playwright test --project=chromium --headed');
-  logSuccess('3. Browse readymade prompts in praman-prompts/ folder');
-  logWarn('Auth setup (tests/auth.setup.ts) runs automatically before tests');
+  printNextSteps(options.targetDir);
 
   // IDE-specific appendable instructions
   printIDESetupInstructions(detection);
