@@ -16,27 +16,27 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "3.10.0",
-    "@docusaurus/faster": "3.10.0",
-    "@docusaurus/plugin-ideal-image": "^3.10.0",
-    "@docusaurus/preset-classic": "3.10.0",
-    "@easyops-cn/docusaurus-search-local": "^0.55.1",
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/faster": "3.10.2",
+    "@docusaurus/plugin-ideal-image": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "@easyops-cn/docusaurus-search-local": "^0.55.3",
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
     "docusaurus-plugin-image-zoom": "^3.0.1",
-    "docusaurus-plugin-llms": "^0.3.0",
-    "docusaurus-plugin-typedoc": "^1.4.2",
+    "docusaurus-plugin-llms": "^0.6.0",
+    "docusaurus-plugin-typedoc": "^1.4.3",
     "prism-react-renderer": "^2.3.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "typedoc": "^0.28.18",
-    "typedoc-plugin-markdown": "^4.11.0"
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.13.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.10.0",
-    "@docusaurus/tsconfig": "3.10.0",
-    "@docusaurus/types": "3.10.0",
-    "typescript": "6.0.2"
+    "@docusaurus/module-type-aliases": "3.10.2",
+    "@docusaurus/tsconfig": "3.10.2",
+    "@docusaurus/types": "3.10.2",
+    "typescript": "6.0.3"
   },
   "browserslist": {
     "production": [
@@ -58,6 +58,8 @@
     "serialize-javascript": "7.0.5",
     "brace-expansion@<=1.1.20": "1.1.21",
     "brace-expansion@2.0.0 - 2.1.6": "2.1.7",
-    "brace-expansion@3.0.0 - 5.0.11": "5.0.12"
+    "brace-expansion@3.0.0 - 5.0.11": "5.0.12",
+    "minimatch@9.0.0 - 9.0.6": "9.0.9",
+    "yaml@2.0.0 - 2.8.2": "2.8.4"
   }
 }
