@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
 > Generated: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
-> Total: 195 capabilities
+> Total: 198 capabilities
 
 ---
 
@@ -30,6 +30,7 @@
 - **control.setSelectedKey** — Set selected key on selection control via proxy.
 - **selectors.serializeUI5SelectorToCSS** — Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.
 - **screencast.highlightControls** — Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).
+- **proxy.contextRetryDelay** — Computes the exponential-backoff delay, with jitter, for retrying after the execution context is destroyed.
 
 ## table — Table discovery, reading, and manipulation
 
@@ -244,3 +245,5 @@
 - **testData.save** — Saves test data to a JSON file for later reuse.
 - **testData.load** — Loads previously saved test data from a JSON file.
 - **testData.cleanup** — Cleans up all test data files created during the test session.
+- **webStorage.fixture** — Playwright fixture exposing localStorage and sessionStorage helpers for the page under test.
+- **webStorage.helper** — Reads, writes, seeds and inspects a single browser storage area (Playwright 1.61+).

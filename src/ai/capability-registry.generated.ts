@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-10-02 with 195 entries.
+ * Generated on 2026-10-02 with 198 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {
@@ -2309,6 +2309,39 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     priority: 'fixture',
     usageExample:
       "screencast.highlightControls(true);\nawait ui5.button({ text: 'Save' }).press();",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-UI5-024',
+    qualifiedName: 'proxy.contextRetryDelay',
+    name: 'contextRetryDelay',
+    description:
+      'Computes the exponential-backoff delay, with jitter, for retrying after the execution context is destroyed.',
+    category: 'ui5',
+    priority: 'implementation',
+    usageExample: 'const delay = contextRetryDelay(0); // 500-600 ms',
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATA-005',
+    qualifiedName: 'webStorage.fixture',
+    name: 'webStorage',
+    description:
+      'Playwright fixture exposing localStorage and sessionStorage helpers for the page under test.',
+    category: 'data',
+    priority: 'fixture',
+    usageExample: "await webStorage.localStorage.seed({ token: 'abc', userId: '42' });",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATA-006',
+    qualifiedName: 'webStorage.helper',
+    name: 'webStorageHelper',
+    description:
+      'Reads, writes, seeds and inspects a single browser storage area (Playwright 1.61+).',
+    category: 'data',
+    priority: 'namespace',
+    usageExample: "const token = await webStorage.localStorage.get('token');",
     registryVersion: 1,
   },
   {
