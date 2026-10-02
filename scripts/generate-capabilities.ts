@@ -23,9 +23,12 @@
  * @see recipes.yaml
  */
 
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { resolve, dirname } from 'node:path';
+import { readFile, mkdir } from 'node:fs/promises';
+import { resolve, dirname, relative } from 'node:path';
 import { parse as parseYaml } from 'yaml';
+
+import { emitGenerated } from './generated-file.js';
+import type { EmitMode } from './generated-file.js';
 
 import { CapabilitiesYamlSchema } from '../src/ai/schemas/capability.schema.js';
 import { RecipesYamlSchema } from '../src/ai/schemas/recipe.schema.js';
@@ -35,6 +38,9 @@ import type { RecipeEntry } from '../src/ai/schemas/recipe.schema.js';
 import type { RecipesYaml } from '../src/ai/schemas/recipe.schema.js';
 
 const ROOT = resolve(import.meta.dirname ?? '.', '..');
+
+/** `--check` verifies the artifacts are current without writing anything. */
+const IS_CHECK = process.argv.includes('--check');
 
 /* ── Paths ────────────────────────────────────────────────────────────────── */
 
@@ -51,7 +57,21 @@ const CAPABILITIES_JSON = resolve(ROOT, 'capabilities.json');
 
 /* ── Helpers ──────────────────────────────────────────────────────────────── */
 
-const today = new Date().toISOString().split('T')[0];
+/**
+ * The stamp written into every derived artifact.
+ *
+ * @remarks
+ * Taken from `capabilities.yaml`'s own `generatedAt` rather than `new Date()`.
+ * A wall-clock stamp made every regeneration a diff even when nothing changed,
+ * which is precisely why no drift check could exist. Deriving it from the input
+ * makes output a pure function of the input, so regenerating is a no-op unless
+ * the manifest actually changed.
+ *
+ * Removing the field outright was not an option: `generatedAt` is required by
+ * `CapabilitiesYamlSchema`, is part of the published `capabilities.json`, and is
+ * asserted by the unit tests. Assigned once in `main()` after the YAML parses.
+ */
+let generatedAt = '';
 
 /**
  * Trim trailing whitespace from `usageExample` values.
@@ -220,7 +240,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on ${today} with ${String(entries.length)} entries.
+ * Generated on ${generatedAt} with ${String(entries.length)} entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
 ${arrayBody.join(',\n')},
@@ -266,7 +286,7 @@ import type { RecipeEntry } from './schemas/recipe.schema.js';
  * Static list of generated recipe entries.
  *
  * @remarks
- * Generated on ${today} with ${String(entries.length)} entries.
+ * Generated on ${generatedAt} with ${String(entries.length)} entries.
  */
 export const GENERATED_RECIPES: readonly RecipeEntry[] = [
 ${serialized.join(',\n')},
@@ -286,7 +306,7 @@ function generateCapabilitiesMd(
   lines.push('# Praman Capabilities Reference');
   lines.push('');
   lines.push(
-    `> **Generated**: ${today} — do not edit manually, run \`npm run generate:capabilities\``,
+    `> **Generated**: ${generatedAt} — do not edit manually, run \`npm run generate:capabilities\``,
   );
   lines.push(
     `> **Total**: ${String(entries.length)} capabilities across ${String(Object.keys(yamlData.categories).length)} categories`,
@@ -356,7 +376,9 @@ function generateSkillCapabilitiesMd(
 
   lines.push('# Praman Capabilities Reference (Agent)');
   lines.push('');
-  lines.push(`> Generated: ${today} — do not edit manually, run \`npm run generate:capabilities\``);
+  lines.push(
+    `> Generated: ${generatedAt} — do not edit manually, run \`npm run generate:capabilities\``,
+  );
   lines.push(`> Total: ${String(entries.length)} capabilities`);
   lines.push('');
   lines.push('---');
@@ -403,7 +425,7 @@ function generateCapabilitiesJson(
     name: 'playwright-praman',
     description: 'Capability manifest for Praman SAP UI5 test automation',
     registryVersion: yamlData.registryVersion,
-    generatedAt: today,
+    generatedAt,
     totalCapabilities: entries.length,
     categories: yamlData.categories,
     capabilities: entries.map((entry) => {
@@ -467,6 +489,10 @@ async function main(): Promise<void> {
     return;
   }
 
+  // The stamp every derived artifact carries comes from the manifest itself,
+  // so regenerating without changing the manifest is a no-op.
+  generatedAt = capabilitiesYaml.generatedAt;
+
   // 4. Trim trailing whitespace from usage examples and patterns
   const capabilities = trimExamples(capabilitiesYaml.capabilities);
   const recipes = trimPatterns(recipesYaml.recipes);
@@ -474,39 +500,37 @@ async function main(): Promise<void> {
   console.log(`  Found ${String(capabilities.length)} capabilities`);
   console.log(`  Found ${String(recipes.length)} recipes`);
 
-  // 5. Generate and write output files
-  console.log('Writing output files...');
+  // 5. Emit the five derived artifacts
+  const mode: EmitMode = IS_CHECK ? 'check' : 'write';
+  console.log(IS_CHECK ? 'Checking output files...' : 'Writing output files...');
 
-  // Output 1: capability-registry.generated.ts
-  await ensureDir(CAPABILITY_REGISTRY_TS);
-  const capRegistryContent = generateCapabilityRegistryTs(capabilities);
-  await writeFile(CAPABILITY_REGISTRY_TS, capRegistryContent, 'utf-8');
-  console.log(`  Written: ${CAPABILITY_REGISTRY_TS} (${String(capabilities.length)} entries)`);
+  const artifacts: readonly { path: string; content: string }[] = [
+    { path: CAPABILITY_REGISTRY_TS, content: generateCapabilityRegistryTs(capabilities) },
+    { path: RECIPE_REGISTRY_TS, content: generateRecipeRegistryTs(recipes) },
+    { path: CAPABILITIES_MD, content: generateCapabilitiesMd(capabilities, capabilitiesYaml) },
+    {
+      path: CAPABILITIES_SKILL_MD,
+      content: generateSkillCapabilitiesMd(capabilities, capabilitiesYaml),
+    },
+    { path: CAPABILITIES_JSON, content: generateCapabilitiesJson(capabilities, capabilitiesYaml) },
+  ];
 
-  // Output 2: recipe-registry.generated.ts
-  await ensureDir(RECIPE_REGISTRY_TS);
-  const recipeRegistryContent = generateRecipeRegistryTs(recipes);
-  await writeFile(RECIPE_REGISTRY_TS, recipeRegistryContent, 'utf-8');
-  console.log(`  Written: ${RECIPE_REGISTRY_TS} (${String(recipes.length)} entries)`);
+  const stale: string[] = [];
+  for (const artifact of artifacts) {
+    if (!IS_CHECK) await ensureDir(artifact.path);
+    const result = await emitGenerated(artifact.path, artifact.content, mode);
+    if (result.changed) stale.push(relative(ROOT, artifact.path));
+    const label = result.changed ? (IS_CHECK ? 'STALE' : 'Written') : 'current';
+    console.log(`  ${label}: ${relative(ROOT, artifact.path)}`);
+  }
 
-  // Output 3: docs/capabilities.md
-  await ensureDir(CAPABILITIES_MD);
-  const capsMdContent = generateCapabilitiesMd(capabilities, capabilitiesYaml);
-  await writeFile(CAPABILITIES_MD, capsMdContent, 'utf-8');
-  console.log(`  Written: ${CAPABILITIES_MD}`);
-
-  // Output 4: skills capabilities-reference.md
-  await ensureDir(CAPABILITIES_SKILL_MD);
-  const skillMdContent = generateSkillCapabilitiesMd(capabilities, capabilitiesYaml);
-  await writeFile(CAPABILITIES_SKILL_MD, skillMdContent, 'utf-8');
-  console.log(`  Written: ${CAPABILITIES_SKILL_MD}`);
-
-  // Output 5: capabilities.json (machine-readable manifest for AI agents)
-  const capsJsonContent = generateCapabilitiesJson(capabilities, capabilitiesYaml);
-  await writeFile(CAPABILITIES_JSON, capsJsonContent, 'utf-8');
-  console.log(`  Written: ${CAPABILITIES_JSON} (${String(capabilities.length)} entries)`);
-
-  console.log('Done.');
+  if (IS_CHECK && stale.length > 0) {
+    console.error('\nThese artifacts are out of date — run `npm run generate:capabilities`:');
+    for (const p of stale) console.error(`  ${p}`);
+    process.exitCode = 1;
+    return;
+  }
+  console.log(IS_CHECK ? 'All generated artifacts are current.' : 'Done.');
 }
 
 main().catch((err: unknown) => {
