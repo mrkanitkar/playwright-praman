@@ -36,6 +36,7 @@ import { expect, mergeTests } from '@playwright/test';
 import { aiTest } from './ai-fixtures.js';
 import { authTest } from './auth-fixtures.js';
 import { browserBindTest } from './browser-bind-fixture.js';
+import { clockTest } from './clock-fixtures.js';
 import { controlTreeTest } from './control-tree-fixtures.js';
 import { failureArtifactsTest } from './failure-artifacts-fixture.js';
 import { feTest } from './fe-fixtures.js';
@@ -102,6 +103,7 @@ export const test = mergeTests(
   controlTreeTest,
   failureArtifactsTest,
   overlayTest,
+  clockTest,
   feTest,
   aiTest,
   intentTest,
@@ -507,6 +509,42 @@ export type { FailureArtifactsFixtures } from './failure-artifacts-fixture.js';
  * });
  * ```
  */
+/**
+ * Deterministic time control for date-driven SAP scenarios.
+ *
+ * @remarks
+ * The clock is NOT installed automatically — SAP session tokens and SAML
+ * assertions carry validity windows, so a globally faked clock could invalidate
+ * a session mid-test. Call `ui5Clock.install()` only where you need it.
+ *
+ * @example
+ * ```typescript
+ * import { clockTest } from 'playwright-praman';
+ *
+ * clockTest('fiscal period boundary', async ({ page, ui5Clock }) => {
+ *   await ui5Clock.install('2026-03-31T23:59:00Z');
+ *   await page.goto('/');
+ * });
+ * ```
+ */
+export { clockTest } from './clock-fixtures.js';
+export type { ClockFixtures } from './clock-fixtures.js';
+export { Ui5Clock } from './clock-handler.js';
+export type { Ui5ClockOptions } from './clock-handler.js';
+
+/**
+ * UI5 diagnostics capture — console output, page errors, network requests.
+ *
+ * @example
+ * ```typescript
+ * import { collectPageDiagnostics } from 'playwright-praman';
+ *
+ * const diagnostics = await collectPageDiagnostics(page);
+ * ```
+ */
+export { collectPageDiagnostics, DIAGNOSTIC_CAPS } from './page-diagnostics.js';
+export type { PageDiagnostics } from './page-diagnostics.js';
+
 export { overlayTest } from './overlay-fixtures.js';
 export type { OverlayFixtures } from './overlay-fixtures.js';
 export { BUILT_IN_OVERLAY_RULES, OverlayHandler } from './overlay-handler.js';

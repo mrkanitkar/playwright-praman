@@ -1,7 +1,7 @@
 # Praman Capabilities Reference
 
-> **Generated**: 2026-08-26 — do not edit manually, run `npm run generate:capabilities`
-> **Total**: 187 capabilities across 15 categories
+> **Generated**: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
+> **Total**: 194 capabilities across 15 categories
 
 ---
 
@@ -12,7 +12,7 @@
 | ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 23    |
 | table    | `UI5-TABLE`  | Table discovery, reading, and manipulation     | 24    |
 | dialog   | `UI5-DLG`    | Dialog lifecycle management                    | 10    |
-| date     | `UI5-DATE`   | Date and time picker operations                | 7     |
+| date     | `UI5-DATE`   | Date and time picker operations                | 13    |
 | odata    | `UI5-ODATA`  | OData model and HTTP operations                | 11    |
 | navigate | `UI5-NAV`    | FLP and in-app navigation                      | 9     |
 | auth     | `UI5-AUTH`   | SAP authentication and session management      | 6     |
@@ -22,7 +22,7 @@
 | footer   | `UI5-FOOTER` | Footer toolbar actions                         | 6     |
 | flp      | `UI5-FLP`    | Fiori Launchpad services (locks, settings)     | 10    |
 | ai       | `UI5-AI`     | AI-powered discovery and context building      | 9     |
-| assert   | `UI5-ASSERT` | UI5-aware custom matchers for assertions       | 10    |
+| assert   | `UI5-ASSERT` | UI5-aware custom matchers for assertions       | 11    |
 | data     | `UI5-DATA`   | Test data generation, persistence, and cleanup | 4     |
 
 ---
@@ -101,15 +101,21 @@
 
 ## date — Date and time picker operations
 
-| ID             | Name           | Description                                                             | Usage Example                                                             |
-| -------------- | -------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `UI5-DATE-001` | setDatePicker  | Sets a date value on a DatePicker control.                              | `await ui5.date.setDatePicker('deliveryDate', '2026-03-15');`             |
-| `UI5-DATE-002` | getDatePicker  | Gets the current date value from a DatePicker control.                  | `const date = await ui5.date.getDatePicker('deliveryDate');`              |
-| `UI5-DATE-003` | setDateRange   | Sets start and end dates on a DateRangeSelection control.               | `await ui5.date.setDateRange('reportRange', '2026-01-01', '2026-03-31');` |
-| `UI5-DATE-004` | getDateRange   | Gets the current start and end dates from a DateRangeSelection control. | `const range = await ui5.date.getDateRange('reportRange');`               |
-| `UI5-DATE-005` | setTimePicker  | Sets a time value on a TimePicker control.                              | `await ui5.date.setTimePicker('startTime', '14:30:00');`                  |
-| `UI5-DATE-006` | getTimePicker  | Gets the current time value from a TimePicker control.                  | `const time = await ui5.date.getTimePicker('startTime');`                 |
-| `UI5-DATE-007` | setAndValidate | Sets a date and validates the input against the control's constraints.  | `await ui5.date.setAndValidate('deliveryDate', '2026-03-15');`            |
+| ID             | Name           | Description                                                                                                                         | Usage Example                                                             |
+| -------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `UI5-DATE-001` | setDatePicker  | Sets a date value on a DatePicker control.                                                                                          | `await ui5.date.setDatePicker('deliveryDate', '2026-03-15');`             |
+| `UI5-DATE-002` | getDatePicker  | Gets the current date value from a DatePicker control.                                                                              | `const date = await ui5.date.getDatePicker('deliveryDate');`              |
+| `UI5-DATE-003` | setDateRange   | Sets start and end dates on a DateRangeSelection control.                                                                           | `await ui5.date.setDateRange('reportRange', '2026-01-01', '2026-03-31');` |
+| `UI5-DATE-004` | getDateRange   | Gets the current start and end dates from a DateRangeSelection control.                                                             | `const range = await ui5.date.getDateRange('reportRange');`               |
+| `UI5-DATE-005` | setTimePicker  | Sets a time value on a TimePicker control.                                                                                          | `await ui5.date.setTimePicker('startTime', '14:30:00');`                  |
+| `UI5-DATE-006` | getTimePicker  | Gets the current time value from a TimePicker control.                                                                              | `const time = await ui5.date.getTimePicker('startTime');`                 |
+| `UI5-DATE-007` | setAndValidate | Sets a date and validates the input against the control's constraints.                                                              | `await ui5.date.setAndValidate('deliveryDate', '2026-03-15');`            |
+| `UI5-DATE-080` | install        | Installs a fake browser clock, optionally at a given time. Opt-in only — SAP session tokens and SAML assertions are time-sensitive. | `await ui5Clock.install('2026-03-31T12:00:00Z');`                         |
+| `UI5-DATE-081` | setFixedTime   | Pins the clock to a fixed time without affecting timers.                                                                            | `await ui5Clock.setFixedTime('2026-12-31T23:59:00Z');`                    |
+| `UI5-DATE-082` | fastForward    | Jumps the clock forward, firing any timers scheduled in between.                                                                    | `await ui5Clock.fastForward('30:00');`                                    |
+| `UI5-DATE-083` | pauseAt        | Advances the clock to a time and pauses there.                                                                                      | `await ui5Clock.pauseAt('2026-06-30T00:00:00Z');`                         |
+| `UI5-DATE-084` | resume         | Resumes normal time flow after a pause.                                                                                             | `await ui5Clock.resume();`                                                |
+| `UI5-DATE-085` | runFor         | Runs the clock forward, firing timers, without jumping.                                                                             | `await ui5Clock.runFor(5_000);`                                           |
 
 ## odata — OData model and HTTP operations
 
@@ -278,6 +284,7 @@
 | `UI5-ASSERT-007` | toHaveUI5CellText           | Assert table cell contains expected text.                                                                                                             | `await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');`    |
 | `UI5-ASSERT-008` | getControlProperty          | Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.                                                | `import { getControlProperty } from 'playwright-praman';`    |
 | `UI5-ASSERT-009` | getControlAggregation       | Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.                            | `import { getControlAggregation } from 'playwright-praman';` |
+| `UI5-OTHER-002`  | collectPageDiagnostics      | Collects console output, page errors, and network requests from a page. Attached automatically to failing tests as failure-ui5-diagnostics.           | `const diagnostics = await collectPageDiagnostics(page);`    |
 | `UI5-OTHER-001`  | attachBridgeNavigationReset | Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener. | `const detach = attachBridgeNavigationReset(page, logger);`  |
 
 ## data — Test data generation, persistence, and cleanup

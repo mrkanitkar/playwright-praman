@@ -63,6 +63,8 @@ import { Buffer } from 'node:buffer';
 import { test as base } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+import { collectPageDiagnostics } from './page-diagnostics.js';
+
 import { createControlTreeScript } from '#bridge/browser-scripts/control-tree.js';
 import type { PramanConfig } from '#core/config/index.js';
 import { createLogger } from '#core/logging/index.js';
@@ -239,6 +241,20 @@ export const failureArtifactsTest = base.extend<FailureArtifactsFixtures, Failur
         }
       } catch (suggestionsError: unknown) {
         log.debug({ err: suggestionsError }, 'Failure suggestions capture failed (non-fatal)');
+      }
+
+      // 5. UI5 diagnostics — what the page said and did before it failed
+      try {
+        const diagnostics = await collectPageDiagnostics(page);
+        if (!diagnostics.isEmpty) {
+          await testInfo.attach('failure-ui5-diagnostics', {
+            contentType: 'application/json',
+            body: Buffer.from(JSON.stringify(diagnostics, null, 2), 'utf8'),
+          });
+          log.debug('Failure UI5 diagnostics attached to test artifacts');
+        }
+      } catch (diagnosticsError: unknown) {
+        log.debug({ err: diagnosticsError }, 'Failure UI5 diagnostics capture failed (non-fatal)');
       }
     },
     { auto: true },

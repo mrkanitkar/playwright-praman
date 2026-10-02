@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
-> Generated: 2026-08-26 — do not edit manually, run `npm run generate:capabilities`
-> Total: 187 capabilities
+> Generated: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
+> Total: 194 capabilities
 
 ---
 
@@ -80,6 +80,12 @@
 - **ui5.date.setTimePicker** — Sets a time value on a TimePicker control.
 - **ui5.date.getTimePicker** — Gets the current time value from a TimePicker control.
 - **ui5.date.setAndValidate** — Sets a date and validates the input against the control's constraints.
+- **ui5Clock.install** — Installs a fake browser clock, optionally at a given time. Opt-in only — SAP session tokens and SAML assertions are time-sensitive.
+- **ui5Clock.setFixedTime** — Pins the clock to a fixed time without affecting timers.
+- **ui5Clock.fastForward** — Jumps the clock forward, firing any timers scheduled in between.
+- **ui5Clock.pauseAt** — Advances the clock to a time and pauses there.
+- **ui5Clock.resume** — Resumes normal time flow after a pause.
+- **ui5Clock.runFor** — Runs the clock forward, firing timers, without jumping.
 
 ## odata — OData model and HTTP operations
 
@@ -228,6 +234,7 @@
 - **matchers.toHaveUI5CellText** — Assert table cell contains expected text.
 - **matchers.getControlProperty** — Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.
 - **matchers.getControlAggregation** — Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.
+- **ui5Diagnostics.collect** — Collects console output, page errors, and network requests from a page. Attached automatically to failing tests as failure-ui5-diagnostics.
 - **fixtures.attachBridgeNavigationReset** — Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener.
 
 ## data — Test data generation, persistence, and cleanup
