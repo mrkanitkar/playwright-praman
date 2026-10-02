@@ -65,6 +65,10 @@ const mockOtelApi = {
   metrics: {
     setGlobalMeterProvider: vi.fn(),
   },
+  // The real values from @opentelemetry/api. The wrapper used to hardcode 1 and
+  // 2, which typescript-eslint 8.71's no-unsafe-enum-assignment flagged; it now
+  // reads them from the resolved module, so the double has to supply them.
+  SpanStatusCode: { UNSET: 0, OK: 1, ERROR: 2 },
 };
 
 const mockSdkInstance = {
