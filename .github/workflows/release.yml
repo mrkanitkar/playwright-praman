@@ -60,7 +60,7 @@ jobs:
         run: |
           if [ -z "$SAP_CLOUD_BASE_URL" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "::warning::SAP credentials not configured — skipping integration tests"
+            echo "::warning::NO BROWSER WAS LAUNCHED by this job. SAP_CLOUD_BASE_URL is not configured, so the whole Playwright matrix below was skipped — this green tick means 'did nothing', not 'passed'. Credential-free browser coverage lives in the UI5 Bridge Smoke job in ci.yml."
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
