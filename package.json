@@ -172,7 +172,7 @@
     "css-selector-parser": "3.3.0",
     "fontoxpath": "3.34.0",
     "pino": "10.3.1",
-    "zod": "4.4.3"
+    "zod": "4.6.5"
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.78.0",
@@ -270,7 +270,7 @@
     "eslint-plugin-security": "4.0.1",
     "eslint-plugin-sonarjs": "4.2.0",
     "eslint-plugin-tsdoc": "0.5.2",
-    "eslint-plugin-unicorn": "73.0.0",
+    "eslint-plugin-unicorn": "74.0.0",
     "glob": "13.0.6",
     "husky": "9.1.7",
     "knip": "6.32.2",
