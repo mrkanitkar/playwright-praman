@@ -28,7 +28,7 @@
  * @module scripts
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 import { format, resolveConfig } from 'prettier';
@@ -79,6 +79,25 @@ export async function formatForPath(content: string, filePath: string): Promise<
 }
 
 /**
+ * Reads a file, treating "not there" as no content.
+ *
+ * @remarks
+ * Reads and handles failure rather than calling `existsSync` first. The
+ * check-then-act form is a time-of-check/time-of-use race — CodeQL's
+ * `js/file-system-race`, raised as high severity — because the file can change
+ * between the two calls. Attempting the read is both race-free and the
+ * idiomatic Node form.
+ */
+function readIfPresent(filePath: string): string | undefined {
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- generator utility: path is built by the caller from the repo root
+    return readFileSync(filePath, 'utf8');
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Writes a generated file, or reports whether the one on disk is current.
  *
  * @remarks
@@ -104,11 +123,7 @@ export async function emitGenerated(
   mode: EmitMode,
 ): Promise<EmitResult> {
   const formatted = await formatForPath(content, filePath);
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- generator utility: path is built by the caller from the repo root
-  const exists = existsSync(filePath);
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- generator utility: same path, already proven to exist
-  const current = exists ? readFileSync(filePath, 'utf8') : undefined;
+  const current = readIfPresent(filePath);
   const changed = current !== formatted;
 
   if (mode === 'check' || !changed) {
