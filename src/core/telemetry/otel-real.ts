@@ -59,9 +59,21 @@ const OTEL_RESOURCES_PACKAGE = '@opentelemetry/resources';
  */
 class RealSpanWrapper implements SpanWrapper {
   readonly #span: Span;
+  /**
+   * The real `SpanStatusCode` enum, injected rather than imported.
+   *
+   * @remarks
+   * `@opentelemetry/api` is an optional peer dependency, so this module cannot
+   * import a value from it. The numeric codes used to be hardcoded as `1` and
+   * `2` with explanatory comments; passing the enum through from the tracer —
+   * which already holds the resolved module — keeps the values correct at the
+   * source instead of restating them here.
+   */
+  readonly #statusCode: typeof OtelApi.SpanStatusCode;
 
-  constructor(span: Span) {
+  constructor(span: Span, statusCode: typeof OtelApi.SpanStatusCode) {
     this.#span = span;
+    this.#statusCode = statusCode;
   }
 
   end(): void {
@@ -73,7 +85,7 @@ class RealSpanWrapper implements SpanWrapper {
   }
 
   setStatus(code: 'ok' | 'error', message?: string): void {
-    const otelCode = code === 'ok' ? 1 : 2; // SpanStatusCode.OK = 1, ERROR = 2
+    const otelCode = code === 'ok' ? this.#statusCode.OK : this.#statusCode.ERROR;
     this.#span.setStatus(message !== undefined ? { code: otelCode, message } : { code: otelCode });
   }
 
@@ -107,7 +119,7 @@ class RealTracerWrapper implements TracerWrapper {
 
   startSpan(name: string, attributes?: Record<string, string>): SpanWrapper {
     const span = this.#tracer.startSpan(name, attributes !== undefined ? { attributes } : {});
-    return new RealSpanWrapper(span);
+    return new RealSpanWrapper(span, this.#otelApi.SpanStatusCode);
   }
 
   async withSpan<T>(name: string, fn: () => Promise<T>): Promise<T> {
@@ -115,11 +127,11 @@ class RealTracerWrapper implements TracerWrapper {
     const ctx = this.#otelApi.trace.setSpan(this.#otelApi.context.active(), span);
     try {
       const result = await this.#otelApi.context.with(ctx, fn);
-      span.setStatus({ code: 1 }); // SpanStatusCode.OK
+      span.setStatus({ code: this.#otelApi.SpanStatusCode.OK });
       return result;
     } catch (error: unknown) {
       span.setStatus({
-        code: 2, // SpanStatusCode.ERROR
+        code: this.#otelApi.SpanStatusCode.ERROR,
         message: error instanceof Error ? error.message : String(error),
       });
       if (error instanceof Error) {

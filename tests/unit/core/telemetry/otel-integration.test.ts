@@ -15,7 +15,7 @@
  * that spans are actually created and exported when telemetry is enabled.
  * No Docker or external services needed — everything runs in-process.
  */
-import { trace } from '@opentelemetry/api';
+import { SpanStatusCode, trace } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   InMemorySpanExporter,
@@ -81,7 +81,7 @@ describe('OTel Integration — Real SDK with InMemoryExporter', () => {
       span.setAttribute('praman.test', true);
       span.setAttribute('praman.test.file', 'test.spec.ts');
       span.setAttribute('praman.test.duration', 1500);
-      span.setStatus({ code: 1 }); // SpanStatusCode.OK
+      span.setStatus({ code: SpanStatusCode.OK });
       span.end();
 
       await provider.forceFlush();
