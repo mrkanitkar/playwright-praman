@@ -1,7 +1,7 @@
 {
   "name": "playwright-praman",
   "version": "1.3.5",
-  "description": "Playwright plugin for SAP S/4HANA, Fiori & UI5 test automation — AI test generation, 199 typed control proxies, OData V2/V4, Fiori Elements, 6 auth strategies",
+  "description": "Playwright plugin for SAP S/4HANA, Fiori & UI5 test automation \u2014 AI test generation, 199 typed control proxies, OData V2/V4, Fiori Elements, 6 auth strategies",
   "author": {
     "name": "Maheshwar Kanitkar",
     "email": "support@zestest.in",
@@ -136,7 +136,7 @@
     "test:integration": "playwright test",
     "test:integration:demo": "playwright test --config tests/integration/playwright.integration.config.ts",
     "test:integration:ui": "playwright test --ui",
-    "ci": "npm run validate:no-js && npm run lint && npm run typecheck && npm run test:unit && npm run build && npm run check:dist-imports && npm run lint:ui5-deprecated && npm run validate:capabilities && npm run validate:agent-assets",
+    "ci": "npm run validate:no-js && npm run lint && npm run typecheck && npm run test:unit && npm run build && npm run check:dist-imports && npm run lint:ui5-deprecated && npm run validate:capabilities && npm run validate:agent-assets && npm run validate:generated",
     "ci:full": "npm run ci && npm run test:integration && npm run spellcheck && npm run deadcode && npm run mdlint",
     "docs:dev": "cd docs && npx docusaurus start",
     "docs:build": "cd docs && npx docusaurus build",
@@ -165,7 +165,8 @@
     "prepare": "husky",
     "generate:agent-assets": "tsx scripts/generate-agent-assets.ts",
     "validate:agent-assets": "tsx scripts/generate-agent-assets.ts --check",
-    "smoke:init": "tsx scripts/smoke-init.ts"
+    "smoke:init": "tsx scripts/smoke-init.ts",
+    "validate:generated": "npm run generate:capabilities -- --check && npm run generate:skill-md -- --check"
   },
   "dependencies": {
     "commander": "15.0.0",
