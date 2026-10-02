@@ -31,6 +31,7 @@ Thumbs.db
 .env.*.local
 
 # Claude Code local settings
+.claude/settings.json
 .claude/settings.local.json
 
 # Docs build
