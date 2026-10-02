@@ -187,6 +187,8 @@ export class FLPLocksHandler {
    * @param username - Optional username to filter by LockOwner.
    * @returns Number of lock entries found.
    *
+   * @capability flpLocks.getNumberOfLockEntries
+   *
    * @example
    * ```typescript
    * const count = await locks.getNumberOfLockEntries('TESTUSER');
@@ -208,6 +210,8 @@ export class FLPLocksHandler {
    * @returns Number of entries deleted.
    * @throws FLPError with ERR_FLP_API_UNAVAILABLE on 404 or connection error.
    * @throws FLPError with ERR_FLP_PERMISSION_DENIED on 403.
+   *
+   * @capability flpLocks.deleteAllLockEntries
    *
    * @example
    * ```typescript
@@ -240,6 +244,8 @@ export class FLPLocksHandler {
    * @remarks
    * Logs warnings on failure but does not throw. Safe to call in
    * `afterEach` / `afterAll` hooks.
+   *
+   * @capability flpLocks.cleanup
    *
    * @example
    * ```typescript

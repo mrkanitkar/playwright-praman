@@ -33,7 +33,17 @@ import {
   RESET,
   BOLD,
 } from './capability-validation-utils.js';
+import {
+  capabilityNameFromTag,
+  capabilityValidationFailures,
+  findCapabilityTag,
+} from './capability-audit.js';
 import type { SourceCapability } from './capability-validation-utils.js';
+import {
+  capabilityNameFromTag,
+  capabilityValidationFailures,
+  findCapabilityTag,
+} from './capability-audit.js';
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
@@ -69,25 +79,16 @@ function readAndValidateYaml(): CapabilitiesYaml | null {
 
 /* ── Step 2: Cross-reference YAML ↔ source tags ─────────────────────────── */
 
-function findMatchingTag(
-  qualifiedName: string,
-  name: string,
-  sourceTags: readonly SourceCapability[],
-): SourceCapability | undefined {
-  return sourceTags.find((tag) => {
-    const tagLower = tag.tagText.toLowerCase();
-    return tagLower.includes(qualifiedName.toLowerCase()) || tagLower.includes(name.toLowerCase());
-  });
-}
-
+/**
+ * Whether a source tag names a capability the manifest declares.
+ *
+ * @remarks
+ * An exact comparison of qualified names. See {@link findCapabilityTag} for why
+ * the previous substring form had to go.
+ */
 function isTagReferencedInYaml(tag: SourceCapability, yamlData: CapabilitiesYaml): boolean {
-  const tagLower = tag.tagText.toLowerCase();
-  return yamlData.capabilities.some((entry) => {
-    return (
-      tagLower.includes(entry.qualifiedName.toLowerCase()) ||
-      tagLower.includes(entry.name.toLowerCase())
-    );
-  });
+  const tagName = capabilityNameFromTag(tag.tagText);
+  return yamlData.capabilities.some((entry) => entry.qualifiedName === tagName);
 }
 
 interface CrossRefCounts {
@@ -109,7 +110,7 @@ function printCrossRefReport(
   console.log();
 
   for (const entry of yamlData.capabilities) {
-    const match = findMatchingTag(entry.qualifiedName, entry.name, sourceTags);
+    const match = findCapabilityTag(entry.qualifiedName, sourceTags);
     if (match !== undefined) {
       counts.pass++;
       console.log(
@@ -148,14 +149,18 @@ function printExportCoverageReport(root: string): { missing: number; total: numb
   const exports = scanExportsForCapabilityTags(root, SRC_GLOB);
   const missing = exports.filter((e) => !e.hasCapabilityTag);
 
-  console.log(`  Found ${String(exports.length)} exports, ${String(missing.length)} missing @capability`);
+  console.log(
+    `  Found ${String(exports.length)} exports, ${String(missing.length)} missing @capability`,
+  );
   console.log();
 
   if (missing.length > 0) {
     console.log(`${BOLD}Exports missing @capability tag:${RESET}`);
     console.log();
     for (const exp of missing) {
-      console.log(`  ${YELLOW}\u26A0${RESET} ${exp.file}:${String(exp.line)} ${DIM}${exp.name}${RESET}`);
+      console.log(
+        `  ${YELLOW}\u26A0${RESET} ${exp.file}:${String(exp.line)} ${DIM}${exp.name}${RESET}`,
+      );
     }
     console.log();
   }
@@ -164,7 +169,9 @@ function printExportCoverageReport(root: string): { missing: number; total: numb
   const coverage = computeDirectoryCoverage(exports);
   console.log(`${BOLD}Per-directory coverage:${RESET}`);
   console.log();
-  console.log(`  ${'Directory'.padEnd(25)} ${'Tagged'.padStart(7)} ${'Total'.padStart(7)} ${'Coverage'.padStart(9)}`);
+  console.log(
+    `  ${'Directory'.padEnd(25)} ${'Tagged'.padStart(7)} ${'Total'.padStart(7)} ${'Coverage'.padStart(9)}`,
+  );
   console.log(`  ${'-'.repeat(25)} ${'-'.repeat(7)} ${'-'.repeat(7)} ${'-'.repeat(9)}`);
   for (const dir of coverage) {
     const color = dir.coveragePercent >= 90 ? GREEN : dir.coveragePercent >= 50 ? YELLOW : RED;
@@ -219,13 +226,19 @@ function printSummary(
   console.log(`${'='.repeat(60)}`);
   console.log();
 
-  if (IS_STRICT && (exportStats.missing > 0 || invalidFormat > 0)) {
-    console.log(`${RED}STRICT MODE: Validation FAILED.${RESET}`);
-    if (exportStats.missing > 0) {
-      console.log(`  ${RED}${String(exportStats.missing)} exports missing @capability tag.${RESET}`);
-    }
-    if (invalidFormat > 0) {
-      console.log(`  ${RED}${String(invalidFormat)} tags do not match a qualifiedName.${RESET}`);
+  const failures = capabilityValidationFailures(
+    {
+      unverified: crossRef.warn,
+      invalidTags: invalidFormat,
+      exportsMissingTag: exportStats.missing,
+    },
+    { strict: IS_STRICT },
+  );
+
+  if (failures.length > 0) {
+    console.log(`${RED}Validation FAILED.${RESET}`);
+    for (const failure of failures) {
+      console.log(`  ${RED}${failure}${RESET}`);
     }
     console.log();
     process.exitCode = 1;

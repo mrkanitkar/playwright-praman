@@ -17,6 +17,8 @@ import { readFileSync } from 'node:fs';
 import { relative, dirname } from 'node:path';
 import { globSync } from 'glob';
 
+import { capabilityNameFromTag } from './capability-audit.js';
+
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
 /**
@@ -28,8 +30,7 @@ export const CAPABILITY_TAG_REGEX = /@capability\s+(.+)/g;
  * Regex to detect exported functions, classes, and const declarations.
  * Matches: export function, export async function, export class, export const
  */
-const EXPORT_REGEX =
-  /^export\s+(?:async\s+)?(?:function|class|const)\s+(\w+)/;
+const EXPORT_REGEX = /^export\s+(?:async\s+)?(?:function|class|const)\s+(\w+)/;
 
 /* ── ANSI colors ─────────────────────────────────────────────────────────── */
 
@@ -88,10 +89,7 @@ const EXCLUDED_PATTERNS = [
 /**
  * Scan source files for @capability TSDoc tags.
  */
-export function scanSourceForCapabilityTags(
-  root: string,
-  srcGlob: string,
-): SourceCapability[] {
+export function scanSourceForCapabilityTags(root: string, srcGlob: string): SourceCapability[] {
   const sourceFiles = globSync(srcGlob, { cwd: root, absolute: true });
   const capabilities: SourceCapability[] = [];
 
@@ -122,10 +120,7 @@ export function scanSourceForCapabilityTags(
  *
  * Excludes: index.ts, generated files, browser-scripts, CLI, tests, version.ts.
  */
-export function scanExportsForCapabilityTags(
-  root: string,
-  srcGlob: string,
-): ExportInfo[] {
+export function scanExportsForCapabilityTags(root: string, srcGlob: string): ExportInfo[] {
   const sourceFiles = globSync(srcGlob, {
     cwd: root,
     absolute: true,
@@ -206,15 +201,13 @@ export function scanExportsForCapabilityTags(
 /**
  * Compute per-directory coverage statistics from export info.
  */
-export function computeDirectoryCoverage(
-  exports: readonly ExportInfo[],
-): DirectoryCoverage[] {
+export function computeDirectoryCoverage(exports: readonly ExportInfo[]): DirectoryCoverage[] {
   const dirMap = new Map<string, { total: number; tagged: number }>();
 
   for (const exp of exports) {
     // Extract first two path segments (e.g., "src/modules")
     const parts = exp.file.split('/');
-    const dir = parts.length >= 2 ? `${parts[0]}/${parts[1]}` : parts[0] ?? '';
+    const dir = parts.length >= 2 ? `${parts[0]}/${parts[1]}` : (parts[0] ?? '');
 
     const entry = dirMap.get(dir) ?? { total: 0, tagged: 0 };
     entry.total++;
@@ -241,5 +234,5 @@ export function validateTagFormat(
   sourceTags: readonly SourceCapability[],
   qualifiedNames: ReadonlySet<string>,
 ): SourceCapability[] {
-  return sourceTags.filter((tag) => !qualifiedNames.has(tag.tagText));
+  return sourceTags.filter((tag) => !qualifiedNames.has(capabilityNameFromTag(tag.tagText)));
 }

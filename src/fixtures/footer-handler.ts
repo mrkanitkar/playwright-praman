@@ -154,6 +154,8 @@ export class FooterHandler {
    *
    * @throws ControlError if the Apply button is not found.
    *
+   * @capability ui5Footer.clickApply
+   *
    * @example
    * ```typescript
    * await footer.clickApply();
@@ -171,6 +173,8 @@ export class FooterHandler {
    * @aiContext Use to cancel and discard changes in the current view.
    *
    * @throws ControlError if the Cancel button is not found.
+   *
+   * @capability ui5Footer.clickCancel
    *
    * @example
    * ```typescript
@@ -190,6 +194,8 @@ export class FooterHandler {
    *
    * @throws ControlError if the Edit button is not found.
    *
+   * @capability ui5Footer.clickEdit
+   *
    * @example
    * ```typescript
    * await footer.clickEdit();
@@ -208,6 +214,8 @@ export class FooterHandler {
    *
    * @throws ControlError if the Delete button is not found.
    *
+   * @capability ui5Footer.clickDelete
+   *
    * @example
    * ```typescript
    * await footer.clickDelete();
@@ -225,6 +233,8 @@ export class FooterHandler {
    * @aiContext Use to create a new document or record.
    *
    * @throws ControlError if the Create button is not found.
+   *
+   * @capability ui5Footer.clickCreate
    *
    * @example
    * ```typescript

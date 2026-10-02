@@ -59,7 +59,12 @@ docs-verify-reports/
 plugins/praman-sap-testing/
 
 # Generated
-skills/playwright-praman-sap-testing/SKILL.md
+# NOTE: skills/playwright-praman-sap-testing/SKILL.md was listed here as
+# "Generated", but no script produces it — it is hand-authored, and it is the
+# entry point every Praman agent is instructed to read first. Being ignored and
+# untracked, it shipped only when the publishing machine happened to have a copy
+# in its working tree; it was absent from the published 1.3.5 tarball entirely.
+# It must stay tracked. See tests/unit/package/published-files.test.ts.
 src/proxy/typed/*.generated.ts
 *.sbom.json
 license-report.json

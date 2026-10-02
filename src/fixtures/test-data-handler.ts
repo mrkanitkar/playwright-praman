@@ -129,6 +129,8 @@ export class TestDataHandler {
    * @param filename - File name (relative to baseDir).
    * @param data - Data to serialize as JSON.
    *
+   * @capability testData.save
+   *
    * @example
    * ```typescript
    * await handler.save('order.json', { id: '123', total: 99.99 });
@@ -151,6 +153,8 @@ export class TestDataHandler {
    * @param filename - File name (relative to baseDir).
    * @returns The parsed JSON content.
    * @throws Error if the file cannot be read.
+   *
+   * @capability testData.load
    *
    * @example
    * ```typescript
@@ -187,6 +191,8 @@ export class TestDataHandler {
    * Files are deleted in reverse order (last saved first). Individual
    * deletion failures are logged as warnings but do not throw. After
    * file cleanup, attempts to remove the base directory.
+   *
+   * @capability testData.cleanup
    *
    * @example
    * ```typescript
