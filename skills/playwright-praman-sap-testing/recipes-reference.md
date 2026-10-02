@@ -1,6 +1,6 @@
 # Praman Recipes Reference
 
-> **Generated**: 2026-02-27 — do not edit manually, run `npm run generate:skill-md`
+> **Generated**: 2026-10-02 — do not edit manually, run `npm run generate:skill-md`
 > 14 recipes extracted from recipes.yaml
 
 ## Button Click

@@ -1,104 +1,183 @@
 # Praman SAP Test Automation — Agent Skill Reference
 
-**Package**: `playwright-praman` v1.0.1
+<!-- praman:generated:meta start -->
+
+**Package**: `playwright-praman` v1.3.5
 **Import**: `import { test, expect } from 'playwright-praman'`
 **Purpose**: Primary instruction set for Praman AI agents (planner, generator, healer)
+
+<!-- praman:generated:meta end -->
 
 ---
 
 ## Step 0: MANDATORY PREFLIGHT (Static Capability Reference)
 
 **Do NOT call runtime APIs** — `pramanAI.capabilities.forAI()` is only available inside running tests, not during agent planning.
-Instead, use this static capability table verified against `playwright-praman` v1.0.1 source code.
+Instead, use this static capability table, which is generated from `capabilities.yaml` and carries signatures read from the source.
 
 ### PRAMAN_CAPABILITIES
 
+<!-- praman:generated:capabilities start -->
+
 ```text
 ui5
-  control(selector), controls(selector), click(selector), fill(selector, text),
-  select(selector, key), clear(selector), waitFor(selector, options?),
-  waitForUI5(), check(selector), uncheck(selector), inspect(selector),
-  clearCache(), destroy()
+  control(...), controls(selector), click(selector), fill(selector, value), press(selector),
+  select(selector, key), check(selector), uncheck(selector), clear(selector), getText(selector),
+  getValue(selector), waitForUI5(...), waitFor(selector, options?), inspect(...), clearCache(),
+  destroy()
+
+control
+  setValue(...), fireChange(...), open(...), close(...), setSelectedKey(...)
 
 ui5.table
-  getRows(id), getRowCount(id), getCellValue(id, row, col), getData(id),
-  selectRow(id, row), clickRow(id, row), findRowByValues(id, values),
-  filterByColumn(id, col, value), sortByColumn(id, col), getColumnNames(id),
-  ensureRowVisible(id, row), selectRowByValues(id, values), exportData(id), detectType(id)
+  detectType(...), getRows(...), getRowCount(...), getCellValue(...), getData(...),
+  selectRow(...), selectAll(...), deselectAll(...), waitForData(...),
+  getSelectedRows(page, tableId, options?), getColumnNames(page, tableId),
+  findRowByValues(page, tableId, columnValues),
+  getCellByColumnName(page, tableId, rowIndex, columnName, options?),
+  clickRow(page, tableId, rowIndex), selectRowByValues(page, tableId, columnValues, options?),
+  ensureRowVisible(page, tableId, rowIndex),
+  setTableCellValue(page, tableId, rowIndex, colIndex, value), getRowCountAlt(...),
+  filterByColumn(page, tableId, columnIndex, filterValue, options?),
+  sortByColumn(page, tableId, columnIndex, options?), getSortOrder(page, tableId, columnIndex),
+  getFilterValue(page, tableId, columnIndex), exportData(...), clickSettings(...)
 
 ui5.dialog
-  waitFor(opts?), getOpen(), isOpen(dialogId), dismiss(opts?),
-  confirm(opts?), waitForClosed(dialogId), getButtons(dialogId)
+  waitFor(...), getOpen(...), isOpen(...), dismiss(...), confirm(...), waitForClosed(...),
+  getButtons(...)
 
 ui5.date
-  setDatePicker(id, date), getDatePicker(id), setDateRange(id, start, end),
-  getDateRange(id), setTimePicker(id, time), getTimePicker(id), setAndValidate(id, date)
+  setDatePicker(...), getDatePicker(...), setDateRange(...), getDateRange(...),
+  setTimePicker(...), getTimePicker(...), setAndValidate(...)
 
 ui5.odata
-  getModelData(path), getModelProperty(path), fetchCSRFToken(url),
-  createEntity(url, entitySet, data), queryEntities(url, entitySet, opts?),
-  updateEntity(...), deleteEntity(...), waitForLoad(), hasPendingChanges(),
-  getEntityCount(path), callFunctionImport(url, fn, params?)
+  getModelData(page, path, options?), getModelProperty(page, path, options?), waitForLoad(...),
+  fetchCSRFToken(page, serviceUrl), getEntityCount(page, path, options?),
+  hasPendingChanges(page, options?), createEntity(page, serviceUrl, entitySet, data, options?),
+  updateEntity(page, serviceUrl, entitySet, key, data, options?),
+  deleteEntity(page, serviceUrl, entitySet, key, options?),
+  queryEntities(page, serviceUrl, entitySet, options?),
+  callFunctionImport(page, serviceUrl, functionName, params?, method?, options?)
 
 ui5Navigation
-  navigateToTile(title), navigateToApp(appId), navigateToHash(hash),
-  navigateToHome(), navigateToIntent(intent, params?, options?), searchAndOpenApp(title),
-  navigateBack(), navigateForward(), getCurrentHash()
+  navigateToApp(page, appId, options?), navigateToTile(page, tileTitle, options?),
+  navigateToIntent(page, intent, params?, options?), navigateToHash(page, hash, options?),
+  navigateToHome(page, options?), navigateBack(page, options?), navigateForward(page, options?),
+  searchAndOpenApp(page, appTitle, options?), getCurrentHash(page)
 
-sapAuth (SEED ONLY)
-  login(page, config), loginFromEnv(page), logout(page),
-  isAuthenticated(page), isSessionExpired(timeoutMs?), getSessionInfo()
+sapAuth
+  login(page, config), loginFromEnv(page), logout(page), isAuthenticated(page),
+  isSessionExpired(timeoutMs?), getSessionInfo()
 
 fe.listReport
-  getTable(), getFilterBar(), setFilter(field, value), search(),
-  clearFilters(), navigateToItem(rowIndex), getVariants(), selectVariant(name)
+  getTable(...), getFilterBar(page, options?), setFilter(...), search(...), clearFilters(...),
+  navigateToItem(page, tableId, rowIndex, options?), getVariants(...),
+  selectVariant(page, variantName, options?), getFilterValue(...)
 
 fe.objectPage
-  navigateToSection(id), getSectionData(id), clickButton(name),
-  clickEdit(), clickSave(), getSections(), getHeaderTitle(), isInEditMode()
+  navigateToSection(page, sectionIdentifier, options?), getSectionData(page, sectionIdentifier),
+  clickButton(...), clickEdit(...), clickSave(...), getSections(...), getHeaderTitle(page),
+  isInEditMode(page)
 
 fe.table
-  getRowCount(id), getCellValue(id, row, col), findRow(id, values),
-  clickRow(id, row), getColumnNames(id)
+  getRowCount(...), getCellValue(...), findRow(...), clickRow(...), getColumnNames(...)
 
 fe.list
-  getItemCount(id), getItemTitle(id, index), findItemByTitle(id, title),
-  clickItem(id, index), selectItem(id, index, selected)
+  getItemCount(...), getItemTitle(...), findItemByTitle(...), clickItem(...), selectItem(...)
 
 intent.core
-  fillField(label, value), clickButton(text), selectOption(label, option),
-  assertField(label, expected), confirmAndWait(), waitForSave()
+  fillField(ui5, vocabulary, label, value), clickButton(ui5, text),
+  selectOption(ui5, vocabulary, label, option), assertField(ui5, vocabulary, label, expected),
+  confirmAndWait(ui5), waitForSave(ui5, options?),
+  navigateAndSearch(ui5, ui5Nav, vocabulary, appId, criteria, options?)
 
 intent.procurement
-  createPurchaseOrder(data), approvePurchaseOrder(data),
-  searchPurchaseOrders(criteria), createPurchaseRequisition(data),
-  confirmGoodsReceipt(data), searchVendors()
+  createPurchaseOrder(ui5, ui5Nav, vocabulary, input, options?),
+  approvePurchaseOrder(ui5, ui5Nav, input, options?),
+  searchPurchaseOrders(ui5, ui5Nav, vocabulary, criteria, options?),
+  createPurchaseRequisition(ui5, ui5Nav, vocabulary, input, options?),
+  confirmGoodsReceipt(ui5, ui5Nav, input, options?), searchVendors(ui5, ui5Nav, options?)
 
 intent.sales
-  createSalesOrder(data), createQuotation(data), approveQuotation(data),
-  searchSalesOrders(criteria), searchCustomers(), checkDeliveryStatus(data)
+  createSalesOrder(ui5, ui5Nav, vocabulary, input, options?),
+  createQuotation(ui5, ui5Nav, vocabulary, input, options?),
+  approveQuotation(ui5, ui5Nav, input, options?),
+  searchSalesOrders(ui5, ui5Nav, vocabulary, criteria, options?),
+  searchCustomers(ui5, ui5Nav, options?), checkDeliveryStatus(ui5, ui5Nav, input, options?)
 
 intent.finance
-  createJournalEntry(data), postVendorInvoice(data), processPayment(data)
+  createJournalEntry(ui5, ui5Nav, vocabulary, input, options?),
+  postVendorInvoice(ui5, ui5Nav, vocabulary, input, options?),
+  processPayment(ui5, ui5Nav, vocabulary, input, options?)
 
 intent.manufacturing
-  createProductionOrder(data), confirmProductionOrder(data)
+  createProductionOrder(ui5, ui5Nav, vocabulary, input, options?),
+  confirmProductionOrder(ui5, ui5Nav, vocabulary, input, options?)
 
 intent.masterData
-  createVendorMaster(data), createCustomerMaster(data), createMaterialMaster(data)
+  createVendorMaster(ui5, ui5Nav, vocabulary, input, options?),
+  createCustomerMaster(ui5, ui5Nav, vocabulary, input, options?),
+  createMaterialMaster(ui5, ui5Nav, vocabulary, input, options?)
 
 pramanAI
-  discoverPage(opts?), buildContext(), capabilities (registry),
-  recipes (registry), agentic (handler), llm (service), vocabulary
+  discoverPage(page, options?), buildContext(...), capabilities(), recipes(), agentic(...),
+  llm(...), vocabulary(...)
 
-customMatchers
-  toHaveUI5Text(text), toBeUI5Visible(), toBeUI5Enabled(),
-  toHaveUI5Property(prop, val), toHaveUI5ValueState(state),
-  toHaveUI5RowCount(n), toHaveUI5CellText(row, col, text),
-  toHaveUI5SelectedRows(indices), toHaveUI5Binding(path), toBeUI5ControlType(type)
+capability-registry
+  forAI(), byCategory(category)
 
-support: ui5Shell, ui5Footer, flpLocks, flpSettings, testData, btpWorkZone
+ui5Shell
+  expectShellHeader(...), clickHome(), openNotifications(), openUserMenu()
+
+ui5Footer
+  clickSave(...), clickApply(), clickCancel(), clickEdit(), clickDelete(), clickCreate()
+
+flpLocks
+  getLockEntries(...), getNumberOfLockEntries(username?), deleteAllLockEntries(username?),
+  cleanup()
+
+flpSettings
+  getLanguage(...), getDateFormat(), getTimeFormat(), getTimezone(), getNumberFormat(),
+  getAllSettings()
+
+testData
+  generate(...), save(filename, data), load(filename), cleanup()
+
+matchers
+  toHaveUI5Text(...), toBeUI5Visible(...), toBeUI5Enabled(...), toHaveUI5Property(...),
+  toHaveUI5ValueState(...), toHaveUI5RowCount(...), toHaveUI5CellText(...),
+  getControlProperty(page, controlId, propertyName),
+  getControlAggregation(page, controlId, aggregationName)
+
+selectors
+  serializeUI5SelectorToCSS(selector)
+
+screencast
+  highlightControls()
+
+proxy
+  contextRetryDelay(attempt)
+
+webStorage
+  webStorage(...), webStorageHelper(...)
+
+ui5Overlays
+  register(rule), registerAll(rules), dispose()
+
+ui5Clock
+  install(time?), setFixedTime(time), fastForward(ticks), pauseAt(time), resume(), runFor(ticks)
+
+ui5Wait
+  waitForControlState(locator, predicate, options?)
+
+ui5Diagnostics
+  collectPageDiagnostics(page)
+
+fixtures
+  attachBridgeNavigationReset(page, logger?)
 ```
+
+<!-- praman:generated:capabilities end -->
 
 ---
 
