@@ -74,11 +74,20 @@ describe('package.json files[] allowlist', () => {
   });
 });
 
+/** True when some allowlist entry publishes `tree`, ignoring a trailing slash. */
+function isAllowlisted(tree: string): boolean {
+  const bare = tree.replace(/\/$/, '');
+  return allowlist.some((entry) => entry.replace(/\/$/, '') === bare);
+}
+
 // Issue #246 named these two trees specifically — `init` copies agents into
 // .github/ and .claude/, and the seed spec into tests/seeds/.
 describe('agent assets consumed by `playwright-praman init` (issue #246)', () => {
+  // Matched on the path rather than the literal string, so writing the entry as
+  // `agents` instead of `agents/` does not fail a package that still works.
   it.each(['agents/', 'seeds/'])('ships %s', (tree) => {
-    expect(allowlist).toContain(tree);
+    expect(isAllowlisted(tree)).toBe(true);
+    expect(publishedFileCount(tree)).toBeGreaterThan(0);
   });
 
   it('ships a Claude agent for every published Copilot agent', () => {
@@ -118,7 +127,7 @@ describe('agent skill entry point (hand-authored, must stay tracked)', () => {
   });
 
   it('falls under a files[] entry so npm publishes it', () => {
+    expect(isAllowlisted('skills/')).toBe(true);
     expect(publishedFileCount('skills/')).toBeGreaterThan(0);
-    expect(allowlist).toContain('skills/');
   });
 });
