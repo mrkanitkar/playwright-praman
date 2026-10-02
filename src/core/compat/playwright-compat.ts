@@ -92,6 +92,17 @@ export interface PlaywrightFeatures {
   readonly hasBrowserContextEvent: boolean;
   readonly hasWebAuthnCredentials: boolean;
   readonly hasWebStorageAPI: boolean;
+  /**
+   * `page.consoleMessages()` / `page.pageErrors()` accept a `filter` option.
+   *
+   * @remarks
+   * The base methods exist at the 1.57 floor, but take no arguments there.
+   * JavaScript silently ignores surplus arguments, so passing `{ filter }` on an
+   * older runtime returns *every* message while the caller believes it received
+   * only the filtered set — wrong data rather than a crash. Always guard the
+   * option on this flag.
+   */
+  readonly hasConsoleMessageFilter: boolean;
   readonly hasSoftPoll: boolean;
   readonly hasScreencastTimestamp: boolean;
   readonly hasVideoRetainModes: boolean;
@@ -158,6 +169,7 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
     hasBrowserContextEvent: isAtLeast(ver, '1.60.0'),
     hasWebAuthnCredentials: isAtLeast(ver, '1.61.0'),
     hasWebStorageAPI: isAtLeast(ver, '1.61.0'),
+    hasConsoleMessageFilter: isAtLeast(ver, '1.59.0'),
     hasSoftPoll: isAtLeast(ver, '1.61.0'),
     hasScreencastTimestamp: isAtLeast(ver, '1.61.0'),
     hasVideoRetainModes: isAtLeast(ver, '1.61.0'),

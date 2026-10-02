@@ -164,6 +164,31 @@ describe('detectFeatures — 1.61 capabilities', () => {
   });
 });
 
+describe('detectFeatures — consoleMessages filter option', () => {
+  // Verified empirically against published type definitions: 1.58 has bare
+  // consoleMessages(), 1.59 gains the options parameter.
+  it('is false at the 1.57 floor, where the method takes no arguments', () => {
+    expect(
+      detectFeatures({ major: 1, minor: 57, patch: 0, raw: '1.57.0' }).hasConsoleMessageFilter,
+    ).toBe(false);
+  });
+
+  it('is false at 1.58', () => {
+    expect(
+      detectFeatures({ major: 1, minor: 58, patch: 0, raw: '1.58.0' }).hasConsoleMessageFilter,
+    ).toBe(false);
+  });
+
+  it('is true from 1.59 onwards', () => {
+    expect(
+      detectFeatures({ major: 1, minor: 59, patch: 0, raw: '1.59.0' }).hasConsoleMessageFilter,
+    ).toBe(true);
+    expect(
+      detectFeatures({ major: 1, minor: 62, patch: 1, raw: '1.62.1' }).hasConsoleMessageFilter,
+    ).toBe(true);
+  });
+});
+
 describe('hasFeature', () => {
   it('returns correct boolean for installed Playwright version', () => {
     const version = getPlaywrightVersion();

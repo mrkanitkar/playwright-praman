@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-08-26 with 187 entries.
+ * Generated on 2026-10-02 with 194 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {
@@ -2373,6 +2373,82 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     priority: 'fixture',
     usageExample: 'await overlays.dispose();',
     registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATE-080',
+    qualifiedName: 'ui5Clock.install',
+    name: 'install',
+    description:
+      'Installs a fake browser clock, optionally at a given time. Opt-in only — SAP session tokens and SAML assertions are time-sensitive.',
+    category: 'date',
+    priority: 'fixture',
+    usageExample: "await ui5Clock.install('2026-03-31T12:00:00Z');",
+    registryVersion: 1,
+    aiSteering:
+      'Install before page.goto() so the app sees the faked time from first render. Only use in tests that genuinely depend on date logic.',
+  },
+  {
+    id: 'UI5-DATE-081',
+    qualifiedName: 'ui5Clock.setFixedTime',
+    name: 'setFixedTime',
+    description: 'Pins the clock to a fixed time without affecting timers.',
+    category: 'date',
+    priority: 'fixture',
+    usageExample: "await ui5Clock.setFixedTime('2026-12-31T23:59:00Z');",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATE-082',
+    qualifiedName: 'ui5Clock.fastForward',
+    name: 'fastForward',
+    description: 'Jumps the clock forward, firing any timers scheduled in between.',
+    category: 'date',
+    priority: 'fixture',
+    usageExample: "await ui5Clock.fastForward('30:00');",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATE-083',
+    qualifiedName: 'ui5Clock.pauseAt',
+    name: 'pauseAt',
+    description: 'Advances the clock to a time and pauses there.',
+    category: 'date',
+    priority: 'fixture',
+    usageExample: "await ui5Clock.pauseAt('2026-06-30T00:00:00Z');",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATE-084',
+    qualifiedName: 'ui5Clock.resume',
+    name: 'resume',
+    description: 'Resumes normal time flow after a pause.',
+    category: 'date',
+    priority: 'fixture',
+    usageExample: 'await ui5Clock.resume();',
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATE-085',
+    qualifiedName: 'ui5Clock.runFor',
+    name: 'runFor',
+    description: 'Runs the clock forward, firing timers, without jumping.',
+    category: 'date',
+    priority: 'fixture',
+    usageExample: 'await ui5Clock.runFor(5_000);',
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-OTHER-002',
+    qualifiedName: 'ui5Diagnostics.collect',
+    name: 'collectPageDiagnostics',
+    description:
+      'Collects console output, page errors, and network requests from a page. Attached automatically to failing tests as failure-ui5-diagnostics.',
+    category: 'assert',
+    priority: 'implementation',
+    usageExample: 'const diagnostics = await collectPageDiagnostics(page);',
+    registryVersion: 1,
+    aiSteering:
+      'Use when diagnosing a failure — UI5 logs through sap/base/Log, so console output usually explains the failure.',
   },
   {
     id: 'UI5-OTHER-001',

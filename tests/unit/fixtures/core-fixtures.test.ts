@@ -81,6 +81,7 @@ const mockMeterInstance: MeterWrapper = {
 
 const mockFeatures: PlaywrightFeatures = {
   hasRouteFromHAR: true,
+  hasConsoleMessageFilter: true,
   hasScreenshotCaret: true,
   hasClockAPI: true,
   hasAriaSnapshot: true,
