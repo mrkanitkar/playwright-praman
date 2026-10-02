@@ -20,7 +20,7 @@
     "@docusaurus/faster": "3.10.0",
     "@docusaurus/plugin-ideal-image": "^3.10.0",
     "@docusaurus/preset-classic": "3.10.0",
-    "@easyops-cn/docusaurus-search-local": "^0.55.1",
+    "@easyops-cn/docusaurus-search-local": "^0.55.3",
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
     "docusaurus-plugin-image-zoom": "^3.0.1",
