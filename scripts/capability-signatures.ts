@@ -68,8 +68,6 @@ interface CapabilityRef {
  * @param tagged - All tagged declarations found in source.
  * @returns `name(a, b)` when provable, otherwise `name(...)`.
  *
- * @capability generated.signature
- *
  * @example
  * ```typescript
  * renderCapabilitySignature({ qualifiedName: 'ui5.fill', name: 'fill' }, tagged);
@@ -138,8 +136,6 @@ function declarationNameOf(node: Node): string | undefined {
  *
  * @param globs - Source globs to scan.
  * @returns Every tagged declaration, including repeats for one capability.
- *
- * @capability generated.tagScan
  *
  * @example
  * ```typescript

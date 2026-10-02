@@ -90,8 +90,6 @@ export async function formatForPath(content: string, filePath: string): Promise<
  * @param mode - `write` to emit, `check` to verify only.
  * @returns Which file was handled and whether it changed or is stale.
  *
- * @capability generated.emit
- *
  * @example
  * ```typescript
  * const results = await Promise.all(

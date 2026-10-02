@@ -52,8 +52,6 @@ function marker(region: string, edge: 'start' | 'end'): string {
  * @returns The content with that region's body replaced.
  * @throws Error when the markers are missing or out of order.
  *
- * @capability generated.skillRegion
- *
  * @example
  * ```typescript
  * const updated = replaceRegion(skillMd, REGION_MARKERS.meta, metaBlock, 'SKILL.md');
