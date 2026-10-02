@@ -164,6 +164,35 @@ describe('detectFeatures — 1.61 capabilities', () => {
   });
 });
 
+describe('detectFeatures — 1.62 capabilities', () => {
+  // Every threshold verified by installing the published packages and diffing
+  // type definitions: all four are absent in 1.60 and 1.61, present in 1.62.
+  it('returns all 1.62 flags true for version 1.62.0', () => {
+    const features = detectFeatures({ major: 1, minor: 62, patch: 0, raw: '1.62.0' });
+
+    expect(features.hasLocatorWaitForFunction).toBe(true);
+    expect(features.hasWebPScreenshots).toBe(true);
+    expect(features.hasRetryStrategyIsolated).toBe(true);
+    expect(features.hasAbortSignal).toBe(true);
+  });
+
+  it('returns all 1.62 flags false for version 1.61.0', () => {
+    const features = detectFeatures({ major: 1, minor: 61, patch: 0, raw: '1.61.0' });
+
+    expect(features.hasLocatorWaitForFunction).toBe(false);
+    expect(features.hasWebPScreenshots).toBe(false);
+    expect(features.hasRetryStrategyIsolated).toBe(false);
+    expect(features.hasAbortSignal).toBe(false);
+  });
+
+  it('returns all 1.62 flags false at the 1.57 floor', () => {
+    const features = detectFeatures({ major: 1, minor: 57, patch: 0, raw: '1.57.0' });
+
+    expect(features.hasLocatorWaitForFunction).toBe(false);
+    expect(features.hasWebPScreenshots).toBe(false);
+  });
+});
+
 describe('detectFeatures — consoleMessages filter option', () => {
   // Verified empirically against published type definitions: 1.58 has bare
   // consoleMessages(), 1.59 gains the options parameter.

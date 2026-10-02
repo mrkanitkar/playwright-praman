@@ -2680,6 +2680,17 @@ capabilities:
       await ui5Clock.runFor(5_000);
     registryVersion: 1
 
+  - id: UI5-OTHER-003
+    qualifiedName: ui5Wait.forControlState
+    name: waitForControlState
+    description: 'Waits until one specific control satisfies a predicate — binding refreshed, busy cleared, aggregation populated. Complements waitForUI5Stable, which is application-wide.'
+    category: assert
+    priority: implementation
+    aiSteering: 'Use for per-control waits. Use waitForUI5Stable when you need the whole application to be idle — the two are not interchangeable.'
+    usageExample: |
+      await waitForControlState(table, '(el) => !el.classList.contains("sapUiLocalBusy")');
+    registryVersion: 1
+
   - id: UI5-OTHER-002
     qualifiedName: ui5Diagnostics.collect
     name: collectPageDiagnostics

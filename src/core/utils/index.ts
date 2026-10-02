@@ -28,3 +28,10 @@ export { compareSemVer, isAtLeast, parseSemVer, satisfiesRange } from './version
 export type { SemVer } from './version-compare.js';
 export { briefDOMSettle, waitForUI5Bootstrap, waitForUI5Stable } from './wait-helpers.js';
 export type { WaitForUI5StableOptions } from './wait-helpers.js';
+
+export { waitForControlState } from './control-wait.js';
+export type {
+  ControlWaitResult,
+  ControlWaitStrategy,
+  WaitForControlStateOptions,
+} from './control-wait.js';

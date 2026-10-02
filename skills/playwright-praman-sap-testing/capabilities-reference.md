@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
 > Generated: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
-> Total: 194 capabilities
+> Total: 195 capabilities
 
 ---
 
@@ -234,6 +234,7 @@
 - **matchers.toHaveUI5CellText** — Assert table cell contains expected text.
 - **matchers.getControlProperty** — Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.
 - **matchers.getControlAggregation** — Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.
+- **ui5Wait.forControlState** — Waits until one specific control satisfies a predicate — binding refreshed, busy cleared, aggregation populated. Complements waitForUI5Stable, which is application-wide.
 - **ui5Diagnostics.collect** — Collects console output, page errors, and network requests from a page. Attached automatically to failing tests as failure-ui5-diagnostics.
 - **fixtures.attachBridgeNavigationReset** — Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener.
 

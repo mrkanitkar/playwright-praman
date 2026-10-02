@@ -10,6 +10,21 @@
 /**
  * Playwright version detection and feature flags.
  *
+ * **Policy: throw when the floor has no equivalent, degrade when it does.**
+ *
+ * Two kinds of gated feature, two correct behaviors:
+ *
+ * - *No equivalent on the floor* — fail loudly with
+ *   `ERR_COMPAT_FEATURE_UNAVAILABLE`, naming the required version and the
+ *   workaround. The Web Storage API is the reference case: there is no older
+ *   `page.localStorage`, so pretending otherwise would be dishonest.
+ * - *An equivalent exists* — degrade transparently and log at `debug` which path
+ *   was taken. `locator.waitForFunction` is the reference case: a page-scoped
+ *   `page.waitForFunction` expresses the same predicate, so throwing would deny
+ *   users a capability Praman can actually deliver.
+ *
+ * Stated here so it is decided once rather than re-derived per feature.
+ *
  * @remarks
  * Detects the installed Playwright version at runtime and exposes feature
  * flags indicating which APIs are available. Used by higher layers to
@@ -106,6 +121,25 @@ export interface PlaywrightFeatures {
   readonly hasSoftPoll: boolean;
   readonly hasScreencastTimestamp: boolean;
   readonly hasVideoRetainModes: boolean;
+
+  // ── 1.62 ──────────────────────────────────────────────────────────────────
+
+  /**
+   * `locator.waitForFunction()` — element-scoped wait predicates.
+   *
+   * @remarks
+   * Verified absent in 1.60 and 1.61, present in 1.62. This is *additive* to
+   * {@link waitForUI5Stable}, not a replacement: UI5 stability is a global
+   * property read off the core, while this is scoped to one element and receives
+   * that element as its argument.
+   */
+  readonly hasLocatorWaitForFunction: boolean;
+  /** `screenshot({ type: 'webp' })` — smaller failure artifacts. */
+  readonly hasWebPScreenshots: boolean;
+  /** `testConfig.retryStrategy`, including `'isolated'`. */
+  readonly hasRetryStrategyIsolated: boolean;
+  /** `AbortSignal` support via the `signal` option on waiting APIs. */
+  readonly hasAbortSignal: boolean;
 }
 
 /**
@@ -173,6 +207,10 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
     hasSoftPoll: isAtLeast(ver, '1.61.0'),
     hasScreencastTimestamp: isAtLeast(ver, '1.61.0'),
     hasVideoRetainModes: isAtLeast(ver, '1.61.0'),
+    hasLocatorWaitForFunction: isAtLeast(ver, '1.62.0'),
+    hasWebPScreenshots: isAtLeast(ver, '1.62.0'),
+    hasRetryStrategyIsolated: isAtLeast(ver, '1.62.0'),
+    hasAbortSignal: isAtLeast(ver, '1.62.0'),
   };
 }
 
