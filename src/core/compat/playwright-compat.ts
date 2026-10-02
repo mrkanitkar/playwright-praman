@@ -25,6 +25,13 @@
  *
  * Stated here so it is decided once rather than re-derived per feature.
  *
+ * **LOC exception**: This file exceeds 300 LOC (~350 lines) because the feature
+ * table grows by a handful of flags with every Playwright minor and must stay
+ * in one place: `PlaywrightFeatures` and `detectFeatures` are a single
+ * declaration/threshold pair, and splitting them per version would separate
+ * each flag from its own version gate — the one thing a reader needs to see
+ * together.
+ *
  * @remarks
  * Detects the installed Playwright version at runtime and exposes feature
  * flags indicating which APIs are available. Used by higher layers to
@@ -140,6 +147,54 @@ export interface PlaywrightFeatures {
   readonly hasRetryStrategyIsolated: boolean;
   /** `AbortSignal` support via the `signal` option on waiting APIs. */
   readonly hasAbortSignal: boolean;
+
+  // ── 1.63 ──────────────────────────────────────────────────────────────────
+
+  /**
+   * `test()` and `test.describe()` accept `lock` — named mutual exclusion.
+   *
+   * @remarks
+   * Tests holding the same lock name never run concurrently across files,
+   * workers and projects. Directly relevant to SAP: FLP user settings, a
+   * shared backend customizing transaction, or a single named test user are
+   * all global state that parallel specs otherwise corrupt.
+   *
+   * There is no equivalent on the 1.57 floor — `fullyParallel: false` is
+   * per-project and far blunter — so per the module policy above, callers
+   * must throw rather than degrade when this is unavailable.
+   */
+  readonly hasTestLocks: boolean;
+  /**
+   * `page.frameLocator()` / `frame.frameLocator()` with the selector omitted.
+   *
+   * @remarks
+   * Searches every frame in the subtree instead of requiring the iframe to be
+   * located first, throwing if the match spans more than one frame. The
+   * floor-compatible form is the same call *with* a selector, so this degrades
+   * rather than throws.
+   */
+  readonly hasSubtreeFrameLocator: boolean;
+  /**
+   * `locator.visible()` — the supported replacement for the `:visible`
+   * pseudo-class.
+   */
+  readonly hasVisibleLocator: boolean;
+  /**
+   * `test.step()` accepts `subtitle` and `params`, surfaced on `TestStep`.
+   *
+   * @remarks
+   * Reporters receive structured step data rather than only a title. Guard the
+   * option rather than the read: on an older runtime the extra options object
+   * is silently ignored, so a reporter would render blank subtitles while
+   * believing it had them.
+   */
+  readonly hasStepParams: boolean;
+  /** `locator.ariaSnapshotJSON()` / `page.ariaSnapshotJSON()` — JSON, not YAML. */
+  readonly hasAriaSnapshotJSON: boolean;
+  /** `page.on('dialogclosed')` / `browserContext.on('dialogclosed')`. */
+  readonly hasDialogClosedEvent: boolean;
+  /** `storageState({ opfs })` — origin private file system in storage state. */
+  readonly hasOpfsStorageState: boolean;
 }
 
 /**
@@ -211,6 +266,13 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
     hasWebPScreenshots: isAtLeast(ver, '1.62.0'),
     hasRetryStrategyIsolated: isAtLeast(ver, '1.62.0'),
     hasAbortSignal: isAtLeast(ver, '1.62.0'),
+    hasTestLocks: isAtLeast(ver, '1.63.0'),
+    hasSubtreeFrameLocator: isAtLeast(ver, '1.63.0'),
+    hasVisibleLocator: isAtLeast(ver, '1.63.0'),
+    hasStepParams: isAtLeast(ver, '1.63.0'),
+    hasAriaSnapshotJSON: isAtLeast(ver, '1.63.0'),
+    hasDialogClosedEvent: isAtLeast(ver, '1.63.0'),
+    hasOpfsStorageState: isAtLeast(ver, '1.63.0'),
   };
 }
 

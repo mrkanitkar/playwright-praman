@@ -3,11 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Compiles against the packed playwright-praman tarball to verify shipped .d.ts compatibility. Not part of the test suite.",
+  "description": "Compiles against the packed playwright-praman tarball to verify shipped .d.ts compatibility. Not part of the test suite. `playwright-praman` is deliberately absent from dependencies: the tarball path is only known at run time, so CI installs it with `npm install \"$RUNNER_TEMP\"/playwright-praman-*.tgz` (see the Consumer Types jobs in .github/workflows/ci.yml). Run the same command locally after `npm pack`.",
   "dependencies": {
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^26.3.0",
-    "playwright-praman": "file:../../../../../../../var/folders/62/8zg3v5hn24321xnnt3t6f8gc0000gp/T/tmp.Q9RMKVE65T/playwright-praman-1.3.5.tgz",
     "typescript": "^6.0.3"
   }
 }
