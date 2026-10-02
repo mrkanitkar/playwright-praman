@@ -40,6 +40,12 @@ const REQUIRED: readonly string[] = [
   '.github/agents/praman-sap-healer.agent.md',
   '.github/skills/praman-sap-cli/SKILL.md',
   '.claude/agents/praman-sap-planner.md',
+  // The instruction set every agent is told to read first. It was gitignored
+  // and untracked, so it shipped only from a working tree that happened to
+  // hold a copy — and was missing from the published 1.3.5 package. Asserting
+  // it here covers the whole chain: tracked -> published -> copied into the
+  // consumer's project.
+  'skills/playwright-praman-sap-testing/SKILL.md',
 ];
 
 /** Runs a command, returning stdout and throwing on a non-zero exit. */
