@@ -292,7 +292,7 @@
     "typedoc-plugin-markdown": "4.13.1",
     "typescript": "6.0.3",
     "typescript-eslint": "8.71.0",
-    "vitest": "4.1.11",
+    "vitest": "5.0.2",
     "yaml": "2.9.1",
     "zod-to-json-schema": "^3.25.1"
   },
