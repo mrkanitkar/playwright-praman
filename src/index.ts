@@ -60,6 +60,12 @@ export { clockTest, Ui5Clock } from './fixtures/index.js';
 export type { ClockFixtures, Ui5ClockOptions } from './fixtures/index.js';
 export { collectPageDiagnostics, DIAGNOSTIC_CAPS } from './fixtures/index.js';
 export type { PageDiagnostics } from './fixtures/index.js';
+export { waitForControlState } from './core/utils/control-wait.js';
+export type {
+  ControlWaitResult,
+  ControlWaitStrategy,
+  WaitForControlStateOptions,
+} from './core/utils/control-wait.js';
 export type { ExtendedUI5Handler } from './fixtures/index.js';
 export type {
   ScreencastFixture,

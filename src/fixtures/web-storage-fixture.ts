@@ -27,6 +27,7 @@
  * @module fixtures/web-storage-fixture
  */
 
+import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 
 import { hasFeature } from '#core/compat/playwright-compat.js';
@@ -232,6 +233,29 @@ function assertWebStorageAvailable(): void {
  * await helper.seed({ key: 'value' });
  * ```
  */
+/**
+ * Narrows a possibly-absent storage area, failing with the compat error.
+ *
+ * @param area - The storage area read off the page.
+ * @param name - Which area, for the error message.
+ * @returns The storage area.
+ * @throws {@link PramanError} with `ERR_COMPAT_FEATURE_UNAVAILABLE` when absent.
+ */
+function assertArea(area: StorageArea | undefined, name: string): StorageArea {
+  if (area !== undefined) return area;
+  throw new PramanError({
+    code: ErrorCode.ERR_COMPAT_FEATURE_UNAVAILABLE,
+    message: `page.${name} is unavailable despite the version check passing.`,
+    attempted: `Access page.${name}`,
+    retryable: false,
+    details: { area: name, feature: 'hasWebStorageAPI' },
+    suggestions: [
+      'Upgrade Playwright: npm install -D @playwright/test@1.61.0',
+      'Check your installed version: npx playwright --version',
+    ],
+  });
+}
+
 function createWebStorageHelper(storageArea: StorageArea): WebStorageHelper {
   return {
     setItem: async (key: string, value: string) => storageArea.setItem(key, value),
@@ -292,12 +316,16 @@ function createWebStorageHelper(storageArea: StorageArea): WebStorageHelper {
 export const webStorageTest = base.extend<{ webStorage: WebStorageFixture }>({
   webStorage: async ({ page }, use) => {
     assertWebStorageAvailable();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment -- PW 1.61 API not yet in @playwright/test types
-    const pageAny = page as any;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- PW 1.61 API not yet in @playwright/test types
-    const local = createWebStorageHelper(pageAny.localStorage);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- PW 1.61 API not yet in @playwright/test types
-    const session = createWebStorageHelper(pageAny.sessionStorage);
+    // Narrowed cast rather than `any`: the storage areas may be absent on an
+    // older runtime, and this keeps type checking on everything else.
+    const storagePage = page as Page & {
+      localStorage?: StorageArea;
+      sessionStorage?: StorageArea;
+    };
+    const local = createWebStorageHelper(assertArea(storagePage.localStorage, 'localStorage'));
+    const session = createWebStorageHelper(
+      assertArea(storagePage.sessionStorage, 'sessionStorage'),
+    );
     await use({ localStorage: local, sessionStorage: session });
   },
 });

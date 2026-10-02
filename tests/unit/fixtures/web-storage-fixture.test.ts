@@ -282,3 +282,58 @@ describe('assertWebStorageAvailable', () => {
     }).not.toThrow();
   });
 });
+
+// ── Fixture body: narrowed access to the storage areas ──────────────────────
+
+describe('webStorage fixture — storage area access', () => {
+  beforeEach(() => {
+    mockHasFeature.mockReturnValue(true);
+  });
+
+  async function runFixture(page: unknown): Promise<unknown> {
+    const { webStorageTest } = await import('../../../src/fixtures/web-storage-fixture.js');
+    const defs = (webStorageTest as unknown as { _fixtureDefinitions: Record<string, unknown> })
+      ._fixtureDefinitions;
+    const fn = defs['webStorage'] as (
+      deps: Record<string, unknown>,
+      use: (v: unknown) => Promise<void>,
+    ) => Promise<void>;
+    let captured: unknown;
+    await fn({ page }, async (value) => {
+      captured = value;
+      await Promise.resolve();
+    });
+    return captured;
+  }
+
+  it('provides both storage helpers when the areas are present', async () => {
+    const result = (await runFixture({
+      localStorage: makeMockStorageArea(),
+      sessionStorage: makeMockStorageArea(),
+    })) as Record<string, unknown> | undefined;
+
+    expect(result?.['localStorage']).toBeDefined();
+    expect(result?.['sessionStorage']).toBeDefined();
+  });
+
+  // Defensive: the version check passed but the runtime lacks the area. Prior to
+  // this the code reached in through `page as any`, which would have produced an
+  // opaque TypeError instead of a named compat error.
+  it('throws the compat error when localStorage is absent', async () => {
+    await expect(runFixture({ sessionStorage: makeMockStorageArea() })).rejects.toMatchObject({
+      code: 'ERR_COMPAT_FEATURE_UNAVAILABLE',
+    });
+  });
+
+  it('throws the compat error when sessionStorage is absent', async () => {
+    await expect(runFixture({ localStorage: makeMockStorageArea() })).rejects.toMatchObject({
+      code: 'ERR_COMPAT_FEATURE_UNAVAILABLE',
+    });
+  });
+
+  it('names the missing area in the error details', async () => {
+    await expect(runFixture({ sessionStorage: makeMockStorageArea() })).rejects.toMatchObject({
+      details: { area: 'localStorage' },
+    });
+  });
+});

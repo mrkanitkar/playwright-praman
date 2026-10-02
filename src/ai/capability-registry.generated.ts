@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-10-02 with 194 entries.
+ * Generated on 2026-10-02 with 195 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {
@@ -2436,6 +2436,20 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     priority: 'fixture',
     usageExample: 'await ui5Clock.runFor(5_000);',
     registryVersion: 1,
+  },
+  {
+    id: 'UI5-OTHER-003',
+    qualifiedName: 'ui5Wait.forControlState',
+    name: 'waitForControlState',
+    description:
+      'Waits until one specific control satisfies a predicate — binding refreshed, busy cleared, aggregation populated. Complements waitForUI5Stable, which is application-wide.',
+    category: 'assert',
+    priority: 'implementation',
+    usageExample:
+      'await waitForControlState(table, \'(el) => !el.classList.contains("sapUiLocalBusy")\');',
+    registryVersion: 1,
+    aiSteering:
+      'Use for per-control waits. Use waitForUI5Stable when you need the whole application to be idle — the two are not interchangeable.',
   },
   {
     id: 'UI5-OTHER-002',

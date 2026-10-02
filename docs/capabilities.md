@@ -1,7 +1,7 @@
 # Praman Capabilities Reference
 
 > **Generated**: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
-> **Total**: 194 capabilities across 15 categories
+> **Total**: 195 capabilities across 15 categories
 
 ---
 
@@ -22,7 +22,7 @@
 | footer   | `UI5-FOOTER` | Footer toolbar actions                         | 6     |
 | flp      | `UI5-FLP`    | Fiori Launchpad services (locks, settings)     | 10    |
 | ai       | `UI5-AI`     | AI-powered discovery and context building      | 9     |
-| assert   | `UI5-ASSERT` | UI5-aware custom matchers for assertions       | 11    |
+| assert   | `UI5-ASSERT` | UI5-aware custom matchers for assertions       | 12    |
 | data     | `UI5-DATA`   | Test data generation, persistence, and cleanup | 4     |
 
 ---
@@ -273,19 +273,20 @@
 
 ## assert — UI5-aware custom matchers for assertions
 
-| ID               | Name                        | Description                                                                                                                                           | Usage Example                                                |
-| ---------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `UI5-ASSERT-001` | toHaveUI5Text               | Assert control has expected text.                                                                                                                     | `await expect(locator).toHaveUI5Text('Expected text');`      |
-| `UI5-ASSERT-002` | toBeUI5Visible              | Assert UI5 control is visible.                                                                                                                        | `await expect(locator).toBeUI5Visible();`                    |
-| `UI5-ASSERT-003` | toBeUI5Enabled              | Assert UI5 control is enabled.                                                                                                                        | `await expect(locator).toBeUI5Enabled();`                    |
-| `UI5-ASSERT-004` | toHaveUI5Property           | Assert control has specific property value.                                                                                                           | `await expect(locator).toHaveUI5Property('enabled', true);`  |
-| `UI5-ASSERT-005` | toHaveUI5ValueState         | Assert control value state (Error, Warning, etc.).                                                                                                    | `await expect(locator).toHaveUI5ValueState('Success');`      |
-| `UI5-ASSERT-006` | toHaveUI5RowCount           | Assert table has expected row count.                                                                                                                  | `await expect(table).toHaveUI5RowCount(5);`                  |
-| `UI5-ASSERT-007` | toHaveUI5CellText           | Assert table cell contains expected text.                                                                                                             | `await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');`    |
-| `UI5-ASSERT-008` | getControlProperty          | Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.                                                | `import { getControlProperty } from 'playwright-praman';`    |
-| `UI5-ASSERT-009` | getControlAggregation       | Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.                            | `import { getControlAggregation } from 'playwright-praman';` |
-| `UI5-OTHER-002`  | collectPageDiagnostics      | Collects console output, page errors, and network requests from a page. Attached automatically to failing tests as failure-ui5-diagnostics.           | `const diagnostics = await collectPageDiagnostics(page);`    |
-| `UI5-OTHER-001`  | attachBridgeNavigationReset | Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener. | `const detach = attachBridgeNavigationReset(page, logger);`  |
+| ID               | Name                        | Description                                                                                                                                                               | Usage Example                                                                           |
+| ---------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `UI5-ASSERT-001` | toHaveUI5Text               | Assert control has expected text.                                                                                                                                         | `await expect(locator).toHaveUI5Text('Expected text');`                                 |
+| `UI5-ASSERT-002` | toBeUI5Visible              | Assert UI5 control is visible.                                                                                                                                            | `await expect(locator).toBeUI5Visible();`                                               |
+| `UI5-ASSERT-003` | toBeUI5Enabled              | Assert UI5 control is enabled.                                                                                                                                            | `await expect(locator).toBeUI5Enabled();`                                               |
+| `UI5-ASSERT-004` | toHaveUI5Property           | Assert control has specific property value.                                                                                                                               | `await expect(locator).toHaveUI5Property('enabled', true);`                             |
+| `UI5-ASSERT-005` | toHaveUI5ValueState         | Assert control value state (Error, Warning, etc.).                                                                                                                        | `await expect(locator).toHaveUI5ValueState('Success');`                                 |
+| `UI5-ASSERT-006` | toHaveUI5RowCount           | Assert table has expected row count.                                                                                                                                      | `await expect(table).toHaveUI5RowCount(5);`                                             |
+| `UI5-ASSERT-007` | toHaveUI5CellText           | Assert table cell contains expected text.                                                                                                                                 | `await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');`                               |
+| `UI5-ASSERT-008` | getControlProperty          | Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.                                                                    | `import { getControlProperty } from 'playwright-praman';`                               |
+| `UI5-ASSERT-009` | getControlAggregation       | Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.                                                | `import { getControlAggregation } from 'playwright-praman';`                            |
+| `UI5-OTHER-003`  | waitForControlState         | Waits until one specific control satisfies a predicate — binding refreshed, busy cleared, aggregation populated. Complements waitForUI5Stable, which is application-wide. | `await waitForControlState(table, '(el) => !el.classList.contains("sapUiLocalBusy")');` |
+| `UI5-OTHER-002`  | collectPageDiagnostics      | Collects console output, page errors, and network requests from a page. Attached automatically to failing tests as failure-ui5-diagnostics.                               | `const diagnostics = await collectPageDiagnostics(page);`                               |
+| `UI5-OTHER-001`  | attachBridgeNavigationReset | Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener.                     | `const detach = attachBridgeNavigationReset(page, logger);`                             |
 
 ## data — Test data generation, persistence, and cleanup
 
