@@ -33,6 +33,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run validate:agent-assets
+      - run: npm run validate:generated
       - run: npx cspell "src/**/*.ts" "docs/**/*.md" --no-progress
       - run: npx knip
       - run: npx markdownlint-cli2 "**/*.md" "#node_modules" "#docs/build" "#docs/node_modules"

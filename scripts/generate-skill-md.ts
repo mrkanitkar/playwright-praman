@@ -24,9 +24,15 @@
  * 5. Validate outputs: frontmatter valid, body reasonable size
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { resolve, relative } from 'node:path';
 import { parse as parseYaml } from 'yaml';
+
+import { collectTaggedDeclarations, renderCapabilitySignature } from './capability-signatures.js';
+import { emitGenerated } from './generated-file.js';
+import type { EmitMode } from './generated-file.js';
+import { REGION_MARKERS, replaceRegion } from './skill-md-regions.js';
+
 import { CapabilitiesYamlSchema } from '../src/ai/schemas/capability.schema.js';
 import { RecipesYamlSchema } from '../src/ai/schemas/recipe.schema.js';
 
@@ -56,15 +62,21 @@ interface ExtractedRecipe {
 // ── Constants ─────────────────────────────────────────────────────────────
 
 const OUTPUT_DIR = resolve(process.cwd(), 'skills/playwright-praman-sap-testing');
+const SKILL_MD = resolve(OUTPUT_DIR, 'SKILL.md');
+const SRC_GLOBS = ['src/**/*.ts', '!src/**/*.generated.ts'] as const;
+
+/** `--check` verifies the artifacts are current without writing anything. */
+const IS_CHECK = process.argv.includes('--check');
+
+/** Width at which the compact capability listing wraps. */
+const LIST_WIDTH = 96;
 
 // ── Rendering ──────────────────────────────────────────────────────────────
 
 /**
  * Generate api-reference.md content (alphabetical function index).
  */
-function renderApiReference(caps: ExtractedCapability[]): string {
-  const date = new Date().toISOString().split('T')[0];
-
+function renderApiReference(caps: ExtractedCapability[], date: string): string {
   if (caps.length === 0) {
     return `# Praman API Reference
 
@@ -93,9 +105,7 @@ No capabilities found yet.
 /**
  * Generate recipes-reference.md content (curated test patterns from recipes.yaml).
  */
-function renderRecipes(recipes: ExtractedRecipe[]): string {
-  const date = new Date().toISOString().split('T')[0];
-
+function renderRecipes(recipes: ExtractedRecipe[], date: string): string {
   if (recipes.length === 0) {
     return `# Praman Recipes Reference
 
@@ -130,9 +140,70 @@ No recipes found yet.
   return md;
 }
 
+/**
+ * Renders the compact capability listing agents read in place of runtime APIs.
+ *
+ * @remarks
+ * Keeps the hand-written shape — a namespace, then its methods wrapped across
+ * indented lines — because that form is far cheaper in an agent's context than a
+ * 198-row table would be. The content is now complete and code-derived: the
+ * previous hand-maintained listing covered 135 of 198 capabilities, omitted all
+ * five `control.*` entries (two of which CLAUDE.md rule 5 makes mandatory for
+ * every input), and misnamed parameters — `fill(selector, text)` where the real
+ * one is `value`.
+ *
+ * Signatures come from {@link renderCapabilitySignature}, which prints real
+ * parameter names only where a tagged declaration proves them and `name(...)`
+ * otherwise, so this can never state a signature the code does not have.
+ */
+function renderCapabilityListing(
+  caps: readonly ExtractedCapability[],
+  tagged: readonly {
+    qualifiedName: string;
+    declarationName: string;
+    parameters: readonly string[];
+  }[],
+): string {
+  const byNamespace = new Map<string, string[]>();
+  for (const cap of caps) {
+    const parts = cap.qualifiedName.split('.');
+    const namespace = parts.length > 1 ? parts.slice(0, -1).join('.') : cap.qualifiedName;
+    const rendered = renderCapabilitySignature(cap, tagged);
+    byNamespace.set(namespace, [...(byNamespace.get(namespace) ?? []), rendered]);
+  }
+
+  const blocks: string[] = [];
+  for (const [namespace, entries] of byNamespace) {
+    const wrapped: string[] = [];
+    let line = '';
+    for (const entry of entries) {
+      const candidate = line === '' ? entry : `${line}, ${entry}`;
+      if (`  ${candidate}`.length > LIST_WIDTH && line !== '') {
+        wrapped.push(`  ${line},`);
+        line = entry;
+      } else {
+        line = candidate;
+      }
+    }
+    if (line !== '') wrapped.push(`  ${line}`);
+    blocks.push([namespace, ...wrapped].join('\n'));
+  }
+
+  return ['```text', blocks.join('\n\n'), '```'].join('\n');
+}
+
+/** Renders the package/import facts, with the version read from package.json. */
+function renderMeta(version: string): string {
+  return [
+    `**Package**: \`playwright-praman\` v${version}`,
+    "**Import**: `import { test, expect } from 'playwright-praman'`",
+    '**Purpose**: Primary instruction set for Praman AI agents (planner, generator, healer)',
+  ].join('\n');
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────
 
-function main(): void {
+async function main(): Promise<void> {
   console.log('Reading capabilities.yaml and recipes.yaml...');
 
   const capsRaw = readFileSync(resolve(process.cwd(), 'capabilities.yaml'), 'utf-8');
@@ -165,22 +236,54 @@ function main(): void {
   console.log(`   Found ${capabilities.length} capabilities`);
   console.log(`   Found ${recipes.length} recipes`);
 
-  // Ensure output directory exists
-  if (!existsSync(OUTPUT_DIR)) {
-    mkdirSync(OUTPUT_DIR, { recursive: true });
+  // Signatures are read from src/, not dist/: build:full runs the generators
+  // before build, so dist/ may be stale or absent.
+  const tagged = collectTaggedDeclarations(SRC_GLOBS);
+  const pkg = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf-8')) as {
+    version: string;
+  };
+
+  const skillMd = replaceRegion(
+    replaceRegion(
+      readFileSync(SKILL_MD, 'utf-8'),
+      REGION_MARKERS.meta,
+      renderMeta(pkg.version),
+      'SKILL.md',
+    ),
+    REGION_MARKERS.capabilities,
+    renderCapabilityListing(capabilities, tagged),
+    'SKILL.md',
+  );
+
+  const mode: EmitMode = IS_CHECK ? 'check' : 'write';
+  const artifacts: readonly { path: string; content: string }[] = [
+    {
+      path: resolve(OUTPUT_DIR, 'api-reference.md'),
+      content: renderApiReference(capabilities, capsYaml.generatedAt),
+    },
+    {
+      path: resolve(OUTPUT_DIR, 'recipes-reference.md'),
+      content: renderRecipes(recipes, capsYaml.generatedAt),
+    },
+    { path: SKILL_MD, content: skillMd },
+  ];
+
+  const stale: string[] = [];
+  for (const artifact of artifacts) {
+    const result = await emitGenerated(artifact.path, artifact.content, mode);
+    if (result.changed) stale.push(relative(process.cwd(), artifact.path));
+    const label = result.changed ? (IS_CHECK ? 'STALE' : 'Written') : 'current';
+    console.log(`  ${label}: ${relative(process.cwd(), artifact.path)}`);
   }
 
-  // Write api-reference.md
-  const apiPath = resolve(OUTPUT_DIR, 'api-reference.md');
-  writeFileSync(apiPath, renderApiReference(capabilities), 'utf-8');
-  console.log(`Written: ${relative(process.cwd(), apiPath)}`);
+  if (IS_CHECK && stale.length > 0) {
+    console.error('\nThese artifacts are out of date — run `npm run generate:skill-md`:');
+    for (const p of stale) console.error(`  ${p}`);
+    process.exitCode = 1;
+    return;
+  }
 
-  // Write recipes-reference.md
-  const recipesPath = resolve(OUTPUT_DIR, 'recipes-reference.md');
-  writeFileSync(recipesPath, renderRecipes(recipes), 'utf-8');
-  console.log(`Written: ${relative(process.cwd(), recipesPath)}`);
-
-  console.log('\ngenerate-skill-md complete.');
+  console.log(IS_CHECK ? 'All skill artifacts are current.' : '\ngenerate-skill-md complete.');
 }
 
-main();
+await main();
