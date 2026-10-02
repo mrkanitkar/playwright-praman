@@ -273,7 +273,7 @@
     "eslint-plugin-security": "4.1.0",
     "eslint-plugin-sonarjs": "4.2.2",
     "eslint-plugin-tsdoc": "0.5.3",
-    "eslint-plugin-unicorn": "74.0.0",
+    "eslint-plugin-unicorn": "76.0.0",
     "glob": "13.0.6",
     "husky": "9.1.7",
     "knip": "6.38.0",
