@@ -256,7 +256,7 @@
     "@playwright/cli": "0.1.22",
     "@playwright/test": "1.63.0",
     "@rolldown/plugin-babel": "0.2.4",
-    "@size-limit/file": "13.0.3",
+    "@size-limit/file": "14.1.0",
     "@ui5/mcp-server": "0.3.1",
     "@vitest/coverage-v8": "4.1.11",
     "@vitest/ui": "4.1.11",
