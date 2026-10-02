@@ -4,6 +4,21 @@
 > CJS output format) as a patch. See [versioning.md](docs/versioning.md) for the
 > full history and the semver contract from v1.3.4 onward.
 
+## [1.4.0](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.5...playwright-praman-v1.4.0) (2026-10-02)
+
+
+### Features
+
+* **compat:** bring compat layer to 1.62, add per-control waits ([#252](https://github.com/mrkanitkar/playwright-praman/issues/252)) ([37b081d](https://github.com/mrkanitkar/playwright-praman/commit/37b081d3a749c7197b745351a6605ca62e2023ad))
+* **fixtures:** capture UI5 diagnostics on failure, add opt-in clock ([#251](https://github.com/mrkanitkar/playwright-praman/issues/251)) ([667781e](https://github.com/mrkanitkar/playwright-praman/commit/667781ea3367f2e7e86963d4ab3727fa47a044d3))
+* **fixtures:** handle SAP overlays that interrupt an action ([#230](https://github.com/mrkanitkar/playwright-praman/issues/230)) ([be28217](https://github.com/mrkanitkar/playwright-praman/commit/be28217769b4e31c8c1fcee65497bdd04fdf370f))
+
+
+### Bug Fixes
+
+* **ci:** actually run agent-asset validation, and stop prettier corrupting it ([#228](https://github.com/mrkanitkar/playwright-praman/issues/228)) ([df9a07f](https://github.com/mrkanitkar/playwright-praman/commit/df9a07f9d1846df1901f6962aba5b4ce7424b5c9))
+* **cli:** make init actually scaffold a project ([#226](https://github.com/mrkanitkar/playwright-praman/issues/226)) ([d956111](https://github.com/mrkanitkar/playwright-praman/commit/d956111c1dd20677690753a54e68047ae67908da))
+
 ## [1.3.5](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.4...playwright-praman-v1.3.5) (2026-07-05)
 
 
