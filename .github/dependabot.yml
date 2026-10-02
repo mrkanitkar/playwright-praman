@@ -22,6 +22,41 @@ updates:
         update-types:
           - patch
 
+  # Docusaurus site — a standalone package with its own lockfile, not an npm
+  # workspace of the root. Without this entry Dependabot only ever opened
+  # *security* PRs here (those scan every lockfile regardless of config), never
+  # version updates, so /docs drifted and its advisories looked unfixable when
+  # they were simply un-attempted.
+  #
+  # Grouped aggressively: the Docusaurus packages must move in lockstep, and a
+  # 1465-package transitive tree otherwise produces a PR per bump.
+  - package-ecosystem: npm
+    directory: /docs
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    reviewers:
+      - mrkanitkar
+    labels:
+      - dependencies
+      - docs
+    groups:
+      docusaurus:
+        patterns:
+          - '@docusaurus/*'
+          - 'docusaurus-plugin-*'
+          - '@easyops-cn/docusaurus-search-local'
+      docs-dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      docs-production-dependencies:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+
   # GitHub Actions
   - package-ecosystem: github-actions
     directory: /
