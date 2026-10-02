@@ -221,6 +221,8 @@ export interface ScreencastFixture {
    * @param enabled - Whether to auto-highlight interactions.
    * @param style - Optional inline CSS string or CSS-property map for the overlay.
    *
+   * @capability screencast.highlightControls
+   *
    * @example
    * ```typescript
    * screencast.highlightControls(true);

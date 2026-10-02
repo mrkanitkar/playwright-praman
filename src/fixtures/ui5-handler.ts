@@ -441,6 +441,8 @@ export class UI5Handler {
    * @param selector - The UI5 selector to search for.
    * @returns Array of discovered control proxies.
    *
+   * @capability ui5.controls
+   *
    * @example
    * ```typescript
    * const buttons = await handler.controls({ controlType: 'sap.m.Button' });
@@ -482,6 +484,8 @@ export class UI5Handler {
    *
    * @param selector - The UI5 selector to click.
    *
+   * @capability ui5.click
+   *
    * @example
    * ```typescript
    * await handler.click({ id: 'submitBtn' });
@@ -504,6 +508,8 @@ export class UI5Handler {
    * @param selector - The UI5 selector.
    * @param value - The text to enter.
    *
+   * @capability ui5.fill
+   *
    * @example
    * ```typescript
    * await handler.fill({ id: 'nameInput' }, 'John');
@@ -525,6 +531,8 @@ export class UI5Handler {
    *
    * @param selector - The UI5 selector to press.
    *
+   * @capability ui5.press
+   *
    * @example
    * ```typescript
    * await handler.press({ id: 'saveBtn' });
@@ -543,6 +551,8 @@ export class UI5Handler {
    *
    * @param selector - The UI5 selector.
    * @param key - The key or ID of the item to select.
+   *
+   * @capability ui5.select
    *
    * @example
    * ```typescript
@@ -563,6 +573,8 @@ export class UI5Handler {
    *
    * @param selector - The UI5 selector for the checkbox.
    *
+   * @capability ui5.check
+   *
    * @example
    * ```typescript
    * await handler.check({ id: 'agreeCheckbox' });
@@ -581,6 +593,8 @@ export class UI5Handler {
    * @aiContext Use to uncheck (disable) a UI5 checkbox control.
    *
    * @param selector - The UI5 selector for the checkbox.
+   *
+   * @capability ui5.uncheck
    *
    * @example
    * ```typescript
@@ -601,6 +615,8 @@ export class UI5Handler {
    *
    * @param selector - The UI5 selector to clear.
    *
+   * @capability ui5.clear
+   *
    * @example
    * ```typescript
    * await handler.clear({ id: 'searchInput' });
@@ -620,6 +636,8 @@ export class UI5Handler {
    *
    * @param selector - The UI5 selector.
    * @returns The control's text value.
+   *
+   * @capability ui5.getText
    *
    * @example
    * ```typescript
@@ -642,6 +660,8 @@ export class UI5Handler {
    *
    * @param selector - The UI5 selector.
    * @returns The control's value.
+   *
+   * @capability ui5.getValue
    *
    * @example
    * ```typescript
@@ -685,6 +705,8 @@ export class UI5Handler {
    * @param selector - The UI5 selector to wait for.
    * @param options - Optional timeout and polling interval.
    * @throws TimeoutError if the control is not found within the timeout.
+   *
+   * @capability ui5.waitFor
    *
    * @example
    * ```typescript
@@ -810,6 +832,8 @@ export class UI5Handler {
    * @ai
    * @aiContext Use to force re-discovery of controls after page changes.
    *
+   * @capability ui5.clearCache
+   *
    * @example
    * ```typescript
    * handler.clearCache();
@@ -824,6 +848,8 @@ export class UI5Handler {
    *
    * @ai
    * @aiContext Use in teardown to release handler resources.
+   *
+   * @capability ui5.destroy
    *
    * @example
    * ```typescript

@@ -137,6 +137,8 @@ export class FLPSettingsHandler {
    * @returns Date format string (e.g. `'1'` for dd.MM.yyyy).
    * @throws FLPError when the UShell Container is not available.
    *
+   * @capability flpSettings.getDateFormat
+   *
    * @example
    * ```typescript
    * const fmt = await handler.getDateFormat();
@@ -152,6 +154,8 @@ export class FLPSettingsHandler {
    *
    * @returns Time format string (e.g. `'0'` for 12-hour, `'1'` for 24-hour).
    * @throws FLPError when the UShell Container is not available.
+   *
+   * @capability flpSettings.getTimeFormat
    *
    * @example
    * ```typescript
@@ -169,6 +173,8 @@ export class FLPSettingsHandler {
    * @returns Timezone identifier (e.g. `'Europe/Berlin'`, `'UTC'`).
    * @throws FLPError when the UShell Container is not available.
    *
+   * @capability flpSettings.getTimezone
+   *
    * @example
    * ```typescript
    * const tz = await handler.getTimezone();
@@ -185,6 +191,8 @@ export class FLPSettingsHandler {
    * @returns Number format string (e.g. `' '` for spaces, `','` for commas).
    * @throws FLPError when the UShell Container is not available.
    *
+   * @capability flpSettings.getNumberFormat
+   *
    * @example
    * ```typescript
    * const fmt = await handler.getNumberFormat();
@@ -200,6 +208,8 @@ export class FLPSettingsHandler {
    *
    * @returns All user settings as an {@link FLPUserSettings} object.
    * @throws FLPError when the UShell Container is not available.
+   *
+   * @capability flpSettings.getAllSettings
    *
    * @example
    * ```typescript

@@ -136,6 +136,8 @@ export class ShellHandler {
    * Targets `#shell-header-logo` or `.sapUshellShellHeadItm` (Fiori 2.0/3.0).
    * Waits for UI5 stability after clicking.
    *
+   * @capability ui5Shell.clickHome
+   *
    * @example
    * ```typescript
    * await shell.clickHome();
@@ -191,6 +193,8 @@ export class ShellHandler {
    *
    * @throws NavigationError if the notifications icon is not found.
    *
+   * @capability ui5Shell.openNotifications
+   *
    * @example
    * ```typescript
    * await shell.openNotifications();
@@ -238,6 +242,8 @@ export class ShellHandler {
    * @aiContext Use to open the user menu for profile or settings access.
    *
    * @throws NavigationError if the user avatar button is not found.
+   *
+   * @capability ui5Shell.openUserMenu
    *
    * @example
    * ```typescript

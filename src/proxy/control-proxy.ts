@@ -822,6 +822,12 @@ function throwIfBlacklisted(prop: string, state: ControlProxyState): void {
  * @param state - Control state with ID, type, page, and interaction strategy.
  * @returns A `UI5ControlBase` proxy that routes method calls through the bridge.
  *
+ * @capability control.setValue
+ * @capability control.fireChange
+ * @capability control.open
+ * @capability control.close
+ * @capability control.setSelectedKey
+ *
  * @example
  * ```typescript
  * const proxy = createControlProxy({

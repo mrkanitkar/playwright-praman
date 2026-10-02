@@ -105,6 +105,8 @@ export class CapabilityRegistry {
    * @param category - Category to filter by.
    * @returns Entries whose `category` matches exactly.
    *
+   * @capability capability-registry.byCategory
+   *
    * @example
    * ```typescript
    * const navCaps = registry.byCategory('navigate');
@@ -253,6 +255,8 @@ export class CapabilityRegistry {
    * provider-specific formatting or token-budget-aware truncation.
    *
    * @returns Structured JSON snapshot of the entire registry.
+   *
+   * @capability capability-registry.forAI
    *
    * @example
    * ```typescript
