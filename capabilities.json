@@ -96,12 +96,7 @@
       "priority": "fixture",
       "usageExample": "const buttons = await ui5.controls({ controlType: 'sap.m.Button' });",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button",
-        "sap.m.Input",
-        "sap.m.Text",
-        "sap.m.Label"
-      ]
+      "controlTypes": ["sap.m.Button", "sap.m.Input", "sap.m.Text", "sap.m.Label"]
     },
     {
       "id": "UI5-UI5-003",
@@ -112,11 +107,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.click({ id: 'submitBtn' });",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button",
-        "sap.m.Link",
-        "sap.ui.unified.MenuItem"
-      ]
+      "controlTypes": ["sap.m.Button", "sap.m.Link", "sap.ui.unified.MenuItem"]
     },
     {
       "id": "UI5-UI5-004",
@@ -127,12 +118,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.fill({ id: 'vendorInput' }, '100001');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Input",
-        "sap.m.TextArea",
-        "sap.m.SearchField",
-        "sap.m.ComboBox"
-      ]
+      "controlTypes": ["sap.m.Input", "sap.m.TextArea", "sap.m.SearchField", "sap.m.ComboBox"]
     },
     {
       "id": "UI5-UI5-005",
@@ -143,9 +129,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.press({ id: 'saveBtn' });",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-UI5-006",
@@ -156,11 +140,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.select({ id: 'purchOrgSelect' }, '1000');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Select",
-        "sap.m.ComboBox",
-        "sap.m.MultiComboBox"
-      ]
+      "controlTypes": ["sap.m.Select", "sap.m.ComboBox", "sap.m.MultiComboBox"]
     },
     {
       "id": "UI5-UI5-007",
@@ -171,9 +151,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.check({ id: 'agreeCheckbox' });",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.CheckBox"
-      ]
+      "controlTypes": ["sap.m.CheckBox"]
     },
     {
       "id": "UI5-UI5-008",
@@ -184,9 +162,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.uncheck({ id: 'agreeCheckbox' });",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.CheckBox"
-      ]
+      "controlTypes": ["sap.m.CheckBox"]
     },
     {
       "id": "UI5-UI5-009",
@@ -197,11 +173,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.clear({ id: 'searchField' });",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Input",
-        "sap.m.TextArea",
-        "sap.m.SearchField"
-      ]
+      "controlTypes": ["sap.m.Input", "sap.m.TextArea", "sap.m.SearchField"]
     },
     {
       "id": "UI5-UI5-010",
@@ -212,12 +184,7 @@
       "priority": "fixture",
       "usageExample": "const label = await ui5.getText({ id: 'statusLabel' });",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Label",
-        "sap.m.Text",
-        "sap.m.Title",
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Label", "sap.m.Text", "sap.m.Title", "sap.m.Button"]
     },
     {
       "id": "UI5-UI5-011",
@@ -329,11 +296,7 @@
       "priority": "fixture",
       "usageExample": "const combo = await ui5.control({ id: 'variantCombo' });\nawait combo.open();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.ComboBox",
-        "sap.m.MultiComboBox",
-        "sap.m.Select"
-      ]
+      "controlTypes": ["sap.m.ComboBox", "sap.m.MultiComboBox", "sap.m.Select"]
     },
     {
       "id": "UI5-UI5-020",
@@ -344,11 +307,7 @@
       "priority": "fixture",
       "usageExample": "const combo = await ui5.control({ id: 'variantCombo' });\nawait combo.close();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.ComboBox",
-        "sap.m.MultiComboBox",
-        "sap.m.Select"
-      ]
+      "controlTypes": ["sap.m.ComboBox", "sap.m.MultiComboBox", "sap.m.Select"]
     },
     {
       "id": "UI5-UI5-021",
@@ -359,11 +318,7 @@
       "priority": "fixture",
       "usageExample": "const combo = await ui5.control({ id: 'variantCombo' });\nawait combo.setSelectedKey('1');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.ComboBox",
-        "sap.m.MultiComboBox",
-        "sap.m.Select"
-      ]
+      "controlTypes": ["sap.m.ComboBox", "sap.m.MultiComboBox", "sap.m.Select"]
     },
     {
       "id": "UI5-TABLE-001",
@@ -946,9 +901,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.date.setDatePicker('deliveryDate', '2026-03-15');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.DatePicker"
-      ]
+      "controlTypes": ["sap.m.DatePicker"]
     },
     {
       "id": "UI5-DATE-002",
@@ -959,9 +912,7 @@
       "priority": "fixture",
       "usageExample": "const date = await ui5.date.getDatePicker('deliveryDate');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.DatePicker"
-      ]
+      "controlTypes": ["sap.m.DatePicker"]
     },
     {
       "id": "UI5-DATE-003",
@@ -972,9 +923,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.date.setDateRange('reportRange', '2026-01-01', '2026-03-31');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.DateRangeSelection"
-      ]
+      "controlTypes": ["sap.m.DateRangeSelection"]
     },
     {
       "id": "UI5-DATE-004",
@@ -985,9 +934,7 @@
       "priority": "fixture",
       "usageExample": "const range = await ui5.date.getDateRange('reportRange');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.DateRangeSelection"
-      ]
+      "controlTypes": ["sap.m.DateRangeSelection"]
     },
     {
       "id": "UI5-DATE-005",
@@ -998,9 +945,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.date.setTimePicker('startTime', '14:30:00');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.TimePicker"
-      ]
+      "controlTypes": ["sap.m.TimePicker"]
     },
     {
       "id": "UI5-DATE-006",
@@ -1011,9 +956,7 @@
       "priority": "fixture",
       "usageExample": "const time = await ui5.date.getTimePicker('startTime');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.TimePicker"
-      ]
+      "controlTypes": ["sap.m.TimePicker"]
     },
     {
       "id": "UI5-DATE-007",
@@ -1024,9 +967,7 @@
       "priority": "fixture",
       "usageExample": "await ui5.date.setAndValidate('deliveryDate', '2026-03-15');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.DatePicker"
-      ]
+      "controlTypes": ["sap.m.DatePicker"]
     },
     {
       "id": "UI5-ODATA-001",
@@ -1299,10 +1240,7 @@
       "priority": "fixture",
       "usageExample": "const tableId = await fe.listReport.getTable();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ui.comp.smarttable.SmartTable",
-        "sap.ui.mdc.Table"
-      ]
+      "controlTypes": ["sap.ui.comp.smarttable.SmartTable", "sap.ui.mdc.Table"]
     },
     {
       "id": "UI5-FE-002",
@@ -1313,10 +1251,7 @@
       "priority": "fixture",
       "usageExample": "const filterBarId = await fe.listReport.getFilterBar();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ui.comp.smartfilterbar.SmartFilterBar",
-        "sap.ui.mdc.FilterBar"
-      ]
+      "controlTypes": ["sap.ui.comp.smartfilterbar.SmartFilterBar", "sap.ui.mdc.FilterBar"]
     },
     {
       "id": "UI5-FE-003",
@@ -1327,10 +1262,7 @@
       "priority": "fixture",
       "usageExample": "await fe.listReport.setFilter('CompanyCode', '1000');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ui.comp.smartfilterbar.SmartFilterBar",
-        "sap.ui.mdc.FilterBar"
-      ]
+      "controlTypes": ["sap.ui.comp.smartfilterbar.SmartFilterBar", "sap.ui.mdc.FilterBar"]
     },
     {
       "id": "UI5-FE-004",
@@ -1341,10 +1273,7 @@
       "priority": "fixture",
       "usageExample": "await fe.listReport.search();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ui.comp.smartfilterbar.SmartFilterBar",
-        "sap.ui.mdc.FilterBar"
-      ]
+      "controlTypes": ["sap.ui.comp.smartfilterbar.SmartFilterBar", "sap.ui.mdc.FilterBar"]
     },
     {
       "id": "UI5-FE-005",
@@ -1355,10 +1284,7 @@
       "priority": "fixture",
       "usageExample": "await fe.listReport.clearFilters();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ui.comp.smartfilterbar.SmartFilterBar",
-        "sap.ui.mdc.FilterBar"
-      ]
+      "controlTypes": ["sap.ui.comp.smartfilterbar.SmartFilterBar", "sap.ui.mdc.FilterBar"]
     },
     {
       "id": "UI5-FE-006",
@@ -1369,10 +1295,7 @@
       "priority": "fixture",
       "usageExample": "await fe.listReport.navigateToItem(0);",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ui.comp.smarttable.SmartTable",
-        "sap.ui.mdc.Table"
-      ]
+      "controlTypes": ["sap.ui.comp.smarttable.SmartTable", "sap.ui.mdc.Table"]
     },
     {
       "id": "UI5-FE-007",
@@ -1403,10 +1326,7 @@
       "priority": "fixture",
       "usageExample": "const value = await fe.listReport.getFilterValue('CompanyCode');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ui.comp.smartfilterbar.SmartFilterBar",
-        "sap.ui.mdc.FilterBar"
-      ]
+      "controlTypes": ["sap.ui.comp.smartfilterbar.SmartFilterBar", "sap.ui.mdc.FilterBar"]
     },
     {
       "id": "UI5-FE-010",
@@ -1417,10 +1337,7 @@
       "priority": "fixture",
       "usageExample": "await fe.objectPage.navigateToSection('Items');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.uxap.ObjectPageLayout",
-        "sap.uxap.ObjectPageSection"
-      ]
+      "controlTypes": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageSection"]
     },
     {
       "id": "UI5-FE-011",
@@ -1431,10 +1348,7 @@
       "priority": "fixture",
       "usageExample": "const data = await fe.objectPage.getSectionData('General Information');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.uxap.ObjectPageLayout",
-        "sap.uxap.ObjectPageSection"
-      ]
+      "controlTypes": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageSection"]
     },
     {
       "id": "UI5-FE-012",
@@ -1445,9 +1359,7 @@
       "priority": "fixture",
       "usageExample": "await fe.objectPage.clickButton('Edit');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FE-013",
@@ -1458,9 +1370,7 @@
       "priority": "fixture",
       "usageExample": "await fe.objectPage.clickEdit();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FE-014",
@@ -1471,9 +1381,7 @@
       "priority": "fixture",
       "usageExample": "await fe.objectPage.clickSave();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FE-015",
@@ -1484,10 +1392,7 @@
       "priority": "fixture",
       "usageExample": "const sections = await fe.objectPage.getSections();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.uxap.ObjectPageLayout",
-        "sap.uxap.ObjectPageSection"
-      ]
+      "controlTypes": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageSection"]
     },
     {
       "id": "UI5-FE-016",
@@ -1498,9 +1403,7 @@
       "priority": "fixture",
       "usageExample": "const title = await fe.objectPage.getHeaderTitle();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.uxap.ObjectPageLayout"
-      ]
+      "controlTypes": ["sap.uxap.ObjectPageLayout"]
     },
     {
       "id": "UI5-FE-017",
@@ -1511,9 +1414,7 @@
       "priority": "fixture",
       "usageExample": "const editing = await fe.objectPage.isInEditMode();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.uxap.ObjectPageLayout"
-      ]
+      "controlTypes": ["sap.uxap.ObjectPageLayout"]
     },
     {
       "id": "UI5-FE-018",
@@ -1604,11 +1505,7 @@
       "priority": "fixture",
       "usageExample": "const count = await fe.list.getItemCount('notificationList');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.List",
-        "sap.m.StandardListItem",
-        "sap.m.ListItemBase"
-      ]
+      "controlTypes": ["sap.m.List", "sap.m.StandardListItem", "sap.m.ListItemBase"]
     },
     {
       "id": "UI5-FE-024",
@@ -1619,11 +1516,7 @@
       "priority": "fixture",
       "usageExample": "const title = await fe.list.getItemTitle('notificationList', 0);",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.List",
-        "sap.m.StandardListItem",
-        "sap.m.ListItemBase"
-      ]
+      "controlTypes": ["sap.m.List", "sap.m.StandardListItem", "sap.m.ListItemBase"]
     },
     {
       "id": "UI5-FE-025",
@@ -1634,11 +1527,7 @@
       "priority": "fixture",
       "usageExample": "const idx = await fe.list.findItemByTitle('notificationList', 'PO 4500001234 approved');",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.List",
-        "sap.m.StandardListItem",
-        "sap.m.ListItemBase"
-      ]
+      "controlTypes": ["sap.m.List", "sap.m.StandardListItem", "sap.m.ListItemBase"]
     },
     {
       "id": "UI5-FE-026",
@@ -1649,11 +1538,7 @@
       "priority": "fixture",
       "usageExample": "await fe.list.clickItem('notificationList', 0);",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.List",
-        "sap.m.StandardListItem",
-        "sap.m.ListItemBase"
-      ]
+      "controlTypes": ["sap.m.List", "sap.m.StandardListItem", "sap.m.ListItemBase"]
     },
     {
       "id": "UI5-FE-027",
@@ -1664,11 +1549,7 @@
       "priority": "fixture",
       "usageExample": "await fe.list.selectItem('notificationList', 0, true);",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.List",
-        "sap.m.StandardListItem",
-        "sap.m.ListItemBase"
-      ]
+      "controlTypes": ["sap.m.List", "sap.m.StandardListItem", "sap.m.ListItemBase"]
     },
     {
       "id": "UI5-INTENT-001",
@@ -2100,9 +1981,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Shell.expectShellHeader();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ushell.ui.shell.ShellHeader"
-      ]
+      "controlTypes": ["sap.ushell.ui.shell.ShellHeader"]
     },
     {
       "id": "UI5-SHELL-002",
@@ -2113,9 +1992,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Shell.clickHome();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ushell.ui.shell.ShellHeader"
-      ]
+      "controlTypes": ["sap.ushell.ui.shell.ShellHeader"]
     },
     {
       "id": "UI5-SHELL-003",
@@ -2126,9 +2003,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Shell.openNotifications();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ushell.ui.shell.ShellHeader"
-      ]
+      "controlTypes": ["sap.ushell.ui.shell.ShellHeader"]
     },
     {
       "id": "UI5-SHELL-004",
@@ -2139,9 +2014,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Shell.openUserMenu();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.ushell.ui.shell.ShellHeader"
-      ]
+      "controlTypes": ["sap.ushell.ui.shell.ShellHeader"]
     },
     {
       "id": "UI5-FOOTER-001",
@@ -2152,9 +2025,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Footer.clickSave();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FOOTER-002",
@@ -2165,9 +2036,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Footer.clickApply();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FOOTER-003",
@@ -2178,9 +2047,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Footer.clickCancel();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FOOTER-004",
@@ -2191,9 +2058,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Footer.clickEdit();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FOOTER-005",
@@ -2204,9 +2069,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Footer.clickDelete();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FOOTER-006",
@@ -2217,9 +2080,7 @@
       "priority": "fixture",
       "usageExample": "await ui5Footer.clickCreate();",
       "registryVersion": 1,
-      "controlTypes": [
-        "sap.m.Button"
-      ]
+      "controlTypes": ["sap.m.Button"]
     },
     {
       "id": "UI5-FLP-001",
