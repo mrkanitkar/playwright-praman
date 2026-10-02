@@ -173,7 +173,11 @@ jobs:
     steps:
       - name: Skip if Azure credentials not configured
         if: env.PLAYWRIGHT_SERVICE_URL == ''
-        run: echo "::warning::PLAYWRIGHT_SERVICE_URL secret not configured — skipping Azure Playwright tests"
+        run: |
+          echo "::warning::NO BROWSER WAS LAUNCHED by this job. The \
+          PLAYWRIGHT_SERVICE_URL secret is not configured, so every step below \
+          was skipped and this green tick means 'did nothing', not 'passed'. \
+          Credential-free browser coverage lives in the UI5 Bridge Smoke job."
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: env.PLAYWRIGHT_SERVICE_URL != ''
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -412,3 +416,44 @@ jobs:
 
             console.log('OK: 1.' + catalogued + ' flags active and no uncatalogued release.');
           "
+
+  # The only job in this repository that actually launches a browser.
+  #
+  # playwright-floor and playwright-ceiling above pin the ends of the peer range
+  # but run `test:unit`, where the UI5 bridge is mocked. The three jobs that do
+  # drive a browser — azure-playwright here, plus the integration matrices in
+  # canary.yml and release.yml — are each gated on a secret this repository does
+  # not have, so all three skip and report green. Nothing has been exercising
+  # Playwright against real UI5.
+  #
+  # These specs target public UI5 demo apps on the SAP CDN with a bundled mock
+  # OData server, so they need no secrets and run on every PR. The matrix covers
+  # both ends of the declared peer range (>=1.57.0 <2.0.0), which is what makes
+  # it a testbed rather than a spot check.
+  bridge-smoke:
+    name: UI5 Bridge Smoke (PW ${{ matrix.playwright-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        playwright-version: ['1.57.0', '1.63.0']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm install @playwright/test@${{ matrix.playwright-version }}
+      # Each Playwright minor pins its own browser revision, so this downloads a
+      # different Chromium per matrix leg. That is the point: it proves the
+      # bridge works against the browser each supported version ships with.
+      - run: npx playwright install --with-deps chromium chromium-headless-shell
+      - run: npm run test:integration:demo
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: bridge-smoke-report-pw-${{ matrix.playwright-version }}
+          path: playwright-report/
+          retention-days: 14

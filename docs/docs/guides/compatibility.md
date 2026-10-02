@@ -27,13 +27,28 @@ This page documents which versions are actively tested and recommended.
 | 1.63.x             | Recommended   | Yes       | Test locks, subtree `frameLocator`, step params |
 | 2.x                | Not supported | No        | Breaking API changes expected                   |
 
-Two jobs bound this range on every CI run: `Playwright Floor (1.57.0)` pins the
-declared minimum, and `Playwright Ceiling (latest)` installs
-`@playwright/test@latest`. The ceiling job also **fails when Playwright
-publishes a minor Praman has not yet catalogued**, so this table cannot quietly
-fall behind the code again. Versions between the floor and the ceiling are
-supported via feature detection but are not individually exercised — only
-1.57.0 and `latest` are, plus 1.57.0 and 1.63.0 in the integration matrix.
+Three jobs bound this range on every CI run:
+
+| Job                                     | What it pins              | What it proves                                                                                                     |
+| --------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `Playwright Floor (1.57.0)`             | the declared minimum      | the unit suite passes at the floor                                                                                 |
+| `Playwright Ceiling (latest)`           | `@playwright/test@latest` | the newest catalogued flags are active, **and** that Playwright has not published a minor Praman hasn't catalogued |
+| `UI5 Bridge Smoke (PW 1.57.0 / 1.63.0)` | both ends of the range    | a **real Chromium** drives the UI5 bridge against live UI5 1.146.0 apps                                            |
+
+The ceiling job fails on an uncatalogued Playwright minor, so the feature table
+below cannot quietly fall behind the code.
+
+The bridge smoke job is the only CI job that launches a browser. It targets
+public UI5 demo apps on the SAP CDN, which bundle their own mock OData server,
+so it needs no SAP system and no secrets — and each matrix leg downloads the
+Chromium revision its own Playwright version pins, so the bridge is exercised
+against the browser each supported version actually ships with.
+
+Versions between the floor and the ceiling are supported via feature detection
+but are not individually exercised. The SAP-system integration matrices in
+`canary.yml` and `release.yml` list more versions, but they are gated on a
+`SAP_CLOUD_BASE_URL` secret and skip when it is absent — treat them as
+opt-in coverage for a configured fork, not as a guarantee this project makes.
 
 ## TypeScript Version Matrix
 
