@@ -122,7 +122,7 @@ describe('cli/scaffolder — Docker support', () => {
       const composeSrc = join(PKG_ROOT, 'examples', 'docker', 'docker-compose.yml');
       const dockerfileSrc = join(PKG_ROOT, 'examples', 'docker', 'Dockerfile');
       mockFs.files.set(composeSrc, 'services:\n  praman-tests:\n');
-      mockFs.files.set(dockerfileSrc, 'FROM mcr.microsoft.com/playwright:v1.59.0-noble\n');
+      mockFs.files.set(dockerfileSrc, 'FROM mcr.microsoft.com/playwright:v1.63.0-noble\n');
 
       const created: string[] = [];
       await scaffoldDockerFiles(TEST_DIR, false, created);

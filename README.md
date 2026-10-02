@@ -36,7 +36,7 @@ Describe your business process; AI agents deliver production-ready test scripts.
 ## Platform &amp; Engine Support
 
 - **Node.js:** ≥22 (Active LTS). See [versioning policy](docs/versioning.md).
-- **Playwright:** ≥1.57.0 (CI-tested against 1.57.0, 1.60.0, and `next`).
+- **Playwright:** ≥1.57.0 (CI-tested against 1.57.0, 1.63.0, and `next`).
 - **OS:** Windows 10/11, macOS, Linux (Ubuntu/Debian). CI runs a 3-OS matrix.
 
 ## Quick Start
@@ -155,7 +155,7 @@ SAPUI5, and OpenUI5 — both Fiori Elements and freestyle apps.
 
 | Component   | Version                      |
 | ----------- | ---------------------------- |
-| Playwright  | 1.60.0 (peer: ≥1.57.0)       |
+| Playwright  | 1.63.0 (peer: ≥1.57.0)       |
 | TypeScript  | 6.0.3 (supports 7.x)         |
 | Node.js     | ≥22                          |
 | ESLint      | 10.4.0 (11 plugins)          |

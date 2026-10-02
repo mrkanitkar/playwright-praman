@@ -354,20 +354,61 @@ jobs:
       - run: npm install @playwright/test@latest
       - run: npm run build
       - run: npm run test:unit
-      - name: Verify PW 1.61+ feature flags active
+      # Two assertions, because this job installs @playwright/test@latest and a
+      # fixed flag check silently rots: it kept asserting 1.61 flags while the
+      # compat table had grown to 1.62, so it passed without validating
+      # anything new.
+      #
+      #   1. the newest catalogued flag group is actually active, and
+      #   2. Playwright has not released a minor we have not catalogued yet.
+      #
+      # (2) is the one that matters — it turns this job into a drift detector,
+      # so a new Playwright minor fails here instead of shipping unnoticed.
+      # Bump NEWEST_CATALOGUED_MINOR when adding a version block to
+      # src/core/compat/playwright-compat.ts.
+      - name: Verify newest catalogued PW feature flags, and detect uncatalogued releases
+        env:
+          NEWEST_CATALOGUED_MINOR: '63'
         run: |
           node -e "
             const { detectFeatures, parsePlaywrightVersion } = require('./dist/index.cjs');
             const pkg = require('@playwright/test/package.json');
             const ver = parsePlaywrightVersion(pkg.version);
             const features = detectFeatures(ver);
+            const catalogued = Number(process.env.NEWEST_CATALOGUED_MINOR);
+
             console.log('Playwright version:', pkg.version);
-            console.log('hasWebStorageAPI:', features.hasWebStorageAPI);
-            console.log('hasScreencastTimestamp:', features.hasScreencastTimestamp);
-            console.log('hasSoftPoll:', features.hasSoftPoll);
-            if (!features.hasWebStorageAPI) {
-              console.error('ERROR: PW 1.61 features not detected');
+            console.log('newest catalogued minor: 1.' + catalogued);
+
+            const newest = {
+              hasTestLocks: features.hasTestLocks,
+              hasSubtreeFrameLocator: features.hasSubtreeFrameLocator,
+              hasVisibleLocator: features.hasVisibleLocator,
+              hasStepParams: features.hasStepParams,
+              hasAriaSnapshotJSON: features.hasAriaSnapshotJSON,
+              hasDialogClosedEvent: features.hasDialogClosedEvent,
+              hasOpfsStorageState: features.hasOpfsStorageState,
+            };
+            for (const [flag, on] of Object.entries(newest)) {
+              console.log(flag + ':', on);
+            }
+
+            const missing = Object.entries(newest).filter(([, on]) => !on).map(([f]) => f);
+            if (ver.minor >= catalogued && missing.length > 0) {
+              console.error('ERROR: PW 1.' + catalogued + ' features not detected: ' + missing.join(', '));
               process.exit(1);
             }
-            console.log('✓ All PW 1.61 feature flags active');
+
+            if (ver.minor > catalogued) {
+              console.error(
+                '::error::Playwright ' + pkg.version + ' is newer than the newest catalogued ' +
+                'minor (1.' + catalogued + '). Add a 1.' + ver.minor + ' block to ' +
+                'src/core/compat/playwright-compat.ts, mirror it in ' +
+                'tests/unit/core/compat/playwright-compat.test.ts, then bump ' +
+                'NEWEST_CATALOGUED_MINOR in this workflow.'
+              );
+              process.exit(1);
+            }
+
+            console.log('OK: 1.' + catalogued + ' flags active and no uncatalogued release.');
           "

@@ -193,6 +193,59 @@ describe('detectFeatures — 1.62 capabilities', () => {
   });
 });
 
+describe('detectFeatures — 1.63 capabilities', () => {
+  // Every threshold verified against the shipped 1.63.0 type definitions
+  // rather than the release notes:
+  //   playwright/types/test.d.ts     — `lock?: string | string[]`, and
+  //                                    `test.step(..., { params, subtitle })`
+  //   playwright-core/types/types.d.ts — `visible(): Locator`,
+  //                                    `frameLocator(selector?: string)`,
+  //                                    `ariaSnapshotJSON(options?)`,
+  //                                    `on('dialogclosed', ...)`, `opfs?: boolean`
+  it('returns all 1.63 flags true for version 1.63.0', () => {
+    const features = detectFeatures({ major: 1, minor: 63, patch: 0, raw: '1.63.0' });
+
+    expect(features.hasTestLocks).toBe(true);
+    expect(features.hasSubtreeFrameLocator).toBe(true);
+    expect(features.hasVisibleLocator).toBe(true);
+    expect(features.hasStepParams).toBe(true);
+    expect(features.hasAriaSnapshotJSON).toBe(true);
+    expect(features.hasDialogClosedEvent).toBe(true);
+    expect(features.hasOpfsStorageState).toBe(true);
+  });
+
+  it('returns all 1.63 flags false for version 1.62.0', () => {
+    const features = detectFeatures({ major: 1, minor: 62, patch: 0, raw: '1.62.0' });
+
+    expect(features.hasTestLocks).toBe(false);
+    expect(features.hasSubtreeFrameLocator).toBe(false);
+    expect(features.hasVisibleLocator).toBe(false);
+    expect(features.hasStepParams).toBe(false);
+    expect(features.hasAriaSnapshotJSON).toBe(false);
+    expect(features.hasDialogClosedEvent).toBe(false);
+    expect(features.hasOpfsStorageState).toBe(false);
+  });
+
+  it('returns all 1.63 flags false at the 1.57 floor', () => {
+    const features = detectFeatures({ major: 1, minor: 57, patch: 0, raw: '1.57.0' });
+
+    expect(features.hasTestLocks).toBe(false);
+    expect(features.hasSubtreeFrameLocator).toBe(false);
+    expect(features.hasVisibleLocator).toBe(false);
+    expect(features.hasStepParams).toBe(false);
+  });
+
+  // 1.63 is additive: nothing it introduced removes or narrows an older flag.
+  it('leaves the 1.61 and 1.62 flags true at 1.63.0', () => {
+    const features = detectFeatures({ major: 1, minor: 63, patch: 0, raw: '1.63.0' });
+
+    expect(features.hasWebStorageAPI).toBe(true);
+    expect(features.hasSoftPoll).toBe(true);
+    expect(features.hasLocatorWaitForFunction).toBe(true);
+    expect(features.hasAbortSignal).toBe(true);
+  });
+});
+
 describe('detectFeatures — consoleMessages filter option', () => {
   // Verified empirically against published type definitions: 1.58 has bare
   // consoleMessages(), 1.59 gains the options parameter.
@@ -233,7 +286,7 @@ describe('hasFeature', () => {
 
 describe('assertMinVersion', () => {
   it('passes when installed version satisfies minimum', () => {
-    // Should not throw — installed Playwright is 1.58.2
+    // Should not throw — any installed Playwright satisfies a 1.0.0 minimum.
     expect(() => {
       assertMinVersion('1.0.0');
     }).not.toThrow();

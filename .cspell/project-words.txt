@@ -83,6 +83,7 @@ deadcode
 deserialise
 detachhead
 dhikraft
+dialogclosed
 dlgs
 docusaurus
 domcontentloaded
@@ -136,6 +137,7 @@ normalised
 npmjs
 opencode
 opentelemetry
+opfs
 optimised
 otel
 otlp
