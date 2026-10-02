@@ -12,6 +12,13 @@
  * 4. `skills/playwright-praman-sap-testing/capabilities-reference.md`
  * 5. `capabilities.json` (machine-readable manifest for AI agents)
  *
+ * **Ownership.** This script is the sole writer of all five, output 4 included.
+ * `generate-skill-md.ts` also wrote output 4 until that duplicate was removed:
+ * `7a583ce` rewrote both scripts to be YAML-driven without retiring either path,
+ * so whichever ran last decided the committed content, and `build:full` runs
+ * `generate:skill-md` afterwards and silently overwrote this one. That script now
+ * owns only `api-reference.md` and `recipes-reference.md`.
+ *
  * @see capabilities.yaml
  * @see recipes.yaml
  */

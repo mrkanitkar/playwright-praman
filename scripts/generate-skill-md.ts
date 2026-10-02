@@ -1,19 +1,27 @@
 #!/usr/bin/env tsx
 /**
- * Generate capabilities-reference.md, api-reference.md, and recipes-reference.md
- * from capabilities.yaml and recipes.yaml (validated via Zod schemas).
+ * Generate api-reference.md and recipes-reference.md from capabilities.yaml and
+ * recipes.yaml (validated via Zod schemas).
  *
  * @remarks
- * Output files are written to `skills/playwright-praman-sap-testing/`.
+ * **Ownership.** This script owns `api-reference.md` and `recipes-reference.md`
+ * in `skills/playwright-praman-sap-testing/`, and nothing else.
+ *
+ * `capabilities-reference.md` belongs to `generate-capabilities.ts`. Both scripts
+ * used to write it: `7a583ce` rewrote each of them to be YAML-driven without
+ * retiring either path, so whichever ran last decided the committed content, and
+ * `build:full` runs this script *after* `generate:capabilities` and silently
+ * overwrote it. The owner is the one `capabilities.yaml`'s own header documents,
+ * which also renders the YAML's category descriptions and truncates nothing.
+ *
  * Run with: `npm run generate:skill-md`
  *
  * Algorithm:
  * 1. Read `capabilities.yaml` and `recipes.yaml` from project root
  * 2. Validate via Zod schemas (CapabilitiesYamlSchema, RecipesYamlSchema)
- * 3. Generate capabilities-reference.md (table per category)
- * 4. Generate api-reference.md (alphabetical function list)
- * 5. Generate recipes-reference.md (curated test patterns)
- * 6. Validate outputs: frontmatter valid, body reasonable size
+ * 3. Generate api-reference.md (alphabetical function list)
+ * 4. Generate recipes-reference.md (curated test patterns)
+ * 5. Validate outputs: frontmatter valid, body reasonable size
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -49,104 +57,7 @@ interface ExtractedRecipe {
 
 const OUTPUT_DIR = resolve(process.cwd(), 'skills/playwright-praman-sap-testing');
 
-const CATEGORY_ORDER = [
-  'ui5',
-  'table',
-  'dialog',
-  'date',
-  'odata',
-  'navigate',
-  'auth',
-  'fe',
-  'intent',
-  'shell',
-  'footer',
-  'flp',
-  'ai',
-  'data',
-];
-
 // ── Rendering ──────────────────────────────────────────────────────────────
-
-/**
- * Group capabilities by their category field.
- */
-function groupByCategory(caps: ExtractedCapability[]): Map<string, ExtractedCapability[]> {
-  const map = new Map<string, ExtractedCapability[]>();
-
-  for (const cap of caps) {
-    const category = cap.category;
-    const existing = map.get(category);
-    if (existing) {
-      existing.push(cap);
-    } else {
-      map.set(category, [cap]);
-    }
-  }
-
-  // Sort by CATEGORY_ORDER, then alphabetical for unknown categories
-  const sorted = new Map<string, ExtractedCapability[]>();
-  for (const key of CATEGORY_ORDER) {
-    const group = map.get(key);
-    if (group) {
-      sorted.set(key, group);
-    }
-  }
-  for (const [key, val] of map) {
-    if (!sorted.has(key)) sorted.set(key, val);
-  }
-
-  return sorted;
-}
-
-/**
- * Generate capabilities-reference.md content.
- */
-function renderCapabilities(caps: ExtractedCapability[]): string {
-  if (caps.length === 0) {
-    return `# Praman Capabilities Reference
-
-> **Note**: No capabilities found in capabilities.yaml.
-> Run \`npm run generate:skill-md\` after populating capabilities.yaml.
-
-Capabilities will be auto-generated from capabilities.yaml entries.
-`;
-  }
-
-  const grouped = groupByCategory(caps);
-  const date = new Date().toISOString().split('T')[0];
-
-  let md = `# Praman Capabilities Reference
-
-> **Generated**: ${date} — do not edit manually, run \`npm run generate:skill-md\`
-> **Total**: ${caps.length} capabilities across ${grouped.size} categories
-
----
-
-`;
-
-  for (const [category, group] of grouped) {
-    const title = category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, ' ');
-    md += `## ${title}\n\n`;
-    md += `| Capability | Function | Description | SAP Module |\n`;
-    md += `|---|---|---|---|\n`;
-    for (const cap of group) {
-      const sapMod = cap.sapModule ?? 'All';
-      md += `| \`${cap.qualifiedName}\` | \`${cap.name}()\` | ${cap.description} | ${sapMod} |\n`;
-    }
-    md += '\n';
-
-    // Examples inline for first 3 per category
-    const withExamples = group.filter((c) => c.usageExample.length > 0).slice(0, 3);
-    for (const cap of withExamples) {
-      md += `### ${cap.name}\n\n`;
-      if (cap.intent) md += `**Intent**: ${cap.intent}\n\n`;
-      md += `\`\`\`typescript\n${cap.usageExample}\n\`\`\`\n\n`;
-    }
-  }
-
-  return md;
-}
 
 /**
  * Generate api-reference.md content (alphabetical function index).
@@ -258,11 +169,6 @@ function main(): void {
   if (!existsSync(OUTPUT_DIR)) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
-
-  // Write capabilities-reference.md
-  const capsPath = resolve(OUTPUT_DIR, 'capabilities-reference.md');
-  writeFileSync(capsPath, renderCapabilities(capabilities), 'utf-8');
-  console.log(`Written: ${relative(process.cwd(), capsPath)}`);
 
   // Write api-reference.md
   const apiPath = resolve(OUTPUT_DIR, 'api-reference.md');
