@@ -45,6 +45,7 @@ import { intentTest } from './intent-fixtures.js';
 import { moduleTest } from './module-fixtures.js';
 import { navTest } from './nav-fixtures.js';
 import { odataTraceTest } from './odata-trace-fixtures.js';
+import { overlayTest } from './overlay-fixtures.js';
 import { screencastTest } from './screencast-fixture.js';
 import { shellFooterTest } from './shell-footer-fixtures.js';
 import { stabilityTest } from './stability-fixtures.js';
@@ -100,6 +101,7 @@ export const test = mergeTests(
   stabilityTest,
   controlTreeTest,
   failureArtifactsTest,
+  overlayTest,
   feTest,
   aiTest,
   intentTest,
@@ -483,3 +485,29 @@ export type { WebStorageFixture, WebStorageHelper } from './web-storage-fixture.
  */
 export { failureArtifactsTest } from './failure-artifacts-fixture.js';
 export type { FailureArtifactsFixtures } from './failure-artifacts-fixture.js';
+
+/**
+ * Overlay interruption handling for SAP overlays that block an action.
+ *
+ * @remarks
+ * Built-in rules detect and report without dismissing anything. Supply a
+ * `dismiss` function to opt into auto-dismissal for a specific overlay.
+ *
+ * @example
+ * ```typescript
+ * import { overlayTest } from 'playwright-praman';
+ *
+ * overlayTest('survives the cookie banner', async ({ page, overlays }) => {
+ *   await overlays.register({
+ *     name: 'cookie-consent',
+ *     selector: '#cookieBanner',
+ *     dismiss: async (overlay) => overlay.getByRole('button', { name: 'Accept' }).click(),
+ *   });
+ *   await page.goto('/');
+ * });
+ * ```
+ */
+export { overlayTest } from './overlay-fixtures.js';
+export type { OverlayFixtures } from './overlay-fixtures.js';
+export { BUILT_IN_OVERLAY_RULES, OverlayHandler } from './overlay-handler.js';
+export type { OverlayDetection, OverlayRule } from './overlay-handler.js';

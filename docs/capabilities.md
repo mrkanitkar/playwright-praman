@@ -1,7 +1,7 @@
 # Praman Capabilities Reference
 
-> **Generated**: 2026-05-25 — do not edit manually, run `npm run generate:capabilities`
-> **Total**: 183 capabilities across 15 categories
+> **Generated**: 2026-08-26 — do not edit manually, run `npm run generate:capabilities`
+> **Total**: 187 capabilities across 15 categories
 
 ---
 
@@ -11,7 +11,7 @@
 | -------- | ------------ | ---------------------------------------------- | ----- |
 | ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 23    |
 | table    | `UI5-TABLE`  | Table discovery, reading, and manipulation     | 24    |
-| dialog   | `UI5-DLG`    | Dialog lifecycle management                    | 7     |
+| dialog   | `UI5-DLG`    | Dialog lifecycle management                    | 10    |
 | date     | `UI5-DATE`   | Date and time picker operations                | 7     |
 | odata    | `UI5-ODATA`  | OData model and HTTP operations                | 11    |
 | navigate | `UI5-NAV`    | FLP and in-app navigation                      | 9     |
@@ -22,7 +22,7 @@
 | footer   | `UI5-FOOTER` | Footer toolbar actions                         | 6     |
 | flp      | `UI5-FLP`    | Fiori Launchpad services (locks, settings)     | 10    |
 | ai       | `UI5-AI`     | AI-powered discovery and context building      | 9     |
-| assert   | `UI5-ASSERT` | UI5-aware custom matchers for assertions       | 9     |
+| assert   | `UI5-ASSERT` | UI5-aware custom matchers for assertions       | 10    |
 | data     | `UI5-DATA`   | Test data generation, persistence, and cleanup | 4     |
 
 ---
@@ -86,15 +86,18 @@
 
 ## dialog — Dialog lifecycle management
 
-| ID            | Name          | Description                                            | Usage Example                                                            |
-| ------------- | ------------- | ------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `UI5-DLG-001` | waitFor       | Waits for a dialog to appear and returns its metadata. | `const dlg = await ui5.dialog.waitFor({ title: 'Confirm' });`            |
-| `UI5-DLG-002` | getOpen       | Returns all currently open dialogs.                    | `const dialogs = await ui5.dialog.getOpen();`                            |
-| `UI5-DLG-003` | isOpen        | Checks whether a specific dialog is currently open.    | `const open = await ui5.dialog.isOpen('confirmDialog');`                 |
-| `UI5-DLG-004` | dismiss       | Dismisses (closes) a dialog.                           | `await ui5.dialog.dismiss({ title: 'Warning' });`                        |
-| `UI5-DLG-005` | confirm       | Confirms a dialog by clicking its confirmation button. | `await ui5.dialog.confirm({ title: 'Save Changes', buttonText: 'OK' });` |
-| `UI5-DLG-006` | waitForClosed | Waits for a specific dialog to close.                  | `await ui5.dialog.waitForClosed('confirmDialog', { timeout: 5000 });`    |
-| `UI5-DLG-007` | getButtons    | Returns the buttons available in a specific dialog.    | `const buttons = await ui5.dialog.getButtons('confirmDialog');`          |
+| ID            | Name          | Description                                                                                                                                           | Usage Example                                                            |
+| ------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `UI5-DLG-001` | waitFor       | Waits for a dialog to appear and returns its metadata.                                                                                                | `const dlg = await ui5.dialog.waitFor({ title: 'Confirm' });`            |
+| `UI5-DLG-002` | getOpen       | Returns all currently open dialogs.                                                                                                                   | `const dialogs = await ui5.dialog.getOpen();`                            |
+| `UI5-DLG-003` | isOpen        | Checks whether a specific dialog is currently open.                                                                                                   | `const open = await ui5.dialog.isOpen('confirmDialog');`                 |
+| `UI5-DLG-004` | dismiss       | Dismisses (closes) a dialog.                                                                                                                          | `await ui5.dialog.dismiss({ title: 'Warning' });`                        |
+| `UI5-DLG-005` | confirm       | Confirms a dialog by clicking its confirmation button.                                                                                                | `await ui5.dialog.confirm({ title: 'Save Changes', buttonText: 'OK' });` |
+| `UI5-DLG-006` | waitForClosed | Waits for a specific dialog to close.                                                                                                                 | `await ui5.dialog.waitForClosed('confirmDialog', { timeout: 5000 });`    |
+| `UI5-DLG-007` | getButtons    | Returns the buttons available in a specific dialog.                                                                                                   | `const buttons = await ui5.dialog.getButtons('confirmDialog');`          |
+| `UI5-DLG-090` | register      | Registers a rule for an SAP overlay that can interrupt an action. Detects and reports by default; pass a dismiss function to opt into auto-dismissal. | `await overlays.register({`                                              |
+| `UI5-DLG-091` | registerAll   | Registers several overlay rules in one call.                                                                                                          | `await overlays.registerAll(BUILT_IN_OVERLAY_RULES);`                    |
+| `UI5-DLG-092` | dispose       | Unregisters every overlay rule this handler registered. Called automatically by the overlays fixture on teardown.                                     | `await overlays.dispose();`                                              |
 
 ## date — Date and time picker operations
 
@@ -264,17 +267,18 @@
 
 ## assert — UI5-aware custom matchers for assertions
 
-| ID               | Name                  | Description                                                                                                                | Usage Example                                                |
-| ---------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `UI5-ASSERT-001` | toHaveUI5Text         | Assert control has expected text.                                                                                          | `await expect(locator).toHaveUI5Text('Expected text');`      |
-| `UI5-ASSERT-002` | toBeUI5Visible        | Assert UI5 control is visible.                                                                                             | `await expect(locator).toBeUI5Visible();`                    |
-| `UI5-ASSERT-003` | toBeUI5Enabled        | Assert UI5 control is enabled.                                                                                             | `await expect(locator).toBeUI5Enabled();`                    |
-| `UI5-ASSERT-004` | toHaveUI5Property     | Assert control has specific property value.                                                                                | `await expect(locator).toHaveUI5Property('enabled', true);`  |
-| `UI5-ASSERT-005` | toHaveUI5ValueState   | Assert control value state (Error, Warning, etc.).                                                                         | `await expect(locator).toHaveUI5ValueState('Success');`      |
-| `UI5-ASSERT-006` | toHaveUI5RowCount     | Assert table has expected row count.                                                                                       | `await expect(table).toHaveUI5RowCount(5);`                  |
-| `UI5-ASSERT-007` | toHaveUI5CellText     | Assert table cell contains expected text.                                                                                  | `await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');`    |
-| `UI5-ASSERT-008` | getControlProperty    | Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.                     | `import { getControlProperty } from 'playwright-praman';`    |
-| `UI5-ASSERT-009` | getControlAggregation | Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers. | `import { getControlAggregation } from 'playwright-praman';` |
+| ID               | Name                        | Description                                                                                                                                           | Usage Example                                                |
+| ---------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `UI5-ASSERT-001` | toHaveUI5Text               | Assert control has expected text.                                                                                                                     | `await expect(locator).toHaveUI5Text('Expected text');`      |
+| `UI5-ASSERT-002` | toBeUI5Visible              | Assert UI5 control is visible.                                                                                                                        | `await expect(locator).toBeUI5Visible();`                    |
+| `UI5-ASSERT-003` | toBeUI5Enabled              | Assert UI5 control is enabled.                                                                                                                        | `await expect(locator).toBeUI5Enabled();`                    |
+| `UI5-ASSERT-004` | toHaveUI5Property           | Assert control has specific property value.                                                                                                           | `await expect(locator).toHaveUI5Property('enabled', true);`  |
+| `UI5-ASSERT-005` | toHaveUI5ValueState         | Assert control value state (Error, Warning, etc.).                                                                                                    | `await expect(locator).toHaveUI5ValueState('Success');`      |
+| `UI5-ASSERT-006` | toHaveUI5RowCount           | Assert table has expected row count.                                                                                                                  | `await expect(table).toHaveUI5RowCount(5);`                  |
+| `UI5-ASSERT-007` | toHaveUI5CellText           | Assert table cell contains expected text.                                                                                                             | `await expect(table).toHaveUI5CellText(0, 2, 'MAT-001');`    |
+| `UI5-ASSERT-008` | getControlProperty          | Low-level bridge call to read a single property from a UI5 control by ID. Used internally by matchers.                                                | `import { getControlProperty } from 'playwright-praman';`    |
+| `UI5-ASSERT-009` | getControlAggregation       | Low-level bridge call to read an aggregation (child controls) from a UI5 control by ID. Used internally by table matchers.                            | `import { getControlAggregation } from 'playwright-praman';` |
+| `UI5-OTHER-001`  | attachBridgeNavigationReset | Attaches a framenavigated listener that resets bridge injection state on main-frame navigation. Returns a cleanup function that removes the listener. | `const detach = attachBridgeNavigationReset(page, logger);`  |
 
 ## data — Test data generation, persistence, and cleanup
 

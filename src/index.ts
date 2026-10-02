@@ -54,6 +54,8 @@ export { expect, test } from './fixtures/index.js';
 export { authTest, browserBindTest, coreTest, moduleTest } from './fixtures/index.js';
 export { screencastTest } from './fixtures/index.js';
 export { webStorageTest } from './fixtures/index.js';
+export { overlayTest, OverlayHandler, BUILT_IN_OVERLAY_RULES } from './fixtures/index.js';
+export type { OverlayFixtures, OverlayDetection, OverlayRule } from './fixtures/index.js';
 export type { ExtendedUI5Handler } from './fixtures/index.js';
 export type {
   ScreencastFixture,

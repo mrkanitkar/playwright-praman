@@ -2576,6 +2576,45 @@ capabilities:
       const items = await getControlAggregation(page, '__list0', 'items');
     registryVersion: 1
 
+  # ════════════════════════════════════════════════════════════════════════════
+  # Namespace: ui5Overlays — SAP overlays that interrupt an action
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - id: UI5-DLG-090
+    qualifiedName: ui5Overlays.register
+    name: register
+    description: 'Registers a rule for an SAP overlay that can interrupt an action. Detects and reports by default; pass a dismiss function to opt into auto-dismissal.'
+    category: dialog
+    priority: fixture
+    aiSteering: 'Prefer detect-only rules. Only supply a dismiss function when answering the overlay cannot change what the test asserts.'
+    usageExample: |
+      await overlays.register({
+        name: 'cookie-consent',
+        selector: '#cookieBanner',
+        dismiss: async (overlay) => overlay.getByRole('button', { name: 'Accept' }).click(),
+      });
+    registryVersion: 1
+
+  - id: UI5-DLG-091
+    qualifiedName: ui5Overlays.registerAll
+    name: registerAll
+    description: 'Registers several overlay rules in one call.'
+    category: dialog
+    priority: fixture
+    usageExample: |
+      await overlays.registerAll(BUILT_IN_OVERLAY_RULES);
+    registryVersion: 1
+
+  - id: UI5-DLG-092
+    qualifiedName: ui5Overlays.dispose
+    name: dispose
+    description: 'Unregisters every overlay rule this handler registered. Called automatically by the overlays fixture on teardown.'
+    category: dialog
+    priority: fixture
+    usageExample: |
+      await overlays.dispose();
+    registryVersion: 1
+
   - id: UI5-OTHER-001
     qualifiedName: fixtures.attachBridgeNavigationReset
     name: attachBridgeNavigationReset
