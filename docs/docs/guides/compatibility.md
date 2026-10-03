@@ -121,6 +121,10 @@ capabilities introduced in newer Playwright releases:
 | OPFS in storage state        | 1.63+            | `hasOpfsStorageState`       |
 | `httpCredentials` array      | 1.63+            | `hasHttpCredentialsArray`   |
 
+Test locks are the one flag with a user-facing guard: `requireTestLocks()`
+throws below 1.63 rather than letting a silently-ignored `lock` run your tests
+in parallel. See [Parallel Execution](./parallel-execution.md#test-locks-for-shared-sap-state-playwright-163).
+
 Praman's behaviour when a feature is unavailable depends on whether the floor
 has an equivalent — the policy is stated once in
 `src/core/compat/playwright-compat.ts` and applies to every flag above:

@@ -72,5 +72,9 @@ export {
   getPlaywrightFeatures,
   getPlaywrightVersion,
   hasFeature,
+  MIN_TEST_LOCKS_VERSION,
+  requireTestLocks,
+  SAP_LOCKS,
+  sapObjectLock,
 } from './compat/index.js';
 export type { PlaywrightFeatures, PlaywrightVersion } from './compat/index.js';
