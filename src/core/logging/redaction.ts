@@ -149,9 +149,10 @@ function stringifyParamValue(value: unknown): string {
  * runs between Playwright's data and every sink. Values are stringified because
  * OTel span attributes are `Record<string, string>`.
  *
- * @param params - Raw `TestStep.params`, or `undefined` on Playwright 1.57-1.62
- *   where the property does not exist.
- * @returns The surviving keys as strings, or `undefined` when `params` was absent.
+ * @param params - Raw `TestStep.params`; `undefined` on Playwright 1.57-1.62
+ *   where the property does not exist, or `null` from a patched runtime.
+ * @returns The surviving keys as strings, or `undefined` when there were none
+ *   to read.
  *
  * @example
  * ```typescript
@@ -162,9 +163,9 @@ function stringifyParamValue(value: unknown): string {
  * ```
  */
 export function redactStepParams(
-  params: Readonly<Record<string, unknown>> | undefined,
+  params: Readonly<Record<string, unknown>> | null | undefined,
 ): Record<string, string> | undefined {
-  if (params === undefined) {
+  if (params === undefined || params === null) {
     return undefined;
   }
 

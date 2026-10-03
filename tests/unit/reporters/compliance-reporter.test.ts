@@ -359,3 +359,102 @@ describe('ComplianceReporter', () => {
     expect(report.timestamp).toMatch(/Z$/u);
   });
 });
+
+// ── Raw-locator enrichment (Playwright 1.63) ───────────────────────────────
+//
+// 1.63 reports the target locator on Playwright's own pw:api steps, so a raw
+// call can be named rather than merely counted. Everything here goes through
+// the same allow-list redactor the OTel reporter uses.
+
+describe('ComplianceReporter raw-locator enrichment', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  /** Runs one test's steps through the reporter and returns the written report. */
+  async function reportFor(
+    steps: ReturnType<typeof createMockTestStep>[],
+  ): Promise<TestComplianceReport> {
+    const reporter = new ComplianceReporter();
+    reporter.onBegin(createMockFullConfig(), createMockSuite());
+    reporter.onTestEnd(createMockTestCase({ title: 't' }), createMockTestResult({ steps }));
+    await reporter.onEnd(createMockFullResult());
+
+    const [, content] = mockWriteFile.mock.calls[0] as [string, string, string];
+    return JSON.parse(content) as TestComplianceReport;
+  }
+
+  it('names the locator behind a raw Playwright step', async () => {
+    const report = await reportFor([
+      createMockTestStep({
+        title: 'locator.click',
+        category: 'pw:api',
+        params: { locator: "getByRole('button')" },
+      }),
+    ]);
+
+    expect(report.tests[0]?.rawPlaywrightSteps).toBe(1);
+    expect(report.tests[0]?.rawPlaywrightLocators).toEqual(["getByRole('button')"]);
+  });
+
+  it('never writes a typed password to the report', async () => {
+    const report = await reportFor([
+      createMockTestStep({
+        title: 'locator.fill',
+        category: 'pw:api',
+        params: { locator: "getByLabel('Password')", value: 'hunter2' },
+      }),
+    ]);
+
+    const [, content] = mockWriteFile.mock.calls[0] as [string, string, string];
+    expect(content).not.toContain('hunter2');
+    expect(report.tests[0]?.rawPlaywrightLocators).toEqual(["getByLabel('Password')"]);
+  });
+
+  it('deduplicates repeated locators', async () => {
+    const report = await reportFor([
+      createMockTestStep({ title: 'locator.click', params: { locator: 'getByText("A")' } }),
+      createMockTestStep({ title: 'locator.click', params: { locator: 'getByText("A")' } }),
+      createMockTestStep({ title: 'locator.click', params: { locator: 'getByText("B")' } }),
+    ]);
+
+    expect(report.tests[0]?.rawPlaywrightSteps).toBe(3);
+    expect(report.tests[0]?.rawPlaywrightLocators).toEqual(['getByText("A")', 'getByText("B")']);
+  });
+
+  it('omits an empty locator rather than recording a blank entry', async () => {
+    const report = await reportFor([
+      createMockTestStep({ title: 'locator.click', params: { locator: '' } }),
+    ]);
+
+    expect(report.tests[0]?.rawPlaywrightLocators).toEqual([]);
+  });
+
+  it('records no locators on PW 1.57-1.62, where params does not exist', async () => {
+    const report = await reportFor([createMockTestStep({ title: 'locator.click' })]);
+
+    expect(report.tests[0]?.rawPlaywrightSteps).toBe(1);
+    expect(report.tests[0]?.rawPlaywrightLocators).toEqual([]);
+  });
+
+  it('reports 100% compliance for a run with no tests at all', async () => {
+    const reporter = new ComplianceReporter();
+    reporter.onBegin(createMockFullConfig(), createMockSuite());
+    await reporter.onEnd(createMockFullResult());
+
+    const [, content] = mockWriteFile.mock.calls[0] as [string, string, string];
+    const report = JSON.parse(content) as TestComplianceReport;
+    expect(report.totalTests).toBe(0);
+    expect(report.compliancePercentage).toBe(100);
+  });
+});
+
+describe('isPramanStep robustness', () => {
+  it('does not throw when params is null', () => {
+    // A reporter that throws inside onTestEnd takes the whole run's reporting
+    // with it, so a malformed params must degrade to the title heuristic.
+    expect(() => isPramanStep({ title: 'Click save', params: null })).not.toThrow();
+    expect(isPramanStep({ title: 'Click save', params: null })).toBe(true);
+    expect(isPramanStep({ title: 'page.click', params: null })).toBe(false);
+  });
+});

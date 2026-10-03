@@ -104,7 +104,7 @@ export interface OTelReporterOptions {
  */
 export function buildStepAttributes(
   step: Pick<TestStep, 'category' | 'title'> & {
-    readonly params?: Readonly<Record<string, unknown>> | undefined;
+    readonly params?: Readonly<Record<string, unknown>> | null | undefined;
     readonly subtitle?: string | undefined;
   },
   test: Pick<TestCase, 'title' | 'location'>,

@@ -103,7 +103,14 @@ export interface ComplianceReporterOptions {
  */
 export interface ClassifiableStep {
   readonly title: string;
-  readonly params?: Readonly<Record<string, unknown>> | undefined;
+  /**
+   * Structured params (Playwright 1.63+).
+   *
+   * `null` is admitted deliberately: `Reflect.get` can return whatever a
+   * patched or shimmed runtime placed there, and a reporter that throws inside
+   * `onTestEnd` takes the whole run's reporting with it.
+   */
+  readonly params?: Readonly<Record<string, unknown>> | null | undefined;
 }
 
 /**
@@ -165,7 +172,10 @@ export function isPramanStep(stepOrTitle: string | ClassifiableStep): boolean {
     return matchesPramanStepTitle(stepOrTitle);
   }
 
-  const { params } = stepOrTitle;
+  // Via readStepParams, not `stepOrTitle.params`: a `null` params would
+  // otherwise throw here, and a reporter that throws inside onTestEnd takes
+  // the whole run's reporting with it.
+  const params = readStepParams(stepOrTitle);
   if (params !== undefined) {
     return params['praman'] === true;
   }
