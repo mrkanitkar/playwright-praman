@@ -56,6 +56,14 @@ export { screencastTest } from './fixtures/index.js';
 export { webStorageTest } from './fixtures/index.js';
 export { overlayTest, OverlayHandler, BUILT_IN_OVERLAY_RULES } from './fixtures/index.js';
 export type { OverlayFixtures, OverlayDetection, OverlayRule } from './fixtures/index.js';
+export { nativeDialogTest, NativeDialogHandler } from './fixtures/index.js';
+export type {
+  NativeDialogAction,
+  NativeDialogFixtures,
+  NativeDialogRecord,
+  NativeDialogRule,
+  NativeDialogType,
+} from './fixtures/index.js';
 export { clockTest, Ui5Clock } from './fixtures/index.js';
 export type { ClockFixtures, Ui5ClockOptions } from './fixtures/index.js';
 export { collectPageDiagnostics, DIAGNOSTIC_CAPS } from './fixtures/index.js';

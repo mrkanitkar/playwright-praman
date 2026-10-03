@@ -44,6 +44,7 @@ import { flpLocksTest } from './flp-locks-fixtures.js';
 import { flpSettingsTest } from './flp-settings-fixtures.js';
 import { intentTest } from './intent-fixtures.js';
 import { moduleTest } from './module-fixtures.js';
+import { nativeDialogTest } from './native-dialog-fixtures.js';
 import { navTest } from './nav-fixtures.js';
 import { odataTraceTest } from './odata-trace-fixtures.js';
 import { overlayTest } from './overlay-fixtures.js';
@@ -103,6 +104,7 @@ export const test = mergeTests(
   controlTreeTest,
   failureArtifactsTest,
   overlayTest,
+  nativeDialogTest,
   clockTest,
   feTest,
   aiTest,
@@ -544,6 +546,40 @@ export type { Ui5ClockOptions } from './clock-handler.js';
  */
 export { collectPageDiagnostics, DIAGNOSTIC_CAPS } from './page-diagnostics.js';
 export type { PageDiagnostics } from './page-diagnostics.js';
+
+/**
+ * Native browser dialog diagnostics — `alert`, `confirm`, `prompt`,
+ * `beforeunload`.
+ *
+ * @remarks
+ * Not `sap.m.Dialog`: for UI5 dialogs use the `ui5Dialog` module. Installs in
+ * detect-only mode, so merely having the fixture changes nothing — Playwright
+ * keeps auto-dismissing. Opt in with `register()` to answer dialogs, and note
+ * that doing so makes Praman responsible for every dialog on the page.
+ *
+ * Diagnostics need Playwright 1.63+ (`dialogclosed`); answering dialogs works
+ * at the 1.57 floor.
+ *
+ * @example
+ * ```typescript
+ * import { nativeDialogTest } from 'playwright-praman';
+ *
+ * nativeDialogTest('records the unsaved-changes warning', async ({ page, nativeDialogs }) => {
+ *   await page.goto('/app#/edit');
+ *   await page.goto('/app#/list');
+ *   // nativeDialogs.records lists any beforeunload the browser raised
+ * });
+ * ```
+ */
+export { nativeDialogTest } from './native-dialog-fixtures.js';
+export type { NativeDialogFixtures } from './native-dialog-fixtures.js';
+export type {
+  NativeDialogAction,
+  NativeDialogRecord,
+  NativeDialogRule,
+  NativeDialogType,
+} from './native-dialog-handler.js';
+export { NativeDialogHandler } from './native-dialog-handler.js';
 
 export { overlayTest } from './overlay-fixtures.js';
 export type { OverlayFixtures } from './overlay-fixtures.js';
