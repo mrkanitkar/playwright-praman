@@ -32,6 +32,7 @@ import { test, expect } from 'playwright-praman';
 | `flpLocks`      | test   | FLP             | SM12 lock management with auto-cleanup                                                                           |
 | `flpSettings`   | test   | FLP             | User settings reader (language, date format)                                                                     |
 | `testData`      | test   | Data            | Template-based data generation with auto-cleanup                                                                 |
+| `nativeDialogs` | test   | Diagnostics     | Records native `alert`/`confirm`/`prompt`/`beforeunload` dialogs; can answer them on request (Playwright 1.63+)  |
 | `pramanConfig`  | worker | Infrastructure  | Frozen config (loaded once per worker)                                                                           |
 | `pramanLogger`  | test   | Infrastructure  | Test-scoped pino logger                                                                                          |
 | `rootLogger`    | worker | Infrastructure  | Worker-scoped root logger                                                                                        |
@@ -238,6 +239,70 @@ test('test data', async ({ testData }) => {
   // Auto-cleanup on teardown
 });
 ```
+
+## Native Dialogs: `nativeDialogs`
+
+Records the browser's **own** dialogs — `alert`, `confirm`, `prompt`,
+`beforeunload`. Not `sap.m.Dialog`: for UI5 dialogs use `ui5.dialog`. The two
+share a word and nothing else.
+
+Why this exists: Praman already offers `ui5.odata.hasPendingChanges()` to detect
+unsaved changes _before_ navigating, precisely to avoid the browser's data-loss
+warning. That warning is a native `beforeunload` dialog, and until now Playwright
+auto-dismissed it where no test could see it.
+
+### Detect-only by default
+
+```typescript
+import { nativeDialogTest } from 'playwright-praman';
+
+nativeDialogTest('navigating away raises no surprise warning', async ({ page, nativeDialogs }) => {
+  await page.goto('/app#/edit');
+  await page.goto('/app#/list');
+
+  expect(nativeDialogs.records).toEqual([]); // nothing was auto-dismissed
+});
+```
+
+Installing the fixture **changes nothing**: it attaches only `dialogclosed`, so
+Playwright keeps auto-dismissing exactly as before. Records are attached to the
+test as `native-dialogs` JSON whenever a dialog appeared.
+
+### Answering dialogs — opt in deliberately
+
+```typescript
+nativeDialogTest('discards unsaved changes on exit', async ({ page, nativeDialogs }) => {
+  nativeDialogs.register({ name: 'discard', types: ['beforeunload'], action: 'accept' });
+
+  await page.goto('/app#/edit');
+  await page.goto('/app#/list');
+});
+```
+
+:::warning Registering a rule makes Praman responsible for every dialog
+
+Playwright auto-dismisses native dialogs **only while no `dialog` listener
+exists**. Calling `register()` attaches one, and from then on any dialog left
+unanswered **freezes the page** — every later action times out with no useful
+error.
+
+Praman guarantees this cannot happen: a dialog whose type no rule covers, or
+whose rule has hit its `times` cap, is dismissed and logged at `warn` rather
+than ignored. The `warn` is the signal that your policy is incomplete.
+
+:::
+
+### Version support
+
+| Capability                                    | Requires                                                  |
+| --------------------------------------------- | --------------------------------------------------------- |
+| Recording dialogs (`records`, the attachment) | **Playwright 1.63+** (`dialogclosed`)                     |
+| Answering dialogs (`register`)                | the **1.57 floor** — `page.on('dialog')` is long-standing |
+
+Below 1.63 recording degrades to silence and logs at `debug`, rather than
+throwing: there is no floor equivalent for _watching_ a dialog without taking
+responsibility for it, and observation is additive, so a test that only wants
+diagnostics still runs.
 
 ## Standalone Usage
 
