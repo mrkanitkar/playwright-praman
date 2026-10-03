@@ -92,6 +92,8 @@ export default defineConfig({
           branches: 100,
           functions: 100,
           lines: 100,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         // ── Tier 2: Core infrastructure (95/90/95/95) ──────────────────────
         'src/core/config/**/*.ts': {
@@ -99,36 +101,48 @@ export default defineConfig({
           branches: 90,
           functions: 95,
           lines: 95,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         'src/core/logging/**/*.ts': {
           statements: 95,
           branches: 90,
           functions: 95,
           lines: 95,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         'src/core/telemetry/**/*.ts': {
           statements: 95,
           branches: 90,
           functions: 95,
           lines: 95,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         'src/core/utils/**/*.ts': {
           statements: 95,
           branches: 90,
           functions: 95,
           lines: 95,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         'src/core/constants/**/*.ts': {
           statements: 95,
           branches: 90,
           functions: 95,
           lines: 95,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         'src/core/compat/**/*.ts': {
           statements: 95,
           branches: 90,
           functions: 95,
           lines: 95,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         // ── CLI files un-excluded for coverage ────────────────────────────
         'src/cli/ide-installer.ts': {
@@ -136,18 +150,24 @@ export default defineConfig({
           statements: 85,
           functions: 85,
           branches: 80,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         'src/cli/uninstall.ts': {
           lines: 85,
           statements: 85,
           functions: 85,
           branches: 80,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
         'src/cli/preuninstall.ts': {
           lines: 85,
           statements: 85,
           functions: 85,
           branches: 80,
+          // v5: a glob no longer inherits the top-level perFile.
+          perFile: true,
         },
       },
       watermarks: {
