@@ -4,6 +4,30 @@
 > CJS output format) as a patch. See [versioning.md](docs/versioning.md) for the
 > full history and the semver contract from v1.3.4 onward.
 
+## [1.3.6](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.5...playwright-praman-v1.3.6) (2026-10-03)
+
+
+### Features
+
+* **ai:** Phase A — single ownership and the integrity primitives ([#261](https://github.com/mrkanitkar/playwright-praman/issues/261)) ([a7adccc](https://github.com/mrkanitkar/playwright-praman/commit/a7adccc16776ebc1a8f8f2086df8ba03dc99a11c))
+* **ai:** Phase B — deterministic generation and a drift gate ([#264](https://github.com/mrkanitkar/playwright-praman/issues/264)) ([3fd6195](https://github.com/mrkanitkar/playwright-praman/commit/3fd61950a2b04713c1bf1bdc7c4c3e32e8a9b835))
+* **compat:** bring compat layer to 1.62, add per-control waits ([#252](https://github.com/mrkanitkar/playwright-praman/issues/252)) ([37b081d](https://github.com/mrkanitkar/playwright-praman/commit/37b081d3a749c7197b745351a6605ca62e2023ad))
+* **core:** catalogue three more Playwright flags, and correct the tech-stack table ([#298](https://github.com/mrkanitkar/playwright-praman/issues/298)) ([dcfe6ba](https://github.com/mrkanitkar/playwright-praman/commit/dcfe6ba3d4ae69eb45272da084f6dfa537a1301d))
+* **core:** detect Playwright 1.63 features and gate uncatalogued releases ([#265](https://github.com/mrkanitkar/playwright-praman/issues/265)) ([cd9193e](https://github.com/mrkanitkar/playwright-praman/commit/cd9193ea412eb8df5bc49bca6c3a3b2f34971523))
+* **fixtures:** capture UI5 diagnostics on failure, add opt-in clock ([#251](https://github.com/mrkanitkar/playwright-praman/issues/251)) ([667781e](https://github.com/mrkanitkar/playwright-praman/commit/667781ea3367f2e7e86963d4ab3727fa47a044d3))
+* **fixtures:** handle SAP overlays that interrupt an action ([#230](https://github.com/mrkanitkar/playwright-praman/issues/230)) ([be28217](https://github.com/mrkanitkar/playwright-praman/commit/be28217769b4e31c8c1fcee65497bdd04fdf370f))
+* **fixtures:** observe native browser dialogs, answer them only on request ([#301](https://github.com/mrkanitkar/playwright-praman/issues/301)) ([aca8f0f](https://github.com/mrkanitkar/playwright-praman/commit/aca8f0fab4c7cb3b1c4374a6317ea2ff99d8678e))
+
+
+### Bug Fixes
+
+* **ci:** actually run agent-asset validation, and stop prettier corrupting it ([#228](https://github.com/mrkanitkar/playwright-praman/issues/228)) ([df9a07f](https://github.com/mrkanitkar/playwright-praman/commit/df9a07f9d1846df1901f6962aba5b4ce7424b5c9))
+* **cli:** make init actually scaffold a project ([#226](https://github.com/mrkanitkar/playwright-praman/issues/226)) ([d956111](https://github.com/mrkanitkar/playwright-praman/commit/d956111c1dd20677690753a54e68047ae67908da))
+* **deps:** refresh overrides that had gone stale into new advisory ranges ([#268](https://github.com/mrkanitkar/playwright-praman/issues/268)) ([39be63f](https://github.com/mrkanitkar/playwright-praman/commit/39be63f1b0b2b0391aa1bc1cb8b2d1ff5693f5fa))
+* **modules:** guard malformed OData bodies, and time calls by resource timing ([#300](https://github.com/mrkanitkar/playwright-praman/issues/300)) ([67a944d](https://github.com/mrkanitkar/playwright-praman/commit/67a944d354048c679b1c790b34fbf5147ea33cdf))
+* **release:** ship the agent skill entry point and guard files[] ([#256](https://github.com/mrkanitkar/playwright-praman/issues/256)) ([9c33708](https://github.com/mrkanitkar/playwright-praman/commit/9c3370803dd3d2c3a7f479199b45f1bcfb68daf5))
+* **reporters:** classify Praman steps structurally, not by title prefix ([#296](https://github.com/mrkanitkar/playwright-praman/issues/296)) ([eb3d063](https://github.com/mrkanitkar/playwright-praman/commit/eb3d063c1f516a441d144f591b70375e69d5d7df))
+
 ## [1.3.5](https://github.com/mrkanitkar/playwright-praman/compare/playwright-praman-v1.3.4...playwright-praman-v1.3.5) (2026-07-05)
 
 
