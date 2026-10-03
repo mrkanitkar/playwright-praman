@@ -108,6 +108,10 @@ export {
   getPlaywrightFeatures,
   hasFeature,
   assertMinVersion,
+  MIN_TEST_LOCKS_VERSION,
+  requireTestLocks,
+  SAP_LOCKS,
+  sapObjectLock,
 } from './core/compat/index.js';
 
 // ── Utils ───────────────────────────────────────────────────────────

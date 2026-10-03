@@ -619,3 +619,14 @@ sap.uxap.*       -- UX AP Patterns (ObjectPage, ObjectPageSection)
 5. **`setValue()` + `fireChange()` + `waitForUI5()` for every input** -- three-step pattern mandatory
 6. **`searchOpenDialogs: true` for dialog controls** -- dialogs live outside normal DOM hierarchy
 7. **TSDoc compliance header in every generated test** -- gold-standard header with discovery metadata
+
+## Test locks (Playwright 1.63+) — do NOT emit by default
+
+Never add `lock` to a generated `test()` unless the user explicitly asks.
+Praman's declared peer floor is `>=1.57.0`, and on 1.57–1.62 `lock` is an
+unknown property the runner silently drops — the generated test would run in
+parallel while appearing to be serialised.
+
+When the user does ask, emit `requireTestLocks()` at module scope alongside it,
+and prefer a name from `SAP_LOCKS` or `sapObjectLock(type, key)` over an
+invented string. See `docs/docs/guides/parallel-execution.md`.

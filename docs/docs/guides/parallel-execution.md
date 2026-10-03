@@ -69,6 +69,75 @@ test('edit order assigned to this worker', async ({ ui5, page }, testInfo) => {
 });
 ```
 
+## Test Locks for Shared SAP State (Playwright 1.63+)
+
+The strategies above avoid conflicts by making tests _not share_ — unique data,
+per-worker pools, separate projects. When the state genuinely cannot be split,
+Playwright 1.63 adds `lock`: tests holding the same lock name never run
+concurrently, across files, workers **and** projects.
+
+:::caution Two different things called "lock"
+
+`flpLocks` manages SAP **SM12 lock entries** — locks held by the SAP server,
+which the fixture can query and release _after_ a conflict. Playwright's `lock`
+is client-side mutual exclusion between test workers, which stops the conflict
+happening.
+
+They are unrelated mechanisms that **compose**: the Playwright lock prevents two
+workers reaching one object at once, which is what produces the SM12 entry the
+fixture would otherwise have to clean up.
+
+:::
+
+```typescript
+import { test } from 'playwright-praman';
+import { requireTestLocks, SAP_LOCKS, sapObjectLock } from 'playwright-praman';
+
+// Fails fast at collection time on Playwright < 1.63 — see the warning below.
+requireTestLocks();
+
+test('changes the FLP display language', { lock: SAP_LOCKS.flpSettings }, async ({ ui5 }) => {
+  // No other test holding SAP_LOCKS.flpSettings runs while this one does.
+});
+
+test(
+  'approves one purchase order',
+  { lock: sapObjectLock('PurchaseOrder', '4500000123') },
+  async ({ ui5 }) => {
+    // Scoped to this object: a test editing a *different* PO still runs in parallel.
+  },
+);
+```
+
+### The supplied lock names
+
+| Name                       | Why it is a contention source                                                                                                                                               |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SAP_LOCKS.flpSettings`    | FLP user settings (language, timezone, formats). `flpSettings` is **read-only**, so it is the victim here, not the cause — lock whatever _mutates_ settings through the UI. |
+| `SAP_LOCKS.testUser`       | A single named SAP user shared across a suite: logging in, personalizing or holding a transaction affects every other test using it.                                        |
+| `SAP_LOCKS.testData`       | `testData.cleanup()` removes the data directory **recursively**. Unlocked, one worker's teardown deletes another worker's fixtures mid-test.                                |
+| `sapObjectLock(type, key)` | One business object. Deliberately scoped so two tests editing different objects still run in parallel.                                                                      |
+
+### Why `requireTestLocks()` is not optional
+
+:::warning On Playwright 1.57–1.62 an unguarded `lock` is silently ignored
+
+`playwright test` does **not** typecheck — `@playwright/test` ships no
+TypeScript dependency, and the runner strips types rather than checking them. An unknown `lock`
+property is therefore dropped at run time: your tests run **in parallel**, the
+shared state corrupts, and nothing reports it. The TypeScript error only appears
+if you separately run `tsc`.
+
+`requireTestLocks()` turns that fail-open into a loud
+`ERR_COMPAT_FEATURE_UNAVAILABLE` at collection time. Call it at module scope in
+any spec that uses `lock`.
+
+:::
+
+If you are below 1.63, the nearest floor equivalent is `fullyParallel: false`
+on the project — far blunter, since it serialises every test in the project
+rather than the few that touch one piece of shared state.
+
 ## Praman Bridge in Parallel Workers
 
 The Praman bridge is injected per-page, not per-worker. Each worker creates its own browser context and page, so bridge injection is fully

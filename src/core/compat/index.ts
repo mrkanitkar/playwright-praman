@@ -33,3 +33,9 @@ export {
   hasFeature,
   assertMinVersion,
 } from './playwright-compat.js';
+export {
+  MIN_TEST_LOCKS_VERSION,
+  requireTestLocks,
+  SAP_LOCKS,
+  sapObjectLock,
+} from './test-locks.js';
