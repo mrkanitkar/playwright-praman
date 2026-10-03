@@ -66,6 +66,39 @@ const MIN_DIALOG_CLOSED_VERSION = '1.63.0';
 /** Default cap on how many times one rule may fire per test. */
 const DEFAULT_TIMES = 5;
 
+/** Signature of `page.on` / `page.off` with the event name left open. */
+type DialogEventMethod = (event: string, listener: (dialog: Dialog) => void) => unknown;
+
+/**
+ * Subscribes to or unsubscribes from an event Playwright may not declare.
+ *
+ * @remarks
+ * `'dialogclosed'` was added in 1.63, so `page.on('dialogclosed', …)` is
+ * `TS2769: No overload matches this call` when compiled against the 1.57
+ * floor — a *build* error for floor users that a typecheck on 1.63 cannot
+ * see. `Reflect.get` is the same escape hatch `control-wait.ts` uses for
+ * `locator.waitForFunction`, and is applied only to this event: `'dialog'`
+ * exists at the floor and stays strongly typed.
+ *
+ * Callers must still gate on {@link hasFeature} — this only sidesteps the
+ * compiler, it does not make the event exist.
+ *
+ * @param page - The page to (un)subscribe on.
+ * @param method - `'on'` to subscribe, `'off'` to unsubscribe.
+ * @param event - The event name.
+ * @param listener - The handler.
+ */
+function toggleUndeclaredEvent(
+  page: Page,
+  method: 'on' | 'off',
+  event: string,
+  listener: (dialog: Dialog) => void,
+): void {
+  const fn = Reflect.get(page, method) as DialogEventMethod | undefined;
+  if (typeof fn !== 'function') return;
+  fn.call(page, event, listener);
+}
+
 /** The native dialog types a browser can raise. */
 export type NativeDialogType = 'alert' | 'beforeunload' | 'confirm' | 'prompt';
 
@@ -205,7 +238,7 @@ export class NativeDialogHandler {
     };
 
     this.#closedListener = listener;
-    this.#page.on('dialogclosed', listener);
+    toggleUndeclaredEvent(this.#page, 'on', 'dialogclosed', listener);
   }
 
   /**
@@ -288,7 +321,7 @@ export class NativeDialogHandler {
       this.#dialogListener = undefined;
     }
     if (this.#closedListener !== undefined) {
-      this.#page.off('dialogclosed', this.#closedListener);
+      toggleUndeclaredEvent(this.#page, 'off', 'dialogclosed', this.#closedListener);
       this.#closedListener = undefined;
     }
   }
