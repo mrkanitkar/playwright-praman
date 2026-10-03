@@ -103,58 +103,40 @@ export const ACTION_MAP = {
 /**
  * Prefixes deliberately shorter than any {@link ACTION_MAP} verb.
  *
- * @remarks
  * Matching is `startsWith`, so these intentionally cover families of titles
  * (`'Wait for'` covers both `'Wait for UI5'` and `'Wait for control'`, and any
  * future `Wait for …`). Kept explicit because they cannot be derived, and
  * removing them would narrow long-standing behaviour.
  *
- * @example
- * ```typescript
- * import { BROAD_STEP_PREFIXES } from '#core/utils/step-actions.js';
- *
- * BROAD_STEP_PREFIXES.includes('Wait for'); // true
- * ```
+ * @internal
  */
-export const BROAD_STEP_PREFIXES: readonly string[] = ['Wait for', 'Destroy'] as const;
+const BROAD_STEP_PREFIXES: readonly string[] = ['Wait for', 'Destroy'] as const;
 
 /**
  * Every title prefix that marks a step as Praman-produced.
  *
- * @remarks
  * Derived from {@link ACTION_MAP} rather than hand-maintained, so a new handler
- * method is classified the moment its verb is registered.
+ * method is classified the moment its verb is registered. This derivation is
+ * the entire point of the module: the previous hand-kept copy had drifted.
  *
- * @example
- * ```typescript
- * import { PRAMAN_STEP_PREFIXES } from '#core/utils/step-actions.js';
- *
- * PRAMAN_STEP_PREFIXES.includes('Get all settings'); // true
- * ```
+ * @internal
  */
-export const PRAMAN_STEP_PREFIXES: readonly string[] = [
+const PRAMAN_STEP_PREFIXES: readonly string[] = [
   ...new Set<string>([...Object.values(ACTION_MAP), ...BROAD_STEP_PREFIXES]),
 ];
 
 /**
  * Matches the `namespace.method` titles produced by `withStep` call sites.
  *
- * @remarks
  * `nav-fixtures.ts` emits `'ui5Navigation.navigateToApp: myApp'`, and the
  * generic proxy at `module-fixtures.ts` joins a step prefix to the method name
  * with a dot, where that prefix is either `'ui5'` or `'ui5.'` plus the module
  * namespace. The trailing dot is required so a prose title such as
  * `'ui5 is great'` is not swept in.
  *
- * @example
- * ```typescript
- * import { WITH_STEP_NAMESPACE_PATTERN } from '#core/utils/step-actions.js';
- *
- * WITH_STEP_NAMESPACE_PATTERN.test('ui5.table.getRows'); // true
- * WITH_STEP_NAMESPACE_PATTERN.test('ui5 is great'); // false
- * ```
+ * @internal
  */
-export const WITH_STEP_NAMESPACE_PATTERN = /^ui5[A-Za-z]*\./u;
+const WITH_STEP_NAMESPACE_PATTERN = /^ui5[A-Za-z]*\./u;
 
 /**
  * Classifies a step title as Praman-produced, by title alone.

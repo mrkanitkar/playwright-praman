@@ -55,7 +55,19 @@ function mockTestResult(overrides: Partial<TestResult> = {}): TestResult {
 }
 
 /** Creates a minimal mock TestStep. */
-function mockTestStep(overrides: Partial<TestStep> = {}): TestStep {
+/**
+ * Overrides accepted by {@link mockTestStep}.
+ *
+ * `params` and `subtitle` are declared structurally rather than taken from
+ * `Partial<TestStep>`: Playwright only added them in 1.63, so referencing them
+ * through `TestStep` is a compile error against the 1.57 floor.
+ */
+type MockStepOverrides = Partial<TestStep> & {
+  readonly params?: Readonly<Record<string, unknown>>;
+  readonly subtitle?: string;
+};
+
+function mockTestStep(overrides: MockStepOverrides = {}): TestStep {
   return {
     title: 'locator.click',
     category: 'pw:api',

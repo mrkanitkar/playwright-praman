@@ -104,7 +104,6 @@ export function createRedactConfig(): RedactConfig {
 /**
  * Keys permitted to leave the process from a step's `params`.
  *
- * @remarks
  * An **allow-list, deliberately** — not a deny-list. Playwright curates what it
  * puts in `params` and may add keys in any minor; a deny-list would export each
  * new one until someone noticed. The first three are Praman's own marker, the
@@ -113,14 +112,9 @@ export function createRedactConfig(): RedactConfig {
  * Notably absent: `value`. Playwright documents a `fill()` step's params as
  * `{ locator: "getByLabel('Password')", value: 'secret' }`.
  *
- * @example
- * ```typescript
- * import { STEP_PARAM_ALLOWED_KEYS } from '#core/logging/redaction.js';
- *
- * STEP_PARAM_ALLOWED_KEYS.includes('value'); // false
- * ```
+ * @internal
  */
-export const STEP_PARAM_ALLOWED_KEYS: readonly string[] = [
+const STEP_PARAM_ALLOWED_KEYS: readonly string[] = [
   'praman',
   'module',
   'action',
