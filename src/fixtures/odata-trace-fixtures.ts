@@ -104,8 +104,66 @@ interface CapturedTrace {
   readonly url: string;
   readonly statusCode: number;
   readonly duration: number;
+  /**
+   * Which clock produced {@link CapturedTrace.duration}.
+   *
+   * @remarks
+   * Reported rather than hidden so a reader can tell an accurate measurement
+   * from a fallback. `'resource-timing'` is the browser's own figure for the
+   * request; `'wall-clock'` is a `Date.now()` delta, which also includes
+   * Playwright's event-dispatch latency and so reads slightly high.
+   */
+  readonly durationSource: DurationSource;
   readonly responseSize: number;
   readonly timestamp: string;
+}
+
+/** Which clock a trace's duration came from. */
+type DurationSource = 'resource-timing' | 'wall-clock';
+
+/**
+ * Subset of `Request.timing()` this fixture reads.
+ *
+ * @remarks
+ * Structural rather than Playwright's own type: `timing()` is present at the
+ * 1.57 floor with an identical field set, so no feature gate is needed — but
+ * the method is read defensively in case a stubbed runtime omits it.
+ */
+interface RequestTiming {
+  readonly requestStart: number;
+  readonly responseEnd: number;
+}
+
+/**
+ * Resolves how long an OData call took, preferring the browser's own timing.
+ *
+ * @remarks
+ * Playwright documents every `timing()` field as **"-1 if not available"**, so
+ * the unavailable case is normal rather than exceptional and must fall back
+ * instead of reporting a nonsense duration. A negative span is also rejected:
+ * it means the two marks are not comparable, not that time ran backwards.
+ *
+ * A zero span is *kept* — a cached response legitimately reports 0ms, and that
+ * is data worth seeing.
+ *
+ * @param request - The Playwright request the response belongs to.
+ * @param wallClockMs - The `Date.now()` delta, used when timing is unusable.
+ * @returns The duration and which clock produced it.
+ */
+function resolveDuration(
+  request: { timing?: () => RequestTiming },
+  wallClockMs: number,
+): { duration: number; durationSource: DurationSource } {
+  const timing = typeof request.timing === 'function' ? request.timing() : undefined;
+
+  if (timing !== undefined && timing.requestStart >= 0 && timing.responseEnd >= 0) {
+    const span = timing.responseEnd - timing.requestStart;
+    if (span >= 0) {
+      return { duration: span, durationSource: 'resource-timing' };
+    }
+  }
+
+  return { duration: wallClockMs, durationSource: 'wall-clock' };
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
@@ -196,11 +254,17 @@ export const odataTraceTest = base.extend<ODataTraceFixtures, ODataTraceDeps>({
         const contentLength = headers['content-length'];
         const responseSize = contentLength !== undefined ? Number(contentLength) : 0;
 
+        const { duration, durationSource } = resolveDuration(request, endTime - startTime);
+        if (durationSource === 'wall-clock') {
+          log.debug({ url: request.url() }, 'Resource timing unavailable — using wall clock');
+        }
+
         completedTraces.push({
           method: request.method(),
           url: request.url(),
           statusCode: response.status(),
-          duration: endTime - startTime,
+          duration,
+          durationSource,
           responseSize,
           timestamp: new Date(startTime).toISOString(),
         });

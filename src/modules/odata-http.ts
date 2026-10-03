@@ -104,11 +104,39 @@ export interface ODataHttpResult<TData = unknown> {
   readonly etag?: string;
 }
 
-/** Internal: Playwright API response shape. */
+/**
+ * Internal: Playwright API response shape.
+ *
+ * @remarks
+ * `json()` stays `unknown` rather than generic. Playwright 1.63 made its own
+ * `get<T>()` generic, which looks like it would remove the assertion in
+ * {@link parseResponse} — it does not. The body is untyped JSON from a remote
+ * SAP system, so `unknown -> TData` is an unverifiable claim wherever it is
+ * written; a generic parameter only *relocates* it to the call site (Playwright
+ * resolves `T` to `any` under the hood). Keeping it here puts the one
+ * unavoidable assertion in one place instead of six.
+ */
 interface APIResponse {
   status(): number;
   json(): Promise<unknown>;
   headers(): Record<string, string>;
+}
+
+/**
+ * Narrows an arbitrary JSON value to an indexable object.
+ *
+ * @remarks
+ * `json()` is typed `unknown` and the body arrives from a remote SAP system, so
+ * the envelope parse cannot assume it received an object. Arrays are excluded
+ * deliberately: they are indexable but are not OData envelopes, and treating
+ * one as a record would silently read `undefined` instead of reporting nothing
+ * matched.
+ *
+ * @param value - Any parsed JSON value.
+ * @returns `true` when `value` can be indexed by string key.
+ */
+function isJsonObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /** Internal: Request options (mirrors Playwright's APIRequestContext options). */
@@ -214,6 +242,9 @@ function buildQueryParams(
 /** Extracts status, data, and etag from an APIResponse. */
 async function parseResponse<TData>(response: APIResponse): Promise<ODataHttpResult<TData>> {
   const status = response.status();
+  // The one unavoidable assertion: the caller names the entity shape it
+  // expects, and nothing can verify that against untyped remote JSON without
+  // validating every field on every request. See APIResponse above.
   const data = (await response.json()) as TData;
   const headers = response.headers();
   const etag = headers['etag'];
@@ -520,21 +551,24 @@ export async function queryEntities<TData = unknown>(
   const status = response.status();
   assertSuccessStatus(status, url, operation);
 
-  // Type assertion: response.json() returns unknown; OData responses are always JSON objects
-  const raw = (await response.json()) as Record<string, unknown>;
+  const raw: unknown = await response.json();
   const headersMap = response.headers();
   const etag = headersMap['etag'];
 
-  // Parse OData V2 (d.results) or V4 (value) response format
-  let entities: readonly TData[];
-  // Type assertions: OData V2 wraps in d.results, V4 uses value — both are arrays of entity records
-  const dProperty = raw['d'] as Record<string, unknown> | undefined;
-  if (dProperty !== undefined && Array.isArray(dProperty['results'])) {
-    entities = dProperty['results'] as readonly TData[];
-  } else if (Array.isArray(raw['value'])) {
-    entities = raw['value'] as readonly TData[];
-  } else {
-    entities = [];
+  // Parse OData V2 (d.results) or V4 (value). Narrowed rather than asserted:
+  // a `null` body previously reached `raw['d']` and threw
+  // "Cannot read properties of null", surfacing as a Praman crash instead of
+  // an empty result. The two remaining assertions are irreducible —
+  // Array.isArray narrows to any[], and proving the *element* type would mean
+  // validating every entity on every read.
+  let entities: readonly TData[] = [];
+  if (isJsonObject(raw)) {
+    const dProperty = raw['d'];
+    if (isJsonObject(dProperty) && Array.isArray(dProperty['results'])) {
+      entities = dProperty['results'] as readonly TData[];
+    } else if (Array.isArray(raw['value'])) {
+      entities = raw['value'] as readonly TData[];
+    }
   }
 
   return etag !== undefined ? { status, data: entities, etag } : { status, data: entities };
