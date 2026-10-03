@@ -25,7 +25,7 @@
  *
  * Stated here so it is decided once rather than re-derived per feature.
  *
- * **LOC exception**: This file exceeds 300 LOC (~350 lines) because the feature
+ * **LOC exception**: This file exceeds 300 LOC (~400 lines) because the feature
  * table grows by a handful of flags with every Playwright minor and must stay
  * in one place: `PlaywrightFeatures` and `detectFeatures` are a single
  * declaration/threshold pair, and splitting them per version would separate
@@ -147,6 +147,28 @@ export interface PlaywrightFeatures {
   readonly hasRetryStrategyIsolated: boolean;
   /** `AbortSignal` support via the `signal` option on waiting APIs. */
   readonly hasAbortSignal: boolean;
+  /**
+   * `apiResponse.timing()` — real resource timing for an API response.
+   *
+   * @remarks
+   * *Added in v1.62*, per the API doc badge. Replaces wall-clock
+   * `Date.now()` deltas, which measure Playwright's own round-trip rather than
+   * the request.
+   */
+  readonly hasApiResponseTiming: boolean;
+  /**
+   * `scroll: 'auto' | 'none'` on actions — opt out of auto scroll-into-view.
+   *
+   * @remarks
+   * *Added in v1.62*, per the API doc badge (`locator.click` option `scroll`).
+   *
+   * Declared but not yet consumed, deliberately: passing `{ scroll: 'none' }`
+   * to an older runtime is **silently ignored**, so the caller would believe
+   * it had opted out while Playwright scrolled anyway — the same trap
+   * {@link PlaywrightFeatures.hasConsoleMessageFilter} documents. Any future
+   * use of the option must guard on this flag.
+   */
+  readonly hasScrollOption: boolean;
 
   // ── 1.63 ──────────────────────────────────────────────────────────────────
 
@@ -195,6 +217,24 @@ export interface PlaywrightFeatures {
   readonly hasDialogClosedEvent: boolean;
   /** `storageState({ opfs })` — origin private file system in storage state. */
   readonly hasOpfsStorageState: boolean;
+  /**
+   * `httpCredentials` accepts an array, for per-origin credentials.
+   *
+   * @remarks
+   * **No "Added in" badge exists for the array form** — the API docs show the
+   * `Object | Array<Object>` union without a version note, so the usual
+   * badge check could not settle it. Established instead by diffing the
+   * *published* type definitions: `playwright-core@1.63.0` declares
+   * `httpCredentials?: {…}|Array<{…}>` (types.d.ts:11450), while 1.57.0 and
+   * 1.62.0 contain no array form at all.
+   *
+   * Declared but not consumed: Praman has no `httpCredentials` call site, and
+   * the six auth strategies are form/SAML/certificate based rather than HTTP
+   * Basic. Catalogued so the record is complete and so any future use is
+   * guarded — an array passed to an older runtime would be read as a single
+   * malformed credentials object, not rejected.
+   */
+  readonly hasHttpCredentialsArray: boolean;
 }
 
 /**
@@ -266,6 +306,8 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
     hasWebPScreenshots: isAtLeast(ver, '1.62.0'),
     hasRetryStrategyIsolated: isAtLeast(ver, '1.62.0'),
     hasAbortSignal: isAtLeast(ver, '1.62.0'),
+    hasApiResponseTiming: isAtLeast(ver, '1.62.0'),
+    hasScrollOption: isAtLeast(ver, '1.62.0'),
     hasTestLocks: isAtLeast(ver, '1.63.0'),
     hasSubtreeFrameLocator: isAtLeast(ver, '1.63.0'),
     hasVisibleLocator: isAtLeast(ver, '1.63.0'),
@@ -273,6 +315,7 @@ export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures {
     hasAriaSnapshotJSON: isAtLeast(ver, '1.63.0'),
     hasDialogClosedEvent: isAtLeast(ver, '1.63.0'),
     hasOpfsStorageState: isAtLeast(ver, '1.63.0'),
+    hasHttpCredentialsArray: isAtLeast(ver, '1.63.0'),
   };
 }
 
