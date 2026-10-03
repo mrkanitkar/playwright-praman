@@ -174,6 +174,8 @@ describe('detectFeatures — 1.62 capabilities', () => {
     expect(features.hasWebPScreenshots).toBe(true);
     expect(features.hasRetryStrategyIsolated).toBe(true);
     expect(features.hasAbortSignal).toBe(true);
+    expect(features.hasApiResponseTiming).toBe(true);
+    expect(features.hasScrollOption).toBe(true);
   });
 
   it('returns all 1.62 flags false for version 1.61.0', () => {
@@ -183,6 +185,8 @@ describe('detectFeatures — 1.62 capabilities', () => {
     expect(features.hasWebPScreenshots).toBe(false);
     expect(features.hasRetryStrategyIsolated).toBe(false);
     expect(features.hasAbortSignal).toBe(false);
+    expect(features.hasApiResponseTiming).toBe(false);
+    expect(features.hasScrollOption).toBe(false);
   });
 
   it('returns all 1.62 flags false at the 1.57 floor', () => {
@@ -190,6 +194,8 @@ describe('detectFeatures — 1.62 capabilities', () => {
 
     expect(features.hasLocatorWaitForFunction).toBe(false);
     expect(features.hasWebPScreenshots).toBe(false);
+    expect(features.hasApiResponseTiming).toBe(false);
+    expect(features.hasScrollOption).toBe(false);
   });
 });
 
@@ -212,6 +218,7 @@ describe('detectFeatures — 1.63 capabilities', () => {
     expect(features.hasAriaSnapshotJSON).toBe(true);
     expect(features.hasDialogClosedEvent).toBe(true);
     expect(features.hasOpfsStorageState).toBe(true);
+    expect(features.hasHttpCredentialsArray).toBe(true);
   });
 
   it('returns all 1.63 flags false for version 1.62.0', () => {
@@ -224,6 +231,7 @@ describe('detectFeatures — 1.63 capabilities', () => {
     expect(features.hasAriaSnapshotJSON).toBe(false);
     expect(features.hasDialogClosedEvent).toBe(false);
     expect(features.hasOpfsStorageState).toBe(false);
+    expect(features.hasHttpCredentialsArray).toBe(false);
   });
 
   it('returns all 1.63 flags false at the 1.57 floor', () => {
@@ -233,6 +241,7 @@ describe('detectFeatures — 1.63 capabilities', () => {
     expect(features.hasSubtreeFrameLocator).toBe(false);
     expect(features.hasVisibleLocator).toBe(false);
     expect(features.hasStepParams).toBe(false);
+    expect(features.hasHttpCredentialsArray).toBe(false);
   });
 
   // 1.63 is additive: nothing it introduced removes or narrows an older flag.

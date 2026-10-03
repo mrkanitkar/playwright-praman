@@ -60,18 +60,18 @@ opt-in coverage for a configured fork, not as a guarantee this project makes.
 
 ## Tech Stack
 
-| Component     | Version                      |
-| ------------- | ---------------------------- |
-| Playwright    | 1.63.0 (peer: >=1.57.0)      |
-| TypeScript    | 6.0.3 (supports 7.x)         |
-| Node.js       | >=22                         |
-| ESLint        | 10.4.0 (11 plugins)          |
-| Zod           | 4.4.3                        |
-| Pino          | 10.3.1                       |
-| Build         | tsup 8.5.1 (ESM + CJS)       |
-| Test Runner   | Vitest 4.1.7                 |
-| AI SDKs       | Anthropic 0.98.0, OpenAI 6.x |
-| OpenTelemetry | SDK 0.218.0 (optional)       |
+| Component     | Version                         |
+| ------------- | ------------------------------- |
+| Playwright    | 1.63.0 (peer: >=1.57.0)         |
+| TypeScript    | 6.0.3 (supports 7.x)            |
+| Node.js       | >=22                            |
+| ESLint        | 10.12.0 (11 plugins)            |
+| Zod           | 4.6.5                           |
+| Pino          | 10.4.0                          |
+| Build         | tsup 8.5.1 (ESM + CJS)          |
+| Test Runner   | Vitest 5.0.3                    |
+| AI SDKs       | Anthropic >=0.78, OpenAI >=6.22 |
+| OpenTelemetry | SDK >=0.212 (optional)          |
 
 ## Minimum Version Enforcement
 
@@ -110,6 +110,8 @@ capabilities introduced in newer Playwright releases:
 | WebP screenshots             | 1.62+            | `hasWebPScreenshots`        |
 | `retryStrategy: 'isolated'`  | 1.62+            | `hasRetryStrategyIsolated`  |
 | `AbortSignal` support        | 1.62+            | `hasAbortSignal`            |
+| `apiResponse.timing()`       | 1.62+            | `hasApiResponseTiming`      |
+| `scroll: 'none'` on actions  | 1.62+            | `hasScrollOption`           |
 | Test locks                   | 1.63+            | `hasTestLocks`              |
 | Subtree `frameLocator()`     | 1.63+            | `hasSubtreeFrameLocator`    |
 | `locator.visible()`          | 1.63+            | `hasVisibleLocator`         |
@@ -117,6 +119,7 @@ capabilities introduced in newer Playwright releases:
 | `ariaSnapshotJSON()`         | 1.63+            | `hasAriaSnapshotJSON`       |
 | `dialogclosed` event         | 1.63+            | `hasDialogClosedEvent`      |
 | OPFS in storage state        | 1.63+            | `hasOpfsStorageState`       |
+| `httpCredentials` array      | 1.63+            | `hasHttpCredentialsArray`   |
 
 Praman's behaviour when a feature is unavailable depends on whether the floor
 has an equivalent — the policy is stated once in
