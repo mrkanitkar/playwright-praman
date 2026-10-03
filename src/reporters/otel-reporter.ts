@@ -52,6 +52,7 @@ import type {
 } from '@playwright/test/reporter';
 
 import { createLogger } from '#core/logging/index.js';
+import { redactStepParams } from '#core/logging/redaction.js';
 import type {
   MeterWrapper,
   MetricCounter,
@@ -74,6 +75,64 @@ export interface OTelReporterOptions {
 }
 
 // Step span keys are plain strings: `${testId}:${category}:${title}:${startTime}`
+
+/**
+ * Builds the OTel span attributes for a test step.
+ *
+ * @remarks
+ * Exported as a pure function for two reasons: it is the single point where a
+ * step's data becomes an exported attribute, and the reporter's tracer is
+ * private, so this is the only way to assert on the output without a live
+ * collector. Since the OTel exporter is real network egress, **every** step
+ * param passes through {@link redactStepParams} here — an allow-list that drops
+ * the `value` key Playwright uses to carry text typed by `fill()`.
+ *
+ * On Playwright 1.57-1.62 `params` and `subtitle` do not exist, so those keys
+ * are omitted entirely rather than emitted empty.
+ *
+ * @param step - The step that began.
+ * @param test - Its parent test case.
+ * @returns Flat string attributes, safe to export.
+ *
+ * Not re-exported from the `./reporters` barrel: this is a seam, not a feature
+ * consumers need, and widening the public API for a test would be the wrong
+ * trade.
+ *
+ * @example
+ * ```typescript
+ * import { buildStepAttributes } from '../../src/reporters/otel-reporter.js';
+ *
+ * buildStepAttributes(step, test);
+ * // { 'praman.step.category': 'pw:api', 'praman.step.params.locator': "getByRole('button')", ... }
+ * ```
+ */
+export function buildStepAttributes(
+  step: Pick<TestStep, 'category' | 'title'> & {
+    readonly params?: Readonly<Record<string, unknown>> | null | undefined;
+    readonly subtitle?: string | undefined;
+  },
+  test: Pick<TestCase, 'title' | 'location'>,
+): Record<string, string> {
+  const attributes: Record<string, string> = {
+    'praman.step.category': step.category,
+    'praman.step.title': step.title,
+    'praman.test.title': test.title,
+    'praman.test.file': test.location.file,
+  };
+
+  if (step.subtitle !== undefined && step.subtitle !== '') {
+    attributes['praman.step.subtitle'] = step.subtitle;
+  }
+
+  const params = redactStepParams(step.params);
+  if (params !== undefined) {
+    for (const [key, value] of Object.entries(params)) {
+      attributes[`praman.step.params.${key}`] = value;
+    }
+  }
+
+  return attributes;
+}
 
 /** Metric name constants to avoid duplicate-string warnings. */
 const METRIC_TEST_PASS = 'praman.test.pass';
@@ -154,16 +213,10 @@ export class OTelReporter implements Reporter {
    * @param step - The step that began
    */
   onStepBegin(test: TestCase, _result: TestResult, step: TestStep): void {
-    const stepCategory = step.category;
-    const spanName = `${stepCategory}: ${step.title}`;
+    const spanName = `${step.category}: ${step.title}`;
     const key = this.#stepKey(test.id, step);
 
-    const span = this.#tracer.startSpan(spanName, {
-      'praman.step.category': stepCategory,
-      'praman.step.title': step.title,
-      'praman.test.title': test.title,
-      'praman.test.file': test.location.file,
-    });
+    const span = this.#tracer.startSpan(spanName, buildStepAttributes(step, test));
 
     this.#stepSpans.set(key, span);
   }

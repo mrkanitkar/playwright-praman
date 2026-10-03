@@ -58,7 +58,40 @@ export interface TestStepOverrides {
   readonly duration: number;
   readonly error?: TestStep['error'];
   readonly steps: TestStep[];
+  /**
+   * Structured step parameters (Playwright 1.63+).
+   *
+   * @remarks
+   * Absent by default so the default mock represents a 1.57-1.62 runtime, where
+   * `TestStep.params` does not exist.
+   *
+   * Declared structurally rather than as `TestStep['params']`: that indexed
+   * access is itself a compile error against the 1.57 floor, where the property
+   * is absent from the interface.
+   */
+  readonly params?: Readonly<Record<string, unknown>>;
+  /** Step subtitle (Playwright 1.63+); absent by default for the same reason. */
+  readonly subtitle?: string;
 }
+
+/**
+ * A `TestStep` plus the fields Playwright only added in 1.63.
+ *
+ * @remarks
+ * The mock must be able to *set* `params` and `subtitle` while still satisfying
+ * `TestStep`. Returning a bare `TestStep` would make the object literal an
+ * excess-property error on the 1.57 floor, so the return type names the extra
+ * fields explicitly on every version.
+ *
+ * @example
+ * ```typescript
+ * const step: MockTestStep = createMockTestStep({ params: { praman: true } });
+ * ```
+ */
+export type MockTestStep = TestStep & {
+  readonly params?: Readonly<Record<string, unknown>>;
+  readonly subtitle?: string;
+};
 
 /**
  * Creates a mock `TestCase` for use in reporter unit tests.
@@ -136,7 +169,7 @@ export function createMockTestResult(overrides?: Partial<TestResultOverrides>): 
  * const step = createMockTestStep({ title: 'Click button', category: 'pw:api', duration: 50 });
  * ```
  */
-export function createMockTestStep(overrides?: Partial<TestStepOverrides>): TestStep {
+export function createMockTestStep(overrides?: Partial<TestStepOverrides>): MockTestStep {
   const base = {
     title: overrides?.title ?? 'mock step',
     category: overrides?.category ?? 'test.step',
@@ -147,8 +180,14 @@ export function createMockTestStep(overrides?: Partial<TestStepOverrides>): Test
     startTime: new Date('2026-01-01T00:00:00Z'),
     titlePath: () => [overrides?.title ?? 'mock step'],
   };
-  // exactOptionalPropertyTypes: only spread error key when it is actually defined
-  return overrides?.error !== undefined ? { ...base, error: overrides.error } : base;
+  // exactOptionalPropertyTypes: only spread optional keys when actually defined.
+  // params/subtitle stay absent by default so the mock models a pre-1.63 runtime.
+  return {
+    ...base,
+    ...(overrides?.error !== undefined && { error: overrides.error }),
+    ...(overrides?.params !== undefined && { params: overrides.params }),
+    ...(overrides?.subtitle !== undefined && { subtitle: overrides.subtitle }),
+  };
 }
 
 /**

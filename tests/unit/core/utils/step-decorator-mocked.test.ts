@@ -35,7 +35,31 @@ vi.mock('@playwright/test', () => ({
 }));
 
 // Import AFTER the vi.mock() call so the mock takes effect
+import { hasFeature } from '#core/compat/playwright-compat.js';
+import type { PramanStepParams } from '#core/utils/step-decorator.js';
 import { isInsideTestContext, ui5Step, withStep } from '#core/utils/step-decorator.js';
+
+/**
+ * Builds the options `test.step()` should receive on the **installed**
+ * Playwright.
+ *
+ * @remarks
+ * These tests use the real `hasFeature`, not a mock, so hard-coding the 1.63
+ * shape made them fail against the 1.57 floor — where `params` and `subtitle`
+ * are correctly omitted. Asserting the version-appropriate shape keeps the
+ * assertion meaningful on both ends of the supported range; the flag-by-flag
+ * behaviour of `buildStepOptions` is covered in `step-decorator-params.test.ts`,
+ * which mocks the flags.
+ */
+function expectedStepOptions(params: PramanStepParams, subtitle?: string): Record<string, unknown> {
+  return {
+    ...(hasFeature('hasBoxedStep') && { box: true }),
+    ...(hasFeature('hasStepParams') && {
+      params,
+      ...(subtitle !== undefined && { subtitle }),
+    }),
+  };
+}
 
 describe('isInsideTestContext (mocked — returns true)', () => {
   it('returns true when test.info() succeeds', () => {
@@ -60,7 +84,7 @@ describe('withStep (mocked — inside test context)', () => {
     await withStep('my step', fn);
 
     expect(mockStep).toHaveBeenCalledOnce();
-    expect(mockStep).toHaveBeenCalledWith('my step', fn, { box: true });
+    expect(mockStep).toHaveBeenCalledWith('my step', fn, expectedStepOptions({ praman: true }));
   });
 
   it('propagates return value through test.step()', async () => {
@@ -75,11 +99,24 @@ describe('withStep (mocked — inside test context)', () => {
     ).rejects.toThrow('inner-error');
   });
 
-  it('passes { box: true } options to test.step()', async () => {
+  it('passes boxed options plus the praman marker to test.step()', async () => {
     await withStep('boxed step', async () => Promise.resolve('ok'));
 
     const callArgs = mockStep.mock.calls[0] as unknown[];
-    expect(callArgs[2]).toStrictEqual({ box: true });
+    expect(callArgs[2]).toStrictEqual(expectedStepOptions({ praman: true }));
+  });
+
+  it('forwards caller-supplied params alongside the marker', async () => {
+    await withStep('enriched step', async () => Promise.resolve('ok'), {
+      praman: true,
+      module: 'ui5Navigation',
+      action: 'navigateToApp',
+    });
+
+    const callArgs = mockStep.mock.calls[0] as unknown[];
+    expect(callArgs[2]).toStrictEqual(
+      expectedStepOptions({ praman: true, module: 'ui5Navigation', action: 'navigateToApp' }),
+    );
   });
 });
 
@@ -107,7 +144,7 @@ describe('ui5Step (mocked — inside test context)', () => {
     expect(callArgs[0]).toBe('Click { id: "saveBtn" }');
   });
 
-  it('passes { box: true } to test.step()', async () => {
+  it('passes boxed options plus module and action to test.step()', async () => {
     class TestHandler {
       @ui5Step
       async getValue(): Promise<string> {
@@ -119,7 +156,31 @@ describe('ui5Step (mocked — inside test context)', () => {
     await handler.getValue();
 
     const callArgs = mockStep.mock.calls[0] as unknown[];
-    expect(callArgs[2]).toStrictEqual({ box: true });
+    // No subtitle: the method takes no arguments, so there is no selector to
+    // format — omitted rather than emitted empty.
+    expect(callArgs[2]).toStrictEqual(
+      expectedStepOptions({ praman: true, module: 'TestHandler', action: 'getValue' }),
+    );
+  });
+
+  it('sets the formatted selector as the step subtitle', async () => {
+    class TestHandler {
+      @ui5Step
+      async click(selector: { id: string }): Promise<string> {
+        return Promise.resolve(`clicked ${selector.id}`);
+      }
+    }
+
+    const handler = new TestHandler();
+    await handler.click({ id: 'saveBtn' });
+
+    const callArgs = mockStep.mock.calls[0] as unknown[];
+    expect(callArgs[2]).toStrictEqual(
+      expectedStepOptions(
+        { praman: true, module: 'TestHandler', action: 'click' },
+        '{ id: "saveBtn" }',
+      ),
+    );
   });
 
   it('propagates return value through test.step()', async () => {

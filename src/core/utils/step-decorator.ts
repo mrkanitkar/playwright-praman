@@ -34,6 +34,8 @@
  */
 import { test } from '@playwright/test';
 
+import { ACTION_MAP } from './step-actions.js';
+
 import { hasFeature } from '#core/compat/playwright-compat.js';
 
 /**
@@ -60,6 +62,84 @@ export function isInsideTestContext(): boolean {
   } catch {
     return false;
   }
+}
+
+// ── Structured step params (Playwright 1.63+) ──────────────────────────────
+
+/**
+ * Structured identification of a Praman-produced step.
+ *
+ * @remarks
+ * Surfaces on `TestStep.params` for reporters, replacing title string-matching.
+ * `praman: true` is the marker that matters — `module` and `action` are
+ * enrichment, so a call site that supplies neither is still classified
+ * correctly.
+ *
+ * @example
+ * ```typescript
+ * const params: PramanStepParams = {
+ *   praman: true, module: 'UI5Handler', action: 'click',
+ * };
+ * ```
+ */
+export interface PramanStepParams {
+  /** Always `true`; the marker reporters classify on. */
+  readonly praman: true;
+  /** Producing class or namespace, e.g. `'UI5Handler'`. */
+  readonly module?: string;
+  /** Method name, e.g. `'click'`. */
+  readonly action?: string;
+}
+
+/**
+ * Options object passed to `test.step()`, assembled per installed Playwright.
+ *
+ * @example
+ * ```typescript
+ * const options: PramanStepOptions = { box: true, params: { praman: true } };
+ * ```
+ */
+export interface PramanStepOptions {
+  readonly box?: boolean;
+  readonly params?: PramanStepParams;
+  readonly subtitle?: string;
+}
+
+/**
+ * Builds the `test.step()` options for the installed Playwright version.
+ *
+ * @remarks
+ * Each key is gated independently, because the two features arrived five
+ * minors apart: `box` in 1.38, `params`/`subtitle` in 1.63. Keys are **omitted**
+ * rather than set to `undefined` — on an older runtime JavaScript silently
+ * ignores surplus options, so a reporter would otherwise render blank subtitles
+ * while believing it had them.
+ *
+ * @param params - Structured identification; the marker is added for free.
+ * @param subtitle - Optional formatted selector shown beside the title.
+ * @returns Options containing only the keys this Playwright understands.
+ *
+ * @example
+ * ```typescript
+ * import { buildStepOptions } from '#core/utils/step-decorator.js';
+ *
+ * buildStepOptions({ praman: true, action: 'click' }, '{ id: "save" }');
+ * // 1.63: { box: true, params: {...}, subtitle: '{ id: "save" }' }
+ * // 1.57: { box: true }
+ * ```
+ */
+export function buildStepOptions(params?: PramanStepParams, subtitle?: string): PramanStepOptions {
+  const boxed = hasFeature('hasBoxedStep');
+
+  if (!hasFeature('hasStepParams')) {
+    return boxed ? { box: true } : {};
+  }
+
+  return {
+    ...(boxed && { box: true }),
+    params: params ?? { praman: true },
+    ...(subtitle !== undefined && subtitle !== '' && { subtitle }),
+  };
 }
 
 /**
@@ -106,7 +186,11 @@ export function ui5Step<
 
     const stepName = generateStepName(className, methodName, args);
 
-    const stepOptions = hasFeature('hasBoxedStep') ? { box: true } : {};
+    const firstArg = args.length > 0 ? args[0] : undefined;
+    const stepOptions = buildStepOptions(
+      { praman: true, module: className, action: methodName },
+      firstArg === undefined ? undefined : formatSelectorForStep(firstArg),
+    );
 
     return test.step(stepName, async () => target.call(this, ...args), stepOptions) as TReturn;
   }
@@ -121,8 +205,14 @@ export function ui5Step<
  * If called outside a Playwright test context, executes `fn` directly (no-op wrapper).
  * Errors from `fn` are propagated — the step marks itself as failed.
  *
+ * On Playwright 1.63+ the step is additionally marked `{ praman: true }` in
+ * `TestStep.params`, so reporters classify it structurally instead of by title.
+ * Every existing call site gains this without changing its arguments; `params`
+ * only enriches that marker.
+ *
  * @param stepName - Human-readable step name (shown in Playwright trace/report).
  * @param fn - Async function to execute inside the step.
+ * @param params - Optional structured identification for reporters.
  * @returns The return value of `fn`.
  *
  * @example
@@ -132,12 +222,15 @@ export function ui5Step<
  * });
  * ```
  */
-export async function withStep<T>(stepName: string, fn: () => Promise<T>): Promise<T> {
+export async function withStep<T>(
+  stepName: string,
+  fn: () => Promise<T>,
+  params?: PramanStepParams,
+): Promise<T> {
   if (!isInsideTestContext()) {
     return fn();
   }
-  const stepOptions = hasFeature('hasBoxedStep') ? { box: true } : {};
-  return test.step(stepName, fn, stepOptions);
+  return test.step(stepName, fn, buildStepOptions(params));
 }
 
 /**
@@ -168,76 +261,11 @@ export function createStepName(module: string, action: string, target?: string):
 }
 
 /**
- * Maps handler method names to human-readable action verbs for step display.
- *
- * @remarks
- * Covers all public async methods across the five handler classes:
- * UI5Handler (14), ShellHandler (3), FooterHandler (6),
- * AgenticHandler (3), and SAPAuthHandler (4).
- *
- * @example
- * ```typescript
- * import { ACTION_MAP } from '#core/utils/step-decorator.js';
- *
- * const verb = ACTION_MAP['click']; // 'Click'
- * const wait = ACTION_MAP['waitForUI5']; // 'Wait for UI5'
- * ```
+ * Re-exported from `step-actions.ts`, which holds no Playwright import so the
+ * compliance reporter can share the verb table without pulling in the test
+ * runtime. See that module for why the two had to stop being separate copies.
  */
-export const ACTION_MAP = {
-  // UI5Handler
-  click: 'Click',
-  fill: 'Fill',
-  press: 'Press',
-  select: 'Select',
-  check: 'Check',
-  uncheck: 'Uncheck',
-  clear: 'Clear',
-  getText: 'Get text',
-  getValue: 'Get value',
-  control: 'Find control',
-  controls: 'Find controls',
-  waitForUI5: 'Wait for UI5',
-  waitFor: 'Wait for control',
-  inspect: 'Inspect control',
-  destroy: 'Destroy handler',
-
-  // ShellHandler
-  expectShellHeader: 'Verify shell header',
-  clickHome: 'Click home',
-  openUserMenu: 'Open user menu',
-
-  // FooterHandler
-  clickSave: 'Click Save',
-  clickApply: 'Click Apply',
-  clickCancel: 'Click Cancel',
-  clickEdit: 'Click Edit',
-  clickDelete: 'Click Delete',
-  clickCreate: 'Click Create',
-
-  // AgenticHandler
-  generateTest: 'Generate test',
-  interpretStep: 'Interpret step',
-  suggestActions: 'Suggest actions',
-
-  // FLPSettingsHandler
-  getLanguage: 'Get language',
-  getDateFormat: 'Get date format',
-  getTimeFormat: 'Get time format',
-  getTimezone: 'Get timezone',
-  getNumberFormat: 'Get number format',
-  getAllSettings: 'Get all settings',
-
-  // SAPAuthHandler
-  login: 'Login',
-  loginFromEnv: 'Login from env',
-  logout: 'Logout',
-  isAuthenticated: 'Check authentication',
-
-  // TestDataHandler
-  save: 'Save test data',
-  load: 'Load test data',
-  cleanup: 'Cleanup test data',
-} as const satisfies Record<string, string>;
+export { ACTION_MAP };
 
 /**
  * Formats a value for display in a selector key-value pair.

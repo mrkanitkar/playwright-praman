@@ -32,7 +32,7 @@ vi.mock('#core/logging/index.js', () => ({
   resetDefaultLogger: vi.fn(),
 }));
 
-import { OTelReporter } from '../../../src/reporters/otel-reporter.js';
+import { buildStepAttributes, OTelReporter } from '../../../src/reporters/otel-reporter.js';
 
 /** Creates a minimal mock TestCase. */
 function mockTestCase(overrides: Partial<TestCase> = {}): TestCase {
@@ -55,7 +55,19 @@ function mockTestResult(overrides: Partial<TestResult> = {}): TestResult {
 }
 
 /** Creates a minimal mock TestStep. */
-function mockTestStep(overrides: Partial<TestStep> = {}): TestStep {
+/**
+ * Overrides accepted by {@link mockTestStep}.
+ *
+ * `params` and `subtitle` are declared structurally rather than taken from
+ * `Partial<TestStep>`: Playwright only added them in 1.63, so referencing them
+ * through `TestStep` is a compile error against the 1.57 floor.
+ */
+type MockStepOverrides = Partial<TestStep> & {
+  readonly params?: Readonly<Record<string, unknown>>;
+  readonly subtitle?: string;
+};
+
+function mockTestStep(overrides: MockStepOverrides = {}): TestStep {
   return {
     title: 'locator.click',
     category: 'pw:api',
@@ -339,5 +351,67 @@ describe('OTelReporter with endpoint configured', () => {
     await expect(
       reporterWithEndpoint.onEnd({ status: 'passed' } as FullResult),
     ).resolves.toBeUndefined();
+  });
+});
+
+// ── 1.63 step params on spans ──────────────────────────────────────────────
+//
+// `buildStepAttributes` is the pure seam where a step becomes span attributes.
+// It is exported precisely so the leak can be gated without a live tracer:
+// the OTel exporter is real network egress.
+
+describe('buildStepAttributes', () => {
+  it('never exports a password typed through fill()', () => {
+    const attrs = buildStepAttributes(
+      mockTestStep({
+        title: 'Fill password',
+        category: 'pw:api',
+        params: { locator: "getByLabel('Password')", value: 'hunter2' },
+      }),
+      mockTestCase(),
+    );
+
+    expect(JSON.stringify(attrs)).not.toContain('hunter2');
+  });
+
+  it('exports the allow-listed locator so raw calls are actionable', () => {
+    const attrs = buildStepAttributes(
+      mockTestStep({
+        title: 'Click',
+        category: 'pw:api',
+        params: { locator: "getByRole('button')" },
+      }),
+      mockTestCase(),
+    );
+
+    expect(attrs['praman.step.params.locator']).toBe("getByRole('button')");
+  });
+
+  it('exports the subtitle when present (1.63)', () => {
+    const attrs = buildStepAttributes(
+      mockTestStep({ title: 'Click', subtitle: "getByRole('button')" }),
+      mockTestCase(),
+    );
+
+    expect(attrs['praman.step.subtitle']).toBe("getByRole('button')");
+  });
+
+  it('omits params and subtitle keys entirely on PW 1.57-1.62', () => {
+    const attrs = buildStepAttributes(mockTestStep({ title: 'locator.click' }), mockTestCase());
+
+    expect(Object.keys(attrs).some((k) => k.startsWith('praman.step.params.'))).toBe(false);
+    expect(attrs).not.toHaveProperty('praman.step.subtitle');
+  });
+
+  it('keeps the pre-existing attributes unchanged', () => {
+    const attrs = buildStepAttributes(
+      mockTestStep({ title: 'locator.click', category: 'pw:api' }),
+      mockTestCase(),
+    );
+
+    expect(attrs['praman.step.category']).toBe('pw:api');
+    expect(attrs['praman.step.title']).toBe('locator.click');
+    expect(attrs['praman.test.title']).toBe('should create purchase order');
+    expect(attrs['praman.test.file']).toBe('tests/po.spec.ts');
   });
 });
