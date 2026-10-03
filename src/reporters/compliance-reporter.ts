@@ -114,6 +114,26 @@ export interface ClassifiableStep {
 }
 
 /**
+ * Reads `TestStep.params` without requiring the property to exist in the type.
+ *
+ * @remarks
+ * `params` was added to `TestStep` in Playwright 1.63. Accessing `step.params`
+ * directly compiles here but fails `tsc` against the 1.57 floor with
+ * `TS2339: Property 'params' does not exist on type 'TestStep'` — a *build*
+ * error for floor users, invisible to a typecheck on 1.63. `Reflect.get` is the
+ * same escape hatch `control-wait.ts` uses for `locator.waitForFunction`.
+ *
+ * @param step - Any step-like value.
+ * @returns The params record, or `undefined` on 1.57-1.62.
+ */
+function readStepParams(step: object): Readonly<Record<string, unknown>> | undefined {
+  const params: unknown = Reflect.get(step, 'params');
+  return typeof params === 'object' && params !== null
+    ? (params as Readonly<Record<string, unknown>>)
+    : undefined;
+}
+
+/**
  * Determines whether a step was produced by a Praman abstraction.
  *
  * @remarks
@@ -147,26 +167,6 @@ export interface ClassifiableStep {
  * isPramanStep('page.click');                              // false
  * ```
  */
-/**
- * Reads `TestStep.params` without requiring the property to exist in the type.
- *
- * @remarks
- * `params` was added to `TestStep` in Playwright 1.63. Accessing `step.params`
- * directly compiles here but fails `tsc` against the 1.57 floor with
- * `TS2339: Property 'params' does not exist on type 'TestStep'` — a *build*
- * error for floor users, invisible to a typecheck on 1.63. `Reflect.get` is the
- * same escape hatch `control-wait.ts` uses for `locator.waitForFunction`.
- *
- * @param step - Any step-like value.
- * @returns The params record, or `undefined` on 1.57-1.62.
- */
-function readStepParams(step: object): Readonly<Record<string, unknown>> | undefined {
-  const params: unknown = Reflect.get(step, 'params');
-  return typeof params === 'object' && params !== null
-    ? (params as Readonly<Record<string, unknown>>)
-    : undefined;
-}
-
 export function isPramanStep(stepOrTitle: string | ClassifiableStep): boolean {
   if (typeof stepOrTitle === 'string') {
     return matchesPramanStepTitle(stepOrTitle);

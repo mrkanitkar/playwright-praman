@@ -94,9 +94,13 @@ export interface OTelReporterOptions {
  * @param test - Its parent test case.
  * @returns Flat string attributes, safe to export.
  *
+ * Not re-exported from the `./reporters` barrel: this is a seam, not a feature
+ * consumers need, and widening the public API for a test would be the wrong
+ * trade.
+ *
  * @example
  * ```typescript
- * import { buildStepAttributes } from 'playwright-praman/reporters';
+ * import { buildStepAttributes } from '../../src/reporters/otel-reporter.js';
  *
  * buildStepAttributes(step, test);
  * // { 'praman.step.category': 'pw:api', 'praman.step.params.locator': "getByRole('button')", ... }
