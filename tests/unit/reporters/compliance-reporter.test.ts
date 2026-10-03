@@ -107,6 +107,92 @@ describe('ComplianceReporter', () => {
     expect(isPramanStep('route.fulfill')).toBe(false);
   });
 
+  // ── Regression: titles Praman actually emits ─────────────────────────────
+  //
+  // Measured before this fix: 12 of these 15 were classified as raw Playwright,
+  // i.e. reported as compliance violations that did not exist. The ' > ' form
+  // the classifier *did* recognise has zero production emitters —
+  // `createStepName` is exported but never called inside `src/`.
+
+  it('recognises every ACTION_MAP verb emitted by ui5Step', () => {
+    const emitted = [
+      'Click { id: "save" }',
+      'Wait for UI5',
+      'Inspect control { id: "t1" }',
+      'Get language',
+      'Get date format',
+      'Get time format',
+      'Get timezone',
+      'Get number format',
+      'Get all settings',
+      'Save test data "x"',
+      'Load test data "x"',
+      'Cleanup test data',
+      'Login',
+      'Login from env',
+      'Wait for control',
+      'Destroy handler',
+    ];
+
+    for (const title of emitted) {
+      expect(isPramanStep(title), title).toBe(true);
+    }
+  });
+
+  it('recognises the dot-separated convention every withStep call site uses', () => {
+    // nav-fixtures.ts:351-384 and the generic proxy at module-fixtures.ts:324
+    expect(isPramanStep('ui5Navigation.navigateToApp: myApp')).toBe(true);
+    expect(isPramanStep('ui5Navigation.navigateToHome')).toBe(true);
+    expect(isPramanStep('ui5Navigation.getCurrentHash')).toBe(true);
+    expect(isPramanStep('ui5.table.getRows')).toBe(true);
+    expect(isPramanStep('ui5.dialog.dismiss')).toBe(true);
+    expect(isPramanStep('ui5.getRows')).toBe(true);
+  });
+
+  it('does not treat a bare ui5 mention as the dot convention', () => {
+    expect(isPramanStep('ui5 is great')).toBe(false);
+    expect(isPramanStep('ui5Navigation')).toBe(false);
+  });
+
+  it('documents the residual prefix ambiguity on the title path', () => {
+    // 'Check' is a real action verb, so a user step named 'Checkout flow' is
+    // indistinguishable by title alone. Asserted rather than glossed over:
+    // prefix matching cannot resolve this, and on 1.63 it is only resolved
+    // when the author passes `params` themselves.
+    expect(isPramanStep('Checkout flow')).toBe(true);
+
+    // Supplying params removes the ambiguity.
+    expect(isPramanStep({ title: 'Checkout flow', params: { orderId: 42 } })).toBe(false);
+  });
+
+  // ── 1.63 structured params take precedence over the title heuristic ──────
+
+  it('classifies by params.praman when present, ignoring the title', () => {
+    // A title the heuristic would reject, but marked structurally.
+    expect(isPramanStep({ title: 'totally opaque', params: { praman: true } })).toBe(true);
+  });
+
+  it('rejects a pw:api step even when its title starts with a Praman verb', () => {
+    // The false-positive direction: Playwright's own steps carry params too,
+    // but never the praman marker. Previously 'Login to the supplier portal'
+    // counted as Praman because 'Login' is a prefix.
+    expect(
+      isPramanStep({
+        title: 'Login to the supplier portal',
+        params: { locator: "getByRole('button')" },
+      }),
+    ).toBe(false);
+  });
+
+  it('falls back to the title heuristic when params is absent (PW 1.57-1.62)', () => {
+    expect(isPramanStep({ title: 'Get all settings' })).toBe(true);
+    expect(isPramanStep({ title: 'page.click' })).toBe(false);
+  });
+
+  it('still accepts a bare title string (public API, unchanged)', () => {
+    expect(isPramanStep('Click button')).toBe(true);
+  });
+
   it('calculates compliance percentage correctly', async () => {
     const reporter = new ComplianceReporter();
     reporter.onBegin(createMockFullConfig(), createMockSuite());

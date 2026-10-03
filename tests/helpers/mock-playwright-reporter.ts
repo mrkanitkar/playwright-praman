@@ -58,6 +58,16 @@ export interface TestStepOverrides {
   readonly duration: number;
   readonly error?: TestStep['error'];
   readonly steps: TestStep[];
+  /**
+   * Structured step parameters (Playwright 1.63+).
+   *
+   * @remarks
+   * Absent by default so the default mock represents a 1.57-1.62 runtime, where
+   * `TestStep.params` does not exist. Pass this explicitly to simulate 1.63.
+   */
+  readonly params?: TestStep['params'];
+  /** Step subtitle (Playwright 1.63+); absent by default for the same reason. */
+  readonly subtitle?: TestStep['subtitle'];
 }
 
 /**
@@ -147,8 +157,14 @@ export function createMockTestStep(overrides?: Partial<TestStepOverrides>): Test
     startTime: new Date('2026-01-01T00:00:00Z'),
     titlePath: () => [overrides?.title ?? 'mock step'],
   };
-  // exactOptionalPropertyTypes: only spread error key when it is actually defined
-  return overrides?.error !== undefined ? { ...base, error: overrides.error } : base;
+  // exactOptionalPropertyTypes: only spread optional keys when actually defined.
+  // params/subtitle stay absent by default so the mock models a pre-1.63 runtime.
+  return {
+    ...base,
+    ...(overrides?.error !== undefined && { error: overrides.error }),
+    ...(overrides?.params !== undefined && { params: overrides.params }),
+    ...(overrides?.subtitle !== undefined && { subtitle: overrides.subtitle }),
+  };
 }
 
 /**

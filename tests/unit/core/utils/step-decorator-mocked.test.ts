@@ -60,7 +60,13 @@ describe('withStep (mocked — inside test context)', () => {
     await withStep('my step', fn);
 
     expect(mockStep).toHaveBeenCalledOnce();
-    expect(mockStep).toHaveBeenCalledWith('my step', fn, { box: true });
+    // On the installed Playwright (1.63) the options also carry the structural
+    // marker reporters classify on. Both paths of buildStepOptions are covered
+    // in step-decorator-params.test.ts, which mocks the feature flags.
+    expect(mockStep).toHaveBeenCalledWith('my step', fn, {
+      box: true,
+      params: { praman: true },
+    });
   });
 
   it('propagates return value through test.step()', async () => {
@@ -75,11 +81,25 @@ describe('withStep (mocked — inside test context)', () => {
     ).rejects.toThrow('inner-error');
   });
 
-  it('passes { box: true } options to test.step()', async () => {
+  it('passes boxed options plus the praman marker to test.step()', async () => {
     await withStep('boxed step', async () => Promise.resolve('ok'));
 
     const callArgs = mockStep.mock.calls[0] as unknown[];
-    expect(callArgs[2]).toStrictEqual({ box: true });
+    expect(callArgs[2]).toStrictEqual({ box: true, params: { praman: true } });
+  });
+
+  it('forwards caller-supplied params alongside the marker', async () => {
+    await withStep('enriched step', async () => Promise.resolve('ok'), {
+      praman: true,
+      module: 'ui5Navigation',
+      action: 'navigateToApp',
+    });
+
+    const callArgs = mockStep.mock.calls[0] as unknown[];
+    expect(callArgs[2]).toStrictEqual({
+      box: true,
+      params: { praman: true, module: 'ui5Navigation', action: 'navigateToApp' },
+    });
   });
 });
 
@@ -107,7 +127,7 @@ describe('ui5Step (mocked — inside test context)', () => {
     expect(callArgs[0]).toBe('Click { id: "saveBtn" }');
   });
 
-  it('passes { box: true } to test.step()', async () => {
+  it('passes boxed options plus module and action to test.step()', async () => {
     class TestHandler {
       @ui5Step
       async getValue(): Promise<string> {
@@ -119,7 +139,31 @@ describe('ui5Step (mocked — inside test context)', () => {
     await handler.getValue();
 
     const callArgs = mockStep.mock.calls[0] as unknown[];
-    expect(callArgs[2]).toStrictEqual({ box: true });
+    // No subtitle: the method takes no arguments, so there is no selector to
+    // format — omitted rather than emitted empty.
+    expect(callArgs[2]).toStrictEqual({
+      box: true,
+      params: { praman: true, module: 'TestHandler', action: 'getValue' },
+    });
+  });
+
+  it('sets the formatted selector as the step subtitle', async () => {
+    class TestHandler {
+      @ui5Step
+      async click(selector: { id: string }): Promise<string> {
+        return Promise.resolve(`clicked ${selector.id}`);
+      }
+    }
+
+    const handler = new TestHandler();
+    await handler.click({ id: 'saveBtn' });
+
+    const callArgs = mockStep.mock.calls[0] as unknown[];
+    expect(callArgs[2]).toStrictEqual({
+      box: true,
+      params: { praman: true, module: 'TestHandler', action: 'click' },
+      subtitle: '{ id: "saveBtn" }',
+    });
   });
 
   it('propagates return value through test.step()', async () => {

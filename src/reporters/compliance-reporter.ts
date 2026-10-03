@@ -43,6 +43,9 @@ import type {
   TestResult,
 } from '@playwright/test/reporter';
 
+import { redactStepParams } from '#core/logging/redaction.js';
+import { matchesPramanStepTitle } from '#core/utils/step-actions.js';
+
 // ── Exported types ─────────────────────────────────────────────────────────
 
 /** Classification of a single test's compliance. */
@@ -56,6 +59,15 @@ export interface TestComplianceEntry {
   readonly pramanSteps: number;
   readonly rawPlaywrightSteps: number;
   readonly totalSteps: number;
+  /**
+   * Locators used by raw Playwright steps, deduplicated.
+   *
+   * @remarks
+   * Requires Playwright 1.63+, which reports the target locator on its own
+   * `pw:api` steps. Always empty on 1.57-1.62 — the count above is then the
+   * only signal available, as before.
+   */
+  readonly rawPlaywrightLocators: readonly string[];
 }
 
 /** Full compliance report written to disk. */
@@ -77,63 +89,68 @@ export interface ComplianceReporterOptions {
 // ── Step categorisation ────────────────────────────────────────────────────
 
 /**
- * Praman action verb prefixes used to identify Praman-managed test steps.
+ * The minimum a step must expose to be classified.
  *
- * @internal
+ * @remarks
+ * Structural rather than Playwright's `TestStep`, deliberately: `params` only
+ * exists from 1.63, so a structural type with an optional key compiles and
+ * behaves correctly across the whole supported range.
+ *
+ * @example
+ * ```typescript
+ * const step: ClassifiableStep = { title: 'Click', params: { praman: true } };
+ * ```
  */
-const PRAMAN_STEP_PREFIXES: readonly string[] = [
-  'Click',
-  'Fill',
-  'Press',
-  'Select',
-  'Check',
-  'Uncheck',
-  'Clear',
-  'Get text',
-  'Get value',
-  'Find control',
-  'Find controls',
-  'Wait for',
-  'Destroy',
-  'Verify shell header',
-  'Click home',
-  'Open user menu',
-  'Click Save',
-  'Click Apply',
-  'Click Cancel',
-  'Click Edit',
-  'Click Delete',
-  'Click Create',
-  'Generate test',
-  'Interpret step',
-  'Suggest actions',
-  'Login',
-  'Logout',
-  'Check authentication',
-];
+export interface ClassifiableStep {
+  readonly title: string;
+  readonly params?: Readonly<Record<string, unknown>> | undefined;
+}
 
 /**
- * Determines whether a step title belongs to a Praman-managed step.
+ * Determines whether a step was produced by a Praman abstraction.
  *
- * A step is considered a Praman step when it either:
- * - starts with one of the known Praman action verbs, or
- * - contains ` \> ` (the withStep wrapper pattern `module \> action`).
+ * @remarks
+ * Two tiers, and the order matters:
  *
- * @param title - The step title to classify.
+ * 1. **Structural (Playwright 1.63+)** — when `params` is present it is
+ *    authoritative. Praman stamps `{ praman: true }` via `buildStepOptions`;
+ *    Playwright's own `pw:api` steps populate `params` too but never that
+ *    marker, so a step carrying params without it is definitively *not* Praman.
+ *    This makes classification exact for every Praman step and every `pw:api`
+ *    step. It does **not** fix a bare `test.step('Checkout flow', fn)` written
+ *    by a user: Playwright only fills `params` from what the author passed, so
+ *    with none it falls to tier 2 and `'Check'` still matches as a prefix.
+ *    Eliminating that needs the author to pass `params`, which Praman cannot
+ *    do on their behalf.
+ * 2. **Title heuristic (1.57-1.62)** — {@link matchesPramanStepTitle}, now
+ *    derived from `ACTION_MAP` rather than a hand-maintained copy that had
+ *    drifted by 10 verbs.
+ *
+ * Accepts a bare title string as before, so existing callers are unaffected.
+ *
+ * @param stepOrTitle - A step, or just its title.
  * @returns `true` if the step was produced by a Praman abstraction.
  *
  * @example
  * ```typescript
- * isPramanStep('Click button');       // true
- * isPramanStep('navigation > open');  // true
- * isPramanStep('page.click');         // false
+ * isPramanStep('Click button');                            // true
+ * isPramanStep('ui5.table.getRows');                       // true
+ * isPramanStep({ title: 'x', params: { praman: true } });  // true
+ * isPramanStep({ title: 'Login now', params: { locator: 'x' } }); // false
+ * isPramanStep('page.click');                              // false
  * ```
  */
-export function isPramanStep(title: string): boolean {
-  if (title.includes(' > ')) {
-    return true;
+export function isPramanStep(stepOrTitle: string | ClassifiableStep): boolean {
+  if (typeof stepOrTitle === 'string') {
+    return matchesPramanStepTitle(stepOrTitle);
   }
-  return PRAMAN_STEP_PREFIXES.some((prefix) => title.startsWith(prefix));
+
+  const { params } = stepOrTitle;
+  if (params !== undefined) {
+    return params['praman'] === true;
+  }
+
+  return matchesPramanStepTitle(stepOrTitle.title);
 }
 
 // ── Default output directory ───────────────────────────────────────────────
@@ -179,12 +196,21 @@ export class ComplianceReporter implements Reporter {
     const steps = result.steps;
     let pramanCount = 0;
     let rawCount = 0;
+    const rawLocators = new Set<string>();
 
     for (const step of steps) {
-      if (isPramanStep(step.title)) {
+      if (isPramanStep(step)) {
         pramanCount++;
-      } else {
-        rawCount++;
+        continue;
+      }
+      rawCount++;
+
+      // Playwright 1.63+ names the locator a raw call used, turning a bare
+      // count into something a user can act on. Routed through the redactor
+      // so no step param can reach disk without passing the allow-list.
+      const locator = redactStepParams(step.params)?.['locator'];
+      if (locator !== undefined && locator !== '') {
+        rawLocators.add(locator);
       }
     }
 
@@ -198,6 +224,7 @@ export class ComplianceReporter implements Reporter {
       pramanSteps: pramanCount,
       rawPlaywrightSteps: rawCount,
       totalSteps: total,
+      rawPlaywrightLocators: [...rawLocators],
     });
   }
 
