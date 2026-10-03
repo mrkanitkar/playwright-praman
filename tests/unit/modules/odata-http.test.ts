@@ -640,3 +640,77 @@ describe('OData HTTP module', () => {
     });
   });
 });
+
+// ── Malformed OData bodies ─────────────────────────────────────────────────
+//
+// `json()` is typed `unknown` by Playwright and the body comes from a remote
+// server, so the envelope parse must not assume it received an object. Before
+// the type guard, a `null` body reached `raw['d']` and threw
+// "Cannot read properties of null (reading 'd')" — a crash in Praman rather
+// than a reported OData problem.
+
+describe('queryEntities — malformed response bodies', () => {
+  it('does not throw when the body is null', async () => {
+    const mock = createMockPage();
+    mock.request.get.mockResolvedValue(createMockResponse(200, null));
+
+    await expect(queryEntities(asPage(mock), SERVICE_URL, 'Products')).resolves.toMatchObject({
+      status: 200,
+      data: [],
+    });
+  });
+
+  it('does not throw when the body is a bare array', async () => {
+    const mock = createMockPage();
+    mock.request.get.mockResolvedValue(createMockResponse(200, [1, 2, 3]));
+
+    await expect(queryEntities(asPage(mock), SERVICE_URL, 'Products')).resolves.toMatchObject({
+      data: [],
+    });
+  });
+
+  it('does not throw when the body is a string', async () => {
+    const mock = createMockPage();
+    mock.request.get.mockResolvedValue(createMockResponse(200, 'not json object'));
+
+    await expect(queryEntities(asPage(mock), SERVICE_URL, 'Products')).resolves.toMatchObject({
+      data: [],
+    });
+  });
+
+  it('does not throw when d is present but null', async () => {
+    const mock = createMockPage();
+    mock.request.get.mockResolvedValue(createMockResponse(200, { d: null }));
+
+    await expect(queryEntities(asPage(mock), SERVICE_URL, 'Products')).resolves.toMatchObject({
+      data: [],
+    });
+  });
+
+  it('does not throw when d.results is not an array', async () => {
+    const mock = createMockPage();
+    mock.request.get.mockResolvedValue(createMockResponse(200, { d: { results: 'nope' } }));
+
+    await expect(queryEntities(asPage(mock), SERVICE_URL, 'Products')).resolves.toMatchObject({
+      data: [],
+    });
+  });
+
+  it('still parses a valid V2 envelope', async () => {
+    const mock = createMockPage();
+    mock.request.get.mockResolvedValue(
+      createMockResponse(200, { d: { results: [{ Id: 'A' }, { Id: 'B' }] } }),
+    );
+
+    const result = await queryEntities<{ Id: string }>(asPage(mock), SERVICE_URL, 'Products');
+    expect(result.data.map((e) => e.Id)).toEqual(['A', 'B']);
+  });
+
+  it('still parses a valid V4 envelope', async () => {
+    const mock = createMockPage();
+    mock.request.get.mockResolvedValue(createMockResponse(200, { value: [{ Id: 'A' }] }));
+
+    const result = await queryEntities<{ Id: string }>(asPage(mock), SERVICE_URL, 'Products');
+    expect(result.data.map((e) => e.Id)).toEqual(['A']);
+  });
+});

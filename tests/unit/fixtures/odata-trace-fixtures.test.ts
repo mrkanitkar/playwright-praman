@@ -89,11 +89,31 @@ function createMockPage(): {
 }
 
 /** Creates a mock Playwright Request object. */
-function createMockRequest(method: string, url: string): Record<string, unknown> {
-  return {
+function createMockRequest(
+  method: string,
+  url: string,
+  timing?: { requestStart: number; responseEnd: number } | 'absent',
+): Record<string, unknown> {
+  const base: Record<string, unknown> = {
     method: vi.fn().mockReturnValue(method),
     url: vi.fn().mockReturnValue(url),
   };
+  if (timing === 'absent') return base;
+  // Playwright documents every field as "-1 if not available"; the default
+  // mock therefore supplies a usable pair.
+  const t = timing ?? { requestStart: 10, responseEnd: 85 };
+  base['timing'] = vi.fn().mockReturnValue({
+    startTime: 1_700_000_000_000,
+    domainLookupStart: -1,
+    domainLookupEnd: -1,
+    connectStart: -1,
+    secureConnectionStart: -1,
+    connectEnd: -1,
+    requestStart: t.requestStart,
+    responseStart: -1,
+    responseEnd: t.responseEnd,
+  });
+  return base;
 }
 
 /** Creates a mock Playwright Response object. */
@@ -493,5 +513,100 @@ describe('isODataUrl', () => {
 
   it('returns false for empty patterns array', () => {
     expect(isODataUrl('https://host/sap/opu/odata/sap/API/Products', [])).toBe(false);
+  });
+});
+
+// ── Duration source: resource timing vs the wall clock ─────────────────────
+//
+// `Date.now()` deltas measure Playwright's own event dispatch as well as the
+// request. `request.timing()` reports the browser's resource timing, and is
+// available at the 1.57 floor — so this needs no feature gate. Every field is
+// documented "-1 if not available", which is the case that must fall back.
+
+describe('odataTraceInterceptor — duration source', () => {
+  /** Drives one request/response pair and returns the attached trace. */
+  async function traceFor(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const fn = extractFixtureFn(fixtures['odataTraceInterceptor']);
+    const { page, emit } = createMockPage();
+    const testInfo = createMockTestInfo();
+
+    const useFn = async (): Promise<void> => {
+      emit('request', request);
+      emit('response', createMockResponse(request, 200, '1024'));
+      await Promise.resolve();
+    };
+
+    await (
+      fn as (
+        deps: Record<string, unknown>,
+        use: () => Promise<void>,
+        info: unknown,
+      ) => Promise<void>
+    )({ page, pramanConfig: createEnabledConfig() }, useFn, testInfo);
+
+    const callArgs = testInfo.attach.mock.calls[0] as unknown[];
+    const attachOpts = callArgs[1] as { body: Buffer };
+    const traces = JSON.parse(attachOpts.body.toString('utf8')) as Record<string, unknown>[];
+    const [first] = traces;
+    if (first === undefined) {
+      throw new Error('expected exactly one attached OData trace');
+    }
+    return first;
+  }
+
+  const ODATA_URL = 'https://host/sap/opu/odata/sap/API_PRODUCT/Products';
+
+  it('prefers resource timing over the wall clock', async () => {
+    const trace = await traceFor(
+      createMockRequest('GET', ODATA_URL, { requestStart: 10, responseEnd: 85 }),
+    );
+
+    expect(trace['duration']).toBe(75);
+    expect(trace['durationSource']).toBe('resource-timing');
+  });
+
+  it('falls back to the wall clock when responseEnd is unavailable', async () => {
+    const trace = await traceFor(
+      createMockRequest('GET', ODATA_URL, { requestStart: 10, responseEnd: -1 }),
+    );
+
+    expect(trace['durationSource']).toBe('wall-clock');
+    expect(typeof trace['duration']).toBe('number');
+  });
+
+  it('falls back when requestStart is unavailable', async () => {
+    const trace = await traceFor(
+      createMockRequest('GET', ODATA_URL, { requestStart: -1, responseEnd: 85 }),
+    );
+
+    expect(trace['durationSource']).toBe('wall-clock');
+  });
+
+  it('falls back when timing() is absent entirely', async () => {
+    // Defensive: the field set is stable across 1.57-1.63, but a patched or
+    // stubbed runtime may not provide the method.
+    const trace = await traceFor(createMockRequest('GET', ODATA_URL, 'absent'));
+
+    expect(trace['durationSource']).toBe('wall-clock');
+    expect(typeof trace['duration']).toBe('number');
+  });
+
+  it('falls back rather than reporting a negative duration', async () => {
+    const trace = await traceFor(
+      createMockRequest('GET', ODATA_URL, { requestStart: 90, responseEnd: 20 }),
+    );
+
+    expect(trace['durationSource']).toBe('wall-clock');
+    expect(trace['duration'] as number).toBeGreaterThanOrEqual(0);
+  });
+
+  it('accepts a zero-length duration from resource timing', async () => {
+    // A cached response can legitimately report 0ms; that is data, not an error.
+    const trace = await traceFor(
+      createMockRequest('GET', ODATA_URL, { requestStart: 40, responseEnd: 40 }),
+    );
+
+    expect(trace['duration']).toBe(0);
+    expect(trace['durationSource']).toBe('resource-timing');
   });
 });
