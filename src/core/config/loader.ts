@@ -382,15 +382,11 @@ export async function loadConfig(options?: LoadConfigOptions): Promise<Readonly<
   throw new ConfigError({
     message: 'Config validation failed: invalid overrides provided to loadConfig()',
     attempted: 'Validate merged configuration (overrides + env vars)',
-    validationErrors: result.error.issues.map(
-      (issue): ValidationIssue => ({
-        path: issue.path.map((segment) =>
-          typeof segment === 'symbol' ? String(segment) : segment,
-        ),
-        message: issue.message,
-        code: issue.code,
-      }),
-    ),
+    validationErrors: result.error.issues.map((issue): ValidationIssue => ({
+      path: issue.path.map((segment) => (typeof segment === 'symbol' ? String(segment) : segment)),
+      message: issue.message,
+      code: issue.code,
+    })),
     suggestions: [
       'Check the overrides passed to loadConfig() for invalid values',
       'Use defineConfig() for type-safe config authoring',
@@ -400,23 +396,48 @@ export async function loadConfig(options?: LoadConfigOptions): Promise<Readonly<
 }
 
 /**
- * Type helper for Praman config files — returns input unchanged.
+ * Type helper for Praman config files with optional environment-specific overrides.
  *
  * @remarks
  * Used in `praman.config.ts` for IDE autocomplete and type checking.
+ * When `environments` is provided, the active environment is determined by
+ * `PRAMAN_ENV` (takes precedence) or `NODE_ENV`. If the active environment
+ * matches a key in `environments`, that override is **shallow-merged** onto
+ * `base` — nested objects such as `auth` or `ai` are replaced entirely,
+ * not deep-merged.
  *
- * @guarantee Returns the input unchanged (identity function for type inference).
+ * @guarantee Returns `base` unchanged when no environment matches or
+ *   `environments` is omitted; returns a shallow merge otherwise.
  *
- * @param input - Config input to pass through.
- * @returns The input unchanged.
+ * @param base - Base config input applied in every environment.
+ * @param environments - Optional map of environment names to partial config
+ *   overrides. The active environment is read from `PRAMAN_ENV` first, then
+ *   `NODE_ENV`.
+ * @returns The resolved config input for the current environment.
  *
  * @example
  * ```typescript
  * // praman.config.ts
  * import { defineConfig } from 'playwright-praman';
- * export default defineConfig({ logLevel: 'debug' });
+ *
+ * export default defineConfig(
+ *   { logLevel: 'info', ui5WaitTimeout: 30_000 },
+ *   {
+ *     ci: { logLevel: 'error', skipStabilityWait: true },
+ *     development: { logLevel: 'debug' },
+ *   },
+ * );
  * ```
  */
-export function defineConfig(input: PramanConfigInput): PramanConfigInput {
-  return input;
+export function defineConfig(
+  base: PramanConfigInput,
+  environments?: Record<string, Partial<PramanConfigInput>>,
+): PramanConfigInput {
+  const env = process.env['PRAMAN_ENV'] ?? process.env['NODE_ENV'];
+  /* eslint-disable security/detect-object-injection -- safe: env comes from process.env, not user input */
+  if (env !== undefined && environments?.[env] !== undefined) {
+    return { ...base, ...environments[env] };
+  }
+  /* eslint-enable security/detect-object-injection */
+  return base;
 }
