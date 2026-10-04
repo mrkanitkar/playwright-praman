@@ -111,6 +111,19 @@ jobs:
       - name: Export map validation
         if: matrix.os == 'ubuntu-latest'
         run: npm run check:exports
+      # api-extractor had only ever run in --local mode, which *writes* the
+      # report and so can never disagree with it. Nothing verified it, and it
+      # sat 7 months stale while new exports accumulated — taking llms-full.txt,
+      # which inlines it, along with it.
+      #
+      # Regenerate-then-diff rather than api-extractor's own CI mode: that mode
+      # exits non-zero on any warning, and the repo carries pre-existing
+      # ae-unresolved-link warnings, so it would fail for reasons unrelated to
+      # drift. Needs dist/, so it lives here and not in validate:generated
+      # (the quality job never builds).
+      - name: API report freshness
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run validate:api-report
       - name: Create npm tarball
         if: matrix.os == 'ubuntu-latest'
         run: npm pack

@@ -1,10 +1,10 @@
 # playwright-praman
 
 > Agent-First SAP UI5 Test Automation Plugin for Playwright.
-> Version: 1.0.1 | License: Apache-2.0
+> Version: 1.3.5 | License: Apache-2.0
 > Install: npm install playwright-praman @playwright/test
 > Import: import { test, expect } from 'playwright-praman'
-> Generated: 2026-02-27 from source docs and API reports
+> Generated from source docs and API reports — do not edit by hand.
 
 ## Quick Start
 
@@ -16,7 +16,22 @@ This guide walks you from zero to a running test in minutes.
 ## Installation
 
 ```bash
-npm install -D playwright-praman @playwright/test
+npm install -D playwright-praman
+npx playwright-praman init
+```
+
+`init` automatically installs `@playwright/test`, `@playwright/cli`, and `dotenv` if they are missing,
+then installs the Chromium browser binary. You do not need to install those packages separately.
+
+For manual installation (e.g. pnpm/yarn workspaces):
+
+```bash
+npm install -D playwright-praman @playwright/test @playwright/cli
+# or
+yarn add -D playwright-praman @playwright/test @playwright/cli
+# or
+pnpm add -D playwright-praman @playwright/test @playwright/cli
+
 npx playwright install chromium
 ```
 
@@ -43,7 +58,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         storageState: '.auth/sap-session.json',
-        baseURL: process.env['SAP_BASE_URL'],
+        baseURL: process.env['SAP_CLOUD_BASE_URL'],
       },
       dependencies: ['auth'],
     },
@@ -63,14 +78,50 @@ cp node_modules/playwright-praman/examples/auth-setup.ts tests/auth-setup.ts
 Or create your own `tests/auth-setup.ts`. See `examples/auth-setup.ts` for a
 complete reference covering OnPrem, BTP Cloud SAML, and Office 365 strategies.
 
-Set environment variables (in `.env.test` or CI secrets):
+Set environment variables (in `.env` or CI secrets):
 
 ```bash
-SAP_BASE_URL=https://your-sap-system.example.com
-SAP_USERNAME=TEST_USER
-SAP_PASSWORD=SecurePassword123
-SAP_AUTH_STRATEGY=basic    # 'basic' | 'btp-saml' | 'office365'
-SAP_CLIENT=100             # OnPrem only
+SAP_ACTIVE_SYSTEM=cloud     # 'cloud' or 'onprem'
+SAP_CLOUD_BASE_URL=https://your-sap-system.example.com
+SAP_CLOUD_USERNAME=TEST_USER
+SAP_CLOUD_PASSWORD=<your-password>
+SAP_AUTH_STRATEGY=btp-saml   # 'basic' | 'btp-saml' | 'office365'
+SAP_CLIENT=100               # Optional, default 100
+SAP_LANGUAGE=EN              # Optional, default EN
+```
+
+> **Tip:** `SAP_CLOUD_BASE_URL` should be the root URL of your SAP system (no trailing path).
+> For BTP, use the full Launchpad URL.
+
+#### Example: On-Premise (Basic Auth)
+
+```bash
+SAP_ACTIVE_SYSTEM=onprem
+SAP_ONPREM_BASE_URL=https://sap-dev.company.com:44300
+SAP_ONPREM_USERNAME=TEST_USER
+SAP_ONPREM_PASSWORD=SecureP@ss123
+SAP_AUTH_STRATEGY=basic
+SAP_CLIENT=100
+```
+
+#### Example: BTP Cloud (SAML)
+
+```bash
+SAP_ACTIVE_SYSTEM=cloud
+SAP_CLOUD_BASE_URL=https://my-tenant.launchpad.cfapps.eu10.hana.ondemand.com
+SAP_CLOUD_USERNAME=test.user@company.com
+SAP_CLOUD_PASSWORD=SecureP@ss123
+SAP_AUTH_STRATEGY=btp-saml
+```
+
+#### Example: Office 365
+
+```bash
+SAP_ACTIVE_SYSTEM=cloud
+SAP_AUTH_STRATEGY=office365
+SAP_CLOUD_BASE_URL=https://sap-portal.company.com
+SAP_CLOUD_USERNAME=test.user@company.onmicrosoft.com
+SAP_CLOUD_PASSWORD=SecureP@ss123
 ```
 
 ### 3. Add .auth to .gitignore
@@ -86,10 +137,7 @@ Create `tests/purchase-order.spec.ts`:
 ```typescript
 import { test, expect } from 'playwright-praman';
 
-test('navigate to Purchase Order app and verify table', async ({
-  ui5,
-  ui5Navigation,
-}) => {
+test('navigate to Purchase Order app and verify table', async ({ ui5, ui5Navigation }) => {
   // Step 1: Navigate to the Fiori app
   await test.step('Open Purchase Order app', async () => {
     await ui5Navigation.navigateToApp('PurchaseOrder-manage');
@@ -118,6 +166,31 @@ test('navigate to Purchase Order app and verify table', async ({
   });
 });
 ```
+
+## Verify Your Setup
+
+Run the example test in headed mode to see it in action:
+
+```bash
+npx playwright test tests/purchase-order.spec.ts --headed
+```
+
+**What to expect:**
+
+- A Chromium window opens and navigates to your SAP login page
+- Auth completes automatically (you will see the FLP home screen)
+- The test interacts with UI5 controls and closes
+
+**Common first-run issues:**
+
+| Symptom                           | Likely Cause                           | Fix                                           |
+| --------------------------------- | -------------------------------------- | --------------------------------------------- |
+| Browser opens but stays blank     | `SAP_CLOUD_BASE_URL` is wrong or unreachable | Check URL in browser manually             |
+| Login page appears but auth fails | Wrong credentials or strategy          | Verify `.env` values; try logging in manually |
+| Auth succeeds but test times out  | App tile not found or UI5 not loaded   | Run `npx playwright-praman doctor`            |
+| `ERR_BRIDGE_NOT_READY`            | UI5 framework not detected             | Ensure the page is a UI5 application          |
+
+For more help: [Troubleshooting Guide](./TROUBLESHOOTING.md)
 
 ## Running Tests
 
@@ -186,11 +259,7 @@ const rowIndex = await ui5.table.findRowByValues('purchaseOrderTable', {
 await ui5.table.clickRow('purchaseOrderTable', rowIndex);
 
 // Get a specific cell value
-const vendor = await ui5.table.getCellByColumnName(
-  'purchaseOrderTable',
-  0,
-  'Vendor',
-);
+const vendor = await ui5.table.getCellByColumnName('purchaseOrderTable', 0, 'Vendor');
 ```
 
 ### Dialog Handling
@@ -286,18 +355,18 @@ Focus on **fixtures, assertions, and test.step()** for structured test flows.
 
 Key fixtures available in every test:
 
-| Fixture | Purpose |
-| --- | --- |
-| `ui5` | Core control discovery and interaction |
-| `ui5.table` | Table read, filter, sort, select |
-| `ui5.dialog` | Dialog lifecycle (wait, confirm, dismiss) |
-| `ui5.date` | DatePicker and TimePicker operations |
-| `ui5.odata` | OData model reads and HTTP operations |
-| `ui5Navigation` | FLP and in-app navigation |
-| `ui5Footer` | Footer toolbar buttons (Save, Edit, Cancel) |
-| `ui5Shell` | Shell header (Home, Notifications, User menu) |
-| `fe` | Fiori Elements List Report, Object Page, Table |
-| `intent` | Business intent APIs (procurement, sales, finance) |
+| Fixture         | Purpose                                            |
+| --------------- | -------------------------------------------------- |
+| `ui5`           | Core control discovery and interaction             |
+| `ui5.table`     | Table read, filter, sort, select                   |
+| `ui5.dialog`    | Dialog lifecycle (wait, confirm, dismiss)          |
+| `ui5.date`      | DatePicker and TimePicker operations               |
+| `ui5.odata`     | OData model reads and HTTP operations              |
+| `ui5Navigation` | FLP and in-app navigation                          |
+| `ui5Footer`     | Footer toolbar buttons (Save, Edit, Cancel)        |
+| `ui5Shell`      | Shell header (Home, Notifications, User menu)      |
+| `fe`            | Fiori Elements List Report, Object Page, Table     |
+| `intent`        | Business intent APIs (procurement, sales, finance) |
 
 Always wrap multi-step flows in `test.step()` for clear reporting:
 
@@ -327,6 +396,25 @@ for the complete 7-rule compliance framework.
 
 **Forbidden patterns**: Never use `page.click('#__...')`, `page.fill('#__...')`,
 or `page.locator('.sapM...')` for UI5 elements. Always use Praman fixtures.
+
+#### Agent Seed File
+
+The seed file (`tests/seeds/sap-seed.spec.ts`) is a special Playwright test that:
+
+1. Authenticates with your SAP system using raw Playwright (no Praman fixtures)
+2. Navigates to the Fiori Launchpad
+3. Waits for UI5 controls to load
+4. Keeps the browser open via MCP `pauseAtEnd` for agent discovery
+
+Use the seed when AI agents need a live, authenticated browser session to explore your app:
+
+```bash
+npx playwright test tests/seeds/sap-seed.spec.ts --project=agent-seed-test
+```
+
+The seed deliberately avoids Praman fixtures so that the MCP server can inspect the
+page without fixture lifecycle interference. For normal test authoring, use the
+standard auth-setup.ts pattern instead.
 
 ### SAP Business Analyst
 
@@ -358,38 +446,100 @@ See `docs/docs/guides/vocabulary-system.md` for term mappings and
 
 ## Further Reading
 
-| Topic | Documentation |
-| --- | --- |
-| Full API reference | `skills/playwright-praman-sap-testing/api-reference.md` |
-| Authentication strategies | `skills/playwright-praman-sap-testing/authentication.md` |
-| AI capabilities | `skills/playwright-praman-sap-testing/ai-capabilities.md` |
-| Architecture overview | `docs/docs/guides/architecture-overview.md` |
-| Vocabulary system | `docs/docs/guides/vocabulary-system.md` |
-| Error handling | `docs/docs/guides/errors.md` |
-| Documentation map | `DOCS-MAP.md` |
+| Topic                     | Documentation                                             |
+| ------------------------- | --------------------------------------------------------- |
+| Full API reference        | `skills/playwright-praman-sap-testing/api-reference.md`   |
+| Authentication strategies | `skills/playwright-praman-sap-testing/authentication.md`  |
+| AI capabilities           | `skills/playwright-praman-sap-testing/ai-capabilities.md` |
+| Architecture overview     | `docs/docs/guides/architecture-overview.md`               |
+| Vocabulary system         | `docs/docs/guides/vocabulary-system.md`                   |
+| Error handling            | `docs/docs/guides/errors.md`                              |
+| Documentation map         | `DOCS-MAP.md`                                             |
 
 ## Selector Reference
+
+# Selector Reference
+
+:::info[In this guide]
+
+- Choose the right selector fields for your use case
+- Find controls by ID, type, properties, binding path, and ancestry
+- Scope selectors to views and dialogs
+- Use the CSS-style `ui5=` locator syntax as an alternative
+- Avoid brittle DOM-based selectors
+
+:::
 
 Selectors are the primary way to find UI5 controls on a page. Praman uses `UI5Selector` objects
 that query the UI5 runtime's control registry — not the DOM.
 
+:::warning[Common mistake]
+Do not use DOM IDs (e.g., `#__xmlview0--btn1`) as selectors. UI5 generates these IDs at
+runtime and they change across views, components, and UI5 versions. Always use the control's
+stable ID or other semantic selector fields.
+
+```typescript
+// Wrong — brittle runtime-generated DOM ID
+await ui5.control({ id: '__xmlview0--btn1' });
+
+// Correct — stable application ID
+await ui5.control({ id: 'saveBtn' });
+
+// Better — semantic selector resilient to ID changes
+await ui5.control({
+  controlType: 'sap.m.Button',
+  properties: { text: 'Save' },
+});
+```
+
+:::
+
+:::info Locator Syntax
+You can also find controls using CSS-style syntax with `page.locator('ui5=...')`.
+This returns a standard Playwright `Locator` and supports combinators, label matching,
+and positional pseudo-classes. See [Finding Controls with Locators](./locator-selector-syntax.md).
+:::
+
 ## UI5Selector Fields
 
-| Field               | Type                      | Description                                       |
-| ------------------- | ------------------------- | ------------------------------------------------- |
-| `controlType`       | `string`                  | Fully qualified UI5 type (e.g., `'sap.m.Button'`) |
-| `id`                | `string \| RegExp`        | Control ID or pattern                             |
-| `viewName`          | `string`                  | Owning view name for scoped discovery             |
-| `viewId`            | `string`                  | Owning view ID for scoped discovery               |
-| `properties`        | `Record<string, unknown>` | Property matchers (key-value pairs)               |
-| `bindingPath`       | `Record<string, string>`  | OData binding path matchers                       |
-| `i18NText`          | `Record<string, string>`  | i18n text matchers (translated values)            |
-| `ancestor`          | `UI5Selector`             | Parent control must match this selector           |
-| `descendant`        | `UI5Selector`             | Child control must match this selector            |
-| `interaction`       | `UI5Interaction`          | Sub-control targeting (idSuffix, domChildWith)    |
-| `searchOpenDialogs` | `boolean`                 | Also search controls inside open dialogs          |
+| Field               | Type                      | Description                                                                                                                                                                   |
+| ------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `controlType`       | `string`                  | Fully qualified UI5 type (e.g., `'sap.m.Button'`). When provided as a string literal, [narrows the return type](/docs/guides/typed-controls) to a control-specific interface. |
+| `id`                | `string \| RegExp`        | Control ID or pattern                                                                                                                                                         |
+| `viewName`          | `string`                  | Owning view name for scoped discovery                                                                                                                                         |
+| `viewId`            | `string`                  | Owning view ID for scoped discovery                                                                                                                                           |
+| `properties`        | `Record<string, unknown>` | Property matchers (key-value pairs)                                                                                                                                           |
+| `bindingPath`       | `Record<string, string>`  | OData binding path matchers                                                                                                                                                   |
+| `i18NText`          | `Record<string, string>`  | i18n text matchers (translated values)                                                                                                                                        |
+| `ancestor`          | `UI5Selector`             | Parent control must match this selector                                                                                                                                       |
+| `descendant`        | `UI5Selector`             | Child control must match this selector                                                                                                                                        |
+| `interaction`       | `UI5Interaction`          | Sub-control targeting (idSuffix, domChildWith)                                                                                                                                |
+| `searchOpenDialogs` | `boolean`                 | Also search controls inside open dialogs                                                                                                                                      |
 
 All fields are optional. At least one must be provided.
+
+### Which selector fields do I need?
+
+Use this decision tree to pick the most resilient selector for your situation:
+
+```text
+Do you know the control's stable ID?
+  ├── YES → Is the ID unique across all views?
+  │          ├── YES → Use { id: 'myId' }
+  │          └── NO  → Add viewName: { id: 'myId', viewName: 'app.view.Detail' }
+  │
+  └── NO  → Do you know the OData binding path?
+             ├── YES → Use { controlType, bindingPath }
+             │         (most resilient — survives ID refactoring)
+             │
+             └── NO  → Do you know a unique property value?
+                        ├── YES → Use { controlType, properties }
+                        │         e.g., { controlType: 'sap.m.Button', properties: { text: 'Save' } }
+                        │
+                        └── NO  → Is the control inside a specific parent?
+                                   ├── YES → Use { controlType, ancestor }
+                                   └── NO  → Use { controlType, viewName }
+```
 
 ## Examples
 
@@ -410,6 +560,12 @@ const button = await ui5.control({ id: /submit/i });
 ```typescript
 const buttons = await ui5.controls({ controlType: 'sap.m.Button' });
 ```
+
+:::tip Typed Returns
+When you use `controlType` with `ui5.control()` (singular), the return type narrows to the specific
+typed interface (e.g., `UI5Button`). See [Typed Control Returns](/docs/guides/typed-controls) for
+full details and examples.
+:::
 
 ### By Type + Properties
 
@@ -486,12 +642,30 @@ const dialogButton = await ui5.control({
 
 ## Selector String Format
 
-Praman registers a `ui5=` custom selector engine with Playwright, enabling usage in `page.locator()`:
+Praman registers a `ui5=` custom selector engine with Playwright, enabling usage in
+`page.locator()`. Two formats are supported:
+
+### JSON Format
+
+Pass a `UI5Selector` object as a JSON string:
 
 ```typescript
 const locator = page.locator('ui5={"controlType":"sap.m.Button","properties":{"text":"Save"}}');
 await locator.click();
 ```
+
+### CSS Format
+
+Use CSS-like syntax to match controls by type, ID, and properties:
+
+```typescript
+page.locator("ui5=sap.m.Button[text='Save']");
+page.locator('ui5=sap.m.Input:labeled("Vendor")');
+page.locator('ui5=sap.m.InputBase::subclass');
+```
+
+For the complete CSS and XPath syntax reference, see
+[Finding Controls with Locators](./locator-selector-syntax.md).
 
 ## Control Type Cheat Sheet
 
@@ -530,6 +704,8 @@ Praman uses a multi-strategy chain for control discovery:
 
 Configure the strategy chain:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { defineConfig } from 'playwright-praman';
 
@@ -538,9 +714,72 @@ export default defineConfig({
 });
 ```
 
+## FAQ
+
+<details>
+<summary>Can I use a RegExp for the id field?</summary>
+
+Yes. RegExp IDs are useful when the control ID includes a view prefix that may change:
+
+```typescript
+await ui5.control({ id: /vendorInput/ });
+```
+
+This matches any control whose ID contains `vendorInput`, such as
+`myApp--detailView--vendorInput`. RegExp selectors are more resilient than exact ID strings
+but less precise — ensure the pattern is specific enough to match only one control.
+
+</details>
+
+<details>
+<summary>When should I use bindingPath instead of properties?</summary>
+
+Use `bindingPath` when you want to find a control by its OData model binding rather than its
+displayed value. This is more resilient because binding paths are defined in the XML view and
+do not change with i18n translations or user data. For example,
+`{ bindingPath: { value: '/PurchaseOrder/Vendor' } }` finds the vendor input regardless of
+what text it currently displays.
+
+</details>
+
+<details>
+<summary>How do I find controls inside a dialog?</summary>
+
+Add `searchOpenDialogs: true` to your selector. Without this flag, the discovery engine only
+searches the main view's control tree and skips controls rendered in overlay dialogs.
+
+```typescript
+await ui5.control({
+  controlType: 'sap.m.Button',
+  properties: { text: 'Confirm' },
+  searchOpenDialogs: true,
+});
+```
+
+</details>
+
+<details>
+<summary>What is the difference between ancestor and descendant?</summary>
+
+`ancestor` scopes the search to controls that have a matching parent higher in the tree.
+`descendant` finds controls that contain a matching child. Use `ancestor` when you know the
+parent container (e.g., find an Input inside a specific Table). Use `descendant` when you
+know the child content (e.g., find a Form that contains a specific Input).
+
+</details>
+
+:::tip[Next steps]
+
+- **[Finding Controls with Locators →](./locator-selector-syntax.md)** — CSS-style `ui5=` selector syntax for `page.locator()`
+- **[Control Interactions →](./control-interactions.md)** — Click, fill, and read controls after finding them
+- **[Typed Control Returns →](./typed-controls.md)** — Get full autocomplete when using `controlType`
+- **[Discovery and Interaction Strategies →](./discovery-and-interaction.md)** — How the multi-strategy discovery chain works
+
+:::
+
 ## Fixtures
 
-Praman provides 12 fixture modules merged into a single `test` object via Playwright's `mergeTests()`.
+Praman provides 13 fixture modules merged into a single `test` object via Playwright's `mergeTests()`.
 
 ## Import
 
@@ -550,24 +789,29 @@ import { test, expect } from 'playwright-praman';
 
 ## Fixture Summary
 
-| Fixture         | Scope  | Type           | Description                                                                           |
-| --------------- | ------ | -------------- | ------------------------------------------------------------------------------------- |
-| `ui5`           | test   | Core           | Control discovery, interaction, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces |
-| `ui5Navigation` | test   | Navigation     | 9 FLP navigation methods                                                              |
-| `btpWorkZone`   | test   | Navigation     | Dual-frame BTP WorkZone manager                                                       |
-| `sapAuth`       | test   | Authentication | SAP authentication (6 strategies)                                                     |
-| `fe`            | test   | Fiori Elements | `.listReport`, `.objectPage`, `.table`, `.list` helpers                               |
-| `pramanAI`      | test   | AI             | Page discovery, agentic handler, LLM, vocabulary                                      |
-| `intent`        | test   | Business       | `.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`                 |
-| `ui5Shell`      | test   | FLP            | Shell header (home, user menu)                                                        |
-| `ui5Footer`     | test   | FLP            | Page footer bar (Save, Edit, Delete, etc.)                                            |
-| `flpLocks`      | test   | FLP            | SM12 lock management with auto-cleanup                                                |
-| `flpSettings`   | test   | FLP            | User settings reader (language, date format)                                          |
-| `testData`      | test   | Data           | Template-based data generation with auto-cleanup                                      |
-| `pramanConfig`  | worker | Infrastructure | Frozen config (loaded once per worker)                                                |
-| `pramanLogger`  | test   | Infrastructure | Test-scoped pino logger                                                               |
-| `rootLogger`    | worker | Infrastructure | Worker-scoped root logger                                                             |
-| `tracer`        | worker | Infrastructure | OpenTelemetry tracer (NoOp when disabled)                                             |
+| Fixture         | Scope  | Type            | Description                                                                                                      |
+| --------------- | ------ | --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `ui5`           | test   | Core            | Control discovery, interaction, `.table`, `.dialog`, `.date`, `.odata` sub-namespaces                            |
+| `ui5Navigation` | test   | Navigation      | 11 FLP navigation methods                                                                                        |
+| `btpWorkZone`   | test   | Navigation      | Dual-frame BTP WorkZone manager                                                                                  |
+| `sapAuth`       | test   | Authentication  | SAP authentication (6 strategies)                                                                                |
+| `fe`            | test   | Fiori Elements  | `.listReport`, `.objectPage`, `.table`, `.list` helpers                                                          |
+| `pramanAI`      | test   | AI              | Page discovery, agentic handler, LLM, vocabulary                                                                 |
+| `intent`        | test   | Business        | `.procurement`, `.sales`, `.finance`, `.manufacturing`, `.masterData`                                            |
+| `ui5Shell`      | test   | FLP             | Shell header (home, user menu)                                                                                   |
+| `ui5Footer`     | test   | FLP             | Page footer bar (Save, Edit, Delete, etc.)                                                                       |
+| `flpLocks`      | test   | FLP             | SM12 lock management with auto-cleanup                                                                           |
+| `flpSettings`   | test   | FLP             | User settings reader (language, date format)                                                                     |
+| `testData`      | test   | Data            | Template-based data generation with auto-cleanup                                                                 |
+| `nativeDialogs` | test   | Diagnostics     | Records native `alert`/`confirm`/`prompt`/`beforeunload` dialogs; can answer them on request (Playwright 1.63+)  |
+| `webStorage`    | test   | Browser State   | Typed `localStorage` / `sessionStorage` helpers — `seed`, `getItem`, `items`, `size` (Playwright 1.61+)          |
+| `pramanConfig`  | worker | Infrastructure  | Frozen config (loaded once per worker)                                                                           |
+| `pramanLogger`  | test   | Infrastructure  | Test-scoped pino logger                                                                                          |
+| `rootLogger`    | worker | Infrastructure  | Worker-scoped root logger                                                                                        |
+| `tracer`        | worker | Infrastructure  | OpenTelemetry tracer (NoOp when disabled, real when `openTelemetry: true`)                                       |
+| `meter`         | worker | Infrastructure  | OpenTelemetry meter for metrics (NoOp when disabled, real when `metrics: true`)                                  |
+| `browserBind`   | test   | CLI Integration | `PRAMAN_BIND=1` exposes browser to CLI agents via `browser.bind()` (Playwright 1.59+)                            |
+| `screencast`    | test   | CLI Integration | Chapter markers, action overlays, control highlighting, frame streaming via `page.screencast` (Playwright 1.59+) |
 
 ## Auto-Fixtures
 
@@ -630,7 +874,10 @@ test('sub-namespaces', async ({ ui5 }) => {
 test('navigation', async ({ ui5Navigation }) => {
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
   await ui5Navigation.navigateToTile('Create Purchase Order');
-  await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', { plant: '1000' });
+  await ui5Navigation.navigateToIntent(
+    { semanticObject: 'PurchaseOrder', action: 'create' },
+    { plant: '1000' },
+  );
   await ui5Navigation.navigateToHome();
   await ui5Navigation.navigateBack();
 
@@ -643,7 +890,7 @@ test('navigation', async ({ ui5Navigation }) => {
 ```typescript
 test('auth control', async ({ sapAuth, page }) => {
   await sapAuth.login(page, { url, username, password, strategy: 'basic' });
-  expect(sapAuth.isAuthenticated()).toBe(true);
+  expect(await sapAuth.isAuthenticated(page)).toBe(true);
   // Auto-logout on teardown
 });
 ```
@@ -705,6 +952,42 @@ test('shell and footer', async ({ ui5Shell, ui5Footer }) => {
 });
 ```
 
+## CLI Integration Fixtures
+
+### Browser Bind: `browserBind`
+
+Opt-in via `PRAMAN_BIND=1`. Exposes the test browser to Playwright CLI agents.
+
+```typescript
+// PRAMAN_BIND=1 npx playwright test
+test('agent-assisted test', async ({ browserBind }) => {
+  if (browserBind.bound) {
+    console.info('Agent can connect at:', browserBind.endpointUrl);
+    // CLI agent inspects live UI while test pauses...
+  }
+});
+```
+
+See [Browser Bind & Screencast](./browser-bind.md) for full details.
+
+### Screencast: `screencast`
+
+Chapter annotations and frame streaming for Playwright 1.59+ screencasts.
+
+```typescript
+test('recorded test', async ({ screencast, ui5 }) => {
+  await screencast.showChapter('Setup');
+  await ui5.click({ id: 'editBtn' });
+
+  await screencast.showChapter('Fill Form');
+  await ui5.fill({ id: 'nameInput' }, 'ACME Corp');
+
+  await screencast.showActions({ enabled: true });
+});
+```
+
+See [Browser Bind & Screencast](./browser-bind.md) for full details.
+
 ## Lock Management: `flpLocks`
 
 ```typescript
@@ -729,9 +1012,75 @@ test('test data', async ({ testData }) => {
 });
 ```
 
+## Native Dialogs: `nativeDialogs`
+
+Records the browser's **own** dialogs — `alert`, `confirm`, `prompt`,
+`beforeunload`. Not `sap.m.Dialog`: for UI5 dialogs use `ui5.dialog`. The two
+share a word and nothing else.
+
+Why this exists: Praman already offers `ui5.odata.hasPendingChanges()` to detect
+unsaved changes _before_ navigating, precisely to avoid the browser's data-loss
+warning. That warning is a native `beforeunload` dialog, and until now Playwright
+auto-dismissed it where no test could see it.
+
+### Detect-only by default
+
+```typescript
+import { nativeDialogTest } from 'playwright-praman';
+
+nativeDialogTest('navigating away raises no surprise warning', async ({ page, nativeDialogs }) => {
+  await page.goto('/app#/edit');
+  await page.goto('/app#/list');
+
+  expect(nativeDialogs.records).toEqual([]); // nothing was auto-dismissed
+});
+```
+
+Installing the fixture **changes nothing**: it attaches only `dialogclosed`, so
+Playwright keeps auto-dismissing exactly as before. Records are attached to the
+test as `native-dialogs` JSON whenever a dialog appeared.
+
+### Answering dialogs — opt in deliberately
+
+```typescript
+nativeDialogTest('discards unsaved changes on exit', async ({ page, nativeDialogs }) => {
+  nativeDialogs.register({ name: 'discard', types: ['beforeunload'], action: 'accept' });
+
+  await page.goto('/app#/edit');
+  await page.goto('/app#/list');
+});
+```
+
+:::warning Registering a rule makes Praman responsible for every dialog
+
+Playwright auto-dismisses native dialogs **only while no `dialog` listener
+exists**. Calling `register()` attaches one, and from then on any dialog left
+unanswered **freezes the page** — every later action times out with no useful
+error.
+
+Praman guarantees this cannot happen: a dialog whose type no rule covers, or
+whose rule has hit its `times` cap, is dismissed and logged at `warn` rather
+than ignored. The `warn` is the signal that your policy is incomplete.
+
+:::
+
+### Version support
+
+| Capability                                    | Requires                                                  |
+| --------------------------------------------- | --------------------------------------------------------- |
+| Recording dialogs (`records`, the attachment) | **Playwright 1.63+** (`dialogclosed`)                     |
+| Answering dialogs (`register`)                | the **1.57 floor** — `page.on('dialog')` is long-standing |
+
+Below 1.63 recording degrades to silence and logs at `debug`, rather than
+throwing: there is no floor equivalent for _watching_ a dialog without taking
+responsibility for it, and observation is additive, so a test that only wants
+diagnostics still runs.
+
 ## Standalone Usage
 
 Individual fixture modules can be imported for lighter setups:
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { coreTest } from 'playwright-praman';
@@ -744,9 +1093,42 @@ const test = mergeTests(coreTest, authTest);
 
 ## Control Interactions
 
+# UI5 Control Interactions
+
+:::info[In this guide]
+
+- Click buttons, fill inputs, and select dropdown values using the `ui5` fixture
+- Understand auto-waiting behavior and how it differs from Playwright's native auto-wait
+- Read control properties and text for assertions
+- Learn the three-tier wait sequence that runs during navigation
+- Skip stability waits for performance-critical paths
+
+:::
+
 The `ui5` fixture provides high-level methods for interacting with UI5 controls. Each method
 discovers the control, waits for UI5 stability, and performs the action through the configured
 interaction strategy.
+
+:::warning[Common mistake]
+Do not use Playwright's native `page.click()` with DOM selectors to interact with UI5 controls.
+UI5 controls manage their own event lifecycle, and DOM-level clicks can bypass OData model
+updates, validation handlers, and change events.
+
+```typescript
+// Wrong — bypasses UI5 event system
+await page.click('#__xmlview0--saveBtn');
+
+// Correct — fires UI5 events, waits for stability
+await ui5.click({ id: 'saveBtn' });
+```
+
+:::
+
+:::tip Typed Control Returns
+When you use `controlType` in your selector, the returned control is typed to the specific interface
+(e.g., `UI5Button`, `UI5Input`). This gives you autocomplete for control-specific methods. See
+[Typed Control Returns](/docs/guides/typed-controls) for details.
+:::
 
 ## Interaction Methods
 
@@ -820,8 +1202,11 @@ expect(label).toBe('Purchase Order Details');
 Reads any property from a UI5 control by name.
 
 ```typescript
-const enabled = await ui5.getProperty({ id: 'saveBtn' }, 'enabled');
-const visible = await ui5.getProperty({ id: 'statusText' }, 'visible');
+const btn = await ui5.control({ id: 'saveBtn' });
+const enabled = await btn.getProperty('enabled');
+
+const status = await ui5.control({ id: 'statusText' });
+const visible = await status.getProperty('visible');
 ```
 
 ### waitForUI5
@@ -864,6 +1249,8 @@ For subsequent interactions (not navigation), only `waitForUI5Stable` is called.
 ### Skipping the Stability Wait
 
 For performance-critical paths where you know UI5 is already stable:
+
+<!-- docs-verify:no-run -->
 
 ```typescript
 import { defineConfig } from 'playwright-praman';
@@ -924,7 +1311,85 @@ Each interaction method follows this sequence:
 If the primary strategy method fails (e.g., `firePress()` not available), the strategy
 automatically falls back to its secondary method (e.g., DOM click).
 
+## FAQ
+
+<details>
+<summary>Can I use page.click() instead of ui5.click()?</summary>
+
+You can, but you should not for UI5 controls. `page.click()` performs a DOM-level click that
+bypasses the UI5 event system. This means OData model bindings may not update, `liveChange`
+and `change` events may not fire, and validation logic may be skipped. Use `ui5.click()` for
+all UI5 controls. Reserve `page.click()` for verified non-UI5 DOM elements (e.g., custom
+shell header buttons).
+
+</details>
+
+<details>
+<summary>How do I interact with controls inside a dialog?</summary>
+
+Pass `searchOpenDialogs: true` in your selector:
+
+```typescript
+await ui5.click({
+  controlType: 'sap.m.Button',
+  properties: { text: 'OK' },
+  searchOpenDialogs: true,
+});
+```
+
+Without this flag, Praman only searches the main view's control tree and will not find
+controls rendered inside dialog overlays.
+
+</details>
+
+<details>
+<summary>Why does ui5.fill() fire both liveChange and change events?</summary>
+
+SAP UI5 input controls use `liveChange` for character-by-character updates (e.g., search
+suggestions) and `change` for final value commits (e.g., OData model updates). Praman fires
+both to match real user behavior. Skipping either event can cause missing suggestions,
+incomplete validation, or stale OData bindings.
+
+</details>
+
+<details>
+<summary>What happens if waitForUI5Stable times out?</summary>
+
+A `TimeoutError` is thrown with details about which async operations were still pending
+(e.g., open XHR requests, unresolved promises). Check for long-running OData calls, infinite
+polling, or background model refresh timers. You can increase the timeout via
+`controlDiscoveryTimeout` in your Praman config.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Selector Reference →](./selectors.md)** — Learn all UI5Selector fields for finding controls
+- **[Typed Control Returns →](./typed-controls.md)** — Get full autocomplete for control-specific methods
+- **[Custom Matchers →](./custom-matchers.md)** — Assert UI5 control state with 10 built-in matchers
+- **[Discovery and Interaction Strategies →](./discovery-and-interaction.md)** — Configure how controls are found and acted on
+
+:::
+
 ## Custom Matchers
+
+# Custom Matchers
+
+:::info[In this guide]
+
+- Assert UI5 control state with 10 purpose-built matchers
+- Understand why DOM-based assertions break on i18n changes and async updates
+- Use auto-retrying matchers that poll the UI5 runtime until timeout
+- Extend assertions with `expect.poll()` for custom UI5 checks
+- Compare Praman matchers with Playwright built-in matchers
+
+:::
+
+Standard Playwright assertions like `expect(text).toBe('Active')` break when your SAP app
+runs in a different locale, because the displayed text changes with i18n translations.
+DOM-based checks like `expect(locator).toBeEnabled()` can also produce false positives
+when a control appears enabled in the DOM but is disabled in the UI5 model during a pending
+OData operation.
 
 Praman extends Playwright's `expect()` with 10 UI5-specific matchers that query control state
 directly from the UI5 runtime. These matchers check the **UI5 model/control state**, not the
@@ -976,7 +1441,7 @@ await expect(page).toHaveUI5Text('headerTitle', /Purchase Order/);
 
 **Error message preview:**
 
-```
+```text
 Expected: "Purchase Order Details"
 Received: "Sales Order Details"
 Control: headerTitle (sap.m.Title)
@@ -1078,24 +1543,41 @@ await expect(page).toHaveUI5SelectedRows('poTable', [0, 2]);
 await expect(page).toHaveUI5SelectedRows('poTable', []); // No selection
 ```
 
-## Auto-Retry Mechanism
+## Auto-Retry Semantics
 
 All Praman matchers are registered as async custom matchers. They query the UI5 runtime via
-`page.evaluate()` on each poll iteration. Playwright's `expect()` auto-retries failed assertions
-until the configured timeout (default 5 seconds).
+`page.evaluate()` on each poll iteration. Praman auto-retries failed assertions until the
+configured timeout expires.
 
-This means you do not need manual retry loops:
+| Setting         | Value    | Override                                |
+| --------------- | -------- | --------------------------------------- |
+| Poll interval   | 100 ms   | Not configurable (internal)             |
+| Default timeout | 5,000 ms | Pass `{ timeout }` option per assertion |
+
+### Timeout Priority
+
+Praman matchers resolve their timeout using this priority (highest wins):
+
+1. **Explicit option** — a `{ timeout }` object passed as the last matcher argument
+2. **Playwright expect timeout** — configured via `expect.configure({ timeout })` or
+   `use: { expect: { timeout } }` in `playwright.config.ts`
+3. **Default** — 5000 ms
 
 ```typescript
-// This auto-retries for up to 5 seconds:
-await expect(page).toHaveUI5Text('statusField', 'Approved');
-```
-
-For longer waits, increase the timeout:
-
-```typescript
+// 1. Explicit: always wins
 await expect(page).toHaveUI5Text('statusField', 'Approved', { timeout: 15_000 });
+
+// 2. Playwright config: honored automatically
+// playwright.config.ts: use: { expect: { timeout: 10_000 } }
+await expect(page).toHaveUI5Text('statusField', 'Approved'); // uses 10s
+
+// 3. Default: 5000ms when nothing else is configured
+await expect(page).toHaveUI5Text('statusField', 'Approved'); // uses 5s
 ```
+
+This means users who configure `expect.configure({ timeout: 10_000 })` or set
+`expect: { timeout: 10_000 }` in their Playwright config will see Praman matchers honor that
+timeout without any additional configuration.
 
 ## Using expect.poll() With UI5 Methods
 
@@ -1104,7 +1586,13 @@ For custom assertions beyond the 10 built-in matchers, use `expect.poll()` with 
 ```typescript
 // Poll until the control value matches
 await expect
-  .poll(async () => ui5.getProperty({ id: 'vendorInput' }, 'value'), { timeout: 10_000 })
+  .poll(
+    async () => {
+      const input = await ui5.control({ id: 'vendorInput' });
+      return input.getProperty('value');
+    },
+    { timeout: 10_000 },
+  )
   .toBe('100001');
 
 // Poll for table row count
@@ -1160,6 +1648,21 @@ test('validate purchase order form', async ({ ui5, page }) => {
 });
 ```
 
+:::warning[Common mistake]
+Do not pass a Locator to Praman matchers. Unlike Playwright's built-in matchers, Praman
+matchers receive a **control ID string** and are called on `page`:
+
+```typescript
+// Wrong — Praman matchers do not accept Locator objects
+const locator = page.locator('ui5=sap.m.Button#saveBtn');
+await expect(locator).toBeUI5Enabled(); // Does not work
+
+// Correct — pass the control ID string to page
+await expect(page).toBeUI5Enabled('saveBtn');
+```
+
+:::
+
 ## Registration
 
 Matchers are auto-registered via the `matcherRegistration` worker-scoped auto-fixture. No setup
@@ -1170,11 +1673,77 @@ import { test, expect } from 'playwright-praman';
 // All 10 matchers are ready to use
 ```
 
+## FAQ
+
+<details>
+<summary>Do Praman matchers auto-retry like Playwright matchers?</summary>
+
+Yes. All 10 matchers are registered as async custom matchers. They query the UI5 runtime via
+`page.evaluate()` on each poll iteration, retrying until the timeout expires. The timeout is
+resolved in this order: explicit `{ timeout }` option > Playwright's `expect.configure({ timeout })`
+
+> 5000 ms default. You can increase the timeout per assertion:
+> `await expect(page).toHaveUI5Text('field', 'value', { timeout: 15_000 })`.
+
+</details>
+
+<details>
+<summary>Can I use Playwright built-in matchers alongside Praman matchers?</summary>
+
+Yes. Use Praman matchers when checking UI5 model/control state (e.g., `toBeUI5Enabled`,
+`toHaveUI5Text`). Use Playwright matchers when checking DOM-level rendering (e.g.,
+`toBeVisible` for CSS visibility, `toHaveURL` for page URL, `toHaveTitle` for page title).
+Both work in the same test.
+
+</details>
+
+<details>
+<summary>How do I assert a property that has no built-in matcher?</summary>
+
+Use `toHaveUI5Property` for any named property, or `expect.poll()` for fully custom checks:
+
+```typescript
+// Named property
+await expect(page).toHaveUI5Property('myInput', 'placeholder', 'Enter value');
+
+// Custom poll
+await expect
+  .poll(async () => {
+    const ctrl = await ui5.control({ id: 'myInput' });
+    return ctrl.getProperty('valueStateText');
+  })
+  .toBe('Required field');
+```
+
+</details>
+
+:::tip[Next steps]
+
+- **[Control Interactions →](./control-interactions.md)** — Click, fill, and read controls before asserting state
+- **[Gold Standard Test Pattern →](./gold-standard-test.md)** — See matchers used in a complete reference test
+- **[Selector Reference →](./selectors.md)** — Find the right control to assert against
+
+:::
+
 ## Navigation
 
-Praman provides 9 navigation functions via the `ui5Navigation` fixture, plus BTP WorkZone
-iframe management via `btpWorkZone`. All navigation uses the FLP's own `hasher` API for
-reliable hash-based routing without full page reloads.
+# Navigation
+
+:::info[In this guide]
+
+- Navigate between SAP Fiori apps without full page reloads
+- Use 11 navigation methods via the `ui5Navigation` and `btpWorkZone` fixtures
+- Manage BTP WorkZone iframe switching with the `btpWorkZone` fixture
+- Understand why `page.goto()` is the wrong approach for FLP navigation
+- Combine shell and workspace interactions in cross-frame tests
+
+:::
+
+Praman provides 11 navigation functions in total: 9 via the `ui5Navigation` fixture
+(`navigateToApp`, `navigateToTile`, `navigateToIntent`, `navigateToHash`, `navigateToHome`,
+`navigateBack`, `navigateForward`, `searchAndOpenApp`, `getCurrentHash`), plus BTP WorkZone
+iframe management via `btpWorkZone` (`getAppFrameForEval`, `getShellFrame`). All navigation
+uses the FLP's own `hasher` API for reliable hash-based routing without full page reloads.
 
 ## Why Not page.goto()?
 
@@ -1218,13 +1787,13 @@ method for parameterized navigation.
 
 ```typescript
 // Basic intent
-await ui5Navigation.navigateToIntent('PurchaseOrder', 'create');
+await ui5Navigation.navigateToIntent({ semanticObject: 'PurchaseOrder', action: 'create' });
 
 // With parameters
-await ui5Navigation.navigateToIntent('PurchaseOrder', 'create', {
-  plant: '1000',
-  purchOrg: '1000',
-});
+await ui5Navigation.navigateToIntent(
+  { semanticObject: 'PurchaseOrder', action: 'create' },
+  { plant: '1000', purchOrg: '1000' },
+);
 
 // Produces hash: #PurchaseOrder-create?plant=1000&purchOrg=1000
 ```
@@ -1301,9 +1870,10 @@ test('open purchase order', async ({ ui5Navigation }) => {
 
 ```typescript
 test('open specific purchase order', async ({ ui5Navigation }) => {
-  await ui5Navigation.navigateToIntent('PurchaseOrder', 'display', {
-    PurchaseOrder: '4500000001',
-  });
+  await ui5Navigation.navigateToIntent(
+    { semanticObject: 'PurchaseOrder', action: 'display' },
+    { PurchaseOrder: '4500000001' },
+  );
 });
 ```
 
@@ -1336,7 +1906,7 @@ frame switching transparently.
 
 ### The Frame Structure
 
-```
+```text
 Outer Frame (WorkZone shell)
   └── Inner Frame (workspace / application)
         └── UI5 Application
@@ -1352,7 +1922,7 @@ import { test } from 'playwright-praman';
 
 test('WorkZone navigation', async ({ btpWorkZone, ui5, page }) => {
   // The manager detects the frame structure automatically
-  const workspace = btpWorkZone.getWorkspaceFrame();
+  const appFrame = btpWorkZone.getAppFrameForEval();
 
   // UI5 operations automatically target the correct frame
   await ui5.click({ id: 'saveBtn' });
@@ -1377,7 +1947,7 @@ test('shell + workspace', async ({ btpWorkZone, ui5Shell, ui5 }) => {
 
 Every navigation call is wrapped in a Playwright `test.step()` for HTML report visibility:
 
-```
+```text
 test 'create purchase order'
   ├── ui5Navigation.navigateToApp: PurchaseOrder-create
   ├── ui5.fill: vendorInput
@@ -1414,20 +1984,142 @@ test('end-to-end purchase order workflow', async ({ ui5Navigation, ui5, ui5Shell
 });
 ```
 
+## FAQ
+
+<details>
+<summary>Why not use page.goto() for SAP Fiori navigation?</summary>
+
+`page.goto()` triggers a full page reload. In SAP Fiori Launchpad, this means the UI5 core
+must re-bootstrap (30-60 seconds on BTP), all OData models are re-initialized, and
+authentication may need to re-negotiate. Praman's navigation functions use
+`window.hasher.setHash()` via `page.evaluate()`, which changes the hash fragment in-place
+without a reload.
+
+</details>
+
+<details>
+<summary>How do I navigate to a specific entity (e.g., a purchase order by number)?</summary>
+
+Use `navigateToIntent` with parameters or `navigateToHash` with a deep link:
+
+```typescript
+// Intent with parameters
+await ui5Navigation.navigateToIntent(
+  { semanticObject: 'PurchaseOrder', action: 'display' },
+  { PurchaseOrder: '4500000001' },
+);
+
+// Direct hash
+await ui5Navigation.navigateToHash("PurchaseOrder-display&/PurchaseOrders('4500000001')");
+```
+
+</details>
+
+<details>
+<summary>Do I need special setup for BTP WorkZone apps?</summary>
+
+Use the `btpWorkZone` fixture. It detects the nested iframe structure automatically and
+ensures `ui5.*` operations target the correct frame. Without it, Playwright targets the outer
+WorkZone shell frame and cannot find UI5 controls rendered inside the inner workspace frame.
+
+</details>
+
+:::tip[Next steps]
+
+- **[Control Interactions →](./control-interactions.md)** — Click, fill, and read controls after navigating
+- **[Business Process Examples →](./business-process-examples.md)** — End-to-end tests with multi-step navigation
+- **[Gold Standard Test Pattern →](./gold-standard-test.md)** — Complete reference test with navigation, interaction, and cleanup
+
+:::
+
 ## Authentication
+
+:::info[In this guide]
+
+- Choose the right authentication strategy for your SAP system (on-premise, BTP, Office 365)
+- Configure the setup project pattern for authenticate-once, reuse-everywhere
+- Set up environment variables for each auth strategy
+- Use the `sapAuth` fixture for explicit auth control in tests
+- Handle session expiry and BTP WorkZone frame contexts
+
+:::
 
 Praman supports 6 pluggable authentication strategies for SAP systems.
 
-## Strategies
+## Auth Strategy Decision Flowchart
 
-| Strategy         | Use Case                                      | Config Value     |
-| ---------------- | --------------------------------------------- | ---------------- |
-| **On-Premise**   | On-premise SAP NetWeaver / S/4HANA            | `'onprem'`       |
-| **Cloud SAML**   | SAP BTP with SAML IdP (IAS, Azure AD)         | `'cloud-saml'`   |
-| **Office 365**   | Microsoft SSO for SAP connected to Azure      | `'office365'`    |
-| **Multi-Tenant** | SAP BTP multi-tenant apps with subdomain auth | `'multi-tenant'` |
-| **API**          | API key or OAuth bearer token (headless)      | `'api'`          |
-| **Certificate**  | Client certificate authentication             | `'certificate'`  |
+```mermaid
+flowchart TD
+    A[Start: What SAP system?] --> B{Cloud or On-Premise?}
+    B -->|On-Premise| C{Standard login page?}
+    C -->|Yes| D["Use <strong>basic</strong><br/>SAP NetWeaver / ABAP"]
+    C -->|No| E["Use <strong>custom</strong><br/>Register custom strategy"]
+    B -->|Cloud / BTP| F{Which IDP?}
+    F -->|SAP IAS / SAML| G["Use <strong>btp-saml</strong><br/>Auto-detected from URL"]
+    F -->|Azure AD / Microsoft 365| H["Use <strong>office365</strong><br/>Set SAP_AUTH_STRATEGY=office365"]
+    F -->|Client Certificate| I["Use <strong>certificate</strong><br/>Set auth.certificatePath"]
+    F -->|Multi-Tenant| J["Use <strong>multi-tenant</strong><br/>Set auth.subdomain"]
+    F -->|Other IDP| E
+```
+
+## Auth Strategy Mapping
+
+The `auth.strategy` config field accepts 4 values. Each maps to an internal
+strategy implementation:
+
+| Config Value | Strategy File          | Use Case                         |
+| ------------ | ---------------------- | -------------------------------- |
+| `basic`      | onprem-strategy.ts     | SAP NetWeaver / ABAP on-premise  |
+| `btp-saml`   | cloud-saml-strategy.ts | SAP BTP Cloud via IAS / SAML     |
+| `office365`  | office365-strategy.ts  | Azure AD / Microsoft 365 SSO     |
+| `custom`     | (user-provided)        | Custom IDP or non-standard login |
+
+### Specialized Strategies (Not Config-Selectable)
+
+These strategies are used programmatically, not via the `auth.strategy` config:
+
+- **api-strategy.ts** — Headless API-based auth (for CI/CD token-based auth).
+  Use via `sapAuth.loginWithApi()`.
+- **certificate-strategy.ts** — Client certificate auth (configured at
+  browser context level in `playwright.config.ts`, not via Praman config).
+- **multi-tenant-strategy.ts** — BTP multi-tenant routing (delegates to
+  cloud-saml or onprem internally, selected by `SAP_ACTIVE_SYSTEM` env var).
+
+## Which Strategy Do I Need?
+
+If you don't set `auth.strategy` explicitly, Praman auto-detects based on your config
+fields and URL pattern. The priority chain is:
+
+| Priority | Condition                         | Strategy Selected                                         | Example                                                    |
+| -------- | --------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------- |
+| 1        | `auth.strategy` is set explicitly | The named strategy (custom registry first, then built-in) | `strategy: 'office365'`                                    |
+| 2        | `auth.certificatePath` is set     | Client Certificate                                        | `certificatePath: '/certs/client.p12'`                     |
+| 3        | `auth.subdomain` is set           | Multi-Tenant (delegates to cloud-saml or onprem)          | `subdomain: 'customer-a'`                                  |
+| 4        | URL matches a cloud pattern       | Cloud SAML (IAS)                                          | `*.cloud.sap`, `*.s4hana.cloud.sap`, `*.hana.ondemand.com` |
+| 5        | None of the above                 | On-Premise (Basic Auth)                                   | Any other URL                                              |
+
+### Decision by SAP System Type
+
+| Your SAP System             | Set These Env Vars                                                          | Strategy Used                   |
+| --------------------------- | --------------------------------------------------------------------------- | ------------------------------- |
+| S/4HANA Cloud               | `SAP_CLOUD_BASE_URL=https://tenant.s4hana.cloud.sap`                        | Auto-detected: **Cloud SAML**   |
+| BTP Launchpad               | `SAP_CLOUD_BASE_URL=https://tenant.launchpad.cfapps.eu10.hana.ondemand.com` | Auto-detected: **Cloud SAML**   |
+| BTP + Azure AD SSO          | Same as above + `SAP_AUTH_STRATEGY=office365`                               | Explicit: **Office 365**        |
+| SAP ECC / NetWeaver on-prem | `SAP_ONPREM_BASE_URL=https://sap.corp:8443/...`                             | Auto-detected: **On-Premise**   |
+| BTP Multi-Tenant            | `SAP_CLOUD_BASE_URL` + `SAP_SUBDOMAIN=customer-a`                           | Auto-detected: **Multi-Tenant** |
+| Client Certificate (PKI)    | `SAP_CERTIFICATE_PATH=/certs/client.p12`                                    | Auto-detected: **Certificate**  |
+| Non-standard IDP            | `SAP_AUTH_STRATEGY=custom` + custom strategy registration                   | Explicit: **Custom**            |
+
+### Cloud URL Patterns (Auto-Detection)
+
+These URL patterns trigger Cloud SAML auto-detection:
+
+- `*.cloud.sap`
+- `*.s4hana.cloud.sap`
+- `*.hana.ondemand.com`
+- `*.cfapps.*.hana.ondemand.com`
+
+If your Cloud URL doesn't match these patterns, set `auth.strategy: 'btp-saml'` explicitly.
 
 ## Setup Project Pattern
 
@@ -1435,41 +2127,36 @@ The recommended pattern uses Playwright's **setup projects** to authenticate onc
 
 ### 1. Auth Setup File
 
-Create `tests/auth-setup.ts` (or use Praman's built-in `src/auth/auth-setup.ts`):
+Create `tests/auth-setup.ts` using the `sapAuth` fixture (provided by `playwright-praman`):
 
 ```typescript
+// tests/auth-setup.ts
 import { join } from 'node:path';
-import { test as setup } from '@playwright/test';
+import { test as setup } from 'playwright-praman';
 
 const authFile = join(process.cwd(), '.auth', 'sap-session.json');
 
-setup('SAP authentication', async ({ page, context }) => {
-  const { SAPAuthHandler } = await import('playwright-praman/auth');
-  const { createAuthStrategy } = await import('playwright-praman/auth');
-
-  const strategy = createAuthStrategy({
-    url: process.env.SAP_BASE_URL ?? '',
-    username: process.env.SAP_ONPREM_USERNAME ?? '',
-    password: process.env.SAP_ONPREM_PASSWORD ?? '',
-    strategy: 'onprem',
-  });
-
-  const handler = new SAPAuthHandler({ strategy });
-  await handler.login(page, {
-    url: process.env.SAP_BASE_URL ?? '',
-    username: process.env.SAP_ONPREM_USERNAME ?? '',
-    password: process.env.SAP_ONPREM_PASSWORD ?? '',
-    client: process.env.SAP_CLIENT,
-    language: process.env.SAP_LANGUAGE,
-  });
+setup('SAP authentication', async ({ sapAuth, page, context }) => {
+  // sapAuth is auto-configured from praman config and environment variables.
+  // The fixture resolves the correct strategy based on SAP_ACTIVE_SYSTEM
+  // and SAP_AUTH_STRATEGY env vars.
+  await sapAuth.login(page);
 
   await context.storageState({ path: authFile });
 });
 ```
 
+:::info[No direct auth imports]
+`SAPAuthHandler` and `createAuthStrategy` are **not** public exports.
+The `playwright-praman/auth` sub-path does **not** exist.
+All authentication is done through the `sapAuth` fixture, which reads
+credentials and strategy from the Praman config / environment variables.
+:::
+
 ### 2. Playwright Config
 
 ```typescript
+// playwright.config.ts
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
@@ -1498,6 +2185,7 @@ export default defineConfig({
 ### 3. Tests Use Saved Session
 
 ```typescript
+// tests/purchase-order.spec.ts
 import { test, expect } from 'playwright-praman';
 
 // No login code needed — storageState handles it
@@ -1515,7 +2203,7 @@ test('navigate after auth', async ({ ui5Navigation }) => {
 SAP_ACTIVE_SYSTEM=onprem
 SAP_ONPREM_BASE_URL=https://sapserver.example.com:8443/sap/bc/ui5_ui5/
 SAP_ONPREM_USERNAME=TESTUSER
-SAP_ONPREM_PASSWORD=secret
+SAP_ONPREM_PASSWORD=<your-password>
 SAP_CLIENT=100
 SAP_LANGUAGE=EN
 ```
@@ -1527,7 +2215,7 @@ SAP_LANGUAGE=EN
 SAP_ACTIVE_SYSTEM=cloud
 SAP_CLOUD_BASE_URL=https://tenant.launchpad.cfapps.eu10.hana.ondemand.com
 SAP_CLOUD_USERNAME=user@company.com
-SAP_CLOUD_PASSWORD=secret
+SAP_CLOUD_PASSWORD=<your-password>
 ```
 
 ### Office 365 SSO
@@ -1538,7 +2226,7 @@ SAP_ACTIVE_SYSTEM=cloud
 SAP_AUTH_STRATEGY=office365
 SAP_CLOUD_BASE_URL=https://tenant.launchpad.cfapps.eu10.hana.ondemand.com
 SAP_CLOUD_USERNAME=user@company.onmicrosoft.com
-SAP_CLOUD_PASSWORD=secret
+SAP_CLOUD_PASSWORD=<your-password>
 ```
 
 ## Using the `sapAuth` Fixture
@@ -1546,9 +2234,12 @@ SAP_CLOUD_PASSWORD=secret
 For tests that need explicit auth control:
 
 ```typescript
+// tests/explicit-auth.spec.ts
 import { test, expect } from 'playwright-praman';
 
 test('explicit auth', async ({ sapAuth, page }) => {
+  // sapAuth.login() uses credentials from praman config / env vars.
+  // Pass overrides only when needed:
   await sapAuth.login(page, {
     url: 'https://sapserver.example.com',
     username: 'TESTUSER',
@@ -1556,30 +2247,121 @@ test('explicit auth', async ({ sapAuth, page }) => {
     strategy: 'onprem',
   });
 
-  expect(sapAuth.isAuthenticated()).toBe(true);
+  // isAuthenticated() requires the page parameter
+  expect(await sapAuth.isAuthenticated(page)).toBe(true);
 
   const session = sapAuth.getSessionInfo();
-  expect(session.user).toBe('TESTUSER');
+  // SessionInfo has: authenticatedAt, strategyName, isValid
+  expect(session.isValid).toBe(true);
+  expect(session.strategyName).toBe('onprem');
 
   // Auto-logout on fixture teardown
 });
 ```
 
+:::tip[Strategy name mapping]
+The config schema names map to runtime strategy names as follows:
+
+| Config Value  | Runtime `strategyName` |
+| ------------- | ---------------------- |
+| `'basic'`     | `'onprem'`             |
+| `'btp-saml'`  | `'cloud-saml'`         |
+| `'office365'` | `'office365'`          |
+| `'custom'`    | User-provided name     |
+
+When checking `session.strategyName`, use the **runtime** name (right column).
+:::
+
 ## Session Expiry
 
 The default session timeout is 1800 seconds (30 minutes), matching SAP ICM defaults.
-See [Product Decision P5-PD-002](../decisions/product-decisions#p5-pd-002-session-timeout-default) for rationale.
+The 30-minute default matches SAP ICM session timeout defaults.
 
 ## BTP WorkZone Authentication
 
 BTP WorkZone renders apps inside nested iframes. The `btpWorkZone` fixture handles frame context automatically:
 
 ```typescript
+// tests/workzone.spec.ts
 test('WorkZone app', async ({ btpWorkZone, ui5 }) => {
-  const workspace = btpWorkZone.getWorkspaceFrame();
+  const appFrame = btpWorkZone.getAppFrameForEval();
   // All operations route through the correct frame
 });
 ```
+
+:::warning[Common mistake]
+Do not import `SAPAuthHandler` or `createAuthStrategy` directly. These are internal APIs.
+All authentication must go through the `sapAuth` fixture, which reads credentials and strategy
+from the Praman config and environment variables automatically.
+:::
+
+## FAQ
+
+<details>
+<summary>Which authentication strategy should I use for my SAP system?</summary>
+
+Use the decision flowchart at the top of this page. In short:
+
+- **SAP BTP / S/4HANA Cloud** with SAP IAS: Use `btp-saml` (auto-detected from URL)
+- **SAP BTP with Azure AD / Microsoft SSO**: Set `SAP_AUTH_STRATEGY=office365`
+- **SAP NetWeaver / ECC on-premise**: Use `basic` (auto-detected for non-cloud URLs)
+- **Client certificate (PKI)**: Set `auth.certificatePath` in config
+- **Multi-tenant BTP**: Set `auth.subdomain` in config
+- **Non-standard IDP**: Use `custom` with a registered strategy
+
+If unsure, let Praman auto-detect — it uses URL patterns to choose the right strategy.
+
+</details>
+
+<details>
+<summary>How do I debug authentication failures?</summary>
+
+Run the auth setup in headed mode to see what happens in the browser:
+
+```bash
+npx playwright test tests/auth-setup.ts --headed --debug
+```
+
+Common causes:
+
+- **Wrong URL**: `SAP_CLOUD_BASE_URL` must be the Fiori Launchpad URL, not an API endpoint
+- **Wrong strategy**: A cloud URL with `SAP_AUTH_STRATEGY=basic` will fail — use `btp-saml`
+- **MFA / TOTP**: Praman does not handle multi-factor auth automatically. Use `custom` strategy with manual MFA handling, or use API tokens
+- **Session expired**: The default session timeout is 30 minutes. Increase `auth.sessionTimeout` for long-running test suites
+
+</details>
+
+<details>
+<summary>Can I use saved cookies or tokens instead of username/password?</summary>
+
+Yes. The setup project pattern saves the browser session to `.auth/sap-session.json` after
+the first login. All subsequent tests reuse this session without re-authenticating. This is the
+recommended approach — it runs login once and shares the session across all test files.
+
+For headless CI/CD environments, you can also use `sapAuth.loginWithApi()` via the
+`api-strategy.ts` for token-based authentication without a browser login flow.
+
+</details>
+
+<details>
+<summary>Why does auth work locally but fail in CI?</summary>
+
+Check these common CI issues:
+
+- Environment variables (`SAP_CLOUD_BASE_URL`, `SAP_CLOUD_USERNAME`, `SAP_CLOUD_PASSWORD`) must be set as CI secrets
+- The CI runner must have network access to the SAP system (VPN, allowlisted IPs)
+- Use `storageState` in `playwright.config.ts` to reuse auth sessions across tests
+- Increase timeouts for slow CI networks: set `auth.loginTimeout` to `60000` or higher
+
+</details>
+
+:::tip[Next steps]
+
+- **[Getting Started →](./getting-started)** — Install Praman and run your first test
+- **[Agent & IDE Setup →](./agent-setup)** — Configure AI agents that handle auth automatically
+- **[Selectors Guide →](./selectors)** — Learn how to find UI5 controls after authentication
+
+:::
 
 ## Configuration
 
@@ -1600,9 +2382,9 @@ export default defineConfig({
   discoveryStrategies: ['direct-id', 'recordreplay'],
   auth: {
     strategy: 'basic',
-    baseUrl: process.env.SAP_BASE_URL!,
-    username: process.env.SAP_USER!,
-    password: process.env.SAP_PASS!,
+    baseUrl: process.env.SAP_CLOUD_BASE_URL!,
+    username: process.env.SAP_CLOUD_USERNAME!,
+    password: process.env.SAP_CLOUD_PASSWORD!,
     client: '100',
     language: 'EN',
   },
@@ -1613,10 +2395,11 @@ export default defineConfig({
     deployment: 'gpt-4o',
   },
   telemetry: {
-    openTelemetry: false,
+    openTelemetry: true,
     exporter: 'otlp',
     endpoint: 'http://localhost:4318',
     serviceName: 'sap-e2e-tests',
+    metrics: true,
   },
 });
 ```
@@ -1661,12 +2444,20 @@ export default defineConfig({
 
 ## Telemetry Sub-Schema
 
-| Field           | Type                                    | Default               | Description                  |
-| --------------- | --------------------------------------- | --------------------- | ---------------------------- |
-| `openTelemetry` | `boolean`                               | `false`               | Enable OpenTelemetry tracing |
-| `exporter`      | `'otlp' \| 'azure-monitor' \| 'jaeger'` | `'otlp'`              | Trace exporter               |
-| `endpoint`      | `string` (URL)                          | —                     | Exporter endpoint URL        |
-| `serviceName`   | `string`                                | `'playwright-praman'` | Service name in traces       |
+Telemetry is disabled by default with zero overhead. See [Telemetry Setup](./telemetry) for the full guide.
+
+| Field                | Type                                    | Default               | Description                                          |
+| -------------------- | --------------------------------------- | --------------------- | ---------------------------------------------------- |
+| `openTelemetry`      | `boolean`                               | `false`               | Enable OpenTelemetry tracing                         |
+| `exporter`           | `'otlp' \| 'azure-monitor' \| 'jaeger'` | `'otlp'`              | Trace exporter                                       |
+| `endpoint`           | `string` (URL)                          | —                     | OTLP/Jaeger endpoint URL (required when enabled)     |
+| `serviceName`        | `string`                                | `'playwright-praman'` | Service name in traces                               |
+| `protocol`           | `'http' \| 'grpc'`                      | `'http'`              | OTel transport protocol                              |
+| `metrics`            | `boolean`                               | `false`               | Enable metric counters and histograms                |
+| `batchTimeout`       | `number`                                | `5000`                | Span batch export timeout (ms)                       |
+| `maxQueueSize`       | `number`                                | `2048`                | Max queued spans before dropping                     |
+| `resourceAttributes` | `Record<string, string>`                | `{}`                  | Additional OTel resource attributes                  |
+| `connectionString`   | `string`                                | —                     | Azure Monitor connection string (required for Azure) |
 
 ## Selectors Sub-Schema
 
@@ -1684,6 +2475,22 @@ export default defineConfig({
 | `autoWait`           | `boolean` | `true`  | Auto-wait for OPA5 readiness  |
 | `debug`              | `boolean` | `false` | Enable OPA5 debug mode        |
 
+## Timeout Precedence
+
+When multiple timeout values could apply, Praman uses this precedence (highest first):
+
+1. **Per-call options** — `ui5.control({ id: 'x' }, { timeout: 5000 })`
+2. **Top-level config** — `controlDiscoveryTimeout: 10000`
+3. **Selectors section** — `selectors.defaultTimeout: 10000` (fallback if top-level not set)
+4. **Built-in default** — 10,000ms
+
+We recommend using only `controlDiscoveryTimeout` at the top level.
+`selectors.defaultTimeout` exists for backward compatibility and will be
+removed in a future major version.
+
+For details on the 3-tier stability wait system, see
+[Stability & Timing](./stability-timing.md).
+
 ## Environment Variable Overrides
 
 Top-level config fields can be overridden via environment variables:
@@ -1696,13 +2503,12 @@ Top-level config fields can be overridden via environment variables:
 | `PRAMAN_INTERACTION_STRATEGY`      | `interactionStrategy`     |
 | `PRAMAN_SKIP_STABILITY_WAIT`       | `skipStabilityWait`       |
 
-**Precedence** (highest to lowest):
+**General config precedence** (highest to lowest):
 
 1. Per-call options (e.g., `ui5.control({ ... }, { timeout: 5000 })`)
-2. Selectors sub-schema config
+2. Environment variable overrides
 3. Top-level config
-4. Environment variable overrides
-5. Schema defaults
+4. Schema defaults
 
 ## Complete `playwright.config.ts` Example
 
@@ -1721,7 +2527,7 @@ export default defineConfig({
     ['playwright-praman/reporters', { type: 'compliance', outputDir: 'reports' }],
   ],
   use: {
-    baseURL: process.env.SAP_BASE_URL,
+    baseURL: process.env.SAP_CLOUD_BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -1752,6 +2558,8 @@ export default defineConfig({
 
 Config is validated with Zod at load time. Invalid config fails fast:
 
+<!-- docs-verify:no-run -->
+
 ```typescript
 import { loadConfig } from 'playwright-praman';
 
@@ -1761,6 +2569,8 @@ const config = await loadConfig();
 ```
 
 ## Error Codes
+
+For step-by-step diagnostic help, see the [Troubleshooting Guide](./troubleshooting.md).
 
 Praman provides 14 typed error classes with 58 machine-readable error codes. Every error includes
 the attempted operation, a `retryable` flag, and actionable recovery `suggestions`.
@@ -1949,6 +2759,43 @@ Every `PramanError` includes:
 | `suggestions` | `string[]`  | 2-4 actionable recovery steps                           |
 | `details`     | `Record`    | Additional context (selector, timeout, etc.)            |
 | `timestamp`   | `string`    | ISO-8601 timestamp                                      |
+
+### Domain-Specific Context Fields
+
+Some error classes extend the base fields with additional diagnostic context:
+
+**`ControlError`** adds:
+
+```typescript
+{
+  availableControls: ['btn1', 'btn2', 'input3'],  // Controls discovered on the page
+  suggestedSelector: { id: 'btn1' },               // Best fuzzy match
+  lastKnownSelector: { id: 'oldBtn' },             // Selector that was attempted
+}
+```
+
+**`SelectorError`** adds:
+
+```typescript
+{
+  ambiguousMatches: [{ id: 'hdr1', type: 'sap.m.Title' }, { id: 'hdr2', type: 'sap.m.Title' }],
+  receivedSelector: { controlType: 'sap.m.Title' },
+}
+```
+
+**`BridgeError`** adds:
+
+```typescript
+{
+  ui5Version: '1.120.4',     // Detected UI5 version at failure time
+  injectionAttempt: 3,       // How many times injection was tried
+}
+```
+
+These fields surface automatically in Playwright's HTML reporter and trace viewer when failure
+artifacts are enabled (default: on). You can inspect them without modifying your test code —
+open the failing step in the trace viewer and the structured error data appears in the error
+details panel.
 
 ### Serialization
 
@@ -2291,13 +3138,13 @@ const count = await ui5.odata.getEntityCount('/PurchaseOrders');
 expect(count).toBeGreaterThan(0);
 ```
 
-### waitForODataLoad
+### waitForLoad
 
-Polls the model until data is available at the given path. Useful after navigation when
+Polls the model until data is available. Useful after navigation when
 OData requests are still in flight.
 
 ```typescript
-await ui5.odata.waitForODataLoad('/PurchaseOrders');
+await ui5.odata.waitForLoad();
 // Data is now available
 const orders = await ui5.odata.getModelData('/PurchaseOrders');
 ```
@@ -2447,7 +3294,7 @@ test('verify OData model state after form edit', async ({ ui5, ui5Navigation }) 
   await ui5Navigation.navigateToApp('PurchaseOrder-manage');
 
   // Wait for initial data load
-  await ui5.odata.waitForODataLoad('/PurchaseOrders');
+  await ui5.odata.waitForLoad();
 
   // Read model data
   const orders = await ui5.odata.getModelData('/PurchaseOrders');
@@ -2494,12 +3341,370 @@ test('seed and cleanup test data via HTTP', async ({ ui5 }) => {
 });
 ```
 
+## Parallel Execution
+
+# Parallel Execution & Sharding
+
+Running SAP UI5 tests in parallel dramatically reduces feedback time. This guide covers Playwright's parallelization model, SAP-specific considerations for auth and locking, and CI sharding strategies.
+
+## Enabling Parallel Execution
+
+Playwright supports parallelism at two levels: across test files (workers) and within a file (fullyParallel). Enable both in your config:
+
+```typescript
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  fullyParallel: true,
+  workers: process.env.CI ? 4 : undefined, // undefined = half CPU cores
+});
+```
+
+With `fullyParallel: true`, individual `test()` blocks within the same file can run concurrently. Without it, tests in a single file run sequentially while different files run in parallel across workers.
+
+## Worker Isolation with Auth State
+
+Each Playwright worker is an independent Node.js process. For SAP tests, share authentication state across workers using Playwright's `storageState` mechanism:
+
+```typescript
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'auth-setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+    {
+      name: 'sap-tests',
+      dependencies: ['auth-setup'],
+      use: {
+        storageState: '.auth/user.json',
+      },
+    },
+  ],
+});
+```
+
+The `auth-setup` project runs once before all workers. Each worker then reuses the saved cookies and session tokens without re-authenticating.
+
+## SAP Fiori Launchpad Lock Considerations
+
+SAP systems enforce object-level locking. When two parallel workers attempt to edit the same business object (e.g., a sales order), one will encounter an SAP lock error (`ENQUEUE_CONFLICT`).
+
+Strategies to avoid lock conflicts:
+
+- **Unique test data per worker**: Generate unique entity IDs with `{{uuid}}` so workers never edit the same object.
+- **Read-only vs. write tests**: Separate display-only tests from edit tests into different projects. Run edit tests with `workers: 1`.
+- **Dedicated test data pools**: Assign each worker its own pre-created entities using `workerIndex`:
+
+```typescript
+import { test } from 'playwright-praman';
+
+test('edit order assigned to this worker', async ({ ui5, page }, testInfo) => {
+  const orderPool = ['ORD-001', 'ORD-002', 'ORD-003', 'ORD-004'];
+  const myOrder = orderPool[testInfo.workerIndex % orderPool.length];
+
+  await page.goto(`/app#/Orders/${myOrder}`);
+  await ui5.waitForUI5();
+});
+```
+
+## Test Locks for Shared SAP State (Playwright 1.63+)
+
+The strategies above avoid conflicts by making tests _not share_ — unique data,
+per-worker pools, separate projects. When the state genuinely cannot be split,
+Playwright 1.63 adds `lock`: tests holding the same lock name never run
+concurrently, across files, workers **and** projects.
+
+:::caution Two different things called "lock"
+
+`flpLocks` manages SAP **SM12 lock entries** — locks held by the SAP server,
+which the fixture can query and release _after_ a conflict. Playwright's `lock`
+is client-side mutual exclusion between test workers, which stops the conflict
+happening.
+
+They are unrelated mechanisms that **compose**: the Playwright lock prevents two
+workers reaching one object at once, which is what produces the SM12 entry the
+fixture would otherwise have to clean up.
+
+:::
+
+```typescript
+import { test } from 'playwright-praman';
+import { requireTestLocks, SAP_LOCKS, sapObjectLock } from 'playwright-praman';
+
+// Fails fast at collection time on Playwright < 1.63 — see the warning below.
+requireTestLocks();
+
+test('changes the FLP display language', { lock: SAP_LOCKS.flpSettings }, async ({ ui5 }) => {
+  // No other test holding SAP_LOCKS.flpSettings runs while this one does.
+});
+
+test(
+  'approves one purchase order',
+  { lock: sapObjectLock('PurchaseOrder', '4500000123') },
+  async ({ ui5 }) => {
+    // Scoped to this object: a test editing a *different* PO still runs in parallel.
+  },
+);
+```
+
+### The supplied lock names
+
+| Name                       | Why it is a contention source                                                                                                                                               |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SAP_LOCKS.flpSettings`    | FLP user settings (language, timezone, formats). `flpSettings` is **read-only**, so it is the victim here, not the cause — lock whatever _mutates_ settings through the UI. |
+| `SAP_LOCKS.testUser`       | A single named SAP user shared across a suite: logging in, personalizing or holding a transaction affects every other test using it.                                        |
+| `SAP_LOCKS.testData`       | `testData.cleanup()` removes the data directory **recursively**. Unlocked, one worker's teardown deletes another worker's fixtures mid-test.                                |
+| `sapObjectLock(type, key)` | One business object. Deliberately scoped so two tests editing different objects still run in parallel.                                                                      |
+
+### Why `requireTestLocks()` is not optional
+
+:::warning On Playwright 1.57–1.62 an unguarded `lock` is silently ignored
+
+`playwright test` does **not** typecheck — `@playwright/test` ships no
+TypeScript dependency, and the runner strips types rather than checking them. An unknown `lock`
+property is therefore dropped at run time: your tests run **in parallel**, the
+shared state corrupts, and nothing reports it. The TypeScript error only appears
+if you separately run `tsc`.
+
+`requireTestLocks()` turns that fail-open into a loud
+`ERR_COMPAT_FEATURE_UNAVAILABLE` at collection time. Call it at module scope in
+any spec that uses `lock`.
+
+:::
+
+If you are below 1.63, the nearest floor equivalent is `fullyParallel: false`
+on the project — far blunter, since it serialises every test in the project
+rather than the few that touch one piece of shared state.
+
+## Praman Bridge in Parallel Workers
+
+The Praman bridge is injected per-page, not per-worker. Each worker creates its own browser context and page, so bridge injection is fully
+independent. No special configuration is needed for the bridge in parallel mode.
+
+One consideration: if `controlDiscoveryTimeout` is too low and the SAP system is under load from multiple workers, increase it:
+
+```typescript
+export default {
+  controlDiscoveryTimeout: 45_000, // 45 seconds under parallel load
+};
+```
+
+## CI Sharding with GitHub Actions
+
+Playwright's built-in sharding distributes test files across multiple CI jobs:
+
+```yaml
+# .github/workflows/test.yml
+jobs:
+  test:
+    strategy:
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --shard=${{ matrix.shard }}/4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results-shard-${{ matrix.shard }}
+          path: test-results/
+```
+
+## Auth Setup for Sharded Runs
+
+When using sharding, every shard must have access to auth state. Use `globalSetup` instead of project dependencies so each shard runs its own login:
+
+```typescript
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  globalSetup: './global-setup.ts', // runs once per shard
+});
+```
+
+## Common Pitfalls
+
+- **Too many workers against SAP**: SAP systems have session limits. If you see `ERR_AUTH_FAILED` errors in parallel runs, reduce `workers`
+  or use more test accounts.
+- **Shared mutable state**: Never store test state in module-level variables. Each worker is a separate process, so module state is not shared.
+  Use `testData.save()` and `testData.load()` for cross-step persistence.
+- **FLP tile cache**: The Fiori Launchpad caches tile data per session. Parallel workers reusing the same `storageState` share the same FLP cache, which is generally safe for read operations.
+- **Shard imbalance**: Playwright distributes by file, not by test count. If one file has 50 tests and others have 5, sharding will be uneven. Keep test files roughly equal in size.
+
+## Version Compatibility
+
+# Playwright Compatibility
+
+Praman declares `@playwright/test` as a peer dependency with the range `>=1.57.0 <2.0.0`.
+This page documents which versions are actively tested and recommended.
+
+## Playwright Version Matrix
+
+| Playwright Version | Status        | CI-Tested | Notes                                           |
+| ------------------ | ------------- | --------- | ----------------------------------------------- |
+| 1.57.x             | Supported     | Yes       | Minimum supported version                       |
+| 1.58.x             | Supported     | No        | Compatible, between the tested floor and top    |
+| 1.59.x             | Supported     | No        | Screencast, CLI agents, `ariaSnapshotDepth`     |
+| 1.60.x             | Supported     | No        | ARIA snapshots, highlight styles, `test.abort`  |
+| 1.61.x             | Supported     | No        | Web Storage API, soft poll, video retain modes  |
+| 1.62.x             | Supported     | No        | `locator.waitForFunction`, WebP, `AbortSignal`  |
+| 1.63.x             | Recommended   | Yes       | Test locks, subtree `frameLocator`, step params |
+| 2.x                | Not supported | No        | Breaking API changes expected                   |
+
+Three jobs bound this range on every CI run:
+
+| Job                                     | What it pins              | What it proves                                                                                                     |
+| --------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `Playwright Floor (1.57.0)`             | the declared minimum      | the unit suite passes at the floor                                                                                 |
+| `Playwright Ceiling (latest)`           | `@playwright/test@latest` | the newest catalogued flags are active, **and** that Playwright has not published a minor Praman hasn't catalogued |
+| `UI5 Bridge Smoke (PW 1.57.0 / 1.63.0)` | both ends of the range    | a **real Chromium** drives the UI5 bridge against live UI5 1.146.0 apps                                            |
+
+The ceiling job fails on an uncatalogued Playwright minor, so the feature table
+below cannot quietly fall behind the code.
+
+The bridge smoke job is the only CI job that launches a browser. It targets
+public UI5 demo apps on the SAP CDN, which bundle their own mock OData server,
+so it needs no SAP system and no secrets — and each matrix leg downloads the
+Chromium revision its own Playwright version pins, so the bridge is exercised
+against the browser each supported version actually ships with.
+
+Versions between the floor and the ceiling are supported via feature detection
+but are not individually exercised. The SAP-system integration matrices in
+`canary.yml` and `release.yml` list more versions, but they are gated on a
+`SAP_CLOUD_BASE_URL` secret and skip when it is absent — treat them as
+opt-in coverage for a configured fork, not as a guarantee this project makes.
+
+## TypeScript Version Matrix
+
+| TypeScript Version | Status      | CI-Tested | Notes                                  |
+| ------------------ | ----------- | --------- | -------------------------------------- |
+| 5.5 – 5.9          | Supported   | No        | Compatible, not actively tested        |
+| 6.x                | Supported   | Yes       | Published types compiled with TS 6.0.3 |
+| 7.x                | Recommended | Yes       | Full inference, strict mode validated  |
+
+## Tech Stack
+
+| Component     | Version                         |
+| ------------- | ------------------------------- |
+| Playwright    | 1.63.0 (peer: >=1.57.0)         |
+| TypeScript    | 6.0.3 (supports 7.x)            |
+| Node.js       | >=22                            |
+| ESLint        | 10.12.0 (11 plugins)            |
+| Zod           | 4.6.5                           |
+| Pino          | 10.4.0                          |
+| Build         | tsup 8.5.1 (ESM + CJS)          |
+| Test Runner   | Vitest 5.0.3                    |
+| AI SDKs       | Anthropic >=0.78, OpenAI >=6.22 |
+| OpenTelemetry | SDK >=0.212 (optional)          |
+
+## Minimum Version Enforcement
+
+At startup, Praman calls `assertMinVersion('1.57.0')` from the internal
+compatibility layer. If an older version is detected, a clear error is thrown
+before any tests execute.
+
+## Feature Detection
+
+Praman uses runtime feature detection (not version checks) to enable
+capabilities introduced in newer Playwright releases:
+
+| Feature                      | Required Version | Detection Key               |
+| ---------------------------- | ---------------- | --------------------------- |
+| Clock API                    | 1.45+            | `hasClockAPI`               |
+| ARIA snapshots               | 1.49+            | `hasAriaSnapshot`           |
+| Screencast API               | 1.59+            | `hasScreencastAPI`          |
+| ARIA snapshot depth          | 1.59+            | `hasAriaSnapshotDepth`      |
+| Set storage state            | 1.59+            | `hasSetStorageState`        |
+| Locator normalize            | 1.59+            | `hasLocatorNormalize`       |
+| URL pattern matcher          | 1.59+            | `hasURLPatternMatcher`      |
+| Test abort                   | 1.60+            | `hasTestAbort`              |
+| `getByRole({ description })` | 1.60+            | `hasGetByRoleDescription`   |
+| Page ARIA snapshot           | 1.60+            | `hasPageAriaSnapshot`       |
+| ARIA snapshot boxes          | 1.60+            | `hasAriaSnapshotBoxes`      |
+| Tracing HAR                  | 1.60+            | `hasTracingHAR`             |
+| Locator drop                 | 1.60+            | `hasLocatorDrop`            |
+| Locator highlight style      | 1.60+            | `hasLocatorHighlightStyle`  |
+| Browser context event        | 1.60+            | `hasBrowserContextEvent`    |
+| WebAuthn credentials         | 1.61+            | `hasWebAuthnCredentials`    |
+| Web Storage API              | 1.61+            | `hasWebStorageAPI`          |
+| Soft poll                    | 1.61+            | `hasSoftPoll`               |
+| Screencast timestamp         | 1.61+            | `hasScreencastTimestamp`    |
+| Video retain modes           | 1.61+            | `hasVideoRetainModes`       |
+| `locator.waitForFunction()`  | 1.62+            | `hasLocatorWaitForFunction` |
+| WebP screenshots             | 1.62+            | `hasWebPScreenshots`        |
+| `retryStrategy: 'isolated'`  | 1.62+            | `hasRetryStrategyIsolated`  |
+| `AbortSignal` support        | 1.62+            | `hasAbortSignal`            |
+| `apiResponse.timing()`       | 1.62+            | `hasApiResponseTiming`      |
+| `scroll: 'none'` on actions  | 1.62+            | `hasScrollOption`           |
+| Test locks                   | 1.63+            | `hasTestLocks`              |
+| Subtree `frameLocator()`     | 1.63+            | `hasSubtreeFrameLocator`    |
+| `locator.visible()`          | 1.63+            | `hasVisibleLocator`         |
+| Step `params` / `subtitle`   | 1.63+            | `hasStepParams`             |
+| `ariaSnapshotJSON()`         | 1.63+            | `hasAriaSnapshotJSON`       |
+| `dialogclosed` event         | 1.63+            | `hasDialogClosedEvent`      |
+| OPFS in storage state        | 1.63+            | `hasOpfsStorageState`       |
+| `httpCredentials` array      | 1.63+            | `hasHttpCredentialsArray`   |
+
+Test locks are the one flag with a user-facing guard: `requireTestLocks()`
+throws below 1.63 rather than letting a silently-ignored `lock` run your tests
+in parallel. See [Parallel Execution](./parallel-execution.md#test-locks-for-shared-sap-state-playwright-163).
+
+Praman's behaviour when a feature is unavailable depends on whether the floor
+has an equivalent — the policy is stated once in
+`src/core/compat/playwright-compat.ts` and applies to every flag above:
+
+- **An equivalent exists** → degrade transparently and log at `debug` which
+  path was taken. `locator.waitForFunction` is the reference case: a
+  page-scoped `page.waitForFunction` expresses the same predicate.
+- **No equivalent on the floor** → throw `ERR_COMPAT_FEATURE_UNAVAILABLE`,
+  naming the required version. The Web Storage API is the reference case:
+  there is no older `page.localStorage`, so degrading would silently give
+  wrong results instead of an actionable error.
+
+A special case worth knowing: `hasConsoleMessageFilter` guards an _option_,
+not a method. `page.consoleMessages()` exists at the 1.57 floor but takes no
+arguments, and JavaScript ignores surplus arguments — so passing `{ filter }`
+on an older runtime returns every message while the caller believes it was
+filtered. Always guard the option, not the call.
+
+## How to Upgrade Playwright
+
+```bash
+npm install --save-dev @playwright/test@latest
+npx playwright install
+```
+
+After upgrading, run your test suite to verify compatibility:
+
+```bash
+npx playwright test --reporter=list
+```
+
+## Reporting Issues
+
+If you encounter a compatibility issue with a specific Playwright version,
+please open a GitHub issue with:
+
+- The exact Playwright version (`npx playwright --version`)
+- The Praman version (`npm ls playwright-praman`)
+- The error message or unexpected behavior
+
 ## API Signatures
 
 > Public API surface from API Extractor report. TypeScript declaration signatures.
 
 ```ts
+import { Buffer as Buffer_2 } from 'node:buffer';
 import { expect } from '@playwright/test';
+import { Locator } from '@playwright/test';
 import { Logger } from 'pino';
 import { Page } from '@playwright/test';
 import * as _playwright_test from '@playwright/test';
@@ -2510,19 +3715,16 @@ export class AIError extends PramanError {
     constructor(options: AIErrorOptions);
     readonly model: string | undefined;
     readonly provider: string | undefined;
-    //
     toAIContext(): AIErrorContext & {
         readonly provider: string | undefined;
         readonly model: string | undefined;
         readonly tokenUsage: TokenUsage | undefined;
     };
-    //
     toJSON(): SerializedPramanError & {
         readonly provider: string | undefined;
         readonly model: string | undefined;
         readonly tokenUsage: TokenUsage | undefined;
     };
-    //
     readonly tokenUsage: TokenUsage | undefined;
 }
 
@@ -2543,12 +3745,14 @@ export type AiResponse<T> = {
     readonly metadata: AiResponseMetadata;
 };
 
-//
 // @public
 export type AppId = Brand<string, 'AppId'>;
 
 // @public
 export function appId(id: string): AppId;
+
+// @public
+export function assertMinVersion(minVersion: string): void;
 
 // @public
 export class AuthError extends PramanError {
@@ -2572,7 +3776,6 @@ export interface AuthStrategy {
     readonly name: string;
 }
 
-//
 // @public
 export const authTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & AuthFixtures & AuthFixtureOptions, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & AuthDeps>;
 
@@ -2597,7 +3800,24 @@ export class BridgeError extends PramanError {
     readonly ui5Version: string | undefined;
 }
 
-//
+// @public
+export const browserBindTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & BrowserBindFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & BrowserBindWorkerDeps>;
+
+// @public
+export interface BTPWorkZoneManager {
+    detect(): Promise<boolean>;
+    enableDualBridge(): Promise<void>;
+    getAppFrameForEval(): WorkZoneFrame;
+    getCurrentApp(): Promise<string | null>;
+    isAppReady(timeout?: number): Promise<boolean>;
+    navigateToApp(appId: string): Promise<void>;
+    switchToApp(): WorkZoneFrameLocator;
+    switchToShell(): WorkZonePage;
+}
+
+// @public
+export const BUILT_IN_OVERLAY_RULES: readonly OverlayRule[];
+
 // @public
 export function callFunctionImport<TData = unknown>(page: ODataHttpPage, serviceUrl: string, functionName: string, params?: Readonly<Record<string, unknown>>, method?: 'GET' | 'POST', options?: ODataHttpOptions): Promise<ODataHttpResult<TData>>;
 
@@ -2637,8 +3857,7 @@ export interface CapabilitiesJSON {
     readonly version: string;
 }
 
-//
-// @public (undocumented)
+// @public
 export type CapabilityEntry = z.infer<typeof CapabilityEntrySchema>;
 
 // @public
@@ -2673,13 +3892,22 @@ export interface CapabilityStats {
     readonly version: string;
 }
 
-//
 // @public
 export function clickRow(page: TableOperationsPage, tableId: string, rowIndex: number): Promise<void>;
 
-//
 // @public
 export function clickTableSettingsButton(page: TableFilterSortPage, tableId: string, options?: TableOptions): Promise<void>;
+
+// @public
+export interface ClockFixtures {
+    ui5Clock: Ui5Clock;
+}
+
+// @public
+export const clockTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & ClockFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions>;
+
+// @public
+export function collectPageDiagnostics(page: Page): Promise<PageDiagnostics>;
 
 // @public
 export type ColumnValueCriteria = Readonly<Record<string, string>>;
@@ -2696,11 +3924,9 @@ export class ConfigError extends PramanError {
         readonly validationErrors: readonly ValidationIssue[];
         readonly configPath: string | undefined;
     };
-    //
     readonly validationErrors: readonly ValidationIssue[];
 }
 
-//
 // @public
 export function confirmDialog(page: DialogPage, options?: FindDialogOptions & {
     readonly buttonText?: string;
@@ -2730,12 +3956,25 @@ export type ControlId = Brand<string, 'ControlId'>;
 // @public
 export function controlId(id: string): ControlId;
 
-//
+// @public
+export interface ControlWaitResult {
+    readonly strategy: ControlWaitStrategy;
+}
+
+// @public
+export type ControlWaitStrategy = 'locator' | 'page';
+
 // @public
 export const coreTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures>;
 
 // @public
 export function createEntity<TData = unknown>(page: ODataHttpPage, serviceUrl: string, entitySet: string, data: unknown, options?: ODataHttpOptions): Promise<ODataHttpResult<TData>>;
+
+// @public
+export function createUI5Matcher<TArgs extends readonly unknown[] = readonly unknown[]>(checkFn: MatcherCheckFn<TArgs>): UI5MatcherFn;
+
+// @public
+export function createWorkZoneManager(page: WorkZonePage, adapter: WorkZoneAdapter): BTPWorkZoneManager;
 
 // @public
 export interface CSRFTokenResult {
@@ -2766,10 +4005,8 @@ export type DateInput = Date | string;
 
 // @public
 export interface DateOptions {
-    readonly locale?: string;
     readonly skipStabilityWait?: boolean;
     readonly timeout?: number;
-    readonly timezone?: string;
 }
 
 // @public
@@ -2794,12 +4031,21 @@ export function defineConfig(input: PramanConfigInput): PramanConfigInput;
 // @public
 export function deleteEntity(page: ODataHttpPage, serviceUrl: string, entitySet: string, key: string, options?: ODataHttpOptions): Promise<void>;
 
-//
 // @public
 export function deselectAllTableRows(page: TablePage, tableId: string, options?: TableOptions): Promise<void>;
 
 // @public
+export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures;
+
+// @public
 export function detectTableType(page: TablePage, tableId: string): Promise<TableInfo>;
+
+// @public
+export const DIAGNOSTIC_CAPS: {
+    readonly consoleMessages: 200;
+    readonly pageErrors: 50;
+    readonly requests: 200;
+};
 
 // @public
 export interface DialogButtonInfo {
@@ -2809,7 +4055,6 @@ export interface DialogButtonInfo {
     readonly type?: string;
 }
 
-//
 // @public
 export type DialogControlType = (typeof DIALOG_CONTROL_TYPES)[number];
 
@@ -2853,6 +4098,7 @@ export const ErrorCode: Readonly<{
     readonly ERR_CONTROL_AGGREGATION: "ERR_CONTROL_AGGREGATION";
     readonly ERR_CONTROL_METHOD: "ERR_CONTROL_METHOD";
     readonly ERR_CONTROL_INTERACTION_FAILED: "ERR_CONTROL_INTERACTION_FAILED";
+    readonly ERR_CONTROL_NO_DOM_REF: "ERR_CONTROL_NO_DOM_REF";
     readonly ERR_AUTH_FAILED: "ERR_AUTH_FAILED";
     readonly ERR_AUTH_TIMEOUT: "ERR_AUTH_TIMEOUT";
     readonly ERR_AUTH_SESSION_EXPIRED: "ERR_AUTH_SESSION_EXPIRED";
@@ -2863,6 +4109,7 @@ export const ErrorCode: Readonly<{
     readonly ERR_ODATA_REQUEST_FAILED: "ERR_ODATA_REQUEST_FAILED";
     readonly ERR_ODATA_PARSE: "ERR_ODATA_PARSE";
     readonly ERR_ODATA_CSRF: "ERR_ODATA_CSRF";
+    readonly ERR_ODATA_TRACE: "ERR_ODATA_TRACE";
     readonly ERR_SELECTOR_INVALID: "ERR_SELECTOR_INVALID";
     readonly ERR_SELECTOR_AMBIGUOUS: "ERR_SELECTOR_AMBIGUOUS";
     readonly ERR_SELECTOR_PARSE: "ERR_SELECTOR_PARSE";
@@ -2883,6 +4130,8 @@ export const ErrorCode: Readonly<{
     readonly ERR_PLUGIN_LOAD: "ERR_PLUGIN_LOAD";
     readonly ERR_PLUGIN_INIT: "ERR_PLUGIN_INIT";
     readonly ERR_PLUGIN_INCOMPATIBLE: "ERR_PLUGIN_INCOMPATIBLE";
+    readonly ERR_PLUGIN_EXTENSION_DUPLICATE: "ERR_PLUGIN_EXTENSION_DUPLICATE";
+    readonly ERR_PLUGIN_EXTENSION_INVALID: "ERR_PLUGIN_EXTENSION_INVALID";
     readonly ERR_VOCAB_TERM_NOT_FOUND: "ERR_VOCAB_TERM_NOT_FOUND";
     readonly ERR_VOCAB_DOMAIN_LOAD_FAILED: "ERR_VOCAB_DOMAIN_LOAD_FAILED";
     readonly ERR_VOCAB_JSON_INVALID: "ERR_VOCAB_JSON_INVALID";
@@ -2896,6 +4145,20 @@ export const ErrorCode: Readonly<{
     readonly ERR_FLP_API_UNAVAILABLE: "ERR_FLP_API_UNAVAILABLE";
     readonly ERR_FLP_INVALID_USER: "ERR_FLP_INVALID_USER";
     readonly ERR_FLP_OPERATION_TIMEOUT: "ERR_FLP_OPERATION_TIMEOUT";
+    readonly ERR_MATCHER_DUPLICATE: "ERR_MATCHER_DUPLICATE";
+    readonly ERR_MATCHER_INVALID: "ERR_MATCHER_INVALID";
+    readonly ERR_MATCHER_FROZEN: "ERR_MATCHER_FROZEN";
+    readonly ERR_BIND_NOT_SUPPORTED: "ERR_BIND_NOT_SUPPORTED";
+    readonly ERR_BIND_FAILED: "ERR_BIND_FAILED";
+    readonly ERR_SCREENCAST_NOT_STARTED: "ERR_SCREENCAST_NOT_STARTED";
+    readonly ERR_SCREENCAST_CHAPTER_FAILED: "ERR_SCREENCAST_CHAPTER_FAILED";
+    readonly ERR_SCREENCAST_FRAME_HANDLER: "ERR_SCREENCAST_FRAME_HANDLER";
+    readonly ERR_TELEMETRY_INIT_FAILED: "ERR_TELEMETRY_INIT_FAILED";
+    readonly ERR_TELEMETRY_PEER_DEP_MISSING: "ERR_TELEMETRY_PEER_DEP_MISSING";
+    readonly ERR_TELEMETRY_EXPORTER_FAILED: "ERR_TELEMETRY_EXPORTER_FAILED";
+    readonly ERR_TELEMETRY_SHUTDOWN_FAILED: "ERR_TELEMETRY_SHUTDOWN_FAILED";
+    readonly ERR_TELEMETRY_METRICS_INIT_FAILED: "ERR_TELEMETRY_METRICS_INIT_FAILED";
+    readonly ERR_COMPAT_FEATURE_UNAVAILABLE: "ERR_COMPAT_FEATURE_UNAVAILABLE";
 }>;
 
 // @public
@@ -2906,7 +4169,6 @@ export { expect }
 // @public
 export function exportTableData(page: TableFilterSortPage, tableId: string, options?: TableExportOptions): Promise<readonly Record<string, string>[]>;
 
-//
 // @public
 export type ExtendedUI5Handler = UI5Handler & {
     readonly table: ReturnType<typeof createTableFixture>;
@@ -2915,7 +4177,19 @@ export type ExtendedUI5Handler = UI5Handler & {
     readonly odata: ReturnType<typeof createODataFixture>;
 };
 
-//
+// @public
+export function extendUI5Handler<T extends ExtensionMethods>(name: string, factory: ExtensionFactory<T>): void;
+
+// @public
+export interface ExtensionContext {
+    readonly config: Readonly<PramanConfig>;
+    readonly handler: UI5Handler;
+    readonly page: Page;
+}
+
+// @public
+export type ExtensionFactory<T extends ExtensionMethods> = (context: ExtensionContext) => T;
+
 // @public
 export function fetchCSRFToken(page: ODataCSRFPage, serviceUrl: string): Promise<CSRFTokenResult>;
 
@@ -2955,11 +4229,15 @@ export function getCellByColumnName(page: TableOperationsPage, tableId: string, 
 // @public
 export function getColumnNames(page: TableOperationsPage, tableId: string): Promise<readonly string[]>;
 
-//
+// @public
+export function getControlAggregation(page: MatcherPage, controlId: string, aggregationName: string): Promise<readonly BridgeControlRef[]>;
+
+// @public
+export function getControlProperty(page: MatcherPage, controlId: string, propertyName: string): Promise<unknown>;
+
 // @public
 export function getCurrentHash(page: NavigationPage): Promise<string>;
 
-//
 // @public
 export function getDatePickerValue(page: DatePage, controlId: string): Promise<string>;
 
@@ -2969,7 +4247,6 @@ export function getDateRangeSelection(page: DatePage, controlId: string): Promis
 // @public
 export function getDialogButtons(page: DialogPage, dialogId?: string): Promise<readonly DialogButtonInfo[]>;
 
-//
 // @public
 export function getEntityCount(page: ODataPage, path: string, options?: ODataOptions): Promise<number>;
 
@@ -2984,6 +4261,12 @@ export function getModelProperty(page: ODataPage, path: string, options?: ODataO
 
 // @public
 export function getOpenDialogs(page: DialogPage): Promise<readonly DialogInfo[]>;
+
+// @public
+export function getPlaywrightFeatures(): PlaywrightFeatures;
+
+// @public
+export function getPlaywrightVersion(): PlaywrightVersion;
 
 // @public
 export function getRowCount(page: TableOperationsPage, tableId: string, options?: TableOptions): Promise<number>;
@@ -3008,6 +4291,9 @@ export function getTableRows(page: TablePage, tableId: string, options?: TableOp
 
 // @public
 export function getTimePickerValue(page: DatePage, controlId: string): Promise<string>;
+
+// @public
+export function hasFeature(feature: keyof PlaywrightFeatures): boolean;
 
 // @public
 export function hasPendingChanges(page: ODataPage, options?: ODataOptions): Promise<boolean>;
@@ -3039,6 +4325,73 @@ export interface LoadConfigOptions {
 }
 
 // @public
+export type MatcherCheckFn<TArgs extends readonly unknown[] = readonly unknown[]> = (page: MatcherPage, controlId: string, ...args: TArgs) => Promise<PollableMatcherResult>;
+
+// @public
+export interface MatcherPage {
+    evaluate<TResult>(script: string, arg?: unknown): Promise<TResult>;
+    waitForFunction(pageFunction: string | (() => unknown), options?: {
+        timeout?: number;
+    }): Promise<unknown>;
+}
+
+// @public
+export interface MatcherResult {
+    readonly actual?: unknown;
+    readonly expected?: unknown;
+    readonly message: () => string;
+    readonly pass: boolean;
+}
+
+// @public
+export const MIN_TEST_LOCKS_VERSION = "1.63.0";
+
+// @public
+export const moduleTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures>;
+
+// @public
+export type NativeDialogAction = 'accept' | 'dismiss';
+
+// @public
+export interface NativeDialogFixtures {
+    nativeDialogs: NativeDialogHandler;
+}
+
+// @public
+export class NativeDialogHandler {
+    constructor(options: NativeDialogHandlerOptions);
+    dispose(): void;
+    observe(): void;
+    get records(): readonly NativeDialogRecord[];
+    register(rule: NativeDialogRule): void;
+    registerAll(rules: readonly NativeDialogRule[]): void;
+}
+
+// @public
+export interface NativeDialogRecord {
+    readonly action: NativeDialogAction | 'observed';
+    readonly error?: string;
+    readonly handledBy: string;
+    readonly message: string;
+    readonly type: string;
+}
+
+// @public
+export interface NativeDialogRule {
+    readonly action: NativeDialogAction;
+    readonly name: string;
+    readonly promptText?: string;
+    readonly times?: number;
+    readonly types: readonly NativeDialogType[];
+}
+
+// @public
+export const nativeDialogTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & NativeDialogFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions>;
+
+// @public
+export type NativeDialogType = 'alert' | 'beforeunload' | 'confirm' | 'prompt';
+
+// @public
 export function navigateBack(page: NavigationPage, options?: NavigationOptions): Promise<void>;
 
 // @public
@@ -3053,9 +4406,14 @@ export function navigateToHash(page: NavigationPage, hash: string, options?: Nav
 // @public
 export function navigateToHome(page: NavigationPage, options?: NavigationOptions): Promise<void>;
 
-//
 // @public
 export function navigateToIntent(page: NavigationPage, intent: NavigationIntent, params?: Readonly<Record<string, string>>, options?: NavigationOptions): Promise<void>;
+
+// @public
+export function navigateToSectionLink(page: SpaceNavigationPage, linkName: string, options?: SectionLinkNavigationOptions): Promise<void>;
+
+// @public
+export function navigateToSpace(page: SpaceNavigationPage, spaceTitle: string, options?: SpaceNavigationOptions): Promise<void>;
 
 // @public
 export function navigateToTile(page: NavigationPage, tileTitle: string, options?: NavigationOptions): Promise<void>;
@@ -3134,7 +4492,109 @@ export interface ODataQueryOptions extends ODataHttpOptions {
 }
 
 // @public
+export interface OverlayDetection {
+    readonly dismissed: boolean;
+    readonly error?: string;
+    readonly rule: string;
+    readonly text: string;
+}
+
+// @public
+export interface OverlayFixtures {
+    overlays: OverlayHandler;
+}
+
+// @public
+export class OverlayHandler {
+    constructor(options: OverlayHandlerOptions);
+    get detections(): readonly OverlayDetection[];
+    dispose(): Promise<void>;
+    register(rule: OverlayRule): Promise<void>;
+    registerAll(rules: readonly OverlayRule[]): Promise<void>;
+}
+
+// @public
+export interface OverlayRule {
+    readonly dismiss?: (overlay: Locator) => Promise<void>;
+    readonly name: string;
+    readonly selector: string;
+    readonly times?: number;
+}
+
+// @public
+export const overlayTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & OverlayFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & OverlayDeps>;
+
+// @public
 export const PACKAGE_NAME: "playwright-praman";
+
+// @public
+export interface PageDiagnostics {
+    readonly consoleMessages: readonly CapturedConsoleMessage[];
+    readonly isEmpty: boolean;
+    readonly pageErrors: readonly string[];
+    readonly requests: readonly CapturedRequest[];
+    readonly truncated: {
+        readonly consoleMessages: boolean;
+        readonly pageErrors: boolean;
+        readonly requests: boolean;
+    };
+}
+
+// @public
+export function parsePlaywrightVersion(versionString: string): PlaywrightVersion;
+
+// @public
+export interface PlaywrightFeatures {
+    readonly hasAbortSignal: boolean;
+    readonly hasApiResponseTiming: boolean;
+    readonly hasAriaSnapshot: boolean;
+    readonly hasAriaSnapshotBoxes: boolean;
+    readonly hasAriaSnapshotDepth: boolean;
+    readonly hasAriaSnapshotJSON: boolean;
+    readonly hasBoxedStep: boolean;
+    readonly hasBrowserContextEvent: boolean;
+    readonly hasClockAPI: boolean;
+    readonly hasConsoleMessageFilter: boolean;
+    readonly hasCustomExpect: boolean;
+    readonly hasDialogClosedEvent: boolean;
+    readonly hasFilterLocator: boolean;
+    readonly hasGetByRoleDescription: boolean;
+    readonly hasHttpCredentialsArray: boolean;
+    readonly hasLocatorAssertions: boolean;
+    readonly hasLocatorDrop: boolean;
+    readonly hasLocatorHighlightStyle: boolean;
+    readonly hasLocatorNormalize: boolean;
+    readonly hasLocatorWaitForFunction: boolean;
+    readonly hasOpfsStorageState: boolean;
+    readonly hasPageAriaSnapshot: boolean;
+    readonly hasRetryStrategyIsolated: boolean;
+    readonly hasRouteFromHAR: boolean;
+    readonly hasScreencastAPI: boolean;
+    readonly hasScreencastTimestamp: boolean;
+    readonly hasScreenshotCaret: boolean;
+    readonly hasScrollOption: boolean;
+    readonly hasSetStorageState: boolean;
+    readonly hasSoftPoll: boolean;
+    readonly hasStepParams: boolean;
+    readonly hasSubtreeFrameLocator: boolean;
+    readonly hasTestAbort: boolean;
+    readonly hasTestLocks: boolean;
+    readonly hasTracingHAR: boolean;
+    readonly hasURLPatternMatcher: boolean;
+    readonly hasVideoRetainModes: boolean;
+    readonly hasVisibleLocator: boolean;
+    readonly hasWebAuthnCredentials: boolean;
+    readonly hasWebPScreenshots: boolean;
+    readonly hasWebStorageAPI: boolean;
+}
+
+// @public
+export interface PlaywrightVersion {
+    readonly major: number;
+    readonly minor: number;
+    readonly patch: number;
+    readonly raw: string;
+}
 
 // @public
 export class PluginError extends PramanError {
@@ -3151,7 +4611,6 @@ export class PluginError extends PramanError {
     };
 }
 
-//
 // @public
 export type PramanConfig = z.output<typeof PramanConfigSchema>;
 
@@ -3174,14 +4633,154 @@ export class PramanError extends Error {
 }
 
 // @public
+export const presets: {
+    readonly ci: {
+        logLevel?: "error" | "debug" | "warn" | "info" | "verbose" | undefined;
+        ui5WaitTimeout?: number | undefined;
+        controlDiscoveryTimeout?: number | undefined;
+        interactionStrategy?: "ui5-native" | "dom-first" | "opa5" | undefined;
+        discoveryStrategies?: ("direct-id" | "recordreplay" | "registry")[] | undefined;
+        skipStabilityWait?: boolean | undefined;
+        preferVisibleControls?: boolean | undefined;
+        ignoreAutoWaitUrls?: string[] | undefined;
+        auth?: {
+            strategy?: "custom" | "btp-saml" | "basic" | "office365" | undefined;
+            baseUrl?: string | undefined;
+            username?: string | undefined;
+            password?: string | undefined;
+            client?: string | undefined;
+            language?: string | undefined;
+        } | undefined;
+        ai?: {
+            provider?: "openai" | "azure-openai" | "anthropic" | undefined;
+            includeAriaSnapshot?: boolean | undefined;
+            apiKey?: string | undefined;
+            model?: string | undefined;
+            temperature?: number | undefined;
+            maxTokens?: number | undefined;
+            endpoint?: string | undefined;
+            deployment?: string | undefined;
+            apiVersion?: string | undefined;
+            anthropicApiKey?: string | undefined;
+        } | undefined;
+        telemetry?: {
+            openTelemetry?: boolean | undefined;
+            exporter?: "otlp" | "azure-monitor" | "jaeger" | undefined;
+            endpoint?: string | undefined;
+            serviceName?: string | undefined;
+            protocol?: "http" | "grpc" | undefined;
+            metrics?: boolean | undefined;
+            batchTimeout?: number | undefined;
+            maxQueueSize?: number | undefined;
+            resourceAttributes?: Record<string, string> | undefined;
+            connectionString?: string | undefined;
+        } | undefined;
+        selectors?: {
+            defaultTimeout?: number | undefined;
+            preferVisibleControls?: boolean | undefined;
+            skipStabilityWait?: boolean | undefined;
+        } | undefined;
+        opa5?: {
+            interactionTimeout?: number | undefined;
+            autoWait?: boolean | undefined;
+            debug?: boolean | undefined;
+        } | undefined;
+        odataTracing?: {
+            enabled?: boolean | undefined;
+            urlPatterns?: string[] | undefined;
+        } | undefined;
+        controlTreeCapture?: {
+            enabled?: boolean | undefined;
+            maxDepth?: number | undefined;
+            maxControls?: number | undefined;
+        } | undefined;
+        overlays?: {
+            enabled?: boolean | undefined;
+        } | undefined;
+        defaultMatchSubclasses?: boolean | undefined;
+        captureFailureArtifacts?: boolean | undefined;
+    };
+    readonly debug: {
+        logLevel?: "error" | "debug" | "warn" | "info" | "verbose" | undefined;
+        ui5WaitTimeout?: number | undefined;
+        controlDiscoveryTimeout?: number | undefined;
+        interactionStrategy?: "ui5-native" | "dom-first" | "opa5" | undefined;
+        discoveryStrategies?: ("direct-id" | "recordreplay" | "registry")[] | undefined;
+        skipStabilityWait?: boolean | undefined;
+        preferVisibleControls?: boolean | undefined;
+        ignoreAutoWaitUrls?: string[] | undefined;
+        auth?: {
+            strategy?: "custom" | "btp-saml" | "basic" | "office365" | undefined;
+            baseUrl?: string | undefined;
+            username?: string | undefined;
+            password?: string | undefined;
+            client?: string | undefined;
+            language?: string | undefined;
+        } | undefined;
+        ai?: {
+            provider?: "openai" | "azure-openai" | "anthropic" | undefined;
+            includeAriaSnapshot?: boolean | undefined;
+            apiKey?: string | undefined;
+            model?: string | undefined;
+            temperature?: number | undefined;
+            maxTokens?: number | undefined;
+            endpoint?: string | undefined;
+            deployment?: string | undefined;
+            apiVersion?: string | undefined;
+            anthropicApiKey?: string | undefined;
+        } | undefined;
+        telemetry?: {
+            openTelemetry?: boolean | undefined;
+            exporter?: "otlp" | "azure-monitor" | "jaeger" | undefined;
+            endpoint?: string | undefined;
+            serviceName?: string | undefined;
+            protocol?: "http" | "grpc" | undefined;
+            metrics?: boolean | undefined;
+            batchTimeout?: number | undefined;
+            maxQueueSize?: number | undefined;
+            resourceAttributes?: Record<string, string> | undefined;
+            connectionString?: string | undefined;
+        } | undefined;
+        selectors?: {
+            defaultTimeout?: number | undefined;
+            preferVisibleControls?: boolean | undefined;
+            skipStabilityWait?: boolean | undefined;
+        } | undefined;
+        opa5?: {
+            interactionTimeout?: number | undefined;
+            autoWait?: boolean | undefined;
+            debug?: boolean | undefined;
+        } | undefined;
+        odataTracing?: {
+            enabled?: boolean | undefined;
+            urlPatterns?: string[] | undefined;
+        } | undefined;
+        controlTreeCapture?: {
+            enabled?: boolean | undefined;
+            maxDepth?: number | undefined;
+            maxControls?: number | undefined;
+        } | undefined;
+        overlays?: {
+            enabled?: boolean | undefined;
+        } | undefined;
+        defaultMatchSubclasses?: boolean | undefined;
+        captureFailureArtifacts?: boolean | undefined;
+    };
+};
+
+// @public
+export interface PropertyMatcher {
+    readonly operator?: 'equals' | 'contains' | 'startsWith' | 'endsWith' | 'regex';
+    readonly value: string | number | boolean;
+}
+
+// @public
 export function queryEntities<TData = unknown>(page: ODataHttpPage, serviceUrl: string, entitySet: string, options?: ODataQueryOptions): Promise<ODataHttpResult<readonly TData[]>>;
 
-//
-// @public (undocumented)
+// @public
 export type RecipeEntry = z.infer<typeof RecipeEntrySchema>;
 
-//
-// @public (undocumented)
+// @public
 export type RecipePriority = z.infer<typeof RecipePrioritySchema>;
 
 // @public
@@ -3223,9 +4822,21 @@ export const recipes: {
     readonly registry: RecipeRegistry;
 };
 
-//
+// @public
+export function registerUI5Matcher(name: string, matcherFn: UI5MatcherFn): void;
+
+// @public
+export function requireTestLocks(): void;
+
 // @public
 export function retry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T>;
+
+// @public
+export const SAP_LOCKS: {
+    readonly flpSettings: "sap:flp-settings";
+    readonly testUser: "sap:test-user";
+    readonly testData: "sap:test-data";
+};
 
 // @public
 export interface SAPAuthConfig {
@@ -3245,7 +4856,43 @@ export interface SAPAuthConfig {
 }
 
 // @public
+export function sapObjectLock(objectType: string, objectKey: string): string;
+
+// @public
+export interface ScreencastFixture {
+    highlightControls: (enabled: boolean, style?: string | Record<string, string | number>) => void;
+    onFrame: (handler: ScreencastFrameHandler) => void;
+    showActions: (options?: ShowActionsOptions) => Promise<void>;
+    showChapter: (title: string) => Promise<void>;
+    showUI5ControlTree: (enabled?: boolean) => void;
+}
+
+// @public
+export interface ScreencastFixtures {
+    screencast: ScreencastFixture;
+}
+
+// @public
+export interface ScreencastFrame {
+    readonly buffer: Buffer_2;
+    readonly timestamp: number;
+}
+
+// @public
+export type ScreencastFrameHandler = (frame: ScreencastFrame) => Promise<void> | void;
+
+// @public
+export const screencastTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & ScreencastFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & ScreencastWorkerDeps>;
+
+// @public
 export function searchAndOpenApp(page: NavigationPage, appTitle: string, options?: NavigationOptions): Promise<void>;
+
+// @public
+export interface SectionLinkNavigationOptions {
+    readonly description?: string;
+    readonly timeout?: number;
+    readonly waitForStable?: boolean;
+}
 
 // @public
 export function selectAllTableRows(page: TablePage, tableId: string, options?: TableOptions): Promise<void>;
@@ -3273,6 +4920,9 @@ export function selectTableRow(page: TablePage, tableId: string, rowIndex: numbe
 
 // @public
 export type SemanticObjectAction = `${string}-${string}`;
+
+// @public
+export function serializeUI5SelectorToCSS(selector: UI5Selector): string;
 
 // @public
 export interface SessionInfo {
@@ -3315,6 +4965,13 @@ export interface SortOrderInfo {
 }
 
 // @public
+export interface SpaceNavigationOptions {
+    readonly exact?: boolean;
+    readonly timeout?: number;
+    readonly waitForStable?: boolean;
+}
+
+// @public
 export interface StandardTableInfo {
     readonly effectiveId: string;
     readonly kind: 'standard';
@@ -3347,12 +5004,28 @@ export interface TableSortOptions extends TableOptions {
     readonly descending?: boolean | undefined;
 }
 
-// @public (undocumented)
-export type TableVariant = 'sap.m.Table' | 'sap.ui.table.Table' | 'sap.ui.table.TreeTable' | 'sap.ui.table.AnalyticalTable' | 'sap.ui.comp.smarttable.SmartTable' | 'sap.ui.mdc.Table';
-
-//
 // @public
-export const test: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures & AuthFixtures & AuthFixtureOptions & NavFixtures & StabilityFixtures & FEFixtures & AIFixtures & IntentTestFixtures & IntentFixtureDeps & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & AuthDeps & NavWorkerDeps & StabilityDeps & AIWorkerDeps>;
+export type TableVariant = (typeof VALID_VARIANTS)[number];
+
+// @public
+export class TelemetryError extends PramanError {
+    constructor(options: TelemetryErrorOptions);
+    readonly exporterType: string | undefined;
+    readonly packageName: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly exporterType: string | undefined;
+        readonly packageName: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly exporterType: string | undefined;
+        readonly packageName: string | undefined;
+    };
+}
+
+// @public
+export const test: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures & AuthFixtures & AuthFixtureOptions & {
+    webStorage: WebStorageFixture;
+} & NavFixtures & StabilityFixtures & ControlTreeFixtures & FailureArtifactsFixtures & OverlayFixtures & NativeDialogFixtures & ClockFixtures & FEFixtures & AIFixtures & IntentTestFixtures & IntentFixtureDeps & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures & ODataTraceFixtures & BrowserBindFixtures & ScreencastFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & AuthDeps & NavWorkerDeps & StabilityDeps & ControlTreeDeps & FailureArtifactsDeps & OverlayDeps & AIWorkerDeps & ODataTraceDeps & BrowserBindWorkerDeps & ScreencastWorkerDeps>;
 
 // @public
 export class TimeoutError extends PramanError {
@@ -3370,8 +5043,25 @@ export class TimeoutError extends PramanError {
 }
 
 // @public
+export class Ui5Clock {
+    constructor(options: Ui5ClockOptions);
+    fastForward(ticks: number | string): Promise<void>;
+    install(time?: ClockTime): Promise<void>;
+    get installed(): boolean;
+    pauseAt(time: ClockTime): Promise<void>;
+    resume(): Promise<void>;
+    runFor(ticks: number | string): Promise<void>;
+    setFixedTime(time: ClockTime): Promise<void>;
+}
+
+// @public
+export interface Ui5ClockOptions {
+    readonly logger?: Logger;
+    readonly page: Page;
+}
+
+// @public
 export interface UI5ControlBase {
-    [method: string]: any;
     readonly controlType: string;
     getAggregation(name: string): Promise<readonly UI5ControlBase[]>;
     getBindingInfo(name: string): Promise<unknown>;
@@ -3384,7 +5074,214 @@ export interface UI5ControlBase {
     readonly id: string;
     isBound(propertyName: string): Promise<boolean>;
     setProperty(name: string, value: unknown): Promise<void>;
+    toLocator(): Promise<_playwright_test.Locator>;
 }
+
+// @public
+export interface UI5ControlMap {
+    'sap.f.Avatar': UI5FAvatar;
+    'sap.f.Card': UI5FCard;
+    'sap.f.DynamicPage': UI5DynamicPage;
+    'sap.f.DynamicPageHeader': UI5DynamicPageHeader;
+    'sap.f.DynamicPageTitle': UI5DynamicPageTitle;
+    'sap.f.FlexibleColumnLayout': UI5FlexibleColumnLayout;
+    'sap.f.GridContainer': UI5GridContainer;
+    'sap.f.ProductSwitch': UI5ProductSwitch;
+    'sap.f.semantic.SemanticPage': UI5FSemanticPage;
+    'sap.f.ShellBar': UI5ShellBar;
+    'sap.m.ActionListItem': UI5ActionListItem;
+    'sap.m.ActionSheet': UI5ActionSheet;
+    'sap.m.App': UI5App;
+    'sap.m.Avatar': UI5Avatar;
+    'sap.m.Bar': UI5Bar;
+    'sap.m.Breadcrumbs': UI5Breadcrumbs;
+    'sap.m.BusyDialog': UI5BusyDialog;
+    'sap.m.BusyIndicator': UI5BusyIndicator;
+    'sap.m.Button': UI5Button;
+    'sap.m.Carousel': UI5Carousel;
+    'sap.m.CheckBox': UI5CheckBox;
+    'sap.m.ColorPalette': UI5ColorPalette;
+    'sap.m.ColorPalettePopover': UI5ColorPalettePopover;
+    'sap.m.Column': UI5Column;
+    'sap.m.ColumnListItem': UI5ColumnListItem;
+    'sap.m.ComboBox': UI5ComboBox;
+    'sap.m.CustomListItem': UI5CustomListItem;
+    'sap.m.DatePicker': UI5DatePicker;
+    'sap.m.DateRangeSelection': UI5DateRangeSelection;
+    'sap.m.DateTimePicker': UI5DateTimePicker;
+    'sap.m.Dialog': UI5Dialog;
+    'sap.m.DisplayListItem': UI5DisplayListItem;
+    'sap.m.DraftIndicator': UI5DraftIndicator;
+    'sap.m.DynamicDateRange': UI5DynamicDateRange;
+    'sap.m.ExpandableText': UI5ExpandableText;
+    'sap.m.FacetFilter': UI5FacetFilter;
+    'sap.m.FacetFilterList': UI5FacetFilterList;
+    'sap.m.FeedInput': UI5FeedInput;
+    'sap.m.FeedListItem': UI5FeedListItem;
+    'sap.m.FlexBox': UI5FlexBox;
+    'sap.m.FormattedText': UI5FormattedText;
+    'sap.m.GenericTile': UI5GenericTile;
+    'sap.m.GroupHeaderListItem': UI5GroupHeaderListItem;
+    'sap.m.HBox': UI5HBox;
+    'sap.m.HeaderContainer': UI5HeaderContainer;
+    'sap.m.IconTabBar': UI5IconTabBar;
+    'sap.m.IconTabFilter': UI5IconTabFilter;
+    'sap.m.IconTabHeader': UI5IconTabHeader;
+    'sap.m.IconTabSeparator': UI5IconTabSeparator;
+    'sap.m.IllustratedMessage': UI5IllustratedMessage;
+    'sap.m.Image': UI5Image;
+    'sap.m.Input': UI5Input;
+    'sap.m.InputListItem': UI5InputListItem;
+    'sap.m.Label': UI5Label;
+    'sap.m.LightBox': UI5LightBox;
+    'sap.m.Link': UI5Link;
+    'sap.m.List': UI5List;
+    'sap.m.ListBase': UI5ListBase;
+    'sap.m.MaskInput': UI5MaskInput;
+    'sap.m.Menu': UI5Menu;
+    'sap.m.MenuButton': UI5MenuButton;
+    'sap.m.MenuItem': UI5MenuItem;
+    'sap.m.MessageItem': UI5MessageItem;
+    'sap.m.MessagePopover': UI5MessagePopover;
+    'sap.m.MessageStrip': UI5MessageStrip;
+    'sap.m.MessageView': UI5MessageView;
+    'sap.m.MultiComboBox': UI5MultiComboBox;
+    'sap.m.MultiInput': UI5MultiInput;
+    'sap.m.NavContainer': UI5NavContainer;
+    'sap.m.NotificationListGroup': UI5NotificationListGroup;
+    'sap.m.NotificationListItem': UI5NotificationListItem;
+    'sap.m.NumericContent': UI5NumericContent;
+    'sap.m.ObjectAttribute': UI5ObjectAttribute;
+    'sap.m.ObjectHeader': UI5ObjectHeader;
+    'sap.m.ObjectIdentifier': UI5ObjectIdentifier;
+    'sap.m.ObjectListItem': UI5ObjectListItem;
+    'sap.m.ObjectMarker': UI5ObjectMarker;
+    'sap.m.ObjectNumber': UI5ObjectNumber;
+    'sap.m.ObjectStatus': UI5ObjectStatus;
+    'sap.m.OverflowToolbar': UI5OverflowToolbar;
+    'sap.m.p13n.GroupPanel': UI5P13nGroupPanel;
+    'sap.m.p13n.Popup': UI5P13nPopup;
+    'sap.m.p13n.SelectionPanel': UI5P13nSelectionPanel;
+    'sap.m.p13n.SortPanel': UI5P13nSortPanel;
+    'sap.m.Page': UI5Page;
+    'sap.m.Panel': UI5Panel;
+    'sap.m.PDFViewer': UI5PDFViewer;
+    'sap.m.PlanningCalendar': UI5PlanningCalendar;
+    'sap.m.Popover': UI5Popover;
+    'sap.m.ProgressIndicator': UI5ProgressIndicator;
+    'sap.m.QuickView': UI5QuickView;
+    'sap.m.QuickViewCard': UI5QuickViewCard;
+    'sap.m.QuickViewPage': UI5QuickViewPage;
+    'sap.m.RadioButton': UI5RadioButton;
+    'sap.m.RadioButtonGroup': UI5RadioButtonGroup;
+    'sap.m.RangeSlider': UI5RangeSlider;
+    'sap.m.RatingIndicator': UI5RatingIndicator;
+    'sap.m.ResponsivePopover': UI5ResponsivePopover;
+    'sap.m.ScrollContainer': UI5ScrollContainer;
+    'sap.m.SearchField': UI5SearchField;
+    'sap.m.SegmentedButton': UI5SegmentedButton;
+    'sap.m.Select': UI5Select;
+    'sap.m.SelectDialog': UI5SelectDialog;
+    'sap.m.SelectionDetails': UI5SelectionDetails;
+    'sap.m.SelectList': UI5SelectList;
+    'sap.m.Shell': UI5Shell;
+    'sap.m.SinglePlanningCalendar': UI5SinglePlanningCalendar;
+    'sap.m.Slider': UI5Slider;
+    'sap.m.SlideTile': UI5SlideTile;
+    'sap.m.SplitApp': UI5SplitApp;
+    'sap.m.SplitButton': UI5SplitButton;
+    'sap.m.SplitContainer': UI5SplitContainer;
+    'sap.m.StandardListItem': UI5StandardListItem;
+    'sap.m.StandardTreeItem': UI5StandardTreeItem;
+    'sap.m.StepInput': UI5StepInput;
+    'sap.m.Switch': UI5Switch;
+    'sap.m.TabContainer': UI5TabContainer;
+    'sap.m.TabContainerItem': UI5TabContainerItem;
+    'sap.m.Table': UI5Table;
+    'sap.m.table.columnmenu.Menu': UI5ColumnMenu;
+    'sap.m.TableSelectDialog': UI5TableSelectDialog;
+    'sap.m.Text': UI5Text;
+    'sap.m.TextArea': UI5TextArea;
+    'sap.m.TileContent': UI5TileContent;
+    'sap.m.TimePicker': UI5TimePicker;
+    'sap.m.Title': UI5Title;
+    'sap.m.ToggleButton': UI5ToggleButton;
+    'sap.m.Token': UI5Token;
+    'sap.m.Tokenizer': UI5Tokenizer;
+    'sap.m.Toolbar': UI5Toolbar;
+    'sap.m.ToolbarSeparator': UI5ToolbarSeparator;
+    'sap.m.ToolbarSpacer': UI5ToolbarSpacer;
+    'sap.m.Tree': UI5Tree;
+    'sap.m.upload.UploadSet': UI5UploadSet;
+    'sap.m.UploadCollection': UI5UploadCollection;
+    'sap.m.VariantManagement': UI5VariantManagement;
+    'sap.m.VBox': UI5VBox;
+    'sap.m.ViewSettingsDialog': UI5ViewSettingsDialog;
+    'sap.m.Wizard': UI5Wizard;
+    'sap.m.WizardStep': UI5WizardStep;
+    'sap.tnt.InfoLabel': UI5InfoLabel;
+    'sap.tnt.NavigationList': UI5NavigationList;
+    'sap.tnt.NavigationListItem': UI5NavigationListItem;
+    'sap.tnt.SideNavigation': UI5SideNavigation;
+    'sap.tnt.ToolHeader': UI5ToolHeader;
+    'sap.tnt.ToolPage': UI5ToolPage;
+    'sap.ui.comp.filterbar.FilterBar': UI5FilterBar;
+    'sap.ui.comp.navpopover.SmartLink': UI5SmartLink;
+    'sap.ui.comp.smartchart.SmartChart': UI5SmartChart;
+    'sap.ui.comp.smartfield.SmartField': UI5SmartField;
+    'sap.ui.comp.smartfilterbar.SmartFilterBar': UI5SmartFilterBar;
+    'sap.ui.comp.smartform.Group': UI5SmartFormGroup;
+    'sap.ui.comp.smartform.GroupElement': UI5SmartFormGroupElement;
+    'sap.ui.comp.smartform.SmartForm': UI5SmartForm;
+    'sap.ui.comp.smartmultiinput.SmartMultiInput': UI5SmartMultiInput;
+    'sap.ui.comp.smarttable.SmartTable': UI5SmartTable;
+    'sap.ui.comp.smartvariants.SmartVariantManagement': UI5SmartVariantManagement;
+    'sap.ui.comp.valuehelpdialog.ValueHelpDialog': UI5ValueHelpDialog;
+    'sap.ui.core.ComponentContainer': UI5ComponentContainer;
+    'sap.ui.core.HTML': UI5HTML;
+    'sap.ui.core.Icon': UI5Icon;
+    'sap.ui.core.Item': UI5Item;
+    'sap.ui.core.ListItem': UI5ListItem;
+    'sap.ui.layout.BlockLayout': UI5BlockLayout;
+    'sap.ui.layout.BlockLayoutCell': UI5BlockLayoutCell;
+    'sap.ui.layout.BlockLayoutRow': UI5BlockLayoutRow;
+    'sap.ui.layout.DynamicSideContent': UI5DynamicSideContent;
+    'sap.ui.layout.form.Form': UI5Form;
+    'sap.ui.layout.form.FormContainer': UI5FormContainer;
+    'sap.ui.layout.form.FormElement': UI5FormElement;
+    'sap.ui.layout.form.SimpleForm': UI5SimpleForm;
+    'sap.ui.layout.Grid': UI5Grid;
+    'sap.ui.layout.HorizontalLayout': UI5HorizontalLayout;
+    'sap.ui.layout.ResponsiveSplitter': UI5ResponsiveSplitter;
+    'sap.ui.layout.Splitter': UI5Splitter;
+    'sap.ui.layout.VerticalLayout': UI5VerticalLayout;
+    'sap.ui.mdc.Chart': UI5MdcChart;
+    'sap.ui.mdc.Field': UI5MdcField;
+    'sap.ui.mdc.FilterBar': UI5MdcFilterBar;
+    'sap.ui.mdc.FilterField': UI5MdcFilterField;
+    'sap.ui.mdc.MultiValueField': UI5MdcMultiValueField;
+    'sap.ui.mdc.Table': UI5MdcTable;
+    'sap.ui.mdc.ValueHelp': UI5MdcValueHelp;
+    'sap.ui.table.AnalyticalTable': UI5AnalyticalTable;
+    'sap.ui.table.Column': UI5TableColumn;
+    'sap.ui.table.Row': UI5TableRow;
+    'sap.ui.table.Table': UI5GridTable;
+    'sap.ui.table.TreeTable': UI5TreeTable;
+    'sap.ui.unified.Calendar': UI5Calendar;
+    'sap.ui.unified.FileUploader': UI5FileUploader;
+    'sap.ui.unified.Menu': UI5UnifiedMenu;
+    'sap.ui.unified.MenuItem': UI5UnifiedMenuItem;
+    'sap.ui.unified.ShellHeadItem': UI5ShellHeadItem;
+    'sap.uxap.AnchorBar': UI5AnchorBar;
+    'sap.uxap.ObjectPageDynamicHeaderTitle': UI5ObjectPageDynamicHeaderTitle;
+    'sap.uxap.ObjectPageHeader': UI5ObjectPageHeader;
+    'sap.uxap.ObjectPageLayout': UI5ObjectPageLayout;
+    'sap.uxap.ObjectPageSection': UI5ObjectPageSection;
+    'sap.uxap.ObjectPageSubSection': UI5ObjectPageSubSection;
+}
+
+// @public
+export type UI5MatcherFn = (page: MatcherPage, controlId: string, ...args: readonly unknown[]) => Promise<MatcherResult>;
 
 // @public
 export interface UI5NavigationAPI {
@@ -3395,6 +5292,8 @@ export interface UI5NavigationAPI {
     navigateToHash(hash: string, options?: NavigationOptions): Promise<void>;
     navigateToHome(options?: NavigationOptions): Promise<void>;
     navigateToIntent(intent: NavigationIntent, params?: Readonly<Record<string, string>>, options?: NavigationOptions): Promise<void>;
+    navigateToSectionLink(linkName: string, options?: SectionLinkNavigationOptions): Promise<void>;
+    navigateToSpace(spaceTitle: string, options?: SpaceNavigationOptions): Promise<void>;
     navigateToTile(title: string, options?: NavigationOptions): Promise<void>;
     searchAndOpenApp(title: string, options?: NavigationOptions): Promise<void>;
 }
@@ -3403,12 +5302,13 @@ export interface UI5NavigationAPI {
 export interface UI5Selector {
     readonly ancestor?: UI5Selector;
     readonly bindingPath?: Readonly<Record<string, string>>;
-    readonly controlType?: string;
+    readonly controlType?: keyof UI5ControlMap | (string & {});
     readonly descendant?: UI5Selector;
     readonly i18NText?: Readonly<Record<string, string>>;
     readonly id?: string | RegExp;
     readonly interaction?: UI5Interaction;
-    readonly properties?: Readonly<Record<string, unknown>>;
+    readonly matchSubclasses?: boolean;
+    readonly properties?: Readonly<Record<string, string | number | boolean | RegExp | PropertyMatcher>>;
     readonly searchOpenDialogs?: boolean;
     readonly viewId?: string;
     readonly viewName?: string;
@@ -3442,6 +5342,15 @@ export class VocabularyError extends PramanError {
 }
 
 // @public
+export function waitForControlState(locator: Locator, predicate: ControlPredicate, options?: WaitForControlStateOptions): Promise<ControlWaitResult>;
+
+// @public
+export interface WaitForControlStateOptions {
+    readonly message?: string;
+    readonly timeout?: number;
+}
+
+// @public
 export function waitForDialog(page: DialogPage, options?: FindDialogOptions): Promise<DialogInfo>;
 
 // @public
@@ -3465,25 +5374,60 @@ export interface WaitForTableDataOptions extends TableOptions {
     readonly polling?: number;
 }
 
-//
 // @public
 export function waitForUI5Bootstrap(page: WaitPage, options?: {
     readonly timeout?: number;
 }): Promise<void>;
 
-//
 // @public
 export function waitForUI5Stable(page: WaitPage, options?: WaitForUI5StableOptions): Promise<void>;
 
-// Warnings were encountered during analysis:
-//
-// dist/index.d.ts:4804:5 - (ae-forgotten-export) The symbol "createTableFixture" needs to be exported by the entry point index.d.ts
-// dist/index.d.ts:4805:5 - (ae-forgotten-export) The symbol "createDialogFixture" needs to be exported by the entry point index.d.ts
-// dist/index.d.ts:4806:5 - (ae-forgotten-export) The symbol "createDateFixture" needs to be exported by the entry point index.d.ts
-// dist/index.d.ts:4807:5 - (ae-forgotten-export) The symbol "createODataFixture" needs to be exported by the entry point index.d.ts
-// dist/recipes-CIWzbAfm.d.ts:432:5 - (ae-forgotten-export) The symbol "AiResponseMetadata" needs to be exported by the entry point index.d.ts
-// dist/recipes-CIWzbAfm.d.ts:436:5 - (ae-forgotten-export) The symbol "AiResponseError" needs to be exported by the entry point index.d.ts
-// dist/recipes-CIWzbAfm.d.ts:1650:5 - (ae-forgotten-export) The symbol "CapabilityCategory" needs to be exported by the entry point index.d.ts
+// @public
+export interface WebStorageFixture {
+    readonly localStorage: WebStorageHelper;
+    readonly sessionStorage: WebStorageHelper;
+}
+
+// @public
+export interface WebStorageHelper {
+    clear(): Promise<void>;
+    getItem(key: string): Promise<string | null>;
+    items(): Promise<Record<string, string>>;
+    removeItem(key: string): Promise<void>;
+    seed(data: Record<string, string>): Promise<void>;
+    setItem(key: string, value: string): Promise<void>;
+    size(): Promise<number>;
+}
+
+// @public
+export const webStorageTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & {
+    webStorage: WebStorageFixture;
+}, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions>;
+
+// @public
+export interface WorkZoneFrame {
+    evaluate(pageFunction: string | ((...args: never[]) => unknown), arg?: unknown): Promise<unknown>;
+    url(): string;
+    waitForFunction(pageFunction: string | (() => unknown), options?: {
+        readonly timeout?: number;
+        readonly polling?: number;
+    }): Promise<unknown>;
+}
+
+// @public
+export interface WorkZonePage {
+    evaluate(pageFunction: string | ((...args: never[]) => unknown), arg?: unknown): Promise<unknown>;
+    frame(options: {
+        readonly url: RegExp | string;
+    }): WorkZoneFrame | null;
+    frameLocator(selector: string): WorkZoneFrameLocator;
+    frames(): readonly WorkZoneFrame[];
+    mainFrame(): WorkZoneFrame;
+    waitForFunction(pageFunction: string | (() => unknown), options?: {
+        readonly timeout?: number;
+        readonly polling?: number;
+    }): Promise<unknown>;
+}
 ```
 
 ## Code Examples
@@ -3502,7 +5446,7 @@ import { test, expect } from 'playwright-praman';
 test.describe('Basic UI5 Control Discovery', () => {
   test('find a GenericTile by header text', async ({ page, ui5 }) => {
     await test.step('Navigate to Fiori Launchpad', async () => {
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
     });
@@ -3573,7 +5517,7 @@ import { test, expect } from 'playwright-praman';
 test.describe('Dialog Handling', () => {
   test('open dialog, fill fields, and dismiss', async ({ page, ui5 }) => {
     await test.step('Navigate to app', async () => {
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
 
@@ -3611,10 +5555,7 @@ test.describe('Dialog Handling', () => {
 
     await test.step('Fill dialog fields', async () => {
       // ui5.fill() = atomic setValue + fireChange + waitForUI5
-      await ui5.fill(
-        { id: 'createDialog--nameInput', searchOpenDialogs: true },
-        'Test Entry',
-      );
+      await ui5.fill({ id: 'createDialog--nameInput', searchOpenDialogs: true }, 'Test Entry');
       await ui5.waitForUI5();
 
       const value = await ui5.getValue({
@@ -3702,7 +5643,7 @@ import { test, expect } from 'playwright-praman';
 test.describe('Table Operations', () => {
   test('read table rows and OData binding data', async ({ page, ui5 }) => {
     await test.step('Navigate to app with table', async () => {
-      await page.goto(process.env['SAP_BASE_URL']!);
+      await page.goto(process.env['SAP_CLOUD_BASE_URL']!);
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveTitle(/Home/, { timeout: 60_000 });
 

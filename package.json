@@ -143,6 +143,7 @@
     "docs:api": "typedoc",
     "docs:api-html": "typedoc --options typedoc-html.json",
     "docs:api-review": "api-extractor run --local --verbose",
+    "validate:api-report": "npm run docs:api-review && git diff --exit-code -- api-reports/",
     "docs:validate": "npm run docs:api && npm run lint && npm run typecheck",
     "generate:capabilities": "tsx scripts/generate-capabilities.ts",
     "generate:skill-md": "tsx scripts/generate-skill-md.ts",
@@ -166,7 +167,7 @@
     "generate:agent-assets": "tsx scripts/generate-agent-assets.ts",
     "validate:agent-assets": "tsx scripts/generate-agent-assets.ts --check",
     "smoke:init": "tsx scripts/smoke-init.ts",
-    "validate:generated": "npm run generate:capabilities -- --check && npm run generate:skill-md -- --check"
+    "validate:generated": "npm run generate:capabilities -- --check && npm run generate:skill-md -- --check && npm run generate:llms-txt -- --check"
   },
   "dependencies": {
     "commander": "15.0.0",

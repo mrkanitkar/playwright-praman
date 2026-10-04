@@ -6,6 +6,94 @@ title: Changelog
 
 # Changelog
 
+## [1.3.6] - 2026-10-03
+
+### Features
+
+- **fixtures:** observe native browser dialogs, answer them only on request ([#301](https://github.com/mrkanitkar/playwright-praman/pull/301))
+- **core:** test locks for shared SAP state, with a fail-closed guard ([#299](https://github.com/mrkanitkar/playwright-praman/pull/299))
+- **core:** catalogue three more Playwright flags, and correct the tech-stack table ([#298](https://github.com/mrkanitkar/playwright-praman/pull/298))
+- **core:** detect Playwright 1.63 features and gate uncatalogued releases ([#265](https://github.com/mrkanitkar/playwright-praman/pull/265))
+- **ai:** Phase B — deterministic generation and a drift gate ([#264](https://github.com/mrkanitkar/playwright-praman/pull/264))
+- **ai:** Phase A — single ownership and the integrity primitives ([#261](https://github.com/mrkanitkar/playwright-praman/pull/261))
+- **compat:** bring compat layer to 1.62, add per-control waits ([#252](https://github.com/mrkanitkar/playwright-praman/pull/252))
+- **fixtures:** capture UI5 diagnostics on failure, add opt-in clock ([#251](https://github.com/mrkanitkar/playwright-praman/pull/251))
+- **fixtures:** handle SAP overlays that interrupt an action ([#230](https://github.com/mrkanitkar/playwright-praman/pull/230))
+
+### Bug Fixes
+
+- **modules:** guard malformed OData bodies, and time calls by resource timing ([#300](https://github.com/mrkanitkar/playwright-praman/pull/300))
+- **reporters:** classify Praman steps structurally, not by title prefix ([#296](https://github.com/mrkanitkar/playwright-praman/pull/296))
+- **deps:** refresh overrides that had gone stale into new advisory ranges ([#268](https://github.com/mrkanitkar/playwright-praman/pull/268))
+- **release:** ship the agent skill entry point and guard files[] ([#256](https://github.com/mrkanitkar/playwright-praman/pull/256)) — fixes [#246](https://github.com/mrkanitkar/playwright-praman/issues/246)
+- **ci:** actually run agent-asset validation, and stop prettier corrupting it ([#228](https://github.com/mrkanitkar/playwright-praman/pull/228))
+- **cli:** make init actually scaffold a project ([#226](https://github.com/mrkanitkar/playwright-praman/pull/226))
+
+### CI & Testing
+
+- add the first CI job that actually launches a browser ([#266](https://github.com/mrkanitkar/playwright-praman/pull/266))
+- **types:** verify shipped .d.ts across TypeScript 5.9-7.0 ([#223](https://github.com/mrkanitkar/playwright-praman/pull/223))
+
+### Dependency Updates
+
+- `@playwright/test` 1.61.1 → 1.63.0
+- `vitest` + `@vitest/coverage-v8` 4.x → 5.x ([#292](https://github.com/mrkanitkar/playwright-praman/pull/292))
+- `eslint` → 10.12.0, `eslint-plugin-n` → 18.4.1
+- Docusaurus suite consolidated to latest
+- `codeql-action` v4.37.8 → v4.38.2, `deploy-pages` → v5.0.1
+- `http-proxy-middleware` override 2.0.10 (security)
+- `actions/checkout` 7.0.0 → 7.0.1
+- 14 dependency-related commits in total
+
+---
+
+## [1.3.5] - 2026-07-05
+
+### Bug Fixes
+
+- align CodeQL action SHAs to resolve version mismatch ([#191](https://github.com/mrkanitkar/playwright-praman/pull/191))
+- resolve CI failures and remove release-as pin ([#189](https://github.com/mrkanitkar/playwright-praman/pull/189))
+
+---
+
+## [1.3.4] - 2026-07-05
+
+### Features
+
+- **compat:** Playwright 1.61 support — 5 new feature flags (`hasWebAuthnCredentials`, `hasWebStorageAPI`, `hasSoftPoll`, `hasScreencastTimestamp`, `hasVideoRetainModes`)
+- **fixtures:** Web Storage fixture for typed localStorage/sessionStorage operations
+- **fixtures:** native screencast frame timestamps on Playwright 1.61+
+- **compat:** new `ERR_COMPAT_FEATURE_UNAVAILABLE` error code under Compat error category
+
+### Bug Fixes
+
+- resolved 5 security vulnerabilities (`vite`, `tar`, `esbuild`, `undici`, `linkify-it`)
+
+### CI & Testing
+
+- Playwright floor (1.57) + ceiling (latest) validation on every push
+- `actions/checkout` upgraded v5 → v7
+- `github/codeql-action` upgraded to 4.36.2
+
+### Dependency Updates
+
+- `@playwright/test` 1.60.0 → 1.61.1
+- `@anthropic-ai/sdk` 0.100.1 → 0.110.0
+- `commander` 14.0.3 → 15.0.0
+- `vitest` + `@vitest/coverage-v8` → 4.1.9
+- 35 dev dependencies upgraded in total
+
+---
+
+## [1.3.3] - 2026-06-02
+
+### Bug Fixes
+
+- UI5 1.136+ ElementRegistry access — migrated from deprecated `sap.ui.core.ElementRegistry` global to modular `sap.ui.require('sap/ui/core/ElementRegistry')` across 3 files ([#152](https://github.com/mrkanitkar/playwright-praman/pull/152), [#157](https://github.com/mrkanitkar/playwright-praman/pull/157))
+- updated `@ui5/mcp-server` 0.2.11 → 0.2.12, resolving all 9 npm audit vulnerabilities (0 remaining)
+
+---
+
 ## [1.3.0] - 2026-05-25
 
 ### Features

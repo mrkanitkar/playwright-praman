@@ -4,7 +4,9 @@
 
 ```ts
 
+import { Buffer as Buffer_2 } from 'node:buffer';
 import { expect } from '@playwright/test';
+import { Locator } from '@playwright/test';
 import { Logger } from 'pino';
 import { Page } from '@playwright/test';
 import * as _playwright_test from '@playwright/test';
@@ -12,30 +14,21 @@ import { z } from 'zod';
 
 // @public
 export class AIError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "AIErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: AIErrorOptions);
     // (undocumented)
     readonly model: string | undefined;
     // (undocumented)
     readonly provider: string | undefined;
-    // Warning: (ae-forgotten-export) The symbol "AIErrorContext" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly provider: string | undefined;
         readonly model: string | undefined;
         readonly tokenUsage: TokenUsage | undefined;
     };
-    // Warning: (ae-forgotten-export) The symbol "SerializedPramanError" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly provider: string | undefined;
         readonly model: string | undefined;
         readonly tokenUsage: TokenUsage | undefined;
     };
-    // Warning: (ae-forgotten-export) The symbol "TokenUsage" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     readonly tokenUsage: TokenUsage | undefined;
 }
@@ -57,8 +50,6 @@ export type AiResponse<T> = {
     readonly metadata: AiResponseMetadata;
 };
 
-// Warning: (ae-forgotten-export) The symbol "Brand" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type AppId = Brand<string, 'AppId'>;
 
@@ -66,19 +57,19 @@ export type AppId = Brand<string, 'AppId'>;
 export function appId(id: string): AppId;
 
 // @public
+export function assertMinVersion(minVersion: string): void;
+
+// @public
 export class AuthError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "AuthErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: AuthErrorOptions);
     // (undocumented)
     readonly loginUrl: string | undefined;
     // (undocumented)
     readonly strategy: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly strategy: string | undefined;
         readonly loginUrl: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly strategy: string | undefined;
         readonly loginUrl: string | undefined;
@@ -87,16 +78,11 @@ export class AuthError extends PramanError {
 
 // @public
 export interface AuthStrategy {
-    // Warning: (ae-forgotten-export) The symbol "AuthPage" needs to be exported by the entry point index.d.ts
     authenticate(page: AuthPage, config: Readonly<SAPAuthConfig>): Promise<void>;
     isAuthenticated(page: AuthPage): Promise<boolean>;
     readonly name: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "AuthFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "AuthFixtureOptions" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "AuthDeps" needs to be exported by the entry point index.d.ts
-//
 // @public
 export const authTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & AuthFixtures & AuthFixtureOptions, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & AuthDeps>;
 
@@ -108,16 +94,13 @@ export function bindingPath(path: string): BindingPath;
 
 // @public
 export class BridgeError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "BridgeErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: BridgeErrorOptions);
     // (undocumented)
     readonly adapterType: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly ui5Version: string | undefined;
         readonly adapterType: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly ui5Version: string | undefined;
         readonly adapterType: string | undefined;
@@ -126,8 +109,24 @@ export class BridgeError extends PramanError {
     readonly ui5Version: string | undefined;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ODataHttpPage" needs to be exported by the entry point index.d.ts
-//
+// @public
+export const browserBindTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & BrowserBindFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & BrowserBindWorkerDeps>;
+
+// @public
+export interface BTPWorkZoneManager {
+    detect(): Promise<boolean>;
+    enableDualBridge(): Promise<void>;
+    getAppFrameForEval(): WorkZoneFrame;
+    getCurrentApp(): Promise<string | null>;
+    isAppReady(timeout?: number): Promise<boolean>;
+    navigateToApp(appId: string): Promise<void>;
+    switchToApp(): WorkZoneFrameLocator;
+    switchToShell(): WorkZonePage;
+}
+
+// @public
+export const BUILT_IN_OVERLAY_RULES: readonly OverlayRule[];
+
 // @public
 export function callFunctionImport<TData = unknown>(page: ODataHttpPage, serviceUrl: string, functionName: string, params?: Readonly<Record<string, unknown>>, method?: 'GET' | 'POST', options?: ODataHttpOptions): Promise<ODataHttpResult<TData>>;
 
@@ -167,9 +166,7 @@ export interface CapabilitiesJSON {
     readonly version: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "CapabilityEntrySchema" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
+// @public
 export type CapabilityEntry = z.infer<typeof CapabilityEntrySchema>;
 
 // @public
@@ -180,7 +177,6 @@ export class CapabilityRegistry {
     find(query: string): CapabilityEntry[];
     findByName(name: string): CapabilityEntry | undefined;
     forAI(): CapabilitiesJSON;
-    // Warning: (ae-forgotten-export) The symbol "AiProviderName" needs to be exported by the entry point index.d.ts
     forProvider(provider: AiProviderName): string;
     get(id: string): CapabilityEntry | undefined;
     getStatistics(): CapabilityStats;
@@ -205,43 +201,43 @@ export interface CapabilityStats {
     readonly version: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "TableOperationsPage" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function clickRow(page: TableOperationsPage, tableId: string, rowIndex: number): Promise<void>;
 
-// Warning: (ae-forgotten-export) The symbol "TableFilterSortPage" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function clickTableSettingsButton(page: TableFilterSortPage, tableId: string, options?: TableOptions): Promise<void>;
+
+// @public
+export interface ClockFixtures {
+    ui5Clock: Ui5Clock;
+}
+
+// @public
+export const clockTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & ClockFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions>;
+
+// @public
+export function collectPageDiagnostics(page: Page): Promise<PageDiagnostics>;
 
 // @public
 export type ColumnValueCriteria = Readonly<Record<string, string>>;
 
 // @public
 export class ConfigError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "ConfigErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: ConfigErrorOptions);
     // (undocumented)
     readonly configPath: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly validationErrors: readonly ValidationIssue[];
         readonly configPath: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly validationErrors: readonly ValidationIssue[];
         readonly configPath: string | undefined;
     };
-    // Warning: (ae-forgotten-export) The symbol "ValidationIssue" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     readonly validationErrors: readonly ValidationIssue[];
 }
 
-// Warning: (ae-forgotten-export) The symbol "DialogPage" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function confirmDialog(page: DialogPage, options?: FindDialogOptions & {
     readonly buttonText?: string;
@@ -249,7 +245,6 @@ export function confirmDialog(page: DialogPage, options?: FindDialogOptions & {
 
 // @public
 export class ControlError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "ControlErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: ControlErrorOptions);
     // (undocumented)
     readonly availableControls: readonly string[];
@@ -257,13 +252,11 @@ export class ControlError extends PramanError {
     readonly lastKnownSelector: UI5Selector | undefined;
     // (undocumented)
     readonly suggestedSelector: UI5Selector | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly lastKnownSelector: UI5Selector | undefined;
         readonly availableControls: readonly string[];
         readonly suggestedSelector: UI5Selector | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly lastKnownSelector: UI5Selector | undefined;
         readonly availableControls: readonly string[];
@@ -277,14 +270,25 @@ export type ControlId = Brand<string, 'ControlId'>;
 // @public
 export function controlId(id: string): ControlId;
 
-// Warning: (ae-forgotten-export) The symbol "TestFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "WorkerFixtures" needs to be exported by the entry point index.d.ts
-//
+// @public
+export interface ControlWaitResult {
+    readonly strategy: ControlWaitStrategy;
+}
+
+// @public
+export type ControlWaitStrategy = 'locator' | 'page';
+
 // @public
 export const coreTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures>;
 
 // @public
 export function createEntity<TData = unknown>(page: ODataHttpPage, serviceUrl: string, entitySet: string, data: unknown, options?: ODataHttpOptions): Promise<ODataHttpResult<TData>>;
+
+// @public
+export function createUI5Matcher<TArgs extends readonly unknown[] = readonly unknown[]>(checkFn: MatcherCheckFn<TArgs>): UI5MatcherFn;
+
+// @public
+export function createWorkZoneManager(page: WorkZonePage, adapter: WorkZoneAdapter): BTPWorkZoneManager;
 
 // @public
 export interface CSRFTokenResult {
@@ -315,10 +319,8 @@ export type DateInput = Date | string;
 
 // @public
 export interface DateOptions {
-    readonly locale?: string;
     readonly skipStabilityWait?: boolean;
     readonly timeout?: number;
-    readonly timezone?: string;
 }
 
 // @public
@@ -343,13 +345,21 @@ export function defineConfig(input: PramanConfigInput): PramanConfigInput;
 // @public
 export function deleteEntity(page: ODataHttpPage, serviceUrl: string, entitySet: string, key: string, options?: ODataHttpOptions): Promise<void>;
 
-// Warning: (ae-forgotten-export) The symbol "TablePage" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function deselectAllTableRows(page: TablePage, tableId: string, options?: TableOptions): Promise<void>;
 
 // @public
+export function detectFeatures(version: PlaywrightVersion): PlaywrightFeatures;
+
+// @public
 export function detectTableType(page: TablePage, tableId: string): Promise<TableInfo>;
+
+// @public
+export const DIAGNOSTIC_CAPS: {
+    readonly consoleMessages: 200;
+    readonly pageErrors: 50;
+    readonly requests: 200;
+};
 
 // @public
 export interface DialogButtonInfo {
@@ -363,8 +373,6 @@ export interface DialogButtonInfo {
     readonly type?: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "DIALOG_CONTROL_TYPES" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type DialogControlType = (typeof DIALOG_CONTROL_TYPES)[number];
 
@@ -415,6 +423,7 @@ export const ErrorCode: Readonly<{
     readonly ERR_CONTROL_AGGREGATION: "ERR_CONTROL_AGGREGATION";
     readonly ERR_CONTROL_METHOD: "ERR_CONTROL_METHOD";
     readonly ERR_CONTROL_INTERACTION_FAILED: "ERR_CONTROL_INTERACTION_FAILED";
+    readonly ERR_CONTROL_NO_DOM_REF: "ERR_CONTROL_NO_DOM_REF";
     readonly ERR_AUTH_FAILED: "ERR_AUTH_FAILED";
     readonly ERR_AUTH_TIMEOUT: "ERR_AUTH_TIMEOUT";
     readonly ERR_AUTH_SESSION_EXPIRED: "ERR_AUTH_SESSION_EXPIRED";
@@ -425,6 +434,7 @@ export const ErrorCode: Readonly<{
     readonly ERR_ODATA_REQUEST_FAILED: "ERR_ODATA_REQUEST_FAILED";
     readonly ERR_ODATA_PARSE: "ERR_ODATA_PARSE";
     readonly ERR_ODATA_CSRF: "ERR_ODATA_CSRF";
+    readonly ERR_ODATA_TRACE: "ERR_ODATA_TRACE";
     readonly ERR_SELECTOR_INVALID: "ERR_SELECTOR_INVALID";
     readonly ERR_SELECTOR_AMBIGUOUS: "ERR_SELECTOR_AMBIGUOUS";
     readonly ERR_SELECTOR_PARSE: "ERR_SELECTOR_PARSE";
@@ -445,6 +455,8 @@ export const ErrorCode: Readonly<{
     readonly ERR_PLUGIN_LOAD: "ERR_PLUGIN_LOAD";
     readonly ERR_PLUGIN_INIT: "ERR_PLUGIN_INIT";
     readonly ERR_PLUGIN_INCOMPATIBLE: "ERR_PLUGIN_INCOMPATIBLE";
+    readonly ERR_PLUGIN_EXTENSION_DUPLICATE: "ERR_PLUGIN_EXTENSION_DUPLICATE";
+    readonly ERR_PLUGIN_EXTENSION_INVALID: "ERR_PLUGIN_EXTENSION_INVALID";
     readonly ERR_VOCAB_TERM_NOT_FOUND: "ERR_VOCAB_TERM_NOT_FOUND";
     readonly ERR_VOCAB_DOMAIN_LOAD_FAILED: "ERR_VOCAB_DOMAIN_LOAD_FAILED";
     readonly ERR_VOCAB_JSON_INVALID: "ERR_VOCAB_JSON_INVALID";
@@ -458,6 +470,20 @@ export const ErrorCode: Readonly<{
     readonly ERR_FLP_API_UNAVAILABLE: "ERR_FLP_API_UNAVAILABLE";
     readonly ERR_FLP_INVALID_USER: "ERR_FLP_INVALID_USER";
     readonly ERR_FLP_OPERATION_TIMEOUT: "ERR_FLP_OPERATION_TIMEOUT";
+    readonly ERR_MATCHER_DUPLICATE: "ERR_MATCHER_DUPLICATE";
+    readonly ERR_MATCHER_INVALID: "ERR_MATCHER_INVALID";
+    readonly ERR_MATCHER_FROZEN: "ERR_MATCHER_FROZEN";
+    readonly ERR_BIND_NOT_SUPPORTED: "ERR_BIND_NOT_SUPPORTED";
+    readonly ERR_BIND_FAILED: "ERR_BIND_FAILED";
+    readonly ERR_SCREENCAST_NOT_STARTED: "ERR_SCREENCAST_NOT_STARTED";
+    readonly ERR_SCREENCAST_CHAPTER_FAILED: "ERR_SCREENCAST_CHAPTER_FAILED";
+    readonly ERR_SCREENCAST_FRAME_HANDLER: "ERR_SCREENCAST_FRAME_HANDLER";
+    readonly ERR_TELEMETRY_INIT_FAILED: "ERR_TELEMETRY_INIT_FAILED";
+    readonly ERR_TELEMETRY_PEER_DEP_MISSING: "ERR_TELEMETRY_PEER_DEP_MISSING";
+    readonly ERR_TELEMETRY_EXPORTER_FAILED: "ERR_TELEMETRY_EXPORTER_FAILED";
+    readonly ERR_TELEMETRY_SHUTDOWN_FAILED: "ERR_TELEMETRY_SHUTDOWN_FAILED";
+    readonly ERR_TELEMETRY_METRICS_INIT_FAILED: "ERR_TELEMETRY_METRICS_INIT_FAILED";
+    readonly ERR_COMPAT_FEATURE_UNAVAILABLE: "ERR_COMPAT_FEATURE_UNAVAILABLE";
 }>;
 
 // @public
@@ -468,8 +494,6 @@ export { expect }
 // @public
 export function exportTableData(page: TableFilterSortPage, tableId: string, options?: TableExportOptions): Promise<readonly Record<string, string>[]>;
 
-// Warning: (ae-forgotten-export) The symbol "UI5Handler" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type ExtendedUI5Handler = UI5Handler & {
     readonly table: ReturnType<typeof createTableFixture>;
@@ -478,8 +502,19 @@ export type ExtendedUI5Handler = UI5Handler & {
     readonly odata: ReturnType<typeof createODataFixture>;
 };
 
-// Warning: (ae-forgotten-export) The symbol "ODataCSRFPage" needs to be exported by the entry point index.d.ts
-//
+// @public
+export function extendUI5Handler<T extends ExtensionMethods>(name: string, factory: ExtensionFactory<T>): void;
+
+// @public
+export interface ExtensionContext {
+    readonly config: Readonly<PramanConfig>;
+    readonly handler: UI5Handler;
+    readonly page: Page;
+}
+
+// @public
+export type ExtensionFactory<T extends ExtensionMethods> = (context: ExtensionContext) => T;
+
 // @public
 export function fetchCSRFToken(page: ODataCSRFPage, serviceUrl: string): Promise<CSRFTokenResult>;
 
@@ -499,16 +534,13 @@ export function findRowByValues(page: TableOperationsPage, tableId: string, colu
 
 // @public
 export class FLPError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "FLPErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: FLPErrorOptions);
     // (undocumented)
     readonly flpService: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly flpService: string | undefined;
         readonly username: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly flpService: string | undefined;
         readonly username: string | undefined;
@@ -526,13 +558,15 @@ export function getCellByColumnName(page: TableOperationsPage, tableId: string, 
 // @public
 export function getColumnNames(page: TableOperationsPage, tableId: string): Promise<readonly string[]>;
 
-// Warning: (ae-forgotten-export) The symbol "NavigationPage" needs to be exported by the entry point index.d.ts
-//
+// @public
+export function getControlAggregation(page: MatcherPage, controlId: string, aggregationName: string): Promise<readonly BridgeControlRef[]>;
+
+// @public
+export function getControlProperty(page: MatcherPage, controlId: string, propertyName: string): Promise<unknown>;
+
 // @public
 export function getCurrentHash(page: NavigationPage): Promise<string>;
 
-// Warning: (ae-forgotten-export) The symbol "DatePage" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function getDatePickerValue(page: DatePage, controlId: string): Promise<string>;
 
@@ -542,8 +576,6 @@ export function getDateRangeSelection(page: DatePage, controlId: string): Promis
 // @public
 export function getDialogButtons(page: DialogPage, dialogId?: string): Promise<readonly DialogButtonInfo[]>;
 
-// Warning: (ae-forgotten-export) The symbol "ODataPage" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function getEntityCount(page: ODataPage, path: string, options?: ODataOptions): Promise<number>;
 
@@ -558,6 +590,12 @@ export function getModelProperty(page: ODataPage, path: string, options?: ODataO
 
 // @public
 export function getOpenDialogs(page: DialogPage): Promise<readonly DialogInfo[]>;
+
+// @public
+export function getPlaywrightFeatures(): PlaywrightFeatures;
+
+// @public
+export function getPlaywrightVersion(): PlaywrightVersion;
 
 // @public
 export function getRowCount(page: TableOperationsPage, tableId: string, options?: TableOptions): Promise<number>;
@@ -584,22 +622,22 @@ export function getTableRows(page: TablePage, tableId: string, options?: TableOp
 export function getTimePickerValue(page: DatePage, controlId: string): Promise<string>;
 
 // @public
+export function hasFeature(feature: keyof PlaywrightFeatures): boolean;
+
+// @public
 export function hasPendingChanges(page: ODataPage, options?: ODataOptions): Promise<boolean>;
 
 // @public
 export class IntentError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "IntentErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: IntentErrorOptions);
     // (undocumented)
     readonly fieldName: string | undefined;
     // (undocumented)
     readonly sapDomain: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly fieldName: string | undefined;
         readonly sapDomain: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly fieldName: string | undefined;
         readonly sapDomain: string | undefined;
@@ -618,6 +656,76 @@ export interface LoadConfigOptions {
 }
 
 // @public
+export type MatcherCheckFn<TArgs extends readonly unknown[] = readonly unknown[]> = (page: MatcherPage, controlId: string, ...args: TArgs) => Promise<PollableMatcherResult>;
+
+// @public
+export interface MatcherPage {
+    evaluate<TResult>(script: string, arg?: unknown): Promise<TResult>;
+    waitForFunction(pageFunction: string | (() => unknown), options?: {
+        timeout?: number;
+    }): Promise<unknown>;
+}
+
+// @public
+export interface MatcherResult {
+    // (undocumented)
+    readonly actual?: unknown;
+    // (undocumented)
+    readonly expected?: unknown;
+    readonly message: () => string;
+    // (undocumented)
+    readonly pass: boolean;
+}
+
+// @public
+export const MIN_TEST_LOCKS_VERSION = "1.63.0";
+
+// @public
+export const moduleTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures>;
+
+// @public
+export type NativeDialogAction = 'accept' | 'dismiss';
+
+// @public
+export interface NativeDialogFixtures {
+    nativeDialogs: NativeDialogHandler;
+}
+
+// @public
+export class NativeDialogHandler {
+    constructor(options: NativeDialogHandlerOptions);
+    dispose(): void;
+    observe(): void;
+    get records(): readonly NativeDialogRecord[];
+    register(rule: NativeDialogRule): void;
+    registerAll(rules: readonly NativeDialogRule[]): void;
+}
+
+// @public
+export interface NativeDialogRecord {
+    readonly action: NativeDialogAction | 'observed';
+    readonly error?: string;
+    readonly handledBy: string;
+    readonly message: string;
+    readonly type: string;
+}
+
+// @public
+export interface NativeDialogRule {
+    readonly action: NativeDialogAction;
+    readonly name: string;
+    readonly promptText?: string;
+    readonly times?: number;
+    readonly types: readonly NativeDialogType[];
+}
+
+// @public
+export const nativeDialogTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & NativeDialogFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions>;
+
+// @public
+export type NativeDialogType = 'alert' | 'beforeunload' | 'confirm' | 'prompt';
+
+// @public
 export function navigateBack(page: NavigationPage, options?: NavigationOptions): Promise<void>;
 
 // @public
@@ -632,28 +740,29 @@ export function navigateToHash(page: NavigationPage, hash: string, options?: Nav
 // @public
 export function navigateToHome(page: NavigationPage, options?: NavigationOptions): Promise<void>;
 
-// Warning: (ae-forgotten-export) The symbol "NavigationIntent" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function navigateToIntent(page: NavigationPage, intent: NavigationIntent, params?: Readonly<Record<string, string>>, options?: NavigationOptions): Promise<void>;
+
+// @public
+export function navigateToSectionLink(page: SpaceNavigationPage, linkName: string, options?: SectionLinkNavigationOptions): Promise<void>;
+
+// @public
+export function navigateToSpace(page: SpaceNavigationPage, spaceTitle: string, options?: SpaceNavigationOptions): Promise<void>;
 
 // @public
 export function navigateToTile(page: NavigationPage, tileTitle: string, options?: NavigationOptions): Promise<void>;
 
 // @public
 export class NavigationError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "NavigationErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: NavigationErrorOptions);
     // (undocumented)
     readonly currentUrl: string | undefined;
     // (undocumented)
     readonly targetUrl: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly targetUrl: string | undefined;
         readonly currentUrl: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly targetUrl: string | undefined;
         readonly currentUrl: string | undefined;
@@ -669,7 +778,6 @@ export interface NavigationOptions {
 
 // @public
 export class ODataError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "ODataErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: ODataErrorOptions);
     // (undocumented)
     readonly entitySet: string | undefined;
@@ -677,13 +785,11 @@ export class ODataError extends PramanError {
     readonly requestUrl: string | undefined;
     // (undocumented)
     readonly statusCode: number | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly statusCode: number | undefined;
         readonly requestUrl: string | undefined;
         readonly entitySet: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly statusCode: number | undefined;
         readonly requestUrl: string | undefined;
@@ -725,30 +831,160 @@ export interface ODataQueryOptions extends ODataHttpOptions {
 }
 
 // @public
+export interface OverlayDetection {
+    readonly dismissed: boolean;
+    readonly error?: string;
+    readonly rule: string;
+    readonly text: string;
+}
+
+// @public
+export interface OverlayFixtures {
+    overlays: OverlayHandler;
+}
+
+// @public
+export class OverlayHandler {
+    constructor(options: OverlayHandlerOptions);
+    get detections(): readonly OverlayDetection[];
+    dispose(): Promise<void>;
+    register(rule: OverlayRule): Promise<void>;
+    registerAll(rules: readonly OverlayRule[]): Promise<void>;
+}
+
+// @public
+export interface OverlayRule {
+    readonly dismiss?: (overlay: Locator) => Promise<void>;
+    readonly name: string;
+    readonly selector: string;
+    readonly times?: number;
+}
+
+// @public
+export const overlayTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & OverlayFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & OverlayDeps>;
+
+// @public
 export const PACKAGE_NAME: "playwright-praman";
 
 // @public
+export interface PageDiagnostics {
+    // (undocumented)
+    readonly consoleMessages: readonly CapturedConsoleMessage[];
+    readonly isEmpty: boolean;
+    // (undocumented)
+    readonly pageErrors: readonly string[];
+    // (undocumented)
+    readonly requests: readonly CapturedRequest[];
+    readonly truncated: {
+        readonly consoleMessages: boolean;
+        readonly pageErrors: boolean;
+        readonly requests: boolean;
+    };
+}
+
+// @public
+export function parsePlaywrightVersion(versionString: string): PlaywrightVersion;
+
+// @public
+export interface PlaywrightFeatures {
+    readonly hasAbortSignal: boolean;
+    readonly hasApiResponseTiming: boolean;
+    // (undocumented)
+    readonly hasAriaSnapshot: boolean;
+    // (undocumented)
+    readonly hasAriaSnapshotBoxes: boolean;
+    // (undocumented)
+    readonly hasAriaSnapshotDepth: boolean;
+    readonly hasAriaSnapshotJSON: boolean;
+    // (undocumented)
+    readonly hasBoxedStep: boolean;
+    // (undocumented)
+    readonly hasBrowserContextEvent: boolean;
+    // (undocumented)
+    readonly hasClockAPI: boolean;
+    readonly hasConsoleMessageFilter: boolean;
+    // (undocumented)
+    readonly hasCustomExpect: boolean;
+    readonly hasDialogClosedEvent: boolean;
+    // (undocumented)
+    readonly hasFilterLocator: boolean;
+    // (undocumented)
+    readonly hasGetByRoleDescription: boolean;
+    readonly hasHttpCredentialsArray: boolean;
+    // (undocumented)
+    readonly hasLocatorAssertions: boolean;
+    // (undocumented)
+    readonly hasLocatorDrop: boolean;
+    // (undocumented)
+    readonly hasLocatorHighlightStyle: boolean;
+    // (undocumented)
+    readonly hasLocatorNormalize: boolean;
+    readonly hasLocatorWaitForFunction: boolean;
+    readonly hasOpfsStorageState: boolean;
+    // (undocumented)
+    readonly hasPageAriaSnapshot: boolean;
+    readonly hasRetryStrategyIsolated: boolean;
+    // (undocumented)
+    readonly hasRouteFromHAR: boolean;
+    // (undocumented)
+    readonly hasScreencastAPI: boolean;
+    // (undocumented)
+    readonly hasScreencastTimestamp: boolean;
+    // (undocumented)
+    readonly hasScreenshotCaret: boolean;
+    readonly hasScrollOption: boolean;
+    // (undocumented)
+    readonly hasSetStorageState: boolean;
+    // (undocumented)
+    readonly hasSoftPoll: boolean;
+    readonly hasStepParams: boolean;
+    readonly hasSubtreeFrameLocator: boolean;
+    // (undocumented)
+    readonly hasTestAbort: boolean;
+    readonly hasTestLocks: boolean;
+    // (undocumented)
+    readonly hasTracingHAR: boolean;
+    // (undocumented)
+    readonly hasURLPatternMatcher: boolean;
+    // (undocumented)
+    readonly hasVideoRetainModes: boolean;
+    readonly hasVisibleLocator: boolean;
+    // (undocumented)
+    readonly hasWebAuthnCredentials: boolean;
+    readonly hasWebPScreenshots: boolean;
+    // (undocumented)
+    readonly hasWebStorageAPI: boolean;
+}
+
+// @public
+export interface PlaywrightVersion {
+    // (undocumented)
+    readonly major: number;
+    // (undocumented)
+    readonly minor: number;
+    // (undocumented)
+    readonly patch: number;
+    // (undocumented)
+    readonly raw: string;
+}
+
+// @public
 export class PluginError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "PluginErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: PluginErrorOptions);
     // (undocumented)
     readonly pluginName: string;
     // (undocumented)
     readonly pluginVersion: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly pluginName: string;
         readonly pluginVersion: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly pluginName: string;
         readonly pluginVersion: string | undefined;
     };
 }
 
-// Warning: (ae-forgotten-export) The symbol "PramanConfigSchema" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type PramanConfig = z.output<typeof PramanConfigSchema>;
 
@@ -757,7 +993,6 @@ export type PramanConfigInput = z.input<typeof PramanConfigSchema>;
 
 // @public
 export class PramanError extends Error {
-    // Warning: (ae-forgotten-export) The symbol "PramanErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: PramanErrorOptions);
     // (undocumented)
     readonly attempted: string;
@@ -779,16 +1014,154 @@ export class PramanError extends Error {
 }
 
 // @public
+export const presets: {
+    readonly ci: {
+        logLevel?: "error" | "debug" | "warn" | "info" | "verbose" | undefined;
+        ui5WaitTimeout?: number | undefined;
+        controlDiscoveryTimeout?: number | undefined;
+        interactionStrategy?: "ui5-native" | "dom-first" | "opa5" | undefined;
+        discoveryStrategies?: ("direct-id" | "recordreplay" | "registry")[] | undefined;
+        skipStabilityWait?: boolean | undefined;
+        preferVisibleControls?: boolean | undefined;
+        ignoreAutoWaitUrls?: string[] | undefined;
+        auth?: {
+            strategy?: "custom" | "btp-saml" | "basic" | "office365" | undefined;
+            baseUrl?: string | undefined;
+            username?: string | undefined;
+            password?: string | undefined;
+            client?: string | undefined;
+            language?: string | undefined;
+        } | undefined;
+        ai?: {
+            provider?: "openai" | "azure-openai" | "anthropic" | undefined;
+            includeAriaSnapshot?: boolean | undefined;
+            apiKey?: string | undefined;
+            model?: string | undefined;
+            temperature?: number | undefined;
+            maxTokens?: number | undefined;
+            endpoint?: string | undefined;
+            deployment?: string | undefined;
+            apiVersion?: string | undefined;
+            anthropicApiKey?: string | undefined;
+        } | undefined;
+        telemetry?: {
+            openTelemetry?: boolean | undefined;
+            exporter?: "otlp" | "azure-monitor" | "jaeger" | undefined;
+            endpoint?: string | undefined;
+            serviceName?: string | undefined;
+            protocol?: "http" | "grpc" | undefined;
+            metrics?: boolean | undefined;
+            batchTimeout?: number | undefined;
+            maxQueueSize?: number | undefined;
+            resourceAttributes?: Record<string, string> | undefined;
+            connectionString?: string | undefined;
+        } | undefined;
+        selectors?: {
+            defaultTimeout?: number | undefined;
+            preferVisibleControls?: boolean | undefined;
+            skipStabilityWait?: boolean | undefined;
+        } | undefined;
+        opa5?: {
+            interactionTimeout?: number | undefined;
+            autoWait?: boolean | undefined;
+            debug?: boolean | undefined;
+        } | undefined;
+        odataTracing?: {
+            enabled?: boolean | undefined;
+            urlPatterns?: string[] | undefined;
+        } | undefined;
+        controlTreeCapture?: {
+            enabled?: boolean | undefined;
+            maxDepth?: number | undefined;
+            maxControls?: number | undefined;
+        } | undefined;
+        overlays?: {
+            enabled?: boolean | undefined;
+        } | undefined;
+        defaultMatchSubclasses?: boolean | undefined;
+        captureFailureArtifacts?: boolean | undefined;
+    };
+    readonly debug: {
+        logLevel?: "error" | "debug" | "warn" | "info" | "verbose" | undefined;
+        ui5WaitTimeout?: number | undefined;
+        controlDiscoveryTimeout?: number | undefined;
+        interactionStrategy?: "ui5-native" | "dom-first" | "opa5" | undefined;
+        discoveryStrategies?: ("direct-id" | "recordreplay" | "registry")[] | undefined;
+        skipStabilityWait?: boolean | undefined;
+        preferVisibleControls?: boolean | undefined;
+        ignoreAutoWaitUrls?: string[] | undefined;
+        auth?: {
+            strategy?: "custom" | "btp-saml" | "basic" | "office365" | undefined;
+            baseUrl?: string | undefined;
+            username?: string | undefined;
+            password?: string | undefined;
+            client?: string | undefined;
+            language?: string | undefined;
+        } | undefined;
+        ai?: {
+            provider?: "openai" | "azure-openai" | "anthropic" | undefined;
+            includeAriaSnapshot?: boolean | undefined;
+            apiKey?: string | undefined;
+            model?: string | undefined;
+            temperature?: number | undefined;
+            maxTokens?: number | undefined;
+            endpoint?: string | undefined;
+            deployment?: string | undefined;
+            apiVersion?: string | undefined;
+            anthropicApiKey?: string | undefined;
+        } | undefined;
+        telemetry?: {
+            openTelemetry?: boolean | undefined;
+            exporter?: "otlp" | "azure-monitor" | "jaeger" | undefined;
+            endpoint?: string | undefined;
+            serviceName?: string | undefined;
+            protocol?: "http" | "grpc" | undefined;
+            metrics?: boolean | undefined;
+            batchTimeout?: number | undefined;
+            maxQueueSize?: number | undefined;
+            resourceAttributes?: Record<string, string> | undefined;
+            connectionString?: string | undefined;
+        } | undefined;
+        selectors?: {
+            defaultTimeout?: number | undefined;
+            preferVisibleControls?: boolean | undefined;
+            skipStabilityWait?: boolean | undefined;
+        } | undefined;
+        opa5?: {
+            interactionTimeout?: number | undefined;
+            autoWait?: boolean | undefined;
+            debug?: boolean | undefined;
+        } | undefined;
+        odataTracing?: {
+            enabled?: boolean | undefined;
+            urlPatterns?: string[] | undefined;
+        } | undefined;
+        controlTreeCapture?: {
+            enabled?: boolean | undefined;
+            maxDepth?: number | undefined;
+            maxControls?: number | undefined;
+        } | undefined;
+        overlays?: {
+            enabled?: boolean | undefined;
+        } | undefined;
+        defaultMatchSubclasses?: boolean | undefined;
+        captureFailureArtifacts?: boolean | undefined;
+    };
+};
+
+// @public
+export interface PropertyMatcher {
+    readonly operator?: 'equals' | 'contains' | 'startsWith' | 'endsWith' | 'regex';
+    readonly value: string | number | boolean;
+}
+
+// @public
 export function queryEntities<TData = unknown>(page: ODataHttpPage, serviceUrl: string, entitySet: string, options?: ODataQueryOptions): Promise<ODataHttpResult<readonly TData[]>>;
 
-// Warning: (ae-forgotten-export) The symbol "RecipeEntrySchema" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
+// @public
 export type RecipeEntry = z.infer<typeof RecipeEntrySchema>;
 
-// Warning: (ae-forgotten-export) The symbol "RecipePrioritySchema" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
+// @public
 export type RecipePriority = z.infer<typeof RecipePrioritySchema>;
 
 // @public
@@ -798,7 +1171,6 @@ export class RecipeRegistry {
     static fromEntries(entries: readonly RecipeEntry[]): RecipeRegistry;
     getTopRecipes(n: number): RecipeEntry[];
     search(query: string): RecipeEntry[];
-    // Warning: (ae-forgotten-export) The symbol "RecipeFilter" needs to be exported by the entry point index.d.ts
     select(filter: RecipeFilter): RecipeEntry[];
     selectByDomain(domain: string): RecipeEntry[];
     selectByPriority(priority: RecipePriority): RecipeEntry[];
@@ -831,10 +1203,21 @@ export const recipes: {
     readonly registry: RecipeRegistry;
 };
 
-// Warning: (ae-forgotten-export) The symbol "RetryOptions" needs to be exported by the entry point index.d.ts
-//
+// @public
+export function registerUI5Matcher(name: string, matcherFn: UI5MatcherFn): void;
+
+// @public
+export function requireTestLocks(): void;
+
 // @public
 export function retry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T>;
+
+// @public
+export const SAP_LOCKS: {
+    readonly flpSettings: "sap:flp-settings";
+    readonly testUser: "sap:test-user";
+    readonly testData: "sap:test-data";
+};
 
 // @public
 export interface SAPAuthConfig {
@@ -854,25 +1237,58 @@ export interface SAPAuthConfig {
 }
 
 // @public
+export function sapObjectLock(objectType: string, objectKey: string): string;
+
+// @public
+export interface ScreencastFixture {
+    highlightControls: (enabled: boolean, style?: string | Record<string, string | number>) => void;
+    onFrame: (handler: ScreencastFrameHandler) => void;
+    showActions: (options?: ShowActionsOptions) => Promise<void>;
+    showChapter: (title: string) => Promise<void>;
+    showUI5ControlTree: (enabled?: boolean) => void;
+}
+
+// @public
+export interface ScreencastFixtures {
+    screencast: ScreencastFixture;
+}
+
+// @public
+export interface ScreencastFrame {
+    readonly buffer: Buffer_2;
+    readonly timestamp: number;
+}
+
+// @public
+export type ScreencastFrameHandler = (frame: ScreencastFrame) => Promise<void> | void;
+
+// @public
+export const screencastTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & ScreencastFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & ScreencastWorkerDeps>;
+
+// @public
 export function searchAndOpenApp(page: NavigationPage, appTitle: string, options?: NavigationOptions): Promise<void>;
+
+// @public
+export interface SectionLinkNavigationOptions {
+    readonly description?: string;
+    readonly timeout?: number;
+    readonly waitForStable?: boolean;
+}
 
 // @public
 export function selectAllTableRows(page: TablePage, tableId: string, options?: TableOptions): Promise<void>;
 
 // @public
 export class SelectorError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "SelectorErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: SelectorErrorOptions);
     // (undocumented)
     readonly parsedSelector: UI5Selector | undefined;
     // (undocumented)
     readonly selectorString: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly selectorString: string | undefined;
         readonly parsedSelector: UI5Selector | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly selectorString: string | undefined;
         readonly parsedSelector: UI5Selector | undefined;
@@ -887,6 +1303,9 @@ export function selectTableRow(page: TablePage, tableId: string, rowIndex: numbe
 
 // @public
 export type SemanticObjectAction = `${string}-${string}`;
+
+// @public
+export function serializeUI5SelectorToCSS(selector: UI5Selector): string;
 
 // @public
 export interface SessionInfo {
@@ -936,6 +1355,13 @@ export interface SortOrderInfo {
 }
 
 // @public
+export interface SpaceNavigationOptions {
+    readonly exact?: boolean;
+    readonly timeout?: number;
+    readonly waitForStable?: boolean;
+}
+
+// @public
 export interface StandardTableInfo {
     // (undocumented)
     readonly effectiveId: string;
@@ -978,41 +1404,42 @@ export interface TableSortOptions extends TableOptions {
     readonly descending?: boolean | undefined;
 }
 
-// @public (undocumented)
-export type TableVariant = 'sap.m.Table' | 'sap.ui.table.Table' | 'sap.ui.table.TreeTable' | 'sap.ui.table.AnalyticalTable' | 'sap.ui.comp.smarttable.SmartTable' | 'sap.ui.mdc.Table';
-
-// Warning: (ae-forgotten-export) The symbol "ModuleFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "NavFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "StabilityFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "FEFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "AIFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "IntentTestFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "IntentFixtureDeps" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ShellFooterFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "FLPLocksFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "FLPSettingsFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "TestDataFixtures" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "NavWorkerDeps" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "StabilityDeps" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "AIWorkerDeps" needs to be exported by the entry point index.d.ts
-//
 // @public
-export const test: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures & AuthFixtures & AuthFixtureOptions & NavFixtures & StabilityFixtures & FEFixtures & AIFixtures & IntentTestFixtures & IntentFixtureDeps & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & AuthDeps & NavWorkerDeps & StabilityDeps & AIWorkerDeps>;
+export type TableVariant = (typeof VALID_VARIANTS)[number];
+
+// @public
+export class TelemetryError extends PramanError {
+    constructor(options: TelemetryErrorOptions);
+    // (undocumented)
+    readonly exporterType: string | undefined;
+    // (undocumented)
+    readonly packageName: string | undefined;
+    toAIContext(): AIErrorContext & {
+        readonly exporterType: string | undefined;
+        readonly packageName: string | undefined;
+    };
+    toJSON(): SerializedPramanError & {
+        readonly exporterType: string | undefined;
+        readonly packageName: string | undefined;
+    };
+}
+
+// @public
+export const test: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures & AuthFixtures & AuthFixtureOptions & {
+    webStorage: WebStorageFixture;
+} & NavFixtures & StabilityFixtures & ControlTreeFixtures & FailureArtifactsFixtures & OverlayFixtures & NativeDialogFixtures & ClockFixtures & FEFixtures & AIFixtures & IntentTestFixtures & IntentFixtureDeps & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures & ODataTraceFixtures & BrowserBindFixtures & ScreencastFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & AuthDeps & NavWorkerDeps & StabilityDeps & ControlTreeDeps & FailureArtifactsDeps & OverlayDeps & AIWorkerDeps & ODataTraceDeps & BrowserBindWorkerDeps & ScreencastWorkerDeps>;
 
 // @public
 export class TimeoutError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "TimeoutErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: TimeoutErrorOptions);
     // (undocumented)
     readonly elapsed: number | undefined;
     // (undocumented)
     readonly timeoutMs: number;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly timeoutMs: number;
         readonly elapsed: number | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly timeoutMs: number;
         readonly elapsed: number | undefined;
@@ -1020,8 +1447,26 @@ export class TimeoutError extends PramanError {
 }
 
 // @public
+export class Ui5Clock {
+    constructor(options: Ui5ClockOptions);
+    fastForward(ticks: number | string): Promise<void>;
+    install(time?: ClockTime): Promise<void>;
+    get installed(): boolean;
+    pauseAt(time: ClockTime): Promise<void>;
+    resume(): Promise<void>;
+    runFor(ticks: number | string): Promise<void>;
+    setFixedTime(time: ClockTime): Promise<void>;
+}
+
+// @public
+export interface Ui5ClockOptions {
+    readonly logger?: Logger;
+    // (undocumented)
+    readonly page: Page;
+}
+
+// @public
 export interface UI5ControlBase {
-    [method: string]: any;
     readonly controlType: string;
     getAggregation(name: string): Promise<readonly UI5ControlBase[]>;
     getBindingInfo(name: string): Promise<unknown>;
@@ -1034,7 +1479,413 @@ export interface UI5ControlBase {
     readonly id: string;
     isBound(propertyName: string): Promise<boolean>;
     setProperty(name: string, value: unknown): Promise<void>;
+    toLocator(): Promise<_playwright_test.Locator>;
 }
+
+// @public
+export interface UI5ControlMap {
+    // (undocumented)
+    'sap.f.Avatar': UI5FAvatar;
+    // (undocumented)
+    'sap.f.Card': UI5FCard;
+    // (undocumented)
+    'sap.f.DynamicPage': UI5DynamicPage;
+    // (undocumented)
+    'sap.f.DynamicPageHeader': UI5DynamicPageHeader;
+    // (undocumented)
+    'sap.f.DynamicPageTitle': UI5DynamicPageTitle;
+    // (undocumented)
+    'sap.f.FlexibleColumnLayout': UI5FlexibleColumnLayout;
+    // (undocumented)
+    'sap.f.GridContainer': UI5GridContainer;
+    // (undocumented)
+    'sap.f.ProductSwitch': UI5ProductSwitch;
+    // (undocumented)
+    'sap.f.semantic.SemanticPage': UI5FSemanticPage;
+    // (undocumented)
+    'sap.f.ShellBar': UI5ShellBar;
+    // (undocumented)
+    'sap.m.ActionListItem': UI5ActionListItem;
+    // (undocumented)
+    'sap.m.ActionSheet': UI5ActionSheet;
+    // (undocumented)
+    'sap.m.App': UI5App;
+    // (undocumented)
+    'sap.m.Avatar': UI5Avatar;
+    // (undocumented)
+    'sap.m.Bar': UI5Bar;
+    // (undocumented)
+    'sap.m.Breadcrumbs': UI5Breadcrumbs;
+    // (undocumented)
+    'sap.m.BusyDialog': UI5BusyDialog;
+    // (undocumented)
+    'sap.m.BusyIndicator': UI5BusyIndicator;
+    // (undocumented)
+    'sap.m.Button': UI5Button;
+    // (undocumented)
+    'sap.m.Carousel': UI5Carousel;
+    // (undocumented)
+    'sap.m.CheckBox': UI5CheckBox;
+    // (undocumented)
+    'sap.m.ColorPalette': UI5ColorPalette;
+    // (undocumented)
+    'sap.m.ColorPalettePopover': UI5ColorPalettePopover;
+    // (undocumented)
+    'sap.m.Column': UI5Column;
+    // (undocumented)
+    'sap.m.ColumnListItem': UI5ColumnListItem;
+    // (undocumented)
+    'sap.m.ComboBox': UI5ComboBox;
+    // (undocumented)
+    'sap.m.CustomListItem': UI5CustomListItem;
+    // (undocumented)
+    'sap.m.DatePicker': UI5DatePicker;
+    // (undocumented)
+    'sap.m.DateRangeSelection': UI5DateRangeSelection;
+    // (undocumented)
+    'sap.m.DateTimePicker': UI5DateTimePicker;
+    // (undocumented)
+    'sap.m.Dialog': UI5Dialog;
+    // (undocumented)
+    'sap.m.DisplayListItem': UI5DisplayListItem;
+    // (undocumented)
+    'sap.m.DraftIndicator': UI5DraftIndicator;
+    // (undocumented)
+    'sap.m.DynamicDateRange': UI5DynamicDateRange;
+    // (undocumented)
+    'sap.m.ExpandableText': UI5ExpandableText;
+    // (undocumented)
+    'sap.m.FacetFilter': UI5FacetFilter;
+    // (undocumented)
+    'sap.m.FacetFilterList': UI5FacetFilterList;
+    // (undocumented)
+    'sap.m.FeedInput': UI5FeedInput;
+    // (undocumented)
+    'sap.m.FeedListItem': UI5FeedListItem;
+    // (undocumented)
+    'sap.m.FlexBox': UI5FlexBox;
+    // (undocumented)
+    'sap.m.FormattedText': UI5FormattedText;
+    // (undocumented)
+    'sap.m.GenericTile': UI5GenericTile;
+    // (undocumented)
+    'sap.m.GroupHeaderListItem': UI5GroupHeaderListItem;
+    // (undocumented)
+    'sap.m.HBox': UI5HBox;
+    // (undocumented)
+    'sap.m.HeaderContainer': UI5HeaderContainer;
+    // (undocumented)
+    'sap.m.IconTabBar': UI5IconTabBar;
+    // (undocumented)
+    'sap.m.IconTabFilter': UI5IconTabFilter;
+    // (undocumented)
+    'sap.m.IconTabHeader': UI5IconTabHeader;
+    // (undocumented)
+    'sap.m.IconTabSeparator': UI5IconTabSeparator;
+    // (undocumented)
+    'sap.m.IllustratedMessage': UI5IllustratedMessage;
+    // (undocumented)
+    'sap.m.Image': UI5Image;
+    // (undocumented)
+    'sap.m.Input': UI5Input;
+    // (undocumented)
+    'sap.m.InputListItem': UI5InputListItem;
+    // (undocumented)
+    'sap.m.Label': UI5Label;
+    // (undocumented)
+    'sap.m.LightBox': UI5LightBox;
+    // (undocumented)
+    'sap.m.Link': UI5Link;
+    // (undocumented)
+    'sap.m.List': UI5List;
+    // (undocumented)
+    'sap.m.ListBase': UI5ListBase;
+    // (undocumented)
+    'sap.m.MaskInput': UI5MaskInput;
+    // (undocumented)
+    'sap.m.Menu': UI5Menu;
+    // (undocumented)
+    'sap.m.MenuButton': UI5MenuButton;
+    // (undocumented)
+    'sap.m.MenuItem': UI5MenuItem;
+    // (undocumented)
+    'sap.m.MessageItem': UI5MessageItem;
+    // (undocumented)
+    'sap.m.MessagePopover': UI5MessagePopover;
+    // (undocumented)
+    'sap.m.MessageStrip': UI5MessageStrip;
+    // (undocumented)
+    'sap.m.MessageView': UI5MessageView;
+    // (undocumented)
+    'sap.m.MultiComboBox': UI5MultiComboBox;
+    // (undocumented)
+    'sap.m.MultiInput': UI5MultiInput;
+    // (undocumented)
+    'sap.m.NavContainer': UI5NavContainer;
+    // (undocumented)
+    'sap.m.NotificationListGroup': UI5NotificationListGroup;
+    // (undocumented)
+    'sap.m.NotificationListItem': UI5NotificationListItem;
+    // (undocumented)
+    'sap.m.NumericContent': UI5NumericContent;
+    // (undocumented)
+    'sap.m.ObjectAttribute': UI5ObjectAttribute;
+    // (undocumented)
+    'sap.m.ObjectHeader': UI5ObjectHeader;
+    // (undocumented)
+    'sap.m.ObjectIdentifier': UI5ObjectIdentifier;
+    // (undocumented)
+    'sap.m.ObjectListItem': UI5ObjectListItem;
+    // (undocumented)
+    'sap.m.ObjectMarker': UI5ObjectMarker;
+    // (undocumented)
+    'sap.m.ObjectNumber': UI5ObjectNumber;
+    // (undocumented)
+    'sap.m.ObjectStatus': UI5ObjectStatus;
+    // (undocumented)
+    'sap.m.OverflowToolbar': UI5OverflowToolbar;
+    // (undocumented)
+    'sap.m.p13n.GroupPanel': UI5P13nGroupPanel;
+    // (undocumented)
+    'sap.m.p13n.Popup': UI5P13nPopup;
+    // (undocumented)
+    'sap.m.p13n.SelectionPanel': UI5P13nSelectionPanel;
+    // (undocumented)
+    'sap.m.p13n.SortPanel': UI5P13nSortPanel;
+    // (undocumented)
+    'sap.m.Page': UI5Page;
+    // (undocumented)
+    'sap.m.Panel': UI5Panel;
+    // (undocumented)
+    'sap.m.PDFViewer': UI5PDFViewer;
+    // (undocumented)
+    'sap.m.PlanningCalendar': UI5PlanningCalendar;
+    // (undocumented)
+    'sap.m.Popover': UI5Popover;
+    // (undocumented)
+    'sap.m.ProgressIndicator': UI5ProgressIndicator;
+    // (undocumented)
+    'sap.m.QuickView': UI5QuickView;
+    // (undocumented)
+    'sap.m.QuickViewCard': UI5QuickViewCard;
+    // (undocumented)
+    'sap.m.QuickViewPage': UI5QuickViewPage;
+    // (undocumented)
+    'sap.m.RadioButton': UI5RadioButton;
+    // (undocumented)
+    'sap.m.RadioButtonGroup': UI5RadioButtonGroup;
+    // (undocumented)
+    'sap.m.RangeSlider': UI5RangeSlider;
+    // (undocumented)
+    'sap.m.RatingIndicator': UI5RatingIndicator;
+    // (undocumented)
+    'sap.m.ResponsivePopover': UI5ResponsivePopover;
+    // (undocumented)
+    'sap.m.ScrollContainer': UI5ScrollContainer;
+    // (undocumented)
+    'sap.m.SearchField': UI5SearchField;
+    // (undocumented)
+    'sap.m.SegmentedButton': UI5SegmentedButton;
+    // (undocumented)
+    'sap.m.Select': UI5Select;
+    // (undocumented)
+    'sap.m.SelectDialog': UI5SelectDialog;
+    // (undocumented)
+    'sap.m.SelectionDetails': UI5SelectionDetails;
+    // (undocumented)
+    'sap.m.SelectList': UI5SelectList;
+    // (undocumented)
+    'sap.m.Shell': UI5Shell;
+    // (undocumented)
+    'sap.m.SinglePlanningCalendar': UI5SinglePlanningCalendar;
+    // (undocumented)
+    'sap.m.Slider': UI5Slider;
+    // (undocumented)
+    'sap.m.SlideTile': UI5SlideTile;
+    // (undocumented)
+    'sap.m.SplitApp': UI5SplitApp;
+    // (undocumented)
+    'sap.m.SplitButton': UI5SplitButton;
+    // (undocumented)
+    'sap.m.SplitContainer': UI5SplitContainer;
+    // (undocumented)
+    'sap.m.StandardListItem': UI5StandardListItem;
+    // (undocumented)
+    'sap.m.StandardTreeItem': UI5StandardTreeItem;
+    // (undocumented)
+    'sap.m.StepInput': UI5StepInput;
+    // (undocumented)
+    'sap.m.Switch': UI5Switch;
+    // (undocumented)
+    'sap.m.TabContainer': UI5TabContainer;
+    // (undocumented)
+    'sap.m.TabContainerItem': UI5TabContainerItem;
+    // (undocumented)
+    'sap.m.Table': UI5Table;
+    // (undocumented)
+    'sap.m.table.columnmenu.Menu': UI5ColumnMenu;
+    // (undocumented)
+    'sap.m.TableSelectDialog': UI5TableSelectDialog;
+    // (undocumented)
+    'sap.m.Text': UI5Text;
+    // (undocumented)
+    'sap.m.TextArea': UI5TextArea;
+    // (undocumented)
+    'sap.m.TileContent': UI5TileContent;
+    // (undocumented)
+    'sap.m.TimePicker': UI5TimePicker;
+    // (undocumented)
+    'sap.m.Title': UI5Title;
+    // (undocumented)
+    'sap.m.ToggleButton': UI5ToggleButton;
+    // (undocumented)
+    'sap.m.Token': UI5Token;
+    // (undocumented)
+    'sap.m.Tokenizer': UI5Tokenizer;
+    // (undocumented)
+    'sap.m.Toolbar': UI5Toolbar;
+    // (undocumented)
+    'sap.m.ToolbarSeparator': UI5ToolbarSeparator;
+    // (undocumented)
+    'sap.m.ToolbarSpacer': UI5ToolbarSpacer;
+    // (undocumented)
+    'sap.m.Tree': UI5Tree;
+    // (undocumented)
+    'sap.m.upload.UploadSet': UI5UploadSet;
+    // (undocumented)
+    'sap.m.UploadCollection': UI5UploadCollection;
+    // (undocumented)
+    'sap.m.VariantManagement': UI5VariantManagement;
+    // (undocumented)
+    'sap.m.VBox': UI5VBox;
+    // (undocumented)
+    'sap.m.ViewSettingsDialog': UI5ViewSettingsDialog;
+    // (undocumented)
+    'sap.m.Wizard': UI5Wizard;
+    // (undocumented)
+    'sap.m.WizardStep': UI5WizardStep;
+    // (undocumented)
+    'sap.tnt.InfoLabel': UI5InfoLabel;
+    // (undocumented)
+    'sap.tnt.NavigationList': UI5NavigationList;
+    // (undocumented)
+    'sap.tnt.NavigationListItem': UI5NavigationListItem;
+    // (undocumented)
+    'sap.tnt.SideNavigation': UI5SideNavigation;
+    // (undocumented)
+    'sap.tnt.ToolHeader': UI5ToolHeader;
+    // (undocumented)
+    'sap.tnt.ToolPage': UI5ToolPage;
+    // (undocumented)
+    'sap.ui.comp.filterbar.FilterBar': UI5FilterBar;
+    // (undocumented)
+    'sap.ui.comp.navpopover.SmartLink': UI5SmartLink;
+    // (undocumented)
+    'sap.ui.comp.smartchart.SmartChart': UI5SmartChart;
+    // (undocumented)
+    'sap.ui.comp.smartfield.SmartField': UI5SmartField;
+    // (undocumented)
+    'sap.ui.comp.smartfilterbar.SmartFilterBar': UI5SmartFilterBar;
+    // (undocumented)
+    'sap.ui.comp.smartform.Group': UI5SmartFormGroup;
+    // (undocumented)
+    'sap.ui.comp.smartform.GroupElement': UI5SmartFormGroupElement;
+    // (undocumented)
+    'sap.ui.comp.smartform.SmartForm': UI5SmartForm;
+    // (undocumented)
+    'sap.ui.comp.smartmultiinput.SmartMultiInput': UI5SmartMultiInput;
+    // (undocumented)
+    'sap.ui.comp.smarttable.SmartTable': UI5SmartTable;
+    // (undocumented)
+    'sap.ui.comp.smartvariants.SmartVariantManagement': UI5SmartVariantManagement;
+    // (undocumented)
+    'sap.ui.comp.valuehelpdialog.ValueHelpDialog': UI5ValueHelpDialog;
+    // (undocumented)
+    'sap.ui.core.ComponentContainer': UI5ComponentContainer;
+    // (undocumented)
+    'sap.ui.core.HTML': UI5HTML;
+    // (undocumented)
+    'sap.ui.core.Icon': UI5Icon;
+    // (undocumented)
+    'sap.ui.core.Item': UI5Item;
+    // (undocumented)
+    'sap.ui.core.ListItem': UI5ListItem;
+    // (undocumented)
+    'sap.ui.layout.BlockLayout': UI5BlockLayout;
+    // (undocumented)
+    'sap.ui.layout.BlockLayoutCell': UI5BlockLayoutCell;
+    // (undocumented)
+    'sap.ui.layout.BlockLayoutRow': UI5BlockLayoutRow;
+    // (undocumented)
+    'sap.ui.layout.DynamicSideContent': UI5DynamicSideContent;
+    // (undocumented)
+    'sap.ui.layout.form.Form': UI5Form;
+    // (undocumented)
+    'sap.ui.layout.form.FormContainer': UI5FormContainer;
+    // (undocumented)
+    'sap.ui.layout.form.FormElement': UI5FormElement;
+    // (undocumented)
+    'sap.ui.layout.form.SimpleForm': UI5SimpleForm;
+    // (undocumented)
+    'sap.ui.layout.Grid': UI5Grid;
+    // (undocumented)
+    'sap.ui.layout.HorizontalLayout': UI5HorizontalLayout;
+    // (undocumented)
+    'sap.ui.layout.ResponsiveSplitter': UI5ResponsiveSplitter;
+    // (undocumented)
+    'sap.ui.layout.Splitter': UI5Splitter;
+    // (undocumented)
+    'sap.ui.layout.VerticalLayout': UI5VerticalLayout;
+    // (undocumented)
+    'sap.ui.mdc.Chart': UI5MdcChart;
+    // (undocumented)
+    'sap.ui.mdc.Field': UI5MdcField;
+    // (undocumented)
+    'sap.ui.mdc.FilterBar': UI5MdcFilterBar;
+    // (undocumented)
+    'sap.ui.mdc.FilterField': UI5MdcFilterField;
+    // (undocumented)
+    'sap.ui.mdc.MultiValueField': UI5MdcMultiValueField;
+    // (undocumented)
+    'sap.ui.mdc.Table': UI5MdcTable;
+    // (undocumented)
+    'sap.ui.mdc.ValueHelp': UI5MdcValueHelp;
+    // (undocumented)
+    'sap.ui.table.AnalyticalTable': UI5AnalyticalTable;
+    // (undocumented)
+    'sap.ui.table.Column': UI5TableColumn;
+    // (undocumented)
+    'sap.ui.table.Row': UI5TableRow;
+    // (undocumented)
+    'sap.ui.table.Table': UI5GridTable;
+    // (undocumented)
+    'sap.ui.table.TreeTable': UI5TreeTable;
+    // (undocumented)
+    'sap.ui.unified.Calendar': UI5Calendar;
+    // (undocumented)
+    'sap.ui.unified.FileUploader': UI5FileUploader;
+    // (undocumented)
+    'sap.ui.unified.Menu': UI5UnifiedMenu;
+    // (undocumented)
+    'sap.ui.unified.MenuItem': UI5UnifiedMenuItem;
+    // (undocumented)
+    'sap.ui.unified.ShellHeadItem': UI5ShellHeadItem;
+    // (undocumented)
+    'sap.uxap.AnchorBar': UI5AnchorBar;
+    // (undocumented)
+    'sap.uxap.ObjectPageDynamicHeaderTitle': UI5ObjectPageDynamicHeaderTitle;
+    // (undocumented)
+    'sap.uxap.ObjectPageHeader': UI5ObjectPageHeader;
+    // (undocumented)
+    'sap.uxap.ObjectPageLayout': UI5ObjectPageLayout;
+    // (undocumented)
+    'sap.uxap.ObjectPageSection': UI5ObjectPageSection;
+    // (undocumented)
+    'sap.uxap.ObjectPageSubSection': UI5ObjectPageSubSection;
+}
+
+// @public
+export type UI5MatcherFn = (page: MatcherPage, controlId: string, ...args: readonly unknown[]) => Promise<MatcherResult>;
 
 // @public
 export interface UI5NavigationAPI {
@@ -1045,6 +1896,8 @@ export interface UI5NavigationAPI {
     navigateToHash(hash: string, options?: NavigationOptions): Promise<void>;
     navigateToHome(options?: NavigationOptions): Promise<void>;
     navigateToIntent(intent: NavigationIntent, params?: Readonly<Record<string, string>>, options?: NavigationOptions): Promise<void>;
+    navigateToSectionLink(linkName: string, options?: SectionLinkNavigationOptions): Promise<void>;
+    navigateToSpace(spaceTitle: string, options?: SpaceNavigationOptions): Promise<void>;
     navigateToTile(title: string, options?: NavigationOptions): Promise<void>;
     searchAndOpenApp(title: string, options?: NavigationOptions): Promise<void>;
 }
@@ -1053,13 +1906,13 @@ export interface UI5NavigationAPI {
 export interface UI5Selector {
     readonly ancestor?: UI5Selector;
     readonly bindingPath?: Readonly<Record<string, string>>;
-    readonly controlType?: string;
+    readonly controlType?: keyof UI5ControlMap | (string & {});
     readonly descendant?: UI5Selector;
     readonly i18NText?: Readonly<Record<string, string>>;
     readonly id?: string | RegExp;
-    // Warning: (ae-forgotten-export) The symbol "UI5Interaction" needs to be exported by the entry point index.d.ts
     readonly interaction?: UI5Interaction;
-    readonly properties?: Readonly<Record<string, unknown>>;
+    readonly matchSubclasses?: boolean;
+    readonly properties?: Readonly<Record<string, string | number | boolean | RegExp | PropertyMatcher>>;
     readonly searchOpenDialogs?: boolean;
     readonly viewId?: string;
     readonly viewName?: string;
@@ -1079,22 +1932,28 @@ export function viewName(name: string): ViewName;
 
 // @public
 export class VocabularyError extends PramanError {
-    // Warning: (ae-forgotten-export) The symbol "VocabularyErrorOptions" needs to be exported by the entry point index.d.ts
     constructor(options: VocabularyErrorOptions);
     // (undocumented)
     readonly domain: string | undefined;
     // (undocumented)
     readonly term: string | undefined;
-    // (undocumented)
     toAIContext(): AIErrorContext & {
         readonly term: string | undefined;
         readonly domain: string | undefined;
     };
-    // (undocumented)
     toJSON(): SerializedPramanError & {
         readonly term: string | undefined;
         readonly domain: string | undefined;
     };
+}
+
+// @public
+export function waitForControlState(locator: Locator, predicate: ControlPredicate, options?: WaitForControlStateOptions): Promise<ControlWaitResult>;
+
+// @public
+export interface WaitForControlStateOptions {
+    readonly message?: string;
+    readonly timeout?: number;
 }
 
 // @public
@@ -1108,7 +1967,6 @@ export function waitForODataLoad(page: ODataPage, options?: WaitForODataLoadOpti
 
 // @public
 export interface WaitForODataLoadOptions extends ODataOptions {
-    // Warning: (ae-forgotten-export) The symbol "ODataEntityPath" needs to be exported by the entry point index.d.ts
     readonly bindingPath?: ODataEntityPath;
     readonly polling?: number;
 }
@@ -1124,27 +1982,60 @@ export interface WaitForTableDataOptions extends TableOptions {
     readonly polling?: number;
 }
 
-// Warning: (ae-forgotten-export) The symbol "WaitPage" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function waitForUI5Bootstrap(page: WaitPage, options?: {
     readonly timeout?: number;
 }): Promise<void>;
 
-// Warning: (ae-forgotten-export) The symbol "WaitForUI5StableOptions" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function waitForUI5Stable(page: WaitPage, options?: WaitForUI5StableOptions): Promise<void>;
 
-// Warnings were encountered during analysis:
-//
-// dist/index.d.ts:4804:5 - (ae-forgotten-export) The symbol "createTableFixture" needs to be exported by the entry point index.d.ts
-// dist/index.d.ts:4805:5 - (ae-forgotten-export) The symbol "createDialogFixture" needs to be exported by the entry point index.d.ts
-// dist/index.d.ts:4806:5 - (ae-forgotten-export) The symbol "createDateFixture" needs to be exported by the entry point index.d.ts
-// dist/index.d.ts:4807:5 - (ae-forgotten-export) The symbol "createODataFixture" needs to be exported by the entry point index.d.ts
-// dist/recipes-CIWzbAfm.d.ts:432:5 - (ae-forgotten-export) The symbol "AiResponseMetadata" needs to be exported by the entry point index.d.ts
-// dist/recipes-CIWzbAfm.d.ts:436:5 - (ae-forgotten-export) The symbol "AiResponseError" needs to be exported by the entry point index.d.ts
-// dist/recipes-CIWzbAfm.d.ts:1650:5 - (ae-forgotten-export) The symbol "CapabilityCategory" needs to be exported by the entry point index.d.ts
+// @public
+export interface WebStorageFixture {
+    readonly localStorage: WebStorageHelper;
+    readonly sessionStorage: WebStorageHelper;
+}
+
+// @public
+export interface WebStorageHelper {
+    clear(): Promise<void>;
+    getItem(key: string): Promise<string | null>;
+    items(): Promise<Record<string, string>>;
+    removeItem(key: string): Promise<void>;
+    seed(data: Record<string, string>): Promise<void>;
+    setItem(key: string, value: string): Promise<void>;
+    size(): Promise<number>;
+}
+
+// @public
+export const webStorageTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & {
+    webStorage: WebStorageFixture;
+}, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions>;
+
+// @public
+export interface WorkZoneFrame {
+    evaluate(pageFunction: string | ((...args: never[]) => unknown), arg?: unknown): Promise<unknown>;
+    url(): string;
+    waitForFunction(pageFunction: string | (() => unknown), options?: {
+        readonly timeout?: number;
+        readonly polling?: number;
+    }): Promise<unknown>;
+}
+
+// @public
+export interface WorkZonePage {
+    evaluate(pageFunction: string | ((...args: never[]) => unknown), arg?: unknown): Promise<unknown>;
+    frame(options: {
+        readonly url: RegExp | string;
+    }): WorkZoneFrame | null;
+    frameLocator(selector: string): WorkZoneFrameLocator;
+    frames(): readonly WorkZoneFrame[];
+    mainFrame(): WorkZoneFrame;
+    waitForFunction(pageFunction: string | (() => unknown), options?: {
+        readonly timeout?: number;
+        readonly polling?: number;
+    }): Promise<unknown>;
+}
 
 // (No @packageDocumentation comment for this package)
 

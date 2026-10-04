@@ -1,6 +1,20 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+
+/**
+ * The published package version, read from the one file that defines it.
+ *
+ * Hardcoded as '1.0' until 2026-10-04, by which point the package was at 1.3.5
+ * — and it is stamped into the site's llms.txt header, i.e. the first thing an
+ * AI agent reads about which version it is looking at.
+ */
+const { version: packageVersion } = JSON.parse(
+  readFileSync(resolve(__dirname, '..', 'package.json'), 'utf8'),
+) as { version: string };
 
 const config: Config = {
   title: 'Praman',
@@ -279,7 +293,7 @@ const config: Config = {
           'Praman extends Playwright with deep SAP UI5 awareness — typed control proxies, ' +
           'UI5 stability synchronization, FLP navigation, OData operations, Fiori Elements ' +
           'testing, and AI-powered test generation. Single npm package: playwright-praman.',
-        version: '1.0',
+        version: packageVersion,
 
         // ── Generation flags ──
         generateLLMsTxt: true,
