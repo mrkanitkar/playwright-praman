@@ -302,6 +302,111 @@ describe('cli/scaffolder', () => {
     });
   });
 
+  // ── scaffoldProject — new templates ───────────────────────────────────────
+
+  describe('scaffoldProject — new scaffold templates', () => {
+    it('writes global.teardown.ts', async () => {
+      const result = await scaffoldProject({ targetDir: TEST_DIR });
+
+      expect(result.success).toBe(true);
+      expect(mockFs.written.has(join(TEST_DIR, 'global.teardown.ts'))).toBe(true);
+    });
+
+    it('writes tests/helpers/master-data.ts', async () => {
+      const result = await scaffoldProject({ targetDir: TEST_DIR });
+
+      expect(result.success).toBe(true);
+      expect(mockFs.written.has(join(TEST_DIR, 'tests', 'helpers', 'master-data.ts'))).toBe(true);
+    });
+
+    it('writes .github/workflows/playwright.yml', async () => {
+      const result = await scaffoldProject({ targetDir: TEST_DIR });
+
+      expect(result.success).toBe(true);
+      expect(mockFs.written.has(join(TEST_DIR, '.github', 'workflows', 'playwright.yml'))).toBe(
+        true,
+      );
+    });
+
+    it('creates tests/helpers/ subdirectory', async () => {
+      await scaffoldProject({ targetDir: TEST_DIR });
+
+      const mkdirCalls = mockFs.mocks.mkdir.mock.calls.map((call: unknown[]) => String(call[0]));
+      expect(mkdirCalls).toContain(join(TEST_DIR, 'tests', 'helpers'));
+    });
+
+    it('creates tests/otc/ subdirectory', async () => {
+      await scaffoldProject({ targetDir: TEST_DIR });
+
+      const mkdirCalls = mockFs.mocks.mkdir.mock.calls.map((call: unknown[]) => String(call[0]));
+      expect(mkdirCalls).toContain(join(TEST_DIR, 'tests', 'otc'));
+    });
+
+    it('creates tests/ptp/ subdirectory', async () => {
+      await scaffoldProject({ targetDir: TEST_DIR });
+
+      const mkdirCalls = mockFs.mocks.mkdir.mock.calls.map((call: unknown[]) => String(call[0]));
+      expect(mkdirCalls).toContain(join(TEST_DIR, 'tests', 'ptp'));
+    });
+
+    it('creates tests/rtr/ subdirectory', async () => {
+      await scaffoldProject({ targetDir: TEST_DIR });
+
+      const mkdirCalls = mockFs.mocks.mkdir.mock.calls.map((call: unknown[]) => String(call[0]));
+      expect(mkdirCalls).toContain(join(TEST_DIR, 'tests', 'rtr'));
+    });
+
+    it('creates .github/workflows/ subdirectory', async () => {
+      await scaffoldProject({ targetDir: TEST_DIR });
+
+      const mkdirCalls = mockFs.mocks.mkdir.mock.calls.map((call: unknown[]) => String(call[0]));
+      expect(mkdirCalls).toContain(join(TEST_DIR, '.github', 'workflows'));
+    });
+
+    it('template content is non-empty', async () => {
+      await scaffoldProject({ targetDir: TEST_DIR });
+
+      const teardown = mockFs.written.get(join(TEST_DIR, 'global.teardown.ts'));
+      const masterData = mockFs.written.get(join(TEST_DIR, 'tests', 'helpers', 'master-data.ts'));
+      const workflow = mockFs.written.get(join(TEST_DIR, '.github', 'workflows', 'playwright.yml'));
+
+      expect(teardown).toBeTruthy();
+      expect(masterData).toBeTruthy();
+      expect(workflow).toBeTruthy();
+      expect(typeof teardown).toBe('string');
+      expect(typeof masterData).toBe('string');
+      expect(typeof workflow).toBe('string');
+    });
+
+    it('skips new template files when they already exist and force is false', async () => {
+      mockFs.dirs.add(EXISTING_DIR);
+      const existingTeardown = join(EXISTING_DIR, 'global.teardown.ts');
+      mockFs.files.set(existingTeardown, '// existing teardown');
+
+      const result = await scaffoldProject({ targetDir: EXISTING_DIR, force: false });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.filesSkipped).toContain(existingTeardown);
+        expect(result.filesCreated).not.toContain(existingTeardown);
+        expect(mockFs.written.has(existingTeardown)).toBe(false);
+      }
+    });
+
+    it('includes new files in filesCreated result', async () => {
+      const result = await scaffoldProject({ targetDir: TEST_DIR });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.filesCreated).toContain(join(TEST_DIR, 'global.teardown.ts'));
+        expect(result.filesCreated).toContain(join(TEST_DIR, 'tests', 'helpers', 'master-data.ts'));
+        expect(result.filesCreated).toContain(
+          join(TEST_DIR, '.github', 'workflows', 'playwright.yml'),
+        );
+      }
+    });
+  });
+
   // ── ScaffoldResult type correctness ─────────────────────────────────────
 
   describe('ScaffoldResult — type correctness', () => {
