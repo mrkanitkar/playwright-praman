@@ -804,6 +804,7 @@ import { test, expect } from 'playwright-praman';
 | `flpSettings`   | test   | FLP             | User settings reader (language, date format)                                                                     |
 | `testData`      | test   | Data            | Template-based data generation with auto-cleanup                                                                 |
 | `nativeDialogs` | test   | Diagnostics     | Records native `alert`/`confirm`/`prompt`/`beforeunload` dialogs; can answer them on request (Playwright 1.63+)  |
+| `webStorage`    | test   | Browser State   | Typed `localStorage` / `sessionStorage` helpers — `seed`, `getItem`, `items`, `size` (Playwright 1.61+)          |
 | `pramanConfig`  | worker | Infrastructure  | Frozen config (loaded once per worker)                                                                           |
 | `pramanLogger`  | test   | Infrastructure  | Test-scoped pino logger                                                                                          |
 | `rootLogger`    | worker | Infrastructure  | Worker-scoped root logger                                                                                        |

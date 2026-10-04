@@ -72,15 +72,15 @@ Two methods with different risk profiles:
 ```typescript
 import { test, expect } from 'playwright-praman';
 
-test('detect unsaved changes dialog', async ({ browserDialogs }) => {
+test('detect unsaved changes dialog', async ({ ui5Navigation, nativeDialogs }) => {
   // Detect-only — observe without answering (1.63+)
-  browserDialogs.observe();
+  nativeDialogs.observe();
 
   // Navigate away from a dirty form
-  await ui5Navigation.navigateTo('/other-page');
+  await ui5Navigation.navigateToHash('Shell-home');
 
   // Assert the beforeunload dialog was observed
-  expect(browserDialogs.observed).toContainEqual(expect.objectContaining({ type: 'beforeunload' }));
+  expect(nativeDialogs.records).toContainEqual(expect.objectContaining({ type: 'beforeunload' }));
 });
 ```
 
