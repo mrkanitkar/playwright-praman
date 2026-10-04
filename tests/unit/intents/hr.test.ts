@@ -227,6 +227,82 @@ describe('hr.createEmployee', () => {
 
     expect(vocab.getFieldSelector).toHaveBeenCalledWith('Given Name');
   });
+
+  it('uses all field overrides simultaneously', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await hr.createEmployee(
+      ui5,
+      ui5Nav,
+      vocab,
+      { firstName: 'Max', lastName: 'Mustermann', personnelArea: '1000' },
+      {
+        overrides: {
+          appId: 'ZEmployee-hire',
+          saveButtonText: 'Hire',
+          fields: {
+            'First Name': 'Given Name',
+            'Last Name': 'Surname',
+            'Personnel Area': 'Pers. Area',
+          },
+        },
+      },
+    );
+
+    expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('ZEmployee-hire');
+    expect(ui5.click).toHaveBeenCalledWith({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Hire' },
+    });
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Given Name');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Surname');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Pers. Area');
+  });
+
+  it('returns error when lastName term is not found (firstName succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await hr.createEmployee(ui5, ui5Nav, vocab, {
+      firstName: 'Max',
+      lastName: 'Mustermann',
+      personnelArea: '1000',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillFirstName');
+  });
+
+  it('returns error when personnelArea term is not found (fn + ln succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await hr.createEmployee(ui5, ui5Nav, vocab, {
+      firstName: 'Max',
+      lastName: 'Mustermann',
+      personnelArea: '1000',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillFirstName');
+    expect(result.metadata.stepsExecuted).toContain('fillLastName');
+  });
 });
 
 // ── recordTime ──────────────────────────────────────────────────────────────
@@ -394,6 +470,82 @@ describe('hr.recordTime', () => {
     );
 
     expect(vocab.getFieldSelector).toHaveBeenCalledWith('Personnel No.');
+  });
+
+  it('uses all field overrides simultaneously', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await hr.recordTime(
+      ui5,
+      ui5Nav,
+      vocab,
+      { employeeId: '00001234', date: '2026-04-15', hours: 8 },
+      {
+        overrides: {
+          appId: 'ZCAT2-record',
+          saveButtonText: 'Submit',
+          fields: {
+            'Employee ID': 'Personnel No.',
+            Date: 'Work Date',
+            Hours: 'Duration',
+          },
+        },
+      },
+    );
+
+    expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('ZCAT2-record');
+    expect(ui5.click).toHaveBeenCalledWith({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Submit' },
+    });
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Personnel No.');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Work Date');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Duration');
+  });
+
+  it('returns error when date term is not found (employeeId succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await hr.recordTime(ui5, ui5Nav, vocab, {
+      employeeId: '00001234',
+      date: '2026-04-15',
+      hours: 8,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillEmployeeId');
+  });
+
+  it('returns error when hours term is not found (emp + date succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await hr.recordTime(ui5, ui5Nav, vocab, {
+      employeeId: '00001234',
+      date: '2026-04-15',
+      hours: 8,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillEmployeeId');
+    expect(result.metadata.stepsExecuted).toContain('fillDate');
   });
 });
 
@@ -592,5 +744,114 @@ describe('hr.requestAbsence', () => {
     );
 
     expect(vocab.getFieldSelector).toHaveBeenCalledWith('Pernr');
+  });
+
+  it('uses all field overrides simultaneously', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await hr.requestAbsence(
+      ui5,
+      ui5Nav,
+      vocab,
+      {
+        employeeId: '00001234',
+        absenceType: '0100',
+        startDate: '2026-05-01',
+        endDate: '2026-05-05',
+      },
+      {
+        overrides: {
+          appId: 'ZLeave-apply',
+          saveButtonText: 'Submit Request',
+          fields: {
+            'Employee ID': 'Pernr',
+            'Absence Type': 'Leave Type',
+            'Start Date': 'From',
+            'End Date': 'To',
+          },
+        },
+      },
+    );
+
+    expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('ZLeave-apply');
+    expect(ui5.click).toHaveBeenCalledWith({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Submit Request' },
+    });
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Pernr');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Leave Type');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('From');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('To');
+  });
+
+  it('returns error when absenceType term is not found (employeeId succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await hr.requestAbsence(ui5, ui5Nav, vocab, {
+      employeeId: '00001234',
+      absenceType: '0100',
+      startDate: '2026-05-01',
+      endDate: '2026-05-05',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillEmployeeId');
+  });
+
+  it('returns error when startDate term is not found (emp + type succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await hr.requestAbsence(ui5, ui5Nav, vocab, {
+      employeeId: '00001234',
+      absenceType: '0100',
+      startDate: '2026-05-01',
+      endDate: '2026-05-05',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillEmployeeId');
+    expect(result.metadata.stepsExecuted).toContain('fillAbsenceType');
+  });
+
+  it('returns error when endDate term is not found (emp + type + start succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 3 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await hr.requestAbsence(ui5, ui5Nav, vocab, {
+      employeeId: '00001234',
+      absenceType: '0100',
+      startDate: '2026-05-01',
+      endDate: '2026-05-05',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillEmployeeId');
+    expect(result.metadata.stepsExecuted).toContain('fillAbsenceType');
+    expect(result.metadata.stepsExecuted).toContain('fillStartDate');
   });
 });

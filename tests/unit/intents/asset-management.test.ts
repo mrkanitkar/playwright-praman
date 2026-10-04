@@ -257,6 +257,115 @@ describe('assetManagement.acquireAsset', () => {
 
     expect(vocab.getFieldSelector).toHaveBeenCalledWith('Class');
   });
+
+  it('uses all field overrides simultaneously', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await assetManagement.acquireAsset(
+      ui5,
+      ui5Nav,
+      vocab,
+      {
+        assetClass: '1000',
+        description: 'CNC Machine',
+        acquisitionValue: 150_000,
+        capitalizationDate: '2026-04-01',
+      },
+      {
+        overrides: {
+          appId: 'ZAsset-acquire',
+          saveButtonText: 'Capitalize',
+          fields: {
+            'Asset Class': 'Class',
+            Description: 'Asset Desc.',
+            'Acquisition Value': 'Acq. Value',
+            'Capitalization Date': 'Cap. Date',
+          },
+        },
+      },
+    );
+
+    expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('ZAsset-acquire');
+    expect(ui5.click).toHaveBeenCalledWith({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Capitalize' },
+    });
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Class');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Asset Desc.');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Acq. Value');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Cap. Date');
+  });
+
+  it('returns error when description term is not found (assetClass succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await assetManagement.acquireAsset(ui5, ui5Nav, vocab, {
+      assetClass: '1000',
+      description: 'CNC Machine',
+      acquisitionValue: 150_000,
+      capitalizationDate: '2026-04-01',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillAssetClass');
+  });
+
+  it('returns error when acquisitionValue term is not found (class + desc succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await assetManagement.acquireAsset(ui5, ui5Nav, vocab, {
+      assetClass: '1000',
+      description: 'CNC Machine',
+      acquisitionValue: 150_000,
+      capitalizationDate: '2026-04-01',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillAssetClass');
+    expect(result.metadata.stepsExecuted).toContain('fillDescription');
+  });
+
+  it('returns error when capitalizationDate term is not found (class + desc + val succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 3 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await assetManagement.acquireAsset(ui5, ui5Nav, vocab, {
+      assetClass: '1000',
+      description: 'CNC Machine',
+      acquisitionValue: 150_000,
+      capitalizationDate: '2026-04-01',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillAssetClass');
+    expect(result.metadata.stepsExecuted).toContain('fillDescription');
+    expect(result.metadata.stepsExecuted).toContain('fillAcquisitionValue');
+  });
 });
 
 // ── retireAsset ─────────────────────────────────────────────────────────────
@@ -419,6 +528,57 @@ describe('assetManagement.retireAsset', () => {
     );
 
     expect(vocab.getFieldSelector).toHaveBeenCalledWith('Main Asset No.');
+  });
+
+  it('uses all field overrides simultaneously', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await assetManagement.retireAsset(
+      ui5,
+      ui5Nav,
+      vocab,
+      { assetNumber: '000000001000', retirementDate: '2026-06-30' },
+      {
+        overrides: {
+          appId: 'ZAsset-scrap',
+          saveButtonText: 'Retire',
+          fields: {
+            'Asset Number': 'Main Asset No.',
+            'Retirement Date': 'Scrap Date',
+          },
+        },
+      },
+    );
+
+    expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('ZAsset-scrap');
+    expect(ui5.click).toHaveBeenCalledWith({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Retire' },
+    });
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Main Asset No.');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Scrap Date');
+  });
+
+  it('returns error when retirementDate term is not found (assetNumber succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await assetManagement.retireAsset(ui5, ui5Nav, vocab, {
+      assetNumber: '000000001000',
+      retirementDate: '2026-06-30',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillAssetNumber');
   });
 });
 
@@ -587,5 +747,81 @@ describe('assetManagement.transferAsset', () => {
     );
 
     expect(vocab.getFieldSelector).toHaveBeenCalledWith('From Asset');
+  });
+
+  it('uses all field overrides simultaneously', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await assetManagement.transferAsset(
+      ui5,
+      ui5Nav,
+      vocab,
+      { sourceAsset: '000000001000', targetAsset: '000000002000', transferDate: '2026-07-01' },
+      {
+        overrides: {
+          appId: 'ZAsset-move',
+          saveButtonText: 'Transfer',
+          fields: {
+            'Source Asset': 'From Asset',
+            'Target Asset': 'To Asset',
+            'Transfer Date': 'Posting Date',
+          },
+        },
+      },
+    );
+
+    expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('ZAsset-move');
+    expect(ui5.click).toHaveBeenCalledWith({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Transfer' },
+    });
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('From Asset');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('To Asset');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Posting Date');
+  });
+
+  it('returns error when targetAsset term is not found (sourceAsset succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await assetManagement.transferAsset(ui5, ui5Nav, vocab, {
+      sourceAsset: '000000001000',
+      targetAsset: '000000002000',
+      transferDate: '2026-07-01',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillSourceAsset');
+  });
+
+  it('returns error when transferDate term is not found (source + target succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await assetManagement.transferAsset(ui5, ui5Nav, vocab, {
+      sourceAsset: '000000001000',
+      targetAsset: '000000002000',
+      transferDate: '2026-07-01',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillSourceAsset');
+    expect(result.metadata.stepsExecuted).toContain('fillTargetAsset');
   });
 });

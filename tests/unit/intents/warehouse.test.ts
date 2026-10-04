@@ -232,6 +232,110 @@ describe('warehouse.createGoodsMovement', () => {
 
     expect(vocab.getFieldSelector).toHaveBeenCalledWith('Mvt Type');
   });
+
+  it('uses all field overrides simultaneously', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await warehouse.createGoodsMovement(
+      ui5,
+      ui5Nav,
+      vocab,
+      { movementType: '101', plant: '1000', material: 'RAW-0001', quantity: 100 },
+      {
+        overrides: {
+          appId: 'ZGoodsMovement-post',
+          saveButtonText: 'Submit',
+          fields: {
+            'Movement Type': 'Mvt Type',
+            Plant: 'Werk',
+            Material: 'Product',
+            Quantity: 'Qty',
+          },
+        },
+      },
+    );
+
+    expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('ZGoodsMovement-post');
+    expect(ui5.click).toHaveBeenCalledWith({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Submit' },
+    });
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Mvt Type');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Werk');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Product');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Qty');
+  });
+
+  it('returns error when plant term is not found (movementType succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await warehouse.createGoodsMovement(ui5, ui5Nav, vocab, {
+      movementType: '101',
+      plant: '1000',
+      material: 'RAW-0001',
+      quantity: 100,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMovementType');
+  });
+
+  it('returns error when material term is not found (mvt + plant succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await warehouse.createGoodsMovement(ui5, ui5Nav, vocab, {
+      movementType: '101',
+      plant: '1000',
+      material: 'RAW-0001',
+      quantity: 100,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMovementType');
+    expect(result.metadata.stepsExecuted).toContain('fillPlant');
+  });
+
+  it('returns error when quantity term is not found (mvt + plant + mat succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 3 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await warehouse.createGoodsMovement(ui5, ui5Nav, vocab, {
+      movementType: '101',
+      plant: '1000',
+      material: 'RAW-0001',
+      quantity: 100,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillMovementType');
+    expect(result.metadata.stepsExecuted).toContain('fillPlant');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
+  });
 });
 
 // ── createTransferOrder ─────────────────────────────────────────────────────
@@ -399,5 +503,81 @@ describe('warehouse.createTransferOrder', () => {
     );
 
     expect(vocab.getFieldSelector).toHaveBeenCalledWith('WH No.');
+  });
+
+  it('uses all field overrides simultaneously', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    const vocab = makeVocab();
+
+    await warehouse.createTransferOrder(
+      ui5,
+      ui5Nav,
+      vocab,
+      { warehouseNumber: '100', material: 'FG-1000', quantity: 25 },
+      {
+        overrides: {
+          appId: 'ZTransferOrder-create',
+          saveButtonText: 'Execute',
+          fields: {
+            'Warehouse Number': 'WH No.',
+            Material: 'Product',
+            Quantity: 'Qty',
+          },
+        },
+      },
+    );
+
+    expect(ui5Nav.navigateToApp).toHaveBeenCalledWith('ZTransferOrder-create');
+    expect(ui5.click).toHaveBeenCalledWith({
+      controlType: 'sap.m.Button',
+      properties: { text: 'Execute' },
+    });
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('WH No.');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Product');
+    expect(vocab.getFieldSelector).toHaveBeenCalledWith('Qty');
+  });
+
+  it('returns error when material term is not found (warehouseNumber succeeds)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount === 1 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await warehouse.createTransferOrder(ui5, ui5Nav, vocab, {
+      warehouseNumber: '100',
+      material: 'FG-1000',
+      quantity: 25,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillWarehouseNumber');
+  });
+
+  it('returns error when quantity term is not found (wh + material succeed)', async () => {
+    const ui5 = makeUI5();
+    const ui5Nav = makeNav();
+    let callCount = 0;
+    const vocab: VocabLookup = {
+      getFieldSelector: vi.fn().mockImplementation(async () => {
+        callCount++;
+        return callCount <= 2 ? Promise.resolve({ id: 'field' }) : Promise.resolve(undefined);
+      }),
+    };
+
+    const result = await warehouse.createTransferOrder(ui5, ui5Nav, vocab, {
+      warehouseNumber: '100',
+      material: 'FG-1000',
+      quantity: 25,
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.metadata.stepsExecuted).toContain('fillWarehouseNumber');
+    expect(result.metadata.stepsExecuted).toContain('fillMaterial');
   });
 });
