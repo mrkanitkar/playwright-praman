@@ -100,7 +100,7 @@ Failing tests now automatically capture and attach:
 
 All three are argument-free and safe across Playwright versions. The `hasConsoleMessageFilter` flag (1.59+) ensures the filter option isn't passed to older runtimes where it would silently return everything.
 
-**Opt-in clock fixture:** A fake clock is available but never auto-installed, because SAP session and token validity are time-sensitive. Controlling time before install throws rather than silently no-opping.
+**Opt-in clock fixture:** A fake clock is available but never auto-installed, because SAP session and token validity are time-sensitive. Controlling time before install throws rather than silently doing nothing.
 
 ### 🤖 AI Generator Integrity
 
