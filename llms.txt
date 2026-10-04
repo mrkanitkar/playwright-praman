@@ -1,7 +1,7 @@
 # playwright-praman
 
 > Agent-First SAP UI5 Test Automation Plugin for Playwright. Typed UI5 control proxies,
-> AI-powered test generation, 21 Playwright fixtures, 215 capabilities across 15 categories.
+> AI-powered test generation, 23 Playwright fixtures, 215 capabilities across 15 categories.
 > Supports SAP S/4HANA, BTP, Fiori Elements. Cross-platform: Windows, macOS, Linux.
 > License: Apache-2.0
 > npm: `npm install playwright-praman` | Import: `import { test, expect } from 'playwright-praman'`
@@ -10,7 +10,7 @@
 
 - [Getting Started](https://praman.dev/docs/guides/getting-started): Installation, project setup, first test in under 5 minutes
 - [Configuration Reference](https://praman.dev/docs/guides/configuration): Zod-validated config schema with defaults — empty `{}` is valid
-- [Fixture Reference](https://praman.dev/docs/guides/fixtures): 21 fixtures plus 5 auto-fixtures — ui5, sapAuth, ui5Navigation, fe, pramanAI, intent, and more
+- [Fixture Reference](https://praman.dev/docs/guides/fixtures): 23 fixtures plus 5 auto-fixtures — ui5, sapAuth, ui5Navigation, fe, pramanAI, intent, and more
 - [Selector Reference](https://praman.dev/docs/guides/selectors): UI5Selector fields — controlType, id, properties, bindingPath, ancestor, descendant
 - [Control Interactions](https://praman.dev/docs/guides/control-interactions): click, fill, press, select, check, clear, getText, getProperty, enterText
 - [Discovery and Interaction Strategies](https://praman.dev/docs/guides/discovery-and-interaction): ui5-native, dom-first, opa5 — swappable interaction modes and discovery strategies
