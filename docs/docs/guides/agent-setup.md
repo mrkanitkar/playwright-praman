@@ -30,18 +30,25 @@ automatically installs AI agent definitions, seed files, and IDE configuration.
 | --------------------- | ---------------------------------------------------------------- |
 | Node.js               | `>=22`                                                           |
 | `@playwright/test`    | `>=1.57.0 <2.0.0` (peer dependency)                              |
-| `@playwright/cli`     | `>=0.1.3` (peer dependency, auto-installed by `init`)            |
 | SAP UI5 / Fiori app   | Any cloud or on-premise instance                                 |
 | Environment variables | `SAP_CLOUD_BASE_URL`, `SAP_CLOUD_USERNAME`, `SAP_CLOUD_PASSWORD` |
 
-:::warning Playwright 1.59+ MCP Server
-Starting with Playwright 1.59, the MCP server is no longer bundled with Playwright. Install it separately:
+:::warning[Install the browser driver for your agent type]
+
+Praman agents come in two flavours. Each requires its own Playwright package — install the one that matches your workflow:
+
+| If you use…                       | Install                                  | Why                                           |
+| --------------------------------- | ---------------------------------------- | --------------------------------------------- |
+| **MCP agents** (no `-cli` suffix) | `npm install --save-dev @playwright/mcp` | Provides the `playwright-test` MCP server     |
+| **CLI agents** (`-cli` suffix)    | `npm install --save-dev @playwright/cli` | Provides `npx @playwright/cli` shell commands |
+
+After installing either package, download the Chromium binary it ships with:
 
 ```bash
-npm install @playwright/mcp
+npx playwright install chromium
 ```
 
-CLI agents (`-cli` suffix) do **not** require the MCP server — they use `@playwright/cli` which is built into Playwright.
+You may install both side-by-side — they coexist.
 :::
 
 Install the package — `init` will handle the rest:
@@ -51,9 +58,16 @@ npm install --save-dev playwright-praman
 npx playwright-praman init
 ```
 
-`init` automatically installs `@playwright/test`, `@playwright/cli`, and `dotenv` if they are missing,
-then runs `npx playwright install chromium` to ensure the browser binary is present.
-You do not need to install those packages manually.
+`init` validates your environment, scaffolds config files, and installs agent definitions for your detected IDEs.
+
+**You must install `@playwright/test` and browser binaries yourself before running `init`:**
+
+```bash
+npm install --save-dev playwright-praman @playwright/test
+npx playwright install chromium
+```
+
+Then install the browser driver for your chosen agent type (see the warning box above).
 
 ## What `init` Installs
 
@@ -396,6 +410,8 @@ via `pauseAtEnd: true` for MCP-connected agents to use.
 
 ### Claude Code — MCP agents
 
+**Prerequisite:** `npm install --save-dev @playwright/mcp` and a running `playwright-test` MCP server (configured in `.mcp.json`).
+
 After setup, `.claude/agents/` contains these MCP-based Praman SAP agents:
 
 | Agent                  | Slash Command          | Purpose                                             |
@@ -411,7 +427,9 @@ After setup, `.claude/agents/` contains these MCP-based Praman SAP agents:
 
 ### Claude Code — CLI agents
 
-Installed by default. Use these when token efficiency matters or the MCP server is unavailable:
+**Prerequisite:** `npm install --save-dev @playwright/cli && npx playwright install chromium`.
+
+Use these when token efficiency matters or the MCP server is unavailable:
 
 | Agent                      | Slash Command          | Purpose                                        |
 | -------------------------- | ---------------------- | ---------------------------------------------- |
@@ -426,6 +444,8 @@ Installed by default. Use these when token efficiency matters or the MCP server 
 
 ### GitHub Copilot — MCP agents
 
+**Prerequisite:** `npm install --save-dev @playwright/mcp` and a running `playwright-test` MCP server.
+
 After setup, `.github/agents/` contains these MCP-based Copilot coding agents:
 
 | Agent file                      | Copilot Mention         | Purpose                                             |
@@ -436,7 +456,9 @@ After setup, `.github/agents/` contains these MCP-based Copilot coding agents:
 
 ### GitHub Copilot — CLI agents
 
-Installed by default. Copilot coding agents that invoke `npx @playwright/cli` commands:
+**Prerequisite:** `npm install --save-dev @playwright/cli && npx playwright install chromium`.
+
+Copilot coding agents that invoke `npx @playwright/cli` commands:
 
 | Agent file                          | Copilot Mention             | Purpose                                        |
 | ----------------------------------- | --------------------------- | ---------------------------------------------- |
@@ -799,11 +821,15 @@ agent-related output files, or use `--no-cli` and skip the agent prompt steps.
 See the [Playwright Primer](./playwright-primer) for a ground-up introduction to writing tests
 without AI agents.
 
-:::warning[Common mistake]
-Do not confuse MCP agents and CLI agents. MCP agents require `@playwright/mcp` (separate install
-on Playwright 1.59+). CLI agents use `@playwright/cli` and work without an MCP server. If you see
-"MCP connection failed" errors, either install `@playwright/mcp` or switch to CLI agents
-(files with `-cli` suffix).
+:::warning[Common mistake — missing browser driver]
+MCP agents and CLI agents use **different** Playwright packages. Neither is installed automatically.
+
+- **MCP agents** need `@playwright/mcp` (`npm install --save-dev @playwright/mcp`).
+- **CLI agents** need `@playwright/cli` (`npm install --save-dev @playwright/cli`).
+
+After installing either, run `npx playwright install chromium` to download its bundled browser binary.
+If Chromium is missing, the agent will fail with "Executable doesn't exist" — pass `--browser=chrome`
+as a temporary workaround to use your system Chrome instead.
 :::
 
 ## FAQ

@@ -305,17 +305,16 @@ Run the seed with the `agent-seed-test` project:
 npx playwright test --project=agent-seed-test
 ```
 
-:::warning[Common mistake]
-Forgetting to install CLI browsers separately from `@playwright/test` browsers. The
-`@playwright/cli` package uses its own browser binaries. If you see
-`browser not found` errors from CLI commands, run:
+:::warning[Common mistake — missing Chromium for CLI agents]
+`@playwright/cli` does **not** download its Chromium binary at install time. If you see
+`browser not found` or `Executable doesn't exist` errors from CLI commands, run:
 
 ```bash
-npx @playwright/cli install-browser chromium
+npx playwright install chromium
 ```
 
-This is separate from `npx playwright install chromium`, which installs browsers for
-`@playwright/test`.
+As a temporary workaround, pass `--browser=chrome` to CLI commands to use your system Chrome
+instead of the bundled Chromium.
 :::
 
 ## Verification Checklist

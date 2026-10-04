@@ -842,24 +842,23 @@ ControlError: Control not found: sap.m.Button[text=Save]
 
 **What changed:**
 
-| Before                               | After                                                         |
-| ------------------------------------ | ------------------------------------------------------------- |
-| `init` installs MCP agents only      | `init` installs MCP **and** CLI agents                        |
-| `--cli` required to add CLI agents   | `--no-cli` to skip CLI agents                                 |
-| `@playwright/cli` not auto-installed | `@playwright/cli` auto-installed alongside `@playwright/test` |
+| Before                               | After                                                                                   |
+| ------------------------------------ | --------------------------------------------------------------------------------------- |
+| `init` installs MCP agents only      | `init` installs MCP **and** CLI agents                                                  |
+| `--cli` required to add CLI agents   | `--no-cli` to skip CLI agents                                                           |
+| `@playwright/cli` not auto-installed | `@playwright/cli` is an optional peer dependency — install manually if using CLI agents |
 
-**`init` now auto-installs four packages** when any are missing:
+**`init` now scaffolds both MCP and CLI agent definitions** by default:
 
-| Package             | Role                                     |
-| ------------------- | ---------------------------------------- |
-| `@playwright/test`  | Playwright test runner                   |
-| `@playwright/cli`   | Playwright CLI for agent browser control |
-| `playwright-praman` | The plugin itself                        |
-| `dotenv`            | Environment variable loading             |
+| Package             | Role                          | Install                          |
+| ------------------- | ----------------------------- | -------------------------------- |
+| `@playwright/test`  | Playwright test runner        | Required — install before `init` |
+| `@playwright/mcp`   | MCP server for MCP agents     | Install if using MCP agents      |
+| `@playwright/cli`   | Playwright CLI for CLI agents | Install if using CLI agents      |
+| `playwright-praman` | The plugin itself             | Required — install before `init` |
 
-This means `npm install playwright-praman && npx playwright-praman init` is the complete
-setup sequence — no separate `npm install @playwright/test @playwright/cli` step required.
-Chromium is still installed unconditionally via `npx playwright install chromium`.
+After installing `@playwright/test`, `@playwright/mcp`, or `@playwright/cli`, run
+`npx playwright install chromium` to download the bundled browser binary.
 
 **Command reference:**
 

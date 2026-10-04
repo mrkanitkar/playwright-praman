@@ -34,17 +34,24 @@ npx playwright install
 
 ## Install the Playwright CLI
 
-Install globally for persistent access:
+Install as a dev dependency in your project (recommended):
+
+```bash
+npm install --save-dev @playwright/cli
+npx playwright install chromium   # download the CLI's bundled Chromium
+```
+
+Or install globally:
 
 ```bash
 npm install -g @playwright/cli@latest
 ```
 
-Or run on-demand with `npx` (no global install required):
-
-```bash
-npx @playwright/cli --help
-```
+:::warning[Chromium must be downloaded separately]
+`@playwright/cli` does **not** download its Chromium binary at install time.
+Run `npx playwright install chromium` after installing, or pass `--browser=chrome`
+to use your system Chrome as a temporary workaround.
+:::
 
 Verify the installation:
 
