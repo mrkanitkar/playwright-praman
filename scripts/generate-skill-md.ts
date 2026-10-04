@@ -192,10 +192,25 @@ function renderCapabilityListing(
   return ['```text', blocks.join('\n\n'), '```'].join('\n');
 }
 
-/** Renders the package/import facts, with the version read from package.json. */
-function renderMeta(version: string): string {
+/**
+ * Renders the package/import facts.
+ *
+ * @remarks
+ * Deliberately carries no version. It used to stamp `package.json`'s, which
+ * made SKILL.md unpublishable: `canary.yml` runs `npm version <x>-alpha.N`
+ * and then publishes, `prepublishOnly` runs `npm run ci`, and this file no
+ * longer matched the stamped version — so `validate:generated` failed and the
+ * canary aborted. Both the stamp and the gate arrived together in #264, and
+ * the next canary attempt (the first since) failed outright.
+ *
+ * The same trap applies to the real release: release-please bumps
+ * `package.json` with no `extra-files` configured, so a version here would go
+ * stale on `main` the moment a release PR merged. A checked-in, byte-gated
+ * artifact must not contain a value that releasing rewrites.
+ */
+function renderMeta(): string {
   return [
-    `**Package**: \`playwright-praman\` v${version}`,
+    '**Package**: `playwright-praman`',
     "**Import**: `import { test, expect } from 'playwright-praman'`",
     '**Purpose**: Primary instruction set for Praman AI agents (planner, generator, healer)',
   ].join('\n');
@@ -239,17 +254,9 @@ async function main(): Promise<void> {
   // Signatures are read from src/, not dist/: build:full runs the generators
   // before build, so dist/ may be stale or absent.
   const tagged = collectTaggedDeclarations(SRC_GLOBS);
-  const pkg = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf-8')) as {
-    version: string;
-  };
 
   const skillMd = replaceRegion(
-    replaceRegion(
-      readFileSync(SKILL_MD, 'utf-8'),
-      REGION_MARKERS.meta,
-      renderMeta(pkg.version),
-      'SKILL.md',
-    ),
+    replaceRegion(readFileSync(SKILL_MD, 'utf-8'), REGION_MARKERS.meta, renderMeta(), 'SKILL.md'),
     REGION_MARKERS.capabilities,
     renderCapabilityListing(capabilities, tagged),
     'SKILL.md',

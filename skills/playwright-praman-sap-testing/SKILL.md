@@ -2,7 +2,7 @@
 
 <!-- praman:generated:meta start -->
 
-**Package**: `playwright-praman` v1.3.5
+**Package**: `playwright-praman`
 **Import**: `import { test, expect } from 'playwright-praman'`
 **Purpose**: Primary instruction set for Praman AI agents (planner, generator, healer)
 
