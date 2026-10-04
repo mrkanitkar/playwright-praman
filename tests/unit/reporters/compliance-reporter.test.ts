@@ -19,7 +19,11 @@ import { mkdir, writeFile } from 'node:fs/promises';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ComplianceReporter, isPramanStep } from '../../../src/reporters/compliance-reporter.js';
+import {
+  ANNOTATION_TYPES,
+  ComplianceReporter,
+  isPramanStep,
+} from '../../../src/reporters/compliance-reporter.js';
 import type { TestComplianceReport } from '../../../src/reporters/compliance-reporter.js';
 import {
   createMockFullConfig,
@@ -456,5 +460,109 @@ describe('isPramanStep robustness', () => {
     expect(() => isPramanStep({ title: 'Click save', params: null })).not.toThrow();
     expect(isPramanStep({ title: 'Click save', params: null })).toBe(true);
     expect(isPramanStep({ title: 'page.click', params: null })).toBe(false);
+  });
+});
+
+// ── Annotation scanning ──────────────────────────────────────────────────────
+
+describe('ComplianceReporter annotation scanning', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  /** Runs one test case through the reporter and returns the written report. */
+  async function reportForCase(
+    testCase: ReturnType<typeof createMockTestCase>,
+    steps: ReturnType<typeof createMockTestStep>[],
+  ): Promise<TestComplianceReport> {
+    const reporter = new ComplianceReporter();
+    reporter.onBegin(createMockFullConfig(), createMockSuite());
+    reporter.onTestEnd(testCase, createMockTestResult({ steps }));
+    await reporter.onEnd(createMockFullResult());
+
+    const [, content] = mockWriteFile.mock.calls[0] as [string, string, string];
+    return JSON.parse(content) as TestComplianceReport;
+  }
+
+  it('includes all four annotation fields when present', async () => {
+    const tc = createMockTestCase({
+      title: 'annotated test',
+      annotations: [
+        { type: ANNOTATION_TYPES.PROCESS, description: 'Order-to-Cash' },
+        { type: ANNOTATION_TYPES.SUBPROCESS, description: 'Create Sales Order' },
+        { type: ANNOTATION_TYPES.CRITICALITY, description: 'high' },
+        { type: ANNOTATION_TYPES.TCODE, description: 'VA01' },
+      ],
+    });
+
+    const report = await reportForCase(tc, [createMockTestStep({ title: 'Click save' })]);
+    const entry = report.tests[0];
+
+    expect(entry?.process).toBe('Order-to-Cash');
+    expect(entry?.subprocess).toBe('Create Sales Order');
+    expect(entry?.criticality).toBe('high');
+    expect(entry?.tcode).toBe('VA01');
+  });
+
+  it('omits annotation fields entirely when no annotations are present', async () => {
+    const tc = createMockTestCase({ title: 'no annotations' });
+
+    const report = await reportForCase(tc, [createMockTestStep({ title: 'Click save' })]);
+
+    // Verify absent by checking the serialised JSON: keys not present at all
+    const [, content] = mockWriteFile.mock.calls[0] as [string, string, string];
+    expect(content).not.toContain('"process"');
+    expect(content).not.toContain('"subprocess"');
+    expect(content).not.toContain('"criticality"');
+    expect(content).not.toContain('"tcode"');
+    expect(report.tests[0]?.testTitle).toBe('no annotations');
+  });
+
+  it('includes only the annotation fields that are present (partial)', async () => {
+    const tc = createMockTestCase({
+      title: 'partial annotations',
+      annotations: [
+        { type: ANNOTATION_TYPES.PROCESS, description: 'Procure-to-Pay' },
+        { type: ANNOTATION_TYPES.TCODE, description: 'ME21N' },
+      ],
+    });
+
+    const report = await reportForCase(tc, [createMockTestStep({ title: 'Click save' })]);
+
+    expect(report.tests[0]?.process).toBe('Procure-to-Pay');
+    expect(report.tests[0]?.tcode).toBe('ME21N');
+
+    // subprocess and criticality must be absent from the serialised output
+    const [, content] = mockWriteFile.mock.calls[0] as [string, string, string];
+    expect(content).not.toContain('"subprocess"');
+    expect(content).not.toContain('"criticality"');
+  });
+
+  it('ignores unrecognised annotation types', async () => {
+    const tc = createMockTestCase({
+      title: 'unknown annotations',
+      annotations: [
+        { type: 'customTag', description: 'should be ignored' },
+        { type: ANNOTATION_TYPES.CRITICALITY, description: 'medium' },
+      ],
+    });
+
+    const report = await reportForCase(tc, [createMockTestStep({ title: 'Click save' })]);
+
+    expect(report.tests[0]?.criticality).toBe('medium');
+    const [, content] = mockWriteFile.mock.calls[0] as [string, string, string];
+    expect(content).not.toContain('"process"');
+  });
+});
+
+// ── ANNOTATION_TYPES constant ────────────────────────────────────────────────
+
+describe('ANNOTATION_TYPES', () => {
+  it('exposes all five recognised annotation type strings', () => {
+    expect(ANNOTATION_TYPES.PROCESS).toBe('process');
+    expect(ANNOTATION_TYPES.SUBPROCESS).toBe('subprocess');
+    expect(ANNOTATION_TYPES.CRITICALITY).toBe('criticality');
+    expect(ANNOTATION_TYPES.TCODE).toBe('tcode');
+    expect(ANNOTATION_TYPES.SAP_MODULE).toBe('sapModule');
   });
 });

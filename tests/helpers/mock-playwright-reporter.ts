@@ -42,6 +42,7 @@ export interface TestCaseOverrides {
   readonly title: string;
   readonly titlePath: string[];
   readonly location: { file: string; line: number; column: number };
+  readonly annotations: { type: string; description?: string }[];
 }
 
 /** Overrides for {@link createMockTestResult}. */
@@ -122,7 +123,7 @@ export function createMockTestCase(overrides?: Partial<TestCaseOverrides>): Test
     retries: 0,
     tags: [],
     timeout: 30000,
-    annotations: [],
+    annotations: overrides?.annotations ?? [],
     results: [],
     type: 'test',
     parent: {} as Suite,
