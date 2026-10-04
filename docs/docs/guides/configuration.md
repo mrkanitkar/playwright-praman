@@ -59,6 +59,7 @@ export default defineConfig({
 | `skipStabilityWait`       | `boolean`                                             | `false`                         | Skip `waitForUI5Stable()`, use brief DOM settle      |
 | `preferVisibleControls`   | `boolean`                                             | `true`                          | Prefer visible controls over hidden ones             |
 | `ignoreAutoWaitUrls`      | `string[]`                                            | `[]`                            | Additional URL patterns to block (WalkMe, analytics) |
+| `skipPostFillWait`        | `boolean`                                             | `false`                         | Skip automatic `waitForUI5()` after `fill()` calls   |
 
 ## Auth Sub-Schema
 
@@ -150,8 +151,56 @@ Top-level config fields can be overridden via environment variables:
 
 1. Per-call options (e.g., `ui5.control({ ... }, { timeout: 5000 })`)
 2. Environment variable overrides
-3. Top-level config
-4. Schema defaults
+3. Environment-specific config (via `defineConfig` second argument)
+4. Top-level config
+5. Schema defaults
+
+## Multi-Environment Configuration
+
+`defineConfig()` accepts an optional second parameter for environment-specific overrides:
+
+```typescript
+// praman.config.ts
+import { defineConfig } from 'playwright-praman';
+
+export default defineConfig(
+  {
+    logLevel: 'info',
+    auth: {
+      strategy: 'form',
+      baseUrl: 'https://dev.example.com',
+    },
+  },
+  {
+    ci: {
+      logLevel: 'error',
+      auth: {
+        strategy: 'basic',
+        baseUrl: 'https://ci.example.com',
+      },
+    },
+    staging: {
+      auth: {
+        baseUrl: 'https://staging.example.com',
+      },
+    },
+  },
+);
+```
+
+Set `PRAMAN_ENV` or `NODE_ENV` to select the environment. `PRAMAN_ENV` takes precedence over `NODE_ENV`. When neither is set, the base config is used unchanged.
+
+```bash
+# Use CI config
+PRAMAN_ENV=ci npx playwright test
+
+# Falls back to NODE_ENV
+NODE_ENV=staging npx playwright test
+```
+
+:::warning[Shallow merge]
+Environment overrides are shallow-merged. For nested objects like `auth`, provide the complete sub-object in the override.
+:::
 
 ## Complete `playwright.config.ts` Example
 

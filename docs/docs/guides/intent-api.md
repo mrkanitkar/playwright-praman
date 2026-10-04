@@ -24,7 +24,7 @@ import { procurement } from 'playwright-praman/intents';
 The intent layer is built on two foundations:
 
 1. **Core wrappers** -- low-level building blocks that accept a UI5Handler slice and optional vocabulary lookup.
-2. **Domain namespaces** -- 5 SAP module-specific APIs that compose the core wrappers into business flows.
+2. **Domain namespaces** -- 9 SAP module-specific APIs that compose the core wrappers into business flows.
 
 ## Core Wrappers
 
@@ -117,6 +117,13 @@ interface IntentOptions {
   skipNavigation?: boolean; // Skip FLP navigation (app already open)
   timeout?: number; // Override default timeout (ms)
   validateViaOData?: boolean; // Validate result via OData GET after save
+  overrides?: IntentOverrides; // Environment-specific customization
+}
+
+interface IntentOverrides {
+  appId?: string; // Custom FLP semantic object hash
+  saveButtonText?: string; // Localized save button label
+  fields?: Record<string, string>; // Localized field label mappings
 }
 
 // Skip navigation when already on the correct page
@@ -125,6 +132,23 @@ const result = await procurement.createPurchaseOrder(ui5, vocab, poData, {
   timeout: 60_000,
 });
 ```
+
+### IntentOverrides
+
+Use `overrides` to make tests portable across SAP system landscapes with different configurations or languages:
+
+```typescript
+// German-language SAP system
+await procurement.createPurchaseOrder(ui5, ui5Nav, vocab, poData, {
+  overrides: {
+    appId: 'ZMM_PO-create',
+    saveButtonText: 'Sichern',
+    fields: { Vendor: 'Lieferant', Plant: 'Werk' },
+  },
+});
+```
+
+All 9 intent domains support `overrides`. The override values take precedence over vocabulary-resolved defaults.
 
 ## Domain Namespaces
 
@@ -243,6 +267,104 @@ await masterData.createMaterial(ui5, vocab, {
 });
 ```
 
+### Quality Management (QM -- Quality Management)
+
+```typescript
+import { quality } from 'playwright-praman/intents';
+
+// Create an inspection lot
+await quality.createInspectionLot(ui5, ui5Nav, vocab, {
+  material: 'RAW-0001',
+  plant: '1000',
+  inspectionType: '01',
+});
+
+// Record inspection results
+await quality.recordResults(ui5, ui5Nav, vocab, {
+  inspectionLot: '000012345678',
+  result: '10.5',
+});
+
+// Create a quality notification
+await quality.createQualityNotification(ui5, ui5Nav, vocab, {
+  notificationType: 'Q1',
+  description: 'Surface defect on batch 2026-03',
+});
+```
+
+### Warehouse Management (WM -- Warehouse Management)
+
+```typescript
+import { warehouse } from 'playwright-praman/intents';
+
+// Create a goods movement
+await warehouse.createGoodsMovement(ui5, ui5Nav, vocab, {
+  movementType: '101',
+  material: 'RAW-0001',
+  plant: '1000',
+  quantity: '500',
+});
+
+// Create a transfer order
+await warehouse.createTransferOrder(ui5, ui5Nav, vocab, {
+  warehouseNumber: '001',
+  material: 'RAW-0001',
+  quantity: '100',
+});
+```
+
+### Asset Management (AM -- Fixed Assets)
+
+```typescript
+import { assetManagement } from 'playwright-praman/intents';
+
+// Acquire a fixed asset
+await assetManagement.acquireAsset(ui5, ui5Nav, vocab, {
+  assetClass: '1000',
+  description: 'CNC Machine Model X',
+  companyCode: '1000',
+});
+
+// Retire an asset
+await assetManagement.retireAsset(ui5, ui5Nav, vocab, {
+  assetNumber: '000000001000',
+  retirementDate: '2026-12-31',
+});
+
+// Transfer an asset between cost centers
+await assetManagement.transferAsset(ui5, ui5Nav, vocab, {
+  assetNumber: '000000001000',
+  targetCostCenter: '2000',
+});
+```
+
+### Human Resources (HR -- Personnel Administration)
+
+```typescript
+import { hr } from 'playwright-praman/intents';
+
+// Create an employee record
+await hr.createEmployee(ui5, ui5Nav, vocab, {
+  firstName: 'Max',
+  lastName: 'Mustermann',
+  personnelArea: '1000',
+});
+
+// Record working time
+await hr.recordTime(ui5, ui5Nav, vocab, {
+  personnelNumber: '00000001',
+  date: '2026-10-04',
+  hours: '8.0',
+});
+
+// Request absence/leave
+await hr.requestAbsence(ui5, ui5Nav, vocab, {
+  absenceType: 'Vacation',
+  startDate: '2026-11-01',
+  endDate: '2026-11-05',
+});
+```
+
 ## Data Shapes
 
 Each domain defines typed data interfaces:
@@ -257,13 +379,24 @@ Each domain defines typed data interfaces:
 | `VendorMasterData`           | MD     | Vendor master data creation          |
 | `CustomerMasterData`         | MD     | Customer master data creation        |
 | `MaterialMasterData`         | MD     | Material master data creation        |
+| `InspectionLotData`          | QM     | Quality inspection lot creation      |
+| `ResultsRecordingData`       | QM     | Inspection results recording         |
+| `QualityNotificationData`    | QM     | Quality notification creation        |
+| `GoodsMovementData`          | WM     | Warehouse goods movement             |
+| `TransferOrderData`          | WM     | Warehouse transfer order             |
+| `AssetAcquisitionData`       | AM     | Fixed asset acquisition              |
+| `AssetRetirementData`        | AM     | Fixed asset retirement               |
+| `AssetTransferData`          | AM     | Fixed asset transfer                 |
+| `EmployeeData`               | HR     | Employee record creation             |
+| `TimeRecordingData`          | HR     | Working time recording               |
+| `AbsenceRequestData`         | HR     | Leave/absence request                |
 
 ## Architecture
 
 The intent layer follows strict dependency rules:
 
 ```text
-Domain functions (procurement.ts, sales.ts, etc.)
+Domain functions (procurement.ts, sales.ts, quality.ts, warehouse.ts, etc.)
     |
     v
 Core wrappers (core-wrappers.ts)
