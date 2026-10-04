@@ -136,6 +136,13 @@
           "sapFieldName": "VSOLA",
           "aliases": ["VSOLA", "qty"]
         }
+      },
+      "actions": {
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        }
       }
     }
   },

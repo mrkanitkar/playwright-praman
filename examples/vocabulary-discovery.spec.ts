@@ -20,8 +20,8 @@
  * 5. **Suggestions** -- autocomplete support for business terms
  * 6. **Integration with intents** -- vocabulary-driven field filling
  *
- * The vocabulary system ships with 6 SAP domain JSON files covering MM, SD, FI, PP,
- * WM/EWM, and QM modules.
+ * The vocabulary system ships with 8 SAP domain JSON files covering MM, SD, FI, PP,
+ * WM/EWM, QM, FI-AA, and HR/HCM modules.
  *
  * Prerequisites:
  * - Authentication handled via setup project (see {@link auth-setup.ts})

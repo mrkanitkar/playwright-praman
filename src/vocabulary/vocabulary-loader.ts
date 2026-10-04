@@ -256,7 +256,7 @@ export async function loadDomainFile(
       cause: cause instanceof Error ? cause : new Error(String(cause)),
       suggestions: [
         `Verify that ${filePath} exists and is readable.`,
-        'Check that the domain name is one of: procurement, sales, finance, manufacturing, warehouse, quality.',
+        'Check that the domain name is one of: procurement, sales, finance, manufacturing, warehouse, quality, asset-management, hr.',
       ],
     });
   }

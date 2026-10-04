@@ -111,12 +111,16 @@ export async function createJournalEntry(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = options?.overrides?.appId ?? 'JournalEntry-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Post';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('JournalEntry-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const docDateResult = await fillField(ui5, vocabulary, 'Document Date', input.documentDate);
+  const docDateLabel = options?.overrides?.fields?.['Document Date'] ?? 'Document Date';
+  const docDateResult = await fillField(ui5, vocabulary, docDateLabel, input.documentDate);
   if (docDateResult.status === 'error') {
     return fiResult({
       status: 'error',
@@ -128,7 +132,8 @@ export async function createJournalEntry(
   }
   steps.push('fillDocumentDate');
 
-  const postDateResult = await fillField(ui5, vocabulary, 'Posting Date', input.postingDate);
+  const postDateLabel = options?.overrides?.fields?.['Posting Date'] ?? 'Posting Date';
+  const postDateResult = await fillField(ui5, vocabulary, postDateLabel, input.postingDate);
   if (postDateResult.status === 'error') {
     return fiResult({
       status: 'error',
@@ -141,8 +146,10 @@ export async function createJournalEntry(
   steps.push('fillPostingDate');
 
   // Fill line items — iterate through the provided items
+  const glLabel = options?.overrides?.fields?.['G/L Account'] ?? 'G/L Account';
+  const amtLabel = options?.overrides?.fields?.['Amount'] ?? 'Amount';
   for (const [index, lineItem] of input.lineItems.entries()) {
-    const glResult = await fillField(ui5, vocabulary, 'G/L Account', lineItem.glAccount);
+    const glResult = await fillField(ui5, vocabulary, glLabel, lineItem.glAccount);
     if (glResult.status === 'error') {
       return fiResult({
         status: 'error',
@@ -154,7 +161,7 @@ export async function createJournalEntry(
     }
     steps.push(`fillGLAccount[${String(index)}]`);
 
-    const amtResult = await fillField(ui5, vocabulary, 'Amount', String(lineItem.amount));
+    const amtResult = await fillField(ui5, vocabulary, amtLabel, String(lineItem.amount));
     if (amtResult.status === 'error') {
       return fiResult({
         status: 'error',
@@ -167,7 +174,7 @@ export async function createJournalEntry(
     steps.push(`fillAmount[${String(index)}]`);
   }
 
-  await clickButton(ui5, 'Post');
+  await clickButton(ui5, saveText);
   steps.push('clickPost');
 
   await waitForSave(ui5, options);
@@ -216,12 +223,16 @@ export async function postVendorInvoice(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = options?.overrides?.appId ?? 'SupplierInvoice-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Post';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('SupplierInvoice-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const vendorResult = await fillField(ui5, vocabulary, 'Vendor', input.vendor);
+  const vendorLabel = options?.overrides?.fields?.['Vendor'] ?? 'Vendor';
+  const vendorResult = await fillField(ui5, vocabulary, vendorLabel, input.vendor);
   if (vendorResult.status === 'error') {
     return fiResult({
       status: 'error',
@@ -233,7 +244,8 @@ export async function postVendorInvoice(
   }
   steps.push('fillVendor');
 
-  const invDateResult = await fillField(ui5, vocabulary, 'Invoice Date', input.invoiceDate);
+  const invDateLabel = options?.overrides?.fields?.['Invoice Date'] ?? 'Invoice Date';
+  const invDateResult = await fillField(ui5, vocabulary, invDateLabel, input.invoiceDate);
   if (invDateResult.status === 'error') {
     return fiResult({
       status: 'error',
@@ -245,7 +257,8 @@ export async function postVendorInvoice(
   }
   steps.push('fillInvoiceDate');
 
-  const amtResult = await fillField(ui5, vocabulary, 'Amount', String(input.amount));
+  const amtLabelInv = options?.overrides?.fields?.['Amount'] ?? 'Amount';
+  const amtResult = await fillField(ui5, vocabulary, amtLabelInv, String(input.amount));
   if (amtResult.status === 'error') {
     return fiResult({
       status: 'error',
@@ -257,7 +270,7 @@ export async function postVendorInvoice(
   }
   steps.push('fillAmount');
 
-  await clickButton(ui5, 'Post');
+  await clickButton(ui5, saveText);
   steps.push('clickPost');
 
   await waitForSave(ui5, options);
@@ -305,12 +318,16 @@ export async function processPayment(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = options?.overrides?.appId ?? 'OutgoingPayment-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Post';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('OutgoingPayment-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const vendorResult = await fillField(ui5, vocabulary, 'Vendor', input.vendor);
+  const vendorLabel = options?.overrides?.fields?.['Vendor'] ?? 'Vendor';
+  const vendorResult = await fillField(ui5, vocabulary, vendorLabel, input.vendor);
   if (vendorResult.status === 'error') {
     return fiResult({
       status: 'error',
@@ -322,7 +339,8 @@ export async function processPayment(
   }
   steps.push('fillVendor');
 
-  const amtResult = await fillField(ui5, vocabulary, 'Amount', String(input.amount));
+  const amtLabelPmt = options?.overrides?.fields?.['Amount'] ?? 'Amount';
+  const amtResult = await fillField(ui5, vocabulary, amtLabelPmt, String(input.amount));
   if (amtResult.status === 'error') {
     return fiResult({
       status: 'error',
@@ -334,7 +352,8 @@ export async function processPayment(
   }
   steps.push('fillAmount');
 
-  const dateResult = await fillField(ui5, vocabulary, 'Payment Date', input.paymentDate);
+  const pmtDateLabel = options?.overrides?.fields?.['Payment Date'] ?? 'Payment Date';
+  const dateResult = await fillField(ui5, vocabulary, pmtDateLabel, input.paymentDate);
   if (dateResult.status === 'error') {
     return fiResult({
       status: 'error',
@@ -346,7 +365,7 @@ export async function processPayment(
   }
   steps.push('fillPaymentDate');
 
-  await clickButton(ui5, 'Post');
+  await clickButton(ui5, saveText);
   steps.push('clickPost');
 
   await waitForSave(ui5, options);

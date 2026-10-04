@@ -1,0 +1,147 @@
+{
+  "$version": "1.2.0",
+  "$description": "Human Resources domain vocabulary with labelFor-based selectors for Intent API v1.2.0",
+  "domain": "hr",
+  "module": "HR/HCM",
+  "ui5Selectors": {
+    "employee": {
+      "header": {
+        "firstName": {
+          "labelFor": { "text": "First Name" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "employee first name",
+          "sapFieldName": "VORNA",
+          "aliases": ["VORNA"]
+        },
+        "lastName": {
+          "labelFor": { "text": "Last Name" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "employee last name",
+          "sapFieldName": "NACHN",
+          "aliases": ["NACHN", "surname"]
+        },
+        "personnelArea": {
+          "labelFor": { "text": "Personnel Area" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "organizational unit for personnel administration",
+          "sapFieldName": "WERKS",
+          "aliases": ["WERKS", "area"]
+        },
+        "employeeGroup": {
+          "labelFor": { "text": "Employee Group" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "classification of employees",
+          "sapFieldName": "PERSG",
+          "aliases": ["PERSG", "group"]
+        }
+      },
+      "actions": {
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    },
+    "timeRecording": {
+      "header": {
+        "employeeId": {
+          "labelFor": { "text": "Employee ID" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "personnel number",
+          "sapFieldName": "PERNR",
+          "aliases": ["PERNR", "pernr"]
+        },
+        "date": {
+          "labelFor": { "text": "Date" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "work date for time recording",
+          "sapFieldName": "WORKDATE",
+          "aliases": ["WORKDATE"]
+        },
+        "hours": {
+          "labelFor": { "text": "Hours" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "recorded working hours",
+          "sapFieldName": "CATSHOURS",
+          "aliases": ["CATSHOURS", "duration"]
+        },
+        "attendanceType": {
+          "labelFor": { "text": "Attendance Type" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "attendance/absence type code",
+          "sapFieldName": "AWART",
+          "aliases": ["AWART"]
+        }
+      },
+      "actions": {
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    },
+    "absenceRequest": {
+      "header": {
+        "employeeId": {
+          "labelFor": { "text": "Employee ID" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "personnel number for leave request",
+          "sapFieldName": "PERNR",
+          "aliases": ["PERNR"]
+        },
+        "absenceType": {
+          "labelFor": { "text": "Absence Type" },
+          "intentApiMethod": "searchAndSelectFromValueHelp",
+          "hasValueHelp": true,
+          "businessContext": "type of absence (vacation, sick, etc.)",
+          "sapFieldName": "AWART",
+          "aliases": ["AWART", "leaveType"]
+        },
+        "startDate": {
+          "labelFor": { "text": "Start Date" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "absence start date",
+          "sapFieldName": "BEGDA",
+          "aliases": ["BEGDA", "from"]
+        },
+        "endDate": {
+          "labelFor": { "text": "End Date" },
+          "intentApiMethod": "fillInputField",
+          "hasValueHelp": false,
+          "businessContext": "absence end date",
+          "sapFieldName": "ENDDA",
+          "aliases": ["ENDDA", "to"]
+        }
+      },
+      "actions": {
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        }
+      }
+    }
+  },
+  "businessTermMappings": {
+    "surname": "lastName",
+    "area": "personnelArea",
+    "group": "employeeGroup",
+    "pernr": "employeeId",
+    "duration": "hours",
+    "leaveType": "absenceType",
+    "from": "startDate",
+    "to": "endDate"
+  }
+}

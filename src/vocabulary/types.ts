@@ -24,7 +24,7 @@ import type { UI5Selector } from '#core/types/selectors.js';
 export type { UI5Selector };
 
 /**
- * The six supported SAP business domains in the vocabulary system.
+ * The eight supported SAP business domains in the vocabulary system.
  *
  * @example
  * ```typescript
@@ -37,7 +37,9 @@ export type SAPDomain =
   | 'finance'
   | 'manufacturing'
   | 'warehouse'
-  | 'quality';
+  | 'quality'
+  | 'asset-management'
+  | 'hr';
 
 /**
  * A single vocabulary term with its synonyms and selector information.
