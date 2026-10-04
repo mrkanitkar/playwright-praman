@@ -21,10 +21,14 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 import * as barrel from '../../../src/index.js';
 import type {
   NavigationOptions,
+  ODataFixtures,
   UI5ControlBase,
   UI5ControlMap,
   UI5NavigationAPI,
   UI5Selector,
+  VisualRegressionFixture,
+  VisualRegressionFixtures,
+  VisualRegressionOptions,
 } from '../../../src/index.js';
 
 describe('src/index.ts barrel', () => {
@@ -139,5 +143,33 @@ describe('src/index.ts barrel', () => {
     expectTypeOf<UI5ControlMap>().not.toBeNever();
     expectTypeOf<NavigationOptions>().not.toBeNever();
     expectTypeOf<UI5NavigationAPI>().not.toBeNever();
+  });
+
+  // ── Standalone OData fixture ─────────────────────────────────────────
+  it('exports odataTest fixture', () => {
+    expect(barrel.odataTest).toBeDefined();
+    expect(typeof barrel.odataTest.extend).toBe('function');
+  });
+
+  it('exports ODataFixtures type', () => {
+    expectTypeOf<ODataFixtures>().toHaveProperty('odata');
+  });
+
+  // ── Visual regression fixture ────────────────────────────────────────
+  it('exports visualRegressionTest fixture', () => {
+    expect(barrel.visualRegressionTest).toBeDefined();
+    expect(typeof barrel.visualRegressionTest.extend).toBe('function');
+  });
+
+  it('exports FLP_CHROME_SELECTORS', () => {
+    expect(barrel.FLP_CHROME_SELECTORS).toBeDefined();
+    expect(barrel.FLP_CHROME_SELECTORS).toHaveLength(3);
+  });
+
+  it('exports VisualRegressionFixture, VisualRegressionFixtures, VisualRegressionOptions types', () => {
+    expectTypeOf<VisualRegressionFixture>().toHaveProperty('compareScreenshot');
+    expectTypeOf<VisualRegressionFixture>().toHaveProperty('maskFLPChrome');
+    expectTypeOf<VisualRegressionFixtures>().toHaveProperty('visualRegression');
+    expectTypeOf<VisualRegressionOptions>().toHaveProperty('threshold');
   });
 });

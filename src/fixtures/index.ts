@@ -46,12 +46,14 @@ import { intentTest } from './intent-fixtures.js';
 import { moduleTest } from './module-fixtures.js';
 import { nativeDialogTest } from './native-dialog-fixtures.js';
 import { navTest } from './nav-fixtures.js';
+import { odataTest } from './odata-fixtures.js';
 import { odataTraceTest } from './odata-trace-fixtures.js';
 import { overlayTest } from './overlay-fixtures.js';
 import { screencastTest } from './screencast-fixture.js';
 import { shellFooterTest } from './shell-footer-fixtures.js';
 import { stabilityTest } from './stability-fixtures.js';
 import { testDataTest } from './test-data-fixtures.js';
+import { visualRegressionTest } from './visual-regression-fixtures.js';
 import { webStorageTest } from './web-storage-fixture.js';
 
 // ── Merged test fixture ─────────────────────────────────────────────
@@ -116,6 +118,8 @@ export const test = mergeTests(
   odataTraceTest,
   browserBindTest,
   screencastTest,
+  odataTest,
+  visualRegressionTest,
 );
 
 export { expect };
@@ -581,7 +585,18 @@ export type {
 } from './native-dialog-handler.js';
 export { NativeDialogHandler } from './native-dialog-handler.js';
 
+export { odataTest } from './odata-fixtures.js';
+export type { ODataFixtures } from './odata-fixtures.js';
+
 export { overlayTest } from './overlay-fixtures.js';
 export type { OverlayFixtures } from './overlay-fixtures.js';
 export { BUILT_IN_OVERLAY_RULES, OverlayHandler } from './overlay-handler.js';
 export type { OverlayDetection, OverlayRule } from './overlay-handler.js';
+
+export { visualRegressionTest } from './visual-regression-fixtures.js';
+export { FLP_CHROME_SELECTORS } from './visual-regression-fixtures.js';
+export type {
+  VisualRegressionFixture,
+  VisualRegressionFixtures,
+  VisualRegressionOptions,
+} from './visual-regression-fixtures.js';

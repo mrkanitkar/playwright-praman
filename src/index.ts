@@ -82,6 +82,14 @@ export type {
   ScreencastFrameHandler,
 } from './fixtures/index.js';
 export type { WebStorageFixture, WebStorageHelper } from './fixtures/index.js';
+export { odataTest } from './fixtures/index.js';
+export type { ODataFixtures } from './fixtures/index.js';
+export { visualRegressionTest, FLP_CHROME_SELECTORS } from './fixtures/index.js';
+export type {
+  VisualRegressionFixture,
+  VisualRegressionFixtures,
+  VisualRegressionOptions,
+} from './fixtures/index.js';
 
 // ── Config ──────────────────────────────────────────────────────────
 export { defineConfig, loadConfig, presets } from './core/config/index.js';

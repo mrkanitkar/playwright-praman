@@ -2721,6 +2721,44 @@ capabilities:
       await waitForControlState(table, '(el) => !el.classList.contains("sapUiLocalBusy")');
     registryVersion: 1
 
+  - id: UI5-ODATA-012
+    qualifiedName: odata.fixture
+    name: odataTest
+    description: 'Standalone OData fixture providing top-level odata without the full ui5 handler.'
+    category: odata
+    priority: fixture
+    usageExample: |
+      import { odataTest } from 'playwright-praman';
+      odataTest('read orders', async ({ odata }) => {
+        const data = await odata.getModelData('/PurchaseOrders');
+      });
+    registryVersion: 1
+
+  - id: UI5-OTHER-003
+    qualifiedName: visualRegression.fixture
+    name: visualRegressionTest
+    description: 'Visual regression fixture for screenshot comparison with FLP chrome masking.'
+    category: other
+    priority: fixture
+    usageExample: |
+      import { visualRegressionTest } from 'playwright-praman';
+      visualRegressionTest('visual check', async ({ visualRegression }) => {
+        await visualRegression.compareScreenshot('home.png', {
+          mask: visualRegression.maskFLPChrome(),
+        });
+      });
+    registryVersion: 1
+
+  - id: UI5-OTHER-004
+    qualifiedName: visualRegression.options
+    name: VisualRegressionOptions
+    description: 'Options for visual regression screenshot comparison — threshold, masking, full-page capture.'
+    category: other
+    priority: namespace
+    usageExample: |
+      const opts: VisualRegressionOptions = { threshold: 0.1, fullPage: true };
+    registryVersion: 1
+
   - id: UI5-OTHER-002
     qualifiedName: ui5Diagnostics.collect
     name: collectPageDiagnostics
