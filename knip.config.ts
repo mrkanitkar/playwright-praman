@@ -37,8 +37,6 @@ const config: KnipConfig = {
     'pino-pretty',
     'zod-to-json-schema',
     'release-please',
-    // MCP server used by Claude Code tooling, not by project code
-    '@ui5/mcp-server',
     // Peer dep + devDep used in CLI init commands; knip can't trace dynamic usage
     '@playwright/cli',
     // Loaded dynamically by @rolldown/plugin-babel via string name, not import
