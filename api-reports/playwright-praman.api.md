@@ -340,7 +340,7 @@ export const DEFAULT_TIMEOUTS: Readonly<{
 }>;
 
 // @public
-export function defineConfig(input: PramanConfigInput): PramanConfigInput;
+export function defineConfig(base: PramanConfigInput, environments?: Record<string, Partial<PramanConfigInput>>): PramanConfigInput;
 
 // @public
 export function deleteEntity(page: ODataHttpPage, serviceUrl: string, entitySet: string, key: string, options?: ODataHttpOptions): Promise<void>;
@@ -531,6 +531,9 @@ export interface FindDialogOptions extends DialogOptions {
 
 // @public
 export function findRowByValues(page: TableOperationsPage, tableId: string, columnValues: ColumnValueCriteria): Promise<number>;
+
+// @public
+export const FLP_CHROME_SELECTORS: readonly ["#shell-header", ".sapUshellShellHead", "#meAreaHeaderButton"];
 
 // @public
 export class FLPError extends PramanError {
@@ -798,6 +801,12 @@ export class ODataError extends PramanError {
 }
 
 // @public
+export interface ODataFixtures {
+    // (undocumented)
+    odata: ReturnType<typeof createODataFixture>;
+}
+
+// @public
 export interface ODataHttpOptions {
     readonly csrfToken?: string;
     readonly headers?: Readonly<Record<string, string>>;
@@ -829,6 +838,9 @@ export interface ODataQueryOptions extends ODataHttpOptions {
     readonly skip?: number;
     readonly top?: number;
 }
+
+// @public
+export const odataTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & ODataFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions>;
 
 // @public
 export interface OverlayDetection {
@@ -1080,6 +1092,7 @@ export const presets: {
         } | undefined;
         defaultMatchSubclasses?: boolean | undefined;
         captureFailureArtifacts?: boolean | undefined;
+        skipPostFillWait?: boolean | undefined;
     };
     readonly debug: {
         logLevel?: "error" | "debug" | "warn" | "info" | "verbose" | undefined;
@@ -1146,6 +1159,7 @@ export const presets: {
         } | undefined;
         defaultMatchSubclasses?: boolean | undefined;
         captureFailureArtifacts?: boolean | undefined;
+        skipPostFillWait?: boolean | undefined;
     };
 };
 
@@ -1427,7 +1441,7 @@ export class TelemetryError extends PramanError {
 // @public
 export const test: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures & AuthFixtures & AuthFixtureOptions & {
     webStorage: WebStorageFixture;
-} & NavFixtures & StabilityFixtures & ControlTreeFixtures & FailureArtifactsFixtures & OverlayFixtures & NativeDialogFixtures & ClockFixtures & FEFixtures & AIFixtures & IntentTestFixtures & IntentFixtureDeps & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures & ODataTraceFixtures & BrowserBindFixtures & ScreencastFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & AuthDeps & NavWorkerDeps & StabilityDeps & ControlTreeDeps & FailureArtifactsDeps & OverlayDeps & AIWorkerDeps & ODataTraceDeps & BrowserBindWorkerDeps & ScreencastWorkerDeps>;
+} & NavFixtures & StabilityFixtures & ControlTreeFixtures & FailureArtifactsFixtures & OverlayFixtures & NativeDialogFixtures & ClockFixtures & FEFixtures & AIFixtures & IntentTestFixtures & IntentFixtureDeps & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures & ODataTraceFixtures & BrowserBindFixtures & ScreencastFixtures & ODataFixtures & VisualRegressionFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & AuthDeps & NavWorkerDeps & StabilityDeps & ControlTreeDeps & FailureArtifactsDeps & OverlayDeps & AIWorkerDeps & ODataTraceDeps & BrowserBindWorkerDeps & ScreencastWorkerDeps>;
 
 // @public
 export class TimeoutError extends PramanError {
@@ -1929,6 +1943,31 @@ export type ViewName = Brand<string, 'ViewName'>;
 
 // @public
 export function viewName(name: string): ViewName;
+
+// @public
+export interface VisualRegressionFixture {
+    compareScreenshot(name: string, options?: VisualRegressionOptions): Promise<void>;
+    maskFLPChrome(): Locator[];
+}
+
+// @public
+export interface VisualRegressionFixtures {
+    // (undocumented)
+    visualRegression: VisualRegressionFixture;
+}
+
+// @public
+export interface VisualRegressionOptions {
+    fullPage?: boolean;
+    mask?: Locator[];
+    maskColor?: string;
+    maxDiffPixelRatio?: number;
+    maxDiffPixels?: number;
+    threshold?: number;
+}
+
+// @public
+export const visualRegressionTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & VisualRegressionFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions>;
 
 // @public
 export class VocabularyError extends PramanError {
