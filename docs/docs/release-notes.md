@@ -6,14 +6,174 @@ description: "What's new in playwright-praman — version history, new features,
 keywords:
   - playwright praman release notes
   - sap ui5 test automation changelog
+  - playwright 1.63 support
+  - playwright 1.62 support
   - playwright 1.61 support
   - playwright 1.60 support
+  - browser dialog fixture
+  - ai generator integrity
+  - sap overlay handler
   - web storage fixture
   - typescript 7 playwright
   - typescript 6 playwright
 ---
 
 # Release Notes
+
+## Version 1.3.6
+
+_Released: October 2026 · [npm](https://www.npmjs.com/package/playwright-praman/v/1.3.6) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases/tag/playwright-praman-v1.3.6)_
+
+### 🎭 Playwright 1.62 + 1.63 Support — 14 New Feature Flags
+
+Praman now detects and gates **Playwright 1.62** and **1.63** APIs via 14 new feature flags, auto-detected at runtime:
+
+**Playwright 1.62 — 6 flags:**
+
+| Feature flag                | API gated                           | What it enables                                              |
+| --------------------------- | ----------------------------------- | ------------------------------------------------------------ |
+| `hasLocatorWaitForFunction` | `locator.waitFor(predicate)`        | Per-control wait predicates beyond global `waitForUI5Stable` |
+| `hasWebPScreenshots`        | WebP screenshot format              | Smaller screenshot files with lossy compression              |
+| `hasRetryStrategyIsolated`  | `retries: { mode: 'isolated' }`     | Isolated retry execution in clean browser contexts           |
+| `hasAbortSignal`            | `AbortSignal` on API methods        | Cancellable Playwright operations with abort controller      |
+| `hasApiResponseTiming`      | Resource Timing on API responses    | Native timing replaces `Date.now()` deltas in OData tracing  |
+| `hasScrollOption`           | `locator.click({ scroll: 'none' })` | Opt out of auto-scroll before click actions                  |
+
+**Playwright 1.63 — 8 flags:**
+
+| Feature flag              | API gated                          | What it enables                                             |
+| ------------------------- | ---------------------------------- | ----------------------------------------------------------- |
+| `hasTestLocks`            | `test({ lock: 'name' })`           | Named test locks for parallel isolation of shared SAP state |
+| `hasSubtreeFrameLocator`  | `locator.frameLocator()`           | Scoped frame locators for nested iframe content             |
+| `hasVisibleLocator`       | `locator.visible()`                | Boolean visibility check without assertion                  |
+| `hasStepParams`           | `test.step(title, fn, { params })` | Structured parameters on test steps for reporting           |
+| `hasAriaSnapshotJSON`     | `ariaSnapshot()` JSON output       | Machine-readable accessibility snapshots for AI grounding   |
+| `hasDialogClosedEvent`    | `page.on('dialogclosed')`          | Detect-only observation of native browser dialogs           |
+| `hasOpfsStorageState`     | `storageState({ opfs: true })`     | Origin-private filesystem storage state persistence         |
+| `hasHttpCredentialsArray` | `httpCredentials` array form       | Multiple HTTP credential sets per browser context           |
+
+All flags return `false` on older Playwright versions — zero behavior change for existing users.
+
+**Ceiling drift detector:** CI now fails when an uncatalogued Playwright release is detected, ensuring new APIs are flagged before they ship uncovered.
+
+**Peer dependency unchanged:** `"@playwright/test": ">=1.57.0 <2.0.0"` — Playwright 1.62 and 1.63 already fall within range.
+
+### 🗨️ New: Browser Dialog Fixture
+
+Native `alert`/`confirm`/`prompt`/`beforeunload` dialogs were invisible to Praman — these are the browser's own dialogs, **not** `sap.m.Dialog`. SAP's "unsaved changes" warning on navigation is a native `beforeunload` dialog that Playwright auto-dismissed silently.
+
+Two methods with different risk profiles:
+
+| Method       | Event          | Risk                         | Gate                                  |
+| ------------ | -------------- | ---------------------------- | ------------------------------------- |
+| `observe()`  | `dialogclosed` | None — purely observational  | Playwright 1.63+, degrades to silence |
+| `register()` | `dialog`       | Changes behavior by existing | All Playwright versions               |
+
+```typescript
+import { test, expect } from 'playwright-praman';
+
+test('detect unsaved changes dialog', async ({ browserDialogs }) => {
+  // Detect-only — observe without answering (1.63+)
+  browserDialogs.observe();
+
+  // Navigate away from a dirty form
+  await ui5Navigation.navigateTo('/other-page');
+
+  // Assert the beforeunload dialog was observed
+  expect(browserDialogs.observed).toContainEqual(expect.objectContaining({ type: 'beforeunload' }));
+});
+```
+
+### 🛡️ New: SAP Overlay Handler
+
+SAP applications show overlays — `BusyIndicator`, `MessageToast`, confirmation dialogs — that interrupt test actions. The new `overlays` fixture detects and handles these automatically using Playwright's `addLocatorHandler` (available since Playwright 1.42, below the 1.57 floor — no version gate needed).
+
+**Detect, don't dismiss:** Handlers report overlays by default. Dismissal is opt-in per rule and logged at `warn`, because silently answering a dialog turns a real failure into a passing test. `BusyIndicator` defers to `waitForUI5Stable` rather than racing it.
+
+### 🔍 New: UI5 Diagnostics on Failure
+
+Failing tests now automatically capture and attach:
+
+- **Console output** — browser console messages at the time of failure
+- **Page errors** — unhandled JavaScript exceptions
+- **Network requests** — failed or pending network calls
+
+All three are argument-free and safe across Playwright versions. The `hasConsoleMessageFilter` flag (1.59+) ensures the filter option isn't passed to older runtimes where it would silently return everything.
+
+**Opt-in clock fixture:** A fake clock is available but never auto-installed, because SAP session and token validity are time-sensitive. Controlling time before install throws rather than silently no-opping.
+
+### 🤖 AI Generator Integrity
+
+Two-phase overhaul of the AI test generator to ensure deterministic, auditable output:
+
+**Phase A** ([#261](https://github.com/mrkanitkar/playwright-praman/pull/261)) — Single ownership and integrity primitives:
+
+- Each generated artifact now has exactly one owner script — no more "last writer wins" races between `generate:skill-md` and `generate:capabilities`
+- Content-neutral: no generated artifact changes in this PR
+
+**Phase B** ([#264](https://github.com/mrkanitkar/playwright-praman/pull/264)) — Deterministic generation and drift gate:
+
+- Removed `new Date()` stamps that made every regeneration produce a diff
+- Output is now a pure function of its input — regenerating twice produces identical bytes
+- CI drift gate: `npm run validate:generated` fails if any generated artifact is stale
+
+### 🔒 Test Locks for Shared SAP State
+
+Playwright 1.63 adds `lock` to the test options: tests holding the same lock name never run concurrently. Praman adds a **runtime guard** and **conventional lock names** for SAP-specific shared state (e.g., a single Sales Order being edited by parallel tests).
+
+The guard is fail-closed: on Playwright < 1.63, attempting to use `lock` throws a `PramanError` with upgrade guidance rather than silently ignoring the option.
+
+### ⏱️ Per-Control Waits
+
+New `waitForControlState()` method for per-control predicates — additive to `waitForUI5Stable()`, which is global. Useful when a specific control's state matters independently of the UI5 framework's busy state.
+
+The compatibility policy is documented: throw when the Playwright floor has no equivalent, degrade when it does.
+
+### 🐛 Bug Fixes
+
+- **[#246](https://github.com/mrkanitkar/playwright-praman/issues/246)** ([#256](https://github.com/mrkanitkar/playwright-praman/pull/256)): `agents/` (20 files) and `seeds/` were not shipped in the npm package. Fixed with a `files[]` guard that fails the build if a declared entry matches nothing.
+- **[#296](https://github.com/mrkanitkar/playwright-praman/pull/296)**: Reporter step classification changed from title-prefix matching to structural classification — 80% misclassification rate (12/15 steps) reduced to 0%.
+- **[#300](https://github.com/mrkanitkar/playwright-praman/pull/300)**: Malformed OData response bodies no longer crash the trace reporter. Calls are now timed by the Resource Timing API instead of `Date.now()` deltas.
+- **[#226](https://github.com/mrkanitkar/playwright-praman/pull/226)**: `npx praman init` now actually scaffolds a project — the command was broken since the tsup chunk-splitting change.
+- **[#228](https://github.com/mrkanitkar/playwright-praman/pull/228)**: Agent-asset validation now runs in CI; Prettier no longer corrupts the asset manifest.
+- **[#268](https://github.com/mrkanitkar/playwright-praman/pull/268)**: Stale npm override ranges refreshed to match current security advisories.
+
+### ⚡ CI & Testing Improvements
+
+- **First browser-launching CI job** ([#266](https://github.com/mrkanitkar/playwright-praman/pull/266)): CI now runs a real Chromium instance, catching wiring bugs that mocked tests pass through.
+- **TypeScript type verification** ([#223](https://github.com/mrkanitkar/playwright-praman/pull/223)): Shipped `.d.ts` files verified against TypeScript 5.9, 6.0, and 7.0 on every push.
+- **Vitest 4 → 5** ([#292](https://github.com/mrkanitkar/playwright-praman/pull/292)): Major test framework upgrade with per-file coverage enforcement restored.
+- **CI action bumps** ([#291](https://github.com/mrkanitkar/playwright-praman/pull/291)): `codeql-action` v4.38.2, `deploy-pages` v5.0.1.
+
+### 📦 Dependency Updates
+
+| Category       | Change                                                                      |
+| -------------- | --------------------------------------------------------------------------- |
+| **Playwright** | `@playwright/test` 1.61.1 → 1.63.0                                          |
+| **Testing**    | `vitest` + `@vitest/coverage-v8` 4.x → 5.x                                  |
+| **Linting**    | `eslint` → 10.12.0, `eslint-plugin-n` → 18.4.1                              |
+| **Docs**       | Docusaurus suite consolidated to latest, `docusaurus-plugin-llms` 0.6.1     |
+| **Security**   | `http-proxy-middleware` override 2.0.10, stale advisory overrides refreshed |
+| **CI Actions** | `codeql-action` v4.37.8 → v4.38.2, `actions/checkout` 7.0.0 → 7.0.1         |
+
+14 dependency-related commits in total (13 upgrades + 1 security override refresh).
+
+**Upgrade:** `npm install playwright-praman@1.3.6` — no config changes needed.
+
+---
+
+## Version 1.3.5
+
+_Released: July 2026 · [npm](https://www.npmjs.com/package/playwright-praman/v/1.3.5) · [GitHub](https://github.com/mrkanitkar/playwright-praman/releases/tag/playwright-praman-v1.3.5)_
+
+### 🔧 CI Fixes
+
+- Aligned CodeQL action SHAs to resolve version mismatch ([#191](https://github.com/mrkanitkar/playwright-praman/pull/191))
+- Resolved CI failures and removed stale `release-as` pin ([#189](https://github.com/mrkanitkar/playwright-praman/pull/189))
+
+No user-facing changes. Upgrade: `npm install playwright-praman@1.3.5`
+
+---
 
 ## Version 1.3.4
 
