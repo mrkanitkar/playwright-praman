@@ -102,7 +102,14 @@ setup('SAP authentication', async ({ page, context }) => {
   const baseUrl = requireEnv('SAP_CLOUD_BASE_URL');
   const username = requireEnv('SAP_CLOUD_USERNAME');
   const password = requireEnv('SAP_CLOUD_PASSWORD');
-  const strategy = process.env['SAP_AUTH_STRATEGY'] ?? 'btp-saml';
+  const rawStrategy = process.env['SAP_AUTH_STRATEGY'] ?? 'btp-saml';
+  const strategyAliases: Record<string, string> = {
+    'cloud-saml': 'btp-saml',
+    onprem: 'basic',
+    'azure-ad': 'office365',
+    entra: 'office365',
+  };
+  const strategy = strategyAliases[rawStrategy] ?? rawStrategy;
   const client = process.env['SAP_CLIENT'] ?? '100';
   const language = process.env['SAP_LANGUAGE'] ?? 'EN';
 

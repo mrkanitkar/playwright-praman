@@ -135,10 +135,8 @@ describe('failureArtifactsCapture fixture', () => {
     expect(options.auto).toBe(true);
   });
 
-  it('pramanConfig placeholder uses option + worker scope', () => {
-    const options = getFixtureOptions('pramanConfig');
-    expect(options.option).toBe(true);
-    expect(options.scope).toBe('worker');
+  it('pramanConfig is NOT a runtime fixture (provided via typed-base)', () => {
+    expect(() => getFixtureOptions('pramanConfig')).toThrow();
   });
 
   it('captures screenshot and control tree on test failure', async () => {

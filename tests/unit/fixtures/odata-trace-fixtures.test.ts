@@ -166,13 +166,8 @@ describe('odata-trace-fixtures declarations', () => {
     expect(opts?.['auto']).toBe(true);
   });
 
-  it('declares pramanConfig as worker-scoped option placeholder', () => {
-    expect(fixtures).toHaveProperty('pramanConfig');
-    const definition = fixtures['pramanConfig'];
-    expect(Array.isArray(definition)).toBe(true);
-    const opts = (definition as unknown[])[1] as Record<string, unknown>;
-    expect(opts['option']).toBe(true);
-    expect(opts['scope']).toBe('worker');
+  it('does NOT declare pramanConfig as a runtime fixture (provided via typed-base)', () => {
+    expect(fixtures).not.toHaveProperty('pramanConfig');
   });
 });
 

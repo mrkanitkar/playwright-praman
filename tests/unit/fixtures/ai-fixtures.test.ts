@@ -187,24 +187,6 @@ function extractFixtureFn(definition: unknown): (...args: any[]) => Promise<void
 }
 
 /**
- * Extracts fixture options from a fixture definition tuple.
- *
- * @param definition - The fixture definition from `_fixtureDefinitions`
- * @returns The fixture options or undefined if bare function
- *
- * @example
- * ```typescript
- * const opts = extractFixtureOptions(fixtures['pramanConfig']);
- * ```
- */
-function extractFixtureOptions(definition: unknown): Record<string, unknown> | undefined {
-  if (Array.isArray(definition) && definition.length > 1) {
-    return definition[1] as Record<string, unknown>;
-  }
-  return undefined;
-}
-
-/**
  * Simulates Playwright's `use()` callback for fixture testing.
  *
  * @param fn - The fixture function to execute
@@ -269,16 +251,9 @@ describe('ai-fixtures fixture definitions', () => {
     vi.restoreAllMocks();
   });
 
-  describe('pramanConfig option placeholder (PW-MERGE-1)', () => {
-    it('pramanConfig is registered as a fixture definition', () => {
-      expect(fixtures).toHaveProperty('pramanConfig');
-    });
-
-    it('pramanConfig is an option fixture with scope worker', () => {
-      const opts = extractFixtureOptions(fixtures['pramanConfig']);
-      expect(opts).toBeDefined();
-      expect(opts?.['option']).toBe(true);
-      expect(opts?.['scope']).toBe('worker');
+  describe('pramanConfig via typed-base (no runtime placeholder)', () => {
+    it('pramanConfig is NOT registered as a fixture definition (provided by type-only base)', () => {
+      expect(fixtures).not.toHaveProperty('pramanConfig');
     });
   });
 

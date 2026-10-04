@@ -84,7 +84,7 @@ export interface AuthStrategy {
 }
 
 // @public
-export const authTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & AuthFixtures & AuthFixtureOptions, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & AuthDeps>;
+export const authTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & AuthFixtures & AuthFixtureOptions, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures>;
 
 // @public
 export type BindingPath = Brand<string, 'BindingPath'>;
@@ -873,7 +873,7 @@ export interface OverlayRule {
 }
 
 // @public
-export const overlayTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & OverlayFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & OverlayDeps>;
+export const overlayTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & OverlayFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures>;
 
 // @public
 export const PACKAGE_NAME: "playwright-praman";
@@ -1037,21 +1037,21 @@ export const presets: {
         preferVisibleControls?: boolean | undefined;
         ignoreAutoWaitUrls?: string[] | undefined;
         auth?: {
-            strategy?: "custom" | "btp-saml" | "basic" | "office365" | undefined;
-            baseUrl?: string | undefined;
+            strategy?: unknown;
+            baseUrl?: unknown;
             username?: string | undefined;
             password?: string | undefined;
             client?: string | undefined;
             language?: string | undefined;
         } | undefined;
         ai?: {
-            provider?: "openai" | "azure-openai" | "anthropic" | undefined;
+            provider?: unknown;
             includeAriaSnapshot?: boolean | undefined;
             apiKey?: string | undefined;
             model?: string | undefined;
             temperature?: number | undefined;
             maxTokens?: number | undefined;
-            endpoint?: string | undefined;
+            endpoint?: unknown;
             deployment?: string | undefined;
             apiVersion?: string | undefined;
             anthropicApiKey?: string | undefined;
@@ -1104,21 +1104,21 @@ export const presets: {
         preferVisibleControls?: boolean | undefined;
         ignoreAutoWaitUrls?: string[] | undefined;
         auth?: {
-            strategy?: "custom" | "btp-saml" | "basic" | "office365" | undefined;
-            baseUrl?: string | undefined;
+            strategy?: unknown;
+            baseUrl?: unknown;
             username?: string | undefined;
             password?: string | undefined;
             client?: string | undefined;
             language?: string | undefined;
         } | undefined;
         ai?: {
-            provider?: "openai" | "azure-openai" | "anthropic" | undefined;
+            provider?: unknown;
             includeAriaSnapshot?: boolean | undefined;
             apiKey?: string | undefined;
             model?: string | undefined;
             temperature?: number | undefined;
             maxTokens?: number | undefined;
-            endpoint?: string | undefined;
+            endpoint?: unknown;
             deployment?: string | undefined;
             apiVersion?: string | undefined;
             anthropicApiKey?: string | undefined;
@@ -1277,7 +1277,7 @@ export interface ScreencastFrame {
 export type ScreencastFrameHandler = (frame: ScreencastFrame) => Promise<void> | void;
 
 // @public
-export const screencastTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & ScreencastFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & ScreencastWorkerDeps>;
+export const screencastTest: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ScreencastFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures>;
 
 // @public
 export function searchAndOpenApp(page: NavigationPage, appTitle: string, options?: NavigationOptions): Promise<void>;
@@ -1441,7 +1441,7 @@ export class TelemetryError extends PramanError {
 // @public
 export const test: _playwright_test.TestType<_playwright_test.PlaywrightTestArgs & _playwright_test.PlaywrightTestOptions & TestFixtures & ModuleFixtures & AuthFixtures & AuthFixtureOptions & {
     webStorage: WebStorageFixture;
-} & NavFixtures & StabilityFixtures & ControlTreeFixtures & FailureArtifactsFixtures & OverlayFixtures & NativeDialogFixtures & ClockFixtures & FEFixtures & AIFixtures & IntentTestFixtures & IntentFixtureDeps & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures & ODataTraceFixtures & BrowserBindFixtures & ScreencastFixtures & ODataFixtures & VisualRegressionFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & AuthDeps & NavWorkerDeps & StabilityDeps & ControlTreeDeps & FailureArtifactsDeps & OverlayDeps & AIWorkerDeps & ODataTraceDeps & BrowserBindWorkerDeps & ScreencastWorkerDeps>;
+} & NavFixtures & StabilityFixtures & ControlTreeFixtures & FailureArtifactsFixtures & OverlayFixtures & NativeDialogFixtures & ClockFixtures & FEFixtures & AIFixtures & IntentTestFixtures & ShellFooterFixtures & FLPLocksFixtures & FLPSettingsFixtures & TestDataFixtures & ODataTraceFixtures & BrowserBindFixtures & ScreencastFixtures & ODataFixtures & VisualRegressionFixtures, _playwright_test.PlaywrightWorkerArgs & _playwright_test.PlaywrightWorkerOptions & WorkerFixtures & BrowserBindWorkerDeps>;
 
 // @public
 export class TimeoutError extends PramanError {

@@ -59,9 +59,10 @@
 
 import type { Buffer } from 'node:buffer';
 
-import { test as base } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import type { Logger } from 'pino';
+
+import { withCore as base } from './typed-base.js';
 
 import { hasFeature } from '#core/compat/index.js';
 import { PramanError } from '#core/errors/base.js';
@@ -298,11 +299,7 @@ interface ScreencastApi {
  * });
  * ```
  */
-export const screencastTest = base.extend<ScreencastFixtures, ScreencastWorkerDeps>({
-  // ── Cross-fixture option placeholder (PW-MERGE-1) ──────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests with coreTest
-  rootLogger: [undefined!, { option: true, scope: 'worker' }],
-
+export const screencastTest = base.extend<ScreencastFixtures>({
   // ── screencast fixture ───────────────────────────────────────────────────
   screencast: async (
     { page, rootLogger }: { page: Page; rootLogger: Logger },

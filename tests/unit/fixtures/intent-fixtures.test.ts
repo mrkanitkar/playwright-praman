@@ -451,17 +451,13 @@ describe('intent-fixtures fixture definitions', () => {
     vi.restoreAllMocks();
   });
 
-  describe('PW-MERGE-1 option placeholders', () => {
-    it('declares ui5 as an option placeholder', () => {
-      const def = fixtures['ui5'];
-      expect(Array.isArray(def)).toBe(true);
-      expect((def as unknown[])[1]).toEqual(expect.objectContaining({ option: true }));
+  describe('typed-base dependencies (no runtime placeholders)', () => {
+    it('does NOT declare ui5 as a runtime fixture (provided via typed-base)', () => {
+      expect(fixtures).not.toHaveProperty('ui5');
     });
 
-    it('declares ui5Navigation as an option placeholder', () => {
-      const def = fixtures['ui5Navigation'];
-      expect(Array.isArray(def)).toBe(true);
-      expect((def as unknown[])[1]).toEqual(expect.objectContaining({ option: true }));
+    it('does NOT declare ui5Navigation as a runtime fixture (provided via typed-base)', () => {
+      expect(fixtures).not.toHaveProperty('ui5Navigation');
     });
   });
 

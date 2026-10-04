@@ -166,24 +166,6 @@ function extractFixtureFn(definition: unknown): (...args: any[]) => Promise<void
 }
 
 /**
- * Extracts fixture options from a fixture definition tuple.
- *
- * @param definition - The fixture definition from `_fixtureDefinitions`
- * @returns The fixture options or undefined if bare function
- *
- * @example
- * ```typescript
- * const opts = extractFixtureOptions(fixtures.pramanConfig);
- * ```
- */
-function extractFixtureOptions(definition: unknown): Record<string, unknown> | undefined {
-  if (Array.isArray(definition) && definition.length > 1) {
-    return definition[1] as Record<string, unknown>;
-  }
-  return undefined;
-}
-
-/**
  * Simulates Playwright's `use()` callback for fixture testing.
  *
  * @param fn - The fixture function to execute
@@ -540,19 +522,13 @@ describe('nav-fixtures fixture definitions', () => {
     });
   });
 
-  describe('cross-fixture dependency declarations', () => {
-    it('declares pramanConfig as option placeholder', () => {
-      const options = extractFixtureOptions(fixtures['pramanConfig']);
-
-      expect(options).toBeDefined();
-      expect(options?.['option']).toBe(true);
+  describe('typed-base dependencies (no runtime placeholders)', () => {
+    it('does NOT declare pramanConfig as a runtime fixture (provided via typed-base)', () => {
+      expect(fixtures).not.toHaveProperty('pramanConfig');
     });
 
-    it('declares rootLogger as option placeholder', () => {
-      const options = extractFixtureOptions(fixtures['rootLogger']);
-
-      expect(options).toBeDefined();
-      expect(options?.['option']).toBe(true);
+    it('does NOT declare rootLogger as a runtime fixture (provided via typed-base)', () => {
+      expect(fixtures).not.toHaveProperty('rootLogger');
     });
   });
 });

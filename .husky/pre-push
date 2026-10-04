@@ -19,3 +19,17 @@ npx tsx scripts/check-no-js-in-src.ts
 
 # Run full validation with coverage
 npm run spellcheck && npm run typecheck && npm run test:unit -- --coverage && npm run build
+
+# Regenerate derived artifacts that depend on build output
+npm run docs:api-review && npm run generate:llms-txt
+
+# Auto-commit regenerated files if they drifted
+GENERATED_FILES="api-reports/ llms.txt llms-full.txt"
+if ! git diff --quiet -- $GENERATED_FILES; then
+  echo ""
+  echo "Generated files are stale — auto-committing..."
+  git add $GENERATED_FILES
+  git commit -m "chore: regenerate api report and llms.txt"
+  echo "Auto-committed regenerated files. Push again to include them."
+  exit 1
+fi

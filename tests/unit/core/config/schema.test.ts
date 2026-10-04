@@ -193,6 +193,76 @@ describe('PramanConfigSchema', () => {
       }
     });
 
+    it('normalises auth strategy alias "cloud-saml" to "btp-saml"', () => {
+      const result = PramanConfigSchema.safeParse({
+        auth: { strategy: 'cloud-saml', baseUrl: 'https://sap.example.com' },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.auth?.strategy).toBe('btp-saml');
+      }
+    });
+
+    it('normalises auth strategy alias "onprem" to "basic"', () => {
+      const result = PramanConfigSchema.safeParse({
+        auth: { strategy: 'onprem', baseUrl: 'https://sap.example.com' },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.auth?.strategy).toBe('basic');
+      }
+    });
+
+    it('normalises auth strategy alias "azure-ad" to "office365"', () => {
+      const result = PramanConfigSchema.safeParse({
+        auth: { strategy: 'azure-ad', baseUrl: 'https://sap.example.com' },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.auth?.strategy).toBe('office365');
+      }
+    });
+
+    it('normalises auth strategy alias "entra" to "office365"', () => {
+      const result = PramanConfigSchema.safeParse({
+        auth: { strategy: 'entra', baseUrl: 'https://sap.example.com' },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.auth?.strategy).toBe('office365');
+      }
+    });
+
+    it('normalises AI provider alias "claude" to "anthropic"', () => {
+      const result = PramanConfigSchema.safeParse({
+        ai: { provider: 'claude' },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.ai?.provider).toBe('anthropic');
+      }
+    });
+
+    it('normalises empty auth baseUrl to undefined', () => {
+      const result = PramanConfigSchema.safeParse({
+        auth: { baseUrl: '' },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.auth?.baseUrl).toBeUndefined();
+      }
+    });
+
+    it('normalises empty AI endpoint to undefined', () => {
+      const result = PramanConfigSchema.safeParse({
+        ai: { endpoint: '' },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.ai?.endpoint).toBeUndefined();
+      }
+    });
+
     it('accepts discoveryStrategies reordering', () => {
       const result = PramanConfigSchema.safeParse({
         discoveryStrategies: ['recordreplay', 'direct-id'],

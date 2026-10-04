@@ -41,6 +41,9 @@ export default defineConfig({
   timeout: 5 * 60 * 1000,
 
   use: {
+    ...devices['Desktop Chrome'],
+    // Set PW_CHANNEL=chrome or PW_CHANNEL=msedge to test on the company-approved browser
+    channel: process.env['PW_CHANNEL'] || undefined,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -57,7 +60,6 @@ export default defineConfig({
     {
       name: 'chromium',
       use: {
-        ...devices['Desktop Chrome'],
         // Reuse the auth session saved by the 'auth-setup' project above.
         // This file is created automatically — add '.auth/' to .gitignore.
         storageState: '.auth/sap-state.json',

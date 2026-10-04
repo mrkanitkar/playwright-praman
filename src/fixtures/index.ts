@@ -75,13 +75,13 @@ import { webStorageTest } from './web-storage-fixture.js';
  * Overlapping fixtures and their resolution:
  *
  * - `pramanConfig` / `rootLogger` — real impl in `coreTest` (pulled in
- *   transitively via `moduleTest`); 7 other modules declare placeholders
- *   (`option: true`) that are satisfied by the real provider.
+ *   transitively via `moduleTest`); other modules reference them via
+ *   type-only bases (no runtime placeholders).
  *
  * - `ui5` — base impl in `coreTest`, **overridden** by `moduleTest`
  *   (adds `.table`, `.dialog`, `.date`, `.odata` sub-namespaces).
- *   `intentTest` declares a placeholder that resolves to `moduleTest`'s
- *   enriched version. `moduleTest` must appear before `intentTest`.
+ *   `intentTest` uses the type-only `withCoreNav` base that resolves to
+ *   `moduleTest`'s enriched version. `moduleTest` must appear before `intentTest`.
  *
  * - All remaining fixture names (`sapAuth`, `fe`, `intent`, `flpLocks`,
  *   etc.) are unique to their respective modules — no precedence concern.
