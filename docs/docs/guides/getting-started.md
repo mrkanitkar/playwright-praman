@@ -30,38 +30,56 @@ Two commands to get started. Then let AI agents generate your tests.
 ## Step 1: Install and Initialize
 
 ```bash
-npm install playwright-praman
+npm install --save-dev playwright-praman @playwright/test
+npx playwright install chromium
 npx playwright-praman init
 ```
 
 `init` handles everything:
 
 - Validates Node.js and npm
-- Installs Chromium browser
-- Prompts for SAP credentials and creates `.env`
 - Detects your IDE and installs AI agent definitions (planner, generator, healer)
 - Scaffolds `playwright.config.ts`, `praman.config.ts`, auth setup, and a gold-standard test
+
+:::tip[Install the right browser driver for your agent workflow]
+
+Praman ships two flavours of AI agent — **MCP agents** and **CLI agents**. Each uses a different Playwright package to control the browser. Install the one that matches how you plan to use agents:
+
+| Agent type                     | Package to install                       | When to use                                         |
+| ------------------------------ | ---------------------------------------- | --------------------------------------------------- |
+| **MCP agents** (default)       | `npm install --save-dev @playwright/mcp` | Claude Code, GitHub Copilot, or any MCP-capable IDE |
+| **CLI agents** (`-cli` suffix) | `npm install --save-dev @playwright/cli` | Token-efficient alternative; no MCP server required |
+
+After installing either package, ensure its bundled browser binary is present:
+
+```bash
+npx playwright install chromium
+```
+
+You can install both packages side-by-side — they coexist in the same project.
+:::
 
 <details>
 <summary>What init installs (full breakdown)</summary>
 
 Praman has 3 direct dependencies and 5 peer dependencies:
 
-| Package                                     | Type            | Purpose                                                   |
-| ------------------------------------------- | --------------- | --------------------------------------------------------- |
-| `@playwright/test`                          | Peer (required) | Playwright test runner (>=1.57.0) — auto-installed        |
-| `@playwright/cli`                           | Peer (required) | Playwright CLI for agent browser control — auto-installed |
-| `commander`                                 | Dependency      | CLI framework for `npx playwright-praman` commands        |
-| `pino`                                      | Dependency      | Structured JSON logging                                   |
-| `zod`                                       | Dependency      | Configuration validation and type-safe schemas            |
-| `@anthropic-ai/sdk`                         | Peer (optional) | AI test generation via Claude                             |
-| `openai`                                    | Peer (optional) | AI test generation via OpenAI / Azure OpenAI              |
-| `@opentelemetry/api`                        | Peer (optional) | Observability and distributed tracing                     |
-| `@opentelemetry/sdk-node`                   | Peer (optional) | OpenTelemetry Node.js SDK                                 |
-| `@opentelemetry/exporter-trace-otlp-http`   | Peer (optional) | OTLP trace exporter (HTTP)                                |
-| `@opentelemetry/exporter-metrics-otlp-http` | Peer (optional) | OTLP metrics exporter (HTTP)                              |
-| `@opentelemetry/sdk-metrics`                | Peer (optional) | OTel metrics SDK                                          |
-| `@azure/monitor-opentelemetry-exporter`     | Peer (optional) | Azure Monitor exporter (beta)                             |
+| Package                                     | Type            | Purpose                                                           |
+| ------------------------------------------- | --------------- | ----------------------------------------------------------------- |
+| `@playwright/test`                          | Peer (required) | Playwright test runner (>=1.57.0)                                 |
+| `@playwright/mcp`                           | Peer (optional) | MCP server for MCP-based agents — install if using MCP agents     |
+| `@playwright/cli`                           | Peer (optional) | Playwright CLI for CLI-based agents — install if using CLI agents |
+| `commander`                                 | Dependency      | CLI framework for `npx playwright-praman` commands                |
+| `pino`                                      | Dependency      | Structured JSON logging                                           |
+| `zod`                                       | Dependency      | Configuration validation and type-safe schemas                    |
+| `@anthropic-ai/sdk`                         | Peer (optional) | AI test generation via Claude                                     |
+| `openai`                                    | Peer (optional) | AI test generation via OpenAI / Azure OpenAI                      |
+| `@opentelemetry/api`                        | Peer (optional) | Observability and distributed tracing                             |
+| `@opentelemetry/sdk-node`                   | Peer (optional) | OpenTelemetry Node.js SDK                                         |
+| `@opentelemetry/exporter-trace-otlp-http`   | Peer (optional) | OTLP trace exporter (HTTP)                                        |
+| `@opentelemetry/exporter-metrics-otlp-http` | Peer (optional) | OTLP metrics exporter (HTTP)                                      |
+| `@opentelemetry/sdk-metrics`                | Peer (optional) | OTel metrics SDK                                                  |
+| `@azure/monitor-opentelemetry-exporter`     | Peer (optional) | Azure Monitor exporter (beta)                                     |
 
 ### IDE detection and agent installation
 

@@ -101,6 +101,18 @@ describe('createAuthStrategy', () => {
       expect(strategy).toBeInstanceOf(MultiTenantAuthStrategy);
       expect(strategy.name).toBe('multi-tenant');
     });
+
+    it('returns OnPremAuthStrategy for config alias "basic"', () => {
+      const strategy = createAuthStrategy(makeConfig({ strategy: 'basic' }));
+      expect(strategy).toBeInstanceOf(OnPremAuthStrategy);
+      expect(strategy.name).toBe('onprem');
+    });
+
+    it('returns CloudSAMLAuthStrategy for config alias "btp-saml"', () => {
+      const strategy = createAuthStrategy(makeConfig({ strategy: 'btp-saml' }));
+      expect(strategy).toBeInstanceOf(CloudSAMLAuthStrategy);
+      expect(strategy.name).toBe('cloud-saml');
+    });
   });
 
   describe('auto-detection from config fields', () => {
@@ -214,6 +226,9 @@ describe('createAuthStrategy', () => {
         expect(authError.suggestions.length).toBeGreaterThan(0);
         expect(authError.suggestions).toContain(
           'Use a valid strategy name: onprem, cloud-saml, office365, api, certificate, multi-tenant',
+        );
+        expect(authError.suggestions).toContain(
+          'Config aliases also accepted: basic (→ onprem), btp-saml (→ cloud-saml)',
         );
       }
     });

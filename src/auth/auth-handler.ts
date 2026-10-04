@@ -28,6 +28,7 @@
 
 import process from 'node:process';
 
+import { createAuthStrategy } from './auth-factory.js';
 import type { AuthPage, AuthStrategy, SAPAuthConfig, SessionInfo } from './auth-types.js';
 
 import { AuthError } from '#core/errors/auth-error.js';
@@ -97,7 +98,7 @@ export interface SAPAuthHandlerOptions {
  * ```
  */
 export class SAPAuthHandler {
-  private readonly strategy: AuthStrategy;
+  private strategy: AuthStrategy;
   private readonly logger: AuthLogger;
   private sessionInfo: SessionInfo | null = null;
   private loginTimestamp: number | null = null;
@@ -203,6 +204,7 @@ export class SAPAuthHandler {
   @ui5Step
   async loginFromEnv(page: AuthPage): Promise<void> {
     const config = this.buildConfigFromEnv();
+    this.strategy = createAuthStrategy(config);
     await this.login(page, config);
   }
 
