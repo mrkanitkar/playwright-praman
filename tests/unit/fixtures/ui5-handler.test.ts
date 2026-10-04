@@ -287,6 +287,60 @@ describe('UI5Handler', () => {
       expect(strategy.enterText).toHaveBeenCalledWith(page, 'btn1', 'Hello');
     });
 
+    it('fill() calls waitForUI5 after enterText by default', async () => {
+      page.waitForFunction.mockClear();
+      await handler.fill(defaultSelector, 'Hello');
+
+      expect(strategy.enterText).toHaveBeenCalledWith(page, 'btn1', 'Hello');
+      // waitForUI5 triggers page.waitForFunction for UI5 stability
+      expect(page.waitForFunction).toHaveBeenCalled();
+    });
+
+    it('fill() skips waitForUI5 when skipPostFillWait is true', async () => {
+      const skipHandler = new UI5Handler({
+        page: page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        config: { skipPostFillWait: true },
+      });
+
+      // Record baseline: calls from discovery only (control() triggers waitForFunction)
+      page.waitForFunction.mockClear();
+      await skipHandler.fill(defaultSelector, 'Hello');
+      const callCountWithSkip = page.waitForFunction.mock.calls.length;
+
+      expect(strategy.enterText).toHaveBeenCalledWith(page, 'btn1', 'Hello');
+
+      // Compare with default (no skip): should have one more waitForFunction call
+      const defaultHandler = new UI5Handler({
+        page: page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+      });
+      page.waitForFunction.mockClear();
+      await defaultHandler.fill(defaultSelector, 'Hello');
+      const callCountDefault = page.waitForFunction.mock.calls.length;
+
+      // Without skip, there should be more waitForFunction calls (post-fill waitForUI5)
+      expect(callCountDefault).toBeGreaterThan(callCountWithSkip);
+    });
+
+    it('fill() calls waitForUI5 when skipPostFillWait is false', async () => {
+      const explicitHandler = new UI5Handler({
+        page: page,
+        interactionStrategy: strategy,
+        discoveryStrategies: ['direct-id', 'recordreplay'],
+        config: { skipPostFillWait: false },
+      });
+
+      page.waitForFunction.mockClear();
+      await explicitHandler.fill(defaultSelector, 'Hello');
+
+      expect(strategy.enterText).toHaveBeenCalledWith(page, 'btn1', 'Hello');
+      // waitForUI5 triggers page.waitForFunction for UI5 stability
+      expect(page.waitForFunction).toHaveBeenCalled();
+    });
+
     it('press() aliases to click via strategy.press', async () => {
       await handler.press(defaultSelector);
 

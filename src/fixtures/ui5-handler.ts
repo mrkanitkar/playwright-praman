@@ -107,6 +107,7 @@ export interface UI5HandlerOptions {
     readonly controlDiscoveryTimeout?: number;
     readonly preferVisibleControls?: boolean;
     readonly skipStabilityWait?: boolean;
+    readonly skipPostFillWait?: boolean;
   };
   /** Optional tracer for OpenTelemetry instrumentation. Defaults to NoOpTracer. */
   readonly tracer?: TracerWrapper;
@@ -159,6 +160,7 @@ export class UI5Handler {
   private readonly discoveryTimeout: number;
   private readonly preferVisibleControls: boolean;
   private readonly skipStabilityWait: boolean;
+  private readonly skipPostFillWait: boolean;
   private readonly tracer: TracerWrapper;
   private readonly bridgeInjectionCounter: MetricCounter;
   private readonly discoveryCounter: MetricCounter;
@@ -174,6 +176,7 @@ export class UI5Handler {
     this.discoveryTimeout = options.config?.controlDiscoveryTimeout ?? DEFAULT_DISCOVERY_TIMEOUT;
     this.preferVisibleControls = options.config?.preferVisibleControls ?? true;
     this.skipStabilityWait = options.config?.skipStabilityWait ?? false;
+    this.skipPostFillWait = options.config?.skipPostFillWait ?? false;
     this.tracer = options.tracer ?? getNoOpTracer();
     this.cache = new ControlProxyCache();
 
@@ -520,6 +523,9 @@ export class UI5Handler {
     return this.tracer.withSpan(createSpanName('ui5', 'fill'), async () => {
       const proxy = await this.control(selector);
       await this.strategy.enterText(this.page, proxy.id, value);
+      if (!this.skipPostFillWait) {
+        await this.waitForUI5();
+      }
     });
   }
 

@@ -422,7 +422,6 @@ test.describe('BOM End-to-End Flow', () => {
 
       // Use ui5.fill() — atomic setValue + fireChange + waitForUI5
       await ui5.fill({ id: IDS.materialInput, searchOpenDialogs: true }, materialValue);
-      await ui5.waitForUI5();
       test.info().annotations.push({
         type: 'info',
         description: `Material set to: ${materialValue}`,
@@ -473,7 +472,6 @@ test.describe('BOM End-to-End Flow', () => {
 
       // Use ui5.fill() — atomic setValue + fireChange + waitForUI5
       await ui5.fill({ id: IDS.plantInput, searchOpenDialogs: true }, plantValue);
-      await ui5.waitForUI5();
       test.info().annotations.push({
         type: 'info',
         description: `Plant set to: ${plantValue}`,

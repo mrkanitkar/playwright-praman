@@ -242,6 +242,11 @@ export const PramanConfigSchema = z
      * to the test report on any test failure. Set to `false` to disable.
      */
     captureFailureArtifacts: z.boolean().default(true),
+    /**
+     * When `true`, `fill()` will not call `waitForUI5()` after entering text.
+     * Useful for rapid sequential fills where intermediate stability waits are unnecessary.
+     */
+    skipPostFillWait: z.boolean().default(false),
   })
   .strict();
 

@@ -377,6 +377,7 @@ export const moduleTest = coreTest.extend<ModuleFixtures>({
           pramanConfig.selectors?.preferVisibleControls ?? pramanConfig.preferVisibleControls,
         skipStabilityWait:
           pramanConfig.selectors?.skipStabilityWait ?? pramanConfig.skipStabilityWait,
+        skipPostFillWait: pramanConfig.skipPostFillWait,
       },
     });
 
