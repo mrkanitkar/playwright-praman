@@ -21,6 +21,11 @@
  * Placeholder tokens:
  * - `{{uuid}}` — replaced with a random UUID via `node:crypto`
  * - `{{timestamp}}` — replaced with an ISO-8601 timestamp
+ * - `{{today}}` — current date in YYYY-MM-DD (SAP date format)
+ * - `{{tomorrow}}` — tomorrow's date in YYYY-MM-DD
+ * - `{{yesterday}}` — yesterday's date in YYYY-MM-DD
+ * - `{{date+N}}` — date N days from now (e.g., `{{date+7}}`)
+ * - `{{date-N}}` — date N days ago (e.g., `{{date-1}}`)
  *
  * Substitution is recursive: nested objects and arrays are traversed.
  * Non-string primitives (numbers, booleans, null) pass through unchanged.
@@ -28,7 +33,12 @@
  * @example
  * ```typescript
  * const testData = new TestDataHandler({ baseDir: '/tmp/test-data' });
- * const order = testData.generate({ id: '{{uuid}}', createdAt: '{{timestamp}}' });
+ * const order = testData.generate({
+ *   id: '{{uuid}}',
+ *   createdAt: '{{timestamp}}',
+ *   deliveryDate: '{{today}}',
+ *   dueDate: '{{date+30}}',
+ * });
  * await testData.save('order.json', order);
  * const loaded = await testData.load<{ id: string }>('order.json');
  * await testData.cleanup();
@@ -99,6 +109,10 @@ export class TestDataHandler {
    * Deep-clones the template and replaces placeholder tokens:
    * - `{{uuid}}` — random UUID (each occurrence gets a unique value)
    * - `{{timestamp}}` — ISO-8601 timestamp at generation time
+   * - `{{today}}` — current date in YYYY-MM-DD (SAP date format)
+   * - `{{tomorrow}}` — tomorrow's date in YYYY-MM-DD
+   * - `{{yesterday}}` — yesterday's date in YYYY-MM-DD
+   * - `{{date+N}}` / `{{date-N}}` — date offset by N days
    *
    * Recursively processes nested objects and arrays. Non-string
    * primitives pass through unchanged.
@@ -111,6 +125,8 @@ export class TestDataHandler {
    * const order = handler.generate({
    *   id: '{{uuid}}',
    *   createdAt: '{{timestamp}}',
+   *   deliveryDate: '{{today}}',
+   *   dueDate: '{{date+30}}',
    *   items: [{ sku: 'prefix-{{uuid}}' }],
    * });
    * ```
@@ -221,6 +237,68 @@ export class TestDataHandler {
   }
 
   /**
+   * Formats a Date as YYYY-MM-DD (ISO 8601 date, matching SAP date fields).
+   *
+   * @param date - The date to format.
+   * @returns The date string in YYYY-MM-DD format.
+   */
+  private formatSAPDate(date: Date): string {
+    const year = String(date.getFullYear());
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Returns a new Date offset by the given number of days from today.
+   *
+   * @param days - Number of days to offset (positive = future, negative = past).
+   * @returns A new Date instance offset by the specified days.
+   */
+  private offsetDate(days: number): Date {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date;
+  }
+
+  /** Pattern matching `{{date+N}}` or `{{date-N}}` placeholders. */
+  private static readonly DATE_OFFSET_PATTERN = /\{\{date([+-]\d+)\}\}/g;
+
+  /** Pattern matching a whole-string `{{date+N}}` or `{{date-N}}` placeholder. */
+  private static readonly DATE_OFFSET_EXACT_PATTERN = /^\{\{date([+-]\d+)\}\}$/;
+
+  /**
+   * Substitutes all template placeholders in a single string value.
+   *
+   * @param value - The string to process.
+   * @returns The string with all placeholders replaced.
+   */
+  private substituteStringPlaceholders(value: string): string {
+    // Exact-match fast path (avoids unnecessary string allocations)
+    if (value === '{{uuid}}') return randomUUID();
+    if (value === '{{timestamp}}') return new Date().toISOString();
+    if (value === '{{today}}') return this.formatSAPDate(new Date());
+    if (value === '{{tomorrow}}') return this.formatSAPDate(this.offsetDate(1));
+    if (value === '{{yesterday}}') return this.formatSAPDate(this.offsetDate(-1));
+
+    const exactDateMatch = TestDataHandler.DATE_OFFSET_EXACT_PATTERN.exec(value);
+    if (exactDateMatch !== null) {
+      return this.formatSAPDate(this.offsetDate(Number(exactDateMatch[1])));
+    }
+
+    // Mixed-string path: replace all occurrences within a larger string
+    return value
+      .replaceAll('{{uuid}}', randomUUID())
+      .replaceAll('{{timestamp}}', new Date().toISOString())
+      .replaceAll('{{today}}', this.formatSAPDate(new Date()))
+      .replaceAll('{{tomorrow}}', this.formatSAPDate(this.offsetDate(1)))
+      .replaceAll('{{yesterday}}', this.formatSAPDate(this.offsetDate(-1)))
+      .replaceAll(TestDataHandler.DATE_OFFSET_PATTERN, (_match, offset: string) =>
+        this.formatSAPDate(this.offsetDate(Number(offset))),
+      );
+  }
+
+  /**
    * Recursively substitutes template placeholders in a value.
    *
    * @param value - Value to process (string, array, object, or primitive).
@@ -228,11 +306,7 @@ export class TestDataHandler {
    */
   private substituteTemplateValues(value: unknown): unknown {
     if (typeof value === 'string') {
-      if (value === '{{uuid}}') return randomUUID();
-      if (value === '{{timestamp}}') return new Date().toISOString();
-      return value
-        .replaceAll('{{uuid}}', randomUUID())
-        .replaceAll('{{timestamp}}', new Date().toISOString());
+      return this.substituteStringPlaceholders(value);
     }
     if (Array.isArray(value)) {
       return value.map((item: unknown) => this.substituteTemplateValues(item));
