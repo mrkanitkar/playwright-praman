@@ -177,8 +177,10 @@ export function detectSystemType(url: string): 'cloud' | 'onprem' {
 function createBuiltinStrategy(name: string): AuthStrategy {
   switch (name) {
     case 'onprem':
+    case 'basic':
       return new OnPremAuthStrategy();
     case 'cloud-saml':
+    case 'btp-saml':
       return new CloudSAMLAuthStrategy();
     case 'office365':
       return new Office365AuthStrategy();
@@ -196,6 +198,7 @@ function createBuiltinStrategy(name: string): AuthStrategy {
         retryable: false,
         suggestions: [
           'Use a valid strategy name: onprem, cloud-saml, office365, api, certificate, multi-tenant',
+          'Config aliases also accepted: basic (→ onprem), btp-saml (→ cloud-saml)',
           'Or register a custom strategy with registerAuthStrategy()',
         ],
       });

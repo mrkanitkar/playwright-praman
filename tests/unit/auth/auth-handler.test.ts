@@ -16,17 +16,29 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createAuthStrategy } from '../../../src/auth/auth-factory.js';
 import type { AuthLogger } from '../../../src/auth/auth-handler.js';
 import { SAPAuthHandler } from '../../../src/auth/auth-handler.js';
 import type { AuthStrategy, SAPAuthConfig } from '../../../src/auth/auth-types.js';
 import { AuthError } from '../../../src/core/errors/auth-error.js';
-import { createMockAuthPage } from '../../helpers/mock-auth-page.js';
 import type { MockAuthPage } from '../../helpers/mock-auth-page.js';
+import { createMockAuthPage } from '../../helpers/mock-auth-page.js';
 
 // ── Mock retry ──────────────────────────────────────────────────────────────
 vi.mock('#core/utils/retry.js', () => ({
   retry: vi.fn(),
 }));
+
+// ── Mock auth-factory (for loginFromEnv strategy re-derivation) ─────────────
+vi.mock('../../../src/auth/auth-factory.js', async () => {
+  const original = await vi.importActual<Record<string, unknown>>(
+    '../../../src/auth/auth-factory.js',
+  );
+  return {
+    ...original,
+    createAuthStrategy: vi.fn(original['createAuthStrategy'] as typeof createAuthStrategy),
+  };
+});
 
 const TEST_PASSWORD = 'test-secret-value';
 
@@ -82,6 +94,7 @@ describe('SAPAuthHandler', () => {
   let page: MockAuthPage;
   let config: Readonly<SAPAuthConfig>;
   let retryMock: ReturnType<typeof vi.fn>;
+  let createAuthStrategyMock: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
     vi.useFakeTimers();
@@ -101,6 +114,10 @@ describe('SAPAuthHandler', () => {
     // Default: retry executes the function immediately (no actual retrying)
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- mock implementation wrapping async fn
     retryMock.mockImplementation(async (fn: () => Promise<unknown>) => fn());
+
+    // Default: createAuthStrategy returns the mock strategy so loginFromEnv tests stay hermetic
+    createAuthStrategyMock = vi.mocked(createAuthStrategy);
+    createAuthStrategyMock.mockReturnValue(mockStrategy);
   });
 
   afterEach(() => {
@@ -370,6 +387,61 @@ describe('SAPAuthHandler', () => {
       // Missing SAP_CLOUD_PASSWORD
 
       await expect(handler.loginFromEnv(page)).rejects.toThrow(AuthError);
+    });
+
+    it('re-derives strategy from env vars (cloud-saml overrides constructor onprem)', async () => {
+      vi.stubEnv('SAP_ACTIVE_SYSTEM', 'cloud');
+      vi.stubEnv('SAP_CLOUD_BASE_URL', 'https://my-tenant.s4hana.cloud.sap');
+      vi.stubEnv('SAP_CLOUD_USERNAME', 'cloud-user');
+      vi.stubEnv('SAP_CLOUD_PASSWORD', 'cloud-pass');
+      vi.stubEnv('SAP_AUTH_STRATEGY', 'cloud-saml');
+
+      const cloudStrategy = createMockStrategy('cloud-saml');
+      createAuthStrategyMock.mockReturnValueOnce(cloudStrategy);
+
+      await handler.loginFromEnv(page);
+
+      expect(createAuthStrategyMock).toHaveBeenCalledWith(
+        expect.objectContaining({ strategy: 'cloud-saml' }),
+      );
+      expect(cloudStrategy.authenticate).toHaveBeenCalled();
+    });
+
+    it('re-derives strategy using btp-saml alias from env', async () => {
+      vi.stubEnv('SAP_ACTIVE_SYSTEM', 'cloud');
+      vi.stubEnv('SAP_CLOUD_BASE_URL', 'https://my-tenant.s4hana.cloud.sap');
+      vi.stubEnv('SAP_CLOUD_USERNAME', 'cloud-user');
+      vi.stubEnv('SAP_CLOUD_PASSWORD', 'cloud-pass');
+      vi.stubEnv('SAP_AUTH_STRATEGY', 'btp-saml');
+
+      const btpStrategy = createMockStrategy('cloud-saml');
+      createAuthStrategyMock.mockReturnValueOnce(btpStrategy);
+
+      await handler.loginFromEnv(page);
+
+      expect(createAuthStrategyMock).toHaveBeenCalledWith(
+        expect.objectContaining({ strategy: 'btp-saml' }),
+      );
+      expect(btpStrategy.authenticate).toHaveBeenCalled();
+      const session = handler.getSessionInfo();
+      expect(session?.strategyName).toBe('cloud-saml');
+    });
+
+    it('auto-detects cloud strategy from URL when SAP_AUTH_STRATEGY is unset', async () => {
+      vi.stubEnv('SAP_ACTIVE_SYSTEM', 'cloud');
+      vi.stubEnv('SAP_CLOUD_BASE_URL', 'https://my-tenant.s4hana.cloud.sap');
+      vi.stubEnv('SAP_CLOUD_USERNAME', 'cloud-user');
+      vi.stubEnv('SAP_CLOUD_PASSWORD', 'cloud-pass');
+
+      const cloudStrategy = createMockStrategy('cloud-saml');
+      createAuthStrategyMock.mockReturnValueOnce(cloudStrategy);
+
+      await handler.loginFromEnv(page);
+
+      expect(createAuthStrategyMock).toHaveBeenCalledWith(
+        expect.objectContaining({ url: 'https://my-tenant.s4hana.cloud.sap' }),
+      );
+      expect(cloudStrategy.authenticate).toHaveBeenCalled();
     });
   });
 
