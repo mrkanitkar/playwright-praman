@@ -16,6 +16,13 @@ keywords:
   - web storage fixture
   - typescript 7 playwright
   - typescript 6 playwright
+  - sap intent api
+  - quality management qm
+  - warehouse management wm
+  - asset management am
+  - human resources hr
+  - visual regression testing
+  - intent overrides
 ---
 
 # Release Notes
@@ -128,6 +135,161 @@ The guard is fail-closed: on Playwright < 1.63, attempting to use `lock` throws 
 New `waitForControlState()` method for per-control predicates — additive to `waitForUI5Stable()`, which is global. Useful when a specific control's state matters independently of the UI5 framework's busy state.
 
 The compatibility policy is documented: throw when the Playwright floor has no equivalent, degrade when it does.
+
+### 🏭 S/4HANA Gap Analysis — 4 New Intent Domains
+
+Based on real-world usage analysis of SAP S/4HANA test suites, Praman adds four new intent domains:
+
+| Domain               | SAP Module | Functions                                                           | Namespace                |
+| -------------------- | ---------- | ------------------------------------------------------------------- | ------------------------ |
+| Quality Management   | QM         | `createInspectionLot`, `recordResults`, `createQualityNotification` | `intent.quality`         |
+| Warehouse Management | WM         | `createGoodsMovement`, `createTransferOrder`                        | `intent.warehouse`       |
+| Asset Management     | AM         | `acquireAsset`, `retireAsset`, `transferAsset`                      | `intent.assetManagement` |
+| Human Resources      | HR         | `createEmployee`, `recordTime`, `requestAbsence`                    | `intent.hr`              |
+
+All follow the existing intent pattern: vocabulary-driven field resolution, `IntentResult` envelope, `IntentOptions` with skip-navigation and timeout.
+
+```typescript
+import { quality, warehouse, assetManagement, hr } from 'playwright-praman/intents';
+
+await quality.createInspectionLot(ui5, ui5Nav, vocab, {
+  material: 'RAW-0001',
+  plant: '1000',
+});
+
+await hr.requestAbsence(ui5, ui5Nav, vocab, {
+  absenceType: 'Vacation',
+  startDate: '2026-11-01',
+  endDate: '2026-11-05',
+});
+```
+
+### 🔧 Intent Configurability — IntentOverrides
+
+All 9 intent domains now accept `overrides` in `IntentOptions` for environment-specific customization:
+
+```typescript
+await procurement.createPurchaseOrder(ui5, ui5Nav, vocab, poData, {
+  overrides: {
+    appId: 'ZMM_PO-create', // Custom FLP hash
+    saveButtonText: 'Sichern', // Localized button label
+    fields: { Vendor: 'Lieferant' }, // Localized field labels
+  },
+});
+```
+
+This eliminates hardcoded FLP semantic objects, button labels, and field names — making tests portable across SAP system landscapes with different configurations or languages.
+
+### 📊 Reporter Enhancements
+
+**Compliance reporter annotations:** The compliance reporter now reads Playwright test annotations for SAP-specific metadata:
+
+```typescript
+test(
+  'create purchase order',
+  {
+    annotation: [
+      { type: 'process', description: 'Procure-to-Pay' },
+      { type: 'tcode', description: 'ME21N' },
+      { type: 'criticality', description: 'high' },
+    ],
+  },
+  async ({ ui5 }) => {
+    /* ... */
+  },
+);
+```
+
+The `ANNOTATION_TYPES` constant is exported from `playwright-praman/reporters`.
+
+**Allure SAP categories:** Pre-defined failure categories for Allure reporting — `ALLURE_SAP_CATEGORIES` maps Praman error codes to Allure-compatible category objects for UI5 control errors, navigation errors, OData errors, auth errors, and test data failures.
+
+### 📸 New: Visual Regression Fixture
+
+Screenshot comparison with automatic FLP chrome masking:
+
+```typescript
+test('purchase order form', async ({ visualRegression }) => {
+  await visualRegression.compareScreenshot('po-form', {
+    mask: visualRegression.maskFLPChrome(),
+  });
+});
+```
+
+The `maskFLPChrome()` method returns locators for `#shell-header`, `.sapUshellShellHead`, and `#meAreaHeaderButton` — the SAP FLP elements that change between sessions and break pixel comparisons.
+
+Available as standalone `visualRegressionTest` or merged into the default `test` object.
+
+### 🗄️ New: Standalone OData Fixture
+
+`odata` is now available as a top-level fixture (alongside the existing `ui5.odata` sub-namespace):
+
+```typescript
+test('verify entity count', async ({ odata }) => {
+  const count = await odata.getEntityCount('/sap/opu/odata/sap/ZMM_PO_SRV/PurchaseOrders');
+  expect(count).toBeGreaterThan(0);
+});
+```
+
+Available as standalone `odataTest` or merged into the default `test` object.
+
+### 📅 Date Template Placeholders
+
+The `testData` fixture now supports date placeholders in templates:
+
+| Placeholder     | Resolves to               |
+| --------------- | ------------------------- |
+| `{{today}}`     | Current date (YYYY-MM-DD) |
+| `{{tomorrow}}`  | Tomorrow's date           |
+| `{{yesterday}}` | Yesterday's date          |
+| `{{date+N}}`    | N days from now           |
+| `{{date-N}}`    | N days ago                |
+
+```typescript
+test('create PO with dynamic dates', async ({ testData }) => {
+  const data = await testData.load('po-template', {
+    deliveryDate: '{{date+14}}', // 2 weeks from now
+    documentDate: '{{today}}',
+  });
+});
+```
+
+### 🌍 Multi-Environment defineConfig
+
+`defineConfig()` now accepts an optional second parameter for environment-specific overrides:
+
+```typescript
+import { defineConfig } from 'playwright-praman';
+
+export default defineConfig(
+  { baseURL: 'https://dev.example.com', auth: { strategy: 'form' } },
+  {
+    ci: { baseURL: 'https://ci.example.com', headless: true },
+    staging: { baseURL: 'https://staging.example.com' },
+  },
+);
+```
+
+Set `PRAMAN_ENV` or `NODE_ENV` to select the environment. `PRAMAN_ENV` takes precedence.
+
+### ⚡ fill() Now Calls waitForUI5
+
+`fill()` now automatically calls `waitForUI5()` after `setValue` + `fireChange`, matching the documented behavior. This eliminates the need for manual `waitForUI5()` calls after fill operations.
+
+Opt out via config for performance-sensitive scenarios:
+
+```typescript
+defineConfig({ skipPostFillWait: true });
+```
+
+### 🧩 Scaffolder Templates
+
+`npx praman init` now generates additional project files:
+
+- `global.teardown.ts` — shared test teardown
+- `tests/helpers/master-data.ts` — reusable master data helpers
+- `.github/workflows/playwright.yml` — CI workflow template
+- Subdirectories: `tests/helpers/`, `tests/otc/`, `tests/ptp/`, `tests/rtr/`
 
 ### 🐛 Bug Fixes
 

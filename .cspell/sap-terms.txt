@@ -109,8 +109,10 @@ srvd
 resourceroots
 
 # SAP i18n test terms
+Lieferant
 Sichern
 Enregistrer
+Werk
 
 # SAP auth (Microsoft IDP)
 loginfmt
