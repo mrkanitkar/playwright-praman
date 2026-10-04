@@ -36,7 +36,6 @@
 
 import process from 'node:process';
 
-import { test as base } from '@playwright/test';
 import type { Logger } from 'pino';
 
 import type {
@@ -58,6 +57,8 @@ import {
 } from '../modules/navigation.js';
 import type { BTPWorkZoneManager } from '../modules/workzone.js';
 import { createWorkZoneManager } from '../modules/workzone.js';
+
+import { withCore as base } from './typed-base.js';
 
 import { resetPageInjection } from '#bridge/injection.js';
 import type { PramanConfig } from '#core/config/index.js';
@@ -330,14 +331,7 @@ export interface NavWorkerDeps {
  * });
  * ```
  */
-export const navTest = base.extend<NavFixtures, NavWorkerDeps>({
-  // ── Cross-fixture option placeholders (PW-MERGE-1) ────────────────
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  rootLogger: [undefined!, { option: true, scope: 'worker' }],
-
+export const navTest = base.extend<NavFixtures>({
   // ── ui5Navigation fixture ─────────────────────────────────────────
 
   ui5Navigation: async ({ page, pramanConfig, rootLogger }, use) => {

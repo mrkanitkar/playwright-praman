@@ -58,8 +58,9 @@
 
 import { Buffer } from 'node:buffer';
 
-import { test as base } from '@playwright/test';
 import type { Page } from '@playwright/test';
+
+import { withCore as base } from './typed-base.js';
 
 import { createControlTreeScript } from '#bridge/browser-scripts/control-tree.js';
 import {
@@ -128,11 +129,7 @@ interface ControlTreeDeps {
  * });
  * ```
  */
-export const controlTreeTest = base.extend<ControlTreeFixtures, ControlTreeDeps>({
-  // Placeholder — provided by coreTest via mergeTests (PW-MERGE-1)
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
-
+export const controlTreeTest = base.extend<ControlTreeFixtures>({
   controlTreeCapture: [
     async (
       { page, pramanConfig }: { page: Page; pramanConfig: Readonly<PramanConfig> },

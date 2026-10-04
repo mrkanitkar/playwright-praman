@@ -40,11 +40,14 @@
  * @module fixtures
  */
 
-import { test as base } from '@playwright/test';
+import type { IntentTestFixtures } from './intent-fixture-types.js';
+import { withCoreNav as base } from './typed-base.js';
 
-import type { IntentFixtureDeps, IntentTestFixtures } from './intent-fixture-types.js';
-
-export type { IntentFixture, IntentFixtureDeps, IntentTestFixtures } from './intent-fixture-types.js';
+export type {
+  IntentFixture,
+  IntentFixtureDeps,
+  IntentTestFixtures,
+} from './intent-fixture-types.js';
 
 // ── Fixture definition ──────────────────────────────────────────────────────
 
@@ -74,13 +77,7 @@ export type { IntentFixture, IntentFixtureDeps, IntentTestFixtures } from './int
  * });
  * ```
  */
-export const intentTest = base.extend<IntentTestFixtures & IntentFixtureDeps>({
-  // ── Cross-fixture option placeholders (PW-MERGE-1) ──────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  ui5: [undefined!, { option: true }],
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  ui5Navigation: [undefined!, { option: true }],
-
+export const intentTest = base.extend<IntentTestFixtures>({
   intent: async ({ ui5, ui5Navigation }, use) => {
     const [intentModule, vocabModule] = await Promise.all([
       import('#intents/index.js'),

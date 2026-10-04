@@ -40,8 +40,9 @@
  * @module fixtures
  */
 
-import { test as base } from '@playwright/test';
 import type { Frame, Page } from '@playwright/test';
+
+import { withCore as base } from './typed-base.js';
 
 import type { PramanConfig } from '#core/config/index.js';
 import { createLogger } from '#core/logging/index.js';
@@ -108,11 +109,7 @@ interface StabilityDeps {
  * });
  * ```
  */
-export const stabilityTest = base.extend<StabilityFixtures, StabilityDeps>({
-  // Placeholder — provided by coreTest via mergeTests (PW-MERGE-1)
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
-
+export const stabilityTest = base.extend<StabilityFixtures>({
   requestInterceptor: [
     async ({ page, pramanConfig }: { page: Page; pramanConfig: Readonly<PramanConfig> }, use) => {
       const patterns = [...DEFAULT_IGNORE_PATTERNS, ...pramanConfig.ignoreAutoWaitUrls];

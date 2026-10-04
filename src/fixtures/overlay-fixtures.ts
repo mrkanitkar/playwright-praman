@@ -45,9 +45,9 @@
 import { Buffer } from 'node:buffer';
 
 import type { Page } from '@playwright/test';
-import { test as base } from '@playwright/test';
 
 import { BUILT_IN_OVERLAY_RULES, OverlayHandler } from './overlay-handler.js';
+import { withCore as base } from './typed-base.js';
 
 import type { PramanConfig } from '#core/config/schema.js';
 import { createLogger } from '#core/logging/logger.js';
@@ -98,11 +98,7 @@ export interface OverlayDeps {
  * });
  * ```
  */
-export const overlayTest = base.extend<OverlayFixtures, OverlayDeps>({
-  // Placeholder — provided by coreTest via mergeTests (PW-MERGE-1)
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
-
+export const overlayTest = base.extend<OverlayFixtures>({
   overlays: async (
     { page, pramanConfig }: { page: Page; pramanConfig: Readonly<PramanConfig> },
     use,

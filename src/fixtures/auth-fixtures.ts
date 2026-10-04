@@ -36,11 +36,11 @@
  * @module fixtures
  */
 
-import { test as base } from '@playwright/test';
-
 import { createAuthStrategy } from '../auth/auth-factory.js';
 import { SAPAuthHandler } from '../auth/auth-handler.js';
 import type { SAPAuthConfig } from '../auth/auth-types.js';
+
+import { withCore as base } from './typed-base.js';
 
 /**
  * Auth fixture option types.
@@ -148,11 +148,7 @@ const fixtureLogger = {
  * });
  * ```
  */
-export const authTest = base.extend<AuthFixtures & AuthFixtureOptions, AuthDeps>({
-  // Placeholder — provided by coreTest via mergeTests (PW-MERGE-1)
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
-
+export const authTest = base.extend<AuthFixtures & AuthFixtureOptions>({
   sapAuthConfig: [{ url: '', username: '', password: '' }, { option: true }],
 
   sapAuth: async ({ sapAuthConfig, page }, use) => {

@@ -50,8 +50,16 @@ const authSchema = z.object({
    * For API-based, certificate, or multi-tenant auth, see the
    * authentication guide — these are configured programmatically.
    */
-  strategy: z.enum(['btp-saml', 'basic', 'office365', 'custom']).default('basic'),
-  baseUrl: z.url().optional(),
+  strategy: z.preprocess(
+    (v) => {
+      if (v === 'cloud-saml') return 'btp-saml';
+      if (v === 'onprem') return 'basic';
+      if (v === 'azure-ad' || v === 'entra') return 'office365';
+      return v;
+    },
+    z.enum(['btp-saml', 'basic', 'office365', 'custom']).default('basic'),
+  ),
+  baseUrl: z.preprocess((v) => (v === '' ? undefined : v), z.url().optional()),
   username: z.string().optional(),
   password: z.string().optional(),
   client: z.string().default('100'),
@@ -60,7 +68,10 @@ const authSchema = z.object({
 
 // ── AI sub-schema ────────────────────────────────────────────────────
 const aiSchema = z.object({
-  provider: z.enum(['azure-openai', 'openai', 'anthropic']).default('azure-openai'),
+  provider: z.preprocess(
+    (v) => (v === 'claude' ? 'anthropic' : v),
+    z.enum(['azure-openai', 'openai', 'anthropic']).default('azure-openai'),
+  ),
   /** Include an aria snapshot in `pramanAI.buildContext()` output (Playwright 1.60+). On unless set to `false`. */
   includeAriaSnapshot: z.boolean().optional(),
   apiKey: z.string().optional(),
@@ -68,7 +79,7 @@ const aiSchema = z.object({
   temperature: z.number().min(0).max(2).default(0.3),
   maxTokens: z.number().int().positive().optional(),
   // Azure OpenAI-specific fields (W2: azure-openai + openai supported; W14: anthropic added)
-  endpoint: z.url().optional(), // Azure: resource endpoint URL
+  endpoint: z.preprocess((v) => (v === '' ? undefined : v), z.url().optional()), // Azure: resource endpoint URL
   deployment: z.string().optional(), // Azure: deployment name
   apiVersion: z.string().optional(), // Azure: API version e.g. '2024-02-01'
   // Anthropic-specific fields (W14: separate key for security clarity)

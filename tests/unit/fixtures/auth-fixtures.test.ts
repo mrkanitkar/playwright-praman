@@ -168,8 +168,8 @@ describe('auth-fixtures fixture declarations', () => {
     expect(fixtures).toHaveProperty('sapAuthConfig');
   });
 
-  it('authTest exports fixture definitions with pramanConfig placeholder', () => {
-    expect(fixtures).toHaveProperty('pramanConfig');
+  it('authTest does not export pramanConfig placeholder (provided by type-only base)', () => {
+    expect(fixtures).not.toHaveProperty('pramanConfig');
   });
 });
 
@@ -203,12 +203,9 @@ describe('auth-fixtures sapAuthConfig option', () => {
   });
 });
 
-describe('auth-fixtures pramanConfig placeholder', () => {
-  it('is declared as a fixture option (cross-fixture dependency via mergeTests)', () => {
-    const options = extractFixtureOptions(fixtures['pramanConfig']);
-
-    expect(options).toBeDefined();
-    expect(options?.['option']).toBe(true);
+describe('auth-fixtures pramanConfig (type-only base)', () => {
+  it('is NOT declared as a fixture — provided via typed-base type cast', () => {
+    expect(fixtures).not.toHaveProperty('pramanConfig');
   });
 });
 

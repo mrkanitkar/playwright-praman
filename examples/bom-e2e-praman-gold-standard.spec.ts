@@ -184,6 +184,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Verify dialog opened — Material SmartField exists inside dialog
       const materialField = await ui5.control({
         id: IDS.materialField,
+        controlType: 'sap.ui.comp.smartfield.SmartField',
         searchOpenDialogs: true,
       });
       const materialType = await materialField.getControlType();
@@ -196,6 +197,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Verify BOM Usage SmartField exists and is required
       const bomUsageField = await ui5.control({
         id: IDS.bomUsageField,
+        controlType: 'sap.ui.comp.smartfield.SmartField',
         searchOpenDialogs: true,
       });
       const bomUsageType = await bomUsageField.getControlType();
@@ -207,10 +209,12 @@ test.describe('BOM End-to-End Flow', () => {
       // Verify dialog footer buttons
       const createDialogBtn = await ui5.control({
         id: IDS.okBtn,
+        controlType: 'sap.m.Button',
         searchOpenDialogs: true,
       });
       const cancelDialogBtn = await ui5.control({
         id: IDS.cancelBtn,
+        controlType: 'sap.m.Button',
         searchOpenDialogs: true,
       });
       const createBtnText = await createDialogBtn.getProperty('text');
@@ -241,30 +245,28 @@ test.describe('BOM End-to-End Flow', () => {
       // Wait for VH dialog to open
       const materialDialog = await ui5.control({
         id: IDS.materialVHDialog,
+        controlType: 'sap.ui.comp.valuehelpdialog.ValueHelpDialog',
         searchOpenDialogs: true,
       });
       const dialogExists = await materialDialog.isOpen();
       expect(dialogExists).toBe(true);
       await ui5.waitForUI5();
 
-      // Get inner table via SmartTable.getTable()
-      const smartTable = await ui5.control({
-        id: IDS.materialVHTable,
-        searchOpenDialogs: true,
-      });
-      const innerTable = await smartTable.getTable();
-
-      // getRows() returns array of UI5ControlProxy instances
-      const rows = (await innerTable.getRows()) as unknown[];
-      test.info().annotations.push({
-        type: 'info',
-        description: `getRows() returned ${rows.length} row proxies`,
-      });
-      expect(rows.length).toBeGreaterThan(0);
-
-      // Wait for OData data to load using Playwright auto-retry
+      // Wait for SmartTable data to load using Playwright auto-retry.
+      // Both getTable()/getRows() and the binding-context check must be
+      // inside the retry — the value-help table loads asynchronously after
+      // the dialog opens, so rows may be empty on the first attempt.
       let materialRowCount = 0;
       await expect(async () => {
+        const smartTable = await ui5.control({
+          id: IDS.materialVHTable,
+          controlType: 'sap.ui.comp.smarttable.SmartTable',
+          searchOpenDialogs: true,
+        });
+        const innerTable = await smartTable.getTable();
+        const rows = (await innerTable.getRows()) as unknown[];
+        expect(rows.length).toBeGreaterThan(0);
+
         materialRowCount = 0;
         for (const row of rows) {
           const ctx = await (
@@ -297,24 +299,25 @@ test.describe('BOM End-to-End Flow', () => {
       // Wait for VH dialog to open
       const plantDialog = await ui5.control({
         id: IDS.plantVHDialog,
+        controlType: 'sap.ui.comp.valuehelpdialog.ValueHelpDialog',
         searchOpenDialogs: true,
       });
       const dialogExists = await plantDialog.isOpen();
       expect(dialogExists).toBe(true);
       await ui5.waitForUI5();
 
-      // Get inner table via SmartTable.getTable()
-      const plantSmartTable = await ui5.control({
-        id: IDS.plantVHTable,
-        searchOpenDialogs: true,
-      });
-      const plantInnerTable = await plantSmartTable.getTable();
-
-      const plantRows = (await plantInnerTable.getRows()) as unknown[];
-
-      // Wait for OData data to load using Playwright auto-retry
+      // Wait for Plant value-help data (same retry pattern as Step 3)
       let plantRowCount = 0;
       await expect(async () => {
+        const plantSmartTable = await ui5.control({
+          id: IDS.plantVHTable,
+          controlType: 'sap.ui.comp.smarttable.SmartTable',
+          searchOpenDialogs: true,
+        });
+        const plantInnerTable = await plantSmartTable.getTable();
+        const plantRows = (await plantInnerTable.getRows()) as unknown[];
+        expect(plantRows.length).toBeGreaterThan(0);
+
         plantRowCount = 0;
         for (const row of plantRows) {
           const ctx = await (
@@ -341,6 +344,7 @@ test.describe('BOM End-to-End Flow', () => {
       // BOM Usage is a SmartField with inner ComboBox
       const bomUsageCombo = await ui5.control({
         id: IDS.bomUsageCombo,
+        controlType: 'sap.m.ComboBox',
         searchOpenDialogs: true,
       });
 
@@ -385,6 +389,7 @@ test.describe('BOM End-to-End Flow', () => {
 
       const materialDialogControl = await ui5.control({
         id: IDS.materialVHDialog,
+        controlType: 'sap.ui.comp.valuehelpdialog.ValueHelpDialog',
         searchOpenDialogs: true,
       });
 
@@ -397,6 +402,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Get first material via SmartTable -> innerTable -> getContextByIndex
       const smartTableMat = await ui5.control({
         id: IDS.materialVHTable,
+        controlType: 'sap.ui.comp.smarttable.SmartTable',
         searchOpenDialogs: true,
       });
       const innerTableMat = await smartTableMat.getTable();
@@ -435,6 +441,7 @@ test.describe('BOM End-to-End Flow', () => {
 
       const plantDialogControl = await ui5.control({
         id: IDS.plantVHDialog,
+        controlType: 'sap.ui.comp.valuehelpdialog.ValueHelpDialog',
         searchOpenDialogs: true,
       });
 
@@ -447,6 +454,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Get first plant via SmartTable -> innerTable -> getContextByIndex
       const smartTablePlant = await ui5.control({
         id: IDS.plantVHTable,
+        controlType: 'sap.ui.comp.smarttable.SmartTable',
         searchOpenDialogs: true,
       });
       const innerTablePlant = await smartTablePlant.getTable();
@@ -480,6 +488,7 @@ test.describe('BOM End-to-End Flow', () => {
       // === FILL BOM USAGE ===
       const bomUsageControl = await ui5.control({
         id: IDS.bomUsageCombo,
+        controlType: 'sap.m.ComboBox',
         searchOpenDialogs: true,
       });
 
@@ -528,12 +537,14 @@ test.describe('BOM End-to-End Flow', () => {
 
       const finalBomUsageCtrl = await ui5.control({
         id: IDS.bomUsageCombo,
+        controlType: 'sap.m.ComboBox',
         searchOpenDialogs: true,
       });
       const finalBomUsageKey = (await finalBomUsageCtrl.getSelectedKey()) ?? '';
 
       const createBtnCtrl = await ui5.control({
         id: IDS.okBtn,
+        controlType: 'sap.m.Button',
         searchOpenDialogs: true,
       });
       const createBtnEnabled = await createBtnCtrl.getEnabled();
@@ -561,6 +572,7 @@ test.describe('BOM End-to-End Flow', () => {
       // Verify Create button state before pressing
       const createBtn = await ui5.control({
         id: IDS.okBtn,
+        controlType: 'sap.m.Button',
         searchOpenDialogs: true,
       });
       const createBtnText = await createBtn.getProperty('text');
@@ -586,6 +598,7 @@ test.describe('BOM End-to-End Flow', () => {
       try {
         const okBtnCheck = await ui5.control({
           id: IDS.okBtn,
+          controlType: 'sap.m.Button',
           searchOpenDialogs: true,
         });
         const isEnabled = await okBtnCheck.getEnabled();
@@ -598,7 +611,11 @@ test.describe('BOM End-to-End Flow', () => {
             plant: (await ui5.getValue({ id: IDS.plantInput, searchOpenDialogs: true })) ?? '',
             bomUsage:
               (await (
-                await ui5.control({ id: IDS.bomUsageCombo, searchOpenDialogs: true })
+                await ui5.control({
+                  id: IDS.bomUsageCombo,
+                  controlType: 'sap.m.ComboBox',
+                  searchOpenDialogs: true,
+                })
               ).getSelectedKey()) ?? '',
           };
         }

@@ -59,8 +59,9 @@
 
 import { Buffer } from 'node:buffer';
 
-import { test as base } from '@playwright/test';
 import type { Page, Request, Response } from '@playwright/test';
+
+import { withCore as base } from './typed-base.js';
 
 import type { PramanConfig } from '#core/config/index.js';
 import { createLogger } from '#core/logging/index.js';
@@ -211,11 +212,7 @@ export function isODataUrl(url: string, patterns: readonly string[]): boolean {
  * });
  * ```
  */
-export const odataTraceTest = base.extend<ODataTraceFixtures, ODataTraceDeps>({
-  // Placeholder — provided by coreTest via mergeTests (PW-MERGE-1)
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
-
+export const odataTraceTest = base.extend<ODataTraceFixtures>({
   odataTraceInterceptor: [
     async (
       { page, pramanConfig }: { page: Page; pramanConfig: Readonly<PramanConfig> },

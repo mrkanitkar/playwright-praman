@@ -365,16 +365,14 @@ export async function loadConfig(options?: LoadConfigOptions): Promise<Readonly<
   // If env vars caused validation failure, fall back to overrides-only and warn
   const fallbackResult = PramanConfigSchema.safeParse(options?.overrides ?? {});
   if (fallbackResult.success) {
-    log.warn(
-      {
-        zodErrors: result.error.issues.map((issue) => ({
-          path: issue.path,
-          message: issue.message,
-          code: issue.code,
-        })),
-      },
-      'Config validation failed due to invalid env vars — falling back to overrides-only config',
-    );
+    for (const issue of result.error.issues) {
+      const field = issue.path.join('.');
+      log.warn(
+        'Invalid env config for %s: %s — this field will be ignored (other env vars are unaffected)',
+        field,
+        issue.message,
+      );
+    }
     return Object.freeze(fallbackResult.data);
   }
 

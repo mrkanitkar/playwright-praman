@@ -208,11 +208,8 @@ describe('screencast-fixture structure', () => {
     expect(fixtures).toHaveProperty('screencast');
   });
 
-  it('has _fixtureDefinitions with rootLogger option placeholder', () => {
-    expect(fixtures).toHaveProperty('rootLogger');
-    const opts = extractFixtureOptions(fixtures['rootLogger']);
-    expect(opts?.['option']).toBe(true);
-    expect(opts?.['scope']).toBe('worker');
+  it('does NOT declare rootLogger as a runtime fixture (provided via typed-base)', () => {
+    expect(fixtures).not.toHaveProperty('rootLogger');
   });
 
   it('declares screencast as a test-scoped fixture (bare function)', () => {
@@ -934,7 +931,6 @@ describe('screencast-fixture — type-level assertions', () => {
 
   it('fixture definitions have expected keys', () => {
     expect(Object.keys(fixtures)).toContain('screencast');
-    expect(Object.keys(fixtures)).toContain('rootLogger');
   });
 });
 

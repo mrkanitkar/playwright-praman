@@ -43,8 +43,6 @@
  * @module fixtures
  */
 
-import { test as base } from '@playwright/test';
-
 import type { AgenticHandler } from '../ai/agentic-handler.js';
 import type { DiscoverPageOptions, DiscoveryPage } from '../ai/bulk-discovery.js';
 import type { CapabilityRegistry } from '../ai/capability-registry.js';
@@ -54,6 +52,8 @@ import type { AiResponse, PageContext } from '../ai/types.js';
 import type { PramanConfig } from '../core/config/schema.js';
 import { createLogger } from '../core/logging/index.js';
 import type { VocabularyService } from '../vocabulary/types.js';
+
+import { withCore as base } from './typed-base.js';
 
 // ── Public fixture type ─────────────────────────────────────────────────────
 
@@ -152,11 +152,7 @@ export interface AIFixtures {
  * });
  * ```
  */
-export const aiTest = base.extend<AIFixtures, AIWorkerDeps>({
-  // ── Cross-fixture option placeholders (PW-MERGE-1) ──────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
-  pramanConfig: [undefined!, { option: true, scope: 'worker' }],
-
+export const aiTest = base.extend<AIFixtures>({
   // ── pramanAI fixture ─────────────────────────────────────────────────────
   pramanAI: async ({ pramanConfig, page }, use) => {
     const [aiModule, vocabModule] = await Promise.all([
