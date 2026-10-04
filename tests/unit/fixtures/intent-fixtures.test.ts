@@ -85,6 +85,27 @@ const mocks = vi.hoisted(() => {
   const createCustomerMaster = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
   const createMaterialMaster = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
 
+  // ── Quality domain ────────────────────────────────────────────────
+  const createInspectionLot = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const recordResults = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const createQualityNotification = vi
+    .fn()
+    .mockResolvedValue({ status: 'success', data: undefined });
+
+  // ── Warehouse domain ──────────────────────────────────────────────
+  const createGoodsMovement = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const createTransferOrder = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+
+  // ── Asset Management domain ───────────────────────────────────────
+  const acquireAsset = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const retireAsset = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const transferAsset = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+
+  // ── HR domain ─────────────────────────────────────────────────────
+  const createEmployee = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const recordTime = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+  const requestAbsence = vi.fn().mockResolvedValue({ status: 'success', data: undefined });
+
   return {
     // vocabulary
     loadDomain,
@@ -122,6 +143,21 @@ const mocks = vi.hoisted(() => {
     createVendorMaster,
     createCustomerMaster,
     createMaterialMaster,
+    // quality
+    createInspectionLot,
+    recordResults,
+    createQualityNotification,
+    // warehouse
+    createGoodsMovement,
+    createTransferOrder,
+    // assetManagement
+    acquireAsset,
+    retireAsset,
+    transferAsset,
+    // hr
+    createEmployee,
+    recordTime,
+    requestAbsence,
   };
 });
 
@@ -162,6 +198,25 @@ vi.mock('#intents/index.js', () => ({
     createVendorMaster: mocks.createVendorMaster,
     createCustomerMaster: mocks.createCustomerMaster,
     createMaterialMaster: mocks.createMaterialMaster,
+  },
+  quality: {
+    createInspectionLot: mocks.createInspectionLot,
+    recordResults: mocks.recordResults,
+    createQualityNotification: mocks.createQualityNotification,
+  },
+  warehouse: {
+    createGoodsMovement: mocks.createGoodsMovement,
+    createTransferOrder: mocks.createTransferOrder,
+  },
+  assetManagement: {
+    acquireAsset: mocks.acquireAsset,
+    retireAsset: mocks.retireAsset,
+    transferAsset: mocks.transferAsset,
+  },
+  hr: {
+    createEmployee: mocks.createEmployee,
+    recordTime: mocks.recordTime,
+    requestAbsence: mocks.requestAbsence,
   },
 }));
 
@@ -372,6 +427,17 @@ function resetAllMockDefaults(): void {
   mocks.createVendorMaster.mockResolvedValue({ status: 'success', data: undefined });
   mocks.createCustomerMaster.mockResolvedValue({ status: 'success', data: undefined });
   mocks.createMaterialMaster.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createInspectionLot.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.recordResults.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createQualityNotification.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createGoodsMovement.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createTransferOrder.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.acquireAsset.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.retireAsset.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.transferAsset.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.createEmployee.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.recordTime.mockResolvedValue({ status: 'success', data: undefined });
+  mocks.requestAbsence.mockResolvedValue({ status: 'success', data: undefined });
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────
@@ -404,7 +470,7 @@ describe('intent-fixtures fixture definitions', () => {
       expect(fixtures).toHaveProperty('intent');
     });
 
-    it('provides all 6 domain namespaces', async () => {
+    it('provides all 10 domain namespaces', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
       const intent = await runFixture<Record<string, unknown>>(fn, {
         ui5: mockUi5,
@@ -418,15 +484,19 @@ describe('intent-fixtures fixture definitions', () => {
       expect(intent['finance']).toBeDefined();
       expect(intent['manufacturing']).toBeDefined();
       expect(intent['masterData']).toBeDefined();
+      expect(intent['quality']).toBeDefined();
+      expect(intent['warehouse']).toBeDefined();
+      expect(intent['assetManagement']).toBeDefined();
+      expect(intent['hr']).toBeDefined();
     });
 
-    it('preloads all 4 vocabulary domains before use()', async () => {
+    it('preloads all 8 vocabulary domains before use()', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
       let domainsLoadedBeforeUse = false;
 
       // Wrap use() to check state at the moment use() is called (value not needed)
       const captureUse = async (): Promise<void> => {
-        domainsLoadedBeforeUse = mocks.loadDomain.mock.calls.length >= 4;
+        domainsLoadedBeforeUse = mocks.loadDomain.mock.calls.length >= 8;
         await Promise.resolve();
       };
 
@@ -435,7 +505,7 @@ describe('intent-fixtures fixture definitions', () => {
       expect(domainsLoadedBeforeUse).toBe(true);
     });
 
-    it('calls loadDomain for procurement, sales, finance, manufacturing', async () => {
+    it('calls loadDomain for all 8 domains including quality, warehouse, asset-management, hr', async () => {
       const fn = extractFixtureFn(fixtures['intent']);
       await runFixture<Record<string, unknown>>(fn, {
         ui5: mockUi5,
@@ -447,6 +517,10 @@ describe('intent-fixtures fixture definitions', () => {
       expect(domainArgs).toContain('sales');
       expect(domainArgs).toContain('finance');
       expect(domainArgs).toContain('manufacturing');
+      expect(domainArgs).toContain('quality');
+      expect(domainArgs).toContain('warehouse');
+      expect(domainArgs).toContain('asset-management');
+      expect(domainArgs).toContain('hr');
     });
 
     // ── core namespace ──────────────────────────────────────────────────
@@ -863,6 +937,197 @@ describe('intent-fixtures fixture definitions', () => {
       )({ materialNumber: 'RAW-0001', description: 'Raw material A' });
 
       expect(mocks.createMaterialMaster).toHaveBeenCalledOnce();
+    });
+
+    // ── quality namespace ─────────────────────────────────────────────
+
+    it('quality.createInspectionLot delegates to quality.createInspectionLot', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const qm = intent['quality'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(qm, 'createInspectionLot')({ material: 'RAW-0001', plant: '1000' });
+
+      expect(mocks.createInspectionLot).toHaveBeenCalledOnce();
+    });
+
+    it('quality.recordResults delegates to quality.recordResults', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const qm = intent['quality'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(qm, 'recordResults')({ inspectionLot: '1000000001', characteristics: [] });
+
+      expect(mocks.recordResults).toHaveBeenCalledOnce();
+    });
+
+    it('quality.createQualityNotification delegates to quality.createQualityNotification', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const qm = intent['quality'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        qm,
+        'createQualityNotification',
+      )({ notificationType: 'Q1', material: 'RAW-0001' });
+
+      expect(mocks.createQualityNotification).toHaveBeenCalledOnce();
+    });
+
+    // ── warehouse namespace ───────────────────────────────────────────
+
+    it('warehouse.createGoodsMovement delegates to warehouse.createGoodsMovement', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const wm = intent['warehouse'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        wm,
+        'createGoodsMovement',
+      )({ movementType: '101', plant: '1000', material: 'RAW-0001', quantity: 100 });
+
+      expect(mocks.createGoodsMovement).toHaveBeenCalledOnce();
+    });
+
+    it('warehouse.createTransferOrder delegates to warehouse.createTransferOrder', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const wm = intent['warehouse'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        wm,
+        'createTransferOrder',
+      )({ warehouseNumber: '100', sourceBin: '01-01', destinationBin: '02-01' });
+
+      expect(mocks.createTransferOrder).toHaveBeenCalledOnce();
+    });
+
+    // ── assetManagement namespace ─────────────────────────────────────
+
+    it('assetManagement.acquireAsset delegates to assetManagement.acquireAsset', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const am = intent['assetManagement'] as Record<
+        string,
+        (...args: unknown[]) => Promise<unknown>
+      >;
+      await method(
+        am,
+        'acquireAsset',
+      )({
+        assetClass: '1000',
+        description: 'Machine',
+        acquisitionValue: 50_000,
+        capitalizationDate: '2026-04-01',
+      });
+
+      expect(mocks.acquireAsset).toHaveBeenCalledOnce();
+    });
+
+    it('assetManagement.retireAsset delegates to assetManagement.retireAsset', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const am = intent['assetManagement'] as Record<
+        string,
+        (...args: unknown[]) => Promise<unknown>
+      >;
+      await method(am, 'retireAsset')({ assetNumber: '100000001', retirementDate: '2026-12-31' });
+
+      expect(mocks.retireAsset).toHaveBeenCalledOnce();
+    });
+
+    it('assetManagement.transferAsset delegates to assetManagement.transferAsset', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const am = intent['assetManagement'] as Record<
+        string,
+        (...args: unknown[]) => Promise<unknown>
+      >;
+      await method(
+        am,
+        'transferAsset',
+      )({ assetNumber: '100000001', targetCostCenter: '1000', transferDate: '2026-06-01' });
+
+      expect(mocks.transferAsset).toHaveBeenCalledOnce();
+    });
+
+    // ── hr namespace ──────────────────────────────────────────────────
+
+    it('hr.createEmployee delegates to hr.createEmployee', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const hr = intent['hr'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        hr,
+        'createEmployee',
+      )({ firstName: 'Max', lastName: 'Mustermann', personnelArea: '1000' });
+
+      expect(mocks.createEmployee).toHaveBeenCalledOnce();
+    });
+
+    it('hr.recordTime delegates to hr.recordTime', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const hr = intent['hr'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(hr, 'recordTime')({ employeeId: '00100001', date: '2026-03-15', hours: 8 });
+
+      expect(mocks.recordTime).toHaveBeenCalledOnce();
+    });
+
+    it('hr.requestAbsence delegates to hr.requestAbsence', async () => {
+      const fn = extractFixtureFn(fixtures['intent']);
+      const intent = await runFixture<Record<string, unknown>>(fn, {
+        ui5: mockUi5,
+        ui5Navigation: mockUi5Navigation,
+      });
+
+      const hr = intent['hr'] as Record<string, (...args: unknown[]) => Promise<unknown>>;
+      await method(
+        hr,
+        'requestAbsence',
+      )({
+        employeeId: '00100001',
+        absenceType: 'Vacation',
+        startDate: '2026-07-01',
+        endDate: '2026-07-14',
+      });
+
+      expect(mocks.requestAbsence).toHaveBeenCalledOnce();
     });
   });
 });

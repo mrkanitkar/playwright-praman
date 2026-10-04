@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
 > Generated: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
-> Total: 198 capabilities
+> Total: 215 capabilities
 
 ---
 
@@ -31,6 +31,8 @@
 - **selectors.serializeUI5SelectorToCSS** — Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.
 - **screencast.highlightControls** — Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).
 - **proxy.contextRetryDelay** — Computes the exponential-backoff delay, with jitter, for retrying after the execution context is destroyed.
+- **visualRegression.fixture** — Visual regression fixture for screenshot comparison with FLP chrome masking.
+- **visualRegression.options** — Options for visual regression screenshot comparison — threshold, masking, full-page capture.
 
 ## table — Table discovery, reading, and manipulation
 
@@ -101,6 +103,7 @@
 - **ui5.odata.deleteEntity** — Deletes an entity via OData HTTP DELETE.
 - **ui5.odata.queryEntities** — Queries an entity set with optional OData query parameters.
 - **ui5.odata.callFunctionImport** — Calls an OData function import.
+- **odata.fixture** — Standalone OData fixture providing top-level odata without the full ui5 handler.
 
 ## navigate — FLP and in-app navigation
 
@@ -182,6 +185,17 @@
 - **intent.masterData.createVendorMaster** — Creates a vendor master record through the Fiori UI.
 - **intent.masterData.createCustomerMaster** — Creates a customer master record through the Fiori UI.
 - **intent.masterData.createMaterialMaster** — Creates a material master record through the Fiori UI.
+- **intent.quality.createInspectionLot** — Creates a quality inspection lot through the Fiori UI.
+- **intent.quality.recordResults** — Records inspection results for a quality inspection lot.
+- **intent.quality.createQualityNotification** — Creates a quality notification for a defect or complaint.
+- **intent.warehouse.createGoodsMovement** — Creates a goods movement (receipt, issue, or transfer) through the Fiori UI.
+- **intent.warehouse.createTransferOrder** — Creates a warehouse transfer order through the Fiori UI.
+- **intent.assetManagement.acquireAsset** — Acquires a fixed asset through the Fiori UI.
+- **intent.assetManagement.retireAsset** — Retires a fixed asset through the Fiori UI.
+- **intent.assetManagement.transferAsset** — Transfers a fixed asset to a new cost center or company code.
+- **intent.hr.createEmployee** — Creates an employee master record through the Fiori UI.
+- **intent.hr.recordTime** — Records a time entry for an employee.
+- **intent.hr.requestAbsence** — Submits an absence/leave request for an employee.
 
 ## shell — SAP Shell header interactions
 
@@ -247,3 +261,6 @@
 - **testData.cleanup** — Cleans up all test data files created during the test session.
 - **webStorage.fixture** — Playwright fixture exposing localStorage and sessionStorage helpers for the page under test.
 - **webStorage.helper** — Reads, writes, seeds and inspects a single browser storage area (Playwright 1.61+).
+- **cli.scaffold.globalTeardownTemplate** — Scaffold template for a Playwright global teardown file.
+- **cli.scaffold.masterDataHelperTemplate** — Scaffold template for a master-data test helper module.
+- **cli.scaffold.playwrightWorkflowTemplate** — Scaffold template for a GitHub Actions Playwright CI workflow.

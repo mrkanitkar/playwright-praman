@@ -47,6 +47,7 @@ function makeConfigNoAi(): Readonly<PramanConfig> {
     ignoreAutoWaitUrls: [],
     defaultMatchSubclasses: false,
     captureFailureArtifacts: true,
+    skipPostFillWait: false,
   };
 }
 

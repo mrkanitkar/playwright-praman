@@ -25,6 +25,11 @@ import { join } from 'node:path';
 import type { IDEDetection } from './ide-detector.js';
 import { scaffoldCliAgents, scaffoldIDEFiles } from './ide-installer.js';
 import { logWarn } from './logger.js';
+import {
+  GLOBAL_TEARDOWN_TEMPLATE,
+  MASTER_DATA_HELPER_TEMPLATE,
+  PLAYWRIGHT_WORKFLOW_TEMPLATE,
+} from './scaffold-templates.js';
 import { getPackageRoot } from './version.js';
 
 /**
@@ -136,10 +141,21 @@ const TEMPLATE_FILES: readonly (readonly [string, string])[] = [
   ['praman.config.ts', PRAMAN_CONFIG_TEMPLATE],
   ['tsconfig.json', TSCONFIG_TEMPLATE],
   ['.gitignore', GITIGNORE_TEMPLATE],
+  ['global.teardown.ts', GLOBAL_TEARDOWN_TEMPLATE],
+  ['tests/helpers/master-data.ts', MASTER_DATA_HELPER_TEMPLATE],
+  ['.github/workflows/playwright.yml', PLAYWRIGHT_WORKFLOW_TEMPLATE],
 ];
 
 /** Subdirectories to create inside the target directory. */
-const SUBDIRECTORIES: readonly string[] = ['tests', '.auth'];
+const SUBDIRECTORIES: readonly string[] = [
+  'tests',
+  '.auth',
+  'tests/helpers',
+  'tests/otc',
+  'tests/ptp',
+  'tests/rtr',
+  '.github/workflows',
+];
 
 /**
  * Checks whether Docker is available on the system.

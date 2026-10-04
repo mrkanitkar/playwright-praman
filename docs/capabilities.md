@@ -1,7 +1,7 @@
 # Praman Capabilities Reference
 
 > **Generated**: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
-> **Total**: 198 capabilities across 15 categories
+> **Total**: 215 capabilities across 15 categories
 
 ---
 
@@ -9,52 +9,54 @@
 
 | Category | Prefix       | Description                                    | Count |
 | -------- | ------------ | ---------------------------------------------- | ----- |
-| ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 24    |
+| ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 26    |
 | table    | `UI5-TABLE`  | Table discovery, reading, and manipulation     | 24    |
 | dialog   | `UI5-DLG`    | Dialog lifecycle management                    | 10    |
 | date     | `UI5-DATE`   | Date and time picker operations                | 13    |
-| odata    | `UI5-ODATA`  | OData model and HTTP operations                | 11    |
+| odata    | `UI5-ODATA`  | OData model and HTTP operations                | 12    |
 | navigate | `UI5-NAV`    | FLP and in-app navigation                      | 9     |
 | auth     | `UI5-AUTH`   | SAP authentication and session management      | 6     |
 | fe       | `UI5-FE`     | Fiori Elements page abstractions               | 27    |
-| intent   | `UI5-INTENT` | Business intent operations (SAP domain)        | 27    |
+| intent   | `UI5-INTENT` | Business intent operations (SAP domain)        | 38    |
 | shell    | `UI5-SHELL`  | SAP Shell header interactions                  | 4     |
 | footer   | `UI5-FOOTER` | Footer toolbar actions                         | 6     |
 | flp      | `UI5-FLP`    | Fiori Launchpad services (locks, settings)     | 10    |
 | ai       | `UI5-AI`     | AI-powered discovery and context building      | 9     |
 | assert   | `UI5-ASSERT` | UI5-aware custom matchers for assertions       | 12    |
-| data     | `UI5-DATA`   | Test data generation, persistence, and cleanup | 6     |
+| data     | `UI5-DATA`   | Test data generation, persistence, and cleanup | 9     |
 
 ---
 
 ## ui5 — Core UI5 control interactions
 
-| ID            | Name                      | Description                                                                                                 | Usage Example                                                          |
-| ------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `UI5-UI5-001` | control                   | Discovers a single control matching the selector.                                                           | `const btn = await ui5.control({ id: 'submitBtn' });`                  |
-| `UI5-UI5-002` | controls                  | Discovers multiple controls matching the selector.                                                          | `const buttons = await ui5.controls({ controlType: 'sap.m.Button' });` |
-| `UI5-UI5-003` | click                     | Clicks a control.                                                                                           | `await ui5.click({ id: 'submitBtn' });`                                |
-| `UI5-UI5-004` | fill                      | Fills a control with text.                                                                                  | `await ui5.fill({ id: 'vendorInput' }, '100001');`                     |
-| `UI5-UI5-005` | press                     | Presses a control (alias for click).                                                                        | `await ui5.press({ id: 'saveBtn' });`                                  |
-| `UI5-UI5-006` | select                    | Selects an item in a selection control.                                                                     | `await ui5.select({ id: 'purchOrgSelect' }, '1000');`                  |
-| `UI5-UI5-007` | check                     | Checks a checkbox.                                                                                          | `await ui5.check({ id: 'agreeCheckbox' });`                            |
-| `UI5-UI5-008` | uncheck                   | Unchecks a checkbox.                                                                                        | `await ui5.uncheck({ id: 'agreeCheckbox' });`                          |
-| `UI5-UI5-009` | clear                     | Clears a control's text.                                                                                    | `await ui5.clear({ id: 'searchField' });`                              |
-| `UI5-UI5-010` | getText                   | Gets the text of a control.                                                                                 | `const label = await ui5.getText({ id: 'statusLabel' });`              |
-| `UI5-UI5-011` | getValue                  | Gets the value of a control.                                                                                | `const val = await ui5.getValue({ id: 'quantityInput' });`             |
-| `UI5-UI5-012` | waitForUI5                | Waits for UI5 to stabilize.                                                                                 | `await ui5.waitForUI5();`                                              |
-| `UI5-UI5-013` | waitFor                   | Waits for a control to appear.                                                                              | `await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });`        |
-| `UI5-UI5-014` | inspect                   | Inspects a control and returns full metadata.                                                               | `const info = await ui5.inspect({ id: 'vendorInput' });`               |
-| `UI5-UI5-015` | clearCache                | Clears the internal proxy cache.                                                                            | `ui5.clearCache();`                                                    |
-| `UI5-UI5-016` | destroy                   | Destroys the handler and cleans up resources.                                                               | `await ui5.destroy();`                                                 |
-| `UI5-UI5-017` | setValue                  | Set value on a control via proxy method forwarding.                                                         | `const input = await ui5.control({ id: 'materialInput' });`            |
-| `UI5-UI5-018` | fireChange                | Fire change event on a control via proxy method forwarding.                                                 | `const input = await ui5.control({ id: 'materialInput' });`            |
-| `UI5-UI5-019` | open                      | Open a control (e.g., ComboBox dropdown) via proxy.                                                         | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-020` | close                     | Close a control via proxy.                                                                                  | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-021` | setSelectedKey            | Set selected key on selection control via proxy.                                                            | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-022` | serializeUI5SelectorToCSS | Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.           | `import { serializeUI5SelectorToCSS } from 'playwright-praman';`       |
-| `UI5-UI5-023` | highlightControls         | Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).        | `screencast.highlightControls(true);`                                  |
-| `UI5-UI5-024` | contextRetryDelay         | Computes the exponential-backoff delay, with jitter, for retrying after the execution context is destroyed. | `const delay = contextRetryDelay(0); // 500-600 ms`                    |
+| ID              | Name                      | Description                                                                                                 | Usage Example                                                               |
+| --------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `UI5-UI5-001`   | control                   | Discovers a single control matching the selector.                                                           | `const btn = await ui5.control({ id: 'submitBtn' });`                       |
+| `UI5-UI5-002`   | controls                  | Discovers multiple controls matching the selector.                                                          | `const buttons = await ui5.controls({ controlType: 'sap.m.Button' });`      |
+| `UI5-UI5-003`   | click                     | Clicks a control.                                                                                           | `await ui5.click({ id: 'submitBtn' });`                                     |
+| `UI5-UI5-004`   | fill                      | Fills a control with text.                                                                                  | `await ui5.fill({ id: 'vendorInput' }, '100001');`                          |
+| `UI5-UI5-005`   | press                     | Presses a control (alias for click).                                                                        | `await ui5.press({ id: 'saveBtn' });`                                       |
+| `UI5-UI5-006`   | select                    | Selects an item in a selection control.                                                                     | `await ui5.select({ id: 'purchOrgSelect' }, '1000');`                       |
+| `UI5-UI5-007`   | check                     | Checks a checkbox.                                                                                          | `await ui5.check({ id: 'agreeCheckbox' });`                                 |
+| `UI5-UI5-008`   | uncheck                   | Unchecks a checkbox.                                                                                        | `await ui5.uncheck({ id: 'agreeCheckbox' });`                               |
+| `UI5-UI5-009`   | clear                     | Clears a control's text.                                                                                    | `await ui5.clear({ id: 'searchField' });`                                   |
+| `UI5-UI5-010`   | getText                   | Gets the text of a control.                                                                                 | `const label = await ui5.getText({ id: 'statusLabel' });`                   |
+| `UI5-UI5-011`   | getValue                  | Gets the value of a control.                                                                                | `const val = await ui5.getValue({ id: 'quantityInput' });`                  |
+| `UI5-UI5-012`   | waitForUI5                | Waits for UI5 to stabilize.                                                                                 | `await ui5.waitForUI5();`                                                   |
+| `UI5-UI5-013`   | waitFor                   | Waits for a control to appear.                                                                              | `await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });`             |
+| `UI5-UI5-014`   | inspect                   | Inspects a control and returns full metadata.                                                               | `const info = await ui5.inspect({ id: 'vendorInput' });`                    |
+| `UI5-UI5-015`   | clearCache                | Clears the internal proxy cache.                                                                            | `ui5.clearCache();`                                                         |
+| `UI5-UI5-016`   | destroy                   | Destroys the handler and cleans up resources.                                                               | `await ui5.destroy();`                                                      |
+| `UI5-UI5-017`   | setValue                  | Set value on a control via proxy method forwarding.                                                         | `const input = await ui5.control({ id: 'materialInput' });`                 |
+| `UI5-UI5-018`   | fireChange                | Fire change event on a control via proxy method forwarding.                                                 | `const input = await ui5.control({ id: 'materialInput' });`                 |
+| `UI5-UI5-019`   | open                      | Open a control (e.g., ComboBox dropdown) via proxy.                                                         | `const combo = await ui5.control({ id: 'variantCombo' });`                  |
+| `UI5-UI5-020`   | close                     | Close a control via proxy.                                                                                  | `const combo = await ui5.control({ id: 'variantCombo' });`                  |
+| `UI5-UI5-021`   | setSelectedKey            | Set selected key on selection control via proxy.                                                            | `const combo = await ui5.control({ id: 'variantCombo' });`                  |
+| `UI5-UI5-022`   | serializeUI5SelectorToCSS | Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.           | `import { serializeUI5SelectorToCSS } from 'playwright-praman';`            |
+| `UI5-UI5-023`   | highlightControls         | Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).        | `screencast.highlightControls(true);`                                       |
+| `UI5-UI5-024`   | contextRetryDelay         | Computes the exponential-backoff delay, with jitter, for retrying after the execution context is destroyed. | `const delay = contextRetryDelay(0); // 500-600 ms`                         |
+| `UI5-OTHER-003` | visualRegressionTest      | Visual regression fixture for screenshot comparison with FLP chrome masking.                                | `import { visualRegressionTest } from 'playwright-praman';`                 |
+| `UI5-OTHER-004` | VisualRegressionOptions   | Options for visual regression screenshot comparison — threshold, masking, full-page capture.                | `const opts: VisualRegressionOptions = { threshold: 0.1, fullPage: true };` |
 
 ## table — Table discovery, reading, and manipulation
 
@@ -120,19 +122,20 @@
 
 ## odata — OData model and HTTP operations
 
-| ID              | Name               | Description                                                 | Usage Example                                                                                       |
-| --------------- | ------------------ | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `UI5-ODATA-001` | getModelData       | Reads data from the OData model at the given path.          | `const data = await ui5.odata.getModelData('/PurchaseOrders');`                                     |
-| `UI5-ODATA-002` | getModelProperty   | Reads a single property value from the OData model.         | `const vendor = await ui5.odata.getModelProperty('/PurchaseOrders(\'4500001234\')/Vendor');`        |
-| `UI5-ODATA-003` | waitForLoad        | Waits for all pending OData requests to complete.           | `await ui5.odata.waitForLoad({ timeout: 30000 });`                                                  |
-| `UI5-ODATA-004` | fetchCSRFToken     | Fetches a CSRF token from the OData service.                | `const token = await ui5.odata.fetchCSRFToken('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');` |
-| `UI5-ODATA-005` | getEntityCount     | Returns the $count for an entity set.                       | `const count = await ui5.odata.getEntityCount('/PurchaseOrders/$count');`                           |
-| `UI5-ODATA-006` | hasPendingChanges  | Checks whether the OData model has unsaved changes.         | `const pending = await ui5.odata.hasPendingChanges();`                                              |
-| `UI5-ODATA-007` | createEntity       | Creates a new entity via OData HTTP POST.                   | `const result = await ui5.odata.createEntity(`                                                      |
-| `UI5-ODATA-008` | updateEntity       | Updates an existing entity via OData HTTP PATCH/PUT.        | `const result = await ui5.odata.updateEntity(`                                                      |
-| `UI5-ODATA-009` | deleteEntity       | Deletes an entity via OData HTTP DELETE.                    | `await ui5.odata.deleteEntity(`                                                                     |
-| `UI5-ODATA-010` | queryEntities      | Queries an entity set with optional OData query parameters. | `const result = await ui5.odata.queryEntities(`                                                     |
-| `UI5-ODATA-011` | callFunctionImport | Calls an OData function import.                             | `const result = await ui5.odata.callFunctionImport(`                                                |
+| ID              | Name               | Description                                                                      | Usage Example                                                                                       |
+| --------------- | ------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `UI5-ODATA-001` | getModelData       | Reads data from the OData model at the given path.                               | `const data = await ui5.odata.getModelData('/PurchaseOrders');`                                     |
+| `UI5-ODATA-002` | getModelProperty   | Reads a single property value from the OData model.                              | `const vendor = await ui5.odata.getModelProperty('/PurchaseOrders(\'4500001234\')/Vendor');`        |
+| `UI5-ODATA-003` | waitForLoad        | Waits for all pending OData requests to complete.                                | `await ui5.odata.waitForLoad({ timeout: 30000 });`                                                  |
+| `UI5-ODATA-004` | fetchCSRFToken     | Fetches a CSRF token from the OData service.                                     | `const token = await ui5.odata.fetchCSRFToken('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');` |
+| `UI5-ODATA-005` | getEntityCount     | Returns the $count for an entity set.                                            | `const count = await ui5.odata.getEntityCount('/PurchaseOrders/$count');`                           |
+| `UI5-ODATA-006` | hasPendingChanges  | Checks whether the OData model has unsaved changes.                              | `const pending = await ui5.odata.hasPendingChanges();`                                              |
+| `UI5-ODATA-007` | createEntity       | Creates a new entity via OData HTTP POST.                                        | `const result = await ui5.odata.createEntity(`                                                      |
+| `UI5-ODATA-008` | updateEntity       | Updates an existing entity via OData HTTP PATCH/PUT.                             | `const result = await ui5.odata.updateEntity(`                                                      |
+| `UI5-ODATA-009` | deleteEntity       | Deletes an entity via OData HTTP DELETE.                                         | `await ui5.odata.deleteEntity(`                                                                     |
+| `UI5-ODATA-010` | queryEntities      | Queries an entity set with optional OData query parameters.                      | `const result = await ui5.odata.queryEntities(`                                                     |
+| `UI5-ODATA-011` | callFunctionImport | Calls an OData function import.                                                  | `const result = await ui5.odata.callFunctionImport(`                                                |
+| `UI5-ODATA-012` | odataTest          | Standalone OData fixture providing top-level odata without the full ui5 handler. | `import { odataTest } from 'playwright-praman';`                                                    |
 
 ## navigate — FLP and in-app navigation
 
@@ -193,35 +196,46 @@
 
 ## intent — Business intent operations (SAP domain)
 
-| ID               | Name                      | Description                                                                        | Usage Example                                                                               |
-| ---------------- | ------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `UI5-INTENT-001` | fillField                 | Resolves a field label via vocabulary and fills the matching UI5 control.          | `await intent.core.fillField('Vendor', '100001');`                                          |
-| `UI5-INTENT-002` | clickButton               | Clicks a sap.m.Button control matching the given button text.                      | `await intent.core.clickButton('Save');`                                                    |
-| `UI5-INTENT-003` | selectOption              | Resolves a field label via vocabulary and selects an item in the matching control. | `await intent.core.selectOption('Purchasing Org', '1000');`                                 |
-| `UI5-INTENT-004` | assertField               | Resolves a field label via vocabulary, reads the control's text, and compares it.  | `await intent.core.assertField('Status', 'In Process');`                                    |
-| `UI5-INTENT-005` | confirmAndWait            | Confirms a dialog and waits for UI5 to stabilize.                                  | `await intent.core.confirmAndWait();`                                                       |
-| `UI5-INTENT-006` | waitForSave               | Waits for all pending UI5 rendering and OData requests to complete.                | `await intent.core.waitForSave();`                                                          |
-| `UI5-INTENT-007` | navigateAndSearch         | Navigates to a list app and runs a search with the given criteria.                 | `await intent.core.navigateAndSearch('PurchaseOrder-manage', { Vendor: '100001' });`        |
-| `UI5-INTENT-008` | createPurchaseOrder       | Creates a purchase order through the Fiori UI.                                     | `await intent.procurement.createPurchaseOrder({`                                            |
-| `UI5-INTENT-009` | approvePurchaseOrder      | Approves a purchase order through the Fiori UI.                                    | `await intent.procurement.approvePurchaseOrder({ PurchaseOrder: '4500001234' });`           |
-| `UI5-INTENT-010` | searchPurchaseOrders      | Searches for purchase orders using filter criteria.                                | `await intent.procurement.searchPurchaseOrders({ Vendor: '100001', CompanyCode: '1000' });` |
-| `UI5-INTENT-011` | createPurchaseRequisition | Creates a purchase requisition through the Fiori UI.                               | `await intent.procurement.createPurchaseRequisition({`                                      |
-| `UI5-INTENT-012` | confirmGoodsReceipt       | Confirms a goods receipt for a purchase order.                                     | `await intent.procurement.confirmGoodsReceipt({ PurchaseOrder: '4500001234' });`            |
-| `UI5-INTENT-013` | searchVendors             | Searches for vendors using filter criteria.                                        | `await intent.procurement.searchVendors({ Name: 'Acme Corp' });`                            |
-| `UI5-INTENT-014` | createSalesOrder          | Creates a sales order through the Fiori UI.                                        | `await intent.sales.createSalesOrder({`                                                     |
-| `UI5-INTENT-015` | createQuotation           | Creates a sales quotation through the Fiori UI.                                    | `await intent.sales.createQuotation({`                                                      |
-| `UI5-INTENT-016` | approveQuotation          | Approves a sales quotation through the Fiori UI.                                   | `await intent.sales.approveQuotation({ Quotation: '5000001234' });`                         |
-| `UI5-INTENT-017` | searchSalesOrders         | Searches for sales orders using filter criteria.                                   | `await intent.sales.searchSalesOrders({ Customer: '200001' });`                             |
-| `UI5-INTENT-018` | searchCustomers           | Searches for customers using filter criteria.                                      | `await intent.sales.searchCustomers({ Name: 'Global Industries' });`                        |
-| `UI5-INTENT-019` | checkDeliveryStatus       | Checks the delivery status for a sales order.                                      | `await intent.sales.checkDeliveryStatus({ SalesOrder: '6000001234' });`                     |
-| `UI5-INTENT-020` | createJournalEntry        | Creates a journal entry through the Fiori UI.                                      | `await intent.finance.createJournalEntry({`                                                 |
-| `UI5-INTENT-021` | postVendorInvoice         | Posts a vendor invoice through the Fiori UI.                                       | `await intent.finance.postVendorInvoice({`                                                  |
-| `UI5-INTENT-022` | processPayment            | Processes a payment through the Fiori UI.                                          | `await intent.finance.processPayment({`                                                     |
-| `UI5-INTENT-023` | createProductionOrder     | Creates a production order through the Fiori UI.                                   | `await intent.manufacturing.createProductionOrder({`                                        |
-| `UI5-INTENT-024` | confirmProductionOrder    | Confirms a production order through the Fiori UI.                                  | `await intent.manufacturing.confirmProductionOrder({`                                       |
-| `UI5-INTENT-025` | createVendorMaster        | Creates a vendor master record through the Fiori UI.                               | `await intent.masterData.createVendorMaster({`                                              |
-| `UI5-INTENT-026` | createCustomerMaster      | Creates a customer master record through the Fiori UI.                             | `await intent.masterData.createCustomerMaster({`                                            |
-| `UI5-INTENT-027` | createMaterialMaster      | Creates a material master record through the Fiori UI.                             | `await intent.masterData.createMaterialMaster({`                                            |
+| ID               | Name                      | Description                                                                        | Usage Example                                                                                                                          |
+| ---------------- | ------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `UI5-INTENT-001` | fillField                 | Resolves a field label via vocabulary and fills the matching UI5 control.          | `await intent.core.fillField('Vendor', '100001');`                                                                                     |
+| `UI5-INTENT-002` | clickButton               | Clicks a sap.m.Button control matching the given button text.                      | `await intent.core.clickButton('Save');`                                                                                               |
+| `UI5-INTENT-003` | selectOption              | Resolves a field label via vocabulary and selects an item in the matching control. | `await intent.core.selectOption('Purchasing Org', '1000');`                                                                            |
+| `UI5-INTENT-004` | assertField               | Resolves a field label via vocabulary, reads the control's text, and compares it.  | `await intent.core.assertField('Status', 'In Process');`                                                                               |
+| `UI5-INTENT-005` | confirmAndWait            | Confirms a dialog and waits for UI5 to stabilize.                                  | `await intent.core.confirmAndWait();`                                                                                                  |
+| `UI5-INTENT-006` | waitForSave               | Waits for all pending UI5 rendering and OData requests to complete.                | `await intent.core.waitForSave();`                                                                                                     |
+| `UI5-INTENT-007` | navigateAndSearch         | Navigates to a list app and runs a search with the given criteria.                 | `await intent.core.navigateAndSearch('PurchaseOrder-manage', { Vendor: '100001' });`                                                   |
+| `UI5-INTENT-008` | createPurchaseOrder       | Creates a purchase order through the Fiori UI.                                     | `await intent.procurement.createPurchaseOrder({`                                                                                       |
+| `UI5-INTENT-009` | approvePurchaseOrder      | Approves a purchase order through the Fiori UI.                                    | `await intent.procurement.approvePurchaseOrder({ PurchaseOrder: '4500001234' });`                                                      |
+| `UI5-INTENT-010` | searchPurchaseOrders      | Searches for purchase orders using filter criteria.                                | `await intent.procurement.searchPurchaseOrders({ Vendor: '100001', CompanyCode: '1000' });`                                            |
+| `UI5-INTENT-011` | createPurchaseRequisition | Creates a purchase requisition through the Fiori UI.                               | `await intent.procurement.createPurchaseRequisition({`                                                                                 |
+| `UI5-INTENT-012` | confirmGoodsReceipt       | Confirms a goods receipt for a purchase order.                                     | `await intent.procurement.confirmGoodsReceipt({ PurchaseOrder: '4500001234' });`                                                       |
+| `UI5-INTENT-013` | searchVendors             | Searches for vendors using filter criteria.                                        | `await intent.procurement.searchVendors({ Name: 'Acme Corp' });`                                                                       |
+| `UI5-INTENT-014` | createSalesOrder          | Creates a sales order through the Fiori UI.                                        | `await intent.sales.createSalesOrder({`                                                                                                |
+| `UI5-INTENT-015` | createQuotation           | Creates a sales quotation through the Fiori UI.                                    | `await intent.sales.createQuotation({`                                                                                                 |
+| `UI5-INTENT-016` | approveQuotation          | Approves a sales quotation through the Fiori UI.                                   | `await intent.sales.approveQuotation({ Quotation: '5000001234' });`                                                                    |
+| `UI5-INTENT-017` | searchSalesOrders         | Searches for sales orders using filter criteria.                                   | `await intent.sales.searchSalesOrders({ Customer: '200001' });`                                                                        |
+| `UI5-INTENT-018` | searchCustomers           | Searches for customers using filter criteria.                                      | `await intent.sales.searchCustomers({ Name: 'Global Industries' });`                                                                   |
+| `UI5-INTENT-019` | checkDeliveryStatus       | Checks the delivery status for a sales order.                                      | `await intent.sales.checkDeliveryStatus({ SalesOrder: '6000001234' });`                                                                |
+| `UI5-INTENT-020` | createJournalEntry        | Creates a journal entry through the Fiori UI.                                      | `await intent.finance.createJournalEntry({`                                                                                            |
+| `UI5-INTENT-021` | postVendorInvoice         | Posts a vendor invoice through the Fiori UI.                                       | `await intent.finance.postVendorInvoice({`                                                                                             |
+| `UI5-INTENT-022` | processPayment            | Processes a payment through the Fiori UI.                                          | `await intent.finance.processPayment({`                                                                                                |
+| `UI5-INTENT-023` | createProductionOrder     | Creates a production order through the Fiori UI.                                   | `await intent.manufacturing.createProductionOrder({`                                                                                   |
+| `UI5-INTENT-024` | confirmProductionOrder    | Confirms a production order through the Fiori UI.                                  | `await intent.manufacturing.confirmProductionOrder({`                                                                                  |
+| `UI5-INTENT-025` | createVendorMaster        | Creates a vendor master record through the Fiori UI.                               | `await intent.masterData.createVendorMaster({`                                                                                         |
+| `UI5-INTENT-026` | createCustomerMaster      | Creates a customer master record through the Fiori UI.                             | `await intent.masterData.createCustomerMaster({`                                                                                       |
+| `UI5-INTENT-027` | createMaterialMaster      | Creates a material master record through the Fiori UI.                             | `await intent.masterData.createMaterialMaster({`                                                                                       |
+| `UI5-INTENT-028` | createInspectionLot       | Creates a quality inspection lot through the Fiori UI.                             | `await intent.quality.createInspectionLot({ Material: 'MAT-001', Plant: '1000' });`                                                    |
+| `UI5-INTENT-029` | recordResults             | Records inspection results for a quality inspection lot.                           | `await intent.quality.recordResults({ InspectionLot: '1000000001', ResultValue: 'Pass' });`                                            |
+| `UI5-INTENT-030` | createQualityNotification | Creates a quality notification for a defect or complaint.                          | `await intent.quality.createQualityNotification({ NotificationType: 'Q1', Description: 'Surface defect' });`                           |
+| `UI5-INTENT-031` | createGoodsMovement       | Creates a goods movement (receipt, issue, or transfer) through the Fiori UI.       | `await intent.warehouse.createGoodsMovement({ MovementType: '101', Material: 'MAT-001', Plant: '1000' });`                             |
+| `UI5-INTENT-032` | createTransferOrder       | Creates a warehouse transfer order through the Fiori UI.                           | `await intent.warehouse.createTransferOrder({ WarehouseNumber: '100', Material: 'MAT-001' });`                                         |
+| `UI5-INTENT-033` | acquireAsset              | Acquires a fixed asset through the Fiori UI.                                       | `await intent.assetManagement.acquireAsset({ Description: 'Office Equipment', AssetClass: '3100' });`                                  |
+| `UI5-INTENT-034` | retireAsset               | Retires a fixed asset through the Fiori UI.                                        | `await intent.assetManagement.retireAsset({ AssetNumber: '000000001000', CompanyCode: '1000' });`                                      |
+| `UI5-INTENT-035` | transferAsset             | Transfers a fixed asset to a new cost center or company code.                      | `await intent.assetManagement.transferAsset({ AssetNumber: '000000001000', TargetCostCenter: '2000' });`                               |
+| `UI5-INTENT-036` | createEmployee            | Creates an employee master record through the Fiori UI.                            | `await intent.hr.createEmployee({ FirstName: 'John', LastName: 'Doe', PersonnelArea: '1000' });`                                       |
+| `UI5-INTENT-037` | recordTime                | Records a time entry for an employee.                                              | `await intent.hr.recordTime({ EmployeeId: '00001234', Date: '2026-01-15', Hours: 8 });`                                                |
+| `UI5-INTENT-038` | requestAbsence            | Submits an absence/leave request for an employee.                                  | `await intent.hr.requestAbsence({ EmployeeId: '00001234', AbsenceType: 'Vacation', StartDate: '2026-07-01', EndDate: '2026-07-14' });` |
 
 ## shell — SAP Shell header interactions
 
@@ -291,11 +305,14 @@
 
 ## data — Test data generation, persistence, and cleanup
 
-| ID             | Name             | Description                                                                                  | Usage Example                                                                     |
-| -------------- | ---------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `UI5-DATA-001` | generate         | Generates test data from a template with randomized values.                                  | `const po = testData.generate({ Vendor: '', Material: '', Quantity: '' });`       |
-| `UI5-DATA-002` | save             | Saves test data to a JSON file for later reuse.                                              | `await testData.save('po-data.json', { Vendor: '100001', Material: 'MAT-001' });` |
-| `UI5-DATA-003` | load             | Loads previously saved test data from a JSON file.                                           | `const data = await testData.load('po-data.json');`                               |
-| `UI5-DATA-004` | cleanup          | Cleans up all test data files created during the test session.                               | `await testData.cleanup();`                                                       |
-| `UI5-DATA-005` | webStorage       | Playwright fixture exposing localStorage and sessionStorage helpers for the page under test. | `await webStorage.localStorage.seed({ token: 'abc', userId: '42' });`             |
-| `UI5-DATA-006` | webStorageHelper | Reads, writes, seeds and inspects a single browser storage area (Playwright 1.61+).          | `const token = await webStorage.localStorage.get('token');`                       |
+| ID             | Name                         | Description                                                                                  | Usage Example                                                                     |
+| -------------- | ---------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `UI5-DATA-001` | generate                     | Generates test data from a template with randomized values.                                  | `const po = testData.generate({ Vendor: '', Material: '', Quantity: '' });`       |
+| `UI5-DATA-002` | save                         | Saves test data to a JSON file for later reuse.                                              | `await testData.save('po-data.json', { Vendor: '100001', Material: 'MAT-001' });` |
+| `UI5-DATA-003` | load                         | Loads previously saved test data from a JSON file.                                           | `const data = await testData.load('po-data.json');`                               |
+| `UI5-DATA-004` | cleanup                      | Cleans up all test data files created during the test session.                               | `await testData.cleanup();`                                                       |
+| `UI5-DATA-005` | webStorage                   | Playwright fixture exposing localStorage and sessionStorage helpers for the page under test. | `await webStorage.localStorage.seed({ token: 'abc', userId: '42' });`             |
+| `UI5-DATA-006` | webStorageHelper             | Reads, writes, seeds and inspects a single browser storage area (Playwright 1.61+).          | `const token = await webStorage.localStorage.get('token');`                       |
+| `UI5-DATA-006` | GLOBAL_TEARDOWN_TEMPLATE     | Scaffold template for a Playwright global teardown file.                                     | `import { GLOBAL_TEARDOWN_TEMPLATE } from 'playwright-praman';`                   |
+| `UI5-DATA-007` | MASTER_DATA_HELPER_TEMPLATE  | Scaffold template for a master-data test helper module.                                      | `import { MASTER_DATA_HELPER_TEMPLATE } from 'playwright-praman';`                |
+| `UI5-DATA-008` | PLAYWRIGHT_WORKFLOW_TEMPLATE | Scaffold template for a GitHub Actions Playwright CI workflow.                               | `import { PLAYWRIGHT_WORKFLOW_TEMPLATE } from 'playwright-praman';`               |

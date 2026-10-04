@@ -106,13 +106,16 @@ export async function createSalesOrder(
 ): Promise<IntentResult> {
   const startTime = Date.now();
   const steps: string[] = [];
+  const appHash = options?.overrides?.appId ?? 'SalesOrder-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Save';
 
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('SalesOrder-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const customerResult = await fillField(ui5, vocabulary, 'Customer', input.customer);
+  const customerLabel = options?.overrides?.fields?.['Customer'] ?? 'Customer';
+  const customerResult = await fillField(ui5, vocabulary, customerLabel, input.customer);
   if (customerResult.status === 'error') {
     return sdResult({
       status: 'error',
@@ -124,7 +127,8 @@ export async function createSalesOrder(
   }
   steps.push('fillCustomer');
 
-  const materialResult = await fillField(ui5, vocabulary, 'Material', input.material);
+  const materialLabel = options?.overrides?.fields?.['Material'] ?? 'Material';
+  const materialResult = await fillField(ui5, vocabulary, materialLabel, input.material);
   if (materialResult.status === 'error') {
     return sdResult({
       status: 'error',
@@ -136,7 +140,8 @@ export async function createSalesOrder(
   }
   steps.push('fillMaterial');
 
-  const qtyResult = await fillField(ui5, vocabulary, 'Quantity', String(input.quantity));
+  const qtyLabel = options?.overrides?.fields?.['Quantity'] ?? 'Quantity';
+  const qtyResult = await fillField(ui5, vocabulary, qtyLabel, String(input.quantity));
   if (qtyResult.status === 'error') {
     return sdResult({
       status: 'error',
@@ -148,7 +153,7 @@ export async function createSalesOrder(
   }
   steps.push('fillQuantity');
 
-  await clickButton(ui5, 'Save');
+  await clickButton(ui5, saveText);
   steps.push('clickSave');
 
   await waitForSave(ui5, options);
@@ -199,13 +204,16 @@ export async function createQuotation(
 ): Promise<IntentResult> {
   const startTime = Date.now();
   const steps: string[] = [];
+  const appHash = options?.overrides?.appId ?? 'Quotation-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Save';
 
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('Quotation-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const customerResult = await fillField(ui5, vocabulary, 'Customer', input.customer);
+  const customerLabel = options?.overrides?.fields?.['Customer'] ?? 'Customer';
+  const customerResult = await fillField(ui5, vocabulary, customerLabel, input.customer);
   if (customerResult.status === 'error') {
     return sdResult({
       status: 'error',
@@ -217,7 +225,8 @@ export async function createQuotation(
   }
   steps.push('fillCustomer');
 
-  const materialResult = await fillField(ui5, vocabulary, 'Material', input.material);
+  const materialLabel = options?.overrides?.fields?.['Material'] ?? 'Material';
+  const materialResult = await fillField(ui5, vocabulary, materialLabel, input.material);
   if (materialResult.status === 'error') {
     return sdResult({
       status: 'error',
@@ -229,7 +238,7 @@ export async function createQuotation(
   }
   steps.push('fillMaterial');
 
-  await clickButton(ui5, 'Save');
+  await clickButton(ui5, saveText);
   steps.push('clickSave');
 
   await waitForSave(ui5, options);
@@ -271,12 +280,15 @@ export async function approveQuotation(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = options?.overrides?.appId ?? 'Quotation-manage';
+  const approveText = options?.overrides?.saveButtonText ?? 'Approve';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('Quotation-manage');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  await ui5.click({ controlType: 'sap.m.Button', properties: { text: 'Approve' } });
+  await ui5.click({ controlType: 'sap.m.Button', properties: { text: approveText } });
   steps.push('clickApprove');
 
   await waitForSave(ui5, options);
@@ -319,11 +331,13 @@ export async function searchSalesOrders(
 ): Promise<IntentResult> {
   const startTime = Date.now();
 
+  const appHash = options?.overrides?.appId ?? 'SalesOrder-manage';
+
   const searchResult = await navigateAndSearch(
     ui5,
     ui5Nav,
     vocabulary,
-    'SalesOrder-manage',
+    appHash,
     criteria,
     options,
   );
@@ -363,12 +377,15 @@ export async function searchCustomers(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = options?.overrides?.appId ?? 'Customer-manage';
+  const goText = options?.overrides?.saveButtonText ?? 'Go';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('Customer-manage');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  await ui5.click({ controlType: 'sap.m.Button', properties: { text: 'Go' } });
+  await ui5.click({ controlType: 'sap.m.Button', properties: { text: goText } });
   steps.push('clickGo');
 
   return sdResult({
@@ -408,8 +425,10 @@ export async function checkDeliveryStatus(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = options?.overrides?.appId ?? 'SalesOrder-manage';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('SalesOrder-manage');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 

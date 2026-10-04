@@ -129,12 +129,16 @@ export async function createPurchaseOrder(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = (options?.overrides?.appId ?? 'PurchaseOrder-create') as IntentString;
+  const saveText = options?.overrides?.saveButtonText ?? 'Save';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('PurchaseOrder-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const vendorResult = await fillField(ui5, vocabulary, 'Vendor', input.vendor);
+  const vendorLabel = options?.overrides?.fields?.['Vendor'] ?? 'Vendor';
+  const vendorResult = await fillField(ui5, vocabulary, vendorLabel, input.vendor);
   if (vendorResult.status === 'error') {
     return mmResult({
       status: 'error',
@@ -146,7 +150,8 @@ export async function createPurchaseOrder(
   }
   steps.push('fillVendor');
 
-  const materialResult = await fillField(ui5, vocabulary, 'Material', input.material);
+  const materialLabel = options?.overrides?.fields?.['Material'] ?? 'Material';
+  const materialResult = await fillField(ui5, vocabulary, materialLabel, input.material);
   if (materialResult.status === 'error') {
     return mmResult({
       status: 'error',
@@ -158,7 +163,8 @@ export async function createPurchaseOrder(
   }
   steps.push('fillMaterial');
 
-  const qtyResult = await fillField(ui5, vocabulary, 'Quantity', String(input.quantity));
+  const qtyLabel = options?.overrides?.fields?.['Quantity'] ?? 'Quantity';
+  const qtyResult = await fillField(ui5, vocabulary, qtyLabel, String(input.quantity));
   if (qtyResult.status === 'error') {
     return mmResult({
       status: 'error',
@@ -170,7 +176,8 @@ export async function createPurchaseOrder(
   }
   steps.push('fillQuantity');
 
-  const plantResult = await fillField(ui5, vocabulary, 'Plant', input.plant);
+  const plantLabel = options?.overrides?.fields?.['Plant'] ?? 'Plant';
+  const plantResult = await fillField(ui5, vocabulary, plantLabel, input.plant);
   if (plantResult.status === 'error') {
     return mmResult({
       status: 'error',
@@ -182,7 +189,7 @@ export async function createPurchaseOrder(
   }
   steps.push('fillPlant');
 
-  await clickButton(ui5, 'Save');
+  await clickButton(ui5, saveText);
   steps.push('clickSave');
 
   await waitForSave(ui5, options);
@@ -223,13 +230,15 @@ export async function approvePurchaseOrder(
 ): Promise<IntentResult> {
   const startTime = Date.now();
   const steps: string[] = [];
+  const appHash = (options?.overrides?.appId ?? 'PurchaseOrder-manage') as IntentString;
+  const approveText = options?.overrides?.saveButtonText ?? 'Approve';
 
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('PurchaseOrder-manage');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  await ui5.click({ controlType: SAP_BUTTON_TYPE, properties: { text: 'Approve' } });
+  await ui5.click({ controlType: SAP_BUTTON_TYPE, properties: { text: approveText } });
   steps.push('clickApprove');
 
   await waitForSave(ui5, options);
@@ -272,11 +281,13 @@ export async function searchPurchaseOrders(
 ): Promise<IntentResult> {
   const startTime = Date.now();
 
+  const appHash = options?.overrides?.appId ?? 'PurchaseOrder-manage';
+
   const searchResult = await navigateAndSearch(
     ui5,
     ui5Nav,
     vocabulary,
-    'PurchaseOrder-manage',
+    appHash,
     criteria,
     options,
   );
@@ -328,12 +339,16 @@ export async function createPurchaseRequisition(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = (options?.overrides?.appId ?? 'PurchaseRequisition-create') as IntentString;
+  const saveText = options?.overrides?.saveButtonText ?? 'Save';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('PurchaseRequisition-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const materialResult = await fillField(ui5, vocabulary, 'Material', input.material);
+  const materialLabel = options?.overrides?.fields?.['Material'] ?? 'Material';
+  const materialResult = await fillField(ui5, vocabulary, materialLabel, input.material);
   if (materialResult.status === 'error') {
     return mmResult({
       status: 'error',
@@ -345,7 +360,8 @@ export async function createPurchaseRequisition(
   }
   steps.push('fillMaterial');
 
-  const qtyResult = await fillField(ui5, vocabulary, 'Quantity', String(input.quantity));
+  const qtyLabel = options?.overrides?.fields?.['Quantity'] ?? 'Quantity';
+  const qtyResult = await fillField(ui5, vocabulary, qtyLabel, String(input.quantity));
   if (qtyResult.status === 'error') {
     return mmResult({
       status: 'error',
@@ -357,7 +373,8 @@ export async function createPurchaseRequisition(
   }
   steps.push('fillQuantity');
 
-  const plantResult = await fillField(ui5, vocabulary, 'Plant', input.plant);
+  const plantLabel = options?.overrides?.fields?.['Plant'] ?? 'Plant';
+  const plantResult = await fillField(ui5, vocabulary, plantLabel, input.plant);
   if (plantResult.status === 'error') {
     return mmResult({
       status: 'error',
@@ -369,7 +386,7 @@ export async function createPurchaseRequisition(
   }
   steps.push('fillPlant');
 
-  await clickButton(ui5, 'Save');
+  await clickButton(ui5, saveText);
   steps.push('clickSave');
 
   await waitForSave(ui5, options);
@@ -414,12 +431,15 @@ export async function confirmGoodsReceipt(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = (options?.overrides?.appId ?? 'GoodsMovement-post') as IntentString;
+  const postText = options?.overrides?.saveButtonText ?? 'Post';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('GoodsMovement-post');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  await ui5.click({ controlType: SAP_BUTTON_TYPE, properties: { text: 'Post' } });
+  await ui5.click({ controlType: SAP_BUTTON_TYPE, properties: { text: postText } });
   steps.push('clickPost');
 
   await waitForSave(ui5, options);
@@ -459,12 +479,15 @@ export async function searchVendors(
   const startTime = Date.now();
   const steps: string[] = [];
 
+  const appHash = (options?.overrides?.appId ?? 'Supplier-manage') as IntentString;
+  const goText = options?.overrides?.saveButtonText ?? 'Go';
+
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('Supplier-manage');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  await ui5.click({ controlType: SAP_BUTTON_TYPE, properties: { text: 'Go' } });
+  await ui5.click({ controlType: SAP_BUTTON_TYPE, properties: { text: goText } });
   steps.push('clickGo');
 
   return mmResult({

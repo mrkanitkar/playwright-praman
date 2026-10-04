@@ -13,8 +13,9 @@
  * @remarks
  * Controlled vocabulary system for SAP S/4HANA business term resolution.
  * Maps natural-language terms to UI5 selectors with fuzzy matching,
- * synonym resolution, and cross-domain search across 6 SAP domains:
- * procurement, sales, finance, manufacturing, warehouse, and quality.
+ * synonym resolution, and cross-domain search across 8 SAP domains:
+ * procurement, sales, finance, manufacturing, warehouse, quality,
+ * asset-management, and hr.
  *
  * @example
  * ```typescript

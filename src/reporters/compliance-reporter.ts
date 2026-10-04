@@ -46,6 +46,36 @@ import type {
 import { redactStepParams } from '#core/logging/redaction.js';
 import { matchesPramanStepTitle } from '#core/utils/step-actions.js';
 
+// ── Annotation type constants ─────────────────────────────────────────────
+
+/**
+ * Recognised Playwright annotation types carrying SAP metadata.
+ *
+ * @remarks
+ * Test authors annotate their tests via `test.info().annotations.push()`
+ * or Playwright's built-in annotation API. The compliance reporter scans
+ * for these types and propagates their descriptions into the compliance
+ * report so downstream tooling (dashboards, Allure, CI gates) can slice
+ * results by SAP process, criticality, or transaction code.
+ *
+ * @example
+ * ```typescript
+ * import { ANNOTATION_TYPES } from 'playwright-praman/reporters';
+ *
+ * test.info().annotations.push(
+ *   { type: ANNOTATION_TYPES.PROCESS, description: 'Order-to-Cash' },
+ *   { type: ANNOTATION_TYPES.TCODE, description: 'VA01' },
+ * );
+ * ```
+ */
+export const ANNOTATION_TYPES = {
+  PROCESS: 'process',
+  SUBPROCESS: 'subprocess',
+  CRITICALITY: 'criticality',
+  TCODE: 'tcode',
+  SAP_MODULE: 'sapModule',
+} as const satisfies Record<string, string>;
+
 // ── Exported types ─────────────────────────────────────────────────────────
 
 /** Classification of a single test's compliance. */
@@ -68,6 +98,14 @@ export interface TestComplianceEntry {
    * only signal available, as before.
    */
   readonly rawPlaywrightLocators: readonly string[];
+  /** SAP business process name (from `process` annotation). */
+  readonly process?: string;
+  /** SAP business subprocess name (from `subprocess` annotation). */
+  readonly subprocess?: string;
+  /** Test criticality level (from `criticality` annotation). */
+  readonly criticality?: string;
+  /** SAP transaction code (from `tcode` annotation). */
+  readonly tcode?: string;
 }
 
 /** Full compliance report written to disk. */
@@ -247,6 +285,15 @@ export class ComplianceReporter implements Reporter {
     const total = pramanCount + rawCount;
     const status = categoriseStatus(pramanCount, rawCount);
 
+    // Scan test annotations for SAP metadata
+    const annotations = test.annotations;
+    const process = annotations.find((a) => a.type === ANNOTATION_TYPES.PROCESS)?.description;
+    const subprocess = annotations.find((a) => a.type === ANNOTATION_TYPES.SUBPROCESS)?.description;
+    const criticality = annotations.find(
+      (a) => a.type === ANNOTATION_TYPES.CRITICALITY,
+    )?.description;
+    const tcode = annotations.find((a) => a.type === ANNOTATION_TYPES.TCODE)?.description;
+
     this.entries.push({
       testTitle: test.title,
       testFile: test.location.file,
@@ -255,6 +302,10 @@ export class ComplianceReporter implements Reporter {
       rawPlaywrightSteps: rawCount,
       totalSteps: total,
       rawPlaywrightLocators: [...rawLocators],
+      ...(process !== undefined ? { process } : {}),
+      ...(subprocess !== undefined ? { subprocess } : {}),
+      ...(criticality !== undefined ? { criticality } : {}),
+      ...(tcode !== undefined ? { tcode } : {}),
     });
   }
 

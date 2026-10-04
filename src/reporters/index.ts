@@ -24,13 +24,18 @@
 
 // ── Compliance Reporter ──────────────────────────────────────────────────────
 
-export { ComplianceReporter, isPramanStep } from './compliance-reporter.js';
+export { ANNOTATION_TYPES, ComplianceReporter, isPramanStep } from './compliance-reporter.js';
 export type {
   TestComplianceReport,
   ComplianceReporterOptions,
   TestComplianceEntry,
   TestComplianceStatus,
 } from './compliance-reporter.js';
+
+// ── Allure SAP Categories ───────────────────────────────────────────────────
+
+export { ALLURE_SAP_CATEGORIES } from './allure-categories.js';
+export type { AllureSapCategory } from './allure-categories.js';
 
 // ── OData Trace Reporter ─────────────────────────────────────────────────────
 

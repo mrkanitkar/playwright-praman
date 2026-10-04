@@ -13,13 +13,17 @@
  * @remarks
  * Extends `aiTest` with an `intent` fixture that provides typed wrappers around
  * all procurement and sales domain intent functions. Vocabulary domain preloads
- * for all 4 supported domains are fully awaited BEFORE `use()` is called, so
+ * for all 8 supported domains are fully awaited BEFORE `use()` is called, so
  * the fixture is ready to use immediately in the test body.
  *
  * Cross-fixture dependencies (`ui5`, `ui5Navigation`) are declared as `option`
  * placeholders (PW-MERGE-1) and overridden by `mergeTests()` in the fixture
  * assembly. This ensures intent functions receive the properly-initialized
  * UI5Handler and UI5NavigationAPI, not a raw Playwright Page.
+ *
+ * Type definitions for {@link IntentFixture}, {@link IntentTestFixtures}, and
+ * {@link IntentFixtureDeps} are in `intent-fixture-types.ts` to stay within the
+ * 300-LOC guideline.
  *
  * @example
  * ```typescript
@@ -38,268 +42,9 @@
 
 import { test as base } from '@playwright/test';
 
-import type {
-  CustomerMasterData,
-  IntentOptions,
-  IntentResult,
-  JournalEntryData,
-  MaterialMasterData,
-  PaymentData,
-  ProductionConfirmationData,
-  ProductionOrderData,
-  VendorInvoiceData,
-  VendorMasterData,
-} from '../intents/types.js';
+import type { IntentFixtureDeps, IntentTestFixtures } from './intent-fixture-types.js';
 
-import type { UI5NavigationAPI } from './nav-fixtures.js';
-import type { UI5Handler } from './ui5-handler.js';
-
-// ── Public fixture type ─────────────────────────────────────────────────────
-
-/**
- * The `intent` fixture object provided to intent-enabled Playwright tests.
- *
- * @ai
- * @aiContext Use to execute SAP business operations (PO, SO, invoices, etc.).
- *
- * @remarks
- * Groups domain intent functions into `core`, `procurement`, `sales`,
- * `finance`, `manufacturing`, and `masterData` namespaces. All functions
- * delegate to the corresponding intent module functions with `ui5`,
- * `ui5Navigation`, and `vocabulary` pre-injected.
- *
- * @intent Provide typed SAP business intent operations to Playwright tests.
- * @capability intent.core.fillField
- *
- * @example
- * ```typescript
- * intentTest('search POs', async ({ intent }) => {
- *   await intent.procurement.searchPurchaseOrders({ Vendor: '100001' });
- * });
- * ```
- */
-export interface IntentFixture {
-  /**
-   * Core intent wrappers for low-level SAP field interactions.
-   *
-   * @ai
-   * @aiContext Use for low-level field fill, button click, and assertions.
-   *
-   * @example
-   * ```typescript
-   * await intent.core.fillField('Vendor', '100001');
-   * await intent.core.clickButton('Save');
-   * ```
-   */
-  core: {
-    /** Fill a labeled form field using vocabulary resolution. */
-    fillField: (label: string, value: string, options?: IntentOptions) => Promise<IntentResult>;
-    /** Click a button by its text label. */
-    clickButton: (text: string, options?: IntentOptions) => Promise<IntentResult>;
-    /** Select an option from a labeled select or combo box. */
-    selectOption: (label: string, option: string, options?: IntentOptions) => Promise<IntentResult>;
-    /** Assert the current value of a labeled field. */
-    assertField: (
-      label: string,
-      expected: string,
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Click the Confirm button and wait for the dialog to close. */
-    confirmAndWait: (options?: IntentOptions) => Promise<IntentResult>;
-    /** Wait for the page to complete a save operation. */
-    waitForSave: (options?: IntentOptions) => Promise<IntentResult>;
-  };
-
-  /**
-   * SAP Materials Management (MM) procurement intent operations.
-   *
-   * @ai
-   * @aiContext Use for purchase orders, requisitions, and goods receipt.
-   *
-   * @example
-   * ```typescript
-   * await intent.procurement.createPurchaseOrder(
-   *   { vendor: '100001', material: 'MAT-001', quantity: 10, plant: '1000' },
-   * );
-   * ```
-   */
-  procurement: {
-    /** Create a purchase order in ME21N. */
-    createPurchaseOrder: (
-      input: {
-        readonly vendor: string;
-        readonly material: string;
-        readonly quantity: number;
-        readonly plant: string;
-      },
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Approve a purchase order by PO number. */
-    approvePurchaseOrder: (
-      input: { readonly poNumber: string },
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Search purchase orders with filter criteria. */
-    searchPurchaseOrders: (
-      criteria: Readonly<Record<string, string>>,
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Create a purchase requisition in ME51N. */
-    createPurchaseRequisition: (
-      input: { readonly material: string; readonly quantity: number; readonly plant: string },
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Confirm goods receipt for a purchase order (MIGO). */
-    confirmGoodsReceipt: (
-      input: { readonly poNumber: string; readonly quantity: number },
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Search vendor master records. */
-    searchVendors: (options?: IntentOptions) => Promise<IntentResult>;
-  };
-
-  /**
-   * SAP Sales & Distribution (SD) intent operations.
-   *
-   * @ai
-   * @aiContext Use for sales orders, quotations, and delivery status.
-   *
-   * @example
-   * ```typescript
-   * await intent.sales.createSalesOrder({
-   *   customer: '200001',
-   *   material: 'FG-1000',
-   *   quantity: 5,
-   *   salesOrganization: '1000',
-   * });
-   * ```
-   */
-  sales: {
-    /** Create a sales order in VA01. */
-    createSalesOrder: (
-      input: {
-        readonly customer: string;
-        readonly material: string;
-        readonly quantity: number;
-        readonly salesOrganization: string;
-      },
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Create a quotation in VA21. */
-    createQuotation: (
-      input: { readonly customer: string; readonly material: string; readonly quantity: number },
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Approve a quotation by quotation number. */
-    approveQuotation: (
-      input: { readonly quotationNumber: string },
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Search sales orders with filter criteria. */
-    searchSalesOrders: (
-      criteria: Readonly<Record<string, string>>,
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Search customer master records. */
-    searchCustomers: (options?: IntentOptions) => Promise<IntentResult>;
-    /** Check delivery status for a sales order. */
-    checkDeliveryStatus: (
-      input: { readonly salesOrderNumber: string },
-      options?: IntentOptions,
-    ) => Promise<IntentResult<string>>;
-  };
-
-  /**
-   * SAP Financial Accounting (FI) intent operations.
-   *
-   * @ai
-   * @aiContext Use for journal entries, vendor invoices, and payments.
-   *
-   * @example
-   * ```typescript
-   * await intent.finance.createJournalEntry({
-   *   documentDate: '2026-02-20',
-   *   postingDate: '2026-02-20',
-   *   lineItems: [{ glAccount: '400000', debitCredit: 'S', amount: 1000 }],
-   * });
-   * ```
-   */
-  finance: {
-    /** Create a journal entry in FB50. */
-    createJournalEntry: (input: JournalEntryData, options?: IntentOptions) => Promise<IntentResult>;
-    /** Post a vendor invoice in FB60. */
-    postVendorInvoice: (input: VendorInvoiceData, options?: IntentOptions) => Promise<IntentResult>;
-    /** Process a vendor payment in F-53. */
-    processPayment: (input: PaymentData, options?: IntentOptions) => Promise<IntentResult>;
-  };
-
-  /**
-   * SAP Production Planning (PP) manufacturing intent operations.
-   *
-   * @ai
-   * @aiContext Use for production orders and confirmations.
-   *
-   * @example
-   * ```typescript
-   * await intent.manufacturing.createProductionOrder({
-   *   material: 'FG-1000', plant: '1000', quantity: 50,
-   * });
-   * ```
-   */
-  manufacturing: {
-    /** Create a production order in CO01. */
-    createProductionOrder: (
-      input: ProductionOrderData,
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Confirm a production order operation in CO11N. */
-    confirmProductionOrder: (
-      input: ProductionConfirmationData,
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-  };
-
-  /**
-   * SAP Master Data (MD) intent operations — cross-module.
-   *
-   * @ai
-   * @aiContext Use to create vendor, customer, or material master records.
-   *
-   * @example
-   * ```typescript
-   * await intent.masterData.createVendorMaster({ name: 'Acme GmbH', country: 'DE' });
-   * ```
-   */
-  masterData: {
-    /** Create a vendor master record in XK01/BP. */
-    createVendorMaster: (input: VendorMasterData, options?: IntentOptions) => Promise<IntentResult>;
-    /** Create a customer master record in XD01/BP. */
-    createCustomerMaster: (
-      input: CustomerMasterData,
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-    /** Create a material master record in MM01. */
-    createMaterialMaster: (
-      input: MaterialMasterData,
-      options?: IntentOptions,
-    ) => Promise<IntentResult>;
-  };
-}
-
-/**
- * Test fixture map for the intentTest extension.
- *
- * @example
- * ```typescript
- * test('uses intents', async ({ intent }) => {
- *   await intent.core.fillField('Name', 'Test');
- * });
- * ```
- */
-export interface IntentTestFixtures {
-  /** SAP business intent operations. */
-  intent: IntentFixture;
-}
+export type { IntentFixture, IntentFixtureDeps, IntentTestFixtures } from './intent-fixture-types.js';
 
 // ── Fixture definition ──────────────────────────────────────────────────────
 
@@ -329,22 +74,6 @@ export interface IntentTestFixtures {
  * });
  * ```
  */
-
-/**
- * Cross-fixture dependencies injected via PW-MERGE-1 option placeholders.
- *
- * @example
- * ```typescript
- * import type { IntentFixtureDeps } from '#fixtures/intent-fixtures.js';
- * ```
- */
-export interface IntentFixtureDeps {
-  /** UI5Handler — overridden at runtime by mergeTests(). */
-  ui5: UI5Handler;
-  /** Navigation API — overridden at runtime by mergeTests(). */
-  ui5Navigation: UI5NavigationAPI;
-}
-
 export const intentTest = base.extend<IntentTestFixtures & IntentFixtureDeps>({
   // ── Cross-fixture option placeholders (PW-MERGE-1) ──────────────────────
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- PW-MERGE-1: placeholder overridden by mergeTests
@@ -367,12 +96,14 @@ export const intentTest = base.extend<IntentTestFixtures & IntentFixtureDeps>({
       vocabulary.loadDomain('finance'),
       vocabulary.loadDomain('manufacturing'),
       // masterData terms are spread across procurement/sales/finance domains
+      vocabulary.loadDomain('quality'),
+      vocabulary.loadDomain('warehouse'),
+      vocabulary.loadDomain('asset-management'),
+      vocabulary.loadDomain('hr'),
     ]);
 
     await use({
       core: {
-        // fillField, clickButton, selectOption, assertField, confirmAndWait do not
-        // accept IntentOptions — trailing optional params are simply omitted.
         fillField: async (label, value) => intentModule.fillField(ui5, vocabulary, label, value),
         clickButton: async (text) => intentModule.clickButton(ui5, text),
         selectOption: async (label, option) =>
@@ -455,6 +186,42 @@ export const intentTest = base.extend<IntentTestFixtures & IntentFixtureDeps>({
           intentModule.masterData.createCustomerMaster(ui5, ui5Navigation, vocabulary, input, opts),
         createMaterialMaster: async (input, opts) =>
           intentModule.masterData.createMaterialMaster(ui5, ui5Navigation, vocabulary, input, opts),
+      },
+      quality: {
+        createInspectionLot: async (input, opts) =>
+          intentModule.quality.createInspectionLot(ui5, ui5Navigation, vocabulary, input, opts),
+        recordResults: async (input, opts) =>
+          intentModule.quality.recordResults(ui5, ui5Navigation, vocabulary, input, opts),
+        createQualityNotification: async (input, opts) =>
+          intentModule.quality.createQualityNotification(
+            ui5,
+            ui5Navigation,
+            vocabulary,
+            input,
+            opts,
+          ),
+      },
+      warehouse: {
+        createGoodsMovement: async (input, opts) =>
+          intentModule.warehouse.createGoodsMovement(ui5, ui5Navigation, vocabulary, input, opts),
+        createTransferOrder: async (input, opts) =>
+          intentModule.warehouse.createTransferOrder(ui5, ui5Navigation, vocabulary, input, opts),
+      },
+      assetManagement: {
+        acquireAsset: async (input, opts) =>
+          intentModule.assetManagement.acquireAsset(ui5, ui5Navigation, vocabulary, input, opts),
+        retireAsset: async (input, opts) =>
+          intentModule.assetManagement.retireAsset(ui5, ui5Navigation, vocabulary, input, opts),
+        transferAsset: async (input, opts) =>
+          intentModule.assetManagement.transferAsset(ui5, ui5Navigation, vocabulary, input, opts),
+      },
+      hr: {
+        createEmployee: async (input, opts) =>
+          intentModule.hr.createEmployee(ui5, ui5Navigation, vocabulary, input, opts),
+        recordTime: async (input, opts) =>
+          intentModule.hr.recordTime(ui5, ui5Navigation, vocabulary, input, opts),
+        requestAbsence: async (input, opts) =>
+          intentModule.hr.requestAbsence(ui5, ui5Navigation, vocabulary, input, opts),
       },
     });
   },

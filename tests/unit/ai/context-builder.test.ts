@@ -86,6 +86,7 @@ interface MinimalConfig {
   ignoreAutoWaitUrls: string[];
   defaultMatchSubclasses: boolean;
   captureFailureArtifacts: boolean;
+  skipPostFillWait: boolean;
 }
 
 function makeMinimalConfig(
@@ -102,6 +103,7 @@ function makeMinimalConfig(
     ignoreAutoWaitUrls: [] as string[],
     defaultMatchSubclasses: false,
     captureFailureArtifacts: true,
+    skipPostFillWait: false,
   };
 }
 

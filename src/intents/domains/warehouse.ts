@@ -8,30 +8,30 @@
  */
 
 /**
- * Manufacturing (PP) intent domain functions.
+ * Warehouse Management (WM) intent domain functions.
  *
  * @remarks
- * Covers SAP Production Planning scenarios: production order creation
- * and operation confirmation.
+ * Covers SAP Warehouse Management scenarios: goods movement posting
+ * and transfer order creation.
  *
- * @sapModule PP
- * @businessContext SAP Production Planning — make-to-order/make-to-stock lifecycle.
+ * @sapModule WM
+ * @businessContext SAP Warehouse Management — inventory movement lifecycle.
  * @module intents
  */
 
 import type { UI5HandlerSlice, VocabLookup } from '../core-wrappers.js';
 import { clickButton, fillField, waitForSave } from '../core-wrappers.js';
 import type {
+  GoodsMovementData,
   IntentOptions,
   IntentResult,
-  ProductionConfirmationData,
-  ProductionOrderData,
+  TransferOrderData,
 } from '../types.js';
 
 // ── Inline navigation API interface ───────────────────────────────────────
 
 /**
- * Minimal navigation API for PP intent functions.
+ * Minimal navigation API for WM intent functions.
  */
 interface NavAPI {
   navigateToApp(appId: string, options?: unknown): Promise<void>;
@@ -40,8 +40,8 @@ interface NavAPI {
 
 // ── Internal helper ────────────────────────────────────────────────────────
 
-/** Builds a PP-scoped `IntentResult<T>`. */
-function ppResult<T>(params: {
+/** Builds a WM-scoped `IntentResult<T>`. */
+function wmResult<T>(params: {
   status: 'success' | 'error' | 'partial';
   intentName: string;
   startTime: number;
@@ -51,8 +51,6 @@ function ppResult<T>(params: {
   retryable?: boolean;
   suggestions?: string[];
 }): IntentResult<T> {
-  // Type assertion: exactOptionalPropertyTypes requires omitting undefined optional fields;
-  // conditional spread produces a union type TypeScript cannot narrow to IntentResult<T>
   return {
     status: params.status,
     ...(params.data !== undefined && { data: params.data }),
@@ -62,7 +60,7 @@ function ppResult<T>(params: {
       retryable: params.retryable ?? false,
       suggestions: params.suggestions ?? [],
       intentName: params.intentName,
-      sapModule: 'PP',
+      sapModule: 'WM',
       stepsExecuted: params.stepsExecuted,
     },
   };
@@ -71,71 +69,72 @@ function ppResult<T>(params: {
 // ── Public intent functions ────────────────────────────────────────────────
 
 /**
- * Creates a production order (PP-SFC CO01).
+ * Creates a goods movement posting (WM — MIGO).
  *
  * @remarks
- * Navigates to `ProductionOrder-create`, fills material, plant, and
- * quantity, then clicks Save.
+ * Navigates to the `GoodsMovement-create` FLP hash, fills movement type,
+ * plant, material, and quantity, then clicks Post.
  *
  * @param ui5 - UI5 interaction handler.
  * @param ui5Nav - Navigation API.
  * @param vocabulary - Vocabulary lookup service.
- * @param input - Production order data.
+ * @param input - Goods movement data.
  * @param options - Optional intent options.
  * @returns `IntentResult` describing the outcome.
  *
- * @intent Create a production order from structured input data.
- * @capability intent.manufacturing.createProductionOrder
- * @sapModule PP
- * @businessContext CO01 — create production order.
+ * @intent Create a warehouse goods movement posting.
+ * @capability intent.warehouse.createGoodsMovement
+ * @sapModule WM
+ * @businessContext MIGO — goods movement (receipt, issue, transfer posting).
  *
  * @example
  * ```typescript
- * import * as manufacturing from '#intents/domains/manufacturing.js';
+ * import * as warehouse from '#intents/domains/warehouse.js';
  *
- * await manufacturing.createProductionOrder(ui5, ui5Nav, vocab, {
- *   material: 'FG-1000',
+ * await warehouse.createGoodsMovement(ui5, ui5Nav, vocab, {
+ *   movementType: '101',
  *   plant: '1000',
- *   quantity: 50,
+ *   material: 'RAW-0001',
+ *   quantity: 100,
  * });
  * ```
  */
-export async function createProductionOrder(
+export async function createGoodsMovement(
   ui5: UI5HandlerSlice,
   ui5Nav: NavAPI,
   vocabulary: VocabLookup,
-  input: ProductionOrderData,
+  input: GoodsMovementData,
   options?: IntentOptions,
 ): Promise<IntentResult> {
   const startTime = Date.now();
   const steps: string[] = [];
-  const appHash = options?.overrides?.appId ?? 'ProductionOrder-create';
-  const saveText = options?.overrides?.saveButtonText ?? 'Save';
+  const appHash = options?.overrides?.appId ?? 'GoodsMovement-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Post';
 
   if (options?.skipNavigation !== true) {
     await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const materialLabel = options?.overrides?.fields?.['Material'] ?? 'Material';
-  const materialResult = await fillField(ui5, vocabulary, materialLabel, input.material);
-  if (materialResult.status === 'error') {
-    return ppResult({
+  const mvtLabel = options?.overrides?.fields?.['Movement Type'] ?? 'Movement Type';
+  const mvtResult = await fillField(ui5, vocabulary, mvtLabel, input.movementType);
+  if (mvtResult.status === 'error') {
+    return wmResult({
       status: 'error',
-      intentName: 'createProductionOrder',
+      intentName: 'createGoodsMovement',
       startTime,
-      stepsExecuted: [...steps, ...materialResult.metadata.stepsExecuted],
-      ...(materialResult.error !== undefined && { error: materialResult.error }),
+      stepsExecuted: [...steps, ...mvtResult.metadata.stepsExecuted],
+      ...(mvtResult.error !== undefined && { error: mvtResult.error }),
     });
   }
-  steps.push('fillMaterial');
+  steps.push('fillMovementType');
 
   const plantLabel = options?.overrides?.fields?.['Plant'] ?? 'Plant';
   const plantResult = await fillField(ui5, vocabulary, plantLabel, input.plant);
   if (plantResult.status === 'error') {
-    return ppResult({
+    return wmResult({
       status: 'error',
-      intentName: 'createProductionOrder',
+      intentName: 'createGoodsMovement',
       startTime,
       stepsExecuted: [...steps, ...plantResult.metadata.stepsExecuted],
       ...(plantResult.error !== undefined && { error: plantResult.error }),
@@ -143,12 +142,25 @@ export async function createProductionOrder(
   }
   steps.push('fillPlant');
 
+  const matLabel = options?.overrides?.fields?.['Material'] ?? 'Material';
+  const matResult = await fillField(ui5, vocabulary, matLabel, input.material);
+  if (matResult.status === 'error') {
+    return wmResult({
+      status: 'error',
+      intentName: 'createGoodsMovement',
+      startTime,
+      stepsExecuted: [...steps, ...matResult.metadata.stepsExecuted],
+      ...(matResult.error !== undefined && { error: matResult.error }),
+    });
+  }
+  steps.push('fillMaterial');
+
   const qtyLabel = options?.overrides?.fields?.['Quantity'] ?? 'Quantity';
   const qtyResult = await fillField(ui5, vocabulary, qtyLabel, String(input.quantity));
   if (qtyResult.status === 'error') {
-    return ppResult({
+    return wmResult({
       status: 'error',
-      intentName: 'createProductionOrder',
+      intentName: 'createGoodsMovement',
       startTime,
       stepsExecuted: [...steps, ...qtyResult.metadata.stepsExecuted],
       ...(qtyResult.error !== undefined && { error: qtyResult.error }),
@@ -156,72 +168,54 @@ export async function createProductionOrder(
   }
   steps.push('fillQuantity');
 
-  if (input.scheduledStart !== undefined) {
-    const schedLabel = options?.overrides?.fields?.['Scheduled Start'] ?? 'Scheduled Start';
-    const startResult = await fillField(ui5, vocabulary, schedLabel, input.scheduledStart);
-    if (startResult.status === 'error') {
-      return ppResult({
-        status: 'error',
-        intentName: 'createProductionOrder',
-        startTime,
-        stepsExecuted: [...steps, ...startResult.metadata.stepsExecuted],
-        ...(startResult.error !== undefined && { error: startResult.error }),
-      });
-    }
-    steps.push('fillScheduledStart');
-  }
-
   await clickButton(ui5, saveText);
-  steps.push('clickSave');
+  steps.push('clickPost');
 
   await waitForSave(ui5, options);
   steps.push('waitForSave');
 
-  return ppResult({
+  return wmResult({
     status: 'success',
-    intentName: 'createProductionOrder',
+    intentName: 'createGoodsMovement',
     startTime,
     stepsExecuted: steps,
   });
 }
 
 /**
- * Confirms a production order operation (PP-SFC CO11N).
- *
- * @remarks
- * Navigates to `ProductionOrder-confirm`, fills order number and quantity,
- * then clicks Save.
+ * Creates a transfer order for bin-to-bin movement (WM-TO / EWM).
  *
  * @param ui5 - UI5 interaction handler.
  * @param ui5Nav - Navigation API.
  * @param vocabulary - Vocabulary lookup service.
- * @param input - Production order confirmation data.
+ * @param input - Transfer order data.
  * @param options - Optional intent options.
  * @returns `IntentResult` describing the outcome.
  *
- * @intent Confirm a production order operation (goods produced).
- * @capability intent.manufacturing.confirmProductionOrder
- * @sapModule PP
- * @businessContext CO11N — enter production order confirmation.
+ * @intent Create a warehouse transfer order for bin movement.
+ * @capability intent.warehouse.createTransferOrder
+ * @sapModule WM
+ * @businessContext LT01 — create transfer order.
  *
  * @example
  * ```typescript
- * await manufacturing.confirmProductionOrder(ui5, ui5Nav, vocab, {
- *   orderNumber: '1000012',
- *   quantity: 50,
+ * await warehouse.createTransferOrder(ui5, ui5Nav, vocab, {
+ *   warehouseNumber: '100',
+ *   material: 'FG-1000',
+ *   quantity: 25,
  * });
  * ```
  */
-export async function confirmProductionOrder(
+export async function createTransferOrder(
   ui5: UI5HandlerSlice,
   ui5Nav: NavAPI,
   vocabulary: VocabLookup,
-  input: ProductionConfirmationData,
+  input: TransferOrderData,
   options?: IntentOptions,
 ): Promise<IntentResult> {
   const startTime = Date.now();
   const steps: string[] = [];
-  const appHash = options?.overrides?.appId ?? 'ProductionOrder-confirm';
+  const appHash = options?.overrides?.appId ?? 'TransferOrder-create';
   const saveText = options?.overrides?.saveButtonText ?? 'Save';
 
   if (options?.skipNavigation !== true) {
@@ -229,25 +223,38 @@ export async function confirmProductionOrder(
     steps.push('navigate');
   }
 
-  const orderLabel = options?.overrides?.fields?.['Order Number'] ?? 'Order Number';
-  const orderResult = await fillField(ui5, vocabulary, orderLabel, input.orderNumber);
-  if (orderResult.status === 'error') {
-    return ppResult({
+  const whLabel = options?.overrides?.fields?.['Warehouse Number'] ?? 'Warehouse Number';
+  const whResult = await fillField(ui5, vocabulary, whLabel, input.warehouseNumber);
+  if (whResult.status === 'error') {
+    return wmResult({
       status: 'error',
-      intentName: 'confirmProductionOrder',
+      intentName: 'createTransferOrder',
       startTime,
-      stepsExecuted: [...steps, ...orderResult.metadata.stepsExecuted],
-      ...(orderResult.error !== undefined && { error: orderResult.error }),
+      stepsExecuted: [...steps, ...whResult.metadata.stepsExecuted],
+      ...(whResult.error !== undefined && { error: whResult.error }),
     });
   }
-  steps.push('fillOrderNumber');
+  steps.push('fillWarehouseNumber');
+
+  const matLabel = options?.overrides?.fields?.['Material'] ?? 'Material';
+  const matResult = await fillField(ui5, vocabulary, matLabel, input.material);
+  if (matResult.status === 'error') {
+    return wmResult({
+      status: 'error',
+      intentName: 'createTransferOrder',
+      startTime,
+      stepsExecuted: [...steps, ...matResult.metadata.stepsExecuted],
+      ...(matResult.error !== undefined && { error: matResult.error }),
+    });
+  }
+  steps.push('fillMaterial');
 
   const qtyLabel = options?.overrides?.fields?.['Quantity'] ?? 'Quantity';
   const qtyResult = await fillField(ui5, vocabulary, qtyLabel, String(input.quantity));
   if (qtyResult.status === 'error') {
-    return ppResult({
+    return wmResult({
       status: 'error',
-      intentName: 'confirmProductionOrder',
+      intentName: 'createTransferOrder',
       startTime,
       stepsExecuted: [...steps, ...qtyResult.metadata.stepsExecuted],
       ...(qtyResult.error !== undefined && { error: qtyResult.error }),
@@ -261,9 +268,9 @@ export async function confirmProductionOrder(
   await waitForSave(ui5, options);
   steps.push('waitForSave');
 
-  return ppResult({
+  return wmResult({
     status: 'success',
-    intentName: 'confirmProductionOrder',
+    intentName: 'createTransferOrder',
     startTime,
     stepsExecuted: steps,
   });

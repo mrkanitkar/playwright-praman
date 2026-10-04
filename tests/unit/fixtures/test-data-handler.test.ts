@@ -21,7 +21,7 @@
 
 import { join } from 'node:path';
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ── Mock logger ────────────────────────────────────────────────────────
 const mockChildLogger = {
@@ -153,6 +153,93 @@ describe('TestDataHandler', () => {
       });
 
       expect(result.label).toBe('order-test-uuid-1234-suffix');
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Group 1b: generate() — date template placeholders
+  // ═══════════════════════════════════════════════════════════════════════
+
+  describe('generate() — date placeholders', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2025-06-15T10:30:00.000Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('replaces {{today}} with current date in YYYY-MM-DD format', () => {
+      const result = handler.generate({ date: '{{today}}' });
+
+      expect(result.date).toBe('2025-06-15');
+    });
+
+    it('replaces {{tomorrow}} with next day in YYYY-MM-DD format', () => {
+      const result = handler.generate({ date: '{{tomorrow}}' });
+
+      expect(result.date).toBe('2025-06-16');
+    });
+
+    it('replaces {{yesterday}} with previous day in YYYY-MM-DD format', () => {
+      const result = handler.generate({ date: '{{yesterday}}' });
+
+      expect(result.date).toBe('2025-06-14');
+    });
+
+    it('replaces {{date+N}} with date N days in the future', () => {
+      const result = handler.generate({ date: '{{date+7}}' });
+
+      expect(result.date).toBe('2025-06-22');
+    });
+
+    it('replaces {{date-N}} with date N days in the past', () => {
+      const result = handler.generate({ date: '{{date-1}}' });
+
+      expect(result.date).toBe('2025-06-14');
+    });
+
+    it('replaces {{date+0}} with today', () => {
+      const result = handler.generate({ date: '{{date+0}}' });
+
+      expect(result.date).toBe('2025-06-15');
+    });
+
+    it('replaces {{date-0}} with today', () => {
+      const result = handler.generate({ date: '{{date-0}}' });
+
+      expect(result.date).toBe('2025-06-15');
+    });
+
+    it('handles large offset {{date+365}}', () => {
+      const result = handler.generate({ date: '{{date+365}}' });
+
+      expect(result.date).toBe('2026-06-15');
+    });
+
+    it('handles mixed date and uuid placeholders in one string', () => {
+      const result = handler.generate({ ref: 'PO-{{today}}-{{uuid}}' });
+
+      expect(result.ref).toBe('PO-2025-06-15-test-uuid-1234');
+    });
+
+    it('handles mixed date offset placeholder in a longer string', () => {
+      const result = handler.generate({ ref: 'DUE-{{date+7}}-BATCH' });
+
+      expect(result.ref).toBe('DUE-2025-06-22-BATCH');
+    });
+
+    it('preserves existing {{uuid}} and {{timestamp}} behavior (regression)', () => {
+      const result = handler.generate({
+        id: '{{uuid}}',
+        createdAt: '{{timestamp}}',
+        mixed: 'item-{{uuid}}-{{timestamp}}',
+      });
+
+      expect(result.id).toBe('test-uuid-1234');
+      expect(result.createdAt).toBe('2025-06-15T10:30:00.000Z');
+      expect(result.mixed).toBe('item-test-uuid-1234-2025-06-15T10:30:00.000Z');
     });
   });
 

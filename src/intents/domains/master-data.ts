@@ -110,13 +110,16 @@ export async function createVendorMaster(
 ): Promise<IntentResult> {
   const startTime = Date.now();
   const steps: string[] = [];
+  const appHash = options?.overrides?.appId ?? 'Supplier-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Save';
 
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('Supplier-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const nameResult = await fillField(ui5, vocabulary, 'Name', input.name);
+  const nameLabel = options?.overrides?.fields?.['Name'] ?? 'Name';
+  const nameResult = await fillField(ui5, vocabulary, nameLabel, input.name);
   if (nameResult.status === 'error') {
     return mdResult({
       status: 'error',
@@ -128,7 +131,8 @@ export async function createVendorMaster(
   }
   steps.push('fillName');
 
-  const countryResult = await fillField(ui5, vocabulary, 'Country', input.country);
+  const countryLabel = options?.overrides?.fields?.['Country'] ?? 'Country';
+  const countryResult = await fillField(ui5, vocabulary, countryLabel, input.country);
   if (countryResult.status === 'error') {
     return mdResult({
       status: 'error',
@@ -141,7 +145,8 @@ export async function createVendorMaster(
   steps.push('fillCountry');
 
   if (input.taxId !== undefined) {
-    const taxResult = await fillField(ui5, vocabulary, 'Tax ID', input.taxId);
+    const taxLabel = options?.overrides?.fields?.['Tax ID'] ?? 'Tax ID';
+    const taxResult = await fillField(ui5, vocabulary, taxLabel, input.taxId);
     if (taxResult.status === 'error') {
       return mdResult({
         status: 'error',
@@ -154,7 +159,7 @@ export async function createVendorMaster(
     steps.push('fillTaxId');
   }
 
-  await clickButton(ui5, 'Save');
+  await clickButton(ui5, saveText);
   steps.push('clickSave');
 
   await waitForSave(ui5, options);
@@ -205,13 +210,16 @@ export async function createCustomerMaster(
 ): Promise<IntentResult> {
   const startTime = Date.now();
   const steps: string[] = [];
+  const appHash = options?.overrides?.appId ?? 'Customer-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Save';
 
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('Customer-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const nameResult = await fillField(ui5, vocabulary, 'Name', input.name);
+  const nameLabel = options?.overrides?.fields?.['Name'] ?? 'Name';
+  const nameResult = await fillField(ui5, vocabulary, nameLabel, input.name);
   if (nameResult.status === 'error') {
     return mdResult({
       status: 'error',
@@ -223,7 +231,8 @@ export async function createCustomerMaster(
   }
   steps.push('fillName');
 
-  const countryResult = await fillField(ui5, vocabulary, 'Country', input.country);
+  const countryLabel = options?.overrides?.fields?.['Country'] ?? 'Country';
+  const countryResult = await fillField(ui5, vocabulary, countryLabel, input.country);
   if (countryResult.status === 'error') {
     return mdResult({
       status: 'error',
@@ -236,10 +245,12 @@ export async function createCustomerMaster(
   steps.push('fillCountry');
 
   if (input.salesOrganization !== undefined) {
+    const salesOrgLabel =
+      options?.overrides?.fields?.['Sales Organization'] ?? 'Sales Organization';
     const salesOrgResult = await fillField(
       ui5,
       vocabulary,
-      'Sales Organization',
+      salesOrgLabel,
       input.salesOrganization,
     );
     if (salesOrgResult.status === 'error') {
@@ -254,7 +265,7 @@ export async function createCustomerMaster(
     steps.push('fillSalesOrganization');
   }
 
-  await clickButton(ui5, 'Save');
+  await clickButton(ui5, saveText);
   steps.push('clickSave');
 
   await waitForSave(ui5, options);
@@ -306,13 +317,16 @@ export async function createMaterialMaster(
 ): Promise<IntentResult> {
   const startTime = Date.now();
   const steps: string[] = [];
+  const appHash = options?.overrides?.appId ?? 'Material-create';
+  const saveText = options?.overrides?.saveButtonText ?? 'Save';
 
   if (options?.skipNavigation !== true) {
-    await ui5Nav.navigateToApp('Material-create');
+    await ui5Nav.navigateToApp(appHash);
     steps.push('navigate');
   }
 
-  const materialResult = await fillField(ui5, vocabulary, 'Material Number', input.materialNumber);
+  const matNumLabel = options?.overrides?.fields?.['Material Number'] ?? 'Material Number';
+  const materialResult = await fillField(ui5, vocabulary, matNumLabel, input.materialNumber);
   if (materialResult.status === 'error') {
     return mdResult({
       status: 'error',
@@ -324,7 +338,8 @@ export async function createMaterialMaster(
   }
   steps.push('fillMaterialNumber');
 
-  const descResult = await fillField(ui5, vocabulary, 'Description', input.description);
+  const descLabel = options?.overrides?.fields?.['Description'] ?? 'Description';
+  const descResult = await fillField(ui5, vocabulary, descLabel, input.description);
   if (descResult.status === 'error') {
     return mdResult({
       status: 'error',
@@ -337,7 +352,8 @@ export async function createMaterialMaster(
   steps.push('fillDescription');
 
   if (input.materialType !== undefined) {
-    const typeResult = await fillField(ui5, vocabulary, 'Material Type', input.materialType);
+    const mtLabel = options?.overrides?.fields?.['Material Type'] ?? 'Material Type';
+    const typeResult = await fillField(ui5, vocabulary, mtLabel, input.materialType);
     if (typeResult.status === 'error') {
       return mdResult({
         status: 'error',
@@ -351,7 +367,8 @@ export async function createMaterialMaster(
   }
 
   if (input.baseUnit !== undefined) {
-    const unitResult = await fillField(ui5, vocabulary, 'Base Unit', input.baseUnit);
+    const buLabel = options?.overrides?.fields?.['Base Unit'] ?? 'Base Unit';
+    const unitResult = await fillField(ui5, vocabulary, buLabel, input.baseUnit);
     if (unitResult.status === 'error') {
       return mdResult({
         status: 'error',
@@ -364,7 +381,7 @@ export async function createMaterialMaster(
     steps.push('fillBaseUnit');
   }
 
-  await clickButton(ui5, 'Save');
+  await clickButton(ui5, saveText);
   steps.push('clickSave');
 
   await waitForSave(ui5, options);

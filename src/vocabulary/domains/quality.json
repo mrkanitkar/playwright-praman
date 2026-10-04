@@ -53,6 +53,13 @@
       }
     },
     "resultsRecording": {
+      "actions": {
+        "save": {
+          "controlType": "sap.m.Button",
+          "properties": { "text": "Save" },
+          "intentApiMethod": "clickButton"
+        }
+      },
       "results": {
         "measuredValue": {
           "labelFor": { "text": "Mean Value" },

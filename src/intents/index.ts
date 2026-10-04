@@ -19,6 +19,10 @@
  * - `finance` — FI (Financial Accounting)
  * - `manufacturing` — PP (Production Planning)
  * - `masterData` — MD (cross-module master data)
+ * - `quality` — QM (Quality Management)
+ * - `warehouse` — WM (Warehouse Management)
+ * - `assetManagement` — AM (Asset Accounting / FI-AA)
+ * - `hr` — HR (Human Capital Management)
  *
  * @module intents
  */
@@ -27,6 +31,7 @@
 export type {
   IntentResult,
   IntentOptions,
+  IntentOverrides,
   JournalEntryData,
   VendorInvoiceData,
   PaymentData,
@@ -35,6 +40,17 @@ export type {
   VendorMasterData,
   CustomerMasterData,
   MaterialMasterData,
+  InspectionLotData,
+  ResultsRecordingData,
+  QualityNotificationData,
+  GoodsMovementData,
+  TransferOrderData,
+  AssetAcquisitionData,
+  AssetRetirementData,
+  AssetTransferData,
+  EmployeeData,
+  TimeRecordingData,
+  AbsenceRequestData,
 } from './types.js';
 
 // ── Core wrappers ────────────────────────────────────────────────────────────
@@ -55,3 +71,7 @@ export * as sales from './domains/sales.js';
 export * as finance from './domains/finance.js';
 export * as manufacturing from './domains/manufacturing.js';
 export * as masterData from './domains/master-data.js';
+export * as quality from './domains/quality.js';
+export * as warehouse from './domains/warehouse.js';
+export * as assetManagement from './domains/asset-management.js';
+export * as hr from './domains/hr.js';
