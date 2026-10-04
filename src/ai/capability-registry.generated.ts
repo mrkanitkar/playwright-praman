@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-10-02 with 198 entries.
+ * Generated on 2026-10-02 with 201 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {
@@ -2483,6 +2483,39 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     registryVersion: 1,
     aiSteering:
       'Use for per-control waits. Use waitForUI5Stable when you need the whole application to be idle — the two are not interchangeable.',
+  },
+  {
+    id: 'UI5-ODATA-012',
+    qualifiedName: 'odata.fixture',
+    name: 'odataTest',
+    description: 'Standalone OData fixture providing top-level odata without the full ui5 handler.',
+    category: 'odata',
+    priority: 'fixture',
+    usageExample:
+      "import { odataTest } from 'playwright-praman';\nodataTest('read orders', async ({ odata }) => {\n  const data = await odata.getModelData('/PurchaseOrders');\n});",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-OTHER-003',
+    qualifiedName: 'visualRegression.fixture',
+    name: 'visualRegressionTest',
+    description: 'Visual regression fixture for screenshot comparison with FLP chrome masking.',
+    category: 'ui5',
+    priority: 'fixture',
+    usageExample:
+      "import { visualRegressionTest } from 'playwright-praman';\nvisualRegressionTest('visual check', async ({ visualRegression }) => {\n  await visualRegression.compareScreenshot('home.png', {\n    mask: visualRegression.maskFLPChrome(),\n  });\n});",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-OTHER-004',
+    qualifiedName: 'visualRegression.options',
+    name: 'VisualRegressionOptions',
+    description:
+      'Options for visual regression screenshot comparison — threshold, masking, full-page capture.',
+    category: 'ui5',
+    priority: 'namespace',
+    usageExample: 'const opts: VisualRegressionOptions = { threshold: 0.1, fullPage: true };',
+    registryVersion: 1,
   },
   {
     id: 'UI5-OTHER-002',

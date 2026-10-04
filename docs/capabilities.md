@@ -1,7 +1,7 @@
 # Praman Capabilities Reference
 
 > **Generated**: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
-> **Total**: 198 capabilities across 15 categories
+> **Total**: 201 capabilities across 15 categories
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Category | Prefix       | Description                                    | Count |
 | -------- | ------------ | ---------------------------------------------- | ----- |
-| ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 24    |
+| ui5      | `UI5-UI5`    | Core UI5 control interactions                  | 26    |
 | table    | `UI5-TABLE`  | Table discovery, reading, and manipulation     | 24    |
 | dialog   | `UI5-DLG`    | Dialog lifecycle management                    | 10    |
 | date     | `UI5-DATE`   | Date and time picker operations                | 13    |
-| odata    | `UI5-ODATA`  | OData model and HTTP operations                | 11    |
+| odata    | `UI5-ODATA`  | OData model and HTTP operations                | 12    |
 | navigate | `UI5-NAV`    | FLP and in-app navigation                      | 9     |
 | auth     | `UI5-AUTH`   | SAP authentication and session management      | 6     |
 | fe       | `UI5-FE`     | Fiori Elements page abstractions               | 27    |
@@ -29,32 +29,34 @@
 
 ## ui5 — Core UI5 control interactions
 
-| ID            | Name                      | Description                                                                                                 | Usage Example                                                          |
-| ------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `UI5-UI5-001` | control                   | Discovers a single control matching the selector.                                                           | `const btn = await ui5.control({ id: 'submitBtn' });`                  |
-| `UI5-UI5-002` | controls                  | Discovers multiple controls matching the selector.                                                          | `const buttons = await ui5.controls({ controlType: 'sap.m.Button' });` |
-| `UI5-UI5-003` | click                     | Clicks a control.                                                                                           | `await ui5.click({ id: 'submitBtn' });`                                |
-| `UI5-UI5-004` | fill                      | Fills a control with text.                                                                                  | `await ui5.fill({ id: 'vendorInput' }, '100001');`                     |
-| `UI5-UI5-005` | press                     | Presses a control (alias for click).                                                                        | `await ui5.press({ id: 'saveBtn' });`                                  |
-| `UI5-UI5-006` | select                    | Selects an item in a selection control.                                                                     | `await ui5.select({ id: 'purchOrgSelect' }, '1000');`                  |
-| `UI5-UI5-007` | check                     | Checks a checkbox.                                                                                          | `await ui5.check({ id: 'agreeCheckbox' });`                            |
-| `UI5-UI5-008` | uncheck                   | Unchecks a checkbox.                                                                                        | `await ui5.uncheck({ id: 'agreeCheckbox' });`                          |
-| `UI5-UI5-009` | clear                     | Clears a control's text.                                                                                    | `await ui5.clear({ id: 'searchField' });`                              |
-| `UI5-UI5-010` | getText                   | Gets the text of a control.                                                                                 | `const label = await ui5.getText({ id: 'statusLabel' });`              |
-| `UI5-UI5-011` | getValue                  | Gets the value of a control.                                                                                | `const val = await ui5.getValue({ id: 'quantityInput' });`             |
-| `UI5-UI5-012` | waitForUI5                | Waits for UI5 to stabilize.                                                                                 | `await ui5.waitForUI5();`                                              |
-| `UI5-UI5-013` | waitFor                   | Waits for a control to appear.                                                                              | `await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });`        |
-| `UI5-UI5-014` | inspect                   | Inspects a control and returns full metadata.                                                               | `const info = await ui5.inspect({ id: 'vendorInput' });`               |
-| `UI5-UI5-015` | clearCache                | Clears the internal proxy cache.                                                                            | `ui5.clearCache();`                                                    |
-| `UI5-UI5-016` | destroy                   | Destroys the handler and cleans up resources.                                                               | `await ui5.destroy();`                                                 |
-| `UI5-UI5-017` | setValue                  | Set value on a control via proxy method forwarding.                                                         | `const input = await ui5.control({ id: 'materialInput' });`            |
-| `UI5-UI5-018` | fireChange                | Fire change event on a control via proxy method forwarding.                                                 | `const input = await ui5.control({ id: 'materialInput' });`            |
-| `UI5-UI5-019` | open                      | Open a control (e.g., ComboBox dropdown) via proxy.                                                         | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-020` | close                     | Close a control via proxy.                                                                                  | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-021` | setSelectedKey            | Set selected key on selection control via proxy.                                                            | `const combo = await ui5.control({ id: 'variantCombo' });`             |
-| `UI5-UI5-022` | serializeUI5SelectorToCSS | Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.           | `import { serializeUI5SelectorToCSS } from 'playwright-praman';`       |
-| `UI5-UI5-023` | highlightControls         | Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).        | `screencast.highlightControls(true);`                                  |
-| `UI5-UI5-024` | contextRetryDelay         | Computes the exponential-backoff delay, with jitter, for retrying after the execution context is destroyed. | `const delay = contextRetryDelay(0); // 500-600 ms`                    |
+| ID              | Name                      | Description                                                                                                 | Usage Example                                                               |
+| --------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `UI5-UI5-001`   | control                   | Discovers a single control matching the selector.                                                           | `const btn = await ui5.control({ id: 'submitBtn' });`                       |
+| `UI5-UI5-002`   | controls                  | Discovers multiple controls matching the selector.                                                          | `const buttons = await ui5.controls({ controlType: 'sap.m.Button' });`      |
+| `UI5-UI5-003`   | click                     | Clicks a control.                                                                                           | `await ui5.click({ id: 'submitBtn' });`                                     |
+| `UI5-UI5-004`   | fill                      | Fills a control with text.                                                                                  | `await ui5.fill({ id: 'vendorInput' }, '100001');`                          |
+| `UI5-UI5-005`   | press                     | Presses a control (alias for click).                                                                        | `await ui5.press({ id: 'saveBtn' });`                                       |
+| `UI5-UI5-006`   | select                    | Selects an item in a selection control.                                                                     | `await ui5.select({ id: 'purchOrgSelect' }, '1000');`                       |
+| `UI5-UI5-007`   | check                     | Checks a checkbox.                                                                                          | `await ui5.check({ id: 'agreeCheckbox' });`                                 |
+| `UI5-UI5-008`   | uncheck                   | Unchecks a checkbox.                                                                                        | `await ui5.uncheck({ id: 'agreeCheckbox' });`                               |
+| `UI5-UI5-009`   | clear                     | Clears a control's text.                                                                                    | `await ui5.clear({ id: 'searchField' });`                                   |
+| `UI5-UI5-010`   | getText                   | Gets the text of a control.                                                                                 | `const label = await ui5.getText({ id: 'statusLabel' });`                   |
+| `UI5-UI5-011`   | getValue                  | Gets the value of a control.                                                                                | `const val = await ui5.getValue({ id: 'quantityInput' });`                  |
+| `UI5-UI5-012`   | waitForUI5                | Waits for UI5 to stabilize.                                                                                 | `await ui5.waitForUI5();`                                                   |
+| `UI5-UI5-013`   | waitFor                   | Waits for a control to appear.                                                                              | `await ui5.waitFor({ id: 'resultTable' }, { timeout: 10000 });`             |
+| `UI5-UI5-014`   | inspect                   | Inspects a control and returns full metadata.                                                               | `const info = await ui5.inspect({ id: 'vendorInput' });`                    |
+| `UI5-UI5-015`   | clearCache                | Clears the internal proxy cache.                                                                            | `ui5.clearCache();`                                                         |
+| `UI5-UI5-016`   | destroy                   | Destroys the handler and cleans up resources.                                                               | `await ui5.destroy();`                                                      |
+| `UI5-UI5-017`   | setValue                  | Set value on a control via proxy method forwarding.                                                         | `const input = await ui5.control({ id: 'materialInput' });`                 |
+| `UI5-UI5-018`   | fireChange                | Fire change event on a control via proxy method forwarding.                                                 | `const input = await ui5.control({ id: 'materialInput' });`                 |
+| `UI5-UI5-019`   | open                      | Open a control (e.g., ComboBox dropdown) via proxy.                                                         | `const combo = await ui5.control({ id: 'variantCombo' });`                  |
+| `UI5-UI5-020`   | close                     | Close a control via proxy.                                                                                  | `const combo = await ui5.control({ id: 'variantCombo' });`                  |
+| `UI5-UI5-021`   | setSelectedKey            | Set selected key on selection control via proxy.                                                            | `const combo = await ui5.control({ id: 'variantCombo' });`                  |
+| `UI5-UI5-022`   | serializeUI5SelectorToCSS | Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.           | `import { serializeUI5SelectorToCSS } from 'playwright-praman';`            |
+| `UI5-UI5-023`   | highlightControls         | Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).        | `screencast.highlightControls(true);`                                       |
+| `UI5-UI5-024`   | contextRetryDelay         | Computes the exponential-backoff delay, with jitter, for retrying after the execution context is destroyed. | `const delay = contextRetryDelay(0); // 500-600 ms`                         |
+| `UI5-OTHER-003` | visualRegressionTest      | Visual regression fixture for screenshot comparison with FLP chrome masking.                                | `import { visualRegressionTest } from 'playwright-praman';`                 |
+| `UI5-OTHER-004` | VisualRegressionOptions   | Options for visual regression screenshot comparison — threshold, masking, full-page capture.                | `const opts: VisualRegressionOptions = { threshold: 0.1, fullPage: true };` |
 
 ## table — Table discovery, reading, and manipulation
 
@@ -120,19 +122,20 @@
 
 ## odata — OData model and HTTP operations
 
-| ID              | Name               | Description                                                 | Usage Example                                                                                       |
-| --------------- | ------------------ | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `UI5-ODATA-001` | getModelData       | Reads data from the OData model at the given path.          | `const data = await ui5.odata.getModelData('/PurchaseOrders');`                                     |
-| `UI5-ODATA-002` | getModelProperty   | Reads a single property value from the OData model.         | `const vendor = await ui5.odata.getModelProperty('/PurchaseOrders(\'4500001234\')/Vendor');`        |
-| `UI5-ODATA-003` | waitForLoad        | Waits for all pending OData requests to complete.           | `await ui5.odata.waitForLoad({ timeout: 30000 });`                                                  |
-| `UI5-ODATA-004` | fetchCSRFToken     | Fetches a CSRF token from the OData service.                | `const token = await ui5.odata.fetchCSRFToken('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');` |
-| `UI5-ODATA-005` | getEntityCount     | Returns the $count for an entity set.                       | `const count = await ui5.odata.getEntityCount('/PurchaseOrders/$count');`                           |
-| `UI5-ODATA-006` | hasPendingChanges  | Checks whether the OData model has unsaved changes.         | `const pending = await ui5.odata.hasPendingChanges();`                                              |
-| `UI5-ODATA-007` | createEntity       | Creates a new entity via OData HTTP POST.                   | `const result = await ui5.odata.createEntity(`                                                      |
-| `UI5-ODATA-008` | updateEntity       | Updates an existing entity via OData HTTP PATCH/PUT.        | `const result = await ui5.odata.updateEntity(`                                                      |
-| `UI5-ODATA-009` | deleteEntity       | Deletes an entity via OData HTTP DELETE.                    | `await ui5.odata.deleteEntity(`                                                                     |
-| `UI5-ODATA-010` | queryEntities      | Queries an entity set with optional OData query parameters. | `const result = await ui5.odata.queryEntities(`                                                     |
-| `UI5-ODATA-011` | callFunctionImport | Calls an OData function import.                             | `const result = await ui5.odata.callFunctionImport(`                                                |
+| ID              | Name               | Description                                                                      | Usage Example                                                                                       |
+| --------------- | ------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `UI5-ODATA-001` | getModelData       | Reads data from the OData model at the given path.                               | `const data = await ui5.odata.getModelData('/PurchaseOrders');`                                     |
+| `UI5-ODATA-002` | getModelProperty   | Reads a single property value from the OData model.                              | `const vendor = await ui5.odata.getModelProperty('/PurchaseOrders(\'4500001234\')/Vendor');`        |
+| `UI5-ODATA-003` | waitForLoad        | Waits for all pending OData requests to complete.                                | `await ui5.odata.waitForLoad({ timeout: 30000 });`                                                  |
+| `UI5-ODATA-004` | fetchCSRFToken     | Fetches a CSRF token from the OData service.                                     | `const token = await ui5.odata.fetchCSRFToken('/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV');` |
+| `UI5-ODATA-005` | getEntityCount     | Returns the $count for an entity set.                                            | `const count = await ui5.odata.getEntityCount('/PurchaseOrders/$count');`                           |
+| `UI5-ODATA-006` | hasPendingChanges  | Checks whether the OData model has unsaved changes.                              | `const pending = await ui5.odata.hasPendingChanges();`                                              |
+| `UI5-ODATA-007` | createEntity       | Creates a new entity via OData HTTP POST.                                        | `const result = await ui5.odata.createEntity(`                                                      |
+| `UI5-ODATA-008` | updateEntity       | Updates an existing entity via OData HTTP PATCH/PUT.                             | `const result = await ui5.odata.updateEntity(`                                                      |
+| `UI5-ODATA-009` | deleteEntity       | Deletes an entity via OData HTTP DELETE.                                         | `await ui5.odata.deleteEntity(`                                                                     |
+| `UI5-ODATA-010` | queryEntities      | Queries an entity set with optional OData query parameters.                      | `const result = await ui5.odata.queryEntities(`                                                     |
+| `UI5-ODATA-011` | callFunctionImport | Calls an OData function import.                                                  | `const result = await ui5.odata.callFunctionImport(`                                                |
+| `UI5-ODATA-012` | odataTest          | Standalone OData fixture providing top-level odata without the full ui5 handler. | `import { odataTest } from 'playwright-praman';`                                                    |
 
 ## navigate — FLP and in-app navigation
 

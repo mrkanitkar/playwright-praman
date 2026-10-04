@@ -2738,7 +2738,7 @@ capabilities:
     qualifiedName: visualRegression.fixture
     name: visualRegressionTest
     description: 'Visual regression fixture for screenshot comparison with FLP chrome masking.'
-    category: other
+    category: ui5
     priority: fixture
     usageExample: |
       import { visualRegressionTest } from 'playwright-praman';
@@ -2753,7 +2753,7 @@ capabilities:
     qualifiedName: visualRegression.options
     name: VisualRegressionOptions
     description: 'Options for visual regression screenshot comparison — threshold, masking, full-page capture.'
-    category: other
+    category: ui5
     priority: namespace
     usageExample: |
       const opts: VisualRegressionOptions = { threshold: 0.1, fullPage: true };

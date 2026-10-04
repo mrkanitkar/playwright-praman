@@ -1,7 +1,7 @@
 # playwright-praman
 
 > Agent-First SAP UI5 Test Automation Plugin for Playwright. Typed UI5 control proxies,
-> AI-powered test generation, 21 Playwright fixtures, 198 capabilities across 15 categories.
+> AI-powered test generation, 21 Playwright fixtures, 201 capabilities across 15 categories.
 > Supports SAP S/4HANA, BTP, Fiori Elements. Cross-platform: Windows, macOS, Linux.
 > License: Apache-2.0
 > npm: `npm install playwright-praman` | Import: `import { test, expect } from 'playwright-praman'`
@@ -91,7 +91,7 @@ Key rules:
 - [Control Proxy](https://praman.dev/docs/guides/control-proxy): JavaScript Proxy pattern for UI5 control method forwarding
 - [Intent API](https://praman.dev/docs/guides/intent-api): Business-oriented test operations for SAP S/4HANA modules
 - [Vocabulary System](https://praman.dev/docs/guides/vocabulary-system): SAP business term resolution with fuzzy matching
-- [Capabilities & Recipes](https://praman.dev/docs/guides/capabilities-recipes): 198 capabilities across 15 categories for AI agent introspection
+- [Capabilities & Recipes](https://praman.dev/docs/guides/capabilities-recipes): 201 capabilities across 15 categories for AI agent introspection
 - [Reporters](https://praman.dev/docs/guides/reporters): ComplianceReporter and ODataTraceReporter
 - [Docker & CI/CD](https://praman.dev/docs/guides/docker-cicd): Container setup, 3-OS CI matrix, quality gates
 - [Migration from wdi5](https://praman.dev/docs/guides/migration-from-wdi5): wdi5 to Praman API mapping and migration checklist

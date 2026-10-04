@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
 > Generated: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
-> Total: 198 capabilities
+> Total: 201 capabilities
 
 ---
 
@@ -31,6 +31,8 @@
 - **selectors.serializeUI5SelectorToCSS** — Serializes a UI5Selector object into a CSS pseudo-class string. Internal selector engine utility.
 - **screencast.highlightControls** — Toggle auto-highlighting of UI5 control interactions during screencast recording (Playwright 1.60+).
 - **proxy.contextRetryDelay** — Computes the exponential-backoff delay, with jitter, for retrying after the execution context is destroyed.
+- **visualRegression.fixture** — Visual regression fixture for screenshot comparison with FLP chrome masking.
+- **visualRegression.options** — Options for visual regression screenshot comparison — threshold, masking, full-page capture.
 
 ## table — Table discovery, reading, and manipulation
 
@@ -101,6 +103,7 @@
 - **ui5.odata.deleteEntity** — Deletes an entity via OData HTTP DELETE.
 - **ui5.odata.queryEntities** — Queries an entity set with optional OData query parameters.
 - **ui5.odata.callFunctionImport** — Calls an OData function import.
+- **odata.fixture** — Standalone OData fixture providing top-level odata without the full ui5 handler.
 
 ## navigate — FLP and in-app navigation
 
