@@ -167,7 +167,7 @@
     "generate:agent-assets": "tsx scripts/generate-agent-assets.ts",
     "validate:agent-assets": "tsx scripts/generate-agent-assets.ts --check",
     "smoke:init": "tsx scripts/smoke-init.ts",
-    "validate:generated": "npm run generate:capabilities -- --check && npm run generate:skill-md -- --check"
+    "validate:generated": "npm run generate:capabilities -- --check && npm run generate:skill-md -- --check && npm run generate:llms-txt -- --check"
   },
   "dependencies": {
     "commander": "15.0.0",
