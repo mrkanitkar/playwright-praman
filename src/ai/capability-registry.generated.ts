@@ -24,7 +24,7 @@ import type { CapabilityEntry } from './schemas/capability.schema.js';
  * Static list of generated capability entries.
  *
  * @remarks
- * Generated on 2026-10-02 with 201 entries.
+ * Generated on 2026-10-02 with 215 entries.
  */
 export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
   {
@@ -2543,5 +2543,178 @@ export const GENERATED_CAPABILITIES: readonly CapabilityEntry[] = [
     registryVersion: 1,
     aiSteering:
       'Use this helper inside fixture setUp to ensure the bridge is re-injected after every full-page navigation.',
+  },
+  {
+    id: 'UI5-INTENT-028',
+    qualifiedName: 'intent.quality.createInspectionLot',
+    name: 'createInspectionLot',
+    description: 'Creates a quality inspection lot through the Fiori UI.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.quality.createInspectionLot({ Material: 'MAT-001', Plant: '1000' });",
+    registryVersion: 1,
+    intent: 'Create a quality inspection lot.',
+    sapModule: 'QM',
+  },
+  {
+    id: 'UI5-INTENT-029',
+    qualifiedName: 'intent.quality.recordResults',
+    name: 'recordResults',
+    description: 'Records inspection results for a quality inspection lot.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.quality.recordResults({ InspectionLot: '1000000001', ResultValue: 'Pass' });",
+    registryVersion: 1,
+    intent: 'Record inspection results for a quality inspection lot.',
+    sapModule: 'QM',
+  },
+  {
+    id: 'UI5-INTENT-030',
+    qualifiedName: 'intent.quality.createQualityNotification',
+    name: 'createQualityNotification',
+    description: 'Creates a quality notification for a defect or complaint.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.quality.createQualityNotification({ NotificationType: 'Q1', Description: 'Surface defect' });",
+    registryVersion: 1,
+    intent: 'Create a quality notification for a defect or complaint.',
+    sapModule: 'QM',
+  },
+  {
+    id: 'UI5-INTENT-031',
+    qualifiedName: 'intent.warehouse.createGoodsMovement',
+    name: 'createGoodsMovement',
+    description: 'Creates a goods movement (receipt, issue, or transfer) through the Fiori UI.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.warehouse.createGoodsMovement({ MovementType: '101', Material: 'MAT-001', Plant: '1000' });",
+    registryVersion: 1,
+    intent: 'Create a goods movement.',
+    sapModule: 'WM',
+  },
+  {
+    id: 'UI5-INTENT-032',
+    qualifiedName: 'intent.warehouse.createTransferOrder',
+    name: 'createTransferOrder',
+    description: 'Creates a warehouse transfer order through the Fiori UI.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.warehouse.createTransferOrder({ WarehouseNumber: '100', Material: 'MAT-001' });",
+    registryVersion: 1,
+    intent: 'Create a warehouse transfer order.',
+    sapModule: 'WM',
+  },
+  {
+    id: 'UI5-INTENT-033',
+    qualifiedName: 'intent.assetManagement.acquireAsset',
+    name: 'acquireAsset',
+    description: 'Acquires a fixed asset through the Fiori UI.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.assetManagement.acquireAsset({ Description: 'Office Equipment', AssetClass: '3100' });",
+    registryVersion: 1,
+    intent: 'Acquire a fixed asset.',
+    sapModule: 'AM',
+  },
+  {
+    id: 'UI5-INTENT-034',
+    qualifiedName: 'intent.assetManagement.retireAsset',
+    name: 'retireAsset',
+    description: 'Retires a fixed asset through the Fiori UI.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.assetManagement.retireAsset({ AssetNumber: '000000001000', CompanyCode: '1000' });",
+    registryVersion: 1,
+    intent: 'Retire a fixed asset.',
+    sapModule: 'AM',
+  },
+  {
+    id: 'UI5-INTENT-035',
+    qualifiedName: 'intent.assetManagement.transferAsset',
+    name: 'transferAsset',
+    description: 'Transfers a fixed asset to a new cost center or company code.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.assetManagement.transferAsset({ AssetNumber: '000000001000', TargetCostCenter: '2000' });",
+    registryVersion: 1,
+    intent: 'Transfer a fixed asset.',
+    sapModule: 'AM',
+  },
+  {
+    id: 'UI5-INTENT-036',
+    qualifiedName: 'intent.hr.createEmployee',
+    name: 'createEmployee',
+    description: 'Creates an employee master record through the Fiori UI.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.hr.createEmployee({ FirstName: 'John', LastName: 'Doe', PersonnelArea: '1000' });",
+    registryVersion: 1,
+    intent: 'Create an employee master record.',
+    sapModule: 'HR',
+  },
+  {
+    id: 'UI5-INTENT-037',
+    qualifiedName: 'intent.hr.recordTime',
+    name: 'recordTime',
+    description: 'Records a time entry for an employee.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.hr.recordTime({ EmployeeId: '00001234', Date: '2026-01-15', Hours: 8 });",
+    registryVersion: 1,
+    intent: 'Record a time entry for an employee.',
+    sapModule: 'HR',
+  },
+  {
+    id: 'UI5-INTENT-038',
+    qualifiedName: 'intent.hr.requestAbsence',
+    name: 'requestAbsence',
+    description: 'Submits an absence/leave request for an employee.',
+    category: 'intent',
+    priority: 'fixture',
+    usageExample:
+      "await intent.hr.requestAbsence({ EmployeeId: '00001234', AbsenceType: 'Vacation', StartDate: '2026-07-01', EndDate: '2026-07-14' });",
+    registryVersion: 1,
+    intent: 'Submit an absence request for an employee.',
+    sapModule: 'HR',
+  },
+  {
+    id: 'UI5-DATA-006',
+    qualifiedName: 'cli.scaffold.globalTeardownTemplate',
+    name: 'GLOBAL_TEARDOWN_TEMPLATE',
+    description: 'Scaffold template for a Playwright global teardown file.',
+    category: 'data',
+    priority: 'implementation',
+    usageExample: "import { GLOBAL_TEARDOWN_TEMPLATE } from 'playwright-praman';",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATA-007',
+    qualifiedName: 'cli.scaffold.masterDataHelperTemplate',
+    name: 'MASTER_DATA_HELPER_TEMPLATE',
+    description: 'Scaffold template for a master-data test helper module.',
+    category: 'data',
+    priority: 'implementation',
+    usageExample: "import { MASTER_DATA_HELPER_TEMPLATE } from 'playwright-praman';",
+    registryVersion: 1,
+  },
+  {
+    id: 'UI5-DATA-008',
+    qualifiedName: 'cli.scaffold.playwrightWorkflowTemplate',
+    name: 'PLAYWRIGHT_WORKFLOW_TEMPLATE',
+    description: 'Scaffold template for a GitHub Actions Playwright CI workflow.',
+    category: 'data',
+    priority: 'implementation',
+    usageExample: "import { PLAYWRIGHT_WORKFLOW_TEMPLATE } from 'playwright-praman';",
+    registryVersion: 1,
   },
 ] as const;

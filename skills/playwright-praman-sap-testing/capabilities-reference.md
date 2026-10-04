@@ -1,7 +1,7 @@
 # Praman Capabilities Reference (Agent)
 
 > Generated: 2026-10-02 — do not edit manually, run `npm run generate:capabilities`
-> Total: 201 capabilities
+> Total: 215 capabilities
 
 ---
 
@@ -185,6 +185,17 @@
 - **intent.masterData.createVendorMaster** — Creates a vendor master record through the Fiori UI.
 - **intent.masterData.createCustomerMaster** — Creates a customer master record through the Fiori UI.
 - **intent.masterData.createMaterialMaster** — Creates a material master record through the Fiori UI.
+- **intent.quality.createInspectionLot** — Creates a quality inspection lot through the Fiori UI.
+- **intent.quality.recordResults** — Records inspection results for a quality inspection lot.
+- **intent.quality.createQualityNotification** — Creates a quality notification for a defect or complaint.
+- **intent.warehouse.createGoodsMovement** — Creates a goods movement (receipt, issue, or transfer) through the Fiori UI.
+- **intent.warehouse.createTransferOrder** — Creates a warehouse transfer order through the Fiori UI.
+- **intent.assetManagement.acquireAsset** — Acquires a fixed asset through the Fiori UI.
+- **intent.assetManagement.retireAsset** — Retires a fixed asset through the Fiori UI.
+- **intent.assetManagement.transferAsset** — Transfers a fixed asset to a new cost center or company code.
+- **intent.hr.createEmployee** — Creates an employee master record through the Fiori UI.
+- **intent.hr.recordTime** — Records a time entry for an employee.
+- **intent.hr.requestAbsence** — Submits an absence/leave request for an employee.
 
 ## shell — SAP Shell header interactions
 
@@ -250,3 +261,6 @@
 - **testData.cleanup** — Cleans up all test data files created during the test session.
 - **webStorage.fixture** — Playwright fixture exposing localStorage and sessionStorage helpers for the page under test.
 - **webStorage.helper** — Reads, writes, seeds and inspects a single browser storage area (Playwright 1.61+).
+- **cli.scaffold.globalTeardownTemplate** — Scaffold template for a Playwright global teardown file.
+- **cli.scaffold.masterDataHelperTemplate** — Scaffold template for a master-data test helper module.
+- **cli.scaffold.playwrightWorkflowTemplate** — Scaffold template for a GitHub Actions Playwright CI workflow.

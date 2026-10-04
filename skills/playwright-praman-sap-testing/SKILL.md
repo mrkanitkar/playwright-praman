@@ -170,11 +170,39 @@ ui5Clock
 ui5Wait
   waitForControlState(locator, predicate, options?)
 
+odata
+  odataTest()
+
+visualRegression
+  visualRegressionTest(), VisualRegressionOptions()
+
 ui5Diagnostics
   collectPageDiagnostics(page)
 
 fixtures
   attachBridgeNavigationReset(page, logger?)
+
+intent.quality
+  createInspectionLot(ui5, ui5Nav, vocabulary, input, options?),
+  recordResults(ui5, ui5Nav, vocabulary, input, options?),
+  createQualityNotification(ui5, ui5Nav, vocabulary, input, options?)
+
+intent.warehouse
+  createGoodsMovement(ui5, ui5Nav, vocabulary, input, options?),
+  createTransferOrder(ui5, ui5Nav, vocabulary, input, options?)
+
+intent.assetManagement
+  acquireAsset(ui5, ui5Nav, vocabulary, input, options?),
+  retireAsset(ui5, ui5Nav, vocabulary, input, options?),
+  transferAsset(ui5, ui5Nav, vocabulary, input, options?)
+
+intent.hr
+  createEmployee(ui5, ui5Nav, vocabulary, input, options?),
+  recordTime(ui5, ui5Nav, vocabulary, input, options?),
+  requestAbsence(ui5, ui5Nav, vocabulary, input, options?)
+
+cli.scaffold
+  GLOBAL_TEARDOWN_TEMPLATE(), MASTER_DATA_HELPER_TEMPLATE(), PLAYWRIGHT_WORKFLOW_TEMPLATE()
 ```
 
 <!-- praman:generated:capabilities end -->
