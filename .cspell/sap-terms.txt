@@ -53,6 +53,9 @@ Perso
 ushell
 
 # SAP transaction codes & tables
+ABAVN
+ABUMN
+ABZON
 EKKO
 EKPO
 MINBE
@@ -88,6 +91,8 @@ MAINT
 
 # SAP Fiori / FLP
 floorplan
+TCODE
+tcode
 floorplans
 Floorplans
 walkme
@@ -129,6 +134,7 @@ papi
 
 # SAP example data
 Globex
+Mustermann
 vendro
 Tricentis
 Veri

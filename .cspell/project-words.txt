@@ -32,6 +32,9 @@ blocklist
 camelcase
 categorisation
 categorise
+colour
+Colour
+customises
 certuser
 checkmark
 cicd
@@ -117,6 +120,7 @@ nocol
 nodenext
 NodeSDK
 normalised
+organisation
 npmjs
 opencode
 opentelemetry
@@ -131,6 +135,7 @@ pclick
 pcontrol
 pfill
 pino
+prio
 playwright-praman
 postmessage
 praman
@@ -146,6 +151,7 @@ Pydantic
 pytest
 QTEST
 readymade
+Recognised
 recordreplay
 recordreply
 redaction
@@ -158,6 +164,7 @@ SAPGUI
 sapmbutton
 sbom
 scaffolder
+sched
 screencast
 screencasts
 scriptable
