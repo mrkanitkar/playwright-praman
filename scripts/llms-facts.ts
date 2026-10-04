@@ -37,10 +37,20 @@ export class DerivationError extends Error {
   }
 }
 
-/** Numbers quoted in `llms.txt`, each derived from its defining source. */
+/**
+ * Numbers quoted in `llms.txt`, each derived from its defining source.
+ *
+ * @remarks
+ * Deliberately excludes the package version. Both artifacts used to stamp it,
+ * and that made them unpublishable: `canary.yml` runs
+ * `npm version <x>-alpha.N` and *then* publishes, `prepublishOnly` runs
+ * `npm run ci`, and the committed bytes no longer matched the stamped version —
+ * so the drift gate correctly failed and the canary never shipped. A
+ * checked-in, byte-gated artifact cannot carry a value that publishing
+ * rewrites. The version belongs in `package.json`, which consumers already
+ * have.
+ */
 export interface PramanFacts {
-  /** Package version from `package.json`. */
-  readonly version: string;
   /** Rows in the `fixtures.md` Fixture Summary table. */
   readonly fixtures: number;
   /** Rows in the `fixtures.md` Auto-Fixtures table. */
@@ -128,7 +138,6 @@ interface CapabilitiesManifest {
 }
 
 interface PackageManifest {
-  readonly version: string;
   readonly exports: Readonly<Record<string, unknown>>;
 }
 
@@ -169,7 +178,6 @@ export async function deriveFacts(root: string): Promise<PramanFacts> {
   const entries = caps.capabilities ?? [];
 
   const facts: PramanFacts = {
-    version: pkg.version,
     fixtures: countTableRows(fixturesDoc, '## Fixture Summary'),
     autoFixtures: countTableRows(fixturesDoc, '## Auto-Fixtures'),
     capabilities: entries.length,

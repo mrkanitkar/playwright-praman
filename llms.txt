@@ -3,7 +3,7 @@
 > Agent-First SAP UI5 Test Automation Plugin for Playwright. Typed UI5 control proxies,
 > AI-powered test generation, 21 Playwright fixtures, 198 capabilities across 15 categories.
 > Supports SAP S/4HANA, BTP, Fiori Elements. Cross-platform: Windows, macOS, Linux.
-> Version: 1.3.5 | License: Apache-2.0
+> License: Apache-2.0
 > npm: `npm install playwright-praman` | Import: `import { test, expect } from 'playwright-praman'`
 
 ## Docs

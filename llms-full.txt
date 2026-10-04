@@ -1,7 +1,7 @@
 # playwright-praman
 
 > Agent-First SAP UI5 Test Automation Plugin for Playwright.
-> Version: 1.3.5 | License: Apache-2.0
+> License: Apache-2.0
 > Install: npm install playwright-praman @playwright/test
 > Import: import { test, expect } from 'playwright-praman'
 > Generated from source docs and API reports — do not edit by hand.

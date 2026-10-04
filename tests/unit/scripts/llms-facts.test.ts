@@ -41,15 +41,6 @@ import { deriveFacts, findBrokenDocLinks } from '../../../scripts/llms-facts.js'
 const ROOT = resolve(import.meta.dirname, '../../..');
 
 describe('deriveFacts', () => {
-  it('reads the version from package.json', async () => {
-    const facts = await deriveFacts(ROOT);
-    const pkg = JSON.parse(await readFile(resolve(ROOT, 'package.json'), 'utf8')) as {
-      version: string;
-    };
-
-    expect(facts.version).toBe(pkg.version);
-  });
-
   it('counts capabilities and categories from capabilities.yaml', async () => {
     const facts = await deriveFacts(ROOT);
     const manifest = parseYaml(await readFile(resolve(ROOT, 'capabilities.yaml'), 'utf8')) as {
@@ -190,6 +181,29 @@ describe('the shipped llms.txt', () => {
     expect(index).toContain(`${String(facts.capabilities)} capabilities`);
     expect(index).toContain(`${String(facts.errorCodes)} error codes`);
     expect(index).toContain(`${String(facts.errorClasses)} error classes`);
-    expect(index).toContain(`Version: ${facts.version}`);
+  });
+
+  it('carries no version stamp, so publishing cannot invalidate it', async () => {
+    // Regression guard for a canary publish that failed outright. `canary.yml`
+    // runs `npm version <next>-alpha.N` and then publishes; `prepublishOnly`
+    // runs `npm run ci`; and the committed bytes no longer matched the stamped
+    // version, so the gate failed and nothing shipped. Any value that
+    // publishing rewrites must stay out of a checked-in, byte-gated artifact.
+    const [index, full] = await Promise.all([
+      readFile(resolve(ROOT, 'llms.txt'), 'utf8'),
+      readFile(resolve(ROOT, 'llms-full.txt'), 'utf8'),
+    ]);
+
+    for (const [name, content] of [
+      ['llms.txt', index],
+      ['llms-full.txt', full],
+    ] as const) {
+      // The generated header only; the API report body legitimately mentions
+      // version numbers in TSDoc (e.g. "Added in v1.62").
+      const header = content.slice(0, 600);
+      expect(header, `${name} header must not stamp a version`).not.toMatch(
+        /Version:\s*\d+\.\d+\.\d+/u,
+      );
+    }
   });
 });

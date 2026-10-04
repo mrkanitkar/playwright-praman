@@ -435,7 +435,7 @@ function buildIndex(facts: PramanFacts): string {
       `${String(facts.capabilities)} capabilities across ` +
       `${String(facts.capabilityCategories)} categories.`,
     '> Supports SAP S/4HANA, BTP, Fiori Elements. Cross-platform: Windows, macOS, Linux.',
-    `> Version: ${facts.version} | License: Apache-2.0`,
+    '> License: Apache-2.0',
     '> npm: `npm install playwright-praman` | ' +
       "Import: `import { test, expect } from 'playwright-praman'`",
     '',
@@ -513,7 +513,7 @@ async function main(): Promise<void> {
     '# playwright-praman',
     '',
     '> Agent-First SAP UI5 Test Automation Plugin for Playwright.',
-    `> Version: ${facts.version} | License: Apache-2.0`,
+    '> License: Apache-2.0',
     '> Install: npm install playwright-praman @playwright/test',
     "> Import: import { test, expect } from 'playwright-praman'",
     '> Generated from source docs and API reports — do not edit by hand.',
