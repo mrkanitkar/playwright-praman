@@ -14,3 +14,9 @@ CHANGELOG.md
 agents/
 seeds/
 skills/praman-sap-cli/
+
+# API Extractor's report, for the same reason. lint-staged runs
+# `prettier --write` over *.md, so committing it reformatted the file that
+# `validate:api-report` then regenerates unformatted — permanent false drift,
+# and the freshness gate could never go green.
+api-reports/
