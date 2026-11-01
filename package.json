@@ -174,7 +174,7 @@
     "css-selector-parser": "3.3.0",
     "fontoxpath": "3.34.0",
     "pino": "10.4.0",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.78.0",
